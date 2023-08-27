@@ -1,18 +1,27 @@
 import { createEventSignal } from '@solid-primitives/event-listener'
 import { createReconnectingWS } from '@solid-primitives/websocket'
 import {
+  IconSortAscending,
+  IconSortDescending,
+  IconX,
+} from '@tabler/icons-solidjs'
+import {
   ColumnDef,
+  SortingState,
   createSolidTable,
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
 } from '@tanstack/solid-table'
 import byteSize from 'byte-size'
 import { isIPv6 } from 'is-ip'
 import { For, createSignal } from 'solid-js'
-import { secret, wsEndpointURL } from '~/signals'
+import { twMerge } from 'tailwind-merge'
+import { secret, useRequest, wsEndpointURL } from '~/signals'
 import type { Connection } from '~/types'
 
 export const Connections = () => {
+  const request = useRequest()
   const [search, setSearch] = createSignal('')
 
   const ws = createReconnectingWS(
@@ -35,7 +44,34 @@ export const Connections = () => {
     ).connections.slice(-100)
   }
 
+  const onCloseConnection = (id: string) => request.delete(`connections/${id}`)
+
+  const [sorting, setSorting] = createSignal<SortingState>([])
+
   const columns: ColumnDef<Connection>[] = [
+    {
+      id: 'close',
+      header: () => (
+        <div class="flex h-full items-center">
+          <button
+            class="btn btn-circle btn-outline btn-xs"
+            onClick={() => request.delete('connections')}
+          >
+            <IconX />
+          </button>
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div class="flex h-full items-center">
+          <button
+            class="btn btn-circle btn-outline btn-xs"
+            onClick={() => onCloseConnection(row.id)}
+          >
+            <IconX />
+          </button>
+        </div>
+      ),
+    },
     {
       accessorKey: 'ID',
       accessorFn: (row) => row.id,
@@ -93,6 +129,11 @@ export const Connections = () => {
   ]
 
   const table = createSolidTable({
+    state: {
+      get sorting() {
+        return sorting()
+      },
+    },
     get data() {
       return search()
         ? connections().filter((connection) =>
@@ -105,6 +146,8 @@ export const Connections = () => {
         : connections()
     },
     columns,
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
     getCoreRowModel: getCoreRowModel(),
   })
 
@@ -125,12 +168,26 @@ export const Connections = () => {
                   <For each={headerGroup.headers}>
                     {(header) => (
                       <th>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
+                        <div
+                          class={twMerge(
+                            'flex items-center justify-between',
+                            header.column.getCanSort() &&
+                              'cursor-pointer select-none',
+                          )}
+                          onClick={header.column.getToggleSortingHandler()}
+                        >
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
+
+                          {{
+                            asc: <IconSortAscending />,
+                            desc: <IconSortDescending />,
+                          }[header.column.getIsSorted() as string] ?? null}
+                        </div>
                       </th>
                     )}
                   </For>
