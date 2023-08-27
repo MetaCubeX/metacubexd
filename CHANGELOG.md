@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/MetaCubeX/metacubexd/compare/v1.3.0...v1.4.0) (2023-08-27)
+
+
+### Features
+
+* **connections:** add sorting and close connection support ([45c9740](https://github.com/MetaCubeX/metacubexd/commit/45c9740d3bee08e8cf874c3d866b9c9c3249a26e))
+
 ## [1.3.0](https://github.com/MetaCubeX/metacubexd/compare/v1.2.0...v1.3.0) (2023-08-27)
 
 
