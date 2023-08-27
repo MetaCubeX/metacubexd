@@ -2,7 +2,7 @@
 
 Clash-Meta Dashboard
 
-![Alt text](docs/image.png)
+![preview](docs/preview.webp)
 
 ## Usage
 
