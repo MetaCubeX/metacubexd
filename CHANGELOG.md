@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/MetaCubeX/metacubexd/compare/v1.0.2...v1.0.3) (2023-08-27)
+
+
+### Bug Fixes
+
+* publish zip instead of assets ([f7ee4f7](https://github.com/MetaCubeX/metacubexd/commit/f7ee4f7faa362afa60487f90b2ddae051f85b535))
+
 ## [1.0.2](https://github.com/MetaCubeX/metacubexd/compare/v1.0.1...v1.0.2) (2023-08-27)
 
 
