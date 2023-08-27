@@ -2,7 +2,7 @@
 import 'solid-devtools'
 import { render } from 'solid-js/web'
 
-import { Router } from '@solidjs/router'
+import { Router, hashIntegration } from '@solidjs/router'
 import { App } from './App'
 import './index.css'
 
@@ -10,7 +10,7 @@ const root = document.getElementById('root')
 
 render(
   () => (
-    <Router>
+    <Router source={hashIntegration()}>
       <App />
     </Router>
   ),
