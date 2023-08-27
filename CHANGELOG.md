@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/MetaCubeX/metacubexd/compare/v1.1.0...v1.2.0) (2023-08-27)
+
+
+### Features
+
+* update proxies page layout ([54e5e1f](https://github.com/MetaCubeX/metacubexd/commit/54e5e1fc2407eff607b6225a957a13258164584c))
+
 ## [1.1.0](https://github.com/MetaCubeX/metacubexd/compare/v1.0.3...v1.1.0) (2023-08-27)
 
 
