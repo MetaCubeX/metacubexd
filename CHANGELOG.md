@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/MetaCubeX/metacubexd/compare/v1.0.0...v1.0.1) (2023-08-27)
+
+
+### Bug Fixes
+
+* publish issue ([a3897da](https://github.com/MetaCubeX/metacubexd/commit/a3897da0f631c12612ff8eb945cad5c9ab6eef24))
+
 ## 1.0.0 (2023-08-27)
 
 
