@@ -23,35 +23,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-type: node
 
-  gh-pages:
-    needs: release-please
-    runs-on: ubuntu-latest
-    if: ${{ needs.release-please.outputs.release_created }}
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: pnpm/action-setup@v2
-        with:
-          version: latest
-
-      - uses: actions/setup-node@v3
-        with:
-          cache: pnpm
-          node-version: latest
-
-      - name: build
-        env:
-          PUBLIC_PATH: '/metacubexd'
-        run: |
-          pnpm install
-          pnpm build
-
-      - name: Publish Github Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-
   release:
     needs: release-please
     runs-on: ubuntu-latest
@@ -68,10 +39,22 @@ jobs:
           cache: pnpm
           node-version: latest
 
-      - name: build
-        run: |
-          pnpm install
-          pnpm build
+      - name: install dependencies
+        run: pnpm install
+
+      - name: build for gh-pages
+        env:
+          PUBLIC_PATH: '/metacubexd'
+        run: pnpm build
+
+      - name: publish github pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+
+      - name: build for release
+        run: pnpm build
 
       - name: zip
         run: |
