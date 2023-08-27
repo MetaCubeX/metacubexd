@@ -1,7 +1,7 @@
 {
-  "name": "vite-template-solid",
+  "name": "metacubexd",
   "version": "0.0.0",
-  "description": "",
+  "description": "clash-meta dashboard with daemon built in",
   "license": "MIT",
   "type": "module",
   "scripts": {
