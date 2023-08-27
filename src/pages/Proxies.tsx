@@ -22,11 +22,11 @@ export const Proxies = () => {
   })
 
   return (
-    <div class="flex flex-col">
+    <div class="flex flex-col gap-4">
       <div>
-        <h1 class="py-4 text-lg font-semibold">Proxies</h1>
+        <h1 class="pb-4 text-lg font-semibold">Proxies</h1>
 
-        <div class="grid grid-cols-4 gap-2">
+        <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
           <For each={proxies()}>
             {(proxy) => (
               <div class="card card-bordered card-compact border-secondary p-4">
@@ -38,9 +38,9 @@ export const Proxies = () => {
       </div>
 
       <div>
-        <h1 class="py-4 text-lg font-semibold">Proxy Providers</h1>
+        <h1 class="pb-4 text-lg font-semibold">Proxy Providers</h1>
 
-        <div class="grid grid-cols-4 gap-2">
+        <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
           <For each={proxyProviders()}>
             {(proxy) => (
               <div class="card card-bordered card-compact border-secondary p-4">
