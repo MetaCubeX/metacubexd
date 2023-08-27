@@ -1,13 +1,13 @@
 import { createEventSignal } from '@solid-primitives/event-listener'
 import { createReconnectingWS } from '@solid-primitives/websocket'
 import { For, createEffect, createSignal } from 'solid-js'
-import { wsEndpointURL } from '~/signals'
+import { secret, wsEndpointURL } from '~/signals'
 
 export const Logs = () => {
   const [search, setSearch] = createSignal('')
   const [logs, setLogs] = createSignal<string[]>([])
 
-  const ws = createReconnectingWS(`${wsEndpointURL()}/logs`)
+  const ws = createReconnectingWS(`${wsEndpointURL()}/logs?token=${secret()}`)
 
   const messageEvent = createEventSignal<{
     message: WebSocketEventMap['message']

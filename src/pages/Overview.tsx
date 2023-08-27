@@ -4,7 +4,7 @@ import { ApexOptions } from 'apexcharts'
 import byteSize from 'byte-size'
 import { SolidApexCharts } from 'solid-apexcharts'
 import { createEffect, createMemo, createSignal } from 'solid-js'
-import { wsEndpointURL } from '~/signals'
+import { secret, wsEndpointURL } from '~/signals'
 import type { Connection } from '~/types'
 
 const defaultChartOptions: ApexOptions = {
@@ -40,7 +40,9 @@ export const Overview = () => {
   )
   const [memories, setMemories] = createSignal<number[]>([])
 
-  const trafficWS = createReconnectingWS(`${wsEndpointURL()}/traffic`)
+  const trafficWS = createReconnectingWS(
+    `${wsEndpointURL()}/traffic?token=${secret()}}`,
+  )
 
   const trafficWSMessageEvent = createEventSignal<{
     message: WebSocketEventMap['message']
@@ -76,7 +78,9 @@ export const Overview = () => {
     },
   ])
 
-  const memoryWS = createReconnectingWS(`${wsEndpointURL()}/memory`)
+  const memoryWS = createReconnectingWS(
+    `${wsEndpointURL()}/memory?token=${secret()}`,
+  )
 
   const memoryWSMessageEvent = createEventSignal<{
     message: WebSocketEventMap['message']
@@ -108,7 +112,9 @@ export const Overview = () => {
     },
   ])
 
-  const connectionsWS = createReconnectingWS(`${wsEndpointURL()}/connections`)
+  const connectionsWS = createReconnectingWS(
+    `${wsEndpointURL()}/connections?token=${secret()}}`,
+  )
 
   const connectionsWSMessageEvent = createEventSignal<{
     message: WebSocketEventMap['message']

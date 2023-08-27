@@ -9,13 +9,15 @@ import {
 import byteSize from 'byte-size'
 import { isIPv6 } from 'is-ip'
 import { For, createSignal } from 'solid-js'
-import { wsEndpointURL } from '~/signals'
+import { secret, wsEndpointURL } from '~/signals'
 import type { Connection } from '../types'
 
 export const Connections = () => {
   const [search, setSearch] = createSignal('')
 
-  const ws = createReconnectingWS(`${wsEndpointURL()}/connections`)
+  const ws = createReconnectingWS(
+    `${wsEndpointURL()}/connections?token=${secret()}`,
+  )
 
   const messageEvent = createEventSignal<{
     message: WebSocketEventMap['message']

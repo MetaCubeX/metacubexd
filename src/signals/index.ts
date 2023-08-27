@@ -30,6 +30,8 @@ export const [curTheme, setCurTheme] = makePersisted(
 export const endpoint = () =>
   endpointList().find(({ id }) => id === selectedEndpoint())
 
+export const secret = () => endpoint()?.secret
+
 export const wsEndpointURL = () => endpoint()?.url.replace('http', 'ws')
 
 export const useRequest = () => {
