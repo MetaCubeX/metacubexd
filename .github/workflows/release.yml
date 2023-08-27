@@ -1,3 +1,5 @@
+name: release
+
 on:
   push:
     branches: main
@@ -47,3 +49,9 @@ jobs:
         with:
           files: dist/*
           tag_name: ${{ needs.release-please.outputs.tag_name }}
+
+      - name: Publish Github Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
