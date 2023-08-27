@@ -1,6 +1,6 @@
 import { For, createSignal, onMount } from 'solid-js'
 import { useRequest } from '~/signals'
-import { Proxy, ProxyProvider } from '~/types'
+import type { Proxy, ProxyProvider } from '~/types'
 
 export const Proxies = () => {
   const request = useRequest()

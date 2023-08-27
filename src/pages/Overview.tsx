@@ -3,7 +3,14 @@ import { createReconnectingWS } from '@solid-primitives/websocket'
 import { ApexOptions } from 'apexcharts'
 import byteSize from 'byte-size'
 import { SolidApexCharts } from 'solid-apexcharts'
-import { createEffect, createMemo, createSignal } from 'solid-js'
+import {
+  JSX,
+  ParentComponent,
+  children,
+  createEffect,
+  createMemo,
+  createSignal,
+} from 'solid-js'
 import { secret, wsEndpointURL } from '~/signals'
 import type { Connection } from '~/types'
 
@@ -33,6 +40,15 @@ const defaultChartOptions: ApexOptions = {
     },
   },
 }
+
+const TrafficWidget: ParentComponent<{ label: JSX.Element }> = (props) => (
+  <div class="stat">
+    <div class="stat-title text-secondary-content">{props.label}</div>
+    <div class="stat-value text-primary-content">
+      {children(() => props.children)()}
+    </div>
+  </div>
+)
 
 export const Overview = () => {
   const [traffics, setTraffics] = createSignal<{ down: number; up: number }[]>(
@@ -134,45 +150,30 @@ export const Overview = () => {
 
   return (
     <div class="flex flex-col gap-4">
-      <div class="stats w-full bg-primary shadow">
-        <div class="stat">
-          <div class="stat-title text-secondary-content">Upload</div>
-          <div class="stat-value text-primary-content">
-            {byteSize(traffic()?.up || 0).toString()}/s
-          </div>
-        </div>
-        <div class="stat">
-          <div class="stat-title text-secondary-content">Download</div>
-          <div class="stat-value text-primary-content">
-            {byteSize(traffic()?.down || 0).toString()}/s
-          </div>
-        </div>
-        <div class="stat">
-          <div class="stat-title text-secondary-content">Upload Total</div>
-          <div class="stat-value text-primary-content">
-            {byteSize(connection()?.uploadTotal || 0).toString()}
-          </div>
-        </div>
-        <div class="stat">
-          <div class="stat-title text-secondary-content">Download Total</div>
-          <div class="stat-value text-primary-content">
-            {byteSize(connection()?.downloadTotal || 0).toString()}
-          </div>
-        </div>
-        <div class="stat">
-          <div class="stat-title text-secondary-content">
-            Active Connections
-          </div>
-          <div class="stat-value text-primary-content">
-            {connection()?.connections.length || 0}
-          </div>
-        </div>
-        <div class="stat">
-          <div class="stat-title text-secondary-content">Memory Usage</div>
-          <div class="stat-value text-primary-content">
-            {byteSize(memory() || 0).toString()}
-          </div>
-        </div>
+      <div class="stats stats-vertical w-full bg-primary shadow sm:stats-horizontal">
+        <TrafficWidget label="Upload">
+          {byteSize(traffic()?.up || 0).toString()}/s
+        </TrafficWidget>
+
+        <TrafficWidget label="Download">
+          {byteSize(traffic()?.down || 0).toString()}/s
+        </TrafficWidget>
+
+        <TrafficWidget label="Upload Total">
+          {byteSize(connection()?.uploadTotal || 0).toString()}
+        </TrafficWidget>
+
+        <TrafficWidget label="Download Total">
+          {byteSize(connection()?.downloadTotal || 0).toString()}
+        </TrafficWidget>
+
+        <TrafficWidget label="Active Connections">
+          {connection()?.connections.length || 0}
+        </TrafficWidget>
+
+        <TrafficWidget label="Memory Usage">
+          {byteSize(memory() || 0).toString()}
+        </TrafficWidget>
       </div>
 
       <div class="mx-auto grid w-full max-w-screen-lg grid-cols-1 gap-4">
