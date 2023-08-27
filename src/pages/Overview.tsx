@@ -134,38 +134,44 @@ export const Overview = () => {
 
   return (
     <div class="flex flex-col gap-4">
-      <div class="stats w-full shadow">
+      <div class="stats w-full bg-primary shadow">
         <div class="stat">
-          <div class="stat-title">Upload</div>
-          <div class="stat-value">
+          <div class="stat-title text-secondary-content">Upload</div>
+          <div class="stat-value text-primary-content">
             {byteSize(traffic()?.up || 0).toString()}/s
           </div>
         </div>
         <div class="stat">
-          <div class="stat-title">Download</div>
-          <div class="stat-value">
+          <div class="stat-title text-secondary-content">Download</div>
+          <div class="stat-value text-primary-content">
             {byteSize(traffic()?.down || 0).toString()}/s
           </div>
         </div>
         <div class="stat">
-          <div class="stat-title">Upload Total</div>
-          <div class="stat-value">
+          <div class="stat-title text-secondary-content">Upload Total</div>
+          <div class="stat-value text-primary-content">
             {byteSize(connection()?.uploadTotal || 0).toString()}
           </div>
         </div>
         <div class="stat">
-          <div class="stat-title">Download Total</div>
-          <div class="stat-value">
+          <div class="stat-title text-secondary-content">Download Total</div>
+          <div class="stat-value text-primary-content">
             {byteSize(connection()?.downloadTotal || 0).toString()}
           </div>
         </div>
         <div class="stat">
-          <div class="stat-title">Active Connections</div>
-          <div class="stat-value">{connection()?.connections.length || 0}</div>
+          <div class="stat-title text-secondary-content">
+            Active Connections
+          </div>
+          <div class="stat-value text-primary-content">
+            {connection()?.connections.length || 0}
+          </div>
         </div>
         <div class="stat">
-          <div class="stat-title">Memory Usage</div>
-          <div class="stat-value">{byteSize(memory() || 0).toString()}</div>
+          <div class="stat-title text-secondary-content">Memory Usage</div>
+          <div class="stat-value text-primary-content">
+            {byteSize(memory() || 0).toString()}
+          </div>
         </div>
       </div>
 
