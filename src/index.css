@@ -2,9 +2,3 @@
 @tailwind components;
 @tailwind utilities;
 @tailwind variants;
-
-.app {
-  min-height: 100vh;
-  padding: 1rem;
-  @apply subpixel-antialiased;
-}

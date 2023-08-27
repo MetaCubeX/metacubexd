@@ -21,6 +21,8 @@ jobs:
           node-version: latest
 
       - name: build
+        env:
+          PUBLIC_PATH: /metacubexd
         run: |
           pnpm install
           pnpm build

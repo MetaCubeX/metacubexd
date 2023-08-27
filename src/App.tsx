@@ -22,7 +22,10 @@ export const App = () => {
   })
 
   return (
-    <div class="app relative" data-theme={curTheme()}>
+    <div
+      class="relative min-h-screen p-4 subpixel-antialiased"
+      data-theme={curTheme()}
+    >
       <div class="sticky inset-x-0 top-0 z-50 flex items-center rounded-md bg-base-200 px-4 py-2">
         <Show when={location.pathname !== '/setup'}>
           <Header />
