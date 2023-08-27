@@ -73,8 +73,13 @@ jobs:
           pnpm install
           pnpm build
 
+      - name: zip
+        run: |
+          zip -r ../dist.zip .
+        working-directory: dist
+
       - name: attach release artifacts
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/**
+          files: dist.zip
           tag_name: ${{ needs.release-please.outputs.tag_name }}
