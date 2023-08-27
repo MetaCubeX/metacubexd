@@ -71,9 +71,6 @@ dependencies:
   solid-devtools:
     specifier: ^0.27.7
     version: 0.27.7(solid-js@1.7.11)(vite@4.4.9)
-  solid-form-handler:
-    specifier: ^1.2.0
-    version: 1.2.0(solid-js@1.7.11)
   solid-js:
     specifier: ^1.7.11
     version: 1.7.11
@@ -1824,14 +1821,6 @@ packages:
       vite: 4.4.9(@types/node@20.5.6)
     transitivePeerDependencies:
       - supports-color
-    dev: false
-
-  /solid-form-handler@1.2.0(solid-js@1.7.11):
-    resolution: {integrity: sha512-T+bIzu9xJgfuZUrN1w7zhl8Dy8FYHZQ+iqtmmfO0dE5qerPbSRWDhSK3tykpfC7cEbW4Ts+ZfNM5IKyqiAALsg==}
-    peerDependencies:
-      solid-js: ^1
-    dependencies:
-      solid-js: 1.7.11
     dev: false
 
   /solid-js@1.7.11:
