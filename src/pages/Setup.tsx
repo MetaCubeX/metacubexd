@@ -40,13 +40,13 @@ export const Setup = () => {
     setEndpointList(endpointList().filter((e) => e.id !== id))
 
   return (
-    <div class="mx-auto flex w-2/3 flex-col items-center gap-4 py-10">
+    <div class="mx-auto flex flex-col items-center gap-4 py-10 sm:w-2/3">
       <form class="contents" use:form={form}>
-        <div class="join flex w-full">
+        <div class="flex w-full flex-col gap-4">
           <input
             name="url"
             type="url"
-            class="input join-item input-bordered flex-1"
+            class="input input-bordered"
             placeholder="http://127.0.0.1:9000"
             list="defaultEndpoints"
           />
@@ -59,7 +59,7 @@ export const Setup = () => {
             name="secret"
             type="password"
             autocomplete="new-password"
-            class="input join-item input-bordered"
+            class="input input-bordered"
             placeholder="secret"
           />
 
