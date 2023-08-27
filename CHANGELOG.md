@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/MetaCubeX/metacubexd/compare/v1.0.3...v1.1.0) (2023-08-27)
+
+
+### Features
+
+* add bg color and text color for stats ([c273169](https://github.com/MetaCubeX/metacubexd/commit/c27316967b8685e600a3af9dd7698498f838bdda))
+
 ## [1.0.3](https://github.com/MetaCubeX/metacubexd/compare/v1.0.2...v1.0.3) (2023-08-27)
 
 
