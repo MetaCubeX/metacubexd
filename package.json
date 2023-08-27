@@ -1,14 +1,13 @@
 {
   "name": "metacubexd",
   "version": "0.0.0",
-  "description": "clash-meta dashboard with daemon built in",
+  "description": "Clash-Meta Dashboard",
   "license": "MIT",
   "type": "module",
   "scripts": {
     "build": "vite build",
     "dev": "vite",
-    "serve": "vite preview",
-    "start": "vite"
+    "serve": "vite preview"
   },
   "dependencies": {
     "@felte/solid": "^1.2.10",
