@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/MetaCubeX/metacubexd/compare/v1.2.0...v1.3.0) (2023-08-27)
+
+
+### Features
+
+* show vertical stats on small screen devices ([841161a](https://github.com/MetaCubeX/metacubexd/commit/841161a0da9f753bff3d9754b29fc0a653c97af9))
+
 ## [1.2.0](https://github.com/MetaCubeX/metacubexd/compare/v1.1.0...v1.2.0) (2023-08-27)
 
 
