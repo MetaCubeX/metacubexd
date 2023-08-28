@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/MetaCubeX/metacubexd/compare/v1.4.0...v1.5.0) (2023-08-28)
+
+
+### Features
+
+* rules page ([#10](https://github.com/MetaCubeX/metacubexd/issues/10)) ([457b498](https://github.com/MetaCubeX/metacubexd/commit/457b49827dd38b61e63fd73e90a3736c956b4157))
+
 ## [1.4.0](https://github.com/MetaCubeX/metacubexd/compare/v1.3.0...v1.4.0) (2023-08-27)
 
 
