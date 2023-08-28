@@ -46,7 +46,11 @@ export const Connections = () => {
 
   const onCloseConnection = (id: string) => request.delete(`connections/${id}`)
 
-  const [sorting, setSorting] = createSignal<SortingState>([])
+  const defaultSorting = Object.freeze({
+    id: 'ID',
+    desc: true,
+  })
+  const [sorting, setSorting] = createSignal<SortingState>([defaultSorting])
 
   const columns: ColumnDef<Connection>[] = [
     {
@@ -182,7 +186,6 @@ export const Connections = () => {
                                 header.column.columnDef.header,
                                 header.getContext(),
                               )}
-
                           {{
                             asc: <IconSortAscending />,
                             desc: <IconSortDescending />,

@@ -37,7 +37,7 @@ export const Setup = () => {
         {
           id: uuid(),
           url: values.url,
-          secret: '',
+          secret: values.secret,
         },
         ...endpointList(),
       ])
