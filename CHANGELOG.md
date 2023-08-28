@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.7.0](https://github.com/MetaCubeX/metacubexd/compare/v1.6.0...v1.7.0) (2023-08-28)
+
+
+### Features
+
+* add footer ([e4bfb3f](https://github.com/MetaCubeX/metacubexd/commit/e4bfb3f2a8e22ce2e32f4cc5a4493a40e81b6f5a))
+* small size table ([9b56558](https://github.com/MetaCubeX/metacubexd/commit/9b56558f84a644fa38c87916c5761b380518c910))
+
 ## [1.6.0](https://github.com/MetaCubeX/metacubexd/compare/v1.5.0...v1.6.0) (2023-08-28)
 
 
