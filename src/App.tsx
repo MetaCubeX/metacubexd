@@ -21,12 +21,12 @@ export const App = () => {
 
   return (
     <div
-      class="relative h-screen flex-col overflow-y-auto p-4 subpixel-antialiased"
+      class="relative flex h-screen flex-col p-2 subpixel-antialiased"
       data-theme={curTheme()}
     >
       <Header />
 
-      <div class="flex-1 py-4">
+      <div class="flex-1 overflow-y-auto py-4">
         <Routes>
           <Show when={selectedEndpoint()}>
             <Route path="/" component={Overview} />
@@ -40,6 +40,12 @@ export const App = () => {
           <Route path="/setup" component={Setup} />
         </Routes>
       </div>
+
+      <footer class="footer footer-center rounded-box hidden bg-base-200 p-2 text-base-content sm:block">
+        <a href="https://github.com/metacubex/metacubexd" target="_blank">
+          metacubexd
+        </a>
+      </footer>
     </div>
   )
 }
