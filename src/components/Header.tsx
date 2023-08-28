@@ -78,7 +78,7 @@ export const Header = () => {
       <div class="drawer drawer-end w-auto sm:ml-auto">
         <input id="themes" type="checkbox" class="drawer-toggle" />
 
-        <div class="drawer-content">
+        <div class="drawer-content flex items-center">
           <label for="themes" class="btn btn-primary drawer-button btn-sm">
             <IconPalette />
           </label>
