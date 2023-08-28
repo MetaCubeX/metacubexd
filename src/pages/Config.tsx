@@ -1,9 +1,9 @@
-import { useRequest } from '~/signals'
-import { For, onMount } from 'solid-js'
-import type { Config as IConfig } from '~/types'
-import { z } from 'zod'
-import { validator } from '@felte/validator-zod'
 import { createForm } from '@felte/solid'
+import { validator } from '@felte/validator-zod'
+import { For, onMount } from 'solid-js'
+import { z } from 'zod'
+import { useRequest } from '~/signals'
+import type { Config as IConfig } from '~/types'
 
 const schema = z.object({
   port: z.number(),

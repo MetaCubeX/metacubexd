@@ -74,9 +74,12 @@ dependencies:
   prettier:
     specifier: ^3.0.2
     version: 3.0.2
+  prettier-plugin-organize-imports:
+    specifier: ^3.2.3
+    version: 3.2.3(prettier@3.0.2)(typescript@5.2.2)
   prettier-plugin-tailwindcss:
     specifier: ^0.5.3
-    version: 0.5.3(prettier@3.0.2)
+    version: 0.5.3(prettier-plugin-organize-imports@3.2.3)(prettier@3.0.2)
   solid-apexcharts:
     specifier: ^0.3.2
     version: 0.3.2(apexcharts@3.42.0)(solid-js@1.7.11)
@@ -3844,7 +3847,27 @@ packages:
       source-map-js: 1.0.2
     dev: false
 
-  /prettier-plugin-tailwindcss@0.5.3(prettier@3.0.2):
+  /prettier-plugin-organize-imports@3.2.3(prettier@3.0.2)(typescript@5.2.2):
+    resolution:
+      {
+        integrity: sha512-KFvk8C/zGyvUaE3RvxN2MhCLwzV6OBbFSkwZ2OamCrs9ZY4i5L77jQ/w4UmUr+lqX8qbaqVq6bZZkApn+IgJSg==,
+      }
+    peerDependencies:
+      '@volar/vue-language-plugin-pug': ^1.0.4
+      '@volar/vue-typescript': ^1.0.4
+      prettier: '>=2.0'
+      typescript: '>=2.9'
+    peerDependenciesMeta:
+      '@volar/vue-language-plugin-pug':
+        optional: true
+      '@volar/vue-typescript':
+        optional: true
+    dependencies:
+      prettier: 3.0.2
+      typescript: 5.2.2
+    dev: false
+
+  /prettier-plugin-tailwindcss@0.5.3(prettier-plugin-organize-imports@3.2.3)(prettier@3.0.2):
     resolution:
       {
         integrity: sha512-M5K80V21yM+CTm/FEFYRv9/9LyInYbCSXpIoPAKMm8zy89IOwdiA2e4JVbcO7tvRtAQWz32zdj7/WKcsmFyAVg==,
@@ -3900,6 +3923,7 @@ packages:
         optional: true
     dependencies:
       prettier: 3.0.2
+      prettier-plugin-organize-imports: 3.2.3(prettier@3.0.2)(typescript@5.2.2)
     dev: false
 
   /prettier@3.0.2:
