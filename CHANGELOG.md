@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.6.0](https://github.com/MetaCubeX/metacubexd/compare/v1.5.0...v1.6.0) (2023-08-28)
+
+
+### Features
+
+* update header layout ([07c82e8](https://github.com/MetaCubeX/metacubexd/commit/07c82e87d83b8117ad603857723b995f37a058f6))
+
+
+### Bug Fixes
+
+* theme icon height ([#13](https://github.com/MetaCubeX/metacubexd/issues/13)) ([2889de2](https://github.com/MetaCubeX/metacubexd/commit/2889de205f1f9f862021fed96a808bb69b207f5d))
+
 ## [1.5.0](https://github.com/MetaCubeX/metacubexd/compare/v1.4.0...v1.5.0) (2023-08-28)
 
 
