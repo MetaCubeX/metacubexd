@@ -164,7 +164,7 @@ export const Connections = () => {
       />
 
       <div class="overflow-x-auto whitespace-nowrap">
-        <table class="table">
+        <table class="table table-xs">
           <thead>
             <For each={table.getHeaderGroups()}>
               {(headerGroup) => (
@@ -202,7 +202,7 @@ export const Connections = () => {
           <tbody>
             <For each={table.getRowModel().rows}>
               {(row) => (
-                <tr>
+                <tr class="hover">
                   <For each={row.getVisibleCells()}>
                     {(cell) => (
                       <td>

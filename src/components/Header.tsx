@@ -9,60 +9,60 @@ import {
   IconRuler,
   IconSettings,
 } from '@tabler/icons-solidjs'
-import { For, Show } from 'solid-js'
+import { For, ParentComponent, Show } from 'solid-js'
 import { themes } from '~/constants'
 import { setCurTheme, setSelectedEndpoint } from '~/signals'
+
+const Nav: ParentComponent<{ href: string; tooltip: string }> = ({
+  href,
+  tooltip,
+  children,
+}) => (
+  <li>
+    <A
+      class="tooltiptooltip-bottom rounded-full"
+      href={href}
+      data-tip={tooltip}
+    >
+      {children}
+    </A>
+  </li>
+)
 
 export const Header = () => {
   const location = useLocation()
   const navigate = useNavigate()
 
   return (
-    <ul class="menu rounded-box menu-horizontal sticky left-0 top-0 z-10 flex items-center justify-center gap-2 bg-base-200 p-2">
+    <ul class="menu menu-horizontal sticky left-0 top-0 z-10 flex items-center justify-center gap-2 rounded-full bg-base-200 p-2">
       <Show when={location.pathname !== '/setup'}>
-        <li>
-          <A class="tooltip tooltip-bottom" href="/" data-tip="Home">
-            <IconHome />
-          </A>
-        </li>
+        <Nav href="/" tooltip="Overview">
+          <IconHome />
+        </Nav>
 
-        <li>
-          <A class="tooltip tooltip-bottom" href="/proxies" data-tip="Proxies">
-            <IconGlobe />
-          </A>
-        </li>
+        <Nav href="/proxies" tooltip="Proxies">
+          <IconGlobe />
+        </Nav>
 
-        <li>
-          <A class="tooltip tooltip-bottom" href="/rules" data-tip="Rules">
-            <IconRuler />
-          </A>
-        </li>
+        <Nav href="/rules" tooltip="Rules">
+          <IconRuler />
+        </Nav>
 
-        <li>
-          <A
-            class="tooltip tooltip-bottom"
-            href="/conns"
-            data-tip="Connections"
-          >
-            <IconNetwork />
-          </A>
-        </li>
+        <Nav href="/conns" tooltip="Connections">
+          <IconNetwork />
+        </Nav>
 
-        <li>
-          <A class="tooltip tooltip-bottom" href="/logs" data-tip="Logs">
-            <IconFileStack />
-          </A>
-        </li>
+        <Nav href="/logs" tooltip="Logs">
+          <IconFileStack />
+        </Nav>
 
-        <li>
-          <A class="tooltip tooltip-bottom" href="/config" data-tip="Config">
-            <IconSettings />
-          </A>
-        </li>
+        <Nav href="/config" tooltip="Config">
+          <IconSettings />
+        </Nav>
 
         <li>
           <button
-            class="tooltip tooltip-bottom"
+            class="tooltip tooltip-bottom rounded-full"
             data-tip="Switch Endpoint"
             onClick={() => {
               setSelectedEndpoint('')
@@ -79,7 +79,10 @@ export const Header = () => {
         <input id="themes" type="checkbox" class="drawer-toggle" />
 
         <div class="drawer-content flex items-center">
-          <label for="themes" class="btn btn-primary drawer-button btn-sm">
+          <label
+            for="themes"
+            class="btn btn-circle btn-primary drawer-button btn-sm"
+          >
             <IconPalette />
           </label>
         </div>
