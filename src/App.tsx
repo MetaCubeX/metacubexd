@@ -1,5 +1,6 @@
 import { Route, Routes, useNavigate } from '@solidjs/router'
 import { Show, lazy, onMount } from 'solid-js'
+import { Footer } from '~/components/Footer'
 import { Header } from '~/components/Header'
 import { curTheme, selectedEndpoint } from '~/signals'
 
@@ -42,11 +43,7 @@ export const App = () => {
         </Routes>
       </div>
 
-      <footer class="footer footer-center hidden rounded bg-base-200 p-2 text-base-content sm:block">
-        <a href="https://github.com/metacubex/metacubexd" target="_blank">
-          metacubexd
-        </a>
-      </footer>
+      <Footer />
     </div>
   )
 }

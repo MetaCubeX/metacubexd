@@ -116,7 +116,8 @@ export default () => {
     },
     {
       accessorKey: 'Host',
-      accessorFn: (row) => row.metadata.host,
+      accessorFn: (row) =>
+        row.metadata.host ? row.metadata.host : row.metadata.destinationIP,
     },
     {
       accessorKey: 'Rule',
