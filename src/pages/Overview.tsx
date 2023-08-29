@@ -76,7 +76,7 @@ export default () => {
   onCleanup(() => clearInterval(preventLeakTimer))
 
   const trafficWS = createReconnectingWS(
-    `${wsEndpointURL()}/traffic?token=${secret()}}`,
+    `${wsEndpointURL()}/traffic?token=${secret()}`,
   )
 
   const trafficWSMessageEvent = createEventSignal<{
@@ -148,7 +148,7 @@ export default () => {
   ])
 
   const connectionsWS = createReconnectingWS(
-    `${wsEndpointURL()}/connections?token=${secret()}}`,
+    `${wsEndpointURL()}/connections?token=${secret()}`,
   )
 
   const connectionsWSMessageEvent = createEventSignal<{

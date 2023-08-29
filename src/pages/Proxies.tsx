@@ -1,13 +1,19 @@
 import { For, createSignal, onMount } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import { useRequest } from '~/signals'
-import type { Proxy, ProxyProvider } from '~/types'
+import { useProxies } from '~/signals/proxies'
+import type { Proxy } from '~/types'
 
 export default () => {
-  const request = useRequest()
-  const [proxies, setProxies] = createSignal<Proxy[]>([])
-  const [delayMap, setDelayMap] = createSignal<Record<string, number>>({})
-  const [proxyProviders, setProxyProviders] = createSignal<ProxyProvider[]>([])
+  const {
+    proxies,
+    proxyProviders,
+    delayMap,
+    updateProxy,
+    setProxiesByProxyName,
+  } = useProxies()
+  const [collapseMap, setCollapseMap] = createSignal<Record<string, boolean>>(
+    {},
+  )
 
   const renderDelay = (proxyname: string) => {
     const delay = delayMap()[proxyname]
@@ -20,26 +26,23 @@ export default () => {
   }
 
   onMount(async () => {
-    const { providers } = await request
-      .get('providers/proxies')
-      .json<{ providers: Record<string, ProxyProvider> }>()
-    const delay = delayMap()
-
-    Object.values(providers).forEach((provider) => {
-      provider.proxies.forEach((proxy) => {
-        delay[proxy.name] = proxy.history[proxy.history.length - 1]?.delay
-      })
-    })
-
-    setDelayMap(delay)
-    setProxyProviders(Object.values(providers))
-
-    const { proxies } = await request
-      .get('proxies')
-      .json<{ proxies: Record<string, Proxy> }>()
-
-    setProxies(Object.values(proxies))
+    await updateProxy()
   })
+
+  const onProxyNodeClick = async (proxy: Proxy, proxyName: string) => {
+    setProxiesByProxyName(proxy, proxyName)
+  }
+
+  const onCollapseTitleClick = (name: string) => {
+    const cMap = collapseMap()
+
+    cMap[name] = !cMap[name]
+    setCollapseMap({ ...cMap })
+  }
+
+  const getCollapseClassName = (name: string) => {
+    return collapseMap()[name] ? 'collapse-open' : 'collapse-close'
+  }
 
   return (
     <div class="flex flex-col gap-4">
@@ -49,23 +52,31 @@ export default () => {
         <div class="grid grid-cols-1 gap-2 sm:grid-cols-1">
           <For each={proxies()}>
             {(proxy) => (
-              <div class="collapse collapse-arrow border-secondary bg-base-200 p-4">
-                <input type="checkbox" />
-                <div class="collapse-title text-xl font-medium">
+              <div
+                class={twMerge(
+                  getCollapseClassName(proxy.name),
+                  'collapse collapse-arrow border-secondary bg-base-200 p-4',
+                )}
+              >
+                <div
+                  class="collapse-title text-xl font-medium"
+                  onClick={() => onCollapseTitleClick(proxy.name)}
+                >
                   {proxy.name} {proxy.type}
                 </div>
                 <div class="collapse-content grid grid-cols-1 gap-2 sm:grid-cols-3 lg:grid-cols-5">
                   <For each={proxy.all}>
-                    {(proxyPoint) => (
+                    {(proxyName) => (
                       <div
                         class={twMerge(
-                          proxy.now === proxyPoint
+                          proxy.now === proxyName
                             ? 'border-primary bg-success-content text-success'
                             : 'border-secondary',
-                          'card card-bordered card-compact m-1 flex-row justify-between p-4',
+                          'card card-bordered card-compact m-1 cursor-pointer flex-row justify-between p-4',
                         )}
+                        onClick={() => onProxyNodeClick(proxy, proxyName)}
                       >
-                        {proxyPoint} {renderDelay(proxyPoint)}
+                        {proxyName} {renderDelay(proxyName)}
                       </div>
                     )}
                   </For>
@@ -82,16 +93,23 @@ export default () => {
         <div class="grid grid-cols-1 gap-2 sm:grid-cols-1">
           <For each={proxyProviders()}>
             {(proxy) => (
-              <div class="collapse-arrow collapse border-secondary bg-base-200 p-4">
-                <input type="checkbox" />
-                <div class="collapse-title text-xl font-medium">
+              <div
+                class={twMerge(
+                  getCollapseClassName(proxy.name),
+                  'collapse-arrow collapse border-secondary bg-base-200 p-4',
+                )}
+              >
+                <div
+                  class="collapse-title text-xl font-medium"
+                  onClick={() => onCollapseTitleClick(proxy.name)}
+                >
                   {proxy.name}
                 </div>
                 <div class="collapse-content grid grid-cols-1 gap-2 sm:grid-cols-3 lg:grid-cols-5">
                   <For each={proxy.proxies}>
-                    {(proxyPoint) => (
+                    {(proxyNode) => (
                       <div class="card card-bordered card-compact m-1 flex-row justify-between border-secondary p-4">
-                        {proxyPoint.name} {renderDelay(proxyPoint.name)}
+                        {proxyNode.name} {renderDelay(proxyNode.name)}
                       </div>
                     )}
                   </For>
