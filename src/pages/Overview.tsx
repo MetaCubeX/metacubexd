@@ -69,7 +69,8 @@ export default () => {
       setTraffics((traffics) => traffics.slice(-CHART_MAX_XAXIS))
       setMemories((memo) => memo.slice(-CHART_MAX_XAXIS))
     },
-    CHART_MAX_XAXIS * 6 * 1000,
+    // we shrink the chart data array size down every 10 minutes
+    10 * 60 * 1000,
   )
 
   onCleanup(() => clearInterval(preventLeakTimer))
