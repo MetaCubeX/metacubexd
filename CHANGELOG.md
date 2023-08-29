@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.11.0](https://github.com/MetaCubeX/metacubexd/compare/v1.10.0...v1.11.0) (2023-08-29)
+
+
+### Features
+
+* **connections:** fallback host column to destinationIP ([4e5f8d2](https://github.com/MetaCubeX/metacubexd/commit/4e5f8d2b3d6c6dc7519f8a12b1060ecf2bb32771))
+* show downlaod and upload speed in per-second form ([49bf6c7](https://github.com/MetaCubeX/metacubexd/commit/49bf6c7e2d76c7de0bf9cb6f538a369460080628))
+
 ## [1.10.0](https://github.com/MetaCubeX/metacubexd/compare/v1.9.0...v1.10.0) (2023-08-29)
 
 
