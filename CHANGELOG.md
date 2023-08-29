@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.12.0](https://github.com/MetaCubeX/metacubexd/compare/v1.11.0...v1.12.0) (2023-08-29)
+
+
+### Features
+
+* **footer:** drop footer ([fc0fbf9](https://github.com/MetaCubeX/metacubexd/commit/fc0fbf9daef45054a3f5e13e64e472823a6fe072))
+* **header:** responsive layout ([2d9daa9](https://github.com/MetaCubeX/metacubexd/commit/2d9daa96cc3bd0b947cd7b34dafcb56eca91cfbe))
+
 ## [1.11.0](https://github.com/MetaCubeX/metacubexd/compare/v1.10.0...v1.11.0) (2023-08-29)
 
 
