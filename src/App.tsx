@@ -1,6 +1,5 @@
 import { Route, Routes, useNavigate } from '@solidjs/router'
 import { Show, lazy, onMount } from 'solid-js'
-import { Footer } from '~/components/Footer'
 import { Header } from '~/components/Header'
 import { curTheme, selectedEndpoint } from '~/signals'
 
@@ -42,8 +41,6 @@ export const App = () => {
           <Route path="/setup" component={Setup} />
         </Routes>
       </div>
-
-      <Footer />
     </div>
   )
 }
