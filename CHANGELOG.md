@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.2](https://github.com/MetaCubeX/metacubexd/compare/v1.13.1...v1.13.2) (2023-08-29)
+
+
+### Bug Fixes
+
+* remove permissions definition ([154d780](https://github.com/MetaCubeX/metacubexd/commit/154d7809f65f1b9794c4586219b4566161573538))
+
 ## [1.13.1](https://github.com/MetaCubeX/metacubexd/compare/v1.13.0...v1.13.1) (2023-08-29)
 
 
