@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.0](https://github.com/MetaCubeX/metacubexd/compare/v1.8.1...v1.9.0) (2023-08-29)
+
+
+### Features
+
+* proxy selectable ([#19](https://github.com/MetaCubeX/metacubexd/issues/19)) ([6b08020](https://github.com/MetaCubeX/metacubexd/commit/6b0802023d3eeb41a76e7a3ee1087c5321a19100))
+
 ## [1.8.1](https://github.com/MetaCubeX/metacubexd/compare/v1.8.0...v1.8.1) (2023-08-29)
 
 
