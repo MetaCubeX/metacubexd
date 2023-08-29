@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.1](https://github.com/MetaCubeX/metacubexd/compare/v1.13.0...v1.13.1) (2023-08-29)
+
+
+### Bug Fixes
+
+* repository name should be lowercase ([5d5b9f2](https://github.com/MetaCubeX/metacubexd/commit/5d5b9f290e8dbc236cd70ba476a5769c0fbda25e))
+
 ## [1.13.0](https://github.com/MetaCubeX/metacubexd/compare/v1.12.0...v1.13.0) (2023-08-29)
 
 
