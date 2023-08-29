@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.0](https://github.com/MetaCubeX/metacubexd/compare/v1.12.0...v1.13.0) (2023-08-29)
+
+
+### Features
+
+* publish docker image ([7d5b3cd](https://github.com/MetaCubeX/metacubexd/commit/7d5b3cddccbb3eba86af2367d163664d2c8e8ba4))
+
 ## [1.12.0](https://github.com/MetaCubeX/metacubexd/compare/v1.11.0...v1.12.0) (2023-08-29)
 
 
