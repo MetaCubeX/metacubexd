@@ -129,13 +129,13 @@ export default () => {
     },
     {
       accessorKey: 'DL Speed',
-      accessorFn: (row) => byteSize(row.downloadSpeed),
+      accessorFn: (row) => `${byteSize(row.downloadSpeed)}/s`,
       sortingFn: (prev, next) =>
         prev.original.downloadSpeed - next.original.downloadSpeed,
     },
     {
       accessorKey: 'UL Speed',
-      accessorFn: (row) => byteSize(row.uploadSpeed),
+      accessorFn: (row) => `${byteSize(row.uploadSpeed)}/s`,
       sortingFn: (prev, next) =>
         prev.original.uploadSpeed - next.original.uploadSpeed,
     },
