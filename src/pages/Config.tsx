@@ -13,7 +13,7 @@ const schema = z.object({
   'mixed-port': z.number(),
 })
 
-export const Config = () => {
+export default () => {
   const request = useRequest()
   const formItemList = [
     {

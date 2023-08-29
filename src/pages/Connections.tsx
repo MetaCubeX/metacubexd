@@ -20,7 +20,7 @@ import { twMerge } from 'tailwind-merge'
 import { secret, useRequest, wsEndpointURL } from '~/signals'
 import type { Connection } from '~/types'
 
-export const Connections = () => {
+export default () => {
   const request = useRequest()
   const [search, setSearch] = createSignal('')
 

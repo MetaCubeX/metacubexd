@@ -1,6 +1,6 @@
 import { createEventSignal } from '@solid-primitives/event-listener'
 import { createReconnectingWS } from '@solid-primitives/websocket'
-import { ApexOptions } from 'apexcharts'
+import type { ApexOptions } from 'apexcharts'
 import byteSize from 'byte-size'
 import { SolidApexCharts } from 'solid-apexcharts'
 import {
@@ -18,7 +18,7 @@ const defaultChartOptions: ApexOptions = {
   chart: {
     toolbar: { show: false },
     zoom: { enabled: false },
-    animations: { easing: 'linear', dynamicAnimation: { speed: 1000 } },
+    animations: { easing: 'linear' },
   },
   noData: { text: 'Loading...' },
   legend: {
@@ -50,7 +50,7 @@ const TrafficWidget: ParentComponent<{ label: JSX.Element }> = (props) => (
   </div>
 )
 
-export const Overview = () => {
+export default () => {
   const [traffics, setTraffics] = createSignal<{ down: number; up: number }[]>(
     [],
   )
@@ -74,7 +74,7 @@ export const Overview = () => {
     const t = traffic()
 
     if (t) {
-      setTraffics((traffics) => [...traffics, t].slice(-100))
+      setTraffics((traffics) => [...traffics, t].slice(-10))
     }
   })
 
@@ -112,7 +112,7 @@ export const Overview = () => {
     const m = memory()
 
     if (m) {
-      setMemories((memories) => [...memories, m].slice(-100))
+      setMemories((memories) => [...memories, m].slice(-10))
     }
   })
 

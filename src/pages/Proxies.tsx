@@ -3,7 +3,7 @@ import { twMerge } from 'tailwind-merge'
 import { useRequest } from '~/signals'
 import type { Proxy, ProxyProvider } from '~/types'
 
-export const Proxies = () => {
+export default () => {
   const request = useRequest()
   const [proxies, setProxies] = createSignal<Proxy[]>([])
   const [delayMap, setDelayMap] = createSignal<Record<string, number>>({})
@@ -15,6 +15,7 @@ export const Proxies = () => {
     if (typeof delay !== 'number' || delay === 0) {
       return ''
     }
+
     return <span>{delay}ms</span>
   }
 
@@ -53,7 +54,7 @@ export const Proxies = () => {
                 <div class="collapse-title text-xl font-medium">
                   {proxy.name} {proxy.type}
                 </div>
-                <div class="collapse-content grid grid-cols-1 gap-2 sm:grid-cols-3  lg:grid-cols-5">
+                <div class="collapse-content grid grid-cols-1 gap-2 sm:grid-cols-3 lg:grid-cols-5">
                   <For each={proxy.all}>
                     {(proxyPoint) => (
                       <div
@@ -86,12 +87,10 @@ export const Proxies = () => {
                 <div class="collapse-title text-xl font-medium">
                   {proxy.name}
                 </div>
-                <div class="collapse-content grid grid  grid-cols-1 gap-2 sm:grid-cols-3  lg:grid-cols-5">
+                <div class="collapse-content grid grid-cols-1 gap-2 sm:grid-cols-3 lg:grid-cols-5">
                   <For each={proxy.proxies}>
                     {(proxyPoint) => (
-                      <div
-                        class={`card card-bordered card-compact m-1  flex-row justify-between  border-secondary p-4`}
-                      >
+                      <div class="card card-bordered card-compact m-1 flex-row justify-between border-secondary p-4">
                         {proxyPoint.name} {renderDelay(proxyPoint.name)}
                       </div>
                     )}

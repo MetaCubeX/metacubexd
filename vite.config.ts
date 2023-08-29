@@ -1,13 +1,9 @@
 import devtools from 'solid-devtools/vite'
-import { defineConfig } from 'vite'
+import { defineConfig, splitVendorChunkPlugin } from 'vite'
 import solidPlugin from 'vite-plugin-solid'
 
 export default defineConfig({
-  base: process.env.PUBLIC_PATH || '/',
-  resolve: {
-    alias: {
-      '~': '/src',
-    },
-  },
-  plugins: [devtools(), solidPlugin()],
+  build: { chunkSizeWarningLimit: 1000 },
+  resolve: { alias: { '~': '/src' } },
+  plugins: [devtools(), solidPlugin(), splitVendorChunkPlugin()],
 })

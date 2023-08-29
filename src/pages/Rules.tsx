@@ -2,7 +2,7 @@ import { For, createSignal, onMount } from 'solid-js'
 import { useRequest } from '~/signals'
 import type { Rule, RuleProvider } from '~/types'
 
-export const Rules = () => {
+export default () => {
   const request = useRequest()
   const [rules, setRules] = createSignal<Rule[]>([])
   const [rulesProviders, setRulesProviders] = createSignal<RuleProvider[]>([])

@@ -1,14 +1,15 @@
 import { Route, Routes, useNavigate } from '@solidjs/router'
-import { Show, onMount } from 'solid-js'
+import { Show, lazy, onMount } from 'solid-js'
 import { Header } from '~/components/Header'
-import { Config } from '~/pages/Config'
-import { Connections } from '~/pages/Connections'
-import { Logs } from '~/pages/Logs'
-import { Overview } from '~/pages/Overview'
-import { Proxies } from '~/pages/Proxies'
-import { Rules } from '~/pages/Rules'
-import { Setup } from '~/pages/Setup'
 import { curTheme, selectedEndpoint } from '~/signals'
+
+const Setup = lazy(() => import('~/pages/Setup'))
+const Overview = lazy(() => import('~/pages/Overview'))
+const Connections = lazy(() => import('~/pages/Connections'))
+const Logs = lazy(() => import('~/pages/Logs'))
+const Proxies = lazy(() => import('~/pages/Proxies'))
+const Rules = lazy(() => import('~/pages/Rules'))
+const Config = lazy(() => import('~/pages/Config'))
 
 export const App = () => {
   const navigate = useNavigate()

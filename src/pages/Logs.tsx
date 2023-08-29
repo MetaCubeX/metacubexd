@@ -3,7 +3,7 @@ import { createReconnectingWS } from '@solid-primitives/websocket'
 import { For, createEffect, createSignal } from 'solid-js'
 import { secret, wsEndpointURL } from '~/signals'
 
-export const Logs = () => {
+export default () => {
   const [search, setSearch] = createSignal('')
   const [logs, setLogs] = createSignal<string[]>([])
 

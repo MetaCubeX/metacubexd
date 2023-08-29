@@ -13,7 +13,7 @@ const schema = z.object({
   secret: z.string(),
 })
 
-export const Setup = () => {
+export default () => {
   const navigate = useNavigate()
 
   const { form } = createForm<z.infer<typeof schema>>({

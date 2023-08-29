@@ -43,9 +43,7 @@ jobs:
         run: pnpm install
 
       - name: build for gh-pages
-        env:
-          PUBLIC_PATH: '/metacubexd'
-        run: pnpm build
+        run: pnpm build --base /metacubexd
 
       - name: publish github pages
         uses: peaceiris/actions-gh-pages@v3
