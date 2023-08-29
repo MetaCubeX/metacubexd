@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.0](https://github.com/MetaCubeX/metacubexd/compare/v1.7.0...v1.8.0) (2023-08-29)
+
+
+### Features
+
+* proxy point && delay ([#15](https://github.com/MetaCubeX/metacubexd/issues/15)) ([341cdd0](https://github.com/MetaCubeX/metacubexd/commit/341cdd0113e80c21c267fd3f7286e3a90a1cc414))
+
 ## [1.7.0](https://github.com/MetaCubeX/metacubexd/compare/v1.6.0...v1.7.0) (2023-08-28)
 
 
