@@ -1,10 +1,11 @@
 import { A, useLocation, useNavigate } from '@solidjs/router'
 import {
+  IconArrowsExchange,
   IconFileStack,
   IconGlobe,
   IconHome,
+  IconMenu,
   IconNetwork,
-  IconNetworkOff,
   IconPalette,
   IconRuler,
   IconSettings,
@@ -20,7 +21,7 @@ const Nav: ParentComponent<{ href: string; tooltip: string }> = ({
 }) => (
   <li>
     <A
-      class="tooltiptooltip-bottom rounded-full"
+      class="tooltip tooltip-bottom rounded-full"
       href={href}
       data-tip={tooltip}
     >
@@ -29,80 +30,141 @@ const Nav: ParentComponent<{ href: string; tooltip: string }> = ({
   </li>
 )
 
+const ThemeSwitcher = () => (
+  <div class="drawer drawer-end w-auto sm:ml-auto">
+    <input id="themes" type="checkbox" class="drawer-toggle" />
+
+    <div class="drawer-content flex items-center">
+      <label
+        for="themes"
+        class="btn btn-circle btn-primary drawer-button btn-sm"
+      >
+        <IconPalette />
+      </label>
+    </div>
+
+    <div class="drawer-side">
+      <label for="themes" class="drawer-overlay" />
+
+      <ul class="menu rounded-box z-50 gap-2 bg-base-300 p-2 shadow">
+        <For each={themes}>
+          {(theme) => (
+            <li
+              data-theme={theme}
+              class="btn btn-xs"
+              onClick={() => setCurTheme(theme)}
+            >
+              {theme}
+            </li>
+          )}
+        </For>
+      </ul>
+    </div>
+  </div>
+)
+
+const navs = () => [
+  {
+    href: '/',
+    name: 'Overview',
+    icon: <IconHome />,
+  },
+  {
+    href: '/proxies',
+    name: 'Proxies',
+    icon: <IconGlobe />,
+  },
+  {
+    href: '/rules',
+    name: 'Rules',
+    icon: <IconRuler />,
+  },
+  {
+    href: '/conns',
+    name: 'Connections',
+    icon: <IconNetwork />,
+  },
+  {
+    href: '/logs',
+    name: 'Logs',
+    icon: <IconFileStack />,
+  },
+  {
+    href: '/config',
+    name: 'Config',
+    icon: <IconSettings />,
+  },
+]
+
 export const Header = () => {
   const location = useLocation()
   const navigate = useNavigate()
 
+  const onSwitchEndpointClick = () => {
+    setSelectedEndpoint('')
+    navigate('/setup')
+  }
+
   return (
-    <ul class="menu menu-horizontal sticky left-0 top-0 z-10 flex items-center justify-center gap-2 rounded-full bg-base-200 p-2">
-      <Show when={location.pathname !== '/setup'}>
-        <Nav href="/" tooltip="Overview">
-          <IconHome />
-        </Nav>
+    <ul class="navbar rounded-box sticky inset-x-0 top-2 z-10 mx-2 mt-2 flex w-auto items-center justify-center bg-base-200 p-2 sm:gap-2">
+      <div class="navbar-start">
+        <div class="drawer w-auto lg:hidden">
+          <input id="navs" type="checkbox" class="drawer-toggle" />
 
-        <Nav href="/proxies" tooltip="Proxies">
-          <IconGlobe />
-        </Nav>
+          <div class="drawer-content flex items-center">
+            <label for="navs" class="btn btn-circle drawer-button btn-sm">
+              <IconMenu />
+            </label>
+          </div>
 
-        <Nav href="/rules" tooltip="Rules">
-          <IconRuler />
-        </Nav>
+          <div class="drawer-side">
+            <label for="navs" class="drawer-overlay" />
 
-        <Nav href="/conns" tooltip="Connections">
-          <IconNetwork />
-        </Nav>
-
-        <Nav href="/logs" tooltip="Logs">
-          <IconFileStack />
-        </Nav>
-
-        <Nav href="/config" tooltip="Config">
-          <IconSettings />
-        </Nav>
-
-        <li>
-          <button
-            class="tooltip tooltip-bottom rounded-full"
-            data-tip="Switch Endpoint"
-            onClick={() => {
-              setSelectedEndpoint('')
-
-              navigate('/setup')
-            }}
-          >
-            <IconNetworkOff />
-          </button>
-        </li>
-      </Show>
-
-      <div class="drawer drawer-end w-auto sm:ml-auto">
-        <input id="themes" type="checkbox" class="drawer-toggle" />
-
-        <div class="drawer-content flex items-center">
-          <label
-            for="themes"
-            class="btn btn-circle btn-primary drawer-button btn-sm"
-          >
-            <IconPalette />
-          </label>
+            <ul class="menu rounded-box z-50 gap-2 bg-base-300 p-2 shadow">
+              <For each={navs()}>
+                {({ href, name }) => (
+                  <li>
+                    <A href={href}>{name}</A>
+                  </li>
+                )}
+              </For>
+            </ul>
+          </div>
         </div>
 
-        <div class="drawer-side">
-          <label for="themes" class="drawer-overlay" />
+        <a
+          class="btn btn-ghost text-xl normal-case"
+          href="https://github.com/metacubex/metacubexd"
+          target="_blank"
+        >
+          metacubexd
+        </a>
+      </div>
 
-          <ul class="menu rounded-box z-50 gap-2 bg-base-300 p-2 shadow">
-            <For each={themes}>
-              {(theme) => (
-                <li
-                  data-theme={theme}
-                  class="btn btn-xs"
-                  onClick={() => setCurTheme(theme)}
-                >
-                  {theme}
-                </li>
+      <Show when={location.pathname !== '/setup'}>
+        <div class="navbar-center hidden lg:flex">
+          <ul class="menu menu-horizontal px-1">
+            <For each={navs()}>
+              {({ href, name, icon }) => (
+                <Nav href={href} tooltip={name}>
+                  {icon}
+                </Nav>
               )}
             </For>
           </ul>
+        </div>
+      </Show>
+
+      <div class="navbar-end">
+        <div class="flex items-center gap-2">
+          <ThemeSwitcher />
+
+          <button
+            class="btn btn-circle btn-secondary btn-sm"
+            onClick={onSwitchEndpointClick}
+          >
+            <IconArrowsExchange />
+          </button>
         </div>
       </div>
     </ul>
