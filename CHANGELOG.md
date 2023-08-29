@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.14.0](https://github.com/MetaCubeX/metacubexd/compare/v1.13.2...v1.14.0) (2023-08-29)
+
+
+### Features
+
+* **docker:** multi-platform support ([c7a8af4](https://github.com/MetaCubeX/metacubexd/commit/c7a8af420f35b1681680df48a4713e0639b586a5))
+
+
+### Bug Fixes
+
+* **dependabot:** package-ecosystem field is not a valid value ([567ffa8](https://github.com/MetaCubeX/metacubexd/commit/567ffa889463183a6a849af8fc03dd6de06fe81e))
+
 ## [1.13.2](https://github.com/MetaCubeX/metacubexd/compare/v1.13.1...v1.13.2) (2023-08-29)
 
 
