@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.1](https://github.com/MetaCubeX/metacubexd/compare/v1.8.0...v1.8.1) (2023-08-29)
+
+
+### Bug Fixes
+
+* charts data slice ([#17](https://github.com/MetaCubeX/metacubexd/issues/17)) ([35f8042](https://github.com/MetaCubeX/metacubexd/commit/35f80426ce083265ef469bf0d20b0ba219a37495))
+
 ## [1.8.0](https://github.com/MetaCubeX/metacubexd/compare/v1.7.0...v1.8.0) (2023-08-29)
 
 
