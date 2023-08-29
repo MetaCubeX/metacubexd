@@ -15,10 +15,15 @@ import {
 } from '@tanstack/solid-table'
 import byteSize from 'byte-size'
 import { isIPv6 } from 'is-ip'
-import { For, createSignal } from 'solid-js'
+import { For, createEffect, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { secret, useRequest, wsEndpointURL } from '~/signals'
 import type { Connection } from '~/types'
+
+type ConnectionWithSpeed = Connection & {
+  downloadSpeed: number
+  uploadSpeed: number
+}
 
 export default () => {
   const request = useRequest()
@@ -32,21 +37,48 @@ export default () => {
     message: WebSocketEventMap['message']
   }>(ws, 'message')
 
-  const connections = () => {
+  const [connectionsWithSpeed, setConnectionsWithSpeed] = createSignal<
+    ConnectionWithSpeed[]
+  >([])
+
+  createEffect(() => {
     const data = messageEvent()?.data
 
     if (!data) {
-      return []
+      return
     }
 
-    return (
-      JSON.parse(data) as { connections: Connection[] }
-    ).connections.slice(-100)
-  }
+    setConnectionsWithSpeed((prevConnections) => {
+      const prevMap = new Map<string, Connection>()
+      prevConnections.forEach((prev) => prevMap.set(prev.id, prev))
+
+      const connections = (
+        JSON.parse(data) as { connections: Connection[] }
+      ).connections.map((connection) => {
+        const prevConn = prevMap.get(connection.id)
+
+        if (!prevConn) {
+          return { ...connection, downloadSpeed: 0, uploadSpeed: 0 }
+        }
+
+        return {
+          ...connection,
+          downloadSpeed: prevConn.download
+            ? connection.download - prevConn.download
+            : 0,
+          uploadSpeed: prevConn.upload
+            ? connection.upload - prevConn.upload
+            : 0,
+        }
+      })
+
+      return connections.slice(-100)
+    })
+  })
 
   const onCloseConnection = (id: string) => request.delete(`connections/${id}`)
 
-  const columns: ColumnDef<Connection>[] = [
+  const columns: ColumnDef<ConnectionWithSpeed>[] = [
     {
       id: 'close',
       header: () => (
@@ -96,14 +128,27 @@ export default () => {
       accessorFn: (row) => row.chains.join(' -> '),
     },
     {
-      accessorKey: 'Download',
-      accessorFn: (row) => byteSize(row.download),
-      sortingFn: (a, b) => a.original.download - b.original.download,
+      accessorKey: 'DL Speed',
+      accessorFn: (row) => byteSize(row.downloadSpeed),
+      sortingFn: (prev, next) =>
+        prev.original.downloadSpeed - next.original.downloadSpeed,
     },
     {
-      accessorKey: 'Upload',
+      accessorKey: 'UL Speed',
+      accessorFn: (row) => byteSize(row.uploadSpeed),
+      sortingFn: (prev, next) =>
+        prev.original.uploadSpeed - next.original.uploadSpeed,
+    },
+    {
+      accessorKey: 'DL',
+      accessorFn: (row) => byteSize(row.download),
+      sortingFn: (prev, next) =>
+        prev.original.download - next.original.download,
+    },
+    {
+      accessorKey: 'UL',
       accessorFn: (row) => byteSize(row.upload),
-      sortingFn: (a, b) => a.original.upload - b.original.upload,
+      sortingFn: (prev, next) => prev.original.upload - next.original.upload,
     },
     {
       accessorKey: 'Source',
@@ -133,14 +178,14 @@ export default () => {
     },
     get data() {
       return search()
-        ? connections().filter((connection) =>
+        ? connectionsWithSpeed().filter((connection) =>
             Object.values(connection).some((conn) =>
               JSON.stringify(conn)
                 .toLowerCase()
                 .includes(search().toLowerCase()),
             ),
           )
-        : connections()
+        : connectionsWithSpeed()
     },
     columns,
     onSortingChange: setSorting,
