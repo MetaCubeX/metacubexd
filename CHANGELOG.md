@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.10.0](https://github.com/MetaCubeX/metacubexd/compare/v1.9.0...v1.10.0) (2023-08-29)
+
+
+### Features
+
+* calculate download speed and upload speed ([6a1c1ab](https://github.com/MetaCubeX/metacubexd/commit/6a1c1abcbceffbc91c70a18e689a778be51c951c))
+* update connection columns ([7336948](https://github.com/MetaCubeX/metacubexd/commit/7336948ad3a5c422bd20b46e99ae056f8b4b53d9))
+
 ## [1.9.0](https://github.com/MetaCubeX/metacubexd/compare/v1.8.1...v1.9.0) (2023-08-29)
 
 
