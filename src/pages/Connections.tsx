@@ -46,12 +46,6 @@ export default () => {
 
   const onCloseConnection = (id: string) => request.delete(`connections/${id}`)
 
-  const defaultSorting = Object.freeze({
-    id: 'ID',
-    desc: true,
-  })
-  const [sorting, setSorting] = createSignal<SortingState>([defaultSorting])
-
   const columns: ColumnDef<Connection>[] = [
     {
       id: 'close',
@@ -81,40 +75,35 @@ export default () => {
       accessorFn: (row) => row.id,
     },
     {
-      accessorKey: 'Network',
-      accessorFn: (row) => row.metadata.network,
+      accessorKey: 'Type',
+      accessorFn: (row) => `${row.metadata.type}(${row.metadata.network})`,
     },
     {
-      accessorKey: 'Download',
-      accessorFn: (row) => byteSize(row.download),
-    },
-    {
-      accessorKey: 'Upload',
-      accessorFn: (row) => byteSize(row.upload),
-    },
-    {
-      accessorKey: 'Rule',
-      accessorFn: (row) => row.rule,
-    },
-    {
-      accessorKey: 'Chains',
-      accessorFn: (row) => row.chains.join(' -> '),
-    },
-    {
-      accessorKey: 'Remote Destination',
-      accessorFn: (row) => row.metadata.remoteDestination,
+      accessorKey: 'Process',
+      accessorFn: (row) => row.metadata.process || '-',
     },
     {
       accessorKey: 'Host',
       accessorFn: (row) => row.metadata.host,
     },
     {
-      accessorKey: 'DNS Mode',
-      accessorFn: (row) => row.metadata.dnsMode,
+      accessorKey: 'Rule',
+      accessorFn: (row) =>
+        !row.rulePayload ? row.rule : `${row.rule} :: ${row.rulePayload}`,
     },
     {
-      accessorKey: 'Type',
-      accessorFn: (row) => row.metadata.type,
+      accessorKey: 'Chains',
+      accessorFn: (row) => row.chains.join(' -> '),
+    },
+    {
+      accessorKey: 'Download',
+      accessorFn: (row) => byteSize(row.download),
+      sortingFn: (a, b) => a.original.download - b.original.download,
+    },
+    {
+      accessorKey: 'Upload',
+      accessorFn: (row) => byteSize(row.upload),
+      sortingFn: (a, b) => a.original.upload - b.original.upload,
     },
     {
       accessorKey: 'Source',
@@ -131,6 +120,10 @@ export default () => {
           : `${row.metadata.destinationIP}:${row.metadata.destinationPort}`,
     },
   ]
+
+  const [sorting, setSorting] = createSignal<SortingState>([
+    { id: 'ID', desc: true },
+  ])
 
   const table = createSolidTable({
     state: {
