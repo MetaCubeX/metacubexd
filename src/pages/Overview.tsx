@@ -10,9 +10,12 @@ import {
   createEffect,
   createMemo,
   createSignal,
+  onCleanup,
 } from 'solid-js'
 import { secret, wsEndpointURL } from '~/signals'
 import type { Connection } from '~/types'
+
+const CHART_MAX_XAXIS = 10
 
 const defaultChartOptions: ApexOptions = {
   chart: {
@@ -30,7 +33,11 @@ const defaultChartOptions: ApexOptions = {
   grid: { yaxis: { lines: { show: false } } },
   stroke: { curve: 'smooth' },
   tooltip: { enabled: false },
-  xaxis: { labels: { show: false }, axisTicks: { show: false } },
+  xaxis: {
+    range: CHART_MAX_XAXIS,
+    labels: { show: false },
+    axisTicks: { show: false },
+  },
   yaxis: {
     labels: {
       style: { colors: 'gray' },
@@ -55,6 +62,17 @@ export default () => {
     [],
   )
   const [memories, setMemories] = createSignal<number[]>([])
+  // https://github.com/apexcharts/apexcharts.js/blob/main/samples/source/line/realtime.xml
+  // TODO: need a better way
+  const preventLeakTimer = setInterval(
+    () => {
+      setTraffics((traffics) => traffics.slice(-CHART_MAX_XAXIS))
+      setMemories((memo) => memo.slice(-CHART_MAX_XAXIS))
+    },
+    CHART_MAX_XAXIS * 6 * 1000,
+  )
+
+  onCleanup(() => clearInterval(preventLeakTimer))
 
   const trafficWS = createReconnectingWS(
     `${wsEndpointURL()}/traffic?token=${secret()}}`,
@@ -74,7 +92,7 @@ export default () => {
     const t = traffic()
 
     if (t) {
-      setTraffics((traffics) => [...traffics, t].slice(-10))
+      setTraffics((traffics) => [...traffics, t])
     }
   })
 
@@ -112,7 +130,7 @@ export default () => {
     const m = memory()
 
     if (m) {
-      setMemories((memories) => [...memories, m].slice(-10))
+      setMemories((memories) => [...memories, m])
     }
   })
 
