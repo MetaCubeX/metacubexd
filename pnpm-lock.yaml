@@ -12,8 +12,8 @@ dependencies:
     specifier: ^1.2.11
     version: 1.2.11(solid-js@1.7.11)
   '@felte/validator-zod':
-    specifier: ^1.0.16
-    version: 1.0.16(zod@3.22.2)
+    specifier: ^1.0.17
+    version: 1.0.17(zod@3.22.2)
   '@solid-primitives/event-listener':
     specifier: ^2.3.0
     version: 2.3.0(solid-js@1.7.11)
@@ -822,11 +822,6 @@ packages:
     dev: false
     optional: true
 
-  /@felte/common@1.1.7:
-    resolution: {integrity: sha512-vnm3Y4TBuldpfN1XojSWk3XNPrRNQUccIPsWTMgLnm+HWqC7DiRR2mDAjr7Ro0Qv5dZWNaakPhftZJbDW5F/iQ==}
-    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
-    dev: false
-
   /@felte/common@1.1.8:
     resolution: {integrity: sha512-VbEOfNLWfDx0SpCfeE+fNWDpvcntND4MFs7Lxd18RIjrZYH82D0wWe9th2oVF9QT5XzgBEdMF5NGIttcwU4sjg==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
@@ -849,13 +844,13 @@ packages:
       solid-js: 1.7.11
     dev: false
 
-  /@felte/validator-zod@1.0.16(zod@3.22.2):
-    resolution: {integrity: sha512-fx6cVCt9AfJvKqlMPXXcwG4hjdxsdj8Z9vIyJvEgg37QkqZ2FySHbU+aAaYDJQ2tSvy+h2VPrlp+xBUW2wJmxQ==}
+  /@felte/validator-zod@1.0.17(zod@3.22.2):
+    resolution: {integrity: sha512-rOX1chLfTcixKMPEdrMSi8zsCM685Dsoy1a5qN1G6Fyh7HYK1vSmI6SfJ7m92DOt6kV+vAP4m5rk94Y8UFIeVw==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     peerDependencies:
       zod: ^3.2.0
     dependencies:
-      '@felte/common': 1.1.7
+      '@felte/common': 1.1.8
       zod: 3.22.2
     dev: false
 
