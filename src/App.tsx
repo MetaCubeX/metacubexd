@@ -30,12 +30,12 @@ export const App = () => {
       <div class="flex-1 overflow-y-auto p-4">
         <Routes>
           <Show when={selectedEndpoint()}>
-            <Route path="/" component={Overview} />
             <Route path="/proxies" component={Proxies} />
             <Route path="/rules" component={Rules} />
             <Route path="/conns" component={Connections} />
             <Route path="/logs" component={Logs} />
             <Route path="/config" component={Config} />
+            <Route path="*" component={Overview} />
           </Show>
 
           <Route path="/setup" component={Setup} />

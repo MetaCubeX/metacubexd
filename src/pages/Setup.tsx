@@ -82,7 +82,7 @@ export default () => {
               class="badge badge-info flex w-full cursor-pointer items-center gap-4 py-4"
               onClick={() => {
                 setSelectedEndpoint(id)
-                navigate('/')
+                navigate('/overview')
               }}
             >
               {url}
