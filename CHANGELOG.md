@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.18.0](https://github.com/MetaCubeX/metacubexd/compare/v1.17.0...v1.18.0) (2023-08-30)
+
+
+### Features
+
+* **connections:** reverse chains ([43edb25](https://github.com/MetaCubeX/metacubexd/commit/43edb25c10e7ead51591b62ffe8e128275803c16))
+* prevent duplicate endpoints from being stored ([#45](https://github.com/MetaCubeX/metacubexd/issues/45)) ([e966288](https://github.com/MetaCubeX/metacubexd/commit/e96628845b2efc32d978f273c9e245a4e83c2246))
+
 ## [1.17.0](https://github.com/MetaCubeX/metacubexd/compare/v1.16.0...v1.17.0) (2023-08-30)
 
 
