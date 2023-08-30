@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.19.0](https://github.com/MetaCubeX/metacubexd/compare/v1.18.0...v1.19.0) (2023-08-30)
+
+
+### Features
+
+* proxy page style ([#47](https://github.com/MetaCubeX/metacubexd/issues/47)) ([51f7121](https://github.com/MetaCubeX/metacubexd/commit/51f712157fac4d727d7dedbb6f67428f05515e06))
+
 ## [1.18.0](https://github.com/MetaCubeX/metacubexd/compare/v1.17.0...v1.18.0) (2023-08-30)
 
 
