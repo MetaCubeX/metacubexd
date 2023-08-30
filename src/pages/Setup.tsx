@@ -19,17 +19,15 @@ export default () => {
   const { form } = createForm<z.infer<typeof schema>>({
     extend: validator({ schema }),
     async onSubmit(values) {
-      const { hello } = await ky
-        .get(values.url, {
-          headers: values.secret
-            ? {
-                Authorization: `Bearer ${values.secret}`,
-              }
-            : {},
-        })
-        .json<{ hello: string }>()
+      const { ok } = await ky.get(values.url, {
+        headers: values.secret
+          ? {
+              Authorization: `Bearer ${values.secret}`,
+            }
+          : {},
+      })
 
-      if (!hello) {
+      if (!ok) {
         return
       }
 
