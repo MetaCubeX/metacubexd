@@ -210,7 +210,7 @@ export default () => {
                 <tr>
                   <For each={headerGroup.headers}>
                     {(header) => (
-                      <th>
+                      <th class="bg-base-200">
                         <div
                           class={twMerge(
                             'flex items-center justify-between',
