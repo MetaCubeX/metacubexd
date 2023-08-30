@@ -1,10 +1,8 @@
+/* @refresh reload */
 import '~/index.css'
 
-/* @refresh reload */
-import 'solid-devtools'
-import { render } from 'solid-js/web'
-
 import { Router, hashIntegration } from '@solidjs/router'
+import { render } from 'solid-js/web'
 import { App } from './App'
 
 const root = document.getElementById('root')
