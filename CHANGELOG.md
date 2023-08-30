@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.21.0](https://github.com/MetaCubeX/metacubexd/compare/v1.20.0...v1.21.0) (2023-08-30)
+
+
+### Features
+
+* hide scrollbar, update overlay menu ([9919cca](https://github.com/MetaCubeX/metacubexd/commit/9919cca00e4315d0efd4dc0e8dcba9287de79f9b))
+* update header ([7a32ec4](https://github.com/MetaCubeX/metacubexd/commit/7a32ec4fe37fca26642e44402ef4309453c252c4))
+* update proxy layout ([b60c855](https://github.com/MetaCubeX/metacubexd/commit/b60c85566cbe4704dffe065a9e41c9c5c83c9365))
+
 ## [1.20.0](https://github.com/MetaCubeX/metacubexd/compare/v1.19.0...v1.20.0) (2023-08-30)
 
 
