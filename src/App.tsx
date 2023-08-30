@@ -1,4 +1,4 @@
-import { Route, Routes, useNavigate } from '@solidjs/router'
+import { Navigate, Route, Routes, useNavigate } from '@solidjs/router'
 import { Show, lazy, onMount } from 'solid-js'
 import { Header } from '~/components/Header'
 import { curTheme, selectedEndpoint } from '~/signals'
@@ -30,12 +30,13 @@ export const App = () => {
       <div class="flex-1 overflow-y-auto p-4">
         <Routes>
           <Show when={selectedEndpoint()}>
+            <Route path="/overview" component={Overview} />
             <Route path="/proxies" component={Proxies} />
             <Route path="/rules" component={Rules} />
             <Route path="/conns" component={Connections} />
             <Route path="/logs" component={Logs} />
             <Route path="/config" component={Config} />
-            <Route path="*" component={Overview} />
+            <Route path="*" element={<Navigate href="/overview" />} />
           </Show>
 
           <Route path="/setup" component={Setup} />
