@@ -13,50 +13,52 @@ const schema = z.object({
   secret: z.string(),
 })
 
-const onSetupSuccess = (id: string) => {
+export default () => {
   const navigate = useNavigate()
 
-  setSelectedEndpoint(id)
-  navigate('/overview')
-}
-
-const checkEndpoint = async ({
-  url,
-  secret,
-}: {
-  url: string
-  secret: string
-}) => {
-  try {
-    const { ok } = await ky.get(url, {
-      headers: secret
-        ? {
-            Authorization: `Bearer ${secret}`,
-          }
-        : {},
-    })
-
-    return ok
-  } catch {
-    return false
-  }
-}
-
-const onEndpointSelect = async (id: string) => {
-  const endpoint = endpointList().find((e) => e.id === id)
-
-  if (!endpoint) {
-    return
+  const onSetupSuccess = (id: string) => {
+    setSelectedEndpoint(id)
+    navigate('/overview')
   }
 
-  if (!(await checkEndpoint({ url: endpoint.url, secret: endpoint.secret }))) {
-    return
+  const checkEndpoint = async ({
+    url,
+    secret,
+  }: {
+    url: string
+    secret: string
+  }) => {
+    try {
+      const { ok } = await ky.get(url, {
+        headers: secret
+          ? {
+              Authorization: `Bearer ${secret}`,
+            }
+          : {},
+      })
+
+      return ok
+    } catch {
+      return false
+    }
   }
 
-  onSetupSuccess(id)
-}
+  const onEndpointSelect = async (id: string) => {
+    const endpoint = endpointList().find((e) => e.id === id)
 
-export default () => {
+    if (!endpoint) {
+      return
+    }
+
+    if (
+      !(await checkEndpoint({ url: endpoint.url, secret: endpoint.secret }))
+    ) {
+      return
+    }
+
+    onSetupSuccess(id)
+  }
+
   const { form } = createForm<z.infer<typeof schema>>({
     extend: validator({ schema }),
     async onSubmit({ url, secret }) {
