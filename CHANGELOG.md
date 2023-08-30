@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.17.0](https://github.com/MetaCubeX/metacubexd/compare/v1.16.0...v1.17.0) (2023-08-30)
+
+
+### Features
+
+* redirect illegal path to overview ([#41](https://github.com/MetaCubeX/metacubexd/issues/41)) ([a114b35](https://github.com/MetaCubeX/metacubexd/commit/a114b35c1abcc5eb3b53c497ab689f9eb138deb7))
+
 ## [1.16.0](https://github.com/MetaCubeX/metacubexd/compare/v1.15.0...v1.16.0) (2023-08-30)
 
 
