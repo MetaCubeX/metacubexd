@@ -41,8 +41,9 @@ export default () => {
             {(proxy) => {
               const title = (
                 <>
-                  <div class="flex items-center">
-                    <span class="mr-3">{proxy.name}</span>
+                  <div class="flex items-center gap-2">
+                    <span>{proxy.name}</span>
+
                     <IconBrandSpeedtest
                       class="cursor-pointer"
                       onClick={(e) => onSpeedTestClick(e, proxy.name)}

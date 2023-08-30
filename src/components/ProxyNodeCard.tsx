@@ -17,6 +17,7 @@ export default (props: {
 
     return <span>{delay}ms</span>
   }
+  console.log(proxyName)
 
   return (
     <div
@@ -24,12 +25,13 @@ export default (props: {
         isSelected
           ? 'border-primary bg-success-content text-success'
           : 'border-secondary',
-        onClick ? 'cursor-pointer' : '',
-        'card card-bordered card-compact m-1 flex-row justify-between border-secondary p-4',
+        onClick && 'cursor-pointer',
+        'card card-bordered tooltip tooltip-bottom card-compact flex flex-row justify-between gap-2 p-4',
       )}
       onClick={() => onClick?.()}
+      data-tip={proxyName}
     >
-      <span class="mr-2 overflow-hidden whitespace-nowrap">{proxyName}</span>
+      <span class="truncate">{proxyName}</span>
       <span>{Delay(proxyName)}</span>
     </div>
   )
