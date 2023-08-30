@@ -10,13 +10,15 @@ export default (props: {
   const { proxyName, isSelected, onClick } = props
   const { delayMap, proxyNodeMap } = useProxies()
   const proxyNode = createMemo(() => proxyNodeMap()[proxyName])
+
   const Delay = (proxyname: string) => {
     const delay = delayMap()[proxyname]
-    let textClassName = 'text-green-500'
 
     if (typeof delay !== 'number' || delay === 0) {
       return ''
     }
+
+    let textClassName = 'text-green-500'
 
     if (delay > 500) {
       textClassName = 'text-red-500'
@@ -27,25 +29,35 @@ export default (props: {
     return <span class={textClassName}>{delay}ms</span>
   }
 
+  const formatProxyType = (type: string) => {
+    const t = type.toLowerCase()
+
+    if (t === 'shadowsocks') {
+      return 'SS'
+    }
+
+    return t
+  }
+
   return (
     <div
       class={twMerge(
+        'card card-bordered tooltip tooltip-bottom card-compact flex gap-1 p-4',
         isSelected
           ? 'border-primary bg-success-content text-success'
           : 'border-secondary',
         onClick && 'cursor-pointer',
-        'card card-bordered tooltip tooltip-bottom card-compact gap-2 p-4',
       )}
       onClick={() => onClick?.()}
       data-tip={proxyName}
     >
-      <div class="flex truncate">{proxyName}</div>
-      <div class="flex flex-row">
-        <div class="flex flex-1 truncate text-sm text-slate-500">
-          {proxyNode().type}
+      <div class="truncate text-left">{proxyName}</div>
+      <div class="flex items-center justify-between gap-1">
+        <div class="truncate text-xs text-slate-500">
+          {formatProxyType(proxyNode().type)}
           {proxyNode().udp ? ' :: udp' : ''}
         </div>
-        <div>{Delay(proxyName)}</div>
+        <div class="text-xs">{Delay(proxyName)}</div>
       </div>
     </div>
   )

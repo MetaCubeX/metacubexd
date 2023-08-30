@@ -36,7 +36,7 @@ export default () => {
       <div>
         <h1 class="pb-4 text-lg font-semibold">Proxies</h1>
 
-        <div class="grid grid-cols-1 gap-2 sm:grid-cols-1">
+        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <For each={proxies()}>
             {(proxy) => {
               const title = (
@@ -54,6 +54,7 @@ export default () => {
                   </div>
                 </>
               )
+
               const content = (
                 <For each={proxy.all}>
                   {(proxyName) => (
@@ -77,7 +78,7 @@ export default () => {
                       [`group-${proxy.name}`]: val,
                     })
                   }
-                ></Collapse>
+                />
               )
             }}
           </For>
@@ -87,7 +88,7 @@ export default () => {
       <div>
         <h1 class="pb-4 text-lg font-semibold">Proxy Providers</h1>
 
-        <div class="grid grid-cols-1 gap-2 sm:grid-cols-1">
+        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <For each={proxyProviders()}>
             {(proxyProvider) => {
               const title = <>{proxyProvider.name}</>
