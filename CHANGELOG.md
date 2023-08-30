@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.15.0](https://github.com/MetaCubeX/metacubexd/compare/v1.14.2...v1.15.0) (2023-08-30)
+
+
+### Features
+
+* speed test ([#38](https://github.com/MetaCubeX/metacubexd/issues/38)) ([a57741b](https://github.com/MetaCubeX/metacubexd/commit/a57741baf6a2b435c5349fa64adcec7210910a78))
+
+
+### Bug Fixes
+
+* support sing-box ([#36](https://github.com/MetaCubeX/metacubexd/issues/36)) ([4eeb345](https://github.com/MetaCubeX/metacubexd/commit/4eeb3458ccf389dda2a6e883877355da55149b66))
+
 ## [1.14.2](https://github.com/MetaCubeX/metacubexd/compare/v1.14.1...v1.14.2) (2023-08-30)
 
 
