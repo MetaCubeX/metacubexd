@@ -1,0 +1,8 @@
+{
+  "tailwindCSS.classAttributes": [
+    "class",
+    "className",
+    "ngClass",
+    ".*ClassName*"
+  ]
+}

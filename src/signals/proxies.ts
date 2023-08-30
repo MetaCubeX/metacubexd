@@ -1,12 +1,18 @@
 import { createSignal } from 'solid-js'
 import { useRequest } from '~/signals'
-import type { Proxy, ProxyProvider } from '~/types'
+import type { Proxy, ProxyNode, ProxyProvider } from '~/types'
+
+// these signals should be global state
+const [proxies, setProxies] = createSignal<Proxy[]>([])
+const [proxyProviders, setProxyProviders] = createSignal<ProxyProvider[]>([])
+
+const [delayMap, setDelayMap] = createSignal<Record<string, number>>({})
+const [proxyNodeMap, setProxyNodeMap] = createSignal<Record<string, ProxyNode>>(
+  {},
+)
 
 export function useProxies() {
   const request = useRequest()
-  const [proxies, setProxies] = createSignal<Proxy[]>([])
-  const [proxyProviders, setProxyProviders] = createSignal<ProxyProvider[]>([])
-  const [delayMap, setDelayMap] = createSignal<Record<string, number>>({})
 
   const updateProxy = async () => {
     const { providers } = await request
@@ -16,6 +22,7 @@ export function useProxies() {
 
     Object.values(providers).forEach((provider) => {
       provider.proxies.forEach((proxy) => {
+        setProxyNodeMap({ ...proxyNodeMap(), [proxy.name]: proxy })
         delay[proxy.name] = proxy.history[proxy.history.length - 1]?.delay
       })
     })
@@ -71,6 +78,7 @@ export function useProxies() {
     proxies,
     proxyProviders,
     delayTestByProxyGroupName,
+    proxyNodeMap,
     delayMap,
     updateProxy,
     setProxiesByProxyName,

@@ -1,5 +1,35 @@
 # Changelog
 
+## [1.21.0](https://github.com/MetaCubeX/metacubexd/compare/v1.20.0...v1.21.0) (2023-08-30)
+
+
+### Features
+
+* hide scrollbar, update overlay menu ([9919cca](https://github.com/MetaCubeX/metacubexd/commit/9919cca00e4315d0efd4dc0e8dcba9287de79f9b))
+* update header ([7a32ec4](https://github.com/MetaCubeX/metacubexd/commit/7a32ec4fe37fca26642e44402ef4309453c252c4))
+* update proxy layout ([b60c855](https://github.com/MetaCubeX/metacubexd/commit/b60c85566cbe4704dffe065a9e41c9c5c83c9365))
+
+## [1.20.0](https://github.com/MetaCubeX/metacubexd/compare/v1.19.0...v1.20.0) (2023-08-30)
+
+
+### Features
+
+* render protocl and udp ([44df379](https://github.com/MetaCubeX/metacubexd/commit/44df379fd6a18ef7d855dac91897480421e494e5))
+* truncate proxy node name ([6db7ced](https://github.com/MetaCubeX/metacubexd/commit/6db7ceddac226e81e4009d4e333f73bac985bd67))
+* update proxy layout ([83b0de8](https://github.com/MetaCubeX/metacubexd/commit/83b0de831a6d6eedc1c2b8ad74de1416752dd835))
+
+
+### Bug Fixes
+
+* card protocol text style ([4a03662](https://github.com/MetaCubeX/metacubexd/commit/4a03662bbd3a64a481bca96f0c81c78efd8bab7e))
+
+## [1.19.0](https://github.com/MetaCubeX/metacubexd/compare/v1.18.0...v1.19.0) (2023-08-30)
+
+
+### Features
+
+* proxy page style ([#47](https://github.com/MetaCubeX/metacubexd/issues/47)) ([51f7121](https://github.com/MetaCubeX/metacubexd/commit/51f712157fac4d727d7dedbb6f67428f05515e06))
+
 ## [1.18.0](https://github.com/MetaCubeX/metacubexd/compare/v1.17.0...v1.18.0) (2023-08-30)
 
 

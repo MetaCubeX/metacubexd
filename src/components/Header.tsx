@@ -10,7 +10,8 @@ import {
   IconRuler,
   IconSettings,
 } from '@tabler/icons-solidjs'
-import { For, ParentComponent, Show } from 'solid-js'
+import { For, ParentComponent, Show, createSignal } from 'solid-js'
+import { twMerge } from 'tailwind-merge'
 import { themes } from '~/constants'
 import { setCurTheme, setSelectedEndpoint } from '~/signals'
 
@@ -21,7 +22,7 @@ const Nav: ParentComponent<{ href: string; tooltip: string }> = ({
 }) => (
   <li>
     <A
-      class="tooltip tooltip-bottom rounded-full"
+      class="tooltip rounded-box tooltip-bottom"
       href={href}
       data-tip={tooltip}
     >
@@ -46,7 +47,7 @@ const ThemeSwitcher = () => (
     <div class="drawer-side">
       <label for="themes" class="drawer-overlay" />
 
-      <ul class="menu rounded-box z-50 gap-2 bg-base-300 p-2 shadow">
+      <ul class="menu rounded-box gap-2 bg-base-300 p-2 shadow">
         <For each={themes}>
           {(theme) => (
             <li
@@ -100,16 +101,24 @@ export const Header = () => {
   const location = useLocation()
   const navigate = useNavigate()
 
+  const [openedDrawer, setOpenedDrawer] = createSignal(false)
+
   const onSwitchEndpointClick = () => {
     setSelectedEndpoint('')
     navigate('/setup')
   }
 
   return (
-    <ul class="navbar rounded-box sticky inset-x-0 top-2 z-10 mx-2 mt-2 flex w-auto items-center justify-center bg-base-200 p-2 sm:gap-2">
-      <div class="navbar-start">
-        <div class="drawer w-auto lg:hidden">
-          <input id="navs" type="checkbox" class="drawer-toggle" />
+    <ul class="navbar rounded-box sticky inset-x-0 top-2 z-10 mx-2 mt-2 flex w-auto items-center justify-center bg-base-300 px-4">
+      <div class="navbar-start gap-4">
+        <div class={twMerge('drawer w-auto lg:hidden', '')}>
+          <input
+            id="navs"
+            type="checkbox"
+            class="drawer-toggle"
+            onChange={(e) => setOpenedDrawer(e.target.checked)}
+            checked={openedDrawer()}
+          />
 
           <div class="drawer-content flex items-center">
             <label for="navs" class="btn btn-circle drawer-button btn-sm">
@@ -120,10 +129,10 @@ export const Header = () => {
           <div class="drawer-side">
             <label for="navs" class="drawer-overlay" />
 
-            <ul class="menu rounded-box z-50 gap-2 bg-base-300 p-2 shadow">
+            <ul class="menu rounded-box min-h-full w-2/5 gap-2 bg-base-300 pt-20 shadow">
               <For each={navs()}>
                 {({ href, name }) => (
-                  <li>
+                  <li onClick={() => setOpenedDrawer(false)}>
                     <A href={href}>{name}</A>
                   </li>
                 )}
@@ -133,7 +142,7 @@ export const Header = () => {
         </div>
 
         <a
-          class="btn btn-ghost text-xl normal-case"
+          class="text-xl font-bold normal-case"
           href="https://github.com/metacubex/metacubexd"
           target="_blank"
         >
@@ -143,7 +152,7 @@ export const Header = () => {
 
       <Show when={location.pathname !== '/setup'}>
         <div class="navbar-center hidden lg:flex">
-          <ul class="menu menu-horizontal px-1">
+          <ul class="menu menu-horizontal gap-2">
             <For each={navs()}>
               {({ href, name, icon }) => (
                 <Nav href={href} tooltip={name}>

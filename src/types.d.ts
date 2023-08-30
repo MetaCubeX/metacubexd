@@ -21,22 +21,24 @@ export type Proxy = {
   now: string
 }
 
+export type ProxyNode = {
+  alive: boolean
+  type: string
+  name: string
+  tfo: boolean
+  udp: boolean
+  xudp: boolean
+  id: string
+  extra: Record<string, unknown>
+  history: {
+    time: string
+    delay: number
+  }[]
+}
+
 export type ProxyProvider = {
   name: string
-  proxies: {
-    alive: boolean
-    type: string
-    name: string
-    tfo: boolean
-    udp: boolean
-    xudp: boolean
-    id: string
-    extra: Record<string, unknown>
-    history: {
-      time: string
-      delay: number
-    }[]
-  }[]
+  proxies: ProxyNode[]
   testUrl: string
   updatedAt: string
   vehicleType: string
