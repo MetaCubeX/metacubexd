@@ -21,7 +21,7 @@ export default () => {
     navigate('/overview')
   }
 
-  const checkEndpoint = ({ url, secret }: { url: string; secret: string }) =>
+  const checkEndpoint = (url: string, secret: string) =>
     ky
       .get(url, {
         headers: secret
@@ -40,9 +40,7 @@ export default () => {
       return
     }
 
-    if (
-      !(await checkEndpoint({ url: endpoint.url, secret: endpoint.secret }))
-    ) {
+    if (!(await checkEndpoint(endpoint.url, endpoint.secret))) {
       return
     }
 
@@ -62,7 +60,7 @@ export default () => {
         return
       }
 
-      if (!(await checkEndpoint({ url, secret }))) {
+      if (!(await checkEndpoint(url, secret))) {
         return
       }
 
