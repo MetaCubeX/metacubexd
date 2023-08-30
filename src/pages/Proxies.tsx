@@ -66,7 +66,7 @@ export default () => {
                 )}
               >
                 <div
-                  class="collapse-title flex items-center text-xl font-medium"
+                  class="collapse-title flex h-10 items-center text-xl font-medium"
                   onClick={() => onCollapseTitleClick(proxy.name)}
                 >
                   {proxy.name} {proxy.type}
