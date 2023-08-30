@@ -13,26 +13,66 @@ const schema = z.object({
   secret: z.string(),
 })
 
-export default () => {
+const onSetupSuccess = (id: string) => {
   const navigate = useNavigate()
 
+  setSelectedEndpoint(id)
+  navigate('/overview')
+}
+
+const checkEndpoint = async ({
+  url,
+  secret,
+}: {
+  url: string
+  secret: string
+}) => {
+  const { ok } = await ky.get(url, {
+    headers: secret
+      ? {
+          Authorization: `Bearer ${secret}`,
+        }
+      : {},
+  })
+
+  return ok
+}
+
+const onEndpointSelect = async (id: string) => {
+  const endpoint = endpointList().find((e) => e.id === id)
+
+  if (!endpoint) {
+    return
+  }
+
+  if (!(await checkEndpoint({ url: endpoint.url, secret: endpoint.secret }))) {
+    return
+  }
+
+  onSetupSuccess(id)
+}
+
+export default () => {
   const { form } = createForm<z.infer<typeof schema>>({
     extend: validator({ schema }),
     async onSubmit({ url, secret }) {
-      const { ok } = await ky.get(url, {
-        headers: secret
-          ? {
-              Authorization: `Bearer ${secret}`,
-            }
-          : {},
-      })
+      const endpointFromHistory = endpointList().find(
+        (history) => history.url === url && history.secret === secret,
+      )
 
-      if (!ok) return 1
+      if (endpointFromHistory) {
+        onSetupSuccess(endpointFromHistory.id)
+
+        return
+      }
+
+      if (!(await checkEndpoint({ url, secret }))) {
+        return
+      }
 
       const id = uuid()
       setEndpointList([{ id, url, secret }, ...endpointList()])
-      setSelectedEndpoint(id)
-      navigate('/overview')
+      onSetupSuccess(id)
     },
   })
 
@@ -74,10 +114,7 @@ export default () => {
           {({ id, url }) => (
             <div
               class="badge badge-info flex w-full cursor-pointer items-center gap-4 py-4"
-              onClick={() => {
-                setSelectedEndpoint(id)
-                navigate('/overview')
-              }}
+              onClick={() => onEndpointSelect(id)}
             >
               {url}
 
