@@ -18,27 +18,21 @@ export default () => {
 
   const { form } = createForm<z.infer<typeof schema>>({
     extend: validator({ schema }),
-    async onSubmit(values) {
-      const { ok } = await ky.get(values.url, {
-        headers: values.secret
+    async onSubmit({ url, secret }) {
+      const { ok } = await ky.get(url, {
+        headers: secret
           ? {
-              Authorization: `Bearer ${values.secret}`,
+              Authorization: `Bearer ${secret}`,
             }
           : {},
       })
 
-      if (!ok) {
-        return
-      }
+      if (!ok) return 1
 
-      setEndpointList([
-        {
-          id: uuid(),
-          url: values.url,
-          secret: values.secret,
-        },
-        ...endpointList(),
-      ])
+      const id = uuid()
+      setEndpointList([{ id, url, secret }, ...endpointList()])
+      setSelectedEndpoint(id)
+      navigate('/overview')
     },
   })
 
