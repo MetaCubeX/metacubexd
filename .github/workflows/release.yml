@@ -38,17 +38,14 @@ jobs:
       - name: install dependencies
         run: pnpm install
 
-      - name: build for gh-pages
-        run: pnpm build --base /metacubexd
+      - name: build
+        run: pnpm build
 
       - name: publish gh-pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
-
-      - name: build for github release
-        run: pnpm build
 
       - name: zip
         run: |
