@@ -2,11 +2,13 @@ import { createSignal } from 'solid-js'
 import { useRequest } from '~/signals'
 import type { Proxy, ProxyProvider } from '~/types'
 
+// these signals should be global state
+const [proxies, setProxies] = createSignal<Proxy[]>([])
+const [delayMap, setDelayMap] = createSignal<Record<string, number>>({})
+const [proxyProviders, setProxyProviders] = createSignal<ProxyProvider[]>([])
+
 export function useProxies() {
   const request = useRequest()
-  const [proxies, setProxies] = createSignal<Proxy[]>([])
-  const [proxyProviders, setProxyProviders] = createSignal<ProxyProvider[]>([])
-  const [delayMap, setDelayMap] = createSignal<Record<string, number>>({})
 
   const updateProxy = async () => {
     const { providers } = await request
