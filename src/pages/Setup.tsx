@@ -27,15 +27,19 @@ const checkEndpoint = async ({
   url: string
   secret: string
 }) => {
-  const { ok } = await ky.get(url, {
-    headers: secret
-      ? {
-          Authorization: `Bearer ${secret}`,
-        }
-      : {},
-  })
+  try {
+    const { ok } = await ky.get(url, {
+      headers: secret
+        ? {
+            Authorization: `Bearer ${secret}`,
+          }
+        : {},
+    })
 
-  return ok
+    return ok
+  } catch {
+    return false
+  }
 }
 
 const onEndpointSelect = async (id: string) => {
