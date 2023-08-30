@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.16.0](https://github.com/MetaCubeX/metacubexd/compare/v1.15.0...v1.16.0) (2023-08-30)
+
+
+### Features
+
+* route to override immediately after checking ([#39](https://github.com/MetaCubeX/metacubexd/issues/39)) ([b178161](https://github.com/MetaCubeX/metacubexd/commit/b178161dbd108f4ae9ed59352d0d0450113051f0))
+
+
+### Bug Fixes
+
+* proxies title height ([b64cfa3](https://github.com/MetaCubeX/metacubexd/commit/b64cfa3f9a774143ceab492c26c67215dad6b195))
+
 ## [1.15.0](https://github.com/MetaCubeX/metacubexd/compare/v1.14.2...v1.15.0) (2023-08-30)
 
 
