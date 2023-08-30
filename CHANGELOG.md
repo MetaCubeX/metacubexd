@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.22.0](https://github.com/MetaCubeX/metacubexd/compare/v1.21.0...v1.22.0) (2023-08-30)
+
+
+### Features
+
+* hide drawer on menu click ([7ce001c](https://github.com/MetaCubeX/metacubexd/commit/7ce001caa11c7aa5c177957777708316e731231d))
+
 ## [1.21.0](https://github.com/MetaCubeX/metacubexd/compare/v1.20.0...v1.21.0) (2023-08-30)
 
 
