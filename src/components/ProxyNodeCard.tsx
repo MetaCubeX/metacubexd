@@ -41,7 +41,7 @@ export default (props: {
     >
       <div class="flex truncate">{proxyName}</div>
       <div class="flex flex-row">
-        <div class="flex flex-1 truncate">
+        <div class="flex flex-1 truncate text-sm text-slate-500">
           {proxyNode().type}
           {proxyNode().udp ? ' :: udp' : ''}
         </div>
