@@ -65,7 +65,7 @@ const ThemeSwitcher = () => (
 
 const navs = () => [
   {
-    href: '/',
+    href: '/overview',
     name: 'Overview',
     icon: <IconHome />,
   },

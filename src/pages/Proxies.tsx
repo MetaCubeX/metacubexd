@@ -1,3 +1,4 @@
+import { IconBrandSpeedtest } from '@tabler/icons-solidjs'
 import { For, createSignal, onMount } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { useProxies } from '~/signals/proxies'
@@ -10,6 +11,7 @@ export default () => {
     delayMap,
     updateProxy,
     setProxiesByProxyName,
+    delayTestByProxyGroupName,
   } = useProxies()
   const [collapseMap, setCollapseMap] = createSignal<Record<string, boolean>>(
     {},
@@ -40,6 +42,11 @@ export default () => {
     setCollapseMap({ ...cMap })
   }
 
+  const onSpeedTestClick = (e: MouseEvent, name: string) => {
+    e.stopPropagation()
+    delayTestByProxyGroupName(name)
+  }
+
   const getCollapseClassName = (name: string) => {
     return collapseMap()[name] ? 'collapse-open' : 'collapse-close'
   }
@@ -59,10 +66,14 @@ export default () => {
                 )}
               >
                 <div
-                  class="collapse-title text-xl font-medium"
+                  class="collapse-title flex items-center text-xl font-medium"
                   onClick={() => onCollapseTitleClick(proxy.name)}
                 >
                   {proxy.name} {proxy.type}
+                  <IconBrandSpeedtest
+                    class="m-4 cursor-pointer"
+                    onClick={(e) => onSpeedTestClick(e, proxy.name)}
+                  />
                 </div>
                 <div class="collapse-content grid grid-cols-1 gap-2 sm:grid-cols-3 lg:grid-cols-5">
                   <For each={proxy.all}>

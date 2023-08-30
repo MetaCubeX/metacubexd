@@ -31,11 +31,15 @@ export function useProxies() {
     const { proxies } = await request
       .get('proxies')
       .json<{ proxies: Record<string, Proxy> }>()
+    const sortIndex = proxies['GLOBAL'].all ?? []
 
     setProxies(
-      Object.values(proxies).filter(
-        (proxy) => proxy.all && proxy.all.length > 0,
-      ),
+      Object.values(proxies)
+        .filter((proxy) => proxy.all && proxy.all.length > 0)
+        .sort(
+          (pre, next) =>
+            sortIndex.indexOf(pre.name) - sortIndex.indexOf(next.name),
+        ),
     )
   }
 
@@ -48,9 +52,25 @@ export function useProxies() {
     await updateProxy()
   }
 
+  const delayTestByProxyGroupName = async (proxyGroupName: string) => {
+    const data: Record<string, number> = await request
+      .get(
+        `group/${proxyGroupName}/delay?url=https%3A%2F%2Fwww.gstatic.com%2Fgenerate_204&timeout=2000`,
+      )
+      .json()
+    const dMap = delayMap()
+
+    Object.entries(data).forEach(([name, time]) => {
+      dMap[name] = time
+    })
+
+    setDelayMap({ ...dMap })
+  }
+
   return {
     proxies,
     proxyProviders,
+    delayTestByProxyGroupName,
     delayMap,
     updateProxy,
     setProxiesByProxyName,
