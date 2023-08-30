@@ -28,7 +28,7 @@
     "autoprefixer": "^10.4.15",
     "byte-size": "^8.1.1",
     "commitlint": "^17.7.1",
-    "daisyui": "^3.6.3",
+    "daisyui": "^3.6.4",
     "husky": "^8.0.3",
     "is-ip": "^5.0.1",
     "ky": "^0.33.3",
