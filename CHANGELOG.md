@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.2](https://github.com/MetaCubeX/metacubexd/compare/v1.14.1...v1.14.2) (2023-08-30)
+
+
+### Bug Fixes
+
+* drop linux/arm/v7 ([f03c6fd](https://github.com/MetaCubeX/metacubexd/commit/f03c6fdf4cb5ff0916165c75c66ba54abb68c2d8))
+
 ## [1.14.1](https://github.com/MetaCubeX/metacubexd/compare/v1.14.0...v1.14.1) (2023-08-30)
 
 
