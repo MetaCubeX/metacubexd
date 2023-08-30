@@ -21,27 +21,17 @@ export default () => {
     navigate('/overview')
   }
 
-  const checkEndpoint = async ({
-    url,
-    secret,
-  }: {
-    url: string
-    secret: string
-  }) => {
-    try {
-      const { ok } = await ky.get(url, {
+  const checkEndpoint = ({ url, secret }: { url: string; secret: string }) =>
+    ky
+      .get(url, {
         headers: secret
           ? {
               Authorization: `Bearer ${secret}`,
             }
           : {},
       })
-
-      return ok
-    } catch {
-      return false
-    }
-  }
+      .then(({ ok }) => ok)
+      .catch(() => false)
 
   const onEndpointSelect = async (id: string) => {
     const endpoint = endpointList().find((e) => e.id === id)
