@@ -126,7 +126,7 @@ export default () => {
     },
     {
       accessorKey: 'Chains',
-      accessorFn: (row) => row.chains.join(' -> '),
+      accessorFn: (row) => row.chains.slice().reverse().join(' :: '),
     },
     {
       accessorKey: 'DL Speed',
