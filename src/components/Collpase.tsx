@@ -39,7 +39,7 @@ const Collapse: ParentComponent<Props> = (props) => {
       <div
         class={twMerge(
           getCollapseContentClassName(),
-          'collapse-content grid grid-cols-1 gap-2 transition-opacity duration-1000 sm:grid-cols-3 lg:grid-cols-5',
+          'collapse-content grid grid-cols-1 gap-2 overflow-hidden transition-opacity duration-1000 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5',
         )}
       >
         {content}
