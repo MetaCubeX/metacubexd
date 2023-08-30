@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.20.0](https://github.com/MetaCubeX/metacubexd/compare/v1.19.0...v1.20.0) (2023-08-30)
+
+
+### Features
+
+* render protocl and udp ([44df379](https://github.com/MetaCubeX/metacubexd/commit/44df379fd6a18ef7d855dac91897480421e494e5))
+* truncate proxy node name ([6db7ced](https://github.com/MetaCubeX/metacubexd/commit/6db7ceddac226e81e4009d4e333f73bac985bd67))
+* update proxy layout ([83b0de8](https://github.com/MetaCubeX/metacubexd/commit/83b0de831a6d6eedc1c2b8ad74de1416752dd835))
+
+
+### Bug Fixes
+
+* card protocol text style ([4a03662](https://github.com/MetaCubeX/metacubexd/commit/4a03662bbd3a64a481bca96f0c81c78efd8bab7e))
+
 ## [1.19.0](https://github.com/MetaCubeX/metacubexd/compare/v1.18.0...v1.19.0) (2023-08-30)
 
 
