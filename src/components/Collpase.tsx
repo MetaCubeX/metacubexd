@@ -19,7 +19,7 @@ const Collapse: ParentComponent<Props> = (props) => {
 
   const getCollapseContentClassName = () => {
     const openedClassName = 'opacity-100'
-    const closedClassName = 'opacity-0 scale-y-0'
+    const closedClassName = 'opacity-0'
     return props.isOpen ? openedClassName : closedClassName
   }
 

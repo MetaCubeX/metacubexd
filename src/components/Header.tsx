@@ -46,7 +46,7 @@ const ThemeSwitcher = () => (
     <div class="drawer-side">
       <label for="themes" class="drawer-overlay" />
 
-      <ul class="menu rounded-box z-50 gap-2 bg-base-300 p-2 shadow">
+      <ul class="menu rounded-box gap-2 bg-base-300 p-2 shadow">
         <For each={themes}>
           {(theme) => (
             <li
@@ -120,7 +120,7 @@ export const Header = () => {
           <div class="drawer-side">
             <label for="navs" class="drawer-overlay" />
 
-            <ul class="menu rounded-box z-50 min-h-full w-2/5 gap-2 bg-base-300 p-2 shadow">
+            <ul class="menu rounded-box min-h-full w-2/5 gap-2 bg-base-300 pt-20 shadow">
               <For each={navs()}>
                 {({ href, name }) => (
                   <li>
