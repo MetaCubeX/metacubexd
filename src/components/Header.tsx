@@ -10,7 +10,8 @@ import {
   IconRuler,
   IconSettings,
 } from '@tabler/icons-solidjs'
-import { For, ParentComponent, Show } from 'solid-js'
+import { For, ParentComponent, Show, createSignal } from 'solid-js'
+import { twMerge } from 'tailwind-merge'
 import { themes } from '~/constants'
 import { setCurTheme, setSelectedEndpoint } from '~/signals'
 
@@ -100,6 +101,8 @@ export const Header = () => {
   const location = useLocation()
   const navigate = useNavigate()
 
+  const [openedDrawer, setOpenedDrawer] = createSignal(false)
+
   const onSwitchEndpointClick = () => {
     setSelectedEndpoint('')
     navigate('/setup')
@@ -108,8 +111,14 @@ export const Header = () => {
   return (
     <ul class="navbar rounded-box sticky inset-x-0 top-2 z-10 mx-2 mt-2 flex w-auto items-center justify-center bg-base-300 px-4">
       <div class="navbar-start gap-4">
-        <div class="drawer w-auto lg:hidden">
-          <input id="navs" type="checkbox" class="drawer-toggle" />
+        <div class={twMerge('drawer w-auto lg:hidden', '')}>
+          <input
+            id="navs"
+            type="checkbox"
+            class="drawer-toggle"
+            onChange={(e) => setOpenedDrawer(e.target.checked)}
+            checked={openedDrawer()}
+          />
 
           <div class="drawer-content flex items-center">
             <label for="navs" class="btn btn-circle drawer-button btn-sm">
@@ -123,7 +132,7 @@ export const Header = () => {
             <ul class="menu rounded-box min-h-full w-2/5 gap-2 bg-base-300 pt-20 shadow">
               <For each={navs()}>
                 {({ href, name }) => (
-                  <li>
+                  <li onClick={() => setOpenedDrawer(false)}>
                     <A href={href}>{name}</A>
                   </li>
                 )}
