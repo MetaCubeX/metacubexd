@@ -40,19 +40,22 @@ export default () => {
           <For each={proxies()}>
             {(proxy) => {
               const title = (
-                <>
-                  <div class="flex items-center gap-2">
+                <div class="flex items-center justify-between">
+                  <div class="flex flex-col">
                     <span>{proxy.name}</span>
 
-                    <IconBrandSpeedtest
-                      class="cursor-pointer"
-                      onClick={(e) => onSpeedTestClick(e, proxy.name)}
-                    />
+                    <div class="text-sm text-slate-500">
+                      {proxy.type} :: {proxy.now}
+                    </div>
                   </div>
-                  <div class="text-sm text-slate-500">
-                    {proxy.type} :: {proxy.now}
-                  </div>
-                </>
+
+                  <button
+                    class="btn btn-circle btn-sm"
+                    onClick={(e) => onSpeedTestClick(e, proxy.name)}
+                  >
+                    <IconBrandSpeedtest />
+                  </button>
+                </div>
               )
 
               const content = (

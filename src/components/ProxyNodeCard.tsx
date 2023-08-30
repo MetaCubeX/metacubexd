@@ -33,7 +33,7 @@ export default (props: {
     const t = type.toLowerCase()
 
     if (t === 'shadowsocks') {
-      return 'SS'
+      return 'ss'
     }
 
     return t

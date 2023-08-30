@@ -31,7 +31,7 @@ const Collapse: ParentComponent<Props> = (props) => {
       )}
     >
       <div
-        class={'collapse-title text-xl font-medium'}
+        class="collapse-title text-xl font-medium"
         onClick={() => onCollapse(!props.isOpen)}
       >
         {title}
