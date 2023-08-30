@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.1](https://github.com/MetaCubeX/metacubexd/compare/v1.14.0...v1.14.1) (2023-08-30)
+
+
+### Bug Fixes
+
+* support child path to fix router issue ([1091234](https://github.com/MetaCubeX/metacubexd/commit/10912347032f02e87c6754bb109510e1873a429f))
+
 ## [1.14.0](https://github.com/MetaCubeX/metacubexd/compare/v1.13.2...v1.14.0) (2023-08-29)
 
 
