@@ -50,13 +50,17 @@ export default () => {
   const { form } = createForm<z.infer<typeof schema>>({
     extend: validator({ schema }),
     async onSubmit({ url, secret }) {
-      const endpointFromHistory = endpointList().find(
-        (history) => history.url === url && history.secret === secret,
-      )
+      const i = endpointList().findIndex((history) => history.url === url)
 
-      if (endpointFromHistory) {
-        onSetupSuccess(endpointFromHistory.id)
+      if (i > -1) {
+        const { id, secret: oldSecret } = endpointList()[i]
 
+        if (secret !== oldSecret && !(await checkEndpoint(url, secret))) {
+          endpointList()[i].secret = secret
+          setEndpointList(endpointList())
+        }
+
+        onSetupSuccess(id)
         return
       }
 
