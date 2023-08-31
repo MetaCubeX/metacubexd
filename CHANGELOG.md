@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.25.0](https://github.com/MetaCubeX/metacubexd/compare/v1.24.0...v1.25.0) (2023-08-31)
+
+
+### Features
+
+* update secret when changed ([#48](https://github.com/MetaCubeX/metacubexd/issues/48)) ([935908e](https://github.com/MetaCubeX/metacubexd/commit/935908e0c1f4885a89a27008d5d7f6cd5e52ff68))
+
 ## [1.24.0](https://github.com/MetaCubeX/metacubexd/compare/v1.23.0...v1.24.0) (2023-08-31)
 
 
