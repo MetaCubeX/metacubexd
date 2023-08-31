@@ -30,12 +30,12 @@ const Collapse: ParentComponent<Props> = (props) => {
         'collapse collapse-arrow overflow-visible border-secondary bg-base-200',
       )}
     >
-      <div
-        class="collapse-title text-xl font-medium"
-        onClick={() => onCollapse(!props.isOpen)}
-      >
-        {title}
-      </div>
+      <input
+        type="checkbox"
+        onChange={(e) => onCollapse(e.target.checked)}
+        checked={props.isOpen}
+      />
+      <div class="collapse-title text-xl font-medium">{title}</div>
       <div
         class={twMerge(
           getCollapseContentClassName(),
