@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.24.0](https://github.com/MetaCubeX/metacubexd/compare/v1.23.0...v1.24.0) (2023-08-31)
+
+
+### Features
+
+* dayjs ([b4fc1b4](https://github.com/MetaCubeX/metacubexd/commit/b4fc1b4c983cebe7a52dd08f4b2b49dd6eb6a17d))
+* health check for provider ([03dda3c](https://github.com/MetaCubeX/metacubexd/commit/03dda3ccad684a326022022c7c83155ee9d32410))
+
 ## [1.23.0](https://github.com/MetaCubeX/metacubexd/compare/v1.22.0...v1.23.0) (2023-08-31)
 
 
