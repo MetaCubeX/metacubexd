@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.23.0](https://github.com/MetaCubeX/metacubexd/compare/v1.22.0...v1.23.0) (2023-08-31)
+
+
+### Features
+
+* config port && hide id in table by default ([e0f5c46](https://github.com/MetaCubeX/metacubexd/commit/e0f5c46a2eb1876b7d412b773139c752414888e4))
+* update provider && rule pages style ([c0fee9d](https://github.com/MetaCubeX/metacubexd/commit/c0fee9d9298f807fb6380e72d49166609e9ac262))
+
 ## [1.22.0](https://github.com/MetaCubeX/metacubexd/compare/v1.21.0...v1.22.0) (2023-08-30)
 
 
