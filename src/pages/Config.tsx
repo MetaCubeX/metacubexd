@@ -15,31 +15,26 @@ const schema = z.object({
 
 export default () => {
   const request = useRequest()
-  const formItemList = [
+  const portsList = [
     {
+      label: 'Http Port',
       key: 'port',
-      label: 'port',
-      type: 'number',
     },
     {
+      label: 'Socks Port',
       key: 'socks-port',
-      label: 'socks-port',
-      type: 'number',
     },
     {
+      label: 'Redir Port',
       key: 'redir-port',
-      label: 'redir-port',
-      type: 'number',
     },
     {
+      label: 'Tproxy Port',
       key: 'tproxy-port',
-      label: 'tproxy-port',
-      type: 'number',
     },
     {
+      label: 'Mixed Port',
       key: 'mixed-port',
-      label: 'mixed-port',
-      type: 'number',
     },
   ]
 
@@ -55,15 +50,16 @@ export default () => {
 
   return (
     <div>
-      config
-      <form class="contents" use:form={form}>
-        <For each={formItemList}>
+      <form class="form" use:form={form}>
+        <For each={portsList}>
           {(item) => (
-            <div class="flex flex-row items-center gap-4">
-              {item.label}:
+            <div class="form-control w-64 max-w-xs">
+              <label class="label">
+                <span class="label-text">{item.label}</span>
+              </label>
               <input
                 name={item.key}
-                type={item.type}
+                type="number"
                 class="input input-bordered"
                 placeholder={item.label}
               />

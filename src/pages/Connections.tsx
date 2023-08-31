@@ -87,7 +87,7 @@ export default () => {
             class="btn btn-circle btn-outline btn-xs"
             onClick={() => request.delete('connections')}
           >
-            <IconX />
+            <IconX class="" />
           </button>
         </div>
       ),
@@ -176,6 +176,9 @@ export default () => {
       get sorting() {
         return sorting()
       },
+      columnVisibility: {
+        ID: false,
+      },
     },
     get data() {
       return search()
@@ -188,6 +191,7 @@ export default () => {
           )
         : connectionsWithSpeed()
     },
+    enableHiding: true,
     columns,
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
