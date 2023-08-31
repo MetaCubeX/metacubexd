@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.27.0](https://github.com/MetaCubeX/metacubexd/compare/v1.26.0...v1.27.0) (2023-08-31)
+
+
+### Features
+
+* sortable column ([4c4011a](https://github.com/MetaCubeX/metacubexd/commit/4c4011a617a5589da13dafcf357b9caef7bf5b32))
+
 ## [1.26.0](https://github.com/MetaCubeX/metacubexd/compare/v1.25.1...v1.26.0) (2023-08-31)
 
 
