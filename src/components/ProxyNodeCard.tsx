@@ -42,10 +42,8 @@ export default (props: {
   return (
     <div
       class={twMerge(
-        'card card-bordered tooltip tooltip-bottom card-compact flex gap-1 p-3',
-        isSelected
-          ? 'border-primary bg-success-content text-success'
-          : 'border-secondary',
+        'card card-bordered tooltip tooltip-bottom card-compact flex gap-1 border-primary p-3',
+        isSelected && 'border-success bg-success-content text-success',
         onClick && 'cursor-pointer',
       )}
       onClick={() => onClick?.()}

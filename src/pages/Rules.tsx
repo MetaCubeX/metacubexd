@@ -29,7 +29,7 @@ export default () => {
         <div class="grid grid-cols-1 gap-2 sm:grid-cols-1">
           <For each={rules()}>
             {(rule) => (
-              <div class="card card-bordered card-compact border-secondary p-4">
+              <div class="card card-bordered card-compact border-primary p-4">
                 <div class="break-all">{rule.payload}</div>
                 <div class="text-xs text-slate-500">
                   {rule.type} :: {rule.proxy}
