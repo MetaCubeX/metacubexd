@@ -32,8 +32,8 @@ export default (props: {
   const formatProxyType = (type: string) => {
     const t = type.toLowerCase()
 
-    if (t === 'shadowsocks') {
-      return 'ss'
+    if (t.includes('shadowsocks')) {
+      return t.replace('shadowsocks', 'ss')
     }
 
     return t
@@ -42,7 +42,7 @@ export default (props: {
   return (
     <div
       class={twMerge(
-        'card card-bordered tooltip tooltip-bottom card-compact flex gap-1 p-4',
+        'card card-bordered tooltip tooltip-bottom card-compact flex gap-1 p-3',
         isSelected
           ? 'border-primary bg-success-content text-success'
           : 'border-secondary',

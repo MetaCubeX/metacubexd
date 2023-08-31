@@ -84,17 +84,19 @@ export default () => {
               )
 
               return (
-                <Collapse
-                  isOpen={collapsedMap()[`group-${proxy.name}`]}
-                  title={title}
-                  content={content}
-                  onCollapse={(val) =>
-                    setCollapsedMap({
-                      ...collapsedMap(),
-                      [`group-${proxy.name}`]: val,
-                    })
-                  }
-                />
+                <div>
+                  <Collapse
+                    isOpen={collapsedMap()[`group-${proxy.name}`]}
+                    title={title}
+                    content={content}
+                    onCollapse={(val) =>
+                      setCollapsedMap({
+                        ...collapsedMap(),
+                        [`group-${proxy.name}`]: val,
+                      })
+                    }
+                  />
+                </div>
               )
             }}
           </For>
@@ -143,17 +145,19 @@ export default () => {
               )
 
               return (
-                <Collapse
-                  isOpen={collapsedMap()[`provider-${proxyProvider.name}`]}
-                  title={title}
-                  content={content}
-                  onCollapse={(val) =>
-                    setCollapsedMap({
-                      ...collapsedMap(),
-                      [`provider-${proxyProvider.name}`]: val,
-                    })
-                  }
-                />
+                <div>
+                  <Collapse
+                    isOpen={collapsedMap()[`provider-${proxyProvider.name}`]}
+                    title={title}
+                    content={content}
+                    onCollapse={(val) =>
+                      setCollapsedMap({
+                        ...collapsedMap(),
+                        [`provider-${proxyProvider.name}`]: val,
+                      })
+                    }
+                  />
+                </div>
               )
             }}
           </For>

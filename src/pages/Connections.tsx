@@ -1,7 +1,9 @@
 import { createEventSignal } from '@solid-primitives/event-listener'
+import { makePersisted } from '@solid-primitives/storage'
 import { createReconnectingWS } from '@solid-primitives/websocket'
 import {
   IconCircleX,
+  IconSettings,
   IconSortAscending,
   IconSortDescending,
 } from '@tabler/icons-solidjs'
@@ -17,6 +19,8 @@ import byteSize from 'byte-size'
 import { isIPv6 } from 'is-ip'
 import { For, createEffect, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
+import ConnectionsModal from '~/components/ConnectionsModal'
+import { AccessorKey } from '~/config/connection'
 import { secret, useRequest, wsEndpointURL } from '~/signals'
 import type { Connection } from '~/types'
 
@@ -25,7 +29,22 @@ type ConnectionWithSpeed = Connection & {
   uploadSpeed: number
 }
 
+type ColumnVisibility = Partial<Record<AccessorKey, boolean>>
+
+const initColumnVisibility = {
+  ...Object.fromEntries(Object.values(AccessorKey).map((i) => [i, true])),
+  [AccessorKey.ID]: false,
+}
+
 export default () => {
+  const [columnVisibility, setColumnVisibility] = makePersisted(
+    createSignal<ColumnVisibility>(initColumnVisibility),
+    {
+      name: 'columnVisibility',
+      storage: localStorage,
+    },
+  )
+
   const request = useRequest()
   const [search, setSearch] = createSignal('')
 
@@ -80,7 +99,7 @@ export default () => {
 
   const columns: ColumnDef<ConnectionWithSpeed>[] = [
     {
-      id: 'close',
+      accessorKey: AccessorKey.Close,
       header: () => (
         <div class="flex h-full items-center">
           <button
@@ -103,63 +122,63 @@ export default () => {
       ),
     },
     {
-      accessorKey: 'ID',
+      accessorKey: AccessorKey.ID,
       accessorFn: (row) => row.id,
     },
     {
-      accessorKey: 'Type',
+      accessorKey: AccessorKey.Type,
       accessorFn: (row) => `${row.metadata.type}(${row.metadata.network})`,
     },
     {
-      accessorKey: 'Process',
+      accessorKey: AccessorKey.Process,
       accessorFn: (row) => row.metadata.process || '-',
     },
     {
-      accessorKey: 'Host',
+      accessorKey: AccessorKey.Host,
       accessorFn: (row) =>
         row.metadata.host ? row.metadata.host : row.metadata.destinationIP,
     },
     {
-      accessorKey: 'Rule',
+      accessorKey: AccessorKey.Rule,
       accessorFn: (row) =>
         !row.rulePayload ? row.rule : `${row.rule} :: ${row.rulePayload}`,
     },
     {
-      accessorKey: 'Chains',
+      accessorKey: AccessorKey.Chains,
       accessorFn: (row) => row.chains.slice().reverse().join(' :: '),
     },
     {
-      accessorKey: 'DL Speed',
+      accessorKey: AccessorKey.DlSpeed,
       accessorFn: (row) => `${byteSize(row.downloadSpeed)}/s`,
       sortingFn: (prev, next) =>
         prev.original.downloadSpeed - next.original.downloadSpeed,
     },
     {
-      accessorKey: 'UL Speed',
+      accessorKey: AccessorKey.ULSpeed,
       accessorFn: (row) => `${byteSize(row.uploadSpeed)}/s`,
       sortingFn: (prev, next) =>
         prev.original.uploadSpeed - next.original.uploadSpeed,
     },
     {
-      accessorKey: 'DL',
+      accessorKey: AccessorKey.Download,
       accessorFn: (row) => byteSize(row.download),
       sortingFn: (prev, next) =>
         prev.original.download - next.original.download,
     },
     {
-      accessorKey: 'UL',
+      accessorKey: AccessorKey.Upload,
       accessorFn: (row) => byteSize(row.upload),
       sortingFn: (prev, next) => prev.original.upload - next.original.upload,
     },
     {
-      accessorKey: 'Source',
+      accessorKey: AccessorKey.Source,
       accessorFn: (row) =>
         isIPv6(row.metadata.sourceIP)
           ? `[${row.metadata.sourceIP}]:${row.metadata.sourcePort}`
           : `${row.metadata.sourceIP}:${row.metadata.sourcePort}`,
     },
     {
-      accessorKey: 'Destination',
+      accessorKey: AccessorKey.Destination,
       accessorFn: (row) =>
         isIPv6(row.metadata.destinationIP)
           ? `[${row.metadata.destinationIP}]:${row.metadata.destinationPort}`
@@ -176,8 +195,8 @@ export default () => {
       get sorting() {
         return sorting()
       },
-      columnVisibility: {
-        ID: false,
+      get columnVisibility() {
+        return columnVisibility()
       },
     },
     get data() {
@@ -200,11 +219,22 @@ export default () => {
 
   return (
     <div class="flex flex-col gap-4">
-      <input
-        class="input input-primary"
-        placeholder="Search"
-        onInput={(e) => setSearch(e.target.value)}
-      />
+      <div class="flex w-full">
+        <input
+          class="input input-primary mr-4 w-40 flex-1"
+          placeholder="Search"
+          onInput={(e) => setSearch(e.target.value)}
+        />
+        <label htmlFor="connection-modal" class="btn">
+          <IconSettings />
+        </label>
+        <ConnectionsModal
+          data={columnVisibility()}
+          onChange={(data: ColumnVisibility) =>
+            setColumnVisibility({ ...data })
+          }
+        />
+      </div>
 
       <div class="overflow-x-auto whitespace-nowrap">
         <table class="table table-xs">
