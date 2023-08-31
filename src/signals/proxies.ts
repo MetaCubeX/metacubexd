@@ -65,19 +65,19 @@ export function useProxies() {
         `group/${proxyGroupName}/delay?url=https%3A%2F%2Fwww.gstatic.com%2Fgenerate_204&timeout=2000`,
       )
       .json()
-    const dMap = delayMap()
 
-    Object.entries(data).forEach(([name, time]) => {
-      dMap[name] = time
-    })
-
-    setDelayMap({ ...dMap })
+    setDelayMap({ ...delayMap(), ...data })
   }
 
-  const updateProxyProviderByProviderName = async (
-    proxyProviderName: string,
-  ) => {
-    await request.put(`/providers/proxies/${proxyProviderName}`)
+  const updateProviderByProviderName = async (proxyProviderName: string) => {
+    await request.put(`providers/proxies/${proxyProviderName}`)
+    await updateProxy()
+  }
+
+  const healthCheckByProviderName = async (providerName: string) => {
+    await request.get(`providers/proxies/${providerName}/healthcheck`, {
+      timeout: 30 * 1000, // thie api was a little bit slow sometimes...
+    })
     await updateProxy()
   }
 
@@ -89,6 +89,7 @@ export function useProxies() {
     delayMap,
     updateProxy,
     setProxyGroupByProxyName,
-    updateProxyProviderByProviderName,
+    updateProviderByProviderName,
+    healthCheckByProviderName,
   }
 }

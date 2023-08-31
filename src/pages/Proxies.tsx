@@ -13,7 +13,8 @@ export default () => {
     updateProxy,
     setProxyGroupByProxyName,
     delayTestByProxyGroupName,
-    updateProxyProviderByProviderName,
+    updateProviderByProviderName,
+    healthCheckByProviderName,
   } = useProxies()
 
   const [collapsedMap, setCollapsedMap] = createSignal<Record<string, boolean>>(
@@ -33,9 +34,14 @@ export default () => {
     delayTestByProxyGroupName(name)
   }
 
+  const onHealthCheckClick = (e: MouseEvent, name: string) => {
+    e.stopPropagation()
+    healthCheckByProviderName(name)
+  }
+
   const onUpdateProviderClick = (e: MouseEvent, name: string) => {
     e.stopPropagation()
-    updateProxyProviderByProviderName(name)
+    updateProviderByProviderName(name)
   }
 
   return (
@@ -112,14 +118,22 @@ export default () => {
                     </div>
                   </div>
 
-                  <button
-                    class="btn btn-circle btn-sm"
-                    onClick={(e) =>
-                      onUpdateProviderClick(e, proxyProvider.name)
-                    }
-                  >
-                    <IconReload />
-                  </button>
+                  <div>
+                    <button
+                      class="btn btn-circle btn-sm mr-2"
+                      onClick={(e) =>
+                        onUpdateProviderClick(e, proxyProvider.name)
+                      }
+                    >
+                      <IconReload />
+                    </button>
+                    <button
+                      class="btn btn-circle btn-sm"
+                      onClick={(e) => onHealthCheckClick(e, proxyProvider.name)}
+                    >
+                      <IconBrandSpeedtest />
+                    </button>
+                  </div>
                 </div>
               )
               const content = (
