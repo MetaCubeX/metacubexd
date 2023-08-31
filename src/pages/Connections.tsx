@@ -30,9 +30,11 @@ type ConnectionWithSpeed = Connection & {
 }
 
 type ColumnVisibility = Partial<Record<AccessorKey, boolean>>
+type ColumnOrder = AccessorKey[]
 
+const initColumnOrder = Object.values(AccessorKey)
 const initColumnVisibility = {
-  ...Object.fromEntries(Object.values(AccessorKey).map((i) => [i, true])),
+  ...Object.fromEntries(initColumnOrder.map((i) => [i, true])),
   [AccessorKey.ID]: false,
 }
 
@@ -41,6 +43,13 @@ export default () => {
     createSignal<ColumnVisibility>(initColumnVisibility),
     {
       name: 'columnVisibility',
+      storage: localStorage,
+    },
+  )
+  const [columnOrder, setColumnOrder] = makePersisted(
+    createSignal<ColumnOrder>(initColumnOrder),
+    {
+      name: 'columnOrder',
       storage: localStorage,
     },
   )
@@ -192,6 +201,9 @@ export default () => {
 
   const table = createSolidTable({
     state: {
+      get columnOrder() {
+        return columnOrder()
+      },
       get sorting() {
         return sorting()
       },
@@ -229,8 +241,12 @@ export default () => {
           <IconSettings />
         </label>
         <ConnectionsModal
-          data={columnVisibility()}
-          onChange={(data: ColumnVisibility) =>
+          order={columnOrder()}
+          visible={columnVisibility()}
+          onOrderChange={(data: ColumnOrder) => {
+            setColumnOrder([...data])
+          }}
+          onVisibleChange={(data: ColumnVisibility) =>
             setColumnVisibility({ ...data })
           }
         />
