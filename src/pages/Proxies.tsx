@@ -4,6 +4,7 @@ import Collapse from '~/components/Collpase'
 import ProxyNodeCard from '~/components/ProxyNodeCard'
 import { useProxies } from '~/signals/proxies'
 import type { Proxy } from '~/types'
+import { formatTimeFromNow } from '~/utils/date'
 
 export default () => {
   const {
@@ -106,8 +107,8 @@ export default () => {
                     <span>{proxyProvider.name}</span>
 
                     <div class="text-sm text-slate-500">
-                      {proxyProvider.vehicleType} :: Updated at{' '}
-                      {new Date(proxyProvider.updatedAt).toLocaleString()}
+                      {proxyProvider.vehicleType} :: Updated{' '}
+                      {formatTimeFromNow(proxyProvider.updatedAt)}
                     </div>
                   </div>
 
