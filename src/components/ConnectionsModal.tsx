@@ -62,7 +62,7 @@ export default (props: {
           'transition-transform': !!state.active.draggable,
         }}
       >
-        <div class="m-1 flex cursor-pointer justify-between p-1">
+        <div class="m-1 flex cursor-grab justify-between p-1">
           <span class="select-none">{key}</span>
           <input
             type="checkbox"
