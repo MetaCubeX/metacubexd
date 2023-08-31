@@ -50,7 +50,7 @@ export function useProxies() {
     )
   }
 
-  const setProxiesByProxyName = async (proxy: Proxy, proxyName: string) => {
+  const setProxyGroupByProxyName = async (proxy: Proxy, proxyName: string) => {
     await request.put(`proxies/${proxy.name}`, {
       body: JSON.stringify({
         name: proxyName,
@@ -74,6 +74,13 @@ export function useProxies() {
     setDelayMap({ ...dMap })
   }
 
+  const updateProxyProviderByProviderName = async (
+    proxyProviderName: string,
+  ) => {
+    await request.put(`/providers/proxies/${proxyProviderName}`)
+    await updateProxy()
+  }
+
   return {
     proxies,
     proxyProviders,
@@ -81,6 +88,7 @@ export function useProxies() {
     proxyNodeMap,
     delayMap,
     updateProxy,
-    setProxiesByProxyName,
+    setProxyGroupByProxyName,
+    updateProxyProviderByProviderName,
   }
 }

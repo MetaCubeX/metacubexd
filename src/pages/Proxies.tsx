@@ -1,4 +1,4 @@
-import { IconBrandSpeedtest } from '@tabler/icons-solidjs'
+import { IconBrandSpeedtest, IconReload } from '@tabler/icons-solidjs'
 import { For, createSignal, onMount } from 'solid-js'
 import Collapse from '~/components/Collpase'
 import ProxyNodeCard from '~/components/ProxyNodeCard'
@@ -10,8 +10,9 @@ export default () => {
     proxies,
     proxyProviders,
     updateProxy,
-    setProxiesByProxyName,
+    setProxyGroupByProxyName,
     delayTestByProxyGroupName,
+    updateProxyProviderByProviderName,
   } = useProxies()
 
   const [collapsedMap, setCollapsedMap] = createSignal<Record<string, boolean>>(
@@ -23,12 +24,17 @@ export default () => {
   })
 
   const onProxyNodeClick = async (proxy: Proxy, proxyName: string) => {
-    setProxiesByProxyName(proxy, proxyName)
+    setProxyGroupByProxyName(proxy, proxyName)
   }
 
   const onSpeedTestClick = (e: MouseEvent, name: string) => {
     e.stopPropagation()
     delayTestByProxyGroupName(name)
+  }
+
+  const onUpdateProviderClick = (e: MouseEvent, name: string) => {
+    e.stopPropagation()
+    updateProxyProviderByProviderName(name)
   }
 
   return (
@@ -94,7 +100,27 @@ export default () => {
         <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <For each={proxyProviders()}>
             {(proxyProvider) => {
-              const title = <>{proxyProvider.name}</>
+              const title = (
+                <div class="flex items-center justify-between">
+                  <div class="flex flex-col">
+                    <span>{proxyProvider.name}</span>
+
+                    <div class="text-sm text-slate-500">
+                      {proxyProvider.vehicleType} :: Updated at{' '}
+                      {new Date(proxyProvider.updatedAt).toLocaleString()}
+                    </div>
+                  </div>
+
+                  <button
+                    class="btn btn-circle btn-sm"
+                    onClick={(e) =>
+                      onUpdateProviderClick(e, proxyProvider.name)
+                    }
+                  >
+                    <IconReload />
+                  </button>
+                </div>
+              )
               const content = (
                 <For each={proxyProvider.proxies}>
                   {(proxy) => <ProxyNodeCard proxyName={proxy.name} />}

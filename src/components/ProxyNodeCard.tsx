@@ -55,7 +55,7 @@ export default (props: {
       <div class="flex items-center justify-between gap-1">
         <div class="truncate text-xs text-slate-500">
           {formatProxyType(proxyNode().type)}
-          {proxyNode().udp ? ' :: udp' : ''}
+          {proxyNode().udp && ' :: udp'}
         </div>
         <div class="text-xs">{Delay(proxyName)}</div>
       </div>
