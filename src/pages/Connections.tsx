@@ -225,7 +225,7 @@ export default () => {
           placeholder="Search"
           onInput={(e) => setSearch(e.target.value)}
         />
-        <label htmlFor="connection-modal" class="btn">
+        <label htmlFor="connection-modal" class="btn btn-circle">
           <IconSettings />
         </label>
         <ConnectionsModal
