@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.25.1](https://github.com/MetaCubeX/metacubexd/compare/v1.25.0...v1.25.1) (2023-08-31)
+
+
+### Bug Fixes
+
+* **connections:** update the look of close button ([eee81e6](https://github.com/MetaCubeX/metacubexd/commit/eee81e62585605794c6f77b99b5c82b0e3d03774))
+
 ## [1.25.0](https://github.com/MetaCubeX/metacubexd/compare/v1.24.0...v1.25.0) (2023-08-31)
 
 
