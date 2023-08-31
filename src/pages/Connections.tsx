@@ -1,9 +1,9 @@
 import { createEventSignal } from '@solid-primitives/event-listener'
 import { createReconnectingWS } from '@solid-primitives/websocket'
 import {
+  IconCircleX,
   IconSortAscending,
   IconSortDescending,
-  IconX,
 } from '@tabler/icons-solidjs'
 import {
   ColumnDef,
@@ -84,20 +84,20 @@ export default () => {
       header: () => (
         <div class="flex h-full items-center">
           <button
-            class="btn btn-circle btn-outline btn-xs"
+            class="btn btn-ghost btn-xs"
             onClick={() => request.delete('connections')}
           >
-            <IconX class="" />
+            <IconCircleX size="18" />
           </button>
         </div>
       ),
       cell: ({ row }) => (
         <div class="flex h-full items-center">
           <button
-            class="btn btn-circle btn-outline btn-xs"
+            class="btn btn-ghost btn-xs"
             onClick={() => onCloseConnection(row.id)}
           >
-            <IconX />
+            <IconCircleX size="18" />
           </button>
         </div>
       ),
