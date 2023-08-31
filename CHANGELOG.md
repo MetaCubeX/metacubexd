@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.27.1](https://github.com/MetaCubeX/metacubexd/compare/v1.27.0...v1.27.1) (2023-08-31)
+
+
+### Bug Fixes
+
+* border color ([c2cb607](https://github.com/MetaCubeX/metacubexd/commit/c2cb607a452b15da3fbfe9c1d2f5007f8b9fbcb6))
+
 ## [1.27.0](https://github.com/MetaCubeX/metacubexd/compare/v1.26.0...v1.27.0) (2023-08-31)
 
 
