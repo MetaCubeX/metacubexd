@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.26.0](https://github.com/MetaCubeX/metacubexd/compare/v1.25.1...v1.26.0) (2023-08-31)
+
+
+### Features
+
+* columns hide ([cb9970c](https://github.com/MetaCubeX/metacubexd/commit/cb9970c29eae947d85e2ba196f92db360fd5add9))
+
 ## [1.25.1](https://github.com/MetaCubeX/metacubexd/compare/v1.25.0...v1.25.1) (2023-08-31)
 
 
