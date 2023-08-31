@@ -84,7 +84,7 @@ export default () => {
       header: () => (
         <div class="flex h-full items-center">
           <button
-            class="btn btn-ghost btn-xs"
+            class="btn btn-circle btn-xs"
             onClick={() => request.delete('connections')}
           >
             <IconCircleX size="18" />
@@ -94,7 +94,7 @@ export default () => {
       cell: ({ row }) => (
         <div class="flex h-full items-center">
           <button
-            class="btn btn-ghost btn-xs"
+            class="btn btn-circle btn-xs"
             onClick={() => onCloseConnection(row.id)}
           >
             <IconCircleX size="18" />
