@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.38.0](https://github.com/MetaCubeX/metacubexd/compare/v1.37.0...v1.38.0) (2023-09-01)
+
+
+### Features
+
+* **logs:** render logs in table ([7eee024](https://github.com/MetaCubeX/metacubexd/commit/7eee024cdc2c831a75710d62e842ae648818dec8))
+
 ## [1.37.0](https://github.com/MetaCubeX/metacubexd/compare/v1.36.1...v1.37.0) (2023-09-01)
 
 
