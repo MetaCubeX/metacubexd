@@ -98,7 +98,6 @@ export default () => {
           <input
             name="secret"
             type="password"
-            autocomplete="new-password"
             class="input input-bordered"
             placeholder="secret"
           />
