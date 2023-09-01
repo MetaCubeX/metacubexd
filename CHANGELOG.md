@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.29.0](https://github.com/MetaCubeX/metacubexd/compare/v1.28.3...v1.29.0) (2023-09-01)
+
+
+### Features
+
+* infinite scroll for rules ([a05c548](https://github.com/MetaCubeX/metacubexd/commit/a05c54854a3ffb1b9d079e14f9d48c0d2e79d2f3))
+
+
+### Bug Fixes
+
+* set proxy both from proxies and provider ([2549bfe](https://github.com/MetaCubeX/metacubexd/commit/2549bfe89cc5dd97ff2eb17d2d66ec659f5f046c))
+
 ## [1.28.3](https://github.com/MetaCubeX/metacubexd/compare/v1.28.2...v1.28.3) (2023-09-01)
 
 
