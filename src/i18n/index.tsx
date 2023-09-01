@@ -20,6 +20,10 @@ const dict = {
       activeConnections: 'Active Connections',
       memoryUsage: 'Memory Usage',
     },
+    proxies: {
+      proxies: 'Proxies',
+      proxyProvider: 'Proxy Provider',
+    },
   },
   'zh-Hans': {
     navs: {
@@ -38,14 +42,23 @@ const dict = {
       activeConnections: '活动连接',
       memoryUsage: '内存使用情况',
     },
+    proxies: {
+      proxies: '代理节点组',
+      proxyProvider: '代理提供商',
+    },
   },
 }
 
 const useLanguage = () => {
-  const [lang, setLang] = makePersisted(createSignal(navigator.language), {
-    name: 'lang',
-    storage: localStorage,
-  })
+  const [lang, setLang] = makePersisted(
+    createSignal(
+      Reflect.has(dict, navigator.language) ? navigator.language : 'en-US',
+    ),
+    {
+      name: 'lang',
+      storage: localStorage,
+    },
+  )
 
   return { lang, setLang }
 }

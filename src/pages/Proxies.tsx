@@ -1,3 +1,4 @@
+import { useI18n } from '@solid-primitives/i18n'
 import { IconBrandSpeedtest, IconReload } from '@tabler/icons-solidjs'
 import { Show, createSignal, onMount } from 'solid-js'
 import Collapse from '~/components/Collpase'
@@ -10,6 +11,7 @@ import type { Proxy } from '~/types'
 import { formatTimeFromNow } from '~/utils/proxies'
 
 export default () => {
+  const [t] = useI18n()
   const {
     proxies,
     proxyProviders,
@@ -62,7 +64,7 @@ export default () => {
   return (
     <div class="flex flex-col gap-4">
       <div>
-        <h1 class="pb-4 text-lg font-semibold">Proxies</h1>
+        <h1 class="pb-4 text-lg font-semibold">{t('proxies.proxies')}</h1>
 
         <ForTwoLine
           subChild={proxies().map((proxy) => {
@@ -117,7 +119,7 @@ export default () => {
       </div>
 
       <Show when={proxyProviders().length > 0}>
-        <h1 class="pb-4 text-lg font-semibold">Proxy Providers</h1>
+        <h1 class="pb-4 text-lg font-semibold">{t('proxies.proxyProvider')}</h1>
 
         <ForTwoLine
           subChild={proxyProviders().map((proxyProvider) => {
