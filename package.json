@@ -49,6 +49,7 @@
     "typescript": "^5.2.2",
     "uuid": "^9.0.0",
     "vite": "^4.4.9",
+    "vite-plugin-pwa": "^0.16.4",
     "vite-plugin-solid": "^2.7.0",
     "zod": "^3.22.2"
   }
