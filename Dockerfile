@@ -11,6 +11,8 @@ RUN pnpm build
 
 FROM docker.io/caddy:alpine
 
+EXPOSE 80
+
 WORKDIR /srv
 
 COPY --from=builder /build/dist/. .
