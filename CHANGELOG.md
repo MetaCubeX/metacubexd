@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.35.1](https://github.com/MetaCubeX/metacubexd/compare/v1.35.0...v1.35.1) (2023-09-01)
+
+
+### Bug Fixes
+
+* collapse render ([b26e033](https://github.com/MetaCubeX/metacubexd/commit/b26e03373fcc2516cf21acc51756dc2237406000))
+
 ## [1.35.0](https://github.com/MetaCubeX/metacubexd/compare/v1.34.0...v1.35.0) (2023-09-01)
 
 
