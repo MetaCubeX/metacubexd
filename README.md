@@ -1,10 +1,14 @@
 # metacubexd
 
-CF pages: https://metacubexd.pages.dev
-
-GH pages: https://metacubex.github.io/metacubexd
-
 Clash-Meta Dashboard
+
+## Published Official Links
+
+GH Pages Custom Domain: http://d.metacubex.one
+
+GH Pages: https://metacubex.github.io/metacubexd
+
+Cloudflare Pages: https://metacubexd.pages.dev
 
 ![preview](docs/preview.webp)
 
