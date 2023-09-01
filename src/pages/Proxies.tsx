@@ -90,7 +90,13 @@ export default () => {
               )
 
               const content = (
-                <ProxyCardGroups proxies={proxy.all!} now={proxy.now} />
+                <ProxyCardGroups
+                  proxies={proxy.all!}
+                  now={proxy.now}
+                  onClick={(name) => {
+                    setProxyGroupByProxyName(proxy, name)
+                  }}
+                />
               )
 
               return (
