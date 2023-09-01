@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.39.0](https://github.com/MetaCubeX/metacubexd/compare/v1.38.0...v1.39.0) (2023-09-01)
+
+
+### Features
+
+* **i18n:** add i18n support for navs ([3c7f01a](https://github.com/MetaCubeX/metacubexd/commit/3c7f01aefc4567886c4610aaf0753d037eeaf838))
+* **i18n:** add more i18n resources ([b3172da](https://github.com/MetaCubeX/metacubexd/commit/b3172da302ddf53a33f6ca092f11eac153401feb))
+* **i18n:** add toggle i18n button ([5620011](https://github.com/MetaCubeX/metacubexd/commit/56200111bd3dcb147e41dbcec2be6a7481b90f67))
+
+
+### Bug Fixes
+
+* default lang ([508e19a](https://github.com/MetaCubeX/metacubexd/commit/508e19a247e90a7a83d1f386851eb13d19e2b58a))
+
 ## [1.38.0](https://github.com/MetaCubeX/metacubexd/compare/v1.37.0...v1.38.0) (2023-09-01)
 
 
