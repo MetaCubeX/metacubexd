@@ -1,6 +1,5 @@
-import { JSX, ParentComponent } from 'solid-js'
+import { JSX, ParentComponent, Show } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-// import { Ch} from '@tabler/icons-solidjs'
 
 type Props = {
   title: JSX.Element
@@ -43,7 +42,7 @@ const Collapse: ParentComponent<Props> = (props) => {
           'collapse-content grid auto-rows-min grid-cols-2 gap-2 transition-opacity duration-1000 lg:grid-cols-3 xl:grid-cols-4',
         )}
       >
-        {content}
+        <Show when={props.isOpen}>{content}</Show>
       </div>
     </div>
   )
