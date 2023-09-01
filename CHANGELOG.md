@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.28.3](https://github.com/MetaCubeX/metacubexd/compare/v1.28.2...v1.28.3) (2023-09-01)
+
+
+### Bug Fixes
+
+* proxy from proxies ([42d9e7b](https://github.com/MetaCubeX/metacubexd/commit/42d9e7bc9f19169d9928157b97a948205ca9cff6))
+
 ## [1.28.2](https://github.com/MetaCubeX/metacubexd/compare/v1.28.1...v1.28.2) (2023-09-01)
 
 
