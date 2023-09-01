@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.41.1](https://github.com/MetaCubeX/metacubexd/compare/v1.41.0...v1.41.1) (2023-09-01)
+
+
+### Bug Fixes
+
+* some themes is overriding global font-family ([c8a41bd](https://github.com/MetaCubeX/metacubexd/commit/c8a41bd29f5b60dc79c6fc623c27d1fbba700408))
+
 ## [1.41.0](https://github.com/MetaCubeX/metacubexd/compare/v1.40.0...v1.41.0) (2023-09-01)
 
 
