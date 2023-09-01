@@ -5,6 +5,7 @@ import {
   IconFileStack,
   IconGlobe,
   IconHome,
+  IconLanguage,
   IconMenu,
   IconNetwork,
   IconPalette,
@@ -66,7 +67,7 @@ const ThemeSwitcher = () => (
 )
 
 export const Header = () => {
-  const [t] = useI18n()
+  const [t, { locale }] = useI18n()
 
   const navs = () => [
     {
@@ -169,6 +170,17 @@ export const Header = () => {
 
       <div class="navbar-end">
         <div class="flex items-center gap-2">
+          <button
+            class="btn btn-circle btn-sm"
+            onClick={() => {
+              const curLocale = locale()
+
+              locale(curLocale === 'en-US' ? 'zh-Hans' : 'en-US')
+            }}
+          >
+            <IconLanguage />
+          </button>
+
           <ThemeSwitcher />
 
           <button

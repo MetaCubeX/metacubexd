@@ -1,4 +1,5 @@
 import { createEventSignal } from '@solid-primitives/event-listener'
+import { useI18n } from '@solid-primitives/i18n'
 import { createReconnectingWS } from '@solid-primitives/websocket'
 import type { ApexOptions } from 'apexcharts'
 import byteSize from 'byte-size'
@@ -58,6 +59,7 @@ const TrafficWidget: ParentComponent<{ label: JSX.Element }> = (props) => (
 )
 
 export default () => {
+  const [t] = useI18n()
   const [traffics, setTraffics] = createSignal<{ down: number; up: number }[]>(
     [],
   )
@@ -170,27 +172,27 @@ export default () => {
   return (
     <div class="flex flex-col gap-4">
       <div class="stats stats-vertical w-full bg-primary shadow lg:stats-horizontal lg:flex">
-        <TrafficWidget label="Upload">
+        <TrafficWidget label={t('stats.upload')}>
           {byteSize(traffic()?.up || 0).toString()}/s
         </TrafficWidget>
 
-        <TrafficWidget label="Download">
+        <TrafficWidget label={t('stats.download')}>
           {byteSize(traffic()?.down || 0).toString()}/s
         </TrafficWidget>
 
-        <TrafficWidget label="Upload Total">
+        <TrafficWidget label={t('stats.uploadTotal')}>
           {byteSize(connection()?.uploadTotal || 0).toString()}
         </TrafficWidget>
 
-        <TrafficWidget label="Download Total">
+        <TrafficWidget label={t('stats.downloadTotal')}>
           {byteSize(connection()?.downloadTotal || 0).toString()}
         </TrafficWidget>
 
-        <TrafficWidget label="Active Connections">
+        <TrafficWidget label={t('stats.activeConnections')}>
           {connection()?.connections.length || 0}
         </TrafficWidget>
 
-        <TrafficWidget label="Memory Usage">
+        <TrafficWidget label={t('stats.memoryUsage')}>
           {byteSize(memory() || 0).toString()}
         </TrafficWidget>
       </div>
