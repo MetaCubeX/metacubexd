@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.32.0](https://github.com/MetaCubeX/metacubexd/compare/v1.31.0...v1.32.0) (2023-09-01)
+
+
+### Features
+
+* add a dns query form ([b42bba7](https://github.com/MetaCubeX/metacubexd/commit/b42bba784a11156cb7964f25de840197dedceee7))
+
 ## [1.31.0](https://github.com/MetaCubeX/metacubexd/compare/v1.30.0...v1.31.0) (2023-09-01)
 
 
