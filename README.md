@@ -1,5 +1,9 @@
 # metacubexd
 
+CF pages: https://metacubexd.pages.dev
+
+GH pages: https://metacubex.github.io/metacubexd
+
 Clash-Meta Dashboard
 
 ![preview](docs/preview.webp)
