@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.41.0](https://github.com/MetaCubeX/metacubexd/compare/v1.40.0...v1.41.0) (2023-09-01)
+
+
+### Features
+
+* publish gh-pages to a custom domain ([4b548fb](https://github.com/MetaCubeX/metacubexd/commit/4b548fb219581ad7fe7eea56eb52aeb082ab5bb9))
+
 ## [1.40.0](https://github.com/MetaCubeX/metacubexd/compare/v1.39.0...v1.40.0) (2023-09-01)
 
 
