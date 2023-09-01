@@ -10,7 +10,9 @@
   src: url('assets/Twemoji.Mozilla.ttf') format('truetype');
 }
 
-:root {
+:root,
+[data-theme='wireframe'],
+[data-theme='cyberpunk'] {
   font-family: 'Fira Sans', 'Twemoji Mozilla';
 }
 
