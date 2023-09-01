@@ -20,7 +20,7 @@ import { isIPv6 } from 'is-ip'
 import { For, createEffect, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import ConnectionsModal from '~/components/ConnectionsModal'
-import { AccessorKey } from '~/config/connection'
+import { AccessorKey } from '~/config/enum'
 import { secret, useRequest, wsEndpointURL } from '~/signals'
 import type { Connection } from '~/types'
 
