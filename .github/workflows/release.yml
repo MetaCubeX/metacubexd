@@ -46,6 +46,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
+          cname: d.metacubex.one
 
       - name: zip
         run: |
