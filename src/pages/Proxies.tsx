@@ -2,6 +2,7 @@ import { IconBrandSpeedtest, IconReload } from '@tabler/icons-solidjs'
 import { For, Show, createSignal, onMount } from 'solid-js'
 import Collapse from '~/components/Collpase'
 import ProxyNodeCard from '~/components/ProxyNodeCard'
+import SubscriptionInfo from '~/components/SubscriptionInfo'
 import { useProxies } from '~/signals/proxies'
 import type { Proxy } from '~/types'
 import { formatTimeFromNow } from '~/utils/date'
@@ -125,7 +126,9 @@ export default () => {
                 <div class="flex items-center justify-between">
                   <div class="flex flex-col">
                     <span>{proxyProvider.name}</span>
-
+                    <SubscriptionInfo
+                      subscriptionInfo={proxyProvider.subscriptionInfo}
+                    />
                     <div class="text-sm text-slate-500">
                       {proxyProvider.vehicleType} :: Updated{' '}
                       {formatTimeFromNow(proxyProvider.updatedAt)}
