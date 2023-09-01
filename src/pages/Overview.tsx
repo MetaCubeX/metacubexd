@@ -49,7 +49,7 @@ const defaultChartOptions: ApexOptions = {
 }
 
 const TrafficWidget: ParentComponent<{ label: JSX.Element }> = (props) => (
-  <div class="stat">
+  <div class="stat flex-1">
     <div class="stat-title text-secondary-content">{props.label}</div>
     <div class="stat-value text-primary-content">
       {children(() => props.children)()}
@@ -169,7 +169,7 @@ export default () => {
 
   return (
     <div class="flex flex-col gap-4">
-      <div class="stats stats-vertical w-full bg-primary shadow sm:stats-horizontal">
+      <div class="stats stats-vertical w-full bg-primary shadow lg:stats-horizontal lg:flex">
         <TrafficWidget label="Upload">
           {byteSize(traffic()?.up || 0).toString()}/s
         </TrafficWidget>
