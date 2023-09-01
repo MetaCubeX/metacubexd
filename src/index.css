@@ -1,4 +1,4 @@
-@import '@fontsource-variable/roboto-mono';
+@import '@fontsource/fira-sans';
 
 @tailwind base;
 @tailwind components;
@@ -11,7 +11,7 @@
 }
 
 :root {
-  font-family: 'Roboto Mono Variable', 'Twemoji Mozilla';
+  font-family: 'Fira Sans', 'Twemoji Mozilla';
 }
 
 ::-webkit-scrollbar {

@@ -14,9 +14,9 @@ dependencies:
   '@felte/validator-zod':
     specifier: ^1.0.17
     version: 1.0.17(zod@3.22.2)
-  '@fontsource-variable/roboto-mono':
-    specifier: ^5.0.9
-    version: 5.0.9
+  '@fontsource/fira-sans':
+    specifier: ^5.0.11
+    version: 5.0.11
   '@solid-primitives/event-listener':
     specifier: ^2.3.0
     version: 2.3.0(solid-js@1.7.11)
@@ -1102,10 +1102,10 @@ packages:
       zod: 3.22.2
     dev: false
 
-  /@fontsource-variable/roboto-mono@5.0.9:
+  /@fontsource/fira-sans@5.0.11:
     resolution:
       {
-        integrity: sha512-iNZz251NVB1sENvrTRt7x5t1yuaYai/QsBRwYtEiot+R33Ks8CQnDZxY2kbrFdEFwTJVqb7RyObjgGVuysTRUw==,
+        integrity: sha512-ozUqZgGSPnc9r7TLL+6VR4Pe0EzgD+MagzF8NJhqHU9y3g0+/QpO1/m55E8UxGo8yoAIHMFQH0EDORFvUI0jtQ==,
       }
     dev: false
 
