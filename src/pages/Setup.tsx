@@ -85,12 +85,12 @@ export default () => {
             name="url"
             type="url"
             class="input input-bordered"
-            placeholder="http://127.0.0.1:9000"
+            placeholder="http://127.0.0.1:9090"
             list="defaultEndpoints"
           />
 
           <datalist id="defaultEndpoints">
-            <option value="http://127.0.0.1:9000" />
+            <option value="http://127.0.0.1:9090" />
           </datalist>
 
           <input
