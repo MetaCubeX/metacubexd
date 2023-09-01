@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.42.0](https://github.com/MetaCubeX/metacubexd/compare/v1.41.2...v1.42.0) (2023-09-01)
+
+
+### Features
+
+* adjust table border radius ([9a9b1b4](https://github.com/MetaCubeX/metacubexd/commit/9a9b1b4abef693d48dfa79c5cccd6f808d98e7ac))
+
 ## [1.41.2](https://github.com/MetaCubeX/metacubexd/compare/v1.41.1...v1.41.2) (2023-09-01)
 
 
