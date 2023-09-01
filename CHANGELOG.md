@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.40.0](https://github.com/MetaCubeX/metacubexd/compare/v1.39.0...v1.40.0) (2023-09-01)
+
+
+### Features
+
+* **i18n:** setup page i18n support ([07ee55d](https://github.com/MetaCubeX/metacubexd/commit/07ee55d8d9a9551d1de3da5836436673433d4ba2))
+
 ## [1.39.0](https://github.com/MetaCubeX/metacubexd/compare/v1.38.0...v1.39.0) (2023-09-01)
 
 
