@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.36.0](https://github.com/MetaCubeX/metacubexd/compare/v1.35.1...v1.36.0) (2023-09-01)
+
+
+### Features
+
+* infinite scroll for proxy card ([2584223](https://github.com/MetaCubeX/metacubexd/commit/258422353f340ae93cab791802a7ae54ae6c8046))
+
 ## [1.35.1](https://github.com/MetaCubeX/metacubexd/compare/v1.35.0...v1.35.1) (2023-09-01)
 
 
