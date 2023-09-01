@@ -50,4 +50,15 @@ services:
     restart: always
     ports:
       - 80:80
+
+  # optional
+  meta:
+    container_name: meta
+    image: docker.io/metacubex/clash-meta:Alpha
+    restart: always
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - ./config.yaml:/root/.config/clash
 ```
