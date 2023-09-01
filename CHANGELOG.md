@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.30.0](https://github.com/MetaCubeX/metacubexd/compare/v1.29.0...v1.30.0) (2023-09-01)
+
+
+### Features
+
+* fira sans font ([a00c28e](https://github.com/MetaCubeX/metacubexd/commit/a00c28e601ac587a68500084a76f28e503bde706))
+
+
+### Bug Fixes
+
+* default listen port ([75e7c64](https://github.com/MetaCubeX/metacubexd/commit/75e7c64007e006ab1b502de4940bae1a4f3cf048))
+
 ## [1.29.0](https://github.com/MetaCubeX/metacubexd/compare/v1.28.3...v1.29.0) (2023-09-01)
 
 
