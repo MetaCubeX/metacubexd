@@ -1,7 +1,7 @@
 import { IconBrandSpeedtest, IconReload } from '@tabler/icons-solidjs'
 import { For, Show, createSignal, onMount } from 'solid-js'
 import Collapse from '~/components/Collpase'
-import ProxyNodeCard from '~/components/ProxyNodeCard'
+import ProxyCardGroups from '~/components/ProxyCardGroups'
 import ProxyNodeDots from '~/components/ProxyNodeDots'
 import SubscriptionInfo from '~/components/SubscriptionInfo'
 import { useProxies } from '~/signals/proxies'
@@ -90,15 +90,7 @@ export default () => {
               )
 
               const content = (
-                <For each={proxy.all}>
-                  {(proxyName) => (
-                    <ProxyNodeCard
-                      proxyName={proxyName}
-                      isSelected={proxy.now === proxyName}
-                      onClick={() => onProxyNodeClick(proxy, proxyName)}
-                    />
-                  )}
-                </For>
+                <ProxyCardGroups proxies={proxy.all!} now={proxy.now} />
               )
 
               return (
@@ -169,9 +161,9 @@ export default () => {
                 </>
               )
               const content = (
-                <For each={proxyProvider.proxies}>
-                  {(proxy) => <ProxyNodeCard proxyName={proxy.name} />}
-                </For>
+                <ProxyCardGroups
+                  proxies={proxyProvider.proxies.map((i) => i.name)}
+                />
               )
 
               return (
