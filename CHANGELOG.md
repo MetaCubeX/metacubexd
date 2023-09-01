@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.36.1](https://github.com/MetaCubeX/metacubexd/compare/v1.36.0...v1.36.1) (2023-09-01)
+
+
+### Bug Fixes
+
+* card click ([25cbdad](https://github.com/MetaCubeX/metacubexd/commit/25cbdad8bc28021131dcadd4339b1b77942e6f71))
+
 ## [1.36.0](https://github.com/MetaCubeX/metacubexd/compare/v1.35.1...v1.36.0) (2023-09-01)
 
 
