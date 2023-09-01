@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.34.0](https://github.com/MetaCubeX/metacubexd/compare/v1.33.1...v1.34.0) (2023-09-01)
+
+
+### Features
+
+* **stats:** flexible size stat on large screen ([f5866dc](https://github.com/MetaCubeX/metacubexd/commit/f5866dcd9dfcdf7d5377d34070d0315500f65742))
+
 ## [1.33.1](https://github.com/MetaCubeX/metacubexd/compare/v1.33.0...v1.33.1) (2023-09-01)
 
 
