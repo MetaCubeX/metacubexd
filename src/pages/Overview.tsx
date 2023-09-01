@@ -195,7 +195,7 @@ export default () => {
         </TrafficWidget>
       </div>
 
-      <div class="mx-auto grid w-full max-w-screen-lg grid-cols-1 gap-4">
+      <div class="mx-auto grid h-full w-full max-w-screen-xl grid-cols-1 gap-4">
         <SolidApexCharts
           type="area"
           options={trafficChartOptions()}

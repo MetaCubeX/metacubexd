@@ -7,7 +7,6 @@ mode: rule
 log-level: info
 ipv6: true
 external-controller: 0.0.0.0:9090
-external-ui: ui
 global-client-fingerprint: random
 
 profile:

@@ -100,6 +100,11 @@ export type Connection = {
   }
 }
 
+export type Log = {
+  type: string
+  payload: string
+}
+
 export type Config = {
   port: number
   'socks-port': number
