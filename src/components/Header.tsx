@@ -22,12 +22,8 @@ const Nav: ParentComponent<{ href: string; tooltip: string }> = ({
   tooltip,
   children,
 }) => (
-  <li>
-    <A
-      class="tooltip rounded-box tooltip-bottom"
-      href={href}
-      data-tip={tooltip}
-    >
+  <li class="tooltip tooltip-bottom" data-tip={tooltip}>
+    <A class="rounded-box" href={href}>
       {children}
     </A>
   </li>
