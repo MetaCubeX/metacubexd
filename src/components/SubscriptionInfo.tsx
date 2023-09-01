@@ -34,9 +34,12 @@ export default (props: { subscriptionInfo: SubscriptionInfo }) => {
 
   return (
     <>
+      <progress class="progress" value={info.percentage} max="100" />
+
       <div class="text-sm text-slate-500">
         {`${info.used}`} / {`${info.total}`} ( {info.percentage}% )
       </div>
+
       <div class="text-sm text-slate-500">Expire: {info.expireStr()} </div>
     </>
   )

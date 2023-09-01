@@ -124,7 +124,7 @@ export default () => {
             {(proxyProvider) => {
               const title = (
                 <div class="flex items-center justify-between">
-                  <div class="flex flex-col">
+                  <div class="flex flex-col gap-1">
                     <span>{proxyProvider.name}</span>
                     <SubscriptionInfo
                       subscriptionInfo={proxyProvider.subscriptionInfo}
@@ -135,7 +135,7 @@ export default () => {
                     </div>
                   </div>
 
-                  <div>
+                  <div class="flex flex-nowrap">
                     <button
                       class="btn btn-circle btn-sm mr-2"
                       onClick={(e) =>
