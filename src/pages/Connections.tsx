@@ -1,4 +1,5 @@
 import { createEventSignal } from '@solid-primitives/event-listener'
+import { useI18n } from '@solid-primitives/i18n'
 import { makePersisted } from '@solid-primitives/storage'
 import { createReconnectingWS } from '@solid-primitives/websocket'
 import {
@@ -39,6 +40,7 @@ const initColumnVisibility = {
 }
 
 export default () => {
+  const [t] = useI18n()
   const [columnVisibility, setColumnVisibility] = makePersisted(
     createSignal<ColumnVisibility>(initColumnVisibility),
     {
@@ -239,12 +241,14 @@ export default () => {
       <div class="flex w-full">
         <input
           class="input input-primary mr-4 w-40 flex-1"
-          placeholder="Search"
+          placeholder={t('search')}
           onInput={(e) => setSearch(e.target.value)}
         />
+
         <label for="connection-modal" class="btn btn-circle">
           <IconSettings />
         </label>
+
         <ConnectionsModal
           order={columnOrder()}
           visible={columnVisibility()}

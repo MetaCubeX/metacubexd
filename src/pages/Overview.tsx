@@ -18,37 +18,6 @@ import type { Connection } from '~/types'
 
 const CHART_MAX_XAXIS = 10
 
-const defaultChartOptions: ApexOptions = {
-  chart: {
-    toolbar: { show: false },
-    zoom: { enabled: false },
-    animations: { easing: 'linear' },
-  },
-  noData: { text: 'Loading...' },
-  legend: {
-    fontSize: '14px',
-    labels: { colors: 'gray' },
-    itemMargin: { horizontal: 64 },
-  },
-  dataLabels: { enabled: false },
-  grid: { yaxis: { lines: { show: false } } },
-  stroke: { curve: 'smooth' },
-  tooltip: { enabled: false },
-  xaxis: {
-    range: CHART_MAX_XAXIS,
-    labels: { show: false },
-    axisTicks: { show: false },
-  },
-  yaxis: {
-    labels: {
-      style: { colors: 'gray' },
-      formatter(val) {
-        return byteSize(val).toString()
-      },
-    },
-  },
-}
-
 const TrafficWidget: ParentComponent<{ label: JSX.Element }> = (props) => (
   <div class="stat flex-1">
     <div class="stat-title text-secondary-content">{props.label}</div>
@@ -60,6 +29,7 @@ const TrafficWidget: ParentComponent<{ label: JSX.Element }> = (props) => (
 
 export default () => {
   const [t] = useI18n()
+
   const [traffics, setTraffics] = createSignal<{ down: number; up: number }[]>(
     [],
   )
@@ -99,18 +69,53 @@ export default () => {
     }
   })
 
+  const defaultChartOptions: ApexOptions = {
+    chart: {
+      toolbar: { show: false },
+      zoom: { enabled: false },
+      animations: { easing: 'linear' },
+    },
+    noData: { text: 'Loading...' },
+    legend: {
+      fontSize: '14px',
+      labels: { colors: 'gray' },
+      itemMargin: { horizontal: 64 },
+    },
+    dataLabels: { enabled: false },
+    grid: { yaxis: { lines: { show: false } } },
+    stroke: { curve: 'smooth' },
+    tooltip: { enabled: false },
+    xaxis: {
+      range: CHART_MAX_XAXIS,
+      labels: { show: false },
+      axisTicks: { show: false },
+    },
+    yaxis: {
+      labels: {
+        style: { colors: 'gray' },
+        formatter(val) {
+          return byteSize(val).toString()
+        },
+      },
+    },
+  }
+
   const trafficChartOptions = createMemo<ApexOptions>(() => ({
-    title: { text: 'Traffic', align: 'center', style: { color: 'gray' } },
+    title: {
+      text: t('traffic'),
+      align: 'center',
+      style: { color: 'gray' },
+    },
     ...defaultChartOptions,
   }))
 
   const trafficChartSeries = createMemo(() => [
     {
-      name: 'Down',
+      name: t('down'),
       data: traffics().map((t) => t.down),
     },
     {
-      name: 'Up',
+      name: t('up'),
       data: traffics().map((t) => t.up),
     },
   ])
@@ -138,16 +143,15 @@ export default () => {
   })
 
   const memoryChartOptions = createMemo<ApexOptions>(() => ({
-    title: { text: 'Memory', align: 'center', style: { color: 'gray' } },
+    title: {
+      text: t('memory'),
+      align: 'center',
+      style: { color: 'gray' },
+    },
     ...defaultChartOptions,
   }))
 
-  const memoryChartSeries = createMemo(() => [
-    {
-      name: 'memory',
-      data: memories(),
-    },
-  ])
+  const memoryChartSeries = createMemo(() => [{ data: memories() }])
 
   const connectionsWS = createReconnectingWS(
     `${wsEndpointURL()}/connections?token=${secret()}`,
@@ -172,27 +176,27 @@ export default () => {
   return (
     <div class="flex flex-col gap-4">
       <div class="stats stats-vertical w-full bg-primary shadow lg:stats-horizontal lg:flex">
-        <TrafficWidget label={t('stats.upload')}>
+        <TrafficWidget label={t('upload')}>
           {byteSize(traffic()?.up || 0).toString()}/s
         </TrafficWidget>
 
-        <TrafficWidget label={t('stats.download')}>
+        <TrafficWidget label={t('download')}>
           {byteSize(traffic()?.down || 0).toString()}/s
         </TrafficWidget>
 
-        <TrafficWidget label={t('stats.uploadTotal')}>
+        <TrafficWidget label={t('uploadTotal')}>
           {byteSize(connection()?.uploadTotal || 0).toString()}
         </TrafficWidget>
 
-        <TrafficWidget label={t('stats.downloadTotal')}>
+        <TrafficWidget label={t('downloadTotal')}>
           {byteSize(connection()?.downloadTotal || 0).toString()}
         </TrafficWidget>
 
-        <TrafficWidget label={t('stats.activeConnections')}>
+        <TrafficWidget label={t('activeConnections')}>
           {connection()?.connections.length || 0}
         </TrafficWidget>
 
-        <TrafficWidget label={t('stats.memoryUsage')}>
+        <TrafficWidget label={t('memoryUsage')}>
           {byteSize(memory() || 0).toString()}
         </TrafficWidget>
       </div>

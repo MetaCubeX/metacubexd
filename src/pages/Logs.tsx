@@ -1,4 +1,5 @@
 import { createEventSignal } from '@solid-primitives/event-listener'
+import { useI18n } from '@solid-primitives/i18n'
 import { createReconnectingWS } from '@solid-primitives/websocket'
 import {
   ColumnDef,
@@ -13,6 +14,7 @@ import { Log } from '~/types'
 type LogWithSeq = Log & { seq: number }
 
 export default () => {
+  const [t] = useI18n()
   let seq = 0
   const [search, setSearch] = createSignal('')
   const [logs, setLogs] = createSignal<LogWithSeq[]>([])
@@ -68,7 +70,7 @@ export default () => {
     <div class="flex flex-col gap-4">
       <input
         class="input input-primary"
-        placeholder="Search"
+        placeholder={t('search')}
         onInput={(e) => setSearch(e.target.value)}
       />
 

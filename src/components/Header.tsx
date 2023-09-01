@@ -72,32 +72,32 @@ export const Header = () => {
   const navs = () => [
     {
       href: '/overview',
-      name: t('navs.overview'),
+      name: t('overview'),
       icon: <IconHome />,
     },
     {
       href: '/proxies',
-      name: t('navs.proxies'),
+      name: t('proxies'),
       icon: <IconGlobe />,
     },
     {
       href: '/rules',
-      name: t('navs.rules'),
+      name: t('rules'),
       icon: <IconRuler />,
     },
     {
       href: '/conns',
-      name: t('navs.connections'),
+      name: t('connections'),
       icon: <IconNetwork />,
     },
     {
       href: '/logs',
-      name: t('navs.logs'),
+      name: t('logs'),
       icon: <IconFileStack />,
     },
     {
       href: '/config',
-      name: t('navs.config'),
+      name: t('config'),
       icon: <IconSettings />,
     },
   ]

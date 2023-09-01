@@ -1,9 +1,11 @@
+import { useI18n } from '@solid-primitives/i18n'
 import InfiniteScroll from 'solid-infinite-scroll'
 import { For, createMemo, createSignal, onMount } from 'solid-js'
 import { useRequest } from '~/signals'
 import type { Rule, RuleProvider } from '~/types'
 
 export default () => {
+  const [t] = useI18n()
   const request = useRequest()
   const [maxRuleRender, setMaxRuleRender] = createSignal(100)
   const [rules, setRules] = createSignal<Rule[]>([])
@@ -27,7 +29,7 @@ export default () => {
   return (
     <div class="flex flex-col gap-4">
       <div>
-        <h1 class="pb-4 text-lg font-semibold">Rules</h1>
+        <h1 class="pb-4 text-lg font-semibold">{t('rules')}</h1>
 
         <div class="grid grid-cols-1 gap-2 sm:grid-cols-1">
           <InfiniteScroll
@@ -48,7 +50,7 @@ export default () => {
       </div>
 
       <div>
-        <h1 class="pb-4 text-lg font-semibold">Rules Providers</h1>
+        <h1 class="pb-4 text-lg font-semibold">{t('ruleProviders')}</h1>
 
         <div class="grid grid-cols-1 gap-2 sm:grid-cols-1">
           <For each={rulesProviders()}>

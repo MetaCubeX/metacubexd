@@ -62,9 +62,9 @@ export default () => {
   }
 
   return (
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-2">
       <div>
-        <h1 class="pb-4 text-lg font-semibold">{t('proxies.proxies')}</h1>
+        <h1 class="pb-4 text-lg font-semibold">{t('proxies')}</h1>
 
         <ForTwoLine
           subChild={proxies().map((proxy) => {
@@ -119,68 +119,75 @@ export default () => {
       </div>
 
       <Show when={proxyProviders().length > 0}>
-        <h1 class="pb-4 text-lg font-semibold">{t('proxies.proxyProvider')}</h1>
+        <div>
+          <h1 class="pb-4 text-lg font-semibold">{t('proxyProviders')}</h1>
 
-        <ForTwoLine
-          subChild={proxyProviders().map((proxyProvider) => {
-            const title = (
-              <>
-                <div class="mr-10 flex items-center justify-between">
-                  <span>{proxyProvider.name}</span>
-                  <div>
-                    <button
-                      class="btn btn-circle btn-sm mr-2"
-                      onClick={(e) =>
-                        onUpdateProviderClick(e, proxyProvider.name)
-                      }
-                    >
-                      <IconReload />
-                    </button>
-                    <button
-                      class="btn btn-circle btn-sm"
-                      onClick={(e) => onHealthCheckClick(e, proxyProvider.name)}
-                    >
-                      <IconBrandSpeedtest />
-                    </button>
+          <ForTwoLine
+            subChild={proxyProviders().map((proxyProvider) => {
+              const title = (
+                <>
+                  <div class="mr-10 flex items-center justify-between">
+                    <span>{proxyProvider.name}</span>
+                    <div>
+                      <button
+                        class="btn btn-circle btn-sm mr-2"
+                        onClick={(e) =>
+                          onUpdateProviderClick(e, proxyProvider.name)
+                        }
+                      >
+                        <IconReload />
+                      </button>
+                      <button
+                        class="btn btn-circle btn-sm"
+                        onClick={(e) =>
+                          onHealthCheckClick(e, proxyProvider.name)
+                        }
+                      >
+                        <IconBrandSpeedtest />
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <SubscriptionInfo
-                  subscriptionInfo={proxyProvider.subscriptionInfo}
-                />
-                <div class="text-sm text-slate-500">
-                  {proxyProvider.vehicleType} :: Updated{' '}
-                  {formatTimeFromNow(proxyProvider.updatedAt)}
-                </div>
-                <Show when={!collapsedMap()[`provider-${proxyProvider.name}`]}>
-                  <ProxyNodeDots
-                    proxyNameList={
-                      proxyProvider.proxies.map((i) => i.name) ?? []
-                    }
+                  <SubscriptionInfo
+                    subscriptionInfo={proxyProvider.subscriptionInfo}
                   />
-                </Show>
-              </>
-            )
-            const content = (
-              <ProxyCardGroups
-                proxies={proxyProvider.proxies.map((i) => i.name)}
-              />
-            )
+                  <div class="text-sm text-slate-500">
+                    {proxyProvider.vehicleType} :: Updated{' '}
+                    {formatTimeFromNow(proxyProvider.updatedAt)}
+                  </div>
+                  <Show
+                    when={!collapsedMap()[`provider-${proxyProvider.name}`]}
+                  >
+                    <ProxyNodeDots
+                      proxyNameList={
+                        proxyProvider.proxies.map((i) => i.name) ?? []
+                      }
+                    />
+                  </Show>
+                </>
+              )
 
-            return (
-              <Collapse
-                isOpen={collapsedMap()[`provider-${proxyProvider.name}`]}
-                title={title}
-                content={content}
-                onCollapse={(val) =>
-                  setCollapsedMap({
-                    ...collapsedMap(),
-                    [`provider-${proxyProvider.name}`]: val,
-                  })
-                }
-              />
-            )
-          })}
-        />
+              const content = (
+                <ProxyCardGroups
+                  proxies={proxyProvider.proxies.map((i) => i.name)}
+                />
+              )
+
+              return (
+                <Collapse
+                  isOpen={collapsedMap()[`provider-${proxyProvider.name}`]}
+                  title={title}
+                  content={content}
+                  onCollapse={(val) =>
+                    setCollapsedMap({
+                      ...collapsedMap(),
+                      [`provider-${proxyProvider.name}`]: val,
+                    })
+                  }
+                />
+              )
+            })}
+          />
+        </div>
       </Show>
     </div>
   )
