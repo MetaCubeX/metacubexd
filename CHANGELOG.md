@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.41.2](https://github.com/MetaCubeX/metacubexd/compare/v1.41.1...v1.41.2) (2023-09-01)
+
+
+### Bug Fixes
+
+* header tooltip on menu items instead of inner links ([2619b4f](https://github.com/MetaCubeX/metacubexd/commit/2619b4fd2f2e1f2921e5503196c11644d6e21708))
+
 ## [1.41.1](https://github.com/MetaCubeX/metacubexd/compare/v1.41.0...v1.41.1) (2023-09-01)
 
 
