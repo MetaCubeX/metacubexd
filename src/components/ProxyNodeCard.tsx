@@ -8,12 +8,10 @@ export default (props: {
   onClick?: () => void
 }) => {
   const { proxyName, isSelected, onClick } = props
-  const { delayMap, proxyNodeMap } = useProxies()
+  const { proxyNodeMap } = useProxies()
   const proxyNode = createMemo(() => proxyNodeMap()[proxyName])
 
-  const Delay = (proxyname: string) => {
-    const delay = delayMap()[proxyname]
-
+  const Delay = (delay: number | undefined) => {
     if (typeof delay !== 'number' || delay === 0) {
       return ''
     }
@@ -29,7 +27,7 @@ export default (props: {
     return <span class={textClassName}>{delay}ms</span>
   }
 
-  const formatProxyType = (type: string) => {
+  const formatProxyType = (type = '') => {
     const t = type.toLowerCase()
 
     if (t.includes('shadowsocks')) {
@@ -57,10 +55,10 @@ export default (props: {
             isSelected && 'text-primary',
           )}
         >
-          {formatProxyType(proxyNode().type)}
-          {proxyNode().udp && ' :: udp'}
+          {formatProxyType(proxyNode()?.type)}
+          {proxyNode()?.udp && ' :: udp'}
         </div>
-        <div class="text-xs">{Delay(proxyName)}</div>
+        <div class="text-xs">{Delay(proxyNode()?.delay)}</div>
       </div>
     </div>
   )
