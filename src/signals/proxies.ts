@@ -38,7 +38,7 @@ export function useProxies() {
     const { proxies } = await request
       .get('proxies')
       .json<{ proxies: Record<string, Proxy> }>()
-    const sortIndex = proxies['GLOBAL'].all ?? []
+    const sortIndex = [...(proxies['GLOBAL'].all ?? []), 'GLOBAL']
 
     setProxies(
       Object.values(proxies)
