@@ -14,6 +14,7 @@
     "@commitlint/config-conventional": "^17.7.0",
     "@felte/solid": "^1.2.11",
     "@felte/validator-zod": "^1.0.17",
+    "@fontsource-variable/roboto-mono": "^5.0.9",
     "@solid-primitives/event-listener": "^2.3.0",
     "@solid-primitives/storage": "^2.1.1",
     "@solid-primitives/websocket": "^1.1.0",
