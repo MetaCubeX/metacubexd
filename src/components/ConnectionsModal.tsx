@@ -101,9 +101,7 @@ export default (props: {
             </DragOverlay>
           </DragDropProvider>
         </div>
-        <label class="modal-backdrop" htmlFor="connection-modal">
-          Close
-        </label>
+        <label class="modal-backdrop" for="connection-modal" />
       </div>
     </>
   )

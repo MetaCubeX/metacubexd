@@ -140,7 +140,10 @@ export default () => {
     },
     {
       accessorKey: AccessorKey.Process,
-      accessorFn: (row) => row.metadata.process || '-',
+      accessorFn: (row) =>
+        row.metadata.process ||
+        row.metadata.processPath.replace(/^.*[/\\](.*)$/, '$1') ||
+        '-',
     },
     {
       accessorKey: AccessorKey.Host,
@@ -237,7 +240,7 @@ export default () => {
           placeholder="Search"
           onInput={(e) => setSearch(e.target.value)}
         />
-        <label htmlFor="connection-modal" class="btn btn-circle">
+        <label for="connection-modal" class="btn btn-circle">
           <IconSettings />
         </label>
         <ConnectionsModal
