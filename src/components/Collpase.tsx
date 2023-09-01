@@ -1,5 +1,6 @@
 import { JSX, ParentComponent } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
+// import { Ch} from '@tabler/icons-solidjs'
 
 type Props = {
   title: JSX.Element
@@ -31,7 +32,7 @@ const Collapse: ParentComponent<Props> = (props) => {
       )}
     >
       <div
-        class="collapse-title text-xl font-medium"
+        class="collapse-title pr-1 text-xl font-medium after:!top-8"
         onClick={() => onCollapse(!props.isOpen)}
       >
         {title}

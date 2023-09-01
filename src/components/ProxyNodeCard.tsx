@@ -1,6 +1,7 @@
 import { createMemo } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { useProxies } from '~/signals/proxies'
+import { getClassNameByDelay } from '~/utils/proxies'
 
 export default (props: {
   proxyName: string
@@ -16,13 +17,8 @@ export default (props: {
       return ''
     }
 
-    let textClassName = 'text-green-500'
-
-    if (delay > 500) {
-      textClassName = 'text-red-500'
-    } else if (delay > 200) {
-      textClassName = 'text-yellow-500'
-    }
+    const color = getClassNameByDelay(delay)
+    const textClassName = `text-${color}`
 
     return <span class={textClassName}>{delay}ms</span>
   }

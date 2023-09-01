@@ -2,10 +2,11 @@ import { IconBrandSpeedtest, IconReload } from '@tabler/icons-solidjs'
 import { For, Show, createSignal, onMount } from 'solid-js'
 import Collapse from '~/components/Collpase'
 import ProxyNodeCard from '~/components/ProxyNodeCard'
+import ProxyNodeDots from '~/components/ProxyNodeDots'
 import SubscriptionInfo from '~/components/SubscriptionInfo'
 import { useProxies } from '~/signals/proxies'
 import type { Proxy } from '~/types'
-import { formatTimeFromNow } from '~/utils/date'
+import { formatTimeFromNow } from '~/utils/proxies'
 
 export default () => {
   const {
@@ -66,22 +67,26 @@ export default () => {
           <For each={proxies()}>
             {(proxy) => {
               const title = (
-                <div class="flex items-center justify-between">
-                  <div class="flex flex-col">
+                <>
+                  <div class="mr-10 flex items-center justify-between">
                     <span>{proxy.name}</span>
-
-                    <div class="text-sm text-slate-500">
-                      {proxy.type} :: {proxy.now}
-                    </div>
+                    <button
+                      class="btn btn-circle btn-sm"
+                      onClick={(e) => onSpeedTestClick(e, proxy.name)}
+                    >
+                      <IconBrandSpeedtest />
+                    </button>
                   </div>
-
-                  <button
-                    class="btn btn-circle btn-sm"
-                    onClick={(e) => onSpeedTestClick(e, proxy.name)}
-                  >
-                    <IconBrandSpeedtest />
-                  </button>
-                </div>
+                  <div class="text-sm text-slate-500">
+                    {proxy.type} :: {proxy.now}
+                  </div>
+                  <Show when={!collapsedMap()[`group-${proxy.name}`]}>
+                    <ProxyNodeDots
+                      proxyNameList={proxy.all ?? []}
+                      now={proxy.now}
+                    />
+                  </Show>
+                </>
               )
 
               const content = (
@@ -123,35 +128,45 @@ export default () => {
           <For each={proxyProviders()}>
             {(proxyProvider) => {
               const title = (
-                <div class="flex items-center justify-between">
-                  <div class="flex flex-col gap-1">
+                <>
+                  <div class="mr-10 flex items-center justify-between">
                     <span>{proxyProvider.name}</span>
-                    <SubscriptionInfo
-                      subscriptionInfo={proxyProvider.subscriptionInfo}
-                    />
-                    <div class="text-sm text-slate-500">
-                      {proxyProvider.vehicleType} :: Updated{' '}
-                      {formatTimeFromNow(proxyProvider.updatedAt)}
+                    <div>
+                      <button
+                        class="btn btn-circle btn-sm mr-2"
+                        onClick={(e) =>
+                          onUpdateProviderClick(e, proxyProvider.name)
+                        }
+                      >
+                        <IconReload />
+                      </button>
+                      <button
+                        class="btn btn-circle btn-sm"
+                        onClick={(e) =>
+                          onHealthCheckClick(e, proxyProvider.name)
+                        }
+                      >
+                        <IconBrandSpeedtest />
+                      </button>
                     </div>
                   </div>
-
-                  <div class="flex flex-nowrap">
-                    <button
-                      class="btn btn-circle btn-sm mr-2"
-                      onClick={(e) =>
-                        onUpdateProviderClick(e, proxyProvider.name)
-                      }
-                    >
-                      <IconReload />
-                    </button>
-                    <button
-                      class="btn btn-circle btn-sm"
-                      onClick={(e) => onHealthCheckClick(e, proxyProvider.name)}
-                    >
-                      <IconBrandSpeedtest />
-                    </button>
+                  <SubscriptionInfo
+                    subscriptionInfo={proxyProvider.subscriptionInfo}
+                  />
+                  <div class="text-sm text-slate-500">
+                    {proxyProvider.vehicleType} :: Updated{' '}
+                    {formatTimeFromNow(proxyProvider.updatedAt)}
                   </div>
-                </div>
+                  <Show
+                    when={!collapsedMap()[`provider-${proxyProvider.name}`]}
+                  >
+                    <ProxyNodeDots
+                      proxyNameList={
+                        proxyProvider.proxies.map((i) => i.name) ?? []
+                      }
+                    />
+                  </Show>
+                </>
               )
               const content = (
                 <For each={proxyProvider.proxies}>
