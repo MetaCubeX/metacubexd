@@ -51,7 +51,12 @@ export default (props: {
     >
       <div class="truncate text-left">{proxyName}</div>
       <div class="flex items-center justify-between gap-1">
-        <div class="truncate text-xs text-slate-500">
+        <div
+          class={twMerge(
+            'truncate text-xs text-slate-500',
+            isSelected && 'text-primary',
+          )}
+        >
           {formatProxyType(proxyNode().type)}
           {proxyNode().udp && ' :: udp'}
         </div>

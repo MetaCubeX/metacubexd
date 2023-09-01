@@ -253,14 +253,14 @@ export default () => {
       </div>
 
       <div class="overflow-x-auto whitespace-nowrap">
-        <table class="table table-xs">
+        <table class="table table-xs bg-base-200">
           <thead>
             <For each={table.getHeaderGroups()}>
               {(headerGroup) => (
                 <tr>
                   <For each={headerGroup.headers}>
                     {(header) => (
-                      <th class="bg-base-200">
+                      <th class="bg-base-300">
                         <div
                           class={twMerge(
                             'flex items-center justify-between',
