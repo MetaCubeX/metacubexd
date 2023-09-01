@@ -44,3 +44,12 @@ export const useRequest = () => {
     },
   })
 }
+
+export const useLanguage = () => {
+  const [lang, setLang] = makePersisted(createSignal(navigator.language), {
+    name: 'lang',
+    storage: localStorage,
+  })
+
+  return { lang, setLang }
+}

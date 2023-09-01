@@ -1,3 +1,4 @@
+import { useI18n } from '@solid-primitives/i18n'
 import { A, useLocation, useNavigate } from '@solidjs/router'
 import {
   IconArrowsExchange,
@@ -64,40 +65,42 @@ const ThemeSwitcher = () => (
   </div>
 )
 
-const navs = () => [
-  {
-    href: '/overview',
-    name: 'Overview',
-    icon: <IconHome />,
-  },
-  {
-    href: '/proxies',
-    name: 'Proxies',
-    icon: <IconGlobe />,
-  },
-  {
-    href: '/rules',
-    name: 'Rules',
-    icon: <IconRuler />,
-  },
-  {
-    href: '/conns',
-    name: 'Connections',
-    icon: <IconNetwork />,
-  },
-  {
-    href: '/logs',
-    name: 'Logs',
-    icon: <IconFileStack />,
-  },
-  {
-    href: '/config',
-    name: 'Config',
-    icon: <IconSettings />,
-  },
-]
-
 export const Header = () => {
+  const [t] = useI18n()
+
+  const navs = () => [
+    {
+      href: '/overview',
+      name: t('navs.overview'),
+      icon: <IconHome />,
+    },
+    {
+      href: '/proxies',
+      name: t('navs.proxies'),
+      icon: <IconGlobe />,
+    },
+    {
+      href: '/rules',
+      name: t('navs.rules'),
+      icon: <IconRuler />,
+    },
+    {
+      href: '/conns',
+      name: t('navs.connections'),
+      icon: <IconNetwork />,
+    },
+    {
+      href: '/logs',
+      name: t('navs.logs'),
+      icon: <IconFileStack />,
+    },
+    {
+      href: '/config',
+      name: t('navs.config'),
+      icon: <IconSettings />,
+    },
+  ]
+
   const location = useLocation()
   const navigate = useNavigate()
 
