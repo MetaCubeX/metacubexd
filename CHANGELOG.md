@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.31.0](https://github.com/MetaCubeX/metacubexd/compare/v1.30.0...v1.31.0) (2023-09-01)
+
+
+### Features
+
+* show subscription usage in a progress bar ([24bfadd](https://github.com/MetaCubeX/metacubexd/commit/24bfaddfc80f0373c181ea873fdc39885f67fe58))
+* subs info ([45da766](https://github.com/MetaCubeX/metacubexd/commit/45da766ed006ef51312206c17c9d65b9aa4a274b))
+
+
+### Bug Fixes
+
+* process not shown ([f5d65eb](https://github.com/MetaCubeX/metacubexd/commit/f5d65eb018f8d2b706d99118e828cf47822cd435))
+
 ## [1.30.0](https://github.com/MetaCubeX/metacubexd/compare/v1.29.0...v1.30.0) (2023-09-01)
 
 
