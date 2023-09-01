@@ -4,6 +4,7 @@ import { ParentComponent, createEffect, createSignal } from 'solid-js'
 
 const dict = {
   'en-US': {
+    add: 'Add',
     overview: 'Overview',
     proxies: 'Proxies',
     rules: 'Rules',
@@ -37,6 +38,7 @@ const dict = {
     close: 'Close',
   },
   'zh-Hans': {
+    add: '添加',
     overview: '概览',
     proxies: '代理',
     rules: '规则',

@@ -1,5 +1,6 @@
 import { createForm } from '@felte/solid'
 import { validator } from '@felte/validator-zod'
+import { useI18n } from '@solid-primitives/i18n'
 import { useNavigate } from '@solidjs/router'
 import { IconX } from '@tabler/icons-solidjs'
 import ky from 'ky'
@@ -14,6 +15,7 @@ const schema = z.object({
 })
 
 export default () => {
+  const [t] = useI18n()
   const navigate = useNavigate()
 
   const onSetupSuccess = (id: string) => {
@@ -102,7 +104,7 @@ export default () => {
           />
 
           <button type="submit" class="btn btn-primary join-item uppercase">
-            Add
+            {t('add')}
           </button>
         </div>
       </form>
