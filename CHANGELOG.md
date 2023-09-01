@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.37.0](https://github.com/MetaCubeX/metacubexd/compare/v1.36.1...v1.37.0) (2023-09-01)
+
+
+### Features
+
+* render in two line ([1807340](https://github.com/MetaCubeX/metacubexd/commit/18073407a6a096ef03433e5f8e4fafd2ebfc27c4))
+
 ## [1.36.1](https://github.com/MetaCubeX/metacubexd/compare/v1.36.0...v1.36.1) (2023-09-01)
 
 
