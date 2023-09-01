@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.28.2](https://github.com/MetaCubeX/metacubexd/compare/v1.28.1...v1.28.2) (2023-09-01)
+
+
+### Bug Fixes
+
+* card info color theme ([80d5138](https://github.com/MetaCubeX/metacubexd/commit/80d5138423312f4c11cd864a01fa353526cde127))
+
 ## [1.28.1](https://github.com/MetaCubeX/metacubexd/compare/v1.28.0...v1.28.1) (2023-09-01)
 
 
