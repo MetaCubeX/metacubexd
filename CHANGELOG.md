@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.28.0](https://github.com/MetaCubeX/metacubexd/compare/v1.27.1...v1.28.0) (2023-09-01)
+
+
+### Features
+
+* add twemoji font ([e4a89fc](https://github.com/MetaCubeX/metacubexd/commit/e4a89fc89ecf17420f15c88ea4c30d6ed62ba92a))
+
 ## [1.27.1](https://github.com/MetaCubeX/metacubexd/compare/v1.27.0...v1.27.1) (2023-08-31)
 
 
