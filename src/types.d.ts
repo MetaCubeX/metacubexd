@@ -139,3 +139,23 @@ export type Config = {
   sniffing: boolean
   'global-client-fingerprint': boolean
 }
+
+export type DNSQuery = {
+  AD: boolean
+  CD: boolean
+  RA: boolean
+  RD: boolean
+  TC: boolean
+  status: number
+  Question: {
+    Name: string
+    Qtype: number
+    Qclass: number
+  }[]
+  Answer: {
+    TTL: number
+    data: string
+    name: string
+    type: number
+  }[]
+}
