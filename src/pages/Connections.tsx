@@ -148,7 +148,9 @@ export default () => {
     {
       accessorKey: AccessorKey.Host,
       accessorFn: (row) =>
-        row.metadata.host ? row.metadata.host : row.metadata.destinationIP,
+        `${
+          row.metadata.host ? row.metadata.host : row.metadata.destinationIP
+        }:${row.metadata.destinationPort}`,
     },
     {
       accessorKey: AccessorKey.Rule,
@@ -192,9 +194,9 @@ export default () => {
     {
       accessorKey: AccessorKey.Destination,
       accessorFn: (row) =>
-        isIPv6(row.metadata.destinationIP)
-          ? `[${row.metadata.destinationIP}]:${row.metadata.destinationPort}`
-          : `${row.metadata.destinationIP}:${row.metadata.destinationPort}`,
+        row.metadata.remoteDestination ||
+        row.metadata.destinationIP ||
+        row.metadata.host,
     },
   ]
 
