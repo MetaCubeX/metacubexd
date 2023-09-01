@@ -20,6 +20,9 @@ dependencies:
   '@solid-primitives/event-listener':
     specifier: ^2.3.0
     version: 2.3.0(solid-js@1.7.11)
+  '@solid-primitives/i18n':
+    specifier: ^1.4.1
+    version: 1.4.1(solid-js@1.7.11)
   '@solid-primitives/storage':
     specifier: ^2.1.1
     version: 2.1.1(solid-js@1.7.11)
@@ -1201,6 +1204,17 @@ packages:
       }
     dev: false
 
+  /@solid-primitives/context@0.2.1(solid-js@1.7.11):
+    resolution:
+      {
+        integrity: sha512-XIIwCOWpRKDersgkR9LNFXaJHIV8QlCFo/tq5bV0cAOZklcwOFcqi2bN+uWgEIQSWGjWXU2kc1H1/TzgYzVDlg==,
+      }
+    peerDependencies:
+      solid-js: ^1.6.12
+    dependencies:
+      solid-js: 1.7.11
+    dev: false
+
   /@solid-primitives/event-listener@2.3.0(solid-js@1.7.11):
     resolution:
       {
@@ -1210,6 +1224,18 @@ packages:
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/utils': 6.2.1(solid-js@1.7.11)
+      solid-js: 1.7.11
+    dev: false
+
+  /@solid-primitives/i18n@1.4.1(solid-js@1.7.11):
+    resolution:
+      {
+        integrity: sha512-lUUb/hmI77O9oMH8Jj4pPta/pAV21gRgN52UJ7cCXVdv1QkiyzX586gDDU+Tj8NsK/U6OrmMk2tClPwqHAk/xA==,
+      }
+    peerDependencies:
+      solid-js: ^1.6.12
+    dependencies:
+      '@solid-primitives/context': 0.2.1(solid-js@1.7.11)
       solid-js: 1.7.11
     dev: false
 

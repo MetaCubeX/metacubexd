@@ -74,9 +74,12 @@ export function useProxies() {
 
   const delayTestByProxyGroupName = async (proxyGroupName: string) => {
     const data: Record<string, number> = await request
-      .get(
-        `group/${proxyGroupName}/delay?url=https%3A%2F%2Fwww.gstatic.com%2Fgenerate_204&timeout=2000`,
-      )
+      .get(`group/${proxyGroupName}/delay`, {
+        searchParams: {
+          url: 'https://www.gstatic.com/generate_204',
+          timeout: 2000,
+        },
+      })
       .json()
 
     Object.entries(data).forEach(([name, delay]) => {
