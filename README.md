@@ -27,7 +27,7 @@ pnpm build
 Serve static files
 
 ```shell
-pnpm preview
+pnpm serve
 ```
 
 ### Run inside Docker
