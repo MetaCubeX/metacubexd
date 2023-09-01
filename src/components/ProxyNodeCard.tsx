@@ -1,7 +1,7 @@
 import { createMemo } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
+import { DELAY } from '~/config/enum'
 import { useProxies } from '~/signals/proxies'
-import { getClassNameByDelay } from '~/utils/proxies'
 
 export default (props: {
   proxyName: string
@@ -13,12 +13,17 @@ export default (props: {
   const proxyNode = createMemo(() => proxyNodeMap()[proxyName])
 
   const Delay = (delay: number | undefined) => {
-    if (typeof delay !== 'number' || delay === 0) {
+    if (typeof delay !== 'number' || delay === DELAY.NOT_CONNECTED) {
       return ''
     }
 
-    const color = getClassNameByDelay(delay)
-    const textClassName = `text-${color}`
+    let textClassName = 'text-success'
+
+    if (delay > DELAY.HIGH) {
+      textClassName = 'text-error'
+    } else if (delay > DELAY.MEDIUM) {
+      textClassName = 'text-warning'
+    }
 
     return <span class={textClassName}>{delay}ms</span>
   }

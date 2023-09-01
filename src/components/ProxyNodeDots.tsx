@@ -1,18 +1,26 @@
 import { For } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
+import { DELAY } from '~/config/enum'
 import { useProxies } from '~/signals/proxies'
-import { getClassNameByDelay } from '~/utils/proxies'
 
 const Delay = (p: { delay: number | undefined; selected: boolean }) => {
-  const color = getClassNameByDelay(p.delay)
-  const bgClassName = `bg-${color}`
-  const isSelected = p.selected && `border-2 border-primary`
+  let dotClassName = p.selected
+    ? 'bg-white border-4 border-success'
+    : 'bg-success'
 
-  return (
-    <div
-      class={twMerge('m-1 h-4 w-4 rounded-full', bgClassName, isSelected)}
-    ></div>
-  )
+  if (typeof p.delay !== 'number' || p.delay === DELAY.NOT_CONNECTED) {
+    dotClassName = p.selected
+      ? 'bg-white border-4 border-neutral'
+      : 'bg-neutral'
+  } else if (p.delay > DELAY.HIGH) {
+    dotClassName = p.selected ? 'bg-white border-4 border-error' : 'bg-error'
+  } else if (p.delay > DELAY.MEDIUM) {
+    dotClassName = p.selected
+      ? 'bg-white border-4 border-warning'
+      : 'bg-warning'
+  }
+
+  return <div class={twMerge('m-1 h-4 w-4 rounded-full', dotClassName)}></div>
 }
 
 export default (props: { proxyNameList: string[]; now?: string }) => {

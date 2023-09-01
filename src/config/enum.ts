@@ -13,3 +13,9 @@ export enum AccessorKey {
   Source = 'Source',
   Destination = 'Destination',
 }
+
+export enum DELAY {
+  NOT_CONNECTED = 0,
+  MEDIUM = 200,
+  HIGH = 500,
+}

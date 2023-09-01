@@ -13,7 +13,7 @@ import {
   useDragDropContext,
 } from '@thisbeyond/solid-dnd'
 import { For, createSignal } from 'solid-js'
-import { AccessorKey } from '~/config/connection'
+import { AccessorKey } from '~/config/enum'
 
 type ColumnVisibility = Partial<Record<AccessorKey, boolean>>
 type ColumnOrder = AccessorKey[]
