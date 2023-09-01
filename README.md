@@ -10,6 +10,8 @@ Clash-Meta Dashboard
 
 ## Usage
 
+### Build locally
+
 Install npm dependencies
 
 ```shell
@@ -26,4 +28,26 @@ Serve static files
 
 ```shell
 pnpm preview
+```
+
+### Run inside Docker
+
+docker cli
+
+```shell
+docker run -d --restart always -p 80:80 --name metacubexd ghcr.io/metacubex/metacubexd
+```
+
+docker-compose.yml
+
+```yaml
+version: '3'
+
+services:
+  metacubexd:
+    container_name: metacubexd
+    image: ghcr.io/metacubex/metacubexd
+    restart: always
+    ports:
+      - 80:80
 ```
