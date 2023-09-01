@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.33.1](https://github.com/MetaCubeX/metacubexd/compare/v1.33.0...v1.33.1) (2023-09-01)
+
+
+### Bug Fixes
+
+* cannot import module from connection ([3b774b9](https://github.com/MetaCubeX/metacubexd/commit/3b774b942358ffb2afa78e119093c2e696fda578))
+* **connections:** destination and host ([bbfd514](https://github.com/MetaCubeX/metacubexd/commit/bbfd5142a3bb8ac2ea1888befaff64c7b522010e))
+* import path ([13ff26c](https://github.com/MetaCubeX/metacubexd/commit/13ff26c9d3340c68483423d3adfa5dac31f25aed))
+
 ## [1.33.0](https://github.com/MetaCubeX/metacubexd/compare/v1.32.0...v1.33.0) (2023-09-01)
 
 
