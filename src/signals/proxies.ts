@@ -1,15 +1,13 @@
 import { createSignal } from 'solid-js'
 import { useRequest } from '~/signals'
-import type { Proxy, ProxyNode, ProxyProvider } from '~/types'
+import type { Proxy, ProxyProvider } from '~/types'
 
 // these signals should be global state
 const [proxies, setProxies] = createSignal<Proxy[]>([])
 const [proxyProviders, setProxyProviders] = createSignal<ProxyProvider[]>([])
 
 const [delayMap, setDelayMap] = createSignal<Record<string, number>>({})
-const [proxyNodeMap, setProxyNodeMap] = createSignal<Record<string, ProxyNode>>(
-  {},
-)
+const [proxyNodeMap, setProxyNodeMap] = createSignal<Record<string, Proxy>>({})
 
 export function useProxies() {
   const request = useRequest()
@@ -18,16 +16,7 @@ export function useProxies() {
     const { providers } = await request
       .get('providers/proxies')
       .json<{ providers: Record<string, ProxyProvider> }>()
-    const delay = delayMap()
 
-    Object.values(providers).forEach((provider) => {
-      provider.proxies.forEach((proxy) => {
-        setProxyNodeMap({ ...proxyNodeMap(), [proxy.name]: proxy })
-        delay[proxy.name] = proxy.history[proxy.history.length - 1]?.delay
-      })
-    })
-
-    setDelayMap(delay)
     setProxyProviders(
       Object.values(providers).filter(
         (provider) =>
@@ -39,7 +28,14 @@ export function useProxies() {
       .get('proxies')
       .json<{ proxies: Record<string, Proxy> }>()
     const sortIndex = [...(proxies['GLOBAL'].all ?? []), 'GLOBAL']
+    const delay = delayMap()
 
+    Object.values(proxies).forEach((proxy) => {
+      setProxyNodeMap({ ...proxyNodeMap(), [proxy.name]: proxy })
+      delay[proxy.name] = proxy.history[proxy.history.length - 1]?.delay
+    })
+
+    setDelayMap(delay)
     setProxies(
       Object.values(proxies)
         .filter((proxy) => proxy.all && proxy.all.length > 0)

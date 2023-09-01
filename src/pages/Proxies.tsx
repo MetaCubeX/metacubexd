@@ -29,19 +29,31 @@ export default () => {
     setProxyGroupByProxyName(proxy, proxyName)
   }
 
-  const onSpeedTestClick = (e: MouseEvent, name: string) => {
+  const onSpeedTestClick = async (e: MouseEvent, name: string) => {
+    const el = e.target as HTMLElement
+
+    el.classList.add('animate-pulse')
     e.stopPropagation()
-    delayTestByProxyGroupName(name)
+    await delayTestByProxyGroupName(name)
+    el.classList.remove('animate-pulse')
   }
 
-  const onHealthCheckClick = (e: MouseEvent, name: string) => {
+  const onHealthCheckClick = async (e: MouseEvent, name: string) => {
+    const el = e.target as HTMLElement
+
+    el.classList.add('animate-pulse')
     e.stopPropagation()
-    healthCheckByProviderName(name)
+    await healthCheckByProviderName(name)
+    el.classList.remove('animate-pulse')
   }
 
-  const onUpdateProviderClick = (e: MouseEvent, name: string) => {
+  const onUpdateProviderClick = async (e: MouseEvent, name: string) => {
+    const el = e.target as HTMLElement
+
+    el.classList.add('animate-spin')
     e.stopPropagation()
-    updateProviderByProviderName(name)
+    await updateProviderByProviderName(name)
+    el.classList.remove('animate-spin')
   }
 
   return (
