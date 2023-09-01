@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.35.0](https://github.com/MetaCubeX/metacubexd/compare/v1.34.0...v1.35.0) (2023-09-01)
+
+
+### Features
+
+* add PWA support ([a8c9c21](https://github.com/MetaCubeX/metacubexd/commit/a8c9c218985cd3cc470589aa3699a47bf280fd5e))
+
 ## [1.34.0](https://github.com/MetaCubeX/metacubexd/compare/v1.33.1...v1.34.0) (2023-09-01)
 
 
