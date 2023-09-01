@@ -38,7 +38,7 @@ export function useProxies() {
     setDelayMap(delay)
     setProxies(
       Object.values(proxies)
-        .filter((proxy) => proxy.all && proxy.all.length > 0)
+        .filter((proxy) => proxy.all?.length)
         .sort(
           (pre, next) =>
             sortIndex.indexOf(pre.name) - sortIndex.indexOf(next.name),
