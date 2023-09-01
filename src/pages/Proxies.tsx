@@ -1,5 +1,5 @@
 import { IconBrandSpeedtest, IconReload } from '@tabler/icons-solidjs'
-import { For, createSignal, onMount } from 'solid-js'
+import { For, Show, createSignal, onMount } from 'solid-js'
 import Collapse from '~/components/Collpase'
 import ProxyNodeCard from '~/components/ProxyNodeCard'
 import { useProxies } from '~/signals/proxies'
@@ -115,7 +115,7 @@ export default () => {
         </div>
       </div>
 
-      <div>
+      <Show when={proxyProviders().length > 0}>
         <h1 class="pb-4 text-lg font-semibold">Proxy Providers</h1>
 
         <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -174,7 +174,7 @@ export default () => {
             }}
           </For>
         </div>
-      </div>
+      </Show>
     </div>
   )
 }

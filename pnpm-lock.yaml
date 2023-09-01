@@ -92,6 +92,9 @@ dependencies:
   solid-apexcharts:
     specifier: ^0.3.2
     version: 0.3.2(apexcharts@3.42.0)(solid-js@1.7.11)
+  solid-infinite-scroll:
+    specifier: ^1.0.1
+    version: 1.0.1
   solid-js:
     specifier: ^1.7.11
     version: 1.7.11
@@ -4037,6 +4040,15 @@ packages:
     dependencies:
       apexcharts: 3.42.0
       defu: 6.1.2
+      solid-js: 1.7.11
+    dev: false
+
+  /solid-infinite-scroll@1.0.1:
+    resolution:
+      {
+        integrity: sha512-yIDyr61316jyHSxuQqidMUTcauKDQyPIzIAKawTrTadqxij2wOcM3ei6/MR6WPBCcR0ZMJ8E0aQInFSnL9w2Hg==,
+      }
+    dependencies:
       solid-js: 1.7.11
     dev: false
 

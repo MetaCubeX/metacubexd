@@ -1,11 +1,14 @@
-import { For, createSignal, onMount } from 'solid-js'
+import InfiniteScroll from 'solid-infinite-scroll'
+import { For, createMemo, createSignal, onMount } from 'solid-js'
 import { useRequest } from '~/signals'
 import type { Rule, RuleProvider } from '~/types'
 
 export default () => {
   const request = useRequest()
+  const [maxRuleRender, setMaxRuleRender] = createSignal(100)
   const [rules, setRules] = createSignal<Rule[]>([])
   const [rulesProviders, setRulesProviders] = createSignal<RuleProvider[]>([])
+  const renderRules = createMemo(() => rules().slice(0, maxRuleRender()))
 
   onMount(async () => {
     const { rules } = await request
@@ -27,7 +30,11 @@ export default () => {
         <h1 class="pb-4 text-lg font-semibold">Rules</h1>
 
         <div class="grid grid-cols-1 gap-2 sm:grid-cols-1">
-          <For each={rules()}>
+          <InfiniteScroll
+            each={renderRules()}
+            hasMore={renderRules().length < rules().length}
+            next={() => setMaxRuleRender(maxRuleRender() + 100)}
+          >
             {(rule) => (
               <div class="card card-bordered card-compact bg-base-200 p-4">
                 <div class="break-all">{rule.payload}</div>
@@ -36,7 +43,7 @@ export default () => {
                 </div>
               </div>
             )}
-          </For>
+          </InfiniteScroll>
         </div>
       </div>
 

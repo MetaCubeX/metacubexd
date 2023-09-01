@@ -32,7 +32,7 @@ export function useProxies() {
 
     Object.values(proxies).forEach((proxy) => {
       setProxyNodeMap({ ...proxyNodeMap(), [proxy.name]: proxy })
-      delay[proxy.name] = proxy.history[proxy.history.length - 1]?.delay
+      delay[proxy.name] = proxy.history.at(-1)?.delay ?? 0
     })
 
     setDelayMap(delay)
