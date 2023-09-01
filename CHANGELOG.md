@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.33.0](https://github.com/MetaCubeX/metacubexd/compare/v1.32.0...v1.33.0) (2023-09-01)
+
+
+### Features
+
+* speed test dot for proxy ([e9c6666](https://github.com/MetaCubeX/metacubexd/commit/e9c6666606c511be4f54582bb73d9bdcb3afd417))
+
+
+### Bug Fixes
+
+* delay dot class import ([09a8ede](https://github.com/MetaCubeX/metacubexd/commit/09a8ede9690b0159e5becb294db51379ad21bc90))
+
 ## [1.32.0](https://github.com/MetaCubeX/metacubexd/compare/v1.31.0...v1.32.0) (2023-09-01)
 
 
