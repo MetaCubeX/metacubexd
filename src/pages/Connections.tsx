@@ -261,8 +261,8 @@ export default () => {
         />
       </div>
 
-      <div class="overflow-x-auto whitespace-nowrap">
-        <table class="table table-xs bg-base-200">
+      <div class="overflow-x-auto whitespace-nowrap rounded-md">
+        <table class="table table-xs rounded-none bg-base-200">
           <thead>
             <For each={table.getHeaderGroups()}>
               {(headerGroup) => (

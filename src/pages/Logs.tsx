@@ -74,8 +74,8 @@ export default () => {
         onInput={(e) => setSearch(e.target.value)}
       />
 
-      <div class="overflow-x-auto whitespace-nowrap">
-        <table class="table table-zebra-zebra table-xs bg-base-200">
+      <div class="overflow-x-auto whitespace-nowrap rounded-md">
+        <table class="table table-zebra-zebra table-xs rounded-none bg-base-200">
           <thead>
             <For each={table.getHeaderGroups()}>
               {(headerGroup) => (
