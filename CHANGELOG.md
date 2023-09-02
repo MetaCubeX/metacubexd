@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.56.0](https://github.com/MetaCubeX/metacubexd/compare/v1.55.0...v1.56.0) (2023-09-02)
+
+
+### Features
+
+* **proxies:** sortProxiesByOrderingType ([635b8ba](https://github.com/MetaCubeX/metacubexd/commit/635b8ba966da12dfe3879e97472014150deec0df))
+
+
+### Bug Fixes
+
+* **proxies:** latency widget ([b511b88](https://github.com/MetaCubeX/metacubexd/commit/b511b88cd1d426ef3252ba0a0d9f28c4fb6ad826))
+
 ## [1.55.0](https://github.com/MetaCubeX/metacubexd/compare/v1.54.0...v1.55.0) (2023-09-02)
 
 
