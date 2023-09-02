@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.44.0](https://github.com/MetaCubeX/metacubexd/compare/v1.43.0...v1.44.0) (2023-09-02)
+
+
+### Features
+
+* preview by bar ([4d29e7c](https://github.com/MetaCubeX/metacubexd/commit/4d29e7c16e64278f2172af4e00b34cf4b10a50ee))
+
 ## [1.43.0](https://github.com/MetaCubeX/metacubexd/compare/v1.42.1...v1.43.0) (2023-09-02)
 
 
