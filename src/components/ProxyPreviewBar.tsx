@@ -1,3 +1,4 @@
+import { createMemo } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import Delay from '~/components/Delay'
 import { DELAY } from '~/config/enum'
@@ -5,18 +6,32 @@ import { useProxies } from '~/signals/proxies'
 
 export default (props: { proxyNameList: string[]; now?: string }) => {
   const { proxyNodeMap } = useProxies()
-  const allNodesDelay = props.proxyNameList.map((i) => proxyNodeMap()[i].delay!)
-  const all = allNodesDelay.length
-  const good = allNodesDelay.filter(
-    (delay) => delay > DELAY.NOT_CONNECTED && delay <= DELAY.MEDIUM,
-  ).length
-  const middle = allNodesDelay.filter(
-    (delay) => delay > DELAY.MEDIUM && delay <= DELAY.HIGH,
-  ).length
-  const slow = allNodesDelay.filter((delay) => delay > DELAY.HIGH).length
-  const notConnected = allNodesDelay.filter(
-    (delay) => delay === DELAY.NOT_CONNECTED || typeof delay !== 'number',
-  ).length
+  const delayList = createMemo(() =>
+    props.proxyNameList.map((i) => proxyNodeMap()[i].delay!),
+  )
+  const all = createMemo(() => delayList().length)
+  const good = createMemo(
+    () =>
+      delayList().filter(
+        (delay) => delay > DELAY.NOT_CONNECTED && delay <= DELAY.MEDIUM,
+      ).length,
+  )
+  const middle = createMemo(
+    () =>
+      delayList().filter((delay) => delay > DELAY.MEDIUM && delay <= DELAY.HIGH)
+        .length,
+  )
+  const slow = createMemo(
+    () => delayList().filter((delay) => delay > DELAY.HIGH).length,
+  )
+  const notConnected = createMemo(
+    () =>
+      delayList().filter(
+        (delay) => delay === DELAY.NOT_CONNECTED || typeof delay !== 'number',
+      ).length,
+  )
+
+  console.log(good())
 
   return (
     <div class="flex w-full items-center">
@@ -24,30 +39,30 @@ export default (props: { proxyNameList: string[]; now?: string }) => {
         <div
           class={twMerge('h-2 bg-success')}
           style={{
-            width: `${(good * 100) / all}%`, // cant use tw class cause dynamic classname wont import
+            width: `${(good() * 100) / all()}%`, // cant use tw class cause dynamic classname wont import
           }}
         ></div>
         <div
           class={twMerge('h-2 bg-warning')}
           style={{
-            width: `${(middle * 100) / all}%`,
+            width: `${(middle() * 100) / all()}%`,
           }}
         ></div>
         <div
           class={twMerge('h-2 bg-error')}
           style={{
-            width: `${(slow * 100) / all}%`,
+            width: `${(slow() * 100) / all()}%`,
           }}
         ></div>
         <div
           class={twMerge('h-2 bg-neutral')}
           style={{
-            width: `${(notConnected * 100) / all}%`,
+            width: `${(notConnected() * 100) / all()}%`,
           }}
         ></div>
       </div>
-      <div class="ml-4 text-xs">
-        <Delay delay={proxyNodeMap()[props.now!]?.delay} />
+      <div class="ml-3 w-8 text-xs">
+        <Delay name={props.now} />
       </div>
     </div>
   )

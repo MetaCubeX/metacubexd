@@ -44,7 +44,7 @@ export default (props: {
           {proxyNode()?.udp && ' :: udp'}
         </div>
         <div class="text-xs">
-          <Delay delay={proxyNode()?.delay} />
+          <Delay name={props.proxyName} />
         </div>
       </div>
     </div>
