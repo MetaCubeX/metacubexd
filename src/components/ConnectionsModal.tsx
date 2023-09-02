@@ -1,3 +1,4 @@
+import { useI18n } from '@solid-primitives/i18n'
 import type {
   DragEventHandler,
   Draggable,
@@ -24,6 +25,7 @@ export default (props: {
   onOrderChange: (value: ColumnOrder) => void
   onVisibleChange: (value: ColumnVisibility) => void
 }) => {
+  const [t] = useI18n()
   const [activeKey, setActiveKey] = createSignal<AccessorKey | null>(null)
   const onDragStart = ({ draggable }: { draggable: Draggable }) =>
     setActiveKey(draggable.id as AccessorKey)
@@ -100,7 +102,15 @@ export default (props: {
               <div class="sortable">{activeKey()}</div>
             </DragOverlay>
           </DragDropProvider>
+
+          <button
+            class="btn btn-neutral btn-sm ml-auto mt-4 block"
+            onClick={() => props.onOrderChange(Object.values(AccessorKey))}
+          >
+            {t('reset')}
+          </button>
         </div>
+
         <label class="modal-backdrop" for="connection-modal" />
       </div>
     </>

@@ -36,6 +36,7 @@ const dict = {
     source: 'Source',
     destination: 'Destination',
     close: 'Close',
+    reset: 'Reset',
   },
   'zh-Hans': {
     add: '添加',
@@ -70,6 +71,7 @@ const dict = {
     source: '源地址',
     destination: '目标地址',
     close: '关闭',
+    reset: '重置',
   },
 }
 
