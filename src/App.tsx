@@ -3,6 +3,7 @@ import { Show, lazy, onMount } from 'solid-js'
 import { Header } from '~/components/Header'
 import { curTheme, selectedEndpoint } from '~/signals'
 import { ROUTE } from './config/enum'
+import { useAutoSwitchTheme } from './signals/config'
 
 const Setup = lazy(() => import('~/pages/Setup'))
 const Overview = lazy(() => import('~/pages/Overview'))
@@ -15,6 +16,8 @@ const Config = lazy(() => import('~/pages/Config'))
 
 export const App = () => {
   const navigate = useNavigate()
+
+  useAutoSwitchTheme()
 
   onMount(async () => {
     if (!selectedEndpoint()) {

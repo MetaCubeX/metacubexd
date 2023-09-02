@@ -4,11 +4,19 @@ import { useI18n } from '@solid-primitives/i18n'
 import { For, Show, createSignal, onMount } from 'solid-js'
 import { z } from 'zod'
 import { PROXIES_PREVIEW_TYPE } from '~/config/enum'
+import { themes } from '~/constants'
 import { useRequest } from '~/signals'
 import {
+  applyThemeByMode,
   autoCloseConns,
+  autoSwitchTheme,
+  favDayTheme,
+  favNightTheme,
   proxiesPreviewType,
   setAutoCloseConns,
+  setAutoSwitchTheme,
+  setFavDayTheme,
+  setFavNightTheme,
   setProxiesPreviewType,
   setUrlForDelayTest,
   urlForDelayTest,
@@ -142,10 +150,59 @@ const ConfigForXd = () => {
   const [t] = useI18n()
 
   return (
-    <div class="flex flex-col gap-4">
+    <div class="grid gap-4">
+      <div class="flex flex-col">
+        <div class="pb-4">{t('autoSwitchTheme')}</div>
+        <input
+          type="checkbox"
+          class="toggle"
+          checked={autoSwitchTheme()}
+          onChange={(e) => {
+            setAutoSwitchTheme(e.target.checked)
+            applyThemeByMode()
+          }}
+        />
+      </div>
+      <Show when={autoSwitchTheme()}>
+        <div class="flex flex-col">
+          <div class="pb-4">{t('favDayTheme')}</div>
+          <select
+            class="select select-bordered w-full max-w-xs"
+            onChange={(e) => {
+              setFavDayTheme(e.target.value)
+              applyThemeByMode()
+            }}
+          >
+            <For each={themes}>
+              {(theme) => (
+                <option selected={favDayTheme() === theme} value={theme}>
+                  {theme}
+                </option>
+              )}
+            </For>
+          </select>
+        </div>
+        <div class="flex flex-col">
+          <div class="pb-4">{t('favNightTheme')}</div>
+          <select
+            class="select select-bordered w-full max-w-xs"
+            onChange={(e) => {
+              setFavNightTheme(e.target.value)
+              applyThemeByMode()
+            }}
+          >
+            <For each={themes}>
+              {(theme) => (
+                <option selected={favNightTheme() === theme} value={theme}>
+                  {theme}
+                </option>
+              )}
+            </For>
+          </select>
+        </div>
+      </Show>
       <div>
         <div class="pb-4">{t('proxiesPreviewType')}</div>
-
         <div class="flex items-center gap-4">
           <For each={Object.values(PROXIES_PREVIEW_TYPE)}>
             {(value) => (
@@ -176,11 +233,11 @@ const ConfigForXd = () => {
         />
       </div>
 
-      <div>
+      <div class="flex flex-col">
         <div class="pb-4">{t('urlForDelayTest')}</div>
 
         <input
-          class="input input-bordered w-96"
+          class="w-100 input input-bordered max-w-md"
           value={urlForDelayTest()}
           onChange={(e) => setUrlForDelayTest(e.target?.value!)}
         />

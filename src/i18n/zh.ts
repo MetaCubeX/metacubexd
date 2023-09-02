@@ -40,4 +40,7 @@ export default {
   proxiesPreviewType: '节点组预览样式',
   urlForDelayTest: '测速链接',
   autoCloseConns: '切换代理时自动断开全部连接',
+  autoSwitchTheme: '自动切换主题',
+  favDayTheme: '浅色主题偏好',
+  favNightTheme: '深色主题偏好',
 }

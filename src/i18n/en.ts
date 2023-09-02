@@ -40,4 +40,7 @@ export default {
   proxiesPreviewType: 'Proxies preview type',
   urlForDelayTest: 'Url for delay test',
   autoCloseConns: 'Automatically close all connections',
+  autoSwitchTheme: 'Automatically switch theme',
+  favDayTheme: 'Favorite light theme',
+  favNightTheme: 'Favorite dark theme',
 }
