@@ -7,6 +7,7 @@ import ProxyCardGroups from '~/components/ProxyCardGroups'
 import ProxyNodePreview from '~/components/ProxyNodePreview'
 import { useProxies } from '~/signals/proxies'
 import type { Proxy } from '~/types'
+import { getBtnElFromClickEvent } from '~/utils/proxies'
 
 export default () => {
   const [t] = useI18n()
@@ -22,7 +23,7 @@ export default () => {
   }
 
   const onSpeedTestClick = async (e: MouseEvent, name: string) => {
-    const el = e.target as HTMLElement
+    const el = getBtnElFromClickEvent(e)
 
     el.classList.add('animate-pulse')
     e.stopPropagation()
