@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.42.1](https://github.com/MetaCubeX/metacubexd/compare/v1.42.0...v1.42.1) (2023-09-02)
+
+
+### Bug Fixes
+
+* bytesize in subs info ([4aa7c24](https://github.com/MetaCubeX/metacubexd/commit/4aa7c24ba4d56c49d25d55e69389c966872f5356))
+
 ## [1.42.0](https://github.com/MetaCubeX/metacubexd/compare/v1.41.2...v1.42.0) (2023-09-01)
 
 
