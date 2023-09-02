@@ -1,11 +1,66 @@
 import { createForm } from '@felte/solid'
 import { validator } from '@felte/validator-zod'
+import { useI18n } from '@solid-primitives/i18n'
+import { makePersisted } from '@solid-primitives/storage'
 import { For, Show, createSignal, onMount } from 'solid-js'
 import { z } from 'zod'
+import { PROXIES_PREVIEW_TYPE } from '~/config/enum'
 import { useRequest } from '~/signals'
 import type { DNSQuery, Config as IConfig } from '~/types'
 
-const schema = z.object({
+const dnsQueryFormSchema = z.object({
+  name: z.string(),
+  type: z.string(),
+})
+
+const DNSQueryForm = () => {
+  const [t] = useI18n()
+  const request = useRequest()
+
+  const { form } = createForm<z.infer<typeof dnsQueryFormSchema>>({
+    extend: validator({ schema: dnsQueryFormSchema }),
+    onSubmit: async (values) => {
+      request
+        .get('dns/query', {
+          searchParams: { name: values.name, type: values.type },
+        })
+        .json<DNSQuery>()
+        .then(({ Answer }) =>
+          setDNSQueryResult(Answer?.map(({ data }) => data) || []),
+        )
+    },
+  })
+
+  const [DNSQueryResult, setDNSQueryResult] = createSignal<string[]>([])
+
+  return (
+    <div class="flex items-center gap-2">
+      <form use:form={form} class="contents">
+        <input name="name" class="input input-bordered flex-1" />
+
+        <select name="type" class="select select-bordered">
+          <option>A</option>
+          <option>AAAA</option>
+          <option>MX</option>
+        </select>
+
+        <button type="submit" class="btn btn-primary">
+          {t('dnsQuery')}
+        </button>
+      </form>
+
+      <Show when={DNSQueryResult().length > 0}>
+        <div class="flex flex-col p-4">
+          <For each={DNSQueryResult()}>
+            {(item) => <div class="py-2">{item}</div>}
+          </For>
+        </div>
+      </Show>
+    </div>
+  )
+}
+
+const configFormSchema = z.object({
   port: z.number(),
   'socks-port': z.number(),
   'redir-port': z.number(),
@@ -13,34 +68,8 @@ const schema = z.object({
   'mixed-port': z.number(),
 })
 
-import { makePersisted } from '@solid-primitives/storage'
-import { PROXIES_PREVIEW_TYPE } from '~/config/enum'
-
-export const [proxiesPreviewType, setProxiesPreviewType] = makePersisted(
-  createSignal(PROXIES_PREVIEW_TYPE.BAR),
-  {
-    name: 'proxiesPreviewType',
-    storage: localStorage,
-  },
-)
-
-export default () => {
+const ConfigForm = () => {
   const request = useRequest()
-
-  const [DNSQueryName, setDNSQueryName] = createSignal('')
-  const [DNSQueryResult, setDNSQueryResult] = createSignal<string[]>([])
-
-  const onDNSQuery = () =>
-    request
-      .get('dns/query', {
-        searchParams: {
-          name: DNSQueryName(),
-        },
-      })
-      .json<DNSQuery>()
-      .then(({ Answer }) => {
-        setDNSQueryResult(Answer.map(({ data }) => data))
-      })
 
   const portsList = [
     {
@@ -65,9 +94,9 @@ export default () => {
     },
   ]
 
-  const { form, setInitialValues, reset } = createForm<z.infer<typeof schema>>({
-    extend: validator({ schema }),
-  })
+  const { form, setInitialValues, reset } = createForm<
+    z.infer<typeof configFormSchema>
+  >({ extend: validator({ schema: configFormSchema }) })
 
   onMount(async () => {
     const configs = await request.get('configs').json<IConfig>()
@@ -78,35 +107,42 @@ export default () => {
 
   return (
     <div>
-      <form
-        class="flex items-center gap-2"
-        onSubmit={(e) => {
-          e.preventDefault()
-          onDNSQuery()
-        }}
-      >
-        <input
-          class="input input-bordered flex-1"
-          value={DNSQueryName()}
-          onSubmit={onDNSQuery}
-          onInput={(e) => setDNSQueryName(e.target.value)}
-        />
-
-        <button type="submit" class="btn btn-primary">
-          DNS Query
-        </button>
+      <form class="contents" use:form={form}>
+        <For each={portsList}>
+          {(item) => (
+            <div class="form-control w-64 max-w-xs">
+              <label class="label">
+                <span class="label-text">{item.label}</span>
+              </label>
+              <input
+                name={item.key}
+                type="number"
+                class="input input-bordered"
+                placeholder={item.label}
+              />
+            </div>
+          )}
+        </For>
       </form>
+    </div>
+  )
+}
 
-      <Show when={DNSQueryResult().length > 0}>
-        <div class="flex flex-col p-4">
-          <For each={DNSQueryResult()}>
-            {(item) => <div class="py-2">{item}</div>}
-          </For>
-        </div>
-      </Show>
+export const [proxiesPreviewType, setProxiesPreviewType] = makePersisted(
+  createSignal(PROXIES_PREVIEW_TYPE.BAR),
+  { name: 'proxiesPreviewType', storage: localStorage },
+)
 
-      <div class="mt-4">
+export default () => {
+  return (
+    <div class="flex flex-col gap-4">
+      <DNSQueryForm />
+
+      <ConfigForm />
+
+      <div>
         <div>Proxies preview type:</div>
+
         <div class="join">
           <label class="flex items-center">
             Bar
@@ -132,24 +168,6 @@ export default () => {
           </label>
         </div>
       </div>
-
-      <form class="contents" use:form={form}>
-        <For each={portsList}>
-          {(item) => (
-            <div class="form-control w-64 max-w-xs">
-              <label class="label">
-                <span class="label-text">{item.label}</span>
-              </label>
-              <input
-                name={item.key}
-                type="number"
-                class="input input-bordered"
-                placeholder={item.label}
-              />
-            </div>
-          )}
-        </For>
-      </form>
     </div>
   )
 }

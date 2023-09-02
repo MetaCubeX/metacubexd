@@ -33,4 +33,5 @@ export default {
   destination: 'Destination',
   close: 'Close',
   reset: 'Reset',
+  dnsQuery: 'DNS Query',
 }

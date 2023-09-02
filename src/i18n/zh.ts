@@ -33,4 +33,5 @@ export default {
   destination: '目标地址',
   close: '关闭',
   reset: '重置',
+  dnsQuery: 'DNS 查询',
 }

@@ -1,8 +1,7 @@
 declare module 'solid-js' {
   namespace JSX {
     interface Directives {
-      form: {}
-      sortable: {}
+      [name: string]: {}
     }
   }
 }
@@ -157,7 +156,7 @@ export type DNSQuery = {
     Qtype: number
     Qclass: number
   }[]
-  Answer: {
+  Answer?: {
     TTL: number
     data: string
     name: string
