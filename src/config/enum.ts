@@ -31,6 +31,7 @@ export enum DELAY {
 }
 
 export enum PROXIES_PREVIEW_TYPE {
+  OFF = 'off',
   DOTS = 'dots',
   BAR = 'bar',
   Auto = 'auto',

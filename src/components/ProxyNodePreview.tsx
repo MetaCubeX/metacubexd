@@ -5,7 +5,10 @@ import ProxyPreviewBar from './ProxyPreviewBar'
 import ProxyPreviewDots from './ProxyPreviewDots'
 
 export default (props: { proxyNameList: string[]; now?: string }) => {
+  const off = () => proxiesPreviewType() === PROXIES_PREVIEW_TYPE.OFF
+
   const isSmallGroup = createMemo(() => props.proxyNameList.length <= 30)
+
   const isShowBar = createMemo(() => {
     const type = proxiesPreviewType()
 
@@ -25,13 +28,13 @@ export default (props: { proxyNameList: string[]; now?: string }) => {
   })
 
   return (
-    <>
+    <Show when={!off()}>
       <Show when={isShowBar()}>
         <ProxyPreviewBar proxyNameList={props.proxyNameList} now={props.now} />
       </Show>
       <Show when={isShowDots()}>
         <ProxyPreviewDots proxyNameList={props.proxyNameList} now={props.now} />
       </Show>
-    </>
+    </Show>
   )
 }

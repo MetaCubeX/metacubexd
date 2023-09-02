@@ -37,6 +37,7 @@ export default {
   dots: 'Dots',
   bar: 'Bar',
   auto: 'Auto',
+  off: 'Off',
   proxiesPreviewType: 'Proxies preview type',
   urlForDelayTest: 'Url for delay test',
   autoCloseConns: 'Automatically close all connections',

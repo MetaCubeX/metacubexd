@@ -37,6 +37,7 @@ export default {
   dots: '点阵',
   bar: '条形',
   auto: '自适应',
+  off: '关闭',
   proxiesPreviewType: '节点组预览样式',
   urlForDelayTest: '测速链接',
   autoCloseConns: '切换代理时自动断开全部连接',
