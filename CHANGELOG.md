@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.52.1](https://github.com/MetaCubeX/metacubexd/compare/v1.52.0...v1.52.1) (2023-09-02)
+
+
+### Bug Fixes
+
+* update proxies ([467d0bc](https://github.com/MetaCubeX/metacubexd/commit/467d0bcce2bd7e0764c847ae3a8231a6ddcf034b))
+
 ## [1.52.0](https://github.com/MetaCubeX/metacubexd/compare/v1.51.1...v1.52.0) (2023-09-02)
 
 
