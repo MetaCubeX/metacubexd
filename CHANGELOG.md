@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.47.0](https://github.com/MetaCubeX/metacubexd/compare/v1.46.0...v1.47.0) (2023-09-02)
+
+
+### Features
+
+* config for delay test ([e92ce75](https://github.com/MetaCubeX/metacubexd/commit/e92ce752251b107423ff945a10a23abce867c5b3))
+
 ## [1.46.0](https://github.com/MetaCubeX/metacubexd/compare/v1.45.2...v1.46.0) (2023-09-02)
 
 
