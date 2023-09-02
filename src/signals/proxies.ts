@@ -105,7 +105,9 @@ export function useProxies() {
   }
 
   const updateProviderByProviderName = async (proxyProviderName: string) => {
-    await request.put(`providers/proxies/${proxyProviderName}`)
+    try {
+      await request.put(`providers/proxies/${proxyProviderName}`)
+    } catch {}
     await updateProxy()
   }
 
