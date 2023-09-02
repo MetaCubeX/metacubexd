@@ -3,6 +3,7 @@ import { IconReload } from '@tabler/icons-solidjs'
 import InfiniteScroll from 'solid-infinite-scroll'
 import { For, Show, createMemo, createSignal, onMount } from 'solid-js'
 import { useRules } from '~/signals/rules'
+import { formatTimeFromNow } from '~/utils/proxies'
 
 export default () => {
   const [t] = useI18n()
@@ -50,7 +51,10 @@ export default () => {
         >
           {(rule) => (
             <div class="card card-bordered card-compact mb-2 bg-base-200 p-4">
-              <div class="break-all">{rule.payload}</div>
+              <div class="break-all">
+                {rule.payload}
+                {rule.size !== -1 && ` (${rule.size})`}
+              </div>
               <div class="text-xs text-slate-500">
                 {rule.type} :: {rule.proxy}
               </div>
@@ -75,7 +79,9 @@ export default () => {
             {(rulesProvider) => (
               <div class="card card-bordered card-compact mb-2 bg-base-200 p-4">
                 <div class="flex h-6 items-center justify-between">
-                  <span>{rulesProvider.name}</span>
+                  <span>
+                    {rulesProvider.name} ({rulesProvider.ruleCount})
+                  </span>
                   <div>
                     <button
                       class="btn btn-circle btn-sm mr-2"
@@ -88,8 +94,8 @@ export default () => {
                   </div>
                 </div>
                 <div class="text-xs text-slate-500">
-                  {rulesProvider.vehicleType} :: {rulesProvider.behavior} (
-                  {rulesProvider.ruleCount})
+                  {rulesProvider.vehicleType} / {rulesProvider.behavior} /
+                  Updated {formatTimeFromNow(rulesProvider.updatedAt)}
                 </div>
               </div>
             )}

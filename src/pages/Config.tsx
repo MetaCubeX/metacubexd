@@ -42,18 +42,21 @@ const DNSQueryForm = () => {
 
   return (
     <div class="flex flex-col">
-      <form use:form={form} class="flex items-center gap-2">
-        <input name="name" class="input input-bordered flex-1" />
-
-        <select name="type" class="select select-bordered">
-          <option>A</option>
-          <option>AAAA</option>
-          <option>MX</option>
-        </select>
-
-        <button type="submit" class="btn btn-primary">
-          {t('dnsQuery')}
-        </button>
+      <form use:form={form} class="flex flex-col gap-2 sm:flex-row">
+        <input
+          name="name"
+          class="input input-bordered w-full max-w-xs sm:flex-1"
+        />
+        <div class="flex items-center gap-2">
+          <select name="type" class="select select-bordered">
+            <option>A</option>
+            <option>AAAA</option>
+            <option>MX</option>
+          </select>
+          <button type="submit" class="btn btn-primary">
+            {t('dnsQuery')}
+          </button>
+        </div>
       </form>
 
       <Show when={DNSQueryResult().length > 0}>
