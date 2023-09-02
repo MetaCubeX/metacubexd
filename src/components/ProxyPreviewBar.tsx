@@ -31,8 +31,6 @@ export default (props: { proxyNameList: string[]; now?: string }) => {
       ).length,
   )
 
-  console.log(good())
-
   return (
     <div class="flex w-full items-center">
       <div class="flex flex-1 overflow-hidden rounded-2xl">
