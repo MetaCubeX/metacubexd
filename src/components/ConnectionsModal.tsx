@@ -14,6 +14,7 @@ import {
   useDragDropContext,
 } from '@thisbeyond/solid-dnd'
 import { For, Show, createSignal } from 'solid-js'
+import { Button } from '~/components/Button'
 import {
   AccessorKey,
   initColumnOrder,
@@ -109,15 +110,15 @@ export default (props: {
             </DragOverlay>
           </DragDropProvider>
 
-          <button
-            class="btn btn-neutral btn-sm ml-auto mt-4 block"
+          <Button
+            class="btn-neutral btn-sm ml-auto mt-4 block"
             onClick={() => {
               props.onOrderChange(initColumnOrder)
               props.onVisibleChange(initColumnVisibility)
             }}
           >
             {t('reset')}
-          </button>
+          </Button>
         </div>
 
         <label class="modal-backdrop" for="connection-modal" />

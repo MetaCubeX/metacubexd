@@ -7,6 +7,7 @@ import ky from 'ky'
 import { For, onMount } from 'solid-js'
 import { v4 as uuid } from 'uuid'
 import { z } from 'zod'
+import { Button } from '~/components/Button'
 import { endpointList, setEndpointList, setSelectedEndpoint } from '~/signals'
 
 const schema = z.object({
@@ -122,9 +123,9 @@ export default () => {
             placeholder="secret"
           />
 
-          <button type="submit" class="btn btn-primary join-item uppercase">
+          <Button type="submit" class="btn-primary join-item uppercase">
             {t('add')}
-          </button>
+          </Button>
         </div>
       </form>
 
@@ -137,15 +138,15 @@ export default () => {
             >
               {url}
 
-              <button
-                class="btn btn-circle btn-ghost btn-xs text-white"
+              <Button
+                class="btn-circle btn-ghost btn-xs text-white"
                 onClick={(e) => {
                   e.stopPropagation()
                   onRemove(id)
                 }}
               >
                 <IconX />
-              </button>
+              </Button>
             </div>
           )}
         </For>

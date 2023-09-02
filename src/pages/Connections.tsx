@@ -20,6 +20,7 @@ import byteSize from 'byte-size'
 import { isIPv6 } from 'is-ip'
 import { For, createEffect, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
+import { Button } from '~/components/Button'
 import ConnectionsModal from '~/components/ConnectionsModal'
 import {
   AccessorKey,
@@ -111,22 +112,22 @@ export default () => {
       accessorKey: AccessorKey.Close,
       header: () => (
         <div class="flex h-full items-center">
-          <button
-            class="btn btn-circle btn-xs"
+          <Button
+            class="btn-circle btn-xs"
             onClick={() => request.delete('connections')}
           >
             <IconCircleX size="18" />
-          </button>
+          </Button>
         </div>
       ),
       cell: ({ row }) => (
         <div class="flex h-full items-center">
-          <button
-            class="btn btn-circle btn-xs"
+          <Button
+            class="btn-circle btn-xs"
             onClick={() => onCloseConnection(row.id)}
           >
             <IconCircleX size="18" />
-          </button>
+          </Button>
         </div>
       ),
     },

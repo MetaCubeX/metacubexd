@@ -15,6 +15,7 @@ import {
 } from '@tabler/icons-solidjs'
 import { For, ParentComponent, Show, createMemo, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
+import { Button } from '~/components/Button'
 import { LANG, ROUTE } from '~/config/enum'
 import { themes } from '~/constants'
 import { setCurTheme, setSelectedEndpoint } from '~/signals'
@@ -181,8 +182,8 @@ export const Header = () => {
 
       <div class="navbar-end">
         <div class="flex items-center gap-2">
-          <button
-            class="btn btn-circle btn-sm"
+          <Button
+            class="btn-circle btn-sm"
             onClick={() => {
               const curLocale = locale()
 
@@ -190,16 +191,16 @@ export const Header = () => {
             }}
           >
             <IconLanguage />
-          </button>
+          </Button>
 
           <ThemeSwitcher />
 
-          <button
-            class="btn btn-circle btn-secondary btn-sm"
+          <Button
+            class="btn-circle btn-secondary btn-sm"
             onClick={onSwitchEndpointClick}
           >
             <IconArrowsExchange />
-          </button>
+          </Button>
         </div>
       </div>
     </ul>

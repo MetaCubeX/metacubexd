@@ -2,6 +2,7 @@ import { useI18n } from '@solid-primitives/i18n'
 import { IconReload } from '@tabler/icons-solidjs'
 import InfiniteScroll from 'solid-infinite-scroll'
 import { For, Show, createMemo, createSignal, onMount } from 'solid-js'
+import { Button } from '~/components/Button'
 import { useRules } from '~/signals/rules'
 import { formatTimeFromNow, getBtnElFromClickEvent } from '~/utils/proxies'
 
@@ -67,12 +68,12 @@ export default () => {
         <div class="flex-1">
           <h1 class="flex h-11 items-center pb-4 text-lg font-semibold">
             {t('ruleProviders')}
-            <button
-              class="btn btn-circle btn-ghost btn-sm ml-2"
+            <Button
+              class="btn-circle btn-ghost btn-sm ml-2"
               onClick={(e) => onUpdateAllProviderClick(e)}
             >
               <IconReload />
-            </button>
+            </Button>
           </h1>
 
           <For each={rulesProviders()}>
@@ -83,14 +84,14 @@ export default () => {
                     {rulesProvider.name} ({rulesProvider.ruleCount})
                   </span>
                   <div>
-                    <button
-                      class="btn btn-circle btn-sm mr-2"
+                    <Button
+                      class="btn-circle btn-sm mr-2"
                       onClick={(e) =>
                         onUpdateProviderClick(e, rulesProvider.name)
                       }
                     >
                       <IconReload />
-                    </button>
+                    </Button>
                   </div>
                 </div>
                 <div class="text-xs text-slate-500">

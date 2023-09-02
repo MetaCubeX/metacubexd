@@ -1,6 +1,7 @@
 import { useI18n } from '@solid-primitives/i18n'
 import { IconBrandSpeedtest, IconReload } from '@tabler/icons-solidjs'
 import { Show, createSignal } from 'solid-js'
+import { Button } from '~/components/Button'
 import Collapse from '~/components/Collpase'
 import ForTwoColumns from '~/components/ForTwoColumns'
 import ProxyCardGroups from '~/components/ProxyCardGroups'
@@ -53,12 +54,13 @@ export default () => {
     <div class="flex flex-col gap-2">
       <h1 class="flex h-8 items-center pb-2 text-lg font-semibold">
         {t('proxyProviders')}
-        <button
-          class="btn btn-circle btn-ghost btn-sm ml-2"
+
+        <Button
+          class="btn-circle btn-ghost btn-sm ml-2"
           onClick={(e) => onUpdateAllProviderClick(e)}
         >
           <IconReload />
-        </button>
+        </Button>
       </h1>
       <ForTwoColumns
         subChild={proxyProviders().map((proxyProvider) => {
@@ -67,20 +69,21 @@ export default () => {
               <div class="mr-8 flex items-center justify-between">
                 <span>{proxyProvider.name}</span>
                 <div>
-                  <button
+                  <Button
                     class="btn btn-circle btn-sm mr-2"
                     onClick={(e) =>
                       onUpdateProviderClick(e, proxyProvider.name)
                     }
                   >
                     <IconReload />
-                  </button>
-                  <button
+                  </Button>
+
+                  <Button
                     class="btn btn-circle btn-sm"
                     onClick={(e) => onHealthCheckClick(e, proxyProvider.name)}
                   >
                     <IconBrandSpeedtest />
-                  </button>
+                  </Button>
                 </div>
               </div>
               <SubscriptionInfo

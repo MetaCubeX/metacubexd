@@ -1,6 +1,7 @@
 import { useI18n } from '@solid-primitives/i18n'
 import { IconBrandSpeedtest } from '@tabler/icons-solidjs'
 import { Show, createSignal } from 'solid-js'
+import { Button } from '~/components/Button'
 import Collapse from '~/components/Collpase'
 import ForTwoColumns from '~/components/ForTwoColumns'
 import ProxyCardGroups from '~/components/ProxyCardGroups'
@@ -42,12 +43,12 @@ export default () => {
             <>
               <div class="mr-10 flex items-center justify-between">
                 <span>{proxy.name}</span>
-                <button
-                  class="btn btn-circle btn-sm"
+                <Button
+                  class="btn-circle btn-sm"
                   onClick={(e) => onSpeedTestClick(e, proxy.name)}
                 >
                   <IconBrandSpeedtest />
-                </button>
+                </Button>
               </div>
               <div class="text-sm text-slate-500">
                 {proxy.type} :: {proxy.now}
