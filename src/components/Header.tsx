@@ -14,6 +14,7 @@ import {
 } from '@tabler/icons-solidjs'
 import { For, ParentComponent, Show, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
+import { LANG } from '~/config/enum'
 import { themes } from '~/constants'
 import { setCurTheme, setSelectedEndpoint } from '~/signals'
 
@@ -171,7 +172,7 @@ export const Header = () => {
             onClick={() => {
               const curLocale = locale()
 
-              locale(curLocale === 'en-US' ? 'zh-Hans' : 'en-US')
+              locale(curLocale === LANG.EN ? LANG.ZH : LANG.EN)
             }}
           >
             <IconLanguage />

@@ -1,17 +1,17 @@
 export enum AccessorKey {
-  Close = 'Close',
+  Close = 'close',
   ID = 'ID',
-  Type = 'Type',
-  Process = 'Process',
-  Host = 'Host',
-  Rule = 'Rule',
-  Chains = 'Chains',
-  DlSpeed = 'DL Speed',
-  ULSpeed = 'UL Speed',
-  Download = 'DL',
-  Upload = 'UL',
-  Source = 'Source',
-  Destination = 'Destination',
+  Type = 'type',
+  Process = 'process',
+  Host = 'host',
+  Rule = 'rules',
+  Chains = 'chains',
+  DlSpeed = 'dlSpeed',
+  ULSpeed = 'ulSpeed',
+  Download = 'dl',
+  Upload = 'ul',
+  Source = 'source',
+  Destination = 'destination',
 }
 
 export enum DELAY {
@@ -23,4 +23,9 @@ export enum DELAY {
 export enum PROXIES_PREVIEW_TYPE {
   DOTS = 'dots',
   BAR = 'bar',
+}
+
+export enum LANG {
+  EN = 'en-US',
+  ZH = 'zh-CN',
 }

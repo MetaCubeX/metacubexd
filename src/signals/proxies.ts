@@ -64,12 +64,18 @@ export function useProxies() {
   }
 
   const setProxyGroupByProxyName = async (proxy: Proxy, proxyName: string) => {
+    const proxyGroupList = proxies().slice()
+    const proxyGroup = proxyGroupList.find((i) => i.name === proxy.name)!
+
     await request.put(`proxies/${proxy.name}`, {
       body: JSON.stringify({
         name: proxyName,
       }),
     })
-    await updateProxy()
+
+    proxyGroup.now = proxyName
+    setProxies(proxyGroupList)
+    updateProxy()
   }
 
   const delayTestByProxyGroupName = async (proxyGroupName: string) => {

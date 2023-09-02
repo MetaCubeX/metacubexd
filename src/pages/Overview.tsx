@@ -201,18 +201,21 @@ export default () => {
         </TrafficWidget>
       </div>
 
-      <div class="mx-auto grid h-full w-full max-w-screen-xl grid-cols-1 gap-4">
-        <SolidApexCharts
-          type="area"
-          options={trafficChartOptions()}
-          series={trafficChartSeries()}
-        />
-
-        <SolidApexCharts
-          type="line"
-          options={memoryChartOptions()}
-          series={memoryChartSeries()}
-        />
+      <div class="flex flex-col sm:flex-row">
+        <div class="m-4 flex-1">
+          <SolidApexCharts
+            type="area"
+            options={trafficChartOptions()}
+            series={trafficChartSeries()}
+          />
+        </div>
+        <div class="m-4 flex-1">
+          <SolidApexCharts
+            type="line"
+            options={memoryChartOptions()}
+            series={memoryChartSeries()}
+          />
+        </div>
       </div>
     </div>
   )

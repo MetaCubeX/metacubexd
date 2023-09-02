@@ -13,7 +13,7 @@ import {
   createSortable,
   useDragDropContext,
 } from '@thisbeyond/solid-dnd'
-import { For, createSignal } from 'solid-js'
+import { For, Show, createSignal } from 'solid-js'
 import { AccessorKey } from '~/config/enum'
 
 type ColumnVisibility = Partial<Record<AccessorKey, boolean>>
@@ -65,7 +65,7 @@ export default (props: {
         }}
       >
         <div class="m-1 flex cursor-grab justify-between p-1">
-          <span class="select-none">{key}</span>
+          <span class="select-none">{t(key)}</span>
           <input
             type="checkbox"
             class="toggle"
@@ -99,7 +99,9 @@ export default (props: {
               </SortableProvider>
             </div>
             <DragOverlay>
-              <div class="sortable">{activeKey()}</div>
+              <Show when={activeKey()}>
+                <div class="sortable">{t(activeKey()!)}</div>
+              </Show>
             </DragOverlay>
           </DragDropProvider>
 

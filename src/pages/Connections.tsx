@@ -278,12 +278,14 @@ export default () => {
                           )}
                           onClick={header.column.getToggleSortingHandler()}
                         >
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
+                          {header.column.id === AccessorKey.Close ? (
+                            flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )
+                          ) : (
+                            <span>{t(header.column.id)}</span>
+                          )}
                           {{
                             asc: <IconSortAscending />,
                             desc: <IconSortDescending />,
