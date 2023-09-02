@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.46.0](https://github.com/MetaCubeX/metacubexd/compare/v1.45.2...v1.46.0) (2023-09-02)
+
+
+### Features
+
+* preview by auto ([3257791](https://github.com/MetaCubeX/metacubexd/commit/3257791dec6851cb02cb627cbba469bf93d9ad90))
+
+
+### Bug Fixes
+
+* init scroll from 30 && revert delay map ([c260db1](https://github.com/MetaCubeX/metacubexd/commit/c260db13df031152d02bcd5328da3b373d3b8741))
+* show option ([1351119](https://github.com/MetaCubeX/metacubexd/commit/135111914d58a5817781b3d657e0803f20e9e5e7))
+
 ## [1.45.2](https://github.com/MetaCubeX/metacubexd/compare/v1.45.1...v1.45.2) (2023-09-02)
 
 
