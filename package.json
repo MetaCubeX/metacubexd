@@ -17,6 +17,7 @@
     "@fontsource/fira-sans": "^5.0.11",
     "@solid-primitives/event-listener": "^2.3.0",
     "@solid-primitives/i18n": "^1.4.1",
+    "@solid-primitives/keyed": "^1.2.0",
     "@solid-primitives/storage": "^2.1.1",
     "@solid-primitives/websocket": "^1.1.0",
     "@solidjs/router": "^0.8.3",

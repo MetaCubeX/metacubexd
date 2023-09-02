@@ -3,6 +3,7 @@ import { validator } from '@felte/validator-zod'
 import { useI18n } from '@solid-primitives/i18n'
 import { For, Show, createSignal, onMount } from 'solid-js'
 import { z } from 'zod'
+import { Button } from '~/components/Button'
 import { PROXIES_PREVIEW_TYPE } from '~/config/enum'
 import { themes } from '~/constants'
 import { useRequest } from '~/signals'
@@ -89,6 +90,7 @@ const configFormSchema = z.object({
 })
 
 const ConfigForm = () => {
+  const [t] = useI18n()
   const request = useRequest()
 
   const portsList = [
@@ -125,8 +127,36 @@ const ConfigForm = () => {
     reset()
   })
 
+  const [updatingGEODatabases, setUpdatingGEODatabases] = createSignal(false)
+  const [upgraging, setUpgraging] = createSignal(false)
+  const [restarting, setRestarting] = createSignal(false)
+
+  const onUpdateGEODatabases = async () => {
+    setUpdatingGEODatabases(true)
+    try {
+      await request.post('configs/geo')
+    } catch {}
+    setUpdatingGEODatabases(false)
+  }
+
+  const onUpgrade = async () => {
+    setUpgraging(true)
+    try {
+      await request.post('upgrade')
+    } catch {}
+    setUpgraging(false)
+  }
+
+  const onRestart = async () => {
+    setRestarting(true)
+    try {
+      await request.post('restart')
+    } catch {}
+    setRestarting(false)
+  }
+
   return (
-    <div>
+    <div class="flex flex-col gap-2">
       <form class="contents" use:form={form}>
         <For each={portsList}>
           {(item) => (
@@ -144,6 +174,20 @@ const ConfigForm = () => {
           )}
         </For>
       </form>
+
+      <div class="flex items-center gap-2">
+        <Button loading={updatingGEODatabases()} onClick={onUpdateGEODatabases}>
+          {t('updateGEODatabases')}
+        </Button>
+
+        <Button loading={restarting()} onClick={onRestart}>
+          {t('restartCore')}
+        </Button>
+
+        <Button loading={upgraging()} onClick={onUpgrade}>
+          {t('upgradeCore')}
+        </Button>
+      </div>
     </div>
   )
 }

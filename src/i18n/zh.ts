@@ -44,4 +44,7 @@ export default {
   favDayTheme: '浅色主题偏好',
   favNightTheme: '深色主题偏好',
   renderInTwoColumns: '节点双列渲染',
+  updateGEODatabases: '更新 GEO 数据库文件',
+  restartCore: '重启核心',
+  upgradeCore: '更新核心',
 }

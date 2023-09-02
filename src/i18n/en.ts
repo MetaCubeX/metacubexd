@@ -44,4 +44,7 @@ export default {
   favDayTheme: 'Favorite light theme',
   favNightTheme: 'Favorite dark theme',
   renderInTwoColumns: 'Render Proxies in two columns',
+  updateGEODatabases: 'Update GEO Databases',
+  restartCore: 'Restart Core',
+  upgradeCore: 'Upgrade Core',
 }
