@@ -1,3 +1,13 @@
+export enum ROUTE {
+  Overview = '/overview',
+  Proxies = '/proxies',
+  Proxyprovider = '/proxyprovider',
+  Rules = '/rules',
+  Conns = '/conns',
+  Log = '/logs',
+  Config = '/config',
+}
+
 export enum AccessorKey {
   Close = 'close',
   ID = 'ID',

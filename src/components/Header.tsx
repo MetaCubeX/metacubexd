@@ -4,6 +4,7 @@ import {
   IconArrowsExchange,
   IconFileStack,
   IconGlobe,
+  IconGlobeFilled,
   IconHome,
   IconLanguage,
   IconMenu,
@@ -12,11 +13,19 @@ import {
   IconRuler,
   IconSettings,
 } from '@tabler/icons-solidjs'
-import { For, ParentComponent, Show, createSignal } from 'solid-js'
+import {
+  For,
+  ParentComponent,
+  Show,
+  createMemo,
+  createSignal,
+  onMount,
+} from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import { LANG } from '~/config/enum'
+import { LANG, ROUTE } from '~/config/enum'
 import { themes } from '~/constants'
 import { setCurTheme, setSelectedEndpoint } from '~/signals'
+import { useProxies } from '~/signals/proxies'
 
 const Nav: ParentComponent<{ href: string; tooltip: string }> = ({
   href,
@@ -65,39 +74,56 @@ const ThemeSwitcher = () => (
 
 export const Header = () => {
   const [t, { locale }] = useI18n()
+  const { updateProxy, proxyProviders } = useProxies()
 
-  const navs = () => [
-    {
-      href: '/overview',
-      name: t('overview'),
-      icon: <IconHome />,
-    },
-    {
-      href: '/proxies',
-      name: t('proxies'),
-      icon: <IconGlobe />,
-    },
-    {
-      href: '/rules',
-      name: t('rules'),
-      icon: <IconRuler />,
-    },
-    {
-      href: '/conns',
-      name: t('connections'),
-      icon: <IconNetwork />,
-    },
-    {
-      href: '/logs',
-      name: t('logs'),
-      icon: <IconFileStack />,
-    },
-    {
-      href: '/config',
-      name: t('config'),
-      icon: <IconSettings />,
-    },
-  ]
+  onMount(() => {
+    updateProxy()
+  })
+
+  const navs = createMemo(() => {
+    const list = [
+      {
+        href: ROUTE.Overview,
+        name: t('overview'),
+        icon: <IconHome />,
+      },
+      {
+        href: ROUTE.Proxies,
+        name: t('proxies'),
+        icon: <IconGlobe />,
+      },
+      {
+        href: ROUTE.Rules,
+        name: t('rules'),
+        icon: <IconRuler />,
+      },
+      {
+        href: ROUTE.Conns,
+        name: t('connections'),
+        icon: <IconNetwork />,
+      },
+      {
+        href: ROUTE.Log,
+        name: t('logs'),
+        icon: <IconFileStack />,
+      },
+      {
+        href: ROUTE.Config,
+        name: t('config'),
+        icon: <IconSettings />,
+      },
+    ]
+
+    if (proxyProviders().length > 0) {
+      list.splice(2, 0, {
+        href: ROUTE.Proxyprovider,
+        name: t('proxyProviders'),
+        icon: <IconGlobeFilled />,
+      })
+    }
+
+    return list
+  })
 
   const location = useLocation()
   const navigate = useNavigate()
