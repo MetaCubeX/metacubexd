@@ -34,8 +34,8 @@ const DNSQueryForm = () => {
   const [DNSQueryResult, setDNSQueryResult] = createSignal<string[]>([])
 
   return (
-    <div class="flex items-center gap-2">
-      <form use:form={form} class="contents">
+    <div class="flex flex-col">
+      <form use:form={form} class="flex items-center gap-2">
         <input name="name" class="input input-bordered flex-1" />
 
         <select name="type" class="select select-bordered">
