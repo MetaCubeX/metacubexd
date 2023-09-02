@@ -35,19 +35,21 @@ const DNSQueryForm = () => {
   const [t] = useI18n()
   const request = useRequest()
 
-  const { form } = createForm<z.infer<typeof dnsQueryFormSchema>>({
-    extend: validator({ schema: dnsQueryFormSchema }),
-    onSubmit: async (values) => {
-      request
-        .get('dns/query', {
-          searchParams: { name: values.name, type: values.type },
-        })
-        .json<DNSQuery>()
-        .then(({ Answer }) =>
-          setDNSQueryResult(Answer?.map(({ data }) => data) || []),
-        )
+  const { form, isSubmitting } = createForm<z.infer<typeof dnsQueryFormSchema>>(
+    {
+      extend: validator({ schema: dnsQueryFormSchema }),
+      onSubmit: async (values) => {
+        request
+          .get('dns/query', {
+            searchParams: { name: values.name, type: values.type },
+          })
+          .json<DNSQuery>()
+          .then(({ Answer }) =>
+            setDNSQueryResult(Answer?.map(({ data }) => data) || []),
+          )
+      },
     },
-  })
+  )
 
   const [DNSQueryResult, setDNSQueryResult] = createSignal<string[]>([])
 
@@ -64,9 +66,10 @@ const DNSQueryForm = () => {
             <option>AAAA</option>
             <option>MX</option>
           </select>
-          <button type="submit" class="btn btn-primary">
+
+          <Button type="submit" class="btn-primary" loading={isSubmitting()}>
             {t('dnsQuery')}
-          </button>
+          </Button>
         </div>
       </form>
 
