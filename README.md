@@ -1,6 +1,15 @@
 # metacubexd
 
-Clash-Meta Dashboard
+<p align="center">
+  <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fmetacubex%2Fmetacubexd&count_bg=%235C3DC8&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false" alt="hits" />
+  <img src="https://custom-icon-badges.herokuapp.com/github/issues-pr-closed/metacubex/metacubexd?color=purple&logo=git-pull-request&logoColor=white" alt="pr/issue" />
+  <img src="https://custom-icon-badges.herokuapp.com/github/last-commit/metacubex/metacubexd?logo=history&logoColor=white" alt="lastcommit" />
+  <img src="https://github.com/metacubex/metacubexd/actions/workflows/release.yml/badge.svg" alt="build-status" />
+  <img src="https://custom-icon-badges.herokuapp.com/github/v/release/metacubex/metacubexd?logo=rocket" alt="version">
+  <img src="https://custom-icon-badges.herokuapp.com/github/license/metacubex/metacubexd?logo=law&color=orange" alt="license" />
+</p>
+
+<p align="center">Clash-Meta Dashboard</p>
 
 ## Published Official Links
 
