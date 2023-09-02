@@ -13,6 +13,17 @@ const schema = z.object({
   'mixed-port': z.number(),
 })
 
+import { makePersisted } from '@solid-primitives/storage'
+import { PROXIES_PREVIEW_TYPE } from '~/config/enum'
+
+export const [proxiesPreviewType, setProxiesPreviewType] = makePersisted(
+  createSignal(PROXIES_PREVIEW_TYPE.BAR),
+  {
+    name: 'proxiesPreviewType',
+    storage: localStorage,
+  },
+)
+
 export default () => {
   const request = useRequest()
 
@@ -93,6 +104,34 @@ export default () => {
           </For>
         </div>
       </Show>
+
+      <div class="mt-4">
+        <div>Proxies preview type:</div>
+        <div class="join">
+          <label class="flex items-center">
+            Bar
+            <input
+              class="radio m-4"
+              aria-label="Bar"
+              type="radio"
+              name="proxiesPreviewType"
+              checked={PROXIES_PREVIEW_TYPE.BAR === proxiesPreviewType()}
+              onChange={() => setProxiesPreviewType(PROXIES_PREVIEW_TYPE.BAR)}
+            />
+          </label>
+          <label class="flex items-center">
+            Dots
+            <input
+              class="radio m-4"
+              aria-label="Dots"
+              type="radio"
+              name="proxiesPreviewType"
+              checked={PROXIES_PREVIEW_TYPE.DOTS === proxiesPreviewType()}
+              onChange={() => setProxiesPreviewType(PROXIES_PREVIEW_TYPE.DOTS)}
+            />
+          </label>
+        </div>
+      </div>
 
       <form class="contents" use:form={form}>
         <For each={portsList}>

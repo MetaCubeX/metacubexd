@@ -4,7 +4,7 @@ import { Show, createSignal, onMount } from 'solid-js'
 import Collapse from '~/components/Collpase'
 import ForTwoLine from '~/components/ForTwoLine'
 import ProxyCardGroups from '~/components/ProxyCardGroups'
-import ProxyNodeDots from '~/components/ProxyNodeDots'
+import ProxyNodePreview from '~/components/ProxyNodePreview'
 import SubscriptionInfo from '~/components/SubscriptionInfo'
 import { useProxies } from '~/signals/proxies'
 import type { Proxy } from '~/types'
@@ -83,7 +83,7 @@ export default () => {
                   {proxy.type} :: {proxy.now}
                 </div>
                 <Show when={!collapsedMap()[`group-${proxy.name}`]}>
-                  <ProxyNodeDots
+                  <ProxyNodePreview
                     proxyNameList={proxy.all ?? []}
                     now={proxy.now}
                   />
@@ -157,7 +157,7 @@ export default () => {
                   <Show
                     when={!collapsedMap()[`provider-${proxyProvider.name}`]}
                   >
-                    <ProxyNodeDots
+                    <ProxyNodePreview
                       proxyNameList={
                         proxyProvider.proxies.map((i) => i.name) ?? []
                       }

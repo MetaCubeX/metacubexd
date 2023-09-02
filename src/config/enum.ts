@@ -19,3 +19,8 @@ export enum DELAY {
   MEDIUM = 200,
   HIGH = 500,
 }
+
+export enum PROXIES_PREVIEW_TYPE {
+  DOTS = 'dots',
+  BAR = 'bar',
+}
