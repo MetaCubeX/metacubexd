@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.45.2](https://github.com/MetaCubeX/metacubexd/compare/v1.45.1...v1.45.2) (2023-09-02)
+
+
+### Bug Fixes
+
+* tool tip for mobile ([b0bac89](https://github.com/MetaCubeX/metacubexd/commit/b0bac89488b6f3a0b9fbe32f74f3ae0f0593cbe7))
+
 ## [1.45.1](https://github.com/MetaCubeX/metacubexd/compare/v1.45.0...v1.45.1) (2023-09-02)
 
 
