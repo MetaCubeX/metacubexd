@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.57.0](https://github.com/MetaCubeX/metacubexd/compare/v1.56.0...v1.57.0) (2023-09-02)
+
+
+### Features
+
+* **config:** make config option titles more noticeable ([b9eb92f](https://github.com/MetaCubeX/metacubexd/commit/b9eb92fc0bd6ef5ce0aa35fd1c7ee46dd028621a))
+
 ## [1.56.0](https://github.com/MetaCubeX/metacubexd/compare/v1.55.0...v1.56.0) (2023-09-02)
 
 
