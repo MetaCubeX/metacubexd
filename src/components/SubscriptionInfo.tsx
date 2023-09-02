@@ -3,8 +3,10 @@ import dayjs from 'dayjs'
 import type { SubscriptionInfo } from '~/types'
 
 const getSubscriptionsInfo = (subscriptionInfo: SubscriptionInfo) => {
-  const total = byteSize(subscriptionInfo.Total)
-  const used = byteSize(subscriptionInfo.Download + subscriptionInfo.Upload)
+  const total = byteSize(subscriptionInfo.Total, { units: 'iec' })
+  const used = byteSize(subscriptionInfo.Download + subscriptionInfo.Upload, {
+    units: 'iec',
+  })
   const percentage = (
     ((subscriptionInfo.Download + subscriptionInfo.Upload) /
       subscriptionInfo.Total) *
