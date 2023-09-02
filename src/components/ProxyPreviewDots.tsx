@@ -1,20 +1,27 @@
 import { For } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import { DELAY } from '~/constants'
-import { useProxies } from '~/signals'
+import {
+  LATENCY_QUALITY_MAP_HTTP,
+  LATENCY_QUALITY_MAP_HTTPS,
+} from '~/constants'
+import { isLatencyTestByHttps, useProxies } from '~/signals'
 
 const DelayDots = (p: { delay: number | undefined; selected: boolean }) => {
+  const delayMap = isLatencyTestByHttps()
+    ? LATENCY_QUALITY_MAP_HTTP
+    : LATENCY_QUALITY_MAP_HTTPS
+
   let dotClassName = p.selected
     ? 'bg-white border-4 border-success'
     : 'bg-success'
 
-  if (typeof p.delay !== 'number' || p.delay === DELAY.NOT_CONNECTED) {
+  if (typeof p.delay !== 'number' || p.delay === delayMap.NOT_CONNECTED) {
     dotClassName = p.selected
       ? 'bg-white border-4 border-neutral'
       : 'bg-neutral'
-  } else if (p.delay > DELAY.HIGH) {
+  } else if (p.delay > delayMap.HIGH) {
     dotClassName = p.selected ? 'bg-white border-4 border-error' : 'bg-error'
-  } else if (p.delay > DELAY.MEDIUM) {
+  } else if (p.delay > delayMap.MEDIUM) {
     dotClassName = p.selected
       ? 'bg-white border-4 border-warning'
       : 'bg-warning'

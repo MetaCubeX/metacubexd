@@ -40,10 +40,16 @@ export enum ROUTES {
   Config = '/config',
 }
 
-export enum DELAY {
+export enum LATENCY_QUALITY_MAP_HTTP {
   NOT_CONNECTED = 0,
   MEDIUM = 200,
   HIGH = 500,
+}
+
+export enum LATENCY_QUALITY_MAP_HTTPS {
+  NOT_CONNECTED = 0,
+  MEDIUM = 800,
+  HIGH = 1500,
 }
 
 export enum PROXIES_PREVIEW_TYPE {

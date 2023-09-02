@@ -1,6 +1,6 @@
 import { createMemo } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import { Delay } from '~/components'
+import { Latency } from '~/components'
 import { useProxies } from '~/signals'
 
 export default (props: {
@@ -44,7 +44,7 @@ export default (props: {
           {proxyNode()?.udp && ' :: udp'}
         </div>
         <div class="text-xs">
-          <Delay name={props.proxyName} />
+          <Latency name={props.proxyName} />
         </div>
       </div>
     </div>

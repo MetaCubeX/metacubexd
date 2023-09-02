@@ -1,6 +1,11 @@
 import { makePersisted } from '@solid-primitives/storage'
 import { createSignal } from 'solid-js'
-import { PROXIES_PREVIEW_TYPE, PROXIES_SORTING_TYPE } from '~/constants'
+import {
+  LATENCY_QUALITY_MAP_HTTP,
+  LATENCY_QUALITY_MAP_HTTPS,
+  PROXIES_PREVIEW_TYPE,
+  PROXIES_SORTING_TYPE,
+} from '~/constants'
 import { setCurTheme } from '~/signals'
 
 export const [proxiesPreviewType, setProxiesPreviewType] = makePersisted(
@@ -35,6 +40,11 @@ export const [renderInTwoColumn, setRenderInTwoColumn] = makePersisted(
   createSignal(true),
   { name: 'renderInTwoColumn', storage: localStorage },
 )
+
+export const isLatencyTestByHttps = () => urlForDelayTest().startsWith('https')
+
+export const latencyQualityMap = () =>
+  isLatencyTestByHttps() ? LATENCY_QUALITY_MAP_HTTPS : LATENCY_QUALITY_MAP_HTTP
 
 const setTheme = (isDark: boolean) => {
   if (autoSwitchTheme()) {

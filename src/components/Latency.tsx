@@ -1,8 +1,8 @@
 import { Show, createEffect, createMemo, createSignal } from 'solid-js'
-import { DELAY } from '~/constants'
-import { useProxies } from '~/signals'
+import { LATENCY_QUALITY_MAP_HTTP } from '~/constants'
+import { latencyQualityMap, useProxies } from '~/signals'
 
-export const Delay = (props: { name?: string }) => {
+export const Latency = (props: { name?: string }) => {
   const { delayMap } = useProxies()
   const [textClassName, setTextClassName] = createSignal('')
   const delay = createMemo(() => {
@@ -12,9 +12,9 @@ export const Delay = (props: { name?: string }) => {
   createEffect(() => {
     setTextClassName('text-success')
 
-    if (delay() > DELAY.HIGH) {
+    if (delay() > latencyQualityMap().HIGH) {
       setTextClassName('text-error')
-    } else if (delay() > DELAY.MEDIUM) {
+    } else if (delay() > latencyQualityMap().MEDIUM) {
       setTextClassName('text-warning')
     }
   })
@@ -22,7 +22,10 @@ export const Delay = (props: { name?: string }) => {
   return (
     <>
       <Show
-        when={typeof delay() === 'number' && delay() !== DELAY.NOT_CONNECTED}
+        when={
+          typeof delay() === 'number' &&
+          delay() !== LATENCY_QUALITY_MAP_HTTP.NOT_CONNECTED
+        }
       >
         <span class={textClassName()}>{delay()}ms</span>
       </Show>

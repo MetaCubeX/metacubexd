@@ -1,7 +1,6 @@
 import { createMemo } from 'solid-js'
-import { Delay } from '~/components'
-import { DELAY } from '~/constants'
-import { useProxies } from '~/signals'
+import { Latency } from '~/components'
+import { latencyQualityMap, useProxies } from '~/signals'
 
 export const ProxyPreviewBar = (props: {
   proxyNameList: string[]
@@ -15,21 +14,29 @@ export const ProxyPreviewBar = (props: {
   const good = createMemo(
     () =>
       delayList().filter(
-        (delay) => delay > DELAY.NOT_CONNECTED && delay <= DELAY.MEDIUM,
+        (delay) =>
+          delay > latencyQualityMap().NOT_CONNECTED &&
+          delay <= latencyQualityMap().MEDIUM,
       ).length,
   )
   const middle = createMemo(
     () =>
-      delayList().filter((delay) => delay > DELAY.MEDIUM && delay <= DELAY.HIGH)
-        .length,
+      delayList().filter(
+        (delay) =>
+          delay > latencyQualityMap().NOT_CONNECTED &&
+          delay <= latencyQualityMap().HIGH,
+      ).length,
   )
   const slow = createMemo(
-    () => delayList().filter((delay) => delay > DELAY.HIGH).length,
+    () =>
+      delayList().filter((delay) => delay > latencyQualityMap().HIGH).length,
   )
   const notConnected = createMemo(
     () =>
       delayList().filter(
-        (delay) => delay === DELAY.NOT_CONNECTED || typeof delay !== 'number',
+        (delay) =>
+          delay === latencyQualityMap().NOT_CONNECTED ||
+          typeof delay !== 'number',
       ).length,
   )
 
@@ -62,7 +69,7 @@ export const ProxyPreviewBar = (props: {
         ></div>
       </div>
       <div class="ml-3 w-8 text-xs">
-        <Delay name={props.now} />
+        <Latency name={props.now} />
       </div>
     </div>
   )
