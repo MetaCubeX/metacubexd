@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.53.0](https://github.com/MetaCubeX/metacubexd/compare/v1.52.1...v1.53.0) (2023-09-02)
+
+
+### Features
+
+* config for render in two col ([5d43ea0](https://github.com/MetaCubeX/metacubexd/commit/5d43ea0b5f48b2d84984bdf94dcef87d8e780432))
+
+
+### Bug Fixes
+
+* btn animate ([a29e638](https://github.com/MetaCubeX/metacubexd/commit/a29e638c1e02fc8fb25ac1806d9e9e9d9af288f9))
+
 ## [1.52.1](https://github.com/MetaCubeX/metacubexd/compare/v1.52.0...v1.52.1) (2023-09-02)
 
 
