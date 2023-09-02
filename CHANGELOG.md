@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.49.0](https://github.com/MetaCubeX/metacubexd/compare/v1.48.0...v1.49.0) (2023-09-02)
+
+
+### Features
+
+* auto close all connections before switch proxy ([b79f10f](https://github.com/MetaCubeX/metacubexd/commit/b79f10f528e5a501f8d2b2e3d7e66eae820a00dd))
+* collapse proxies and provider ([8757924](https://github.com/MetaCubeX/metacubexd/commit/875792432a7d9ea495b0d76c22dd3876bef4c34a))
+
 ## [1.48.0](https://github.com/MetaCubeX/metacubexd/compare/v1.47.0...v1.48.0) (2023-09-02)
 
 
