@@ -39,4 +39,5 @@ export default {
   auto: 'Auto',
   proxiesPreviewType: 'Proxies preview type',
   urlForDelayTest: 'Url for delay test',
+  autoCloseConns: 'Automatically close all connections',
 }

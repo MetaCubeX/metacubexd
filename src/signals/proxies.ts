@@ -1,6 +1,6 @@
 import { createSignal } from 'solid-js'
-import { urlForDelayTest } from '~/pages/Config'
 import { useRequest } from '~/signals'
+import { autoCloseConns, urlForDelayTest } from '~/signals/config'
 import type { Proxy, ProxyNode, ProxyProvider } from '~/types'
 
 type ProxyInfo = {
@@ -37,6 +37,7 @@ export function useProxies() {
       })
     })
   }
+
   const updateProxy = async () => {
     const { providers } = await request
       .get('providers/proxies')
@@ -73,14 +74,18 @@ export function useProxies() {
     const proxyGroupList = proxies().slice()
     const proxyGroup = proxyGroupList.find((i) => i.name === proxy.name)!
 
+    if (autoCloseConns()) request.delete('connections')
+
     await request.put(`proxies/${proxy.name}`, {
       body: JSON.stringify({
         name: proxyName,
       }),
     })
+
     proxyGroup.now = proxyName
+
     setProxies(proxyGroupList)
-    setTimeout(updateProxy)
+    queueMicrotask(updateProxy)
   }
 
   const delayTestByProxyGroupName = async (proxyGroupName: string) => {

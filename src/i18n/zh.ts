@@ -39,4 +39,5 @@ export default {
   auto: '自适应',
   proxiesPreviewType: '节点组预览样式',
   urlForDelayTest: '测速链接',
+  autoCloseConns: '切换代理时自动断开全部连接',
 }

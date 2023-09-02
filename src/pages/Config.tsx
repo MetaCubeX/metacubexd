@@ -1,11 +1,18 @@
 import { createForm } from '@felte/solid'
 import { validator } from '@felte/validator-zod'
 import { useI18n } from '@solid-primitives/i18n'
-import { makePersisted } from '@solid-primitives/storage'
 import { For, Show, createSignal, onMount } from 'solid-js'
 import { z } from 'zod'
 import { PROXIES_PREVIEW_TYPE } from '~/config/enum'
 import { useRequest } from '~/signals'
+import {
+  autoCloseConns,
+  proxiesPreviewType,
+  setAutoCloseConns,
+  setProxiesPreviewType,
+  setUrlForDelayTest,
+  urlForDelayTest,
+} from '~/signals/config'
 import type { DNSQuery, Config as IConfig } from '~/types'
 
 const dnsQueryFormSchema = z.object({
@@ -128,47 +135,54 @@ const ConfigForm = () => {
   )
 }
 
-export const [proxiesPreviewType, setProxiesPreviewType] = makePersisted(
-  createSignal(PROXIES_PREVIEW_TYPE.BAR),
-  { name: 'proxiesPreviewType', storage: localStorage },
-)
-export const [urlForDelayTest, setUrlForDelayTest] = makePersisted(
-  createSignal('https://www.gstatic.com/generate_204'),
-  { name: 'urlForDelayTest', storage: localStorage },
-)
-
 const ConfigForXd = () => {
   const [t] = useI18n()
 
   return (
-    <>
-      <div>{t('proxiesPreviewType')}</div>
-      <div class="flex">
-        <For each={Object.values(PROXIES_PREVIEW_TYPE)}>
-          {(value) => (
-            <label class="flex items-center">
-              {t(value)}
-              <input
-                class="radio m-4"
-                aria-label={value}
-                type="radio"
-                name="proxiesPreviewType"
-                checked={value === proxiesPreviewType()}
-                onChange={() => setProxiesPreviewType(value)}
-              />
-            </label>
-          )}
-        </For>
-      </div>
-      <div>{t('urlForDelayTest')}</div>
+    <div class="flex flex-col gap-4">
       <div>
+        <div class="pb-4">{t('proxiesPreviewType')}</div>
+
+        <div class="flex items-center gap-4">
+          <For each={Object.values(PROXIES_PREVIEW_TYPE)}>
+            {(value) => (
+              <label class="flex items-center gap-2">
+                <span>{t(value)}</span>
+
+                <input
+                  class="radio"
+                  aria-label={value}
+                  type="radio"
+                  checked={value === proxiesPreviewType()}
+                  onChange={() => setProxiesPreviewType(value)}
+                />
+              </label>
+            )}
+          </For>
+        </div>
+      </div>
+
+      <div>
+        <div class="pb-4">{t('autoCloseConns')}</div>
+
+        <input
+          class="toggle"
+          type="checkbox"
+          checked={autoCloseConns()}
+          onChange={(e) => setAutoCloseConns(e.target.checked)}
+        />
+      </div>
+
+      <div>
+        <div class="pb-4">{t('urlForDelayTest')}</div>
+
         <input
           class="input input-bordered w-96"
           value={urlForDelayTest()}
           onChange={(e) => setUrlForDelayTest(e.target?.value!)}
         />
       </div>
-    </>
+    </div>
   )
 }
 

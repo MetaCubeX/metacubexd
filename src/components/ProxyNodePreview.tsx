@@ -1,6 +1,6 @@
 import { Show, createMemo } from 'solid-js'
 import { PROXIES_PREVIEW_TYPE } from '~/config/enum'
-import { proxiesPreviewType } from '~/pages/Config'
+import { proxiesPreviewType } from '~/signals/config'
 import ProxyPreviewBar from './ProxyPreviewBar'
 import ProxyPreviewDots from './ProxyPreviewDots'
 
