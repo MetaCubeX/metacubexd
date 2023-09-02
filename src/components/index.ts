@@ -1,5 +1,5 @@
 export * from './Button'
-export * from './Collpase'
+export * from './Collapse'
 export * from './ConnectionsTableOrderingModal'
 export * from './ForTwoColumns'
 export * from './Header'

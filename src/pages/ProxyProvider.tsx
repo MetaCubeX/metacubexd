@@ -9,8 +9,12 @@ import {
   ProxyNodePreview,
   SubscriptionInfo,
 } from '~/components'
-import { formatTimeFromNow, getBtnElFromClickEvent } from '~/helpers'
-import { useProxies } from '~/signals'
+import {
+  formatTimeFromNow,
+  getBtnElFromClickEvent,
+  sortProxiesByOrderingType,
+} from '~/helpers'
+import { proxiesOrderingType, useProxies } from '~/signals'
 
 export default () => {
   const [t] = useI18n()
@@ -19,6 +23,7 @@ export default () => {
     updateProviderByProviderName,
     updateAllProvider,
     healthCheckByProviderName,
+    latencyMap,
   } = useProxies()
 
   const [collapsedMap, setCollapsedMap] = createSignal<Record<string, boolean>>(
@@ -66,6 +71,12 @@ export default () => {
       </h1>
       <ForTwoColumns
         subChild={proxyProviders().map((proxyProvider) => {
+          const sortedProxyNames = sortProxiesByOrderingType(
+            proxyProvider.proxies.map((i) => i.name) ?? [],
+            latencyMap(),
+            proxiesOrderingType(),
+          )
+
           const title = (
             <>
               <div class="mr-8 flex items-center justify-between">
@@ -96,18 +107,12 @@ export default () => {
                 {formatTimeFromNow(proxyProvider.updatedAt)}
               </div>
               <Show when={!collapsedMap()[`provider-${proxyProvider.name}`]}>
-                <ProxyNodePreview
-                  proxyNameList={proxyProvider.proxies.map((i) => i.name) ?? []}
-                />
+                <ProxyNodePreview proxyNameList={sortedProxyNames} />
               </Show>
             </>
           )
 
-          const content = (
-            <ProxyCardGroups
-              proxies={proxyProvider.proxies.map((i) => i.name)}
-            />
-          )
+          const content = <ProxyCardGroups proxyNames={sortedProxyNames} />
 
           return (
             <Collapse

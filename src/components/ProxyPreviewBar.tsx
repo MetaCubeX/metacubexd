@@ -8,7 +8,7 @@ export const ProxyPreviewBar = (props: {
 }) => {
   const { latencyMap } = useProxies()
   const latencyList = createMemo(() =>
-    props.proxyNameList.map((i) => latencyMap()[i]),
+    props.proxyNameList.map((name) => latencyMap()[name]),
   )
   const all = createMemo(() => latencyList().length)
   const good = createMemo(
@@ -42,7 +42,7 @@ export const ProxyPreviewBar = (props: {
   )
 
   return (
-    <div class="flex h-6 w-full items-center">
+    <div class="flex h-6 w-full items-center gap-2">
       <div class="flex flex-1 overflow-hidden rounded-2xl">
         <div
           class="h-2 bg-success"
@@ -69,9 +69,8 @@ export const ProxyPreviewBar = (props: {
           }}
         ></div>
       </div>
-      <div class="ml-3 w-8 text-xs">
-        <Latency name={props.now} />
-      </div>
+
+      <Latency name={props.now} />
     </div>
   )
 }

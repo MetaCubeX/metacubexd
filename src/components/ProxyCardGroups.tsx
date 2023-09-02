@@ -3,17 +3,17 @@ import { createMemo, createSignal } from 'solid-js'
 import { ProxyNodeCard } from '~/components'
 
 export const ProxyCardGroups = (props: {
-  proxies: string[]
+  proxyNames: string[]
   now?: string
   onClick?: (name: string) => void
 }) => {
   const [maxRender, setMaxRender] = createSignal(100)
-  const proxies = createMemo(() => props.proxies.slice(0, maxRender()))
+  const proxyNames = createMemo(() => props.proxyNames.slice(0, maxRender()))
 
   return (
     <InfiniteScroll
-      each={proxies()}
-      hasMore={proxies().length < props.proxies.length}
+      each={proxyNames()}
+      hasMore={proxyNames().length < props.proxyNames.length}
       next={() => setMaxRender(maxRender() + 30)}
     >
       {(proxy) => (

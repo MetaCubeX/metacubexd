@@ -45,6 +45,12 @@ export default () => {
       </h1>
       <ForTwoColumns
         subChild={proxies().map((proxy) => {
+          const sortedProxyNames = sortProxiesByOrderingType(
+            proxy.all ?? [],
+            latencyMap(),
+            proxiesOrderingType(),
+          )
+
           const title = (
             <>
               <div class="mr-10 flex items-center justify-between">
@@ -61,11 +67,7 @@ export default () => {
               </div>
               <Show when={!collapsedMap()[`group-${proxy.name}`]}>
                 <ProxyNodePreview
-                  proxyNameList={sortProxiesByOrderingType(
-                    proxy.all ?? [],
-                    latencyMap(),
-                    proxiesOrderingType(),
-                  )}
+                  proxyNameList={sortedProxyNames}
                   now={proxy.now}
                 />
               </Show>
@@ -74,11 +76,7 @@ export default () => {
 
           const content = (
             <ProxyCardGroups
-              proxies={sortProxiesByOrderingType(
-                proxy.all ?? [],
-                latencyMap(),
-                proxiesOrderingType(),
-              )}
+              proxyNames={sortedProxyNames}
               now={proxy.now}
               onClick={(name) => {
                 onProxyNodeClick(proxy, name)

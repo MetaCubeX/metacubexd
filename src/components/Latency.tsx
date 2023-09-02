@@ -22,18 +22,16 @@ export const Latency = (props: { name?: string }) => {
   })
 
   return (
-    <>
-      <Show
-        when={
-          typeof latency() === 'number' &&
-          latency() !== LATENCY_QUALITY_MAP_HTTP.NOT_CONNECTED
-        }
-      >
-        <span class={`whitespace-nowrap ${textClassName()}`}>
-          {latency()}
-          {t('ms')}
-        </span>
-      </Show>
-    </>
+    <Show
+      when={
+        typeof latency() === 'number' &&
+        latency() !== LATENCY_QUALITY_MAP_HTTP.NOT_CONNECTED
+      }
+    >
+      <span class={`whitespace-nowrap text-xs ${textClassName()}`}>
+        {latency()}
+        {t('ms')}
+      </span>
+    </Show>
   )
 }
