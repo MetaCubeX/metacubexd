@@ -3,10 +3,10 @@ import { DELAY } from '~/config/enum'
 import { useProxies } from '~/signals/proxies'
 
 const Delay = (props: { name?: string }) => {
-  const { proxyNodeMap } = useProxies()
+  const { delayMap } = useProxies()
   const [textClassName, setTextClassName] = createSignal('')
   const delay = createMemo(() => {
-    return proxyNodeMap()[props.name!]?.delay!
+    return delayMap()[props.name!]
   })
 
   createEffect(() => {

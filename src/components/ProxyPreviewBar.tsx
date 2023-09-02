@@ -4,9 +4,9 @@ import { DELAY } from '~/config/enum'
 import { useProxies } from '~/signals/proxies'
 
 export default (props: { proxyNameList: string[]; now?: string }) => {
-  const { proxyNodeMap } = useProxies()
+  const { delayMap } = useProxies()
   const delayList = createMemo(() =>
-    props.proxyNameList.map((i) => proxyNodeMap()[i].delay!),
+    props.proxyNameList.map((i) => delayMap()[i]),
   )
   const all = createMemo(() => delayList().length)
   const good = createMemo(

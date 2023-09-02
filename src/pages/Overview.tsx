@@ -20,7 +20,7 @@ const CHART_MAX_XAXIS = 10
 
 const TrafficWidget: ParentComponent<{ label: JSX.Element }> = (props) => (
   <div class="stat flex-1">
-    <div class="stat-title text-secondary-content">{props.label}</div>
+    <div class="stat-title text-primary-content">{props.label}</div>
     <div class="stat-value text-primary-content">
       {children(() => props.children)()}
     </div>

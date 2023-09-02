@@ -7,7 +7,7 @@ export default (props: {
   now?: string
   onClick?: (name: string) => void
 }) => {
-  const [maxRender, setMaxRender] = createSignal(30)
+  const [maxRender, setMaxRender] = createSignal(100)
   const proxies = createMemo(() => props.proxies.slice(0, maxRender()))
 
   return (

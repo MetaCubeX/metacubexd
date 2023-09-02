@@ -6,12 +6,12 @@ type ProxyInfo = {
   name: string
   udp: boolean
   type: string
-  delay?: number
 }
 // these signals should be global state
 const [proxies, setProxies] = createSignal<Proxy[]>([])
 const [proxyProviders, setProxyProviders] = createSignal<ProxyProvider[]>([])
 
+const [delayMap, setDelayMap] = createSignal<Record<string, number>>({})
 const [proxyNodeMap, setProxyNodeMap] = createSignal<Record<string, ProxyInfo>>(
   {},
 )
@@ -20,14 +20,19 @@ export function useProxies() {
   const request = useRequest()
   const setProxyInfoByProixes = (proxies: Proxy[] | ProxyNode[]) => {
     proxies.forEach((proxy) => {
+      const delay = proxy.history.at(-1)?.delay ?? 0
+
       setProxyNodeMap({
         ...proxyNodeMap(),
         [proxy.name]: {
           udp: proxy.udp,
           type: proxy.type,
-          delay: proxy.history.at(-1)?.delay ?? 0,
           name: proxy.name,
         },
+      })
+      setDelayMap({
+        ...delayMap(),
+        [proxy.name]: delay,
       })
     })
   }
@@ -72,10 +77,9 @@ export function useProxies() {
         name: proxyName,
       }),
     })
-
     proxyGroup.now = proxyName
     setProxies(proxyGroupList)
-    updateProxy()
+    setTimeout(updateProxy)
   }
 
   const delayTestByProxyGroupName = async (proxyGroupName: string) => {
@@ -88,14 +92,9 @@ export function useProxies() {
       })
       .json()
 
-    Object.entries(data).forEach(([name, delay]) => {
-      setProxyNodeMap({
-        ...proxyNodeMap(),
-        [name]: {
-          ...proxyNodeMap()[name],
-          delay: delay,
-        },
-      })
+    setDelayMap({
+      ...delayMap(),
+      ...data,
     })
   }
 
@@ -115,6 +114,7 @@ export function useProxies() {
     proxies,
     proxyProviders,
     delayTestByProxyGroupName,
+    delayMap,
     proxyNodeMap,
     updateProxy,
     setProxyGroupByProxyName,

@@ -24,14 +24,18 @@ const DelayDots = (p: { delay: number | undefined; selected: boolean }) => {
 }
 
 export default (props: { proxyNameList: string[]; now?: string }) => {
-  const { proxyNodeMap } = useProxies()
+  const { delayMap } = useProxies()
 
   return (
     <div class="flex w-full flex-wrap items-center">
-      <For each={props.proxyNameList.map((name) => proxyNodeMap()[name]!)}>
-        {(proxy) => {
-          const delay = proxy?.delay
-          const isSelected = props.now === proxy.name
+      <For
+        each={props.proxyNameList.map((name): [string, number] => [
+          name,
+          delayMap()[name],
+        ])}
+      >
+        {([name, delay]) => {
+          const isSelected = props.now === name
 
           return <DelayDots delay={delay} selected={isSelected} />
         }}
