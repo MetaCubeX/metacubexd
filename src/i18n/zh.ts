@@ -34,4 +34,8 @@ export default {
   close: '关闭',
   reset: '重置',
   dnsQuery: 'DNS 查询',
+  dots: '点阵',
+  bar: '条形',
+  auto: '自适应',
+  proxiesPreviewType: '节点组预览样式',
 }

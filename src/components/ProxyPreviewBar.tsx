@@ -1,5 +1,4 @@
 import { createMemo } from 'solid-js'
-import { twMerge } from 'tailwind-merge'
 import Delay from '~/components/Delay'
 import { DELAY } from '~/config/enum'
 import { useProxies } from '~/signals/proxies'
@@ -32,28 +31,28 @@ export default (props: { proxyNameList: string[]; now?: string }) => {
   )
 
   return (
-    <div class="flex w-full items-center">
+    <div class="flex h-6 w-full items-center">
       <div class="flex flex-1 overflow-hidden rounded-2xl">
         <div
-          class={twMerge('h-2 bg-success')}
+          class="h-2 bg-success"
           style={{
             width: `${(good() * 100) / all()}%`, // cant use tw class cause dynamic classname wont import
           }}
         ></div>
         <div
-          class={twMerge('h-2 bg-warning')}
+          class="h-2 bg-warning"
           style={{
             width: `${(middle() * 100) / all()}%`,
           }}
         ></div>
         <div
-          class={twMerge('h-2 bg-error')}
+          class="h-2 bg-error"
           style={{
             width: `${(slow() * 100) / all()}%`,
           }}
         ></div>
         <div
-          class={twMerge('h-2 bg-neutral')}
+          class="h-2 bg-neutral"
           style={{
             width: `${(notConnected() * 100) / all()}%`,
           }}

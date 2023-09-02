@@ -34,4 +34,8 @@ export default {
   close: 'Close',
   reset: 'Reset',
   dnsQuery: 'DNS Query',
+  dots: 'Dots',
+  bar: 'Bar',
+  auto: 'Auto',
+  proxiesPreviewType: 'Proxies preview type',
 }

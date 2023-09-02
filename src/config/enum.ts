@@ -23,6 +23,7 @@ export enum DELAY {
 export enum PROXIES_PREVIEW_TYPE {
   DOTS = 'dots',
   BAR = 'bar',
+  Auto = 'auto',
 }
 
 export enum LANG {

@@ -134,6 +134,8 @@ export const [proxiesPreviewType, setProxiesPreviewType] = makePersisted(
 )
 
 export default () => {
+  const [t] = useI18n()
+
   return (
     <div class="flex flex-col gap-4">
       <DNSQueryForm />
@@ -141,31 +143,23 @@ export default () => {
       <ConfigForm />
 
       <div>
-        <div>Proxies preview type:</div>
-
-        <div class="join">
-          <label class="flex items-center">
-            Bar
-            <input
-              class="radio m-4"
-              aria-label="Bar"
-              type="radio"
-              name="proxiesPreviewType"
-              checked={PROXIES_PREVIEW_TYPE.BAR === proxiesPreviewType()}
-              onChange={() => setProxiesPreviewType(PROXIES_PREVIEW_TYPE.BAR)}
-            />
-          </label>
-          <label class="flex items-center">
-            Dots
-            <input
-              class="radio m-4"
-              aria-label="Dots"
-              type="radio"
-              name="proxiesPreviewType"
-              checked={PROXIES_PREVIEW_TYPE.DOTS === proxiesPreviewType()}
-              onChange={() => setProxiesPreviewType(PROXIES_PREVIEW_TYPE.DOTS)}
-            />
-          </label>
+        <div>{t('proxiesPreviewType')}</div>
+        <div class="flex">
+          <For each={Object.values(PROXIES_PREVIEW_TYPE)}>
+            {(value) => (
+              <label class="flex items-center">
+                {t(value)}
+                <input
+                  class="radio m-4"
+                  aria-label={value}
+                  type="radio"
+                  name="proxiesPreviewType"
+                  checked={value === proxiesPreviewType()}
+                  onChange={() => setProxiesPreviewType(value)}
+                />
+              </label>
+            )}
+          </For>
         </div>
       </div>
     </div>
