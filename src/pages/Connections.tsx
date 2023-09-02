@@ -20,8 +20,12 @@ import byteSize from 'byte-size'
 import { isIPv6 } from 'is-ip'
 import { For, createEffect, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import { Button, ConnectionsModal } from '~/components'
-import { AccessorKey, initColumnOrder, initColumnVisibility } from '~/constants'
+import { Button, ConnectionsTableOrderingModal } from '~/components'
+import {
+  CONNECTIONS_TABLE_ACCESSOR_KEY,
+  CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
+  CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY,
+} from '~/constants'
 import { secret, useRequest, wsEndpointURL } from '~/signals'
 import type { Connection } from '~/types'
 
@@ -30,20 +34,20 @@ type ConnectionWithSpeed = Connection & {
   uploadSpeed: number
 }
 
-type ColumnVisibility = Partial<Record<AccessorKey, boolean>>
-type ColumnOrder = AccessorKey[]
+type ColumnVisibility = Partial<Record<CONNECTIONS_TABLE_ACCESSOR_KEY, boolean>>
+type ColumnOrder = CONNECTIONS_TABLE_ACCESSOR_KEY[]
 
 export default () => {
   const [t] = useI18n()
   const [columnVisibility, setColumnVisibility] = makePersisted(
-    createSignal<ColumnVisibility>(initColumnVisibility),
+    createSignal<ColumnVisibility>(CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY),
     {
       name: 'columnVisibility',
       storage: localStorage,
     },
   )
   const [columnOrder, setColumnOrder] = makePersisted(
-    createSignal<ColumnOrder>(initColumnOrder),
+    createSignal<ColumnOrder>(CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER),
     {
       name: 'columnOrder',
       storage: localStorage,
@@ -104,7 +108,7 @@ export default () => {
 
   const columns: ColumnDef<ConnectionWithSpeed>[] = [
     {
-      accessorKey: AccessorKey.Close,
+      accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Close,
       header: () => (
         <div class="flex h-full items-center">
           <Button
@@ -127,68 +131,68 @@ export default () => {
       ),
     },
     {
-      accessorKey: AccessorKey.ID,
+      accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.ID,
       accessorFn: (row) => row.id,
     },
     {
-      accessorKey: AccessorKey.Type,
+      accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Type,
       accessorFn: (row) => `${row.metadata.type}(${row.metadata.network})`,
     },
     {
-      accessorKey: AccessorKey.Process,
+      accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Process,
       accessorFn: (row) =>
         row.metadata.process ||
         row.metadata.processPath.replace(/^.*[/\\](.*)$/, '$1') ||
         '-',
     },
     {
-      accessorKey: AccessorKey.Host,
+      accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Host,
       accessorFn: (row) =>
         `${
           row.metadata.host ? row.metadata.host : row.metadata.destinationIP
         }:${row.metadata.destinationPort}`,
     },
     {
-      accessorKey: AccessorKey.Rule,
+      accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Rule,
       accessorFn: (row) =>
         !row.rulePayload ? row.rule : `${row.rule} :: ${row.rulePayload}`,
     },
     {
-      accessorKey: AccessorKey.Chains,
+      accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Chains,
       accessorFn: (row) => row.chains.slice().reverse().join(' :: '),
     },
     {
-      accessorKey: AccessorKey.DlSpeed,
+      accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.DlSpeed,
       accessorFn: (row) => `${byteSize(row.downloadSpeed)}/s`,
       sortingFn: (prev, next) =>
         prev.original.downloadSpeed - next.original.downloadSpeed,
     },
     {
-      accessorKey: AccessorKey.ULSpeed,
+      accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.ULSpeed,
       accessorFn: (row) => `${byteSize(row.uploadSpeed)}/s`,
       sortingFn: (prev, next) =>
         prev.original.uploadSpeed - next.original.uploadSpeed,
     },
     {
-      accessorKey: AccessorKey.Download,
+      accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Download,
       accessorFn: (row) => byteSize(row.download),
       sortingFn: (prev, next) =>
         prev.original.download - next.original.download,
     },
     {
-      accessorKey: AccessorKey.Upload,
+      accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Upload,
       accessorFn: (row) => byteSize(row.upload),
       sortingFn: (prev, next) => prev.original.upload - next.original.upload,
     },
     {
-      accessorKey: AccessorKey.Source,
+      accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Source,
       accessorFn: (row) =>
         isIPv6(row.metadata.sourceIP)
           ? `[${row.metadata.sourceIP}]:${row.metadata.sourcePort}`
           : `${row.metadata.sourceIP}:${row.metadata.sourcePort}`,
     },
     {
-      accessorKey: AccessorKey.Destination,
+      accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Destination,
       accessorFn: (row) =>
         row.metadata.remoteDestination ||
         row.metadata.destinationIP ||
@@ -243,7 +247,7 @@ export default () => {
           <IconSettings />
         </label>
 
-        <ConnectionsModal
+        <ConnectionsTableOrderingModal
           order={columnOrder()}
           visible={columnVisibility()}
           onOrderChange={(data: ColumnOrder) => {
@@ -272,7 +276,8 @@ export default () => {
                           )}
                           onClick={header.column.getToggleSortingHandler()}
                         >
-                          {header.column.id === AccessorKey.Close ? (
+                          {header.column.id ===
+                          CONNECTIONS_TABLE_ACCESSOR_KEY.Close ? (
                             flexRender(
                               header.column.columnDef.header,
                               header.getContext(),

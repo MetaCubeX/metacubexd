@@ -13,23 +13,29 @@ import {
   createSortable,
   useDragDropContext,
 } from '@thisbeyond/solid-dnd'
-import { For, Show, createSignal } from 'solid-js'
+import { Component, For, Show, createSignal } from 'solid-js'
 import { Button } from '~/components'
-import { AccessorKey, initColumnOrder, initColumnVisibility } from '~/constants'
+import {
+  CONNECTIONS_TABLE_ACCESSOR_KEY,
+  CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
+  CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY,
+} from '~/constants'
 
-type ColumnVisibility = Partial<Record<AccessorKey, boolean>>
-type ColumnOrder = AccessorKey[]
+type ColumnVisibility = Partial<Record<CONNECTIONS_TABLE_ACCESSOR_KEY, boolean>>
+type ColumnOrder = CONNECTIONS_TABLE_ACCESSOR_KEY[]
 
-export const ConnectionsModal = (props: {
+export const ConnectionsTableOrderingModal = (props: {
   order: ColumnOrder
   visible: ColumnVisibility
   onOrderChange: (value: ColumnOrder) => void
   onVisibleChange: (value: ColumnVisibility) => void
 }) => {
   const [t] = useI18n()
-  const [activeKey, setActiveKey] = createSignal<AccessorKey | null>(null)
+  const [activeKey, setActiveKey] =
+    createSignal<CONNECTIONS_TABLE_ACCESSOR_KEY | null>(null)
+
   const onDragStart = ({ draggable }: { draggable: Draggable }) =>
-    setActiveKey(draggable.id as AccessorKey)
+    setActiveKey(draggable.id as CONNECTIONS_TABLE_ACCESSOR_KEY)
   const onDragEnd = ({
     draggable,
     droppable,
@@ -39,8 +45,12 @@ export const ConnectionsModal = (props: {
   }) => {
     if (draggable && droppable) {
       const currentItems = props.order
-      const fromIndex = currentItems.indexOf(draggable.id as AccessorKey)
-      const toIndex = currentItems.indexOf(droppable.id as AccessorKey)
+      const fromIndex = currentItems.indexOf(
+        draggable.id as CONNECTIONS_TABLE_ACCESSOR_KEY,
+      )
+      const toIndex = currentItems.indexOf(
+        droppable.id as CONNECTIONS_TABLE_ACCESSOR_KEY,
+      )
 
       if (fromIndex !== toIndex) {
         const updatedItems = currentItems.slice()
@@ -51,8 +61,9 @@ export const ConnectionsModal = (props: {
     }
   }
 
-  const FormRow = (p: { key: AccessorKey }) => {
-    const key = p.key
+  const FormRow: Component<{
+    key: CONNECTIONS_TABLE_ACCESSOR_KEY
+  }> = ({ key }) => {
     const sortable = createSortable(key)
     const [state] = useDragDropContext()!
 
@@ -109,8 +120,8 @@ export const ConnectionsModal = (props: {
           <Button
             class="btn-neutral btn-sm ml-auto mt-4 block"
             onClick={() => {
-              props.onOrderChange(initColumnOrder)
-              props.onVisibleChange(initColumnVisibility)
+              props.onOrderChange(CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER)
+              props.onVisibleChange(CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY)
             }}
           >
             {t('reset')}

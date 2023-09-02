@@ -16,7 +16,7 @@ import {
 import { For, ParentComponent, Show, createMemo, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Button } from '~/components'
-import { LANG, ROUTE, themes } from '~/constants'
+import { LANG, ROUTES, themes } from '~/constants'
 import { setCurTheme, setSelectedEndpoint, useProxies } from '~/signals'
 
 const Nav: ParentComponent<{ href: string; tooltip: string }> = ({
@@ -70,32 +70,32 @@ export const Header = () => {
   const navs = createMemo(() => {
     const list = [
       {
-        href: ROUTE.Overview,
+        href: ROUTES.Overview,
         name: t('overview'),
         icon: <IconHome />,
       },
       {
-        href: ROUTE.Proxies,
+        href: ROUTES.Proxies,
         name: t('proxies'),
         icon: <IconGlobe />,
       },
       {
-        href: ROUTE.Rules,
+        href: ROUTES.Rules,
         name: t('rules'),
         icon: <IconRuler />,
       },
       {
-        href: ROUTE.Conns,
+        href: ROUTES.Conns,
         name: t('connections'),
         icon: <IconNetwork />,
       },
       {
-        href: ROUTE.Log,
+        href: ROUTES.Log,
         name: t('logs'),
         icon: <IconFileStack />,
       },
       {
-        href: ROUTE.Config,
+        href: ROUTES.Config,
         name: t('config'),
         icon: <IconSettings />,
       },
@@ -103,7 +103,7 @@ export const Header = () => {
 
     if (proxyProviders().length > 0) {
       list.splice(2, 0, {
-        href: ROUTE.Proxyprovider,
+        href: ROUTES.Proxyprovider,
         name: t('proxyProviders'),
         icon: <IconGlobeFilled />,
       })

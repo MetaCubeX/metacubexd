@@ -30,7 +30,7 @@ export const themes = [
   'winter',
 ]
 
-export enum ROUTE {
+export enum ROUTES {
   Overview = '/overview',
   Proxies = '/proxies',
   Proxyprovider = '/proxyprovider',
@@ -38,22 +38,6 @@ export enum ROUTE {
   Conns = '/conns',
   Log = '/logs',
   Config = '/config',
-}
-
-export enum AccessorKey {
-  Close = 'close',
-  ID = 'ID',
-  Type = 'type',
-  Process = 'process',
-  Host = 'host',
-  Rule = 'rules',
-  Chains = 'chains',
-  DlSpeed = 'dlSpeed',
-  ULSpeed = 'ulSpeed',
-  Download = 'dl',
-  Upload = 'ul',
-  Source = 'source',
-  Destination = 'destination',
 }
 
 export enum DELAY {
@@ -82,8 +66,28 @@ export enum LANG {
   ZH = 'zh-CN',
 }
 
-export const initColumnOrder = Object.values(AccessorKey)
-export const initColumnVisibility = {
-  ...Object.fromEntries(initColumnOrder.map((i) => [i, true])),
-  [AccessorKey.ID]: false,
+export enum CONNECTIONS_TABLE_ACCESSOR_KEY {
+  Close = 'close',
+  ID = 'ID',
+  Type = 'type',
+  Process = 'process',
+  Host = 'host',
+  Rule = 'rules',
+  Chains = 'chains',
+  DlSpeed = 'dlSpeed',
+  ULSpeed = 'ulSpeed',
+  Download = 'dl',
+  Upload = 'ul',
+  Source = 'source',
+  Destination = 'destination',
+}
+
+export const CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER = Object.values(
+  CONNECTIONS_TABLE_ACCESSOR_KEY,
+)
+export const CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY = {
+  ...Object.fromEntries(
+    CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER.map((i) => [i, true]),
+  ),
+  [CONNECTIONS_TABLE_ACCESSOR_KEY.ID]: false,
 }

@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes, useNavigate } from '@solidjs/router'
 import { Show, createEffect, lazy, onMount } from 'solid-js'
 import { Header } from '~/components'
-import { ROUTE } from '~/constants'
+import { ROUTES } from '~/constants'
 import {
   curTheme,
   endpoint,
@@ -46,14 +46,14 @@ export const App = () => {
       <div class="flex-1 overflow-y-auto overflow-x-hidden p-2 sm:p-4">
         <Routes>
           <Show when={selectedEndpoint()}>
-            <Route path={ROUTE.Overview} component={Overview} />
-            <Route path={ROUTE.Proxies} component={Proxies} />
-            <Route path={ROUTE.Proxyprovider} component={ProxyProvider} />
-            <Route path={ROUTE.Rules} component={Rules} />
-            <Route path={ROUTE.Conns} component={Connections} />
-            <Route path={ROUTE.Log} component={Logs} />
-            <Route path={ROUTE.Config} component={Config} />
-            <Route path="*" element={<Navigate href={ROUTE.Overview} />} />
+            <Route path={ROUTES.Overview} component={Overview} />
+            <Route path={ROUTES.Proxies} component={Proxies} />
+            <Route path={ROUTES.Proxyprovider} component={ProxyProvider} />
+            <Route path={ROUTES.Rules} component={Rules} />
+            <Route path={ROUTES.Conns} component={Connections} />
+            <Route path={ROUTES.Log} component={Logs} />
+            <Route path={ROUTES.Config} component={Config} />
+            <Route path="*" element={<Navigate href={ROUTES.Overview} />} />
           </Show>
 
           <Route path="/setup" component={Setup} />
