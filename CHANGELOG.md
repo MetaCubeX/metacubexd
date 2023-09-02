@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.51.0](https://github.com/MetaCubeX/metacubexd/compare/v1.50.0...v1.51.0) (2023-09-02)
+
+
+### Features
+
+* reset visible ([350fd56](https://github.com/MetaCubeX/metacubexd/commit/350fd56bc98b25dadf5675b4ecdff323565afe97))
+* rules provider pages ([65346ca](https://github.com/MetaCubeX/metacubexd/commit/65346ca743bf823da841d73c1f31022b1292c53a))
+
+
+### Bug Fixes
+
+* update proxy provider api may throw ([ad46745](https://github.com/MetaCubeX/metacubexd/commit/ad46745329343dea2fe69e0b3b3561cab6b54436))
+
 ## [1.50.0](https://github.com/MetaCubeX/metacubexd/compare/v1.49.0...v1.50.0) (2023-09-02)
 
 
