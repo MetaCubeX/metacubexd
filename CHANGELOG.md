@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.57.1](https://github.com/MetaCubeX/metacubexd/compare/v1.57.0...v1.57.1) (2023-09-02)
+
+
+### Bug Fixes
+
+* **latency:** invalid 0 latency scenario ([dd5f0f1](https://github.com/MetaCubeX/metacubexd/commit/dd5f0f14a070bb9a042bfab1a544a161d8187b58))
+
 ## [1.57.0](https://github.com/MetaCubeX/metacubexd/compare/v1.56.0...v1.57.0) (2023-09-02)
 
 
