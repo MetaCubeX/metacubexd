@@ -19,7 +19,7 @@ export default (props: { proxyNameList: string[]; now?: string }) => {
     const type = proxiesPreviewType()
 
     return (
-      type === PROXIES_PREVIEW_TYPE.BAR ||
+      type === PROXIES_PREVIEW_TYPE.DOTS ||
       (type === PROXIES_PREVIEW_TYPE.Auto && isSmallGroup())
     )
   })
