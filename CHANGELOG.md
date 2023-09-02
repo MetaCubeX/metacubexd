@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.48.0](https://github.com/MetaCubeX/metacubexd/compare/v1.47.0...v1.48.0) (2023-09-02)
+
+
+### Features
+
+* try defalut host and secret && adapt openclash ([fa612a1](https://github.com/MetaCubeX/metacubexd/commit/fa612a12d362a66f9506a7010d209f2bb7967b4b))
+
 ## [1.47.0](https://github.com/MetaCubeX/metacubexd/compare/v1.46.0...v1.47.0) (2023-09-02)
 
 
