@@ -206,7 +206,7 @@ const ConfigForXd = () => {
   return (
     <div class="grid gap-4">
       <div class="flex flex-col">
-        <div class="pb-4">{t('renderInTwoColumns')}</div>
+        <div class="pb-4 text-lg font-semibold">{t('renderInTwoColumns')}</div>
         <input
           type="checkbox"
           class="toggle"
@@ -217,7 +217,7 @@ const ConfigForXd = () => {
         />
       </div>
       <div class="flex flex-col">
-        <div class="pb-4">{t('autoSwitchTheme')}</div>
+        <div class="pb-4 text-lg font-semibold">{t('autoSwitchTheme')}</div>
         <input
           type="checkbox"
           class="toggle"
@@ -230,7 +230,7 @@ const ConfigForXd = () => {
       </div>
       <Show when={autoSwitchTheme()}>
         <div class="flex flex-col">
-          <div class="pb-4">{t('favDayTheme')}</div>
+          <div class="pb-4 text-lg font-semibold">{t('favDayTheme')}</div>
           <select
             class="select select-bordered w-full max-w-xs"
             onChange={(e) => {
@@ -248,7 +248,8 @@ const ConfigForXd = () => {
           </select>
         </div>
         <div class="flex flex-col">
-          <div class="pb-4">{t('favNightTheme')}</div>
+          <div class="pb-4 text-lg font-semibold">{t('favNightTheme')}</div>
+
           <select
             class="select select-bordered w-full max-w-xs"
             onChange={(e) => {
@@ -268,7 +269,7 @@ const ConfigForXd = () => {
       </Show>
 
       <div>
-        <div class="pb-4">{t('proxiesPreviewType')}</div>
+        <div class="pb-4 text-lg font-semibold">{t('proxiesPreviewType')}</div>
 
         <div class="flex items-center gap-4">
           <For each={Object.values(PROXIES_PREVIEW_TYPE)}>
@@ -290,7 +291,7 @@ const ConfigForXd = () => {
       </div>
 
       <div>
-        <div class="pb-4">{t('proxiesSorting')}</div>
+        <div class="pb-4 text-lg font-semibold">{t('proxiesSorting')}</div>
 
         <div class="flex flex-col gap-4">
           <For each={Object.values(PROXIES_ORDERING_TYPE)}>
@@ -312,7 +313,7 @@ const ConfigForXd = () => {
       </div>
 
       <div>
-        <div class="pb-4">{t('autoCloseConns')}</div>
+        <div class="pb-4 text-lg font-semibold">{t('autoCloseConns')}</div>
 
         <input
           class="toggle"
@@ -323,7 +324,7 @@ const ConfigForXd = () => {
       </div>
 
       <div class="flex flex-col">
-        <div class="pb-4">{t('urlForLatencyTest')}</div>
+        <div class="pb-4 text-lg font-semibold">{t('urlForLatencyTest')}</div>
 
         <input
           class="w-100 input input-bordered max-w-md"
