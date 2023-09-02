@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.44.1](https://github.com/MetaCubeX/metacubexd/compare/v1.44.0...v1.44.1) (2023-09-02)
+
+
+### Bug Fixes
+
+* bar and delay reactive ([9ed0540](https://github.com/MetaCubeX/metacubexd/commit/9ed05401a891bf02af90541e08ec9358ada73cff))
+
 ## [1.44.0](https://github.com/MetaCubeX/metacubexd/compare/v1.43.0...v1.44.0) (2023-09-02)
 
 
