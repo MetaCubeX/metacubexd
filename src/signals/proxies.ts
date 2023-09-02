@@ -21,7 +21,7 @@ export const useProxies = () => {
 
   const setProxyInfoByProixes = (proxies: Proxy[] | ProxyNode[]) => {
     proxies.forEach((proxy) => {
-      const latency = proxy.history.at(-1)?.delay ?? -1
+      const latency = proxy.history.at(-1)?.delay || -1
 
       setProxyNodeMap({
         ...proxyNodeMap(),

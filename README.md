@@ -14,35 +14,23 @@ Cloudflare Pages: https://metacubexd.pages.dev
 
 ## Usage
 
-### Build locally
-
-Install npm dependencies
-
-```shell
-pnpm install
-```
-
-Build artifacts
-
-```shell
-pnpm build
-```
-
-Serve static files
-
-```shell
-pnpm serve
-```
-
 ### Run inside Docker
 
-docker cli
+> docker cli
+
+Running
 
 ```shell
 docker run -d --restart always -p 80:80 --name metacubexd ghcr.io/metacubex/metacubexd
 ```
 
-docker-compose.yml
+Update and restart
+
+```shell
+docker pull ghcr.io/metacubex/metacubexd && docker restart metacubexd
+```
+
+> docker-compose.yml
 
 ```yaml
 version: '3'
@@ -65,4 +53,36 @@ services:
       - NET_ADMIN
     volumes:
       - ./config.yaml:/root/.config/clash
+```
+
+Running
+
+```shell
+docker compose up -d
+```
+
+Update and restart
+
+```shell
+docker compose pull && docker compose up -d
+```
+
+### Build locally
+
+> Install npm dependencies
+
+```shell
+pnpm install
+```
+
+> Build artifacts
+
+```shell
+pnpm build
+```
+
+> Serve static files
+
+```shell
+pnpm serve
 ```
