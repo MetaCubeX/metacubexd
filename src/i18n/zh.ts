@@ -43,4 +43,5 @@ export default {
   autoSwitchTheme: '自动切换主题',
   favDayTheme: '浅色主题偏好',
   favNightTheme: '深色主题偏好',
+  renderInTwoColumns: '节点双列渲染',
 }

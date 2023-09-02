@@ -43,4 +43,5 @@ export default {
   autoSwitchTheme: 'Automatically switch theme',
   favDayTheme: 'Favorite light theme',
   favNightTheme: 'Favorite dark theme',
+  renderInTwoColumns: 'Render Proxies in two columns',
 }

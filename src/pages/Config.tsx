@@ -13,11 +13,13 @@ import {
   favDayTheme,
   favNightTheme,
   proxiesPreviewType,
+  renderInTwoColumn,
   setAutoCloseConns,
   setAutoSwitchTheme,
   setFavDayTheme,
   setFavNightTheme,
   setProxiesPreviewType,
+  setRenderInTwoColumn,
   setUrlForDelayTest,
   urlForDelayTest,
 } from '~/signals/config'
@@ -151,6 +153,17 @@ const ConfigForXd = () => {
 
   return (
     <div class="grid gap-4">
+      <div class="flex flex-col">
+        <div class="pb-4">{t('renderInTwoColumns')}</div>
+        <input
+          type="checkbox"
+          class="toggle"
+          checked={renderInTwoColumn()}
+          onChange={(e) => {
+            setRenderInTwoColumn(e.target.checked)
+          }}
+        />
+      </div>
       <div class="flex flex-col">
         <div class="pb-4">{t('autoSwitchTheme')}</div>
         <input

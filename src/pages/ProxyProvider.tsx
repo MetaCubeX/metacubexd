@@ -2,7 +2,7 @@ import { useI18n } from '@solid-primitives/i18n'
 import { IconBrandSpeedtest, IconReload } from '@tabler/icons-solidjs'
 import { Show, createSignal } from 'solid-js'
 import Collapse from '~/components/Collpase'
-import ForTwoLine from '~/components/ForTwoLine'
+import ForTwoColumns from '~/components/ForTwoColumns'
 import ProxyCardGroups from '~/components/ProxyCardGroups'
 import ProxyNodePreview from '~/components/ProxyNodePreview'
 import SubscriptionInfo from '~/components/SubscriptionInfo'
@@ -60,7 +60,7 @@ export default () => {
           <IconReload />
         </button>
       </h1>
-      <ForTwoLine
+      <ForTwoColumns
         subChild={proxyProviders().map((proxyProvider) => {
           const title = (
             <>

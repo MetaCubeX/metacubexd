@@ -27,6 +27,10 @@ export const [favNightTheme, setFavNightTheme] = makePersisted(
   createSignal('night'),
   { name: 'favNightTheme', storage: localStorage },
 )
+export const [renderInTwoColumn, setRenderInTwoColumn] = makePersisted(
+  createSignal(true),
+  { name: 'renderInTwoColumn', storage: localStorage },
+)
 
 const setTheme = (isDark: boolean) => {
   if (autoSwitchTheme()) {

@@ -2,7 +2,7 @@ import { useI18n } from '@solid-primitives/i18n'
 import { IconBrandSpeedtest } from '@tabler/icons-solidjs'
 import { Show, createSignal } from 'solid-js'
 import Collapse from '~/components/Collpase'
-import ForTwoLine from '~/components/ForTwoLine'
+import ForTwoColumns from '~/components/ForTwoColumns'
 import ProxyCardGroups from '~/components/ProxyCardGroups'
 import ProxyNodePreview from '~/components/ProxyNodePreview'
 import { useProxies } from '~/signals/proxies'
@@ -35,7 +35,7 @@ export default () => {
       <h1 class="flex h-8 items-center pb-2 text-lg font-semibold">
         {t('proxies')}
       </h1>
-      <ForTwoLine
+      <ForTwoColumns
         subChild={proxies().map((proxy) => {
           const title = (
             <>
