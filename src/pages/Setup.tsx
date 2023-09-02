@@ -4,7 +4,7 @@ import { useI18n } from '@solid-primitives/i18n'
 import { useNavigate } from '@solidjs/router'
 import { IconX } from '@tabler/icons-solidjs'
 import ky from 'ky'
-import { For } from 'solid-js'
+import { For, onMount } from 'solid-js'
 import { v4 as uuid } from 'uuid'
 import { z } from 'zod'
 import { endpointList, setEndpointList, setSelectedEndpoint } from '~/signals'
@@ -49,36 +49,56 @@ export default () => {
     onSetupSuccess(id)
   }
 
+  const onSubmit = async ({ url, secret }: { url: string; secret: string }) => {
+    const list = endpointList().slice()
+    const point = list.find((history) => history.url === url)
+
+    if (point) {
+      const { id, secret: oldSecret } = point
+
+      if (secret !== oldSecret && !(await checkEndpoint(url, secret))) {
+        point.secret = secret
+        setEndpointList(list)
+      }
+
+      onSetupSuccess(id)
+      return
+    }
+
+    if (!(await checkEndpoint(url, secret))) {
+      return
+    }
+
+    const id = uuid()
+    setEndpointList([{ id, url, secret }, ...list])
+    onSetupSuccess(id)
+  }
+
   const { form } = createForm<z.infer<typeof schema>>({
     extend: validator({ schema }),
-    async onSubmit({ url, secret }) {
-      const i = endpointList().findIndex((history) => history.url === url)
-
-      if (i > -1) {
-        const { id, secret: oldSecret } = endpointList()[i]
-
-        if (secret !== oldSecret && !(await checkEndpoint(url, secret))) {
-          endpointList()[i].secret = secret
-          setEndpointList(endpointList())
-        }
-
-        onSetupSuccess(id)
-        return
-      }
-
-      if (!(await checkEndpoint(url, secret))) {
-        return
-      }
-
-      const id = uuid()
-      setEndpointList([{ id, url, secret }, ...endpointList()])
-      onSetupSuccess(id)
-    },
+    onSubmit: onSubmit,
   })
 
   const onRemove = (id: string) =>
     setEndpointList(endpointList().filter((e) => e.id !== id))
 
+  onMount(() => {
+    const query = new URLSearchParams(window.location.search)
+
+    if (query.has('hostname')) {
+      onSubmit({
+        url: `http://${query.get('hostname')}${
+          query.get('port') && ':' + query.get('port')
+        }`,
+        secret: query.get('secret') ?? '',
+      })
+    } else {
+      onSubmit({
+        url: 'http://127.0.0.1:9090',
+        secret: '',
+      })
+    }
+  })
   return (
     <div class="mx-auto flex flex-col items-center gap-4 py-10 sm:w-2/3">
       <form class="contents" use:form={form}>
@@ -87,7 +107,7 @@ export default () => {
             name="url"
             type="url"
             class="input input-bordered"
-            placeholder="http://127.0.0.1:9090"
+            placeholder="host url"
             list="defaultEndpoints"
           />
 
