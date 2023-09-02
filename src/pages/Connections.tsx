@@ -21,7 +21,11 @@ import { isIPv6 } from 'is-ip'
 import { For, createEffect, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import ConnectionsModal from '~/components/ConnectionsModal'
-import { AccessorKey } from '~/config/enum'
+import {
+  AccessorKey,
+  initColumnOrder,
+  initColumnVisibility,
+} from '~/config/enum'
 import { secret, useRequest, wsEndpointURL } from '~/signals'
 import type { Connection } from '~/types'
 
@@ -32,12 +36,6 @@ type ConnectionWithSpeed = Connection & {
 
 type ColumnVisibility = Partial<Record<AccessorKey, boolean>>
 type ColumnOrder = AccessorKey[]
-
-const initColumnOrder = Object.values(AccessorKey)
-const initColumnVisibility = {
-  ...Object.fromEntries(initColumnOrder.map((i) => [i, true])),
-  [AccessorKey.ID]: false,
-}
 
 export default () => {
   const [t] = useI18n()

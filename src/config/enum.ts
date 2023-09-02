@@ -40,3 +40,9 @@ export enum LANG {
   EN = 'en-US',
   ZH = 'zh-CN',
 }
+
+export const initColumnOrder = Object.values(AccessorKey)
+export const initColumnVisibility = {
+  ...Object.fromEntries(initColumnOrder.map((i) => [i, true])),
+  [AccessorKey.ID]: false,
+}

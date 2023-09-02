@@ -14,7 +14,11 @@ import {
   useDragDropContext,
 } from '@thisbeyond/solid-dnd'
 import { For, Show, createSignal } from 'solid-js'
-import { AccessorKey } from '~/config/enum'
+import {
+  AccessorKey,
+  initColumnOrder,
+  initColumnVisibility,
+} from '~/config/enum'
 
 type ColumnVisibility = Partial<Record<AccessorKey, boolean>>
 type ColumnOrder = AccessorKey[]
@@ -107,7 +111,10 @@ export default (props: {
 
           <button
             class="btn btn-neutral btn-sm ml-auto mt-4 block"
-            onClick={() => props.onOrderChange(Object.values(AccessorKey))}
+            onClick={() => {
+              props.onOrderChange(initColumnOrder)
+              props.onVisibleChange(initColumnVisibility)
+            }}
           >
             {t('reset')}
           </button>
