@@ -25,8 +25,8 @@ import {
   setProxiesOrderingType,
   setProxiesPreviewType,
   setRenderInTwoColumn,
-  setUrlForDelayTest,
-  urlForDelayTest,
+  setUrlForLatencyTest,
+  urlForLatencyTest,
   useRequest,
 } from '~/signals'
 import type { DNSQuery, Config as IConfig } from '~/types'
@@ -323,12 +323,12 @@ const ConfigForXd = () => {
       </div>
 
       <div class="flex flex-col">
-        <div class="pb-4">{t('urlForDelayTest')}</div>
+        <div class="pb-4">{t('urlForLatencyTest')}</div>
 
         <input
           class="w-100 input input-bordered max-w-md"
-          value={urlForDelayTest()}
-          onChange={(e) => setUrlForDelayTest(e.target?.value!)}
+          value={urlForLatencyTest()}
+          onChange={(e) => setUrlForLatencyTest(e.target?.value!)}
         />
       </div>
     </div>

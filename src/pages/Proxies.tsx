@@ -17,7 +17,7 @@ export default () => {
   const {
     proxies,
     setProxyGroupByProxyName,
-    delayTestByProxyGroupName,
+    latencyTestByProxyGroupName,
     latencyMap,
   } = useProxies()
 
@@ -34,7 +34,7 @@ export default () => {
 
     el.classList.add('animate-pulse')
     e.stopPropagation()
-    await delayTestByProxyGroupName(name)
+    await latencyTestByProxyGroupName(name)
     el.classList.remove('animate-pulse')
   }
 
@@ -61,7 +61,11 @@ export default () => {
               </div>
               <Show when={!collapsedMap()[`group-${proxy.name}`]}>
                 <ProxyNodePreview
-                  proxyNameList={proxy.all ?? []}
+                  proxyNameList={sortProxiesByOrderingType(
+                    proxy.all ?? [],
+                    latencyMap(),
+                    proxiesOrderingType(),
+                  )}
                   now={proxy.now}
                 />
               </Show>

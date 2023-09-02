@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js'
-import { autoCloseConns, urlForDelayTest, useRequest } from '~/signals'
+import { autoCloseConns, urlForLatencyTest, useRequest } from '~/signals'
 import type { Proxy, ProxyNode, ProxyProvider } from '~/types'
 
 type ProxyInfo = {
@@ -21,7 +21,7 @@ export const useProxies = () => {
 
   const setProxyInfoByProixes = (proxies: Proxy[] | ProxyNode[]) => {
     proxies.forEach((proxy) => {
-      const delay = proxy.history.at(-1)?.delay ?? -1
+      const latency = proxy.history.at(-1)?.delay ?? -1
 
       setProxyNodeMap({
         ...proxyNodeMap(),
@@ -33,7 +33,7 @@ export const useProxies = () => {
       })
       setLatencyMap({
         ...latencyMap(),
-        [proxy.name]: delay,
+        [proxy.name]: latency,
       })
     })
   }
@@ -88,11 +88,11 @@ export const useProxies = () => {
     setProxies(proxyGroupList)
   }
 
-  const delayTestByProxyGroupName = async (proxyGroupName: string) => {
+  const latencyTestByProxyGroupName = async (proxyGroupName: string) => {
     const data: Record<string, number> = await request
       .get(`group/${proxyGroupName}/delay`, {
         searchParams: {
-          url: urlForDelayTest(),
+          url: urlForLatencyTest(),
           timeout: 2000,
         },
       })
@@ -130,7 +130,7 @@ export const useProxies = () => {
   return {
     proxies,
     proxyProviders,
-    delayTestByProxyGroupName,
+    latencyTestByProxyGroupName,
     latencyMap,
     proxyNodeMap,
     updateProxies,

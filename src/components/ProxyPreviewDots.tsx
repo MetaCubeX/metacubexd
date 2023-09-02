@@ -2,21 +2,21 @@ import { For } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { latencyQualityMap, useProxies } from '~/signals'
 
-const DelayDots = (p: { delay: number | undefined; selected: boolean }) => {
+const LatencyDots = (p: { latency: number | undefined; selected: boolean }) => {
   let dotClassName = p.selected
     ? 'bg-white border-4 border-success'
     : 'bg-success'
 
   if (
-    typeof p.delay !== 'number' ||
-    p.delay === latencyQualityMap().NOT_CONNECTED
+    typeof p.latency !== 'number' ||
+    p.latency === latencyQualityMap().NOT_CONNECTED
   ) {
     dotClassName = p.selected
       ? 'bg-white border-4 border-neutral'
       : 'bg-neutral'
-  } else if (p.delay > latencyQualityMap().HIGH) {
+  } else if (p.latency > latencyQualityMap().HIGH) {
     dotClassName = p.selected ? 'bg-white border-4 border-error' : 'bg-error'
-  } else if (p.delay > latencyQualityMap().MEDIUM) {
+  } else if (p.latency > latencyQualityMap().MEDIUM) {
     dotClassName = p.selected
       ? 'bg-white border-4 border-warning'
       : 'bg-warning'
@@ -39,10 +39,10 @@ export const ProxyPreviewDots = (props: {
           latencyMap()[name],
         ])}
       >
-        {([name, delay]) => {
+        {([name, latency]) => {
           const isSelected = props.now === name
 
-          return <DelayDots delay={delay} selected={isSelected} />
+          return <LatencyDots latency={latency} selected={isSelected} />
         }}
       </For>
     </div>

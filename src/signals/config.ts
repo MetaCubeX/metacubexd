@@ -16,9 +16,9 @@ export const [proxiesOrderingType, setProxiesOrderingType] = makePersisted(
   createSignal(PROXIES_ORDERING_TYPE.NATURAL),
   { name: 'proxiesOrderingType', storage: localStorage },
 )
-export const [urlForDelayTest, setUrlForDelayTest] = makePersisted(
+export const [urlForLatencyTest, setUrlForLatencyTest] = makePersisted(
   createSignal('https://www.gstatic.com/generate_204'),
-  { name: 'urlForDelayTest', storage: localStorage },
+  { name: 'urlForLatencyTest', storage: localStorage },
 )
 export const [autoCloseConns, setAutoCloseConns] = makePersisted(
   createSignal(false),
@@ -41,7 +41,8 @@ export const [renderInTwoColumn, setRenderInTwoColumn] = makePersisted(
   { name: 'renderInTwoColumn', storage: localStorage },
 )
 
-export const isLatencyTestByHttps = () => urlForDelayTest().startsWith('https')
+export const isLatencyTestByHttps = () =>
+  urlForLatencyTest().startsWith('https')
 
 export const latencyQualityMap = () =>
   isLatencyTestByHttps() ? LATENCY_QUALITY_MAP_HTTPS : LATENCY_QUALITY_MAP_HTTP

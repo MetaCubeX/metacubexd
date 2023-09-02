@@ -39,7 +39,7 @@ export default {
   auto: 'Auto',
   off: 'Off',
   proxiesPreviewType: 'Proxies preview type',
-  urlForDelayTest: 'Url for delay test',
+  urlForLatencyTest: 'Url for latency test',
   autoCloseConns: 'Automatically close all connections',
   autoSwitchTheme: 'Automatically switch theme',
   favDayTheme: 'Favorite light theme',

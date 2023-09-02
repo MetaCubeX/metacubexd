@@ -7,36 +7,37 @@ export const ProxyPreviewBar = (props: {
   now?: string
 }) => {
   const { latencyMap } = useProxies()
-  const delayList = createMemo(() =>
+  const latencyList = createMemo(() =>
     props.proxyNameList.map((i) => latencyMap()[i]),
   )
-  const all = createMemo(() => delayList().length)
+  const all = createMemo(() => latencyList().length)
   const good = createMemo(
     () =>
-      delayList().filter(
-        (delay) =>
-          delay > latencyQualityMap().NOT_CONNECTED &&
-          delay <= latencyQualityMap().MEDIUM,
+      latencyList().filter(
+        (latency) =>
+          latency > latencyQualityMap().NOT_CONNECTED &&
+          latency <= latencyQualityMap().MEDIUM,
       ).length,
   )
   const middle = createMemo(
     () =>
-      delayList().filter(
-        (delay) =>
-          delay > latencyQualityMap().NOT_CONNECTED &&
-          delay <= latencyQualityMap().HIGH,
+      latencyList().filter(
+        (latency) =>
+          latency > latencyQualityMap().NOT_CONNECTED &&
+          latency <= latencyQualityMap().HIGH,
       ).length,
   )
   const slow = createMemo(
     () =>
-      delayList().filter((delay) => delay > latencyQualityMap().HIGH).length,
+      latencyList().filter((latency) => latency > latencyQualityMap().HIGH)
+        .length,
   )
   const notConnected = createMemo(
     () =>
-      delayList().filter(
-        (delay) =>
-          delay === latencyQualityMap().NOT_CONNECTED ||
-          typeof delay !== 'number',
+      latencyList().filter(
+        (latency) =>
+          latency === latencyQualityMap().NOT_CONNECTED ||
+          typeof latency !== 'number',
       ).length,
   )
 
