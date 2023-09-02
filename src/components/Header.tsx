@@ -13,23 +13,11 @@ import {
   IconRuler,
   IconSettings,
 } from '@tabler/icons-solidjs'
-import {
-  For,
-  ParentComponent,
-  Show,
-  createEffect,
-  createMemo,
-  createSignal,
-} from 'solid-js'
+import { For, ParentComponent, Show, createMemo, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { LANG, ROUTE } from '~/config/enum'
 import { themes } from '~/constants'
-import {
-  endpoint,
-  selectedEndpoint,
-  setCurTheme,
-  setSelectedEndpoint,
-} from '~/signals'
+import { setCurTheme, setSelectedEndpoint } from '~/signals'
 import { useProxies } from '~/signals/proxies'
 
 const Nav: ParentComponent<{ href: string; tooltip: string }> = ({
@@ -80,14 +68,6 @@ const ThemeSwitcher = () => (
 export const Header = () => {
   const [t, { locale }] = useI18n()
   const { proxyProviders } = useProxies()
-
-  createEffect(() => {
-    // Need fix: useRequest is not reactive so we need to useProxies again or request wont have endpoint
-    if (selectedEndpoint() && endpoint()) {
-      useProxies().updateProxy()
-    }
-  })
-
   const navs = createMemo(() => {
     const list = [
       {

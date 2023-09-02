@@ -1,5 +1,5 @@
-import { createSignal } from 'solid-js'
-import { useRequest } from '~/signals'
+import { createEffect, createSignal } from 'solid-js'
+import { endpoint, selectedEndpoint, useRequest } from '~/signals'
 import { autoCloseConns, urlForDelayTest } from '~/signals/config'
 import type { Proxy, ProxyNode, ProxyProvider } from '~/types'
 
@@ -140,3 +140,9 @@ export function useProxies() {
     healthCheckByProviderName,
   }
 }
+
+createEffect(() => {
+  if (selectedEndpoint() && endpoint()) {
+    useProxies().updateProxy()
+  }
+})
