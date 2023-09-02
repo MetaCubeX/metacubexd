@@ -2,9 +2,9 @@ import { useI18n } from '@solid-primitives/i18n'
 import { IconReload } from '@tabler/icons-solidjs'
 import InfiniteScroll from 'solid-infinite-scroll'
 import { For, Show, createMemo, createSignal, onMount } from 'solid-js'
-import { Button } from '~/components/Button'
-import { useRules } from '~/signals/rules'
-import { formatTimeFromNow, getBtnElFromClickEvent } from '~/utils/proxies'
+import { Button } from '~/components'
+import { formatTimeFromNow, getBtnElFromClickEvent } from '~/helpers'
+import { useRules } from '~/signals'
 
 export default () => {
   const [t] = useI18n()

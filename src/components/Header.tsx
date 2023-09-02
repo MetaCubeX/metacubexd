@@ -15,11 +15,9 @@ import {
 } from '@tabler/icons-solidjs'
 import { For, ParentComponent, Show, createMemo, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import { Button } from '~/components/Button'
-import { LANG, ROUTE } from '~/config/enum'
-import { themes } from '~/constants'
-import { setCurTheme, setSelectedEndpoint } from '~/signals'
-import { useProxies } from '~/signals/proxies'
+import { Button } from '~/components'
+import { LANG, ROUTE, themes } from '~/constants'
+import { setCurTheme, setSelectedEndpoint, useProxies } from '~/signals'
 
 const Nav: ParentComponent<{ href: string; tooltip: string }> = ({
   href,

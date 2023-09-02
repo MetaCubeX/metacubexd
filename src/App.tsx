@@ -1,10 +1,14 @@
 import { Navigate, Route, Routes, useNavigate } from '@solidjs/router'
 import { Show, createEffect, lazy, onMount } from 'solid-js'
-import { Header } from '~/components/Header'
-import { curTheme, endpoint, selectedEndpoint } from '~/signals'
-import { ROUTE } from './config/enum'
-import { useAutoSwitchTheme } from './signals/config'
-import { useProxies } from './signals/proxies'
+import { Header } from '~/components'
+import { ROUTE } from '~/constants'
+import {
+  curTheme,
+  endpoint,
+  selectedEndpoint,
+  useAutoSwitchTheme,
+  useProxies,
+} from '~/signals'
 
 const Setup = lazy(() => import('~/pages/Setup'))
 const Overview = lazy(() => import('~/pages/Overview'))

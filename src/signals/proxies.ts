@@ -1,6 +1,5 @@
 import { createSignal } from 'solid-js'
-import { useRequest } from '~/signals'
-import { autoCloseConns, urlForDelayTest } from '~/signals/config'
+import { autoCloseConns, urlForDelayTest, useRequest } from '~/signals'
 import type { Proxy, ProxyNode, ProxyProvider } from '~/types'
 
 type ProxyInfo = {
@@ -17,8 +16,9 @@ const [proxyNodeMap, setProxyNodeMap] = createSignal<Record<string, ProxyInfo>>(
   {},
 )
 
-export function useProxies() {
+export const useProxies = () => {
   const request = useRequest()
+
   const setProxyInfoByProixes = (proxies: Proxy[] | ProxyNode[]) => {
     proxies.forEach((proxy) => {
       const delay = proxy.history.at(-1)?.delay ?? 0
@@ -85,7 +85,6 @@ export function useProxies() {
     proxyGroup.now = proxyName
 
     setProxies(proxyGroupList)
-    // queueMicrotask(updateProxy)
   }
 
   const delayTestByProxyGroupName = async (proxyGroupName: string) => {
@@ -122,7 +121,7 @@ export function useProxies() {
 
   const healthCheckByProviderName = async (providerName: string) => {
     await request.get(`providers/proxies/${providerName}/healthcheck`, {
-      timeout: 30 * 1000, // thie api was a little bit slow sometimes...
+      timeout: 30 * 1000, // thie api is a little bit slow sometimes...
     })
     await updateProxy()
   }

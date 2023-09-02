@@ -48,4 +48,10 @@ export default {
   updateGEODatabases: '更新 GEO 数据库文件',
   restartCore: '重启核心',
   upgradeCore: '更新核心',
+  proxiesSorting: '节点排序',
+  orderNatural: '原配置文件中的排序',
+  orderLatency_asc: '按延迟从低到高',
+  orderLatency_desc: '按延迟从高到低',
+  orderName_asc: '按名称字母排序 (A-Z)',
+  orderName_desc: '按名称字母排序 (Z-A)',
 }

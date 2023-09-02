@@ -14,17 +14,13 @@ import {
   useDragDropContext,
 } from '@thisbeyond/solid-dnd'
 import { For, Show, createSignal } from 'solid-js'
-import { Button } from '~/components/Button'
-import {
-  AccessorKey,
-  initColumnOrder,
-  initColumnVisibility,
-} from '~/config/enum'
+import { Button } from '~/components'
+import { AccessorKey, initColumnOrder, initColumnVisibility } from '~/constants'
 
 type ColumnVisibility = Partial<Record<AccessorKey, boolean>>
 type ColumnOrder = AccessorKey[]
 
-export default (props: {
+export const ConnectionsModal = (props: {
   order: ColumnOrder
   visible: ColumnVisibility
   onOrderChange: (value: ColumnOrder) => void

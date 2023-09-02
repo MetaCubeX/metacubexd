@@ -1,4 +1,4 @@
-import { LANG } from '~/config/enum'
+import { LANG } from '~/constants'
 import en from './en'
 import zh from './zh'
 

@@ -1,7 +1,7 @@
 import { createMemo } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import Delay from '~/components/Delay'
-import { useProxies } from '~/signals/proxies'
+import { Delay } from '~/components'
+import { useProxies } from '~/signals'
 
 export default (props: {
   proxyName: string

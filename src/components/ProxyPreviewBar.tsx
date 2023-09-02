@@ -1,9 +1,12 @@
 import { createMemo } from 'solid-js'
-import Delay from '~/components/Delay'
-import { DELAY } from '~/config/enum'
-import { useProxies } from '~/signals/proxies'
+import { Delay } from '~/components'
+import { DELAY } from '~/constants'
+import { useProxies } from '~/signals'
 
-export default (props: { proxyNameList: string[]; now?: string }) => {
+export const ProxyPreviewBar = (props: {
+  proxyNameList: string[]
+  now?: string
+}) => {
   const { delayMap } = useProxies()
   const delayList = createMemo(() =>
     props.proxyNameList.map((i) => delayMap()[i]),

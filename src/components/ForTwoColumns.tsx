@@ -1,5 +1,5 @@
 import { JSX, Show, createMemo, createSignal } from 'solid-js'
-import { renderInTwoColumn } from '~/signals/config'
+import { renderInTwoColumn } from '~/signals'
 
 const [windowWidth, setWindowWidth] = createSignal(0)
 
@@ -9,7 +9,7 @@ window.addEventListener('resize', () => {
   setWindowWidth(document.body.clientWidth)
 })
 
-const ForTwoColumns = (props: { subChild: JSX.Element[] }) => {
+export const ForTwoColumns = (props: { subChild: JSX.Element[] }) => {
   const isShowTwoColumns = createMemo(
     () => windowWidth() >= 640 && renderInTwoColumn(),
   ) // 640 is sm size in daisyui
@@ -29,5 +29,3 @@ const ForTwoColumns = (props: { subChild: JSX.Element[] }) => {
     </div>
   )
 }
-
-export default ForTwoColumns

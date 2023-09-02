@@ -1,6 +1,6 @@
 import { JSX, ParentComponent, Show, createMemo } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import { renderInTwoColumn } from '~/signals/config'
+import { renderInTwoColumn } from '~/signals'
 
 type Props = {
   title: JSX.Element
@@ -9,7 +9,7 @@ type Props = {
   onCollapse: (collapsed: boolean) => void
 }
 
-const Collapse: ParentComponent<Props> = (props) => {
+export const Collapse: ParentComponent<Props> = (props) => {
   const { title, content, onCollapse } = props
 
   const getCollapseClassName = () => {
@@ -57,5 +57,3 @@ const Collapse: ParentComponent<Props> = (props) => {
     </div>
   )
 }
-
-export default Collapse

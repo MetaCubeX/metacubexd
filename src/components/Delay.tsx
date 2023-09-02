@@ -1,8 +1,8 @@
 import { Show, createEffect, createMemo, createSignal } from 'solid-js'
-import { DELAY } from '~/config/enum'
-import { useProxies } from '~/signals/proxies'
+import { DELAY } from '~/constants'
+import { useProxies } from '~/signals'
 
-const Delay = (props: { name?: string }) => {
+export const Delay = (props: { name?: string }) => {
   const { delayMap } = useProxies()
   const [textClassName, setTextClassName] = createSignal('')
   const delay = createMemo(() => {
@@ -29,5 +29,3 @@ const Delay = (props: { name?: string }) => {
     </>
   )
 }
-
-export default Delay

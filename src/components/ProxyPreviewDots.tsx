@@ -1,7 +1,7 @@
 import { For } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import { DELAY } from '~/config/enum'
-import { useProxies } from '~/signals/proxies'
+import { DELAY } from '~/constants'
+import { useProxies } from '~/signals'
 
 const DelayDots = (p: { delay: number | undefined; selected: boolean }) => {
   let dotClassName = p.selected
@@ -23,7 +23,10 @@ const DelayDots = (p: { delay: number | undefined; selected: boolean }) => {
   return <div class={twMerge('m-1 h-4 w-4 rounded-full', dotClassName)}></div>
 }
 
-export default (props: { proxyNameList: string[]; now?: string }) => {
+export const ProxyPreviewDots = (props: {
+  proxyNameList: string[]
+  now?: string
+}) => {
   const { delayMap } = useProxies()
 
   return (

@@ -1,11 +1,15 @@
 import { makePersisted } from '@solid-primitives/storage'
 import { createSignal } from 'solid-js'
-import { PROXIES_PREVIEW_TYPE } from '~/config/enum'
+import { PROXIES_PREVIEW_TYPE, PROXIES_SORTING_TYPE } from '~/constants'
 import { setCurTheme } from '~/signals'
 
 export const [proxiesPreviewType, setProxiesPreviewType] = makePersisted(
-  createSignal(PROXIES_PREVIEW_TYPE.BAR),
+  createSignal(PROXIES_PREVIEW_TYPE.Auto),
   { name: 'proxiesPreviewType', storage: localStorage },
+)
+export const [proxiesSortingType, setProxiesSortingType] = makePersisted(
+  createSignal(PROXIES_SORTING_TYPE.NATURAL),
+  { name: 'proxiesSortingType', storage: localStorage },
 )
 export const [urlForDelayTest, setUrlForDelayTest] = makePersisted(
   createSignal('https://www.gstatic.com/generate_204'),
@@ -42,15 +46,13 @@ const setTheme = (isDark: boolean) => {
   }
 }
 
-export function applyThemeByMode() {
+export const applyThemeByMode = () =>
   setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches)
-}
 
-export function useAutoSwitchTheme() {
+export const useAutoSwitchTheme = () => {
   applyThemeByMode()
+
   window
     .matchMedia('(prefers-color-scheme: dark)')
-    .addEventListener('change', (event) => {
-      setTheme(event.matches)
-    })
+    .addEventListener('change', (event) => setTheme(event.matches))
 }

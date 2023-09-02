@@ -1,7 +1,7 @@
 import { I18nContext, createI18nContext, useI18n } from '@solid-primitives/i18n'
 import { makePersisted } from '@solid-primitives/storage'
 import { ParentComponent, createEffect, createSignal } from 'solid-js'
-import { LANG } from '~/config/enum'
+import { LANG } from '~/constants'
 import dict from './dict'
 
 const useLanguage = () => {

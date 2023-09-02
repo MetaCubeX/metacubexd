@@ -2,7 +2,7 @@ import InfiniteScroll from 'solid-infinite-scroll'
 import { createMemo, createSignal } from 'solid-js'
 import ProxyNodeCard from './ProxyNodeCard'
 
-export default (props: {
+export const ProxyCardGroups = (props: {
   proxies: string[]
   now?: string
   onClick?: (name: string) => void

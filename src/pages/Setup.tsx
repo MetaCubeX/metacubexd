@@ -7,7 +7,7 @@ import ky from 'ky'
 import { For, onMount } from 'solid-js'
 import { v4 as uuid } from 'uuid'
 import { z } from 'zod'
-import { Button } from '~/components/Button'
+import { Button } from '~/components'
 import { endpointList, setEndpointList, setSelectedEndpoint } from '~/signals'
 
 const schema = z.object({

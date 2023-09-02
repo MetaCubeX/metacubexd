@@ -1,14 +1,16 @@
 import { useI18n } from '@solid-primitives/i18n'
 import { IconBrandSpeedtest, IconReload } from '@tabler/icons-solidjs'
 import { Show, createSignal } from 'solid-js'
-import { Button } from '~/components/Button'
-import Collapse from '~/components/Collpase'
-import ForTwoColumns from '~/components/ForTwoColumns'
-import ProxyCardGroups from '~/components/ProxyCardGroups'
-import ProxyNodePreview from '~/components/ProxyNodePreview'
-import SubscriptionInfo from '~/components/SubscriptionInfo'
-import { useProxies } from '~/signals/proxies'
-import { formatTimeFromNow, getBtnElFromClickEvent } from '~/utils/proxies'
+import {
+  Button,
+  Collapse,
+  ForTwoColumns,
+  ProxyCardGroups,
+  ProxyNodePreview,
+  SubscriptionInfo,
+} from '~/components'
+import { formatTimeFromNow, getBtnElFromClickEvent } from '~/helpers'
+import { useProxies } from '~/signals'
 
 export default () => {
   const [t] = useI18n()

@@ -48,4 +48,10 @@ export default {
   updateGEODatabases: 'Update GEO Databases',
   restartCore: 'Restart Core',
   upgradeCore: 'Upgrade Core',
+  proxiesSorting: 'Proxies Sorting',
+  orderNatural: 'Original order in config file',
+  orderLatency_asc: 'By latency from low to high',
+  orderLatency_desc: 'By latency from high to low',
+  orderName_asc: 'By name alphabetically (A-Z)',
+  orderName_desc: 'By name alphabetically (Z-A)',
 }

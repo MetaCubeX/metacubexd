@@ -20,13 +20,8 @@ import byteSize from 'byte-size'
 import { isIPv6 } from 'is-ip'
 import { For, createEffect, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import { Button } from '~/components/Button'
-import ConnectionsModal from '~/components/ConnectionsModal'
-import {
-  AccessorKey,
-  initColumnOrder,
-  initColumnVisibility,
-} from '~/config/enum'
+import { Button, ConnectionsModal } from '~/components'
+import { AccessorKey, initColumnOrder, initColumnVisibility } from '~/constants'
 import { secret, useRequest, wsEndpointURL } from '~/signals'
 import type { Connection } from '~/types'
 

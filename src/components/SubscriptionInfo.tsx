@@ -1,8 +1,8 @@
 import byteSize from 'byte-size'
 import dayjs from 'dayjs'
-import type { SubscriptionInfo } from '~/types'
+import type { SubscriptionInfo as ISubscriptionInfo } from '~/types'
 
-const getSubscriptionsInfo = (subscriptionInfo: SubscriptionInfo) => {
+const getSubscriptionsInfo = (subscriptionInfo: ISubscriptionInfo) => {
   const total = byteSize(subscriptionInfo.Total, { units: 'iec' })
   const used = byteSize(subscriptionInfo.Download + subscriptionInfo.Upload, {
     units: 'iec',
@@ -28,7 +28,9 @@ const getSubscriptionsInfo = (subscriptionInfo: SubscriptionInfo) => {
   }
 }
 
-export default (props: { subscriptionInfo: SubscriptionInfo }) => {
+export const SubscriptionInfo = (props: {
+  subscriptionInfo: ISubscriptionInfo
+}) => {
   if (!props.subscriptionInfo) {
     return
   }

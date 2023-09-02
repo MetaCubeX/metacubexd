@@ -1,10 +1,12 @@
 import { Show, createMemo } from 'solid-js'
-import { PROXIES_PREVIEW_TYPE } from '~/config/enum'
-import { proxiesPreviewType } from '~/signals/config'
-import ProxyPreviewBar from './ProxyPreviewBar'
-import ProxyPreviewDots from './ProxyPreviewDots'
+import { ProxyPreviewBar, ProxyPreviewDots } from '~/components'
+import { PROXIES_PREVIEW_TYPE } from '~/constants'
+import { proxiesPreviewType } from '~/signals'
 
-export default (props: { proxyNameList: string[]; now?: string }) => {
+export const ProxyNodePreview = (props: {
+  proxyNameList: string[]
+  now?: string
+}) => {
   const off = () => proxiesPreviewType() === PROXIES_PREVIEW_TYPE.OFF
 
   const isSmallGroup = createMemo(() => props.proxyNameList.length <= 30)

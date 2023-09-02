@@ -3,10 +3,8 @@ import { validator } from '@felte/validator-zod'
 import { useI18n } from '@solid-primitives/i18n'
 import { For, Show, createSignal, onMount } from 'solid-js'
 import { z } from 'zod'
-import { Button } from '~/components/Button'
-import { PROXIES_PREVIEW_TYPE } from '~/config/enum'
-import { themes } from '~/constants'
-import { useRequest } from '~/signals'
+import { Button } from '~/components'
+import { PROXIES_PREVIEW_TYPE, PROXIES_SORTING_TYPE, themes } from '~/constants'
 import {
   applyThemeByMode,
   autoCloseConns,
@@ -14,16 +12,19 @@ import {
   favDayTheme,
   favNightTheme,
   proxiesPreviewType,
+  proxiesSortingType,
   renderInTwoColumn,
   setAutoCloseConns,
   setAutoSwitchTheme,
   setFavDayTheme,
   setFavNightTheme,
   setProxiesPreviewType,
+  setProxiesSortingType,
   setRenderInTwoColumn,
   setUrlForDelayTest,
   urlForDelayTest,
-} from '~/signals/config'
+  useRequest,
+} from '~/signals'
 import type { DNSQuery, Config as IConfig } from '~/types'
 
 const dnsQueryFormSchema = z.object({
@@ -261,8 +262,10 @@ const ConfigForXd = () => {
           </select>
         </div>
       </Show>
+
       <div>
         <div class="pb-4">{t('proxiesPreviewType')}</div>
+
         <div class="flex items-center gap-4">
           <For each={Object.values(PROXIES_PREVIEW_TYPE)}>
             {(value) => (
@@ -275,6 +278,28 @@ const ConfigForXd = () => {
                   type="radio"
                   checked={value === proxiesPreviewType()}
                   onChange={() => setProxiesPreviewType(value)}
+                />
+              </label>
+            )}
+          </For>
+        </div>
+      </div>
+
+      <div>
+        <div class="pb-4">{t('proxiesSorting')}</div>
+
+        <div class="flex flex-col gap-4">
+          <For each={Object.values(PROXIES_SORTING_TYPE)}>
+            {(value) => (
+              <label class="flex items-center gap-2">
+                <span>{t(value)}</span>
+
+                <input
+                  class="radio"
+                  aria-label={value}
+                  type="radio"
+                  checked={value === proxiesSortingType()}
+                  onChange={() => setProxiesSortingType(value)}
                 />
               </label>
             )}
