@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.50.0](https://github.com/MetaCubeX/metacubexd/compare/v1.49.0...v1.50.0) (2023-09-02)
+
+
+### Features
+
+* separate provider page ([419d3e3](https://github.com/MetaCubeX/metacubexd/commit/419d3e33f31a80c21e2ba16864bcad70d9dd4665))
+
+
+### Bug Fixes
+
+* better update provider all ([68ef377](https://github.com/MetaCubeX/metacubexd/commit/68ef377f4bf8690cf3bd371d945e11fd5dcf9b50))
+
 ## [1.49.0](https://github.com/MetaCubeX/metacubexd/compare/v1.48.0...v1.49.0) (2023-09-02)
 
 
