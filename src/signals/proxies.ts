@@ -109,6 +109,15 @@ export function useProxies() {
     await updateProxy()
   }
 
+  const updateAllProvider = async () => {
+    await Promise.all(
+      proxyProviders().map((provider) => {
+        return request.put(`providers/proxies/${provider.name}`)
+      }),
+    )
+    await updateProxy()
+  }
+
   const healthCheckByProviderName = async (providerName: string) => {
     await request.get(`providers/proxies/${providerName}/healthcheck`, {
       timeout: 30 * 1000, // thie api was a little bit slow sometimes...
@@ -125,6 +134,7 @@ export function useProxies() {
     updateProxy,
     setProxyGroupByProxyName,
     updateProviderByProviderName,
+    updateAllProvider,
     healthCheckByProviderName,
   }
 }

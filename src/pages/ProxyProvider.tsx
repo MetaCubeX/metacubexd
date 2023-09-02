@@ -14,6 +14,7 @@ export default () => {
   const {
     proxyProviders,
     updateProviderByProviderName,
+    updateAllProvider,
     healthCheckByProviderName,
   } = useProxies()
 
@@ -41,13 +42,10 @@ export default () => {
 
   const onUpdateAllProviderClick = async (e: MouseEvent) => {
     const el = e.target as HTMLElement
-    const list = proxyProviders().map((provider) => {
-      return updateProviderByProviderName(provider.name)
-    })
 
     el.classList.add('animate-spin')
     e.stopPropagation()
-    await Promise.all(list)
+    await updateAllProvider()
     el.classList.remove('animate-spin')
   }
 
