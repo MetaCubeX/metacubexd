@@ -83,6 +83,9 @@ dependencies:
   husky:
     specifier: ^8.0.3
     version: 8.0.3
+  immer:
+    specifier: ^10.0.2
+    version: 10.0.2
   is-ip:
     specifier: ^5.0.1
     version: 5.0.1
@@ -4436,6 +4439,13 @@ packages:
         integrity: sha512-MAb38BcSbH0eHNBxn7ql2NH/kX33OkB3lZ1BNdh7ENeRChHTYsTvWrMubiIAMNS2llXEEgZ1MUOBtXChP3kaFQ==,
       }
     engines: { node: '>= 4' }
+    dev: false
+
+  /immer@10.0.2:
+    resolution:
+      {
+        integrity: sha512-Rx3CqeqQ19sxUtYV9CU911Vhy8/721wRFnJv3REVGWUmoAcIwzifTsdmJte/MV+0/XpM35LZdQMBGkRIoLPwQA==,
+      }
     dev: false
 
   /import-fresh@3.3.0:

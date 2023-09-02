@@ -4,22 +4,26 @@ import { useI18n } from '@solid-primitives/i18n'
 import { For, Show, createSignal, onMount } from 'solid-js'
 import { z } from 'zod'
 import { Button } from '~/components'
-import { PROXIES_PREVIEW_TYPE, PROXIES_SORTING_TYPE, themes } from '~/constants'
+import {
+  PROXIES_ORDERING_TYPE,
+  PROXIES_PREVIEW_TYPE,
+  themes,
+} from '~/constants'
 import {
   applyThemeByMode,
   autoCloseConns,
   autoSwitchTheme,
   favDayTheme,
   favNightTheme,
+  proxiesOrderingType,
   proxiesPreviewType,
-  proxiesSortingType,
   renderInTwoColumn,
   setAutoCloseConns,
   setAutoSwitchTheme,
   setFavDayTheme,
   setFavNightTheme,
+  setProxiesOrderingType,
   setProxiesPreviewType,
-  setProxiesSortingType,
   setRenderInTwoColumn,
   setUrlForDelayTest,
   urlForDelayTest,
@@ -289,7 +293,7 @@ const ConfigForXd = () => {
         <div class="pb-4">{t('proxiesSorting')}</div>
 
         <div class="flex flex-col gap-4">
-          <For each={Object.values(PROXIES_SORTING_TYPE)}>
+          <For each={Object.values(PROXIES_ORDERING_TYPE)}>
             {(value) => (
               <label class="flex items-center gap-2">
                 <span>{t(value)}</span>
@@ -298,8 +302,8 @@ const ConfigForXd = () => {
                   class="radio"
                   aria-label={value}
                   type="radio"
-                  checked={value === proxiesSortingType()}
-                  onChange={() => setProxiesSortingType(value)}
+                  checked={value === proxiesOrderingType()}
+                  onChange={() => setProxiesOrderingType(value)}
                 />
               </label>
             )}

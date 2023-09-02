@@ -54,4 +54,5 @@ export default {
   orderLatency_desc: 'By latency from high to low',
   orderName_asc: 'By name alphabetically (A-Z)',
   orderName_desc: 'By name alphabetically (Z-A)',
+  ms: 'ms',
 }

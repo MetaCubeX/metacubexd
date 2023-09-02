@@ -1,9 +1,10 @@
 import { createMemo } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Latency } from '~/components'
+import { formatProxyType } from '~/helpers'
 import { useProxies } from '~/signals'
 
-export default (props: {
+export const ProxyNodeCard = (props: {
   proxyName: string
   isSelected?: boolean
   onClick?: () => void
@@ -11,16 +12,6 @@ export default (props: {
   const { proxyName, isSelected, onClick } = props
   const { proxyNodeMap } = useProxies()
   const proxyNode = createMemo(() => proxyNodeMap()[proxyName])
-
-  const formatProxyType = (type = '') => {
-    const t = type.toLowerCase()
-
-    if (t.includes('shadowsocks')) {
-      return t.replace('shadowsocks', 'ss')
-    }
-
-    return t
-  }
 
   return (
     <div

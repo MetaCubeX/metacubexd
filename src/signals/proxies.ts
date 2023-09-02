@@ -11,7 +11,7 @@ type ProxyInfo = {
 const [proxies, setProxies] = createSignal<Proxy[]>([])
 const [proxyProviders, setProxyProviders] = createSignal<ProxyProvider[]>([])
 
-const [delayMap, setDelayMap] = createSignal<Record<string, number>>({})
+const [latencyMap, setLatencyMap] = createSignal<Record<string, number>>({})
 const [proxyNodeMap, setProxyNodeMap] = createSignal<Record<string, ProxyInfo>>(
   {},
 )
@@ -21,7 +21,7 @@ export const useProxies = () => {
 
   const setProxyInfoByProixes = (proxies: Proxy[] | ProxyNode[]) => {
     proxies.forEach((proxy) => {
-      const delay = proxy.history.at(-1)?.delay ?? 0
+      const delay = proxy.history.at(-1)?.delay ?? -1
 
       setProxyNodeMap({
         ...proxyNodeMap(),
@@ -31,14 +31,14 @@ export const useProxies = () => {
           name: proxy.name,
         },
       })
-      setDelayMap({
-        ...delayMap(),
+      setLatencyMap({
+        ...latencyMap(),
         [proxy.name]: delay,
       })
     })
   }
 
-  const updateProxy = async () => {
+  const updateProxies = async () => {
     const { providers } = await request
       .get('providers/proxies')
       .json<{ providers: Record<string, ProxyProvider> }>()
@@ -58,14 +58,15 @@ export const useProxies = () => {
       .get('proxies')
       .json<{ proxies: Record<string, Proxy> }>()
     const sortIndex = [...(proxies['GLOBAL'].all ?? []), 'GLOBAL']
+    const proxiesArray = Object.values(proxies)
 
-    setProxyInfoByProixes(Object.values(proxies))
+    setProxyInfoByProixes(proxiesArray)
     setProxies(
-      Object.values(proxies)
+      proxiesArray
         .filter((proxy) => proxy.all?.length)
         .sort(
-          (pre, next) =>
-            sortIndex.indexOf(pre.name) - sortIndex.indexOf(next.name),
+          (prev, next) =>
+            sortIndex.indexOf(prev.name) - sortIndex.indexOf(next.name),
         ),
     )
   }
@@ -97,8 +98,8 @@ export const useProxies = () => {
       })
       .json()
 
-    setDelayMap({
-      ...delayMap(),
+    setLatencyMap({
+      ...latencyMap(),
       ...data,
     })
   }
@@ -107,7 +108,7 @@ export const useProxies = () => {
     try {
       await request.put(`providers/proxies/${proxyProviderName}`)
     } catch {}
-    await updateProxy()
+    await updateProxies()
   }
 
   const updateAllProvider = async () => {
@@ -116,23 +117,23 @@ export const useProxies = () => {
         return request.put(`providers/proxies/${provider.name}`)
       }),
     )
-    await updateProxy()
+    await updateProxies()
   }
 
   const healthCheckByProviderName = async (providerName: string) => {
     await request.get(`providers/proxies/${providerName}/healthcheck`, {
       timeout: 30 * 1000, // thie api is a little bit slow sometimes...
     })
-    await updateProxy()
+    await updateProxies()
   }
 
   return {
     proxies,
     proxyProviders,
     delayTestByProxyGroupName,
-    delayMap,
+    latencyMap,
     proxyNodeMap,
-    updateProxy,
+    updateProxies,
     setProxyGroupByProxyName,
     updateProviderByProviderName,
     updateAllProvider,

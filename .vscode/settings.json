@@ -3,6 +3,7 @@
     "class",
     "className",
     "ngClass",
+    "classList",
     ".*ClassName*"
   ]
 }

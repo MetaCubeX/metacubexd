@@ -26,11 +26,11 @@ export const App = () => {
 
   createEffect(() => {
     if (selectedEndpoint() && endpoint()) {
-      useProxies().updateProxy()
+      useProxies().updateProxies()
     }
   })
 
-  onMount(async () => {
+  onMount(() => {
     if (!selectedEndpoint()) {
       navigate('/setup')
     }

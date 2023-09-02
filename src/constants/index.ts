@@ -41,13 +41,13 @@ export enum ROUTES {
 }
 
 export enum LATENCY_QUALITY_MAP_HTTP {
-  NOT_CONNECTED = 0,
+  NOT_CONNECTED = -1,
   MEDIUM = 200,
   HIGH = 500,
 }
 
 export enum LATENCY_QUALITY_MAP_HTTPS {
-  NOT_CONNECTED = 0,
+  NOT_CONNECTED = -1,
   MEDIUM = 800,
   HIGH = 1500,
 }
@@ -59,7 +59,7 @@ export enum PROXIES_PREVIEW_TYPE {
   Auto = 'auto',
 }
 
-export enum PROXIES_SORTING_TYPE {
+export enum PROXIES_ORDERING_TYPE {
   NATURAL = 'orderNatural',
   LATENCY_ASC = 'orderLatency_asc',
   LATENCY_DESC = 'orderLatency_desc',

@@ -1,27 +1,22 @@
 import { For } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import {
-  LATENCY_QUALITY_MAP_HTTP,
-  LATENCY_QUALITY_MAP_HTTPS,
-} from '~/constants'
-import { isLatencyTestByHttps, useProxies } from '~/signals'
+import { latencyQualityMap, useProxies } from '~/signals'
 
 const DelayDots = (p: { delay: number | undefined; selected: boolean }) => {
-  const delayMap = isLatencyTestByHttps()
-    ? LATENCY_QUALITY_MAP_HTTP
-    : LATENCY_QUALITY_MAP_HTTPS
-
   let dotClassName = p.selected
     ? 'bg-white border-4 border-success'
     : 'bg-success'
 
-  if (typeof p.delay !== 'number' || p.delay === delayMap.NOT_CONNECTED) {
+  if (
+    typeof p.delay !== 'number' ||
+    p.delay === latencyQualityMap().NOT_CONNECTED
+  ) {
     dotClassName = p.selected
       ? 'bg-white border-4 border-neutral'
       : 'bg-neutral'
-  } else if (p.delay > delayMap.HIGH) {
+  } else if (p.delay > latencyQualityMap().HIGH) {
     dotClassName = p.selected ? 'bg-white border-4 border-error' : 'bg-error'
-  } else if (p.delay > delayMap.MEDIUM) {
+  } else if (p.delay > latencyQualityMap().MEDIUM) {
     dotClassName = p.selected
       ? 'bg-white border-4 border-warning'
       : 'bg-warning'
@@ -34,14 +29,14 @@ export const ProxyPreviewDots = (props: {
   proxyNameList: string[]
   now?: string
 }) => {
-  const { delayMap } = useProxies()
+  const { latencyMap } = useProxies()
 
   return (
     <div class="flex w-full flex-wrap items-center">
       <For
         each={props.proxyNameList.map((name): [string, number] => [
           name,
-          delayMap()[name],
+          latencyMap()[name],
         ])}
       >
         {([name, delay]) => {

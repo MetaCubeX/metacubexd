@@ -54,4 +54,5 @@ export default {
   orderLatency_desc: '按延迟从高到低',
   orderName_asc: '按名称字母排序 (A-Z)',
   orderName_desc: '按名称字母排序 (Z-A)',
+  ms: '毫秒',
 }

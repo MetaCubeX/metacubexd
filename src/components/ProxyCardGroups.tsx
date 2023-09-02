@@ -1,6 +1,6 @@
 import InfiniteScroll from 'solid-infinite-scroll'
 import { createMemo, createSignal } from 'solid-js'
-import ProxyNodeCard from './ProxyNodeCard'
+import { ProxyNodeCard } from '~/components'
 
 export const ProxyCardGroups = (props: {
   proxies: string[]

@@ -6,9 +6,9 @@ export const ProxyPreviewBar = (props: {
   proxyNameList: string[]
   now?: string
 }) => {
-  const { delayMap } = useProxies()
+  const { latencyMap } = useProxies()
   const delayList = createMemo(() =>
-    props.proxyNameList.map((i) => delayMap()[i]),
+    props.proxyNameList.map((i) => latencyMap()[i]),
   )
   const all = createMemo(() => delayList().length)
   const good = createMemo(

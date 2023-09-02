@@ -8,14 +8,18 @@ import {
   ProxyCardGroups,
   ProxyNodePreview,
 } from '~/components'
-import { getBtnElFromClickEvent } from '~/helpers'
-import { useProxies } from '~/signals'
+import { getBtnElFromClickEvent, sortProxiesByOrderingType } from '~/helpers'
+import { proxiesOrderingType, useProxies } from '~/signals'
 import type { Proxy } from '~/types'
 
 export default () => {
   const [t] = useI18n()
-  const { proxies, setProxyGroupByProxyName, delayTestByProxyGroupName } =
-    useProxies()
+  const {
+    proxies,
+    setProxyGroupByProxyName,
+    delayTestByProxyGroupName,
+    latencyMap,
+  } = useProxies()
 
   const [collapsedMap, setCollapsedMap] = createSignal<Record<string, boolean>>(
     {},
@@ -66,7 +70,11 @@ export default () => {
 
           const content = (
             <ProxyCardGroups
-              proxies={proxy.all!}
+              proxies={sortProxiesByOrderingType(
+                proxy.all ?? [],
+                latencyMap(),
+                proxiesOrderingType(),
+              )}
               now={proxy.now}
               onClick={(name) => {
                 onProxyNodeClick(proxy, name)

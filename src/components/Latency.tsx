@@ -1,20 +1,22 @@
+import { useI18n } from '@solid-primitives/i18n'
 import { Show, createEffect, createMemo, createSignal } from 'solid-js'
 import { LATENCY_QUALITY_MAP_HTTP } from '~/constants'
 import { latencyQualityMap, useProxies } from '~/signals'
 
 export const Latency = (props: { name?: string }) => {
-  const { delayMap } = useProxies()
+  const [t] = useI18n()
+  const { latencyMap } = useProxies()
   const [textClassName, setTextClassName] = createSignal('')
-  const delay = createMemo(() => {
-    return delayMap()[props.name!]
+  const latency = createMemo(() => {
+    return latencyMap()[props.name!]
   })
 
   createEffect(() => {
     setTextClassName('text-success')
 
-    if (delay() > latencyQualityMap().HIGH) {
+    if (latency() > latencyQualityMap().HIGH) {
       setTextClassName('text-error')
-    } else if (delay() > latencyQualityMap().MEDIUM) {
+    } else if (latency() > latencyQualityMap().MEDIUM) {
       setTextClassName('text-warning')
     }
   })
@@ -23,11 +25,14 @@ export const Latency = (props: { name?: string }) => {
     <>
       <Show
         when={
-          typeof delay() === 'number' &&
-          delay() !== LATENCY_QUALITY_MAP_HTTP.NOT_CONNECTED
+          typeof latency() === 'number' &&
+          latency() !== LATENCY_QUALITY_MAP_HTTP.NOT_CONNECTED
         }
       >
-        <span class={textClassName()}>{delay()}ms</span>
+        <span class={`whitespace-nowrap ${textClassName()}`}>
+          {latency()}
+          {t('ms')}
+        </span>
       </Show>
     </>
   )
