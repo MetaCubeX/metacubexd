@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.51.1](https://github.com/MetaCubeX/metacubexd/compare/v1.51.0...v1.51.1) (2023-09-02)
+
+
+### Bug Fixes
+
+* rules page && dns query for mobile ([86fd0d7](https://github.com/MetaCubeX/metacubexd/commit/86fd0d7d9db1aec5841f1b2e4931b98e789e5a93))
+
 ## [1.51.0](https://github.com/MetaCubeX/metacubexd/compare/v1.50.0...v1.51.0) (2023-09-02)
 
 
