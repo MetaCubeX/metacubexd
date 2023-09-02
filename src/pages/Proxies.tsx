@@ -32,7 +32,9 @@ export default () => {
 
   return (
     <div class="flex flex-col gap-2">
-      <h1 class="pb-2 text-lg font-semibold">{t('proxies')}</h1>
+      <h1 class="flex h-8 items-center pb-2 text-lg font-semibold">
+        {t('proxies')}
+      </h1>
       <ForTwoLine
         subChild={proxies().map((proxy) => {
           const title = (

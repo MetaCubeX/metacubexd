@@ -85,7 +85,7 @@ export function useProxies() {
     proxyGroup.now = proxyName
 
     setProxies(proxyGroupList)
-    queueMicrotask(updateProxy)
+    // queueMicrotask(updateProxy)
   }
 
   const delayTestByProxyGroupName = async (proxyGroupName: string) => {

@@ -51,7 +51,7 @@ export default () => {
 
   return (
     <div class="flex flex-col gap-2">
-      <h1 class="pm-4 flex items-center text-lg font-semibold">
+      <h1 class="flex h-8 items-center pb-2 text-lg font-semibold">
         {t('proxyProviders')}
         <button
           class="btn btn-circle btn-ghost btn-sm ml-2"
@@ -64,7 +64,7 @@ export default () => {
         subChild={proxyProviders().map((proxyProvider) => {
           const title = (
             <>
-              <div class="mr-10 flex items-center justify-between">
+              <div class="mr-8 flex items-center justify-between">
                 <span>{proxyProvider.name}</span>
                 <div>
                   <button
