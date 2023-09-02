@@ -23,7 +23,7 @@ export const [endpointList, setEndpointList] = makePersisted(
 )
 
 export const [curTheme, setCurTheme] = makePersisted(
-  createSignal<(typeof themes)[number]>('business'),
+  createSignal<(typeof themes)[number]>('halloween'),
   { name: 'theme', storage: localStorage },
 )
 
