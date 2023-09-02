@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.55.0](https://github.com/MetaCubeX/metacubexd/compare/v1.54.0...v1.55.0) (2023-09-02)
+
+
+### Features
+
+* add PROXIES_PREVIEW_TYPE - off ([fec6413](https://github.com/MetaCubeX/metacubexd/commit/fec64133fa8b5a3f14905d7910097d790314471f))
+* relax https latency test range ([1b09fa3](https://github.com/MetaCubeX/metacubexd/commit/1b09fa39af2c5bfc9fd8374c9b2ec53e59595184))
+
 ## [1.54.0](https://github.com/MetaCubeX/metacubexd/compare/v1.53.0...v1.54.0) (2023-09-02)
 
 
