@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.45.0](https://github.com/MetaCubeX/metacubexd/compare/v1.44.1...v1.45.0) (2023-09-02)
+
+
+### Features
+
+* **connections:** reset the ordering of columns ([9d3706f](https://github.com/MetaCubeX/metacubexd/commit/9d3706f39013b0c58860872a95b0c9266628e93c))
+* i18n for conn table ([33fa191](https://github.com/MetaCubeX/metacubexd/commit/33fa191cfed4e05aeb5bb94aaa7ead792ec8a736))
+
 ## [1.44.1](https://github.com/MetaCubeX/metacubexd/compare/v1.44.0...v1.44.1) (2023-09-02)
 
 
