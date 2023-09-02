@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.52.0](https://github.com/MetaCubeX/metacubexd/compare/v1.51.1...v1.52.0) (2023-09-02)
+
+
+### Features
+
+* auto switch theme ([0bbc661](https://github.com/MetaCubeX/metacubexd/commit/0bbc661e93698312e162e0b8391aea20b553c9a9))
+
 ## [1.51.1](https://github.com/MetaCubeX/metacubexd/compare/v1.51.0...v1.51.1) (2023-09-02)
 
 
