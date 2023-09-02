@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.54.0](https://github.com/MetaCubeX/metacubexd/compare/v1.53.0...v1.54.0) (2023-09-02)
+
+
+### Features
+
+* add buttons - updateGEODatabases, restart, upgrade ([8e56543](https://github.com/MetaCubeX/metacubexd/commit/8e5654332ddfce03399e24864b856fed882480c3))
+
 ## [1.53.0](https://github.com/MetaCubeX/metacubexd/compare/v1.52.1...v1.53.0) (2023-09-02)
 
 
