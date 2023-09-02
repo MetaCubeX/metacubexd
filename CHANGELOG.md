@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.45.1](https://github.com/MetaCubeX/metacubexd/compare/v1.45.0...v1.45.1) (2023-09-02)
+
+
+### Bug Fixes
+
+* dns query component layout ([2464896](https://github.com/MetaCubeX/metacubexd/commit/2464896a4635cf04377485316695807519104cd7))
+
 ## [1.45.0](https://github.com/MetaCubeX/metacubexd/compare/v1.44.1...v1.45.0) (2023-09-02)
 
 
