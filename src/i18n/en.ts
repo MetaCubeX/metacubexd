@@ -38,4 +38,5 @@ export default {
   bar: 'Bar',
   auto: 'Auto',
   proxiesPreviewType: 'Proxies preview type',
+  urlForDelayTest: 'Url for delay test',
 }

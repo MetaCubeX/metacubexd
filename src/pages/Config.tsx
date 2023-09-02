@@ -132,36 +132,52 @@ export const [proxiesPreviewType, setProxiesPreviewType] = makePersisted(
   createSignal(PROXIES_PREVIEW_TYPE.BAR),
   { name: 'proxiesPreviewType', storage: localStorage },
 )
+export const [urlForDelayTest, setUrlForDelayTest] = makePersisted(
+  createSignal('https://www.gstatic.com/generate_204'),
+  { name: 'urlForDelayTest', storage: localStorage },
+)
 
-export default () => {
+const ConfigForXd = () => {
   const [t] = useI18n()
 
   return (
+    <>
+      <div>{t('proxiesPreviewType')}</div>
+      <div class="flex">
+        <For each={Object.values(PROXIES_PREVIEW_TYPE)}>
+          {(value) => (
+            <label class="flex items-center">
+              {t(value)}
+              <input
+                class="radio m-4"
+                aria-label={value}
+                type="radio"
+                name="proxiesPreviewType"
+                checked={value === proxiesPreviewType()}
+                onChange={() => setProxiesPreviewType(value)}
+              />
+            </label>
+          )}
+        </For>
+      </div>
+      <div>{t('urlForDelayTest')}</div>
+      <div>
+        <input
+          class="input input-bordered w-96"
+          value={urlForDelayTest()}
+          onChange={(e) => setUrlForDelayTest(e.target?.value!)}
+        />
+      </div>
+    </>
+  )
+}
+
+export default () => {
+  return (
     <div class="flex flex-col gap-4">
       <DNSQueryForm />
-
       <ConfigForm />
-
-      <div>
-        <div>{t('proxiesPreviewType')}</div>
-        <div class="flex">
-          <For each={Object.values(PROXIES_PREVIEW_TYPE)}>
-            {(value) => (
-              <label class="flex items-center">
-                {t(value)}
-                <input
-                  class="radio m-4"
-                  aria-label={value}
-                  type="radio"
-                  name="proxiesPreviewType"
-                  checked={value === proxiesPreviewType()}
-                  onChange={() => setProxiesPreviewType(value)}
-                />
-              </label>
-            )}
-          </For>
-        </div>
-      </div>
+      <ConfigForXd />
     </div>
   )
 }

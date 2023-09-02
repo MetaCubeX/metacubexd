@@ -1,4 +1,5 @@
 import { createSignal } from 'solid-js'
+import { urlForDelayTest } from '~/pages/Config'
 import { useRequest } from '~/signals'
 import type { Proxy, ProxyNode, ProxyProvider } from '~/types'
 
@@ -86,7 +87,7 @@ export function useProxies() {
     const data: Record<string, number> = await request
       .get(`group/${proxyGroupName}/delay`, {
         searchParams: {
-          url: 'https://www.gstatic.com/generate_204',
+          url: urlForDelayTest(),
           timeout: 2000,
         },
       })
