@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.59.0](https://github.com/MetaCubeX/metacubexd/compare/v1.58.0...v1.59.0) (2023-09-03)
+
+
+### Features
+
+* display current version ([1765ada](https://github.com/MetaCubeX/metacubexd/commit/1765adacdad295101e3d0479841affcca8a9ec7e))
+* **overview:** add background color to charts container ([bd83d11](https://github.com/MetaCubeX/metacubexd/commit/bd83d113b169662e369355e655cf179a7704d311))
+
 ## [1.58.0](https://github.com/MetaCubeX/metacubexd/compare/v1.57.3...v1.58.0) (2023-09-03)
 
 
