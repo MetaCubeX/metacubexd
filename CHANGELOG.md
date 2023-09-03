@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.59.1](https://github.com/MetaCubeX/metacubexd/compare/v1.59.0...v1.59.1) (2023-09-03)
+
+
+### Bug Fixes
+
+* **connections:** disable sorting for close column ([98b5d62](https://github.com/MetaCubeX/metacubexd/commit/98b5d62c0208efbd1cf501e031240d41ab434fc0))
+
 ## [1.59.0](https://github.com/MetaCubeX/metacubexd/compare/v1.58.0...v1.59.0) (2023-09-03)
 
 
