@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.60.0](https://github.com/MetaCubeX/metacubexd/compare/v1.59.1...v1.60.0) (2023-09-03)
+
+
+### Features
+
+* **connections:** move close connection button next to search input ([4b8175d](https://github.com/MetaCubeX/metacubexd/commit/4b8175d718211d139b4db17f9412b88608b089fe))
+
 ## [1.59.1](https://github.com/MetaCubeX/metacubexd/compare/v1.59.0...v1.59.1) (2023-09-03)
 
 
