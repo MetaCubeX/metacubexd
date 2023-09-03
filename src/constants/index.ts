@@ -36,7 +36,7 @@ export const themes = [
 export enum ROUTES {
   Overview = '/overview',
   Proxies = '/proxies',
-  Proxyprovider = '/proxyprovider',
+  ProxyProvider = '/proxyprovider',
   Rules = '/rules',
   Conns = '/conns',
   Log = '/logs',

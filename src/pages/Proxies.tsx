@@ -1,6 +1,6 @@
 import { useI18n } from '@solid-primitives/i18n'
 import { IconBrandSpeedtest } from '@tabler/icons-solidjs'
-import { Show, createSignal } from 'solid-js'
+import { createSignal, Show } from 'solid-js'
 import {
   Button,
   Collapse,
@@ -26,7 +26,7 @@ export default () => {
   )
 
   const onProxyNodeClick = async (proxy: Proxy, proxyName: string) => {
-    setProxyGroupByProxyName(proxy, proxyName)
+    void setProxyGroupByProxyName(proxy, proxyName)
   }
 
   const onSpeedTestClick = async (e: MouseEvent, name: string) => {
@@ -79,7 +79,7 @@ export default () => {
               proxyNames={sortedProxyNames}
               now={proxy.now}
               onClick={(name) => {
-                onProxyNodeClick(proxy, name)
+                void onProxyNodeClick(proxy, name)
               }}
             />
           )

@@ -26,7 +26,7 @@ export const App = () => {
 
   createEffect(() => {
     if (selectedEndpoint() && endpoint()) {
-      useProxies().updateProxies()
+      void useProxies().updateProxies()
     }
   })
 
@@ -48,7 +48,7 @@ export const App = () => {
           <Show when={selectedEndpoint()}>
             <Route path={ROUTES.Overview} component={Overview} />
             <Route path={ROUTES.Proxies} component={Proxies} />
-            <Route path={ROUTES.Proxyprovider} component={ProxyProvider} />
+            <Route path={ROUTES.ProxyProvider} component={ProxyProvider} />
             <Route path={ROUTES.Rules} component={Rules} />
             <Route path={ROUTES.Conns} component={Connections} />
             <Route path={ROUTES.Log} component={Logs} />

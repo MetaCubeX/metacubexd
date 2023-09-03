@@ -103,7 +103,7 @@ export const Header = () => {
 
     if (proxyProviders().length > 0) {
       list.splice(2, 0, {
-        href: ROUTES.Proxyprovider,
+        href: ROUTES.ProxyProvider,
         name: t('proxyProviders'),
         icon: <IconGlobeFilled />,
       })

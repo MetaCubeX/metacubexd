@@ -308,7 +308,7 @@ export default () => {
                       <td
                         onContextMenu={(e) => {
                           e.preventDefault()
-                          writeClipboard(cell.renderValue() as string)
+                          void writeClipboard(cell.renderValue() as string)
                         }}
                       >
                         {flexRender(

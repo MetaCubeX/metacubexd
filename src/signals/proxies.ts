@@ -19,7 +19,7 @@ const [proxyNodeMap, setProxyNodeMap] = createSignal<Record<string, ProxyInfo>>(
 export const useProxies = () => {
   const request = useRequest()
 
-  const setProxyInfoByProixes = (proxies: Proxy[] | ProxyNode[]) => {
+  const setProxyInfoByProxies = (proxies: Proxy[] | ProxyNode[]) => {
     proxies.forEach((proxy) => {
       const latency = proxy.history.at(-1)?.delay || -1
 
@@ -44,7 +44,7 @@ export const useProxies = () => {
       .json<{ providers: Record<string, ProxyProvider> }>()
 
     Object.values(providers).forEach((provider) => {
-      setProxyInfoByProixes(provider.proxies)
+      setProxyInfoByProxies(provider.proxies)
     })
 
     setProxyProviders(
@@ -60,7 +60,7 @@ export const useProxies = () => {
     const sortIndex = [...(proxies['GLOBAL'].all ?? []), 'GLOBAL']
     const proxiesArray = Object.values(proxies)
 
-    setProxyInfoByProixes(proxiesArray)
+    setProxyInfoByProxies(proxiesArray)
     setProxies(
       proxiesArray
         .filter((proxy) => proxy.all?.length)
@@ -122,7 +122,7 @@ export const useProxies = () => {
 
   const healthCheckByProviderName = async (providerName: string) => {
     await request.get(`providers/proxies/${providerName}/healthcheck`, {
-      timeout: 30 * 1000, // thie api is a little bit slow sometimes...
+      timeout: 30 * 1000, // this api is a little bit slow sometimes...
     })
     await updateProxies()
   }
