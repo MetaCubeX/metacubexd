@@ -1,7 +1,7 @@
 declare module 'solid-js' {
   namespace JSX {
     interface Directives {
-      [name: string]: {}
+      [name: string]: unknown
     }
   }
 }

@@ -20,7 +20,7 @@ const useLanguage = () => {
 
 const I18nUpdator: ParentComponent = (props) => {
   const { setLang } = useLanguage()
-  const [_, { locale }] = useI18n()
+  const [, { locale }] = useI18n()
 
   createEffect(() => {
     setLang(locale())

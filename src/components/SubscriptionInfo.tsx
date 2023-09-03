@@ -34,6 +34,7 @@ export const SubscriptionInfo = (props: {
   if (!props.subscriptionInfo) {
     return
   }
+
   const info = getSubscriptionsInfo(props.subscriptionInfo)
 
   return (

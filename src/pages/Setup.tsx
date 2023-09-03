@@ -63,6 +63,7 @@ export default () => {
       }
 
       onSetupSuccess(id)
+
       return
     }
 
@@ -100,6 +101,7 @@ export default () => {
       })
     }
   })
+
   return (
     <div class="mx-auto flex flex-col items-center gap-4 py-10 sm:w-2/3">
       <form class="contents" use:form={form}>

@@ -61,10 +61,7 @@ const DNSQueryForm = () => {
   return (
     <div class="flex flex-col">
       <form use:form={form} class="flex flex-col gap-2 sm:flex-row">
-        <input
-          name="name"
-          class="input input-bordered w-full max-w-xs sm:flex-1"
-        />
+        <input name="name" class="input input-bordered w-full sm:flex-1" />
         <div class="flex items-center gap-2">
           <select name="type" class="select select-bordered">
             <option>A</option>
@@ -168,10 +165,11 @@ const ConfigForm = () => {
       <form class="contents" use:form={form}>
         <For each={portsList}>
           {(item) => (
-            <div class="form-control w-64 max-w-xs">
+            <div class="form-control w-64 max-w-sm">
               <label class="label">
                 <span class="label-text">{item.label}</span>
               </label>
+
               <input
                 name={item.key}
                 type="number"
@@ -183,7 +181,7 @@ const ConfigForm = () => {
         </For>
       </form>
 
-      <div class="flex items-center gap-2">
+      <div class="flex flex-wrap items-center gap-2">
         <Button loading={updatingGEODatabases()} onClick={onUpdateGEODatabases}>
           {t('updateGEODatabases')}
         </Button>
@@ -329,7 +327,7 @@ const ConfigForXd = () => {
         <input
           class="w-100 input input-bordered max-w-md"
           value={urlForLatencyTest()}
-          onChange={(e) => setUrlForLatencyTest(e.target?.value!)}
+          onChange={(e) => setUrlForLatencyTest(e.target.value)}
         />
       </div>
     </div>
