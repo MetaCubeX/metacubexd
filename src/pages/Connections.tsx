@@ -110,6 +110,7 @@ export default () => {
   const columns: ColumnDef<ConnectionWithSpeed>[] = [
     {
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Close,
+      enableSorting: false,
       header: () => (
         <div class="flex h-full items-center">
           <Button
@@ -308,7 +309,8 @@ export default () => {
                       <td
                         onContextMenu={(e) => {
                           e.preventDefault()
-                          void writeClipboard(cell.renderValue() as string)
+                          typeof cell.renderValue() === 'string' &&
+                            void writeClipboard(cell.renderValue() as string)
                         }}
                       >
                         {flexRender(
