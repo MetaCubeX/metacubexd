@@ -152,7 +152,7 @@ export default () => {
         </TrafficWidget>
       </div>
 
-      <div class="flex flex-col sm:flex-row">
+      <div class="rounded-box flex flex-col bg-base-300 sm:flex-row">
         <div class="m-4 flex-1">
           <SolidApexCharts
             type="area"
