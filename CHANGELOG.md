@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.58.0](https://github.com/MetaCubeX/metacubexd/compare/v1.57.3...v1.58.0) (2023-09-03)
+
+
+### Features
+
+* **connections:** copy to clipboard on right click ([58afb5f](https://github.com/MetaCubeX/metacubexd/commit/58afb5fce29173b8041b8a93788bba361f3c43cd))
+
 ## [1.57.3](https://github.com/MetaCubeX/metacubexd/compare/v1.57.2...v1.57.3) (2023-09-03)
 
 
