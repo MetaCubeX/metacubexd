@@ -14,10 +14,10 @@ export const ForTwoColumns = (props: { subChild: JSX.Element[] }) => {
     () => windowWidth() >= 640 && renderInTwoColumn(),
   ) // 640 is sm size in daisyui
   const leftCloumns = createMemo(() =>
-    props.subChild.filter((i, index) => index % 2 === 0 || !isShowTwoColumns()),
+    props.subChild.filter((_, index) => index % 2 === 0 || !isShowTwoColumns()),
   )
   const rightCloumns = createMemo(() =>
-    props.subChild.filter((i, index) => index % 2 === 1),
+    props.subChild.filter((_, index) => index % 2 === 1),
   )
 
   return (
