@@ -111,16 +111,7 @@ export default () => {
     {
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Close,
       enableSorting: false,
-      header: () => (
-        <div class="flex h-full items-center">
-          <Button
-            class="btn-circle btn-xs"
-            onClick={() => request.delete('connections')}
-          >
-            <IconCircleX size="18" />
-          </Button>
-        </div>
-      ),
+      header: () => t('close'),
       cell: ({ row }) => (
         <div class="flex h-full items-center">
           <Button
@@ -238,12 +229,19 @@ export default () => {
 
   return (
     <div class="flex flex-col gap-4">
-      <div class="flex w-full">
+      <div class="flex w-full items-center gap-2">
         <input
-          class="input input-primary mr-4 w-40 flex-1"
+          class="input input-primary flex-1"
           placeholder={t('search')}
           onInput={(e) => setSearch(e.target.value)}
         />
+
+        <Button
+          class="btn-circle"
+          onClick={() => request.delete('connections')}
+        >
+          <IconCircleX />
+        </Button>
 
         <label for="connection-modal" class="btn btn-circle">
           <IconSettings />
@@ -272,7 +270,7 @@ export default () => {
                       <th class="bg-base-300">
                         <div
                           class={twMerge(
-                            'flex items-center justify-between',
+                            'flex items-center justify-between gap-2',
                             header.column.getCanSort() &&
                               'cursor-pointer select-none',
                           )}
