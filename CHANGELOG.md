@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.57.2](https://github.com/MetaCubeX/metacubexd/compare/v1.57.1...v1.57.2) (2023-09-03)
+
+
+### Bug Fixes
+
+* bar latency ([197b0c7](https://github.com/MetaCubeX/metacubexd/commit/197b0c7d4b34dafb293ce398c9a59b043b4330eb))
+
 ## [1.57.1](https://github.com/MetaCubeX/metacubexd/compare/v1.57.0...v1.57.1) (2023-09-02)
 
 
