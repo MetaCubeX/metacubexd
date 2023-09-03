@@ -35,6 +35,9 @@ dependencies:
   '@solid-primitives/storage':
     specifier: ^2.1.1
     version: 2.1.1(solid-js@1.7.11)
+  '@solid-primitives/timer':
+    specifier: ^1.3.7
+    version: 1.3.7(solid-js@1.7.11)
   '@solid-primitives/websocket':
     specifier: ^1.1.0
     version: 1.1.0(solid-js@1.7.11)
@@ -56,6 +59,9 @@ dependencies:
   '@types/byte-size':
     specifier: ^8.1.0
     version: 8.1.0
+  '@types/lodash':
+    specifier: ^4.14.197
+    version: 4.14.197
   '@types/node':
     specifier: ^20.5.8
     version: 20.5.8
@@ -107,6 +113,9 @@ dependencies:
   lint-staged:
     specifier: ^14.0.1
     version: 14.0.1
+  lodash:
+    specifier: ^4.17.21
+    version: 4.17.21
   prettier:
     specifier: ^3.0.3
     version: 3.0.3
@@ -2655,6 +2664,17 @@ packages:
       solid-js: 1.7.11
     dev: false
 
+  /@solid-primitives/timer@1.3.7(solid-js@1.7.11):
+    resolution:
+      {
+        integrity: sha512-zS3qA7WVZYsW7+iTdk2M4W1wpMvRhdcMnO23Tcd+nX3YD7eMvjOnO15Oz2mymyfl/OC2ZgM1L5ec66GayEvPwQ==,
+      }
+    peerDependencies:
+      solid-js: ^1.6.12
+    dependencies:
+      solid-js: 1.7.11
+    dev: false
+
   /@solid-primitives/utils@6.2.1(solid-js@1.7.11):
     resolution:
       {
@@ -2848,6 +2868,13 @@ packages:
     resolution:
       {
         integrity: sha512-Hr5Jfhc9eYOQNPYO5WLDq/n4jqijdHNlDXjuAQkkt+mWdQR+XJToOHrsD4cPaMXpn6KO7y2+wM8AZEs8VpBLVA==,
+      }
+    dev: false
+
+  /@types/lodash@4.14.197:
+    resolution:
+      {
+        integrity: sha512-BMVOiWs0uNxHVlHBgzTIqJYmj+PgCo4euloGF+5m4okL3rEYzM2EEv78mw8zWSMM57dM7kVIgJ2QDvwHSoCI5g==,
       }
     dev: false
 

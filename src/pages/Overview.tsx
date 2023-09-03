@@ -1,8 +1,10 @@
 import { createEventSignal } from '@solid-primitives/event-listener'
 import { useI18n } from '@solid-primitives/i18n'
+import { makeTimer } from '@solid-primitives/timer'
 import { createReconnectingWS } from '@solid-primitives/websocket'
 import type { ApexOptions } from 'apexcharts'
 import byteSize from 'byte-size'
+import { merge } from 'lodash'
 import { SolidApexCharts } from 'solid-apexcharts'
 import {
   JSX,
@@ -11,12 +13,10 @@ import {
   createEffect,
   createMemo,
   createSignal,
-  onCleanup,
 } from 'solid-js'
+import { CHART_MAX_XAXIS, DEFAULT_CHART_OPTIONS } from '~/constants'
 import { secret, wsEndpointURL } from '~/signals'
 import type { Connection } from '~/types'
-
-const CHART_MAX_XAXIS = 10
 
 const TrafficWidget: ParentComponent<{ label: JSX.Element }> = (props) => (
   <div class="stat flex-1">
@@ -34,26 +34,24 @@ export default () => {
     [],
   )
   const [memories, setMemories] = createSignal<number[]>([])
+
   // https://github.com/apexcharts/apexcharts.js/blob/main/samples/source/line/realtime.xml
   // TODO: need a better way
-  const preventLeakTimer = setInterval(
+  makeTimer(
     () => {
       setTraffics((traffics) => traffics.slice(-CHART_MAX_XAXIS))
       setMemories((memo) => memo.slice(-CHART_MAX_XAXIS))
     },
-    // we shrink the chart data array size down every 10 minutes
+    // we shrink the chart data array size down every 10 minutes to prevent memory leaks
     10 * 60 * 1000,
+    setInterval,
   )
-
-  onCleanup(() => clearInterval(preventLeakTimer))
 
   const trafficWS = createReconnectingWS(
     `${wsEndpointURL()}/traffic?token=${secret()}`,
   )
 
-  const trafficWSMessageEvent = createEventSignal<{
-    message: WebSocketEventMap['message']
-  }>(trafficWS, 'message')
+  const trafficWSMessageEvent = createEventSignal(trafficWS, 'message')
 
   const traffic = () => {
     const data = trafficWSMessageEvent()?.data
@@ -64,50 +62,12 @@ export default () => {
   createEffect(() => {
     const t = traffic()
 
-    if (t) {
-      setTraffics((traffics) => [...traffics, t])
-    }
+    if (t) setTraffics((traffics) => [...traffics, t])
   })
 
-  const defaultChartOptions: ApexOptions = {
-    chart: {
-      toolbar: { show: false },
-      zoom: { enabled: false },
-      animations: { easing: 'linear' },
-    },
-    noData: { text: 'Loading...' },
-    legend: {
-      fontSize: '14px',
-      labels: { colors: 'gray' },
-      itemMargin: { horizontal: 64 },
-    },
-    dataLabels: { enabled: false },
-    grid: { yaxis: { lines: { show: false } } },
-    stroke: { curve: 'smooth' },
-    tooltip: { enabled: false },
-    xaxis: {
-      range: CHART_MAX_XAXIS,
-      labels: { show: false },
-      axisTicks: { show: false },
-    },
-    yaxis: {
-      labels: {
-        style: { colors: 'gray' },
-        formatter(val) {
-          return byteSize(val).toString()
-        },
-      },
-    },
-  }
-
-  const trafficChartOptions = createMemo<ApexOptions>(() => ({
-    title: {
-      text: t('traffic'),
-      align: 'center',
-      style: { color: 'gray' },
-    },
-    ...defaultChartOptions,
-  }))
+  const trafficChartOptions = createMemo<ApexOptions>(() =>
+    merge({ title: { text: t('traffic') } }, DEFAULT_CHART_OPTIONS),
+  )
 
   const trafficChartSeries = createMemo(() => [
     {
@@ -124,9 +84,7 @@ export default () => {
     `${wsEndpointURL()}/memory?token=${secret()}`,
   )
 
-  const memoryWSMessageEvent = createEventSignal<{
-    message: WebSocketEventMap['message']
-  }>(memoryWS, 'message')
+  const memoryWSMessageEvent = createEventSignal(memoryWS, 'message')
 
   const memory = () => {
     const data = memoryWSMessageEvent()?.data
@@ -137,19 +95,12 @@ export default () => {
   createEffect(() => {
     const m = memory()
 
-    if (m) {
-      setMemories((memories) => [...memories, m])
-    }
+    if (m) setMemories((memories) => [...memories, m])
   })
 
-  const memoryChartOptions = createMemo<ApexOptions>(() => ({
-    title: {
-      text: t('memory'),
-      align: 'center',
-      style: { color: 'gray' },
-    },
-    ...defaultChartOptions,
-  }))
+  const memoryChartOptions = createMemo<ApexOptions>(() =>
+    merge({ title: { text: t('memory') } }, DEFAULT_CHART_OPTIONS),
+  )
 
   const memoryChartSeries = createMemo(() => [{ data: memories() }])
 

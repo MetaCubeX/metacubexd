@@ -1,3 +1,6 @@
+import { ApexOptions } from 'apexcharts'
+import byteSize from 'byte-size'
+
 export const themes = [
   'light',
   'dark',
@@ -38,6 +41,38 @@ export enum ROUTES {
   Conns = '/conns',
   Log = '/logs',
   Config = '/config',
+}
+
+export const CHART_MAX_XAXIS = 10
+
+export const DEFAULT_CHART_OPTIONS: ApexOptions = {
+  title: { align: 'center', style: { color: 'gray' } },
+  chart: {
+    toolbar: { show: false },
+    zoom: { enabled: false },
+    animations: { easing: 'linear' },
+  },
+  noData: { text: 'Loading...' },
+  legend: {
+    fontSize: '14px',
+    labels: { colors: 'gray' },
+    itemMargin: { horizontal: 64 },
+  },
+  dataLabels: { enabled: false },
+  grid: { yaxis: { lines: { show: false } } },
+  stroke: { curve: 'smooth' },
+  tooltip: { enabled: false },
+  xaxis: {
+    range: CHART_MAX_XAXIS,
+    labels: { show: false },
+    axisTicks: { show: false },
+  },
+  yaxis: {
+    labels: {
+      style: { colors: 'gray' },
+      formatter: (val) => byteSize(val).toString(),
+    },
+  },
 }
 
 export enum LATENCY_QUALITY_MAP_HTTP {

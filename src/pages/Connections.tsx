@@ -1,3 +1,4 @@
+import { writeClipboard } from '@solid-primitives/clipboard'
 import { createEventSignal } from '@solid-primitives/event-listener'
 import { useI18n } from '@solid-primitives/i18n'
 import { makePersisted } from '@solid-primitives/storage'
@@ -304,7 +305,12 @@ export default () => {
                 <tr class="hover">
                   <For each={row.getVisibleCells()}>
                     {(cell) => (
-                      <td>
+                      <td
+                        onContextMenu={(e) => {
+                          e.preventDefault()
+                          writeClipboard(cell.renderValue() as string)
+                        }}
+                      >
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext(),
