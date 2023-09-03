@@ -36,7 +36,7 @@ export default () => {
   const [memories, setMemories] = createSignal<number[]>([])
 
   // https://github.com/apexcharts/apexcharts.js/blob/main/samples/source/line/realtime.xml
-  // TODO: need a better way
+  // TODO: needs a better way
   makeTimer(
     () => {
       setTraffics((traffics) => traffics.slice(-CHART_MAX_XAXIS))
@@ -152,7 +152,7 @@ export default () => {
         </TrafficWidget>
       </div>
 
-      <div class="rounded-box flex flex-col bg-base-300 sm:flex-row">
+      <div class="rounded-box flex flex-col bg-base-300 lg:flex-row">
         <div class="m-4 flex-1">
           <SolidApexCharts
             type="area"

@@ -2,22 +2,27 @@ import { For } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { latencyQualityMap, useProxies } from '~/signals'
 
-const LatencyDots = (p: { latency: number | undefined; selected: boolean }) => {
-  let dotClassName = p.selected
+const LatencyDots = (props: {
+  latency: number | undefined
+  selected: boolean
+}) => {
+  let dotClassName = props.selected
     ? 'bg-white border-4 border-success'
     : 'bg-success'
 
   if (
-    typeof p.latency !== 'number' ||
-    p.latency === latencyQualityMap().NOT_CONNECTED
+    typeof props.latency !== 'number' ||
+    props.latency === latencyQualityMap().NOT_CONNECTED
   ) {
-    dotClassName = p.selected
+    dotClassName = props.selected
       ? 'bg-white border-4 border-neutral'
       : 'bg-neutral'
-  } else if (p.latency > latencyQualityMap().HIGH) {
-    dotClassName = p.selected ? 'bg-white border-4 border-error' : 'bg-error'
-  } else if (p.latency > latencyQualityMap().MEDIUM) {
-    dotClassName = p.selected
+  } else if (props.latency > latencyQualityMap().HIGH) {
+    dotClassName = props.selected
+      ? 'bg-white border-4 border-error'
+      : 'bg-error'
+  } else if (props.latency > latencyQualityMap().MEDIUM) {
+    dotClassName = props.selected
       ? 'bg-white border-4 border-warning'
       : 'bg-warning'
   }

@@ -78,7 +78,7 @@ export default () => {
 
   const { form } = createForm<z.infer<typeof schema>>({
     extend: validator({ schema }),
-    onSubmit: onSubmit,
+    onSubmit,
   })
 
   const onRemove = (id: string) =>
@@ -88,14 +88,14 @@ export default () => {
     const query = new URLSearchParams(window.location.search)
 
     if (query.has('hostname')) {
-      onSubmit({
+      void onSubmit({
         url: `http://${query.get('hostname')}${
           query.get('port') && ':' + query.get('port')
         }`,
         secret: query.get('secret') ?? '',
       })
     } else {
-      onSubmit({
+      void onSubmit({
         url: 'http://127.0.0.1:9090',
         secret: '',
       })

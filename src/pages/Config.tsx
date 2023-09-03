@@ -133,7 +133,7 @@ const ConfigForm = () => {
   })
 
   const [updatingGEODatabases, setUpdatingGEODatabases] = createSignal(false)
-  const [upgraging, setUpgraging] = createSignal(false)
+  const [upgrading, setUpgrading] = createSignal(false)
   const [restarting, setRestarting] = createSignal(false)
 
   const onUpdateGEODatabases = async () => {
@@ -145,11 +145,11 @@ const ConfigForm = () => {
   }
 
   const onUpgrade = async () => {
-    setUpgraging(true)
+    setUpgrading(true)
     try {
       await request.post('upgrade')
     } catch {}
-    setUpgraging(false)
+    setUpgrading(false)
   }
 
   const onRestart = async () => {
@@ -190,7 +190,7 @@ const ConfigForm = () => {
           {t('restartCore')}
         </Button>
 
-        <Button loading={upgraging()} onClick={onUpgrade}>
+        <Button loading={upgrading()} onClick={onUpgrade}>
           {t('upgradeCore')}
         </Button>
       </div>

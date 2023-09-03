@@ -10,6 +10,7 @@ export const ProxyPreviewBar = (props: {
   const latencyList = createMemo(() =>
     props.proxyNameList.map((name) => latencyMap()[name]),
   )
+
   const all = createMemo(() => latencyList().length)
   const good = createMemo(
     () =>
@@ -35,9 +36,7 @@ export const ProxyPreviewBar = (props: {
   const notConnected = createMemo(
     () =>
       latencyList().filter(
-        (latency) =>
-          latency === latencyQualityMap().NOT_CONNECTED ||
-          typeof latency !== 'number',
+        (latency) => latency === latencyQualityMap().NOT_CONNECTED,
       ).length,
   )
 
@@ -47,27 +46,27 @@ export const ProxyPreviewBar = (props: {
         <div
           class="h-2 bg-success"
           style={{
-            width: `${(good() * 100) / all()}%`, // cant use tw class cause dynamic classname wont import
+            width: `${(good() * 100) / all()}%`, // cant use tw class, otherwise dynamic classname won't be generated
           }}
-        ></div>
+        />
         <div
           class="h-2 bg-warning"
           style={{
             width: `${(middle() * 100) / all()}%`,
           }}
-        ></div>
+        />
         <div
           class="h-2 bg-error"
           style={{
             width: `${(slow() * 100) / all()}%`,
           }}
-        ></div>
+        />
         <div
           class="h-2 bg-neutral"
           style={{
             width: `${(notConnected() * 100) / all()}%`,
           }}
-        ></div>
+        />
       </div>
 
       <Latency name={props.now} />

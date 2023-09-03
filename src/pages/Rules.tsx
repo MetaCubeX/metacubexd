@@ -18,9 +18,7 @@ export default () => {
   const [maxRuleRender, setMaxRuleRender] = createSignal(100)
   const renderRules = createMemo(() => rules().slice(0, maxRuleRender()))
 
-  onMount(async () => {
-    updateRules()
-  })
+  onMount(updateRules)
 
   const onUpdateProviderClick = async (e: MouseEvent, name: string) => {
     const el = getBtnElFromClickEvent(e)
