@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.57.3](https://github.com/MetaCubeX/metacubexd/compare/v1.57.2...v1.57.3) (2023-09-03)
+
+
+### Bug Fixes
+
+* **font:** adapt to apple fonts ([84c70b0](https://github.com/MetaCubeX/metacubexd/commit/84c70b0550e6e1da5adf2f69ea530c45ff14561a))
+
 ## [1.57.2](https://github.com/MetaCubeX/metacubexd/compare/v1.57.1...v1.57.2) (2023-09-03)
 
 
