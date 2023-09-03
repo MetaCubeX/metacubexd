@@ -41,16 +41,24 @@ export const sortProxiesByOrderingType = (
     switch (orderingType) {
       case PROXIES_ORDERING_TYPE.LATENCY_ASC:
         if (prevLatency === -1) return 1
+
         if (nextLatency === -1) return -1
+
         return prevLatency - nextLatency
+
       case PROXIES_ORDERING_TYPE.LATENCY_DESC:
         if (prevLatency === -1) return 1
+
         if (nextLatency === -1) return -1
+
         return nextLatency - prevLatency
+
       case PROXIES_ORDERING_TYPE.NAME_ASC:
         return a.localeCompare(b)
+
       case PROXIES_ORDERING_TYPE.NAME_DESC:
         return b.localeCompare(a)
+
       default:
         return 0
     }
