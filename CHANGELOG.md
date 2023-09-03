@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.60.1](https://github.com/MetaCubeX/metacubexd/compare/v1.60.0...v1.60.1) (2023-09-03)
+
+
+### Bug Fixes
+
+* **overview:** only enable flex-row layout on large screen ([be8b54a](https://github.com/MetaCubeX/metacubexd/commit/be8b54a0f620acab8afdf9039555d89f7bf74083))
+
 ## [1.60.0](https://github.com/MetaCubeX/metacubexd/compare/v1.59.1...v1.60.0) (2023-09-03)
 
 
