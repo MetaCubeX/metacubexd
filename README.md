@@ -11,6 +11,10 @@
 
 <p align="center">Clash-Meta Dashboard</p>
 
+## Preview
+
+![preview](docs/preview.webp)
+
 ## Published Official Links
 
 GH Pages Custom Domain: http://d.metacubex.one
@@ -18,8 +22,6 @@ GH Pages Custom Domain: http://d.metacubex.one
 GH Pages: https://metacubex.github.io/metacubexd
 
 Cloudflare Pages: https://metacubexd.pages.dev
-
-![preview](docs/preview.webp)
 
 ## Usage
 
