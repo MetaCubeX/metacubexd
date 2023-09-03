@@ -13,7 +13,7 @@
 :root,
 [data-theme='wireframe'],
 [data-theme='cyberpunk'] {
-  font-family: 'Fira Sans', 'Twemoji Mozilla', system-ui, monospace;
+  font-family: '-apple-system', 'Fira Sans', 'Twemoji Mozilla', system-ui, monospace;
 }
 
 ::-webkit-scrollbar {
