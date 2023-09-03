@@ -156,11 +156,11 @@ export const Header = () => {
         </div>
 
         <a
-          class="text-xl font-bold normal-case"
+          class="whitespace-nowrap text-xl font-bold uppercase"
           href="https://github.com/metacubex/metacubexd"
           target="_blank"
         >
-          metacubexd
+          metacube, xd
         </a>
       </div>
 

@@ -340,6 +340,8 @@ export default () => {
       <DNSQueryForm />
       <ConfigForm />
       <ConfigForXd />
+
+      {import.meta.env.version}
     </div>
   )
 }
