@@ -23,7 +23,7 @@ export const ProxyPreviewBar = (props: {
     () =>
       latencyList().filter(
         (latency) =>
-          latency > latencyQualityMap().NOT_CONNECTED &&
+          latency > latencyQualityMap().MEDIUM &&
           latency <= latencyQualityMap().HIGH,
       ).length,
   )
