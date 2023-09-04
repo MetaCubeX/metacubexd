@@ -5,6 +5,8 @@ import type { Proxy, ProxyNode, ProxyProvider } from '~/types'
 type ProxyInfo = {
   name: string
   udp: boolean
+  now: string
+  xudp: boolean
   type: string
 }
 // these signals should be global state
@@ -25,7 +27,9 @@ const setProxiesInfo = (proxies: (Proxy | ProxyNode)[]) => {
 
     newProxyNodeMap[proxy.name] = {
       udp: proxy.udp,
+      xudp: proxy.xudp,
       type: proxy.type,
+      now: proxy.now,
       name: proxy.name,
     }
     newLatencyMap[proxy.name] = latency

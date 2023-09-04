@@ -1,7 +1,7 @@
 import { createMemo } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Latency } from '~/components'
-import { formatProxyType } from '~/helpers'
+import { filterGroupType, formatProxyType } from '~/helpers'
 import { useProxies } from '~/signals'
 
 export const ProxyNodeCard = (props: {
@@ -32,7 +32,15 @@ export const ProxyNodeCard = (props: {
           )}
         >
           {formatProxyType(proxyNode()?.type)}
-          {proxyNode()?.udp && ' :: udp'}
+          {filterGroupType(proxyNode()?.type) ? (
+            <span>
+              {' :: '}
+              {proxyNode()?.xudp && 'x'}
+              {proxyNode()?.udp && 'udp'}
+            </span>
+          ) : (
+            <span>{proxyNode()?.now}</span>
+          )}
         </div>
         <div class="text-xs">
           <Latency name={props.proxyName} />

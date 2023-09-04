@@ -28,10 +28,25 @@ export const formatProxyType = (type = '') => {
   const t = type.toLowerCase()
 
   if (t.includes('shadowsocks')) {
-    return t.replace('shadowsocks', 'ss')
+    return 'ss'
   }
 
   return t
+}
+
+export const filterGroupType = (type = '') => {
+  const t = type.toLowerCase()
+  const conditions = [
+    'selector',
+    'direct',
+    'reject',
+    'urltest',
+    'loadbalance',
+    'fallback',
+    'relay',
+  ]
+
+  return !conditions.includes(t)
 }
 
 export const sortProxiesByOrderingType = (

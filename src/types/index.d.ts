@@ -28,6 +28,7 @@ export type ProxyNode = {
   tfo: boolean
   udp: boolean
   xudp: boolean
+  now: string
   id: string
   extra: Record<string, unknown>
   history: {

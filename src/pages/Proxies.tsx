@@ -71,7 +71,7 @@ export default () => {
                   </Button>
                 </div>
                 <div class="text-sm text-slate-500">
-                  {proxy.type} :: {proxy.now}
+                  {proxy.type} {proxy.now?.length > 0 && ` :: ${proxy.now}`}
                 </div>
                 <Show when={!collapsedMap()[`group-${proxy.name}`]}>
                   <ProxyNodePreview
