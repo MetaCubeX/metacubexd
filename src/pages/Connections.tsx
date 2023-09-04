@@ -111,7 +111,7 @@ export default () => {
     {
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Close,
       enableSorting: false,
-      header: () => t('close'),
+      header: () => <span>{t('close')}</span>,
       cell: ({ row }) => (
         <div class="flex h-full items-center">
           <Button
