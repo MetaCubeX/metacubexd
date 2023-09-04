@@ -9,7 +9,7 @@ import {
   ProxyNodePreview,
 } from '~/components'
 import {
-  handlerBtnClickWithAnimate,
+  handleAnimatedBtnClickWithCallback,
   sortProxiesByOrderingType,
 } from '~/helpers'
 import { proxiesOrderingType, useProxies } from '~/signals'
@@ -33,7 +33,7 @@ export default () => {
   }
 
   const onSpeedTestClick = (e: MouseEvent, name: string) => {
-    handlerBtnClickWithAnimate(
+    handleAnimatedBtnClickWithCallback(
       e,
       latencyTestByProxyGroupName.bind(null, name),
       'animate-pulse',

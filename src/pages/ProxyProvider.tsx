@@ -11,7 +11,7 @@ import {
 } from '~/components'
 import {
   formatTimeFromNow,
-  handlerBtnClickWithAnimate,
+  handleAnimatedBtnClickWithCallback,
   sortProxiesByOrderingType,
 } from '~/helpers'
 import { proxiesOrderingType, useProxies } from '~/signals'
@@ -31,7 +31,7 @@ export default () => {
   )
 
   const onHealthCheckClick = (e: MouseEvent, name: string) => {
-    handlerBtnClickWithAnimate(
+    handleAnimatedBtnClickWithCallback(
       e,
       healthCheckByProviderName.bind(null, name),
       'animate-pulse',
@@ -39,11 +39,14 @@ export default () => {
   }
 
   const onUpdateProviderClick = (e: MouseEvent, name: string) => {
-    handlerBtnClickWithAnimate(e, updateProviderByProviderName.bind(null, name))
+    handleAnimatedBtnClickWithCallback(
+      e,
+      updateProviderByProviderName.bind(null, name),
+    )
   }
 
   const onUpdateAllProviderClick = (e: MouseEvent) => {
-    handlerBtnClickWithAnimate(e, updateAllProvider)
+    handleAnimatedBtnClickWithCallback(e, updateAllProvider)
   }
 
   return (

@@ -5,9 +5,9 @@ export const formatTimeFromNow = (time: number | string) => {
   return dayjs(time).fromNow()
 }
 
-export const handlerBtnClickWithAnimate = async (
+export const handleAnimatedBtnClickWithCallback = async (
   event: MouseEvent,
-  cb: () => void,
+  callback: () => Promise<void>,
   className = 'animate-spin',
 ) => {
   let el = event.target as HTMLElement
@@ -19,7 +19,7 @@ export const handlerBtnClickWithAnimate = async (
 
   el.classList.add(className)
   try {
-    await cb()
+    await callback()
   } catch {}
   el.classList.remove(className)
 }
