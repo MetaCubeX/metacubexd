@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.63.0](https://github.com/MetaCubeX/metacubexd/compare/v1.62.0...v1.63.0) (2023-09-04)
+
+
+### Features
+
+* **connections:** sticky table thead ([7f8f8a9](https://github.com/MetaCubeX/metacubexd/commit/7f8f8a98816464f63cc19fcc6147a490bb58050d))
+* **overview:** reduce padding of the chart container ([3728cd2](https://github.com/MetaCubeX/metacubexd/commit/3728cd2e3289531fe61fd2da11e06aaa89a1a471))
+
 ## [1.62.0](https://github.com/MetaCubeX/metacubexd/compare/v1.61.0...v1.62.0) (2023-09-04)
 
 
