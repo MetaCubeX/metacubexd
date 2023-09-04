@@ -39,7 +39,7 @@ export const App = () => {
 
   return (
     <div
-      class="relative flex h-screen flex-col subpixel-antialiased p-safe"
+      class="relative flex h-screen flex-col subpixel-antialiased pb-safe"
       data-theme={curTheme()}
     >
       <Header />
