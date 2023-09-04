@@ -34,7 +34,7 @@ export const formatProxyType = (type = '') => {
   return t
 }
 
-export const filterGroupType = (type = '') => {
+export const filterSpecialProxyType = (type = '') => {
   const t = type.toLowerCase()
   const conditions = [
     'selector',

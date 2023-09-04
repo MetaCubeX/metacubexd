@@ -1,7 +1,7 @@
-import { createMemo } from 'solid-js'
+import { createMemo, Show } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Latency } from '~/components'
-import { filterGroupType, formatProxyType } from '~/helpers'
+import { filterSpecialProxyType, formatProxyType } from '~/helpers'
 import { useProxies } from '~/signals'
 
 export const ProxyNodeCard = (props: {
@@ -12,6 +12,14 @@ export const ProxyNodeCard = (props: {
   const { proxyName, isSelected, onClick } = props
   const { proxyNodeMap } = useProxies()
   const proxyNode = createMemo(() => proxyNodeMap()[proxyName])
+  const specialType = () =>
+    filterSpecialProxyType(proxyNode()?.type)
+      ? proxyNode()?.xudp
+        ? 'xudp'
+        : proxyNode()?.udp
+        ? 'udp'
+        : null
+      : null
 
   return (
     <div
@@ -32,15 +40,7 @@ export const ProxyNodeCard = (props: {
           )}
         >
           {formatProxyType(proxyNode()?.type)}
-          {filterGroupType(proxyNode()?.type) ? (
-            <span>
-              {' :: '}
-              {proxyNode()?.xudp && 'x'}
-              {proxyNode()?.udp && 'udp'}
-            </span>
-          ) : (
-            <span>{proxyNode()?.now}</span>
-          )}
+          <Show when={specialType()}>{` :: ${specialType()}`}</Show>
         </div>
         <div class="text-xs">
           <Latency name={props.proxyName} />
