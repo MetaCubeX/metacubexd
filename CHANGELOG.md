@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.64.0](https://github.com/MetaCubeX/metacubexd/compare/v1.63.0...v1.64.0) (2023-09-04)
+
+
+### Features
+
+* **logs:** sticky table thead ([5affd5b](https://github.com/MetaCubeX/metacubexd/commit/5affd5b91e253b433fc36e4e6d21f3a631790d3a))
+
 ## [1.63.0](https://github.com/MetaCubeX/metacubexd/compare/v1.62.0...v1.63.0) (2023-09-04)
 
 
