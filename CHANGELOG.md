@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.61.0](https://github.com/MetaCubeX/metacubexd/compare/v1.60.3...v1.61.0) (2023-09-04)
+
+
+### Features
+
+* config for render proxies in same page ([5bc540e](https://github.com/MetaCubeX/metacubexd/commit/5bc540eeffeefd289197283f7ebe491397f18376))
+* time column in conns ([98f6293](https://github.com/MetaCubeX/metacubexd/commit/98f6293290ecedf2f3fde4baa24f60cedfaa0445))
+
 ## [1.60.3](https://github.com/MetaCubeX/metacubexd/compare/v1.60.2...v1.60.3) (2023-09-04)
 
 
