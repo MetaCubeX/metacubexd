@@ -25,6 +25,7 @@ export default {
   process: '进程',
   host: '主机',
   chains: '链路',
+  connectTime: '连接时间',
   dlSpeed: '下载速度',
   ulSpeed: '上传速度',
   dl: '下载量',

@@ -118,6 +118,7 @@ export enum CONNECTIONS_TABLE_ACCESSOR_KEY {
   Chains = 'chains',
   DlSpeed = 'dlSpeed',
   ULSpeed = 'ulSpeed',
+  ConnectTime = 'connectTime',
   Download = 'dl',
   Upload = 'ul',
   Source = 'source',

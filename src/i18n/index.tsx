@@ -1,5 +1,6 @@
 import { I18nContext, createI18nContext, useI18n } from '@solid-primitives/i18n'
 import { makePersisted } from '@solid-primitives/storage'
+import dayjs from 'dayjs'
 import { ParentComponent, createEffect, createSignal } from 'solid-js'
 import { LANG } from '~/constants'
 import dict from './dict'
@@ -24,6 +25,7 @@ const I18nUpdator: ParentComponent = (props) => {
 
   createEffect(() => {
     setLang(locale())
+    dayjs.locale(locale())
   })
 
   return props.children

@@ -25,6 +25,7 @@ export default {
   process: 'Process',
   host: 'Host',
   chains: 'Chains',
+  connectTime: 'Time',
   dlSpeed: 'DL Speed',
   ulSpeed: 'UL Speed',
   dl: 'DL',

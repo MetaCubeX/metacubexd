@@ -18,6 +18,7 @@ import {
   getSortedRowModel,
 } from '@tanstack/solid-table'
 import byteSize from 'byte-size'
+import dayjs from 'dayjs'
 import { isIPv6 } from 'is-ip'
 import { For, createEffect, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
@@ -27,6 +28,7 @@ import {
   CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
   CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY,
 } from '~/constants'
+import { formatTimeFromNow } from '~/helpers'
 import { secret, useRequest, wsEndpointURL } from '~/signals'
 import type { Connection } from '~/types'
 
@@ -153,6 +155,13 @@ export default () => {
     {
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Chains,
       accessorFn: (row) => row.chains.slice().reverse().join(' :: '),
+    },
+    {
+      accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.ConnectTime,
+      accessorFn: (row) => formatTimeFromNow(row.start),
+      sortingFn: (prev, next) =>
+        dayjs(prev.original.start).valueOf() -
+        dayjs(next.original.start).valueOf(),
     },
     {
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.DlSpeed,
