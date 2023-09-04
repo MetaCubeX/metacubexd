@@ -237,7 +237,7 @@ export default () => {
   })
 
   return (
-    <div class="flex flex-col gap-4">
+    <div class="flex h-full flex-col gap-4 overflow-y-auto">
       <div class="flex w-full items-center gap-2">
         <input
           class="input input-primary flex-1"
@@ -268,15 +268,15 @@ export default () => {
         />
       </div>
 
-      <div class="overflow-x-auto whitespace-nowrap rounded-md">
-        <table class="table table-xs rounded-none bg-base-200">
-          <thead>
+      <div class="overflow-x-auto whitespace-nowrap rounded-md bg-base-300">
+        <table class="table table-xs relative rounded-none">
+          <thead class="sticky top-0 z-10">
             <For each={table.getHeaderGroups()}>
               {(headerGroup) => (
                 <tr>
                   <For each={headerGroup.headers}>
                     {(header) => (
-                      <th class="bg-base-300">
+                      <th class="bg-base-200">
                         <div
                           class={twMerge(
                             'flex items-center justify-between gap-2',

@@ -128,7 +128,7 @@ export const Header = () => {
   }
 
   return (
-    <ul class="navbar rounded-box sticky inset-x-0 top-2 z-10 mx-2 mt-2 flex w-auto items-center justify-center bg-base-300 px-4">
+    <ul class="navbar rounded-box sticky inset-x-0 top-2 z-50 mx-2 mt-2 flex w-auto items-center justify-center bg-base-300 px-4">
       <div class="navbar-start gap-4">
         <div class={twMerge('drawer w-auto lg:hidden', '')}>
           <input
