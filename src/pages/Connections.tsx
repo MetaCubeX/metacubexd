@@ -15,6 +15,7 @@ import {
   createSolidTable,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getSortedRowModel,
 } from '@tanstack/solid-table'
 import byteSize from 'byte-size'
@@ -217,20 +218,17 @@ export default () => {
       get columnVisibility() {
         return columnVisibility()
       },
+      get globalFilter() {
+        return search()
+      },
     },
     get data() {
-      return search()
-        ? connectionsWithSpeed().filter((connection) =>
-            Object.values(connection).some((conn) =>
-              JSON.stringify(conn)
-                .toLowerCase()
-                .includes(search().toLowerCase()),
-            ),
-          )
-        : connectionsWithSpeed()
+      return connectionsWithSpeed()
     },
     enableHiding: true,
     columns,
+    onGlobalFilterChange: setSearch,
+    getFilteredRowModel: getFilteredRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     getCoreRowModel: getCoreRowModel(),
