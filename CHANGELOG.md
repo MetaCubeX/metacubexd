@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.65.0](https://github.com/MetaCubeX/metacubexd/compare/v1.64.0...v1.65.0) (2023-09-04)
+
+
+### Features
+
+* **connections:** optimized search ([17d9ae4](https://github.com/MetaCubeX/metacubexd/commit/17d9ae487226401d73ddf363bd76cebe9977f1b5))
+
 ## [1.64.0](https://github.com/MetaCubeX/metacubexd/compare/v1.63.0...v1.64.0) (2023-09-04)
 
 
