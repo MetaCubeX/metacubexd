@@ -67,16 +67,16 @@ export default () => {
   })
 
   return (
-    <div class="flex flex-col gap-4">
+    <div class="flex h-full flex-col gap-4 overflow-y-auto p-1">
       <input
-        class="input input-primary"
+        class="input input-primary flex-shrink-0"
         placeholder={t('search')}
         onInput={(e) => setSearch(e.target.value)}
       />
 
-      <div class="overflow-x-auto whitespace-nowrap rounded-md">
-        <table class="table table-zebra-zebra table-xs rounded-none bg-base-200">
-          <thead>
+      <div class="overflow-x-auto whitespace-nowrap rounded-md bg-base-300">
+        <table class="table table-xs relative rounded-none">
+          <thead class="sticky top-0 z-10">
             <For each={table.getHeaderGroups()}>
               {(headerGroup) => (
                 <tr>
@@ -102,7 +102,7 @@ export default () => {
           <tbody>
             <For each={table.getRowModel().rows}>
               {(row) => (
-                <tr>
+                <tr class="hover">
                   <For each={row.getVisibleCells()}>
                     {(cell) => (
                       <td>

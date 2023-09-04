@@ -237,7 +237,7 @@ export default () => {
   })
 
   return (
-    <div class="flex h-full flex-col gap-4 overflow-y-auto">
+    <div class="flex h-full flex-col gap-4 overflow-y-auto p-1">
       <div class="flex w-full items-center gap-2">
         <input
           class="input input-primary flex-1"
