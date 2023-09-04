@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.67.1](https://github.com/MetaCubeX/metacubexd/compare/v1.67.0...v1.67.1) (2023-09-04)
+
+
+### Bug Fixes
+
+* use min-h-screen-safe instead of h-screen ([6f366fe](https://github.com/MetaCubeX/metacubexd/commit/6f366fe836d1759e6847de19ec64c0f182b242cb))
+
 ## [1.67.0](https://github.com/MetaCubeX/metacubexd/compare/v1.66.0...v1.67.0) (2023-09-04)
 
 
