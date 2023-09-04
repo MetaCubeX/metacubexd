@@ -16,59 +16,55 @@ const [proxyNodeMap, setProxyNodeMap] = createSignal<Record<string, ProxyInfo>>(
   {},
 )
 
+const setProxiesInfo = (proxies: (Proxy | ProxyNode)[]) => {
+  const newProxyNodeMap = { ...proxyNodeMap() }
+  const newLatencyMap = { ...latencyMap() }
+
+  proxies.forEach((proxy) => {
+    const latency = proxy.history.at(-1)?.delay || -1
+
+    newProxyNodeMap[proxy.name] = {
+      udp: proxy.udp,
+      type: proxy.type,
+      name: proxy.name,
+    }
+    newLatencyMap[proxy.name] = latency
+  })
+
+  setProxyNodeMap(newProxyNodeMap)
+  setLatencyMap(newLatencyMap)
+}
+
 export const useProxies = () => {
   const request = useRequest()
 
-  const setProxyInfoByProxies = (proxies: Proxy[] | ProxyNode[]) => {
-    proxies.forEach((proxy) => {
-      const latency = proxy.history.at(-1)?.delay || -1
-
-      setProxyNodeMap({
-        ...proxyNodeMap(),
-        [proxy.name]: {
-          udp: proxy.udp,
-          type: proxy.type,
-          name: proxy.name,
-        },
-      })
-      setLatencyMap({
-        ...latencyMap(),
-        [proxy.name]: latency,
-      })
-    })
-  }
-
   const updateProxies = async () => {
-    const { providers } = await request
-      .get('providers/proxies')
-      .json<{ providers: Record<string, ProxyProvider> }>()
+    const [{ providers }, { proxies }] = await Promise.all([
+      request
+        .get('providers/proxies')
+        .json<{ providers: Record<string, ProxyProvider> }>(),
+      request.get('proxies').json<{ proxies: Record<string, Proxy> }>(),
+    ])
 
-    Object.values(providers).forEach((provider) => {
-      setProxyInfoByProxies(provider.proxies)
-    })
-
-    setProxyProviders(
-      Object.values(providers).filter(
-        (provider) =>
-          provider.name !== 'default' && provider.vehicleType !== 'Compatible',
-      ),
-    )
-
-    const { proxies } = await request
-      .get('proxies')
-      .json<{ proxies: Record<string, Proxy> }>()
     const sortIndex = [...(proxies['GLOBAL'].all ?? []), 'GLOBAL']
-    const proxiesArray = Object.values(proxies)
-
-    setProxyInfoByProxies(proxiesArray)
-    setProxies(
-      proxiesArray
-        .filter((proxy) => proxy.all?.length)
-        .sort(
-          (prev, next) =>
-            sortIndex.indexOf(prev.name) - sortIndex.indexOf(next.name),
-        ),
+    const sortedProxies = Object.values(proxies)
+      .filter((proxy) => proxy.all?.length)
+      .sort(
+        (prev, next) =>
+          sortIndex.indexOf(prev.name) - sortIndex.indexOf(next.name),
+      )
+    const sortedProviders = Object.values(providers).filter(
+      (provider) =>
+        provider.name !== 'default' && provider.vehicleType !== 'Compatible',
     )
+    const allProxies: (Proxy | ProxyNode)[] = [
+      ...Object.values(proxies),
+      ...sortedProviders.flatMap((provider) => provider.proxies),
+    ]
+
+    setProxies(sortedProxies)
+    setProxyProviders(sortedProviders)
+    setProxiesInfo(allProxies)
   }
 
   const setProxyGroupByProxyName = async (proxy: Proxy, proxyName: string) => {

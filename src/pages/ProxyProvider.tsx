@@ -11,7 +11,7 @@ import {
 } from '~/components'
 import {
   formatTimeFromNow,
-  getBtnElFromClickEvent,
+  handlerBtnClickWithAnimate,
   sortProxiesByOrderingType,
 } from '~/helpers'
 import { proxiesOrderingType, useProxies } from '~/signals'
@@ -30,31 +30,20 @@ export default () => {
     {},
   )
 
-  const onHealthCheckClick = async (e: MouseEvent, name: string) => {
-    const el = getBtnElFromClickEvent(e)
-
-    el.classList.add('animate-pulse')
-    e.stopPropagation()
-    await healthCheckByProviderName(name)
-    el.classList.remove('animate-pulse')
+  const onHealthCheckClick = (e: MouseEvent, name: string) => {
+    handlerBtnClickWithAnimate(
+      e,
+      healthCheckByProviderName.bind(null, name),
+      'animate-pulse',
+    )
   }
 
-  const onUpdateProviderClick = async (e: MouseEvent, name: string) => {
-    const el = getBtnElFromClickEvent(e)
-
-    el.classList.add('animate-spin')
-    e.stopPropagation()
-    await updateProviderByProviderName(name)
-    el.classList.remove('animate-spin')
+  const onUpdateProviderClick = (e: MouseEvent, name: string) => {
+    handlerBtnClickWithAnimate(e, updateProviderByProviderName.bind(null, name))
   }
 
-  const onUpdateAllProviderClick = async (e: MouseEvent) => {
-    const el = getBtnElFromClickEvent(e)
-
-    el.classList.add('animate-spin')
-    e.stopPropagation()
-    await updateAllProvider()
-    el.classList.remove('animate-spin')
+  const onUpdateAllProviderClick = (e: MouseEvent) => {
+    handlerBtnClickWithAnimate(e, updateAllProvider)
   }
 
   return (

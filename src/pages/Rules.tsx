@@ -3,7 +3,7 @@ import { IconReload } from '@tabler/icons-solidjs'
 import InfiniteScroll from 'solid-infinite-scroll'
 import { For, Show, createMemo, createSignal, onMount } from 'solid-js'
 import { Button } from '~/components'
-import { formatTimeFromNow, getBtnElFromClickEvent } from '~/helpers'
+import { formatTimeFromNow, handlerBtnClickWithAnimate } from '~/helpers'
 import { useRules } from '~/signals'
 
 export default () => {
@@ -20,22 +20,12 @@ export default () => {
 
   onMount(updateRules)
 
-  const onUpdateProviderClick = async (e: MouseEvent, name: string) => {
-    const el = getBtnElFromClickEvent(e)
-
-    el.classList.add('animate-spin')
-    e.stopPropagation()
-    await updateRuleProviderByName(name)
-    el.classList.remove('animate-spin')
+  const onUpdateProviderClick = (e: MouseEvent, name: string) => {
+    handlerBtnClickWithAnimate(e, updateRuleProviderByName.bind(null, name))
   }
 
-  const onUpdateAllProviderClick = async (e: MouseEvent) => {
-    const el = getBtnElFromClickEvent(e)
-
-    el.classList.add('animate-spin')
-    e.stopPropagation()
-    await updateAllRuleProvider()
-    el.classList.remove('animate-spin')
+  const onUpdateAllProviderClick = (e: MouseEvent) => {
+    handlerBtnClickWithAnimate(e, updateAllRuleProvider)
   }
 
   return (

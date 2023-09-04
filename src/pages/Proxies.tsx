@@ -8,7 +8,10 @@ import {
   ProxyCardGroups,
   ProxyNodePreview,
 } from '~/components'
-import { getBtnElFromClickEvent, sortProxiesByOrderingType } from '~/helpers'
+import {
+  handlerBtnClickWithAnimate,
+  sortProxiesByOrderingType,
+} from '~/helpers'
 import { proxiesOrderingType, useProxies } from '~/signals'
 import type { Proxy } from '~/types'
 
@@ -29,13 +32,12 @@ export default () => {
     void setProxyGroupByProxyName(proxy, proxyName)
   }
 
-  const onSpeedTestClick = async (e: MouseEvent, name: string) => {
-    const el = getBtnElFromClickEvent(e)
-
-    el.classList.add('animate-pulse')
-    e.stopPropagation()
-    await latencyTestByProxyGroupName(name)
-    el.classList.remove('animate-pulse')
+  const onSpeedTestClick = (e: MouseEvent, name: string) => {
+    handlerBtnClickWithAnimate(
+      e,
+      latencyTestByProxyGroupName.bind(null, name),
+      'animate-pulse',
+    )
   }
 
   return (

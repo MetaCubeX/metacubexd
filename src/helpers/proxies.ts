@@ -5,14 +5,21 @@ export const formatTimeFromNow = (time: number | string) => {
   return dayjs(time).fromNow()
 }
 
-export const getBtnElFromClickEvent = (event: MouseEvent) => {
+export const handlerBtnClickWithAnimate = async (
+  event: MouseEvent,
+  cb: () => void,
+  className = 'animate-spin',
+) => {
   let el = event.target as HTMLElement
+  event.stopPropagation()
 
   while (el && !el.classList.contains('btn')) {
     el = el.parentElement!
   }
 
-  return el
+  el.classList.add(className)
+  await cb()
+  el.classList.remove(className)
 }
 
 export const formatProxyType = (type = '') => {
