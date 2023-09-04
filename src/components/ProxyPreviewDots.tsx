@@ -1,5 +1,6 @@
 import { For } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
+import { Latency } from '~/components'
 import { latencyQualityMap, useProxies } from '~/signals'
 
 const LatencyDots = (props: {
@@ -37,19 +38,23 @@ export const ProxyPreviewDots = (props: {
   const { latencyMap } = useProxies()
 
   return (
-    <div class="flex w-full flex-wrap items-center">
-      <For
-        each={props.proxyNameList.map((name): [string, number] => [
-          name,
-          latencyMap()[name],
-        ])}
-      >
-        {([name, latency]) => {
-          const isSelected = props.now === name
+    <div class="flex items-center gap-2">
+      <div class="flex flex-1 flex-wrap items-center">
+        <For
+          each={props.proxyNameList.map((name): [string, number] => [
+            name,
+            latencyMap()[name],
+          ])}
+        >
+          {([name, latency]) => {
+            const isSelected = props.now === name
 
-          return <LatencyDots latency={latency} selected={isSelected} />
-        }}
-      </For>
+            return <LatencyDots latency={latency} selected={isSelected} />
+          }}
+        </For>
+      </div>
+
+      <Latency name={props.now} />
     </div>
   )
 }
