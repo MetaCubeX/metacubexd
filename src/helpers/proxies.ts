@@ -18,7 +18,9 @@ export const handlerBtnClickWithAnimate = async (
   }
 
   el.classList.add(className)
-  await cb()
+  try {
+    await cb()
+  } catch {}
   el.classList.remove(className)
 }
 
