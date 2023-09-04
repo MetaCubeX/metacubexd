@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.67.0](https://github.com/MetaCubeX/metacubexd/compare/v1.66.0...v1.67.0) (2023-09-04)
+
+
+### Features
+
+* add padding-bottom safe-area ([a55ec6f](https://github.com/MetaCubeX/metacubexd/commit/a55ec6f7b18fa8638d673c9c7c493752ae3dbbb1))
+
 ## [1.66.0](https://github.com/MetaCubeX/metacubexd/compare/v1.65.0...v1.66.0) (2023-09-04)
 
 
