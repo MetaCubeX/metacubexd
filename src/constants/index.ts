@@ -41,6 +41,7 @@ export enum ROUTES {
   Conns = '/conns',
   Log = '/logs',
   Config = '/config',
+  Setup = '/setup',
 }
 
 export const CHART_MAX_XAXIS = 10

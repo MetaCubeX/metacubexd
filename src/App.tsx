@@ -32,7 +32,7 @@ export const App = () => {
 
   onMount(() => {
     if (!selectedEndpoint()) {
-      navigate('/setup')
+      navigate(ROUTES.Setup)
     }
   })
 
@@ -56,7 +56,10 @@ export const App = () => {
             <Route path="*" element={<Navigate href={ROUTES.Overview} />} />
           </Show>
 
-          <Route path="/setup" component={Setup} />
+          <Route
+            path={selectedEndpoint() ? ROUTES.Setup : '*'}
+            component={Setup}
+          />
         </Routes>
       </div>
     </div>

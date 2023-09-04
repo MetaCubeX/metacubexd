@@ -119,7 +119,7 @@ export const Header = () => {
 
   const onSwitchEndpointClick = () => {
     setSelectedEndpoint('')
-    navigate('/setup')
+    navigate(ROUTES.Setup)
   }
 
   return (
@@ -167,7 +167,7 @@ export const Header = () => {
         </a>
       </div>
 
-      <Show when={location.pathname !== '/setup'}>
+      <Show when={location.pathname !== ROUTES.Setup}>
         <div class="navbar-center hidden lg:flex">
           <ul class="menu menu-horizontal gap-2">
             <For each={navs()}>
