@@ -8,7 +8,12 @@ import { For, onMount } from 'solid-js'
 import { v4 as uuid } from 'uuid'
 import { z } from 'zod'
 import { Button } from '~/components'
-import { endpointList, setEndpointList, setSelectedEndpoint } from '~/signals'
+import {
+  endpointList,
+  selectedEndpoint,
+  setEndpointList,
+  setSelectedEndpoint,
+} from '~/signals'
 
 const schema = z.object({
   url: z.string().url().nonempty(),
@@ -51,28 +56,27 @@ export default () => {
   }
 
   const onSubmit = async ({ url, secret }: { url: string; secret: string }) => {
-    const list = endpointList().slice()
-    const point = list.find((history) => history.url === url)
-
-    if (point) {
-      const { id, secret: oldSecret } = point
-
-      if (secret !== oldSecret && !(await checkEndpoint(url, secret))) {
-        point.secret = secret
-        setEndpointList(list)
-      }
-
-      onSetupSuccess(id)
-
-      return
-    }
-
     if (!(await checkEndpoint(url, secret))) {
       return
     }
 
     const id = uuid()
-    setEndpointList([{ id, url, secret }, ...list])
+    const list = endpointList().slice()
+    const point = list.find((history) => history.url === url)
+
+    if (!point) {
+      // new host and secret
+      setEndpointList([{ id, url, secret }, ...list])
+      onSetupSuccess(id)
+
+      return
+    }
+
+    // exist host we update secret and id no matter secret is equal or not
+    point.secret = secret
+    point.id = id
+
+    setEndpointList(list)
     onSetupSuccess(id)
   }
 
@@ -81,8 +85,13 @@ export default () => {
     onSubmit,
   })
 
-  const onRemove = (id: string) =>
+  const onRemove = (id: string) => {
+    if (selectedEndpoint() === id) {
+      setSelectedEndpoint('')
+    }
+
     setEndpointList(endpointList().filter((e) => e.id !== id))
+  }
 
   onMount(() => {
     const query = new URLSearchParams(window.location.search)
@@ -93,11 +102,6 @@ export default () => {
           query.get('port') && ':' + query.get('port')
         }`,
         secret: query.get('secret') ?? '',
-      })
-    } else {
-      void onSubmit({
-        url: 'http://127.0.0.1:9090',
-        secret: '',
       })
     }
   })
