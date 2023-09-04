@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.67.2](https://github.com/MetaCubeX/metacubexd/compare/v1.67.1...v1.67.2) (2023-09-04)
+
+
+### Bug Fixes
+
+* rollback to h-screen :) ([b68e0c6](https://github.com/MetaCubeX/metacubexd/commit/b68e0c62c09a727c9b55b59e26f81cc55fb5222b))
+
 ## [1.67.1](https://github.com/MetaCubeX/metacubexd/compare/v1.67.0...v1.67.1) (2023-09-04)
 
 
