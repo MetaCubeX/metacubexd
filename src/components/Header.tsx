@@ -156,11 +156,14 @@ export const Header = () => {
         </div>
 
         <a
-          class="whitespace-nowrap text-xl font-bold uppercase"
+          class="flex whitespace-nowrap text-xl font-bold uppercase"
           href="https://github.com/metacubex/metacubexd"
           target="_blank"
         >
-          metacube, xd
+          <span class="mr-2">metacube, </span>
+          <div class="transition-transform hover:rotate-90 hover:scale-125">
+            xd
+          </div>
         </a>
       </div>
 
