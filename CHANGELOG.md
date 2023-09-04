@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.66.0](https://github.com/MetaCubeX/metacubexd/compare/v1.65.0...v1.66.0) (2023-09-04)
+
+
+### Features
+
+* add safe area paddings ([9840141](https://github.com/MetaCubeX/metacubexd/commit/9840141bce39188094db12373d8c358da771ffd1))
+
+
+### Bug Fixes
+
+* **proxies:** group type does not show UDP ([f0fbe09](https://github.com/MetaCubeX/metacubexd/commit/f0fbe098381c2b33c84b2eb5427f9db4b227e364))
+
 ## [1.65.0](https://github.com/MetaCubeX/metacubexd/compare/v1.64.0...v1.65.0) (2023-09-04)
 
 
