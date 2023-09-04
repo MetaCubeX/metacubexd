@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.62.0](https://github.com/MetaCubeX/metacubexd/compare/v1.61.0...v1.62.0) (2023-09-04)
+
+
+### Features
+
+* **overview:** update the overall look of the overview page ([c757850](https://github.com/MetaCubeX/metacubexd/commit/c757850c1a34b2757ab5ec89e850fe7c1976d533))
+
+
+### Bug Fixes
+
+* **proxies:** also display latency when PROXIES_PREVIEW_TYPE is DOTS ([347ebb6](https://github.com/MetaCubeX/metacubexd/commit/347ebb6f84e1f316bd4551ca0f079ad1050a4f01))
+* rule size ([2ff31d4](https://github.com/MetaCubeX/metacubexd/commit/2ff31d40b1349c2213b999c57d9d7fe0ce9e0af4))
+
 ## [1.61.0](https://github.com/MetaCubeX/metacubexd/compare/v1.60.3...v1.61.0) (2023-09-04)
 
 
