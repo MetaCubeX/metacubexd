@@ -103,6 +103,15 @@ export default () => {
         }`,
         secret: query.get('secret') ?? '',
       })
+    } else if (endpointList().length === 0) {
+      /**   
+        we only try auto login when there is nothing in endpoint list
+        or user who is using config wont be able to switch to another endpoint ever 
+      */
+      void onSubmit({
+        url: 'http://127.0.0.1:9090',
+        secret: '',
+      })
     }
   })
 
