@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.60.3](https://github.com/MetaCubeX/metacubexd/compare/v1.60.2...v1.60.3) (2023-09-04)
+
+
+### Bug Fixes
+
+* auto login ([d7f3649](https://github.com/MetaCubeX/metacubexd/commit/d7f3649eba6e2a6475e5b96b9fff51e414ca47f1))
+* **connections:** close column header translation result not updating ([5689034](https://github.com/MetaCubeX/metacubexd/commit/5689034f942145e35811bb8c2f063ba5632490da))
+
 ## [1.60.2](https://github.com/MetaCubeX/metacubexd/compare/v1.60.1...v1.60.2) (2023-09-04)
 
 
