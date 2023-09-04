@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.60.2](https://github.com/MetaCubeX/metacubexd/compare/v1.60.1...v1.60.2) (2023-09-04)
+
+
+### Bug Fixes
+
+* setup onsubmit secret ([30fd139](https://github.com/MetaCubeX/metacubexd/commit/30fd13946b0a42528330d06994803d811838979e))
+
 ## [1.60.1](https://github.com/MetaCubeX/metacubexd/compare/v1.60.0...v1.60.1) (2023-09-03)
 
 
