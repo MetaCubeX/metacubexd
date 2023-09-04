@@ -5,6 +5,7 @@ import { ROUTES } from '~/constants'
 import {
   curTheme,
   endpoint,
+  renderProxiesInSamePage,
   selectedEndpoint,
   useAutoSwitchTheme,
   useProxies,
@@ -48,7 +49,9 @@ export const App = () => {
           <Show when={selectedEndpoint()}>
             <Route path={ROUTES.Overview} component={Overview} />
             <Route path={ROUTES.Proxies} component={Proxies} />
-            <Route path={ROUTES.ProxyProvider} component={ProxyProvider} />
+            <Show when={!renderProxiesInSamePage()}>
+              <Route path={ROUTES.ProxyProvider} component={ProxyProvider} />
+            </Show>
             <Route path={ROUTES.Rules} component={Rules} />
             <Route path={ROUTES.Conns} component={Connections} />
             <Route path={ROUTES.Log} component={Logs} />

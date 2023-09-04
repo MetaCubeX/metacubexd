@@ -48,7 +48,9 @@ export default () => {
             <div class="card card-bordered card-compact mb-2 bg-base-200 p-4">
               <div class="break-all">
                 {rule.payload}
-                {rule.size !== -1 && ` (${rule.size})`}
+                {typeof rule.size === 'number' &&
+                  rule.size !== -1 &&
+                  ` (${rule.size})`}
               </div>
               <div class="text-xs text-slate-500">
                 {rule.type} :: {rule.proxy}
