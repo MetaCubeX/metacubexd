@@ -143,6 +143,9 @@ dependencies:
   tailwindcss:
     specifier: ^3.3.3
     version: 3.3.3(ts-node@10.9.1)
+  tailwindcss-safe-area:
+    specifier: ^0.4.0
+    version: 0.4.0
   typescript:
     specifier: ^5.2.2
     version: 5.2.2
@@ -7555,6 +7558,14 @@ packages:
       {
         integrity: sha512-3mFKyCo/MBcgyOTlrY8T7odzZFx+w+qKSMAmdFzRvqBfLlSigU6TZnlFHK0lkMwj9Bj8OYU+9yW9lmGuS0QEnQ==,
       }
+    dev: false
+
+  /tailwindcss-safe-area@0.4.0:
+    resolution:
+      {
+        integrity: sha512-V6UFT+LCYJOg9780fcQwA4k0RDCmyjRab7G8fwdeoasT9NOCpmXdCV1q79PSI9AK/KtimTIzGeQfeRH583lH5A==,
+      }
+    engines: { node: '>=16' }
     dev: false
 
   /tailwindcss@3.3.3(ts-node@10.9.1):
