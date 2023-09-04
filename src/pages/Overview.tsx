@@ -19,9 +19,9 @@ import { secret, wsEndpointURL } from '~/signals'
 import type { Connection } from '~/types'
 
 const TrafficWidget: ParentComponent<{ label: JSX.Element }> = (props) => (
-  <div class="stat flex-1">
+  <div class="stat flex-1 place-items-center">
     <div class="stat-title text-primary-content">{props.label}</div>
-    <div class="stat-value text-primary-content">
+    <div class="stat-value text-2xl text-primary-content lg:text-3xl">
       {children(() => props.children)()}
     </div>
   </div>
@@ -102,7 +102,9 @@ export default () => {
     merge({ title: { text: t('memory') } }, DEFAULT_CHART_OPTIONS),
   )
 
-  const memoryChartSeries = createMemo(() => [{ data: memories() }])
+  const memoryChartSeries = createMemo(() => [
+    { name: t('memory'), data: memories() },
+  ])
 
   const connectionsWS = createReconnectingWS(
     `${wsEndpointURL()}/connections?token=${secret()}`,

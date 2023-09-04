@@ -188,12 +188,12 @@ const ConfigForm = () => {
           {t('updateGEODatabases')}
         </Button>
 
-        <Button loading={restarting()} onClick={onRestart}>
-          {t('restartCore')}
-        </Button>
-
         <Button loading={upgrading()} onClick={onUpgrade}>
           {t('upgradeCore')}
+        </Button>
+
+        <Button loading={restarting()} onClick={onRestart}>
+          {t('restartCore')}
         </Button>
       </div>
     </div>
