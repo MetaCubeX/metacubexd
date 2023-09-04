@@ -154,15 +154,15 @@ export default () => {
         </TrafficWidget>
       </div>
 
-      <div class="rounded-box flex flex-col bg-base-300 lg:flex-row">
-        <div class="m-4 flex-1">
+      <div class="rounded-box flex flex-col gap-2 bg-base-300 py-4 lg:flex-row">
+        <div class="flex-1">
           <SolidApexCharts
             type="area"
             options={trafficChartOptions()}
             series={trafficChartSeries()}
           />
         </div>
-        <div class="m-4 flex-1">
+        <div class="flex-1">
           <SolidApexCharts
             type="line"
             options={memoryChartOptions()}
