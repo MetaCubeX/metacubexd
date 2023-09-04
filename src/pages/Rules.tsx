@@ -90,7 +90,7 @@ export default () => {
                 </div>
                 <div class="text-xs text-slate-500">
                   {rulesProvider.vehicleType} / {rulesProvider.behavior} /
-                  Updated {formatTimeFromNow(rulesProvider.updatedAt)}
+                  {t('updated')} {formatTimeFromNow(rulesProvider.updatedAt)}
                 </div>
               </div>
             )}

@@ -17,7 +17,12 @@ import { For, ParentComponent, Show, createMemo, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Button } from '~/components'
 import { LANG, ROUTES, themes } from '~/constants'
-import { setCurTheme, setSelectedEndpoint, useProxies } from '~/signals'
+import {
+  renderProxiesInSamePage,
+  setCurTheme,
+  setSelectedEndpoint,
+  useProxies,
+} from '~/signals'
 
 const Nav: ParentComponent<{ href: string; tooltip: string }> = ({
   href,
@@ -101,7 +106,7 @@ export const Header = () => {
       },
     ]
 
-    if (proxyProviders().length > 0) {
+    if (proxyProviders().length > 0 && !renderProxiesInSamePage()) {
       list.splice(2, 0, {
         href: ROUTES.ProxyProvider,
         name: t('proxyProviders'),

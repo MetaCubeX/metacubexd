@@ -56,4 +56,6 @@ export default {
   orderName_asc: '按名称字母排序 (A-Z)',
   orderName_desc: '按名称字母排序 (Z-A)',
   ms: '毫秒',
+  updated: '更新于',
+  renderProxiesInSamePage: '将代理和代理提供者显示在同一页',
 }

@@ -95,7 +95,7 @@ export default () => {
                 subscriptionInfo={proxyProvider.subscriptionInfo}
               />
               <div class="text-sm text-slate-500">
-                {proxyProvider.vehicleType} :: Updated{' '}
+                {proxyProvider.vehicleType} :: {t('updated')}{' '}
                 {formatTimeFromNow(proxyProvider.updatedAt)}
               </div>
               <Show when={!collapsedMap()[`provider-${proxyProvider.name}`]}>

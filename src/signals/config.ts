@@ -40,6 +40,11 @@ export const [renderInTwoColumn, setRenderInTwoColumn] = makePersisted(
   createSignal(true),
   { name: 'renderInTwoColumn', storage: localStorage },
 )
+export const [renderProxiesInSamePage, setRenderProxiesInSamePage] =
+  makePersisted(createSignal(false), {
+    name: 'renderProxiesInSamePage',
+    storage: localStorage,
+  })
 
 export const isLatencyTestByHttps = () =>
   urlForLatencyTest().startsWith('https')

@@ -18,6 +18,7 @@ import {
   proxiesOrderingType,
   proxiesPreviewType,
   renderInTwoColumn,
+  renderProxiesInSamePage,
   setAutoCloseConns,
   setAutoSwitchTheme,
   setFavDayTheme,
@@ -25,6 +26,7 @@ import {
   setProxiesOrderingType,
   setProxiesPreviewType,
   setRenderInTwoColumn,
+  setRenderProxiesInSamePage,
   setUrlForLatencyTest,
   urlForLatencyTest,
   useRequest,
@@ -211,6 +213,19 @@ const ConfigForXd = () => {
           checked={renderInTwoColumn()}
           onChange={(e) => {
             setRenderInTwoColumn(e.target.checked)
+          }}
+        />
+      </div>
+      <div class="flex flex-col">
+        <div class="pb-4 text-lg font-semibold">
+          {t('renderProxiesInSamePage')}
+        </div>
+        <input
+          type="checkbox"
+          class="toggle"
+          checked={renderProxiesInSamePage()}
+          onChange={(e) => {
+            setRenderProxiesInSamePage(e.target.checked)
           }}
         />
       </div>

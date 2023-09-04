@@ -56,4 +56,6 @@ export default {
   orderName_asc: 'By name alphabetically (A-Z)',
   orderName_desc: 'By name alphabetically (Z-A)',
   ms: 'ms',
+  updated: 'Updated',
+  renderProxiesInSamePage: 'Render proxies and proxy provider in same page',
 }
