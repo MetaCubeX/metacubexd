@@ -109,10 +109,10 @@ export const useProxies = () => {
   }
 
   const updateAllProvider = async () => {
-    await Promise.all(
-      proxyProviders().map((provider) => {
-        return request.put(`providers/proxies/${provider.name}`)
-      }),
+    await Promise.allSettled(
+      proxyProviders().map((provider) =>
+        request.put(`providers/proxies/${provider.name}`),
+      ),
     )
     await updateProxies()
   }
