@@ -5,6 +5,8 @@ import { makePersisted } from '@solid-primitives/storage'
 import { createReconnectingWS } from '@solid-primitives/websocket'
 import {
   IconCircleX,
+  IconPlayerPause,
+  IconPlayerPlay,
   IconSettings,
   IconSortAscending,
   IconSortDescending,
@@ -27,7 +29,7 @@ import byteSize from 'byte-size'
 import dayjs from 'dayjs'
 import { isIPv6 } from 'is-ip'
 import { differenceWith, isEqualWith } from 'lodash'
-import { For, createEffect, createSignal } from 'solid-js'
+import { For, createEffect, createMemo, createSignal, untrack } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Button, ConnectionsTableOrderingModal } from '~/components'
 import {
@@ -74,6 +76,12 @@ export default () => {
   const [activeConnectionsWithSpeed, setActiveConnectionsWithSpeed] =
     createSignal<ConnectionWithSpeed[]>([])
 
+  const [paused, setPaused] = createSignal(false)
+  const [pausedActiveConnectionsSnapshot, setPausedActiveConnectionsSnapshot] =
+    createSignal<ConnectionWithSpeed[]>([])
+  const [pausedClosedConnectionsSnapshot, setPausedClosedConnectionsSnapshot] =
+    createSignal<ConnectionWithSpeed[]>([])
+
   createEffect(() => {
     const data = messageEvent()?.data
 
@@ -118,6 +126,26 @@ export default () => {
       return connections.slice(-100)
     })
   })
+
+  createEffect(() => {
+    if (paused()) {
+      setPausedActiveConnectionsSnapshot(
+        untrack(() => activeConnectionsWithSpeed()),
+      )
+
+      setPausedClosedConnectionsSnapshot(
+        untrack(() => closedConnectionsWithSpeed()),
+      )
+    }
+  })
+
+  const activeConnectionsWithSpeedAndPausing = createMemo(() =>
+    paused() ? pausedActiveConnectionsSnapshot() : activeConnectionsWithSpeed(),
+  )
+
+  const closedConnectionsWithSpeedAndPausing = createMemo(() =>
+    paused() ? pausedClosedConnectionsSnapshot() : closedConnectionsWithSpeed(),
+  )
 
   const onCloseConnection = (id: string) => request.delete(`connections/${id}`)
 
@@ -269,8 +297,8 @@ export default () => {
     },
     get data() {
       return activeTab() === ActiveTab.activeConnections
-        ? activeConnectionsWithSpeed()
-        : closedConnectionsWithSpeed()
+        ? activeConnectionsWithSpeedAndPausing()
+        : closedConnectionsWithSpeedAndPausing()
     },
     sortDescFirst: true,
     enableHiding: true,
@@ -311,12 +339,12 @@ export default () => {
     {
       type: ActiveTab.activeConnections,
       name: t('activeConnections'),
-      count: activeConnectionsWithSpeed().length,
+      count: activeConnectionsWithSpeedAndPausing().length,
     },
     {
       type: ActiveTab.closedConnections,
       name: t('closedConnections'),
-      count: closedConnectionsWithSpeed().length,
+      count: closedConnectionsWithSpeedAndPausing().length,
     },
   ]
 
@@ -341,6 +369,13 @@ export default () => {
           placeholder={t('search')}
           onInput={(e) => setSearch(e.target.value)}
         />
+
+        <Button
+          class="btn-circle"
+          onClick={() => setPaused((paused) => !paused)}
+        >
+          {paused() ? <IconPlayerPause /> : <IconPlayerPlay />}
+        </Button>
 
         <Button
           class="btn-circle"
