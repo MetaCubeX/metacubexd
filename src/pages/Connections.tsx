@@ -36,10 +36,14 @@ import {
   CONNECTIONS_TABLE_ACCESSOR_KEY,
   CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
   CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY,
-  TAILWINDCSS_SIZE,
 } from '~/constants'
 import { formatTimeFromNow } from '~/helpers'
-import { secret, tableSize, useRequest, wsEndpointURL } from '~/signals'
+import {
+  secret,
+  tableSizeClassName,
+  useRequest,
+  wsEndpointURL,
+} from '~/signals'
 import type { Connection } from '~/types'
 
 type ConnectionWithSpeed = Connection & {
@@ -312,28 +316,6 @@ export default () => {
     getGroupedRowModel: getGroupedRowModel(),
     getCoreRowModel: getCoreRowModel(),
   })
-
-  const tableSizeClassName = () => {
-    const size = tableSize()
-    let className = 'table-xs'
-
-    switch (size) {
-      case TAILWINDCSS_SIZE.XS:
-        className = 'table-xs'
-        break
-      case TAILWINDCSS_SIZE.SM:
-        className = 'table-sm'
-        break
-      case TAILWINDCSS_SIZE.MD:
-        className = 'table-md'
-        break
-      case TAILWINDCSS_SIZE.LG:
-        className = 'table-lg'
-        break
-    }
-
-    return className
-  }
 
   const tabs = () => [
     {

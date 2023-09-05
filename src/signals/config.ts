@@ -54,6 +54,29 @@ export const [tableSize, setTableSize] = makePersisted(
   createSignal<TAILWINDCSS_SIZE>(TAILWINDCSS_SIZE.XS),
   { name: 'tableSize', storage: localStorage },
 )
+
+export const tableSizeClassName = () => {
+  const size = tableSize()
+  let className = 'table-xs'
+
+  switch (size) {
+    case TAILWINDCSS_SIZE.XS:
+      className = 'table-xs'
+      break
+    case TAILWINDCSS_SIZE.SM:
+      className = 'table-sm'
+      break
+    case TAILWINDCSS_SIZE.MD:
+      className = 'table-md'
+      break
+    case TAILWINDCSS_SIZE.LG:
+      className = 'table-lg'
+      break
+  }
+
+  return className
+}
+
 export const [requestTimeoutDuration, setRequestTimeoutDuration] =
   makePersisted(createSignal(10000), {
     name: 'requestTimeoutDuration',
