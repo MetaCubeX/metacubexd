@@ -21,13 +21,13 @@ export default () => {
 
   onMount(updateRules)
 
-  const { map: updateingMap, setWithCallback: setUpdateingMap } =
+  const { map: updatingMap, setWithCallback: setUpdatingMap } =
     useStringBooleanMap()
   const [allProviderIsUpdating, setAllProviderIsUpdating] = createSignal(false)
 
   const onUpdateProviderClick = (e: MouseEvent, name: string) => {
     e.stopPropagation()
-    setUpdateingMap(name, async () => await updateRuleProviderByName(name))
+    void setUpdatingMap(name, () => updateRuleProviderByName(name))
   }
 
   const onUpdateAllProviderClick = async (e: MouseEvent) => {
@@ -95,7 +95,7 @@ export default () => {
                     >
                       <IconReload
                         class={twMerge(
-                          updateingMap()[rulesProvider.name] && 'animate-spin',
+                          updatingMap()[rulesProvider.name] && 'animate-spin',
                         )}
                       />
                     </Button>
