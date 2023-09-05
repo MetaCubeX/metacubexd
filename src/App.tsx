@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes, useNavigate } from '@solidjs/router'
 import { Show, createEffect, lazy, onMount } from 'solid-js'
+import { twMerge } from 'tailwind-merge'
 import { Header } from '~/components'
 import { ROUTES } from '~/constants'
 import {
@@ -30,20 +31,6 @@ export const App = () => {
     if (selectedEndpoint() && endpoint()) {
       void useProxies().updateProxies()
     }
-
-    const rootElement = document.querySelector(':root') as HTMLElement
-
-    if (useTwemoji()) {
-      rootElement.style.setProperty(
-        'font-family',
-        "'Fira Sans', 'Twemoji Mozilla', system-ui, monospace",
-      )
-    } else {
-      rootElement.style.setProperty(
-        'font-family',
-        "'Fira Sans', system-ui, monospace",
-      )
-    }
   })
 
   onMount(() => {
@@ -54,7 +41,10 @@ export const App = () => {
 
   return (
     <div
-      class="relative flex h-screen flex-col subpixel-antialiased p-safe"
+      class={twMerge(
+        'relative flex h-screen flex-col subpixel-antialiased p-safe',
+        useTwemoji() ? 'font-twemoji' : 'font-no-twemoji',
+      )}
       data-theme={curTheme()}
     >
       <Header />

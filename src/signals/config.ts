@@ -24,7 +24,7 @@ export const [autoCloseConns, setAutoCloseConns] = makePersisted(
   createSignal(false),
   { name: 'autoCloseConns', storage: localStorage },
 )
-export const [useTwemoji, setTwemoji] = makePersisted(createSignal(false), {
+export const [useTwemoji, setTwemoji] = makePersisted(createSignal(true), {
   name: 'useTwemoji',
   storage: localStorage,
 })

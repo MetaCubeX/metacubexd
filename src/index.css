@@ -10,12 +10,6 @@
   src: url('assets/Twemoji.Mozilla.ttf') format('truetype');
 }
 
-:root,
-[data-theme='wireframe'],
-[data-theme='cyberpunk'] {
-  font-family: 'Fira Sans', 'Twemoji Mozilla', system-ui, monospace;
-}
-
 ::-webkit-scrollbar {
   display: none;
 }
