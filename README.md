@@ -25,6 +25,32 @@ Cloudflare Pages: https://metacubexd.pages.dev
 
 ## Usage
 
+### Enable external-controller in your config file
+
+```yaml
+external-controller: 0.0.0.0:9090
+```
+
+### Use pre-built assets from gh-pages branch
+
+> First time setup
+
+```shell
+git clone https://github.com/metacubex/metacubexd.git -b gh-pages /etc/clash-meta/ui
+```
+
+Make sure you have external-ui directory set correctly in your config file
+
+> Update
+
+```shell
+git -C /etc/clash-meta/ui pull
+```
+
+```yaml
+external-ui: /etc/clash-meta/ui
+```
+
 ### Run inside Docker
 
 > docker cli
@@ -35,7 +61,7 @@ Running
 docker run -d --restart always -p 80:80 --name metacubexd ghcr.io/metacubex/metacubexd
 ```
 
-Update and restart
+Update and Restart
 
 ```shell
 docker pull ghcr.io/metacubex/metacubexd && docker restart metacubexd
@@ -72,7 +98,7 @@ Running
 docker compose up -d
 ```
 
-Update and restart
+Update and Restart
 
 ```shell
 docker compose pull && docker compose up -d
