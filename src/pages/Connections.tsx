@@ -112,7 +112,7 @@ export default () => {
       )
 
       setClosedConnectionsWithSpeed((prev) =>
-        [...prev, ...closedConnections].slice(-1000),
+        [...prev, ...closedConnections].slice(-100),
       )
 
       return connections.slice(-100)
