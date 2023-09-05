@@ -88,21 +88,19 @@ export default () => {
                   <div class="break-all">
                     {rulesProvider.name} ({rulesProvider.ruleCount})
                   </div>
-                  <div class="h-6">
-                    <Button
-                      class="btn-circle btn-sm mr-2"
-                      onClick={(e) =>
-                        onUpdateProviderClick(e, rulesProvider.name)
-                      }
-                    >
-                      <IconReload
-                        class={twMerge(
-                          updatingMap()[rulesProvider.name] &&
-                            'animate-spin text-success',
-                        )}
-                      />
-                    </Button>
-                  </div>
+                  <Button
+                    class="btn-circle btn-sm mr-2"
+                    onClick={(e) =>
+                      onUpdateProviderClick(e, rulesProvider.name)
+                    }
+                  >
+                    <IconReload
+                      class={twMerge(
+                        updatingMap()[rulesProvider.name] &&
+                          'animate-spin text-success',
+                      )}
+                    />
+                  </Button>
                 </div>
                 <div class="text-xs text-slate-500">
                   {rulesProvider.vehicleType} / {rulesProvider.behavior} /
