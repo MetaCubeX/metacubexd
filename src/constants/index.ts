@@ -135,3 +135,10 @@ export const CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY = {
   ),
   [CONNECTIONS_TABLE_ACCESSOR_KEY.ID]: false,
 }
+
+export enum TAILWINDCSS_SIZE {
+  XS = 'xs',
+  SM = 'sm',
+  MD = 'md',
+  LG = 'lg',
+}

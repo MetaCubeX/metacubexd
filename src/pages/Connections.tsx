@@ -28,9 +28,10 @@ import {
   CONNECTIONS_TABLE_ACCESSOR_KEY,
   CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
   CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY,
+  TAILWINDCSS_SIZE,
 } from '~/constants'
 import { formatTimeFromNow } from '~/helpers'
-import { secret, useRequest, wsEndpointURL } from '~/signals'
+import { secret, tableSize, useRequest, wsEndpointURL } from '~/signals'
 import type { Connection } from '~/types'
 
 type ConnectionWithSpeed = Connection & {
@@ -234,6 +235,28 @@ export default () => {
     getCoreRowModel: getCoreRowModel(),
   })
 
+  const tableSizeClassName = () => {
+    const size = tableSize()
+
+    if (size === TAILWINDCSS_SIZE.XS) {
+      return 'table-xs'
+    }
+
+    if (size === TAILWINDCSS_SIZE.SM) {
+      return 'table-sm'
+    }
+
+    if (size === TAILWINDCSS_SIZE.MD) {
+      return 'table-md'
+    }
+
+    if (size === TAILWINDCSS_SIZE.LG) {
+      return 'table-lg'
+    }
+
+    return ''
+  }
+
   return (
     <div class="flex h-full flex-col gap-4 overflow-y-auto p-1">
       <div class="flex w-full items-center gap-2">
@@ -267,7 +290,12 @@ export default () => {
       </div>
 
       <div class="overflow-x-auto whitespace-nowrap rounded-md bg-base-300">
-        <table class="table table-zebra table-xs relative rounded-none">
+        <table
+          class={twMerge(
+            tableSizeClassName(),
+            'table table-zebra relative rounded-none',
+          )}
+        >
           <thead class="sticky top-0 z-10 h-8">
             <For each={table.getHeaderGroups()}>
               {(headerGroup) => (

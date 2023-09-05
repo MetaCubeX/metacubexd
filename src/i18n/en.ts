@@ -59,4 +59,10 @@ export default {
   ms: 'ms',
   updated: 'Updated',
   renderProxiesInSamePage: 'Render proxies and proxy provider in same page',
+  tableSize: 'Table size',
+  xs: 'Extra small size',
+  sm: 'Small size',
+  md: 'Normal size',
+  lg: 'Large size',
+  switchEndpoint: 'Switch Endpoint',
 }

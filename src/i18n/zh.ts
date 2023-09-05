@@ -59,4 +59,10 @@ export default {
   ms: '毫秒',
   updated: '更新于',
   renderProxiesInSamePage: '将代理和代理提供者显示在同一页',
+  tableSize: '表格大小',
+  xs: '超小尺寸',
+  sm: '小尺寸',
+  md: '正常尺寸',
+  lg: '超大尺寸',
+  switchEndpoint: '切换后端',
 }

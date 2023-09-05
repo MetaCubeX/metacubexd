@@ -78,7 +78,7 @@ services:
     image: ghcr.io/metacubex/metacubexd
     restart: always
     ports:
-      - 80:80
+      - '80:80'
 
   # optional
   meta:

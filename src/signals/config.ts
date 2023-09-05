@@ -5,6 +5,7 @@ import {
   LATENCY_QUALITY_MAP_HTTPS,
   PROXIES_ORDERING_TYPE,
   PROXIES_PREVIEW_TYPE,
+  TAILWINDCSS_SIZE,
 } from '~/constants'
 import { setCurTheme } from '~/signals'
 
@@ -49,6 +50,10 @@ export const [renderProxiesInSamePage, setRenderProxiesInSamePage] =
     name: 'renderProxiesInSamePage',
     storage: localStorage,
   })
+export const [tableSize, setTableSize] = makePersisted(
+  createSignal<TAILWINDCSS_SIZE>(TAILWINDCSS_SIZE.XS),
+  { name: 'tableSize', storage: localStorage },
+)
 
 export const isLatencyTestByHttps = () =>
   urlForLatencyTest().startsWith('https')

@@ -1,12 +1,15 @@
 import { createForm } from '@felte/solid'
 import { validator } from '@felte/validator-zod'
 import { useI18n } from '@solid-primitives/i18n'
+import { useNavigate } from '@solidjs/router'
 import { For, Show, createSignal, onMount } from 'solid-js'
 import { z } from 'zod'
 import { Button } from '~/components'
 import {
   PROXIES_ORDERING_TYPE,
   PROXIES_PREVIEW_TYPE,
+  ROUTES,
+  TAILWINDCSS_SIZE,
   themes,
 } from '~/constants'
 import {
@@ -27,8 +30,11 @@ import {
   setProxiesPreviewType,
   setRenderInTwoColumn,
   setRenderProxiesInSamePage,
+  setSelectedEndpoint,
+  setTableSize,
   setTwemoji,
   setUrlForLatencyTest,
+  tableSize,
   urlForLatencyTest,
   useRequest,
   useTwemoji,
@@ -165,7 +171,7 @@ const ConfigForm = () => {
   }
 
   return (
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-4">
       <form class="contents" use:form={form}>
         <For each={portsList}>
           {(item) => (
@@ -198,12 +204,39 @@ const ConfigForm = () => {
           {t('restartCore')}
         </Button>
       </div>
+
+      <div class="flex flex-col">
+        <div class="pb-4 text-lg font-semibold">{t('urlForLatencyTest')}</div>
+
+        <input
+          class="w-100 input input-bordered max-w-md"
+          value={urlForLatencyTest()}
+          onChange={(e) => setUrlForLatencyTest(e.target.value)}
+        />
+      </div>
+
+      <div>
+        <div class="pb-4 text-lg font-semibold">{t('autoCloseConns')}</div>
+
+        <input
+          class="toggle"
+          type="checkbox"
+          checked={autoCloseConns()}
+          onChange={(e) => setAutoCloseConns(e.target.checked)}
+        />
+      </div>
     </div>
   )
 }
 
 const ConfigForXd = () => {
   const [t] = useI18n()
+  const navigate = useNavigate()
+
+  const onSwitchEndpointClick = () => {
+    setSelectedEndpoint('')
+    navigate(ROUTES.Setup)
+  }
 
   return (
     <div class="grid gap-4">
@@ -284,61 +317,6 @@ const ConfigForXd = () => {
       </Show>
 
       <div>
-        <div class="pb-4 text-lg font-semibold">{t('proxiesPreviewType')}</div>
-
-        <div class="flex items-center gap-4">
-          <For each={Object.values(PROXIES_PREVIEW_TYPE)}>
-            {(value) => (
-              <label class="flex items-center gap-2">
-                <span>{t(value)}</span>
-
-                <input
-                  class="radio"
-                  aria-label={value}
-                  type="radio"
-                  checked={value === proxiesPreviewType()}
-                  onChange={() => setProxiesPreviewType(value)}
-                />
-              </label>
-            )}
-          </For>
-        </div>
-      </div>
-
-      <div>
-        <div class="pb-4 text-lg font-semibold">{t('proxiesSorting')}</div>
-
-        <div class="flex flex-col gap-4">
-          <For each={Object.values(PROXIES_ORDERING_TYPE)}>
-            {(value) => (
-              <label class="flex items-center gap-2">
-                <span>{t(value)}</span>
-
-                <input
-                  class="radio"
-                  aria-label={value}
-                  type="radio"
-                  checked={value === proxiesOrderingType()}
-                  onChange={() => setProxiesOrderingType(value)}
-                />
-              </label>
-            )}
-          </For>
-        </div>
-      </div>
-
-      <div>
-        <div class="pb-4 text-lg font-semibold">{t('autoCloseConns')}</div>
-
-        <input
-          class="toggle"
-          type="checkbox"
-          checked={autoCloseConns()}
-          onChange={(e) => setAutoCloseConns(e.target.checked)}
-        />
-      </div>
-
-      <div>
         <div class="pb-4 text-lg font-semibold">{t('useTwemoji')}</div>
 
         <input
@@ -349,14 +327,58 @@ const ConfigForXd = () => {
         />
       </div>
 
-      <div class="flex flex-col">
-        <div class="pb-4 text-lg font-semibold">{t('urlForLatencyTest')}</div>
+      <div>
+        <div class="pb-4 text-lg font-semibold">{t('proxiesPreviewType')}</div>
 
-        <input
-          class="w-100 input input-bordered max-w-md"
-          value={urlForLatencyTest()}
-          onChange={(e) => setUrlForLatencyTest(e.target.value)}
-        />
+        <select
+          class="select select-bordered w-full max-w-xs"
+          value={proxiesPreviewType()}
+          onChange={(e) =>
+            setProxiesPreviewType(e.target.value as PROXIES_PREVIEW_TYPE)
+          }
+        >
+          <For each={Object.values(PROXIES_PREVIEW_TYPE)}>
+            {(value) => <option value={value}>{t(value)}</option>}
+          </For>
+        </select>
+      </div>
+
+      <div>
+        <div class="pb-4 text-lg font-semibold">{t('proxiesSorting')}</div>
+
+        <select
+          class="select select-bordered w-full max-w-xs"
+          value={proxiesOrderingType()}
+          onChange={(e) =>
+            setProxiesOrderingType(e.target.value as PROXIES_ORDERING_TYPE)
+          }
+        >
+          <For each={Object.values(PROXIES_ORDERING_TYPE)}>
+            {(value) => (
+              <option class="flex items-center gap-2" value={value}>
+                {t(value)}
+              </option>
+            )}
+          </For>
+        </select>
+      </div>
+
+      <div>
+        <div class="pb-4 text-lg font-semibold">{t('tableSize')}</div>
+
+        <select
+          class="select select-bordered w-full max-w-xs"
+          value={tableSize()}
+          onChange={(e) => setTableSize(e.target.value as TAILWINDCSS_SIZE)}
+        >
+          <For each={Object.values(TAILWINDCSS_SIZE)}>
+            {(value) => <option value={value}>{t(value)}</option>}
+          </For>
+        </select>
+      </div>
+
+      <div>
+        <Button onClick={onSwitchEndpointClick}>{t('switchEndpoint')}</Button>
       </div>
     </div>
   )
@@ -369,7 +391,7 @@ export default () => {
       <ConfigForm />
       <ConfigForXd />
 
-      {import.meta.env.version}
+      <kbd class="kbd">{import.meta.env.version}</kbd>
     </div>
   )
 }

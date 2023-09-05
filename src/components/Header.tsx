@@ -1,7 +1,6 @@
 import { useI18n } from '@solid-primitives/i18n'
-import { A, useLocation, useNavigate } from '@solidjs/router'
+import { A, useLocation } from '@solidjs/router'
 import {
-  IconArrowsExchange,
   IconFileStack,
   IconGlobe,
   IconGlobeFilled,
@@ -17,12 +16,7 @@ import { For, ParentComponent, Show, createMemo, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Button } from '~/components'
 import { LANG, ROUTES, themes } from '~/constants'
-import {
-  renderProxiesInSamePage,
-  setCurTheme,
-  setSelectedEndpoint,
-  useProxies,
-} from '~/signals'
+import { renderProxiesInSamePage, setCurTheme, useProxies } from '~/signals'
 
 const Nav: ParentComponent<{ href: string; tooltip: string }> = ({
   href,
@@ -118,14 +112,8 @@ export const Header = () => {
   })
 
   const location = useLocation()
-  const navigate = useNavigate()
 
   const [openedDrawer, setOpenedDrawer] = createSignal(false)
-
-  const onSwitchEndpointClick = () => {
-    setSelectedEndpoint('')
-    navigate(ROUTES.Setup)
-  }
 
   return (
     <ul class="navbar rounded-box sticky inset-x-0 top-2 z-50 mx-2 mt-2 flex w-auto items-center justify-center bg-base-300 px-4">
@@ -200,13 +188,6 @@ export const Header = () => {
           </Button>
 
           <ThemeSwitcher />
-
-          <Button
-            class="btn-circle btn-secondary btn-sm"
-            onClick={onSwitchEndpointClick}
-          >
-            <IconArrowsExchange />
-          </Button>
         </div>
       </div>
     </ul>
