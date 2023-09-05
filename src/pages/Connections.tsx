@@ -267,7 +267,7 @@ export default () => {
       </div>
 
       <div class="overflow-x-auto whitespace-nowrap rounded-md bg-base-300">
-        <table class="table table-xs relative rounded-none">
+        <table class="table table-zebra table-xs relative rounded-none">
           <thead class="sticky top-0 z-10">
             <For each={table.getHeaderGroups()}>
               {(headerGroup) => (
@@ -308,7 +308,11 @@ export default () => {
           <tbody>
             <For each={table.getRowModel().rows}>
               {(row) => (
-                <tr class="hover">
+                <tr
+                  class={twMerge(
+                    'hover:!bg-primary hover:text-primary-content',
+                  )}
+                >
                   <For each={row.getVisibleCells()}>
                     {(cell) => (
                       <td
