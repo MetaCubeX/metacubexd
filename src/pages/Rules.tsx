@@ -84,28 +84,24 @@ export default () => {
           <For each={rulesProviders()}>
             {(rulesProvider) => (
               <div class="card card-bordered card-compact mb-2 bg-base-200 p-4">
-                <div class="flex items-center justify-between">
-                  <div class="break-all">
-                    {rulesProvider.name} ({rulesProvider.ruleCount})
-                  </div>
-                  <Button
-                    class="btn-circle btn-sm mr-2"
-                    onClick={(e) =>
-                      onUpdateProviderClick(e, rulesProvider.name)
-                    }
-                  >
-                    <IconReload
-                      class={twMerge(
-                        updatingMap()[rulesProvider.name] &&
-                          'animate-spin text-success',
-                      )}
-                    />
-                  </Button>
+                <div class="break-all pr-8">
+                  {rulesProvider.name} ({rulesProvider.ruleCount})
                 </div>
                 <div class="text-xs text-slate-500">
                   {rulesProvider.vehicleType} / {rulesProvider.behavior} /
                   {t('updated')} {formatTimeFromNow(rulesProvider.updatedAt)}
                 </div>
+                <Button
+                  class="btn-circle btn-sm absolute right-2 top-2 mr-2 h-4"
+                  onClick={(e) => onUpdateProviderClick(e, rulesProvider.name)}
+                >
+                  <IconReload
+                    class={twMerge(
+                      updatingMap()[rulesProvider.name] &&
+                        'animate-spin text-success',
+                    )}
+                  />
+                </Button>
               </div>
             )}
           </For>
