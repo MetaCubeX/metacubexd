@@ -59,7 +59,7 @@ export default () => {
 
             const title = (
               <>
-                <div class="mr-10 flex items-center justify-between">
+                <div class="mr-8 flex items-center justify-between">
                   <span>{proxy.name}</span>
                   <Button
                     class="btn-circle btn-sm"

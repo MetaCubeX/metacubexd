@@ -7,7 +7,7 @@ export const useWindowWidth = () => {
   }
 
   set()
-  window.addEventListener('resize', set, {})
+  window.addEventListener('resize', set)
 
   onCleanup(() => {
     window.removeEventListener('resize', set)
