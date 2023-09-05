@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.72.1](https://github.com/MetaCubeX/metacubexd/compare/v1.72.0...v1.72.1) (2023-09-05)
+
+
+### Bug Fixes
+
+* **connections:** limit closed connection items count below 100 ([f97f467](https://github.com/MetaCubeX/metacubexd/commit/f97f46720a5ded52aa6b592f11b1dca2579bb0b5))
+
 ## [1.72.0](https://github.com/MetaCubeX/metacubexd/compare/v1.71.0...v1.72.0) (2023-09-05)
 
 
