@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.71.0](https://github.com/MetaCubeX/metacubexd/compare/v1.70.0...v1.71.0) (2023-09-05)
+
+
+### Features
+
+* **connections:** connections table now supports grouping ([4c8b38f](https://github.com/MetaCubeX/metacubexd/commit/4c8b38f7563b6c8c38c8295ff0a30ec995c88257))
+
+
+### Bug Fixes
+
+* **proxy:** updateAllProvider, some of the proxy provider update may throw ([e09aac2](https://github.com/MetaCubeX/metacubexd/commit/e09aac2f4bd55bee816fb3d2a615dd4b14169607))
+
 ## [1.70.0](https://github.com/MetaCubeX/metacubexd/compare/v1.69.0...v1.70.0) (2023-09-05)
 
 
