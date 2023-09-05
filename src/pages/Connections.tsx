@@ -26,6 +26,7 @@ import {
 import byteSize from 'byte-size'
 import dayjs from 'dayjs'
 import { isIPv6 } from 'is-ip'
+import { differenceWith, isEqualWith } from 'lodash'
 import { For, createEffect, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Button, ConnectionsTableOrderingModal } from '~/components'
@@ -47,11 +48,17 @@ type ConnectionWithSpeed = Connection & {
 type ColumnVisibility = Partial<Record<CONNECTIONS_TABLE_ACCESSOR_KEY, boolean>>
 type ColumnOrder = CONNECTIONS_TABLE_ACCESSOR_KEY[]
 
+enum ActiveTab {
+  activeConnections = 'activeConnections',
+  closedConnections = 'closedConnections',
+}
+
 export default () => {
   const [t] = useI18n()
   const request = useRequest()
 
   const [search, setSearch] = createSignal('')
+  const [activeTab, setActiveTab] = createSignal(ActiveTab.activeConnections)
 
   const ws = createReconnectingWS(
     `${wsEndpointURL()}/connections?token=${secret()}`,
@@ -61,9 +68,11 @@ export default () => {
     message: WebSocketEventMap['message']
   }>(ws, 'message')
 
-  const [connectionsWithSpeed, setConnectionsWithSpeed] = createSignal<
-    ConnectionWithSpeed[]
-  >([])
+  const [closedConnectionsWithSpeed, setClosedConnectionsWithSpeed] =
+    createSignal<ConnectionWithSpeed[]>([])
+
+  const [activeConnectionsWithSpeed, setActiveConnectionsWithSpeed] =
+    createSignal<ConnectionWithSpeed[]>([])
 
   createEffect(() => {
     const data = messageEvent()?.data
@@ -72,7 +81,7 @@ export default () => {
       return
     }
 
-    setConnectionsWithSpeed((prevConnections) => {
+    setActiveConnectionsWithSpeed((prevConnections) => {
       const prevMap = new Map<string, Connection>()
       prevConnections.forEach((prev) => prevMap.set(prev.id, prev))
 
@@ -95,6 +104,16 @@ export default () => {
             : 0,
         }
       })
+
+      const closedConnections = differenceWith(
+        prevConnections,
+        connections,
+        (a, b) => isEqualWith(a, b, (a, b) => a.id === b.id),
+      )
+
+      setClosedConnectionsWithSpeed((prev) =>
+        [...prev, ...closedConnections].slice(-1000),
+      )
 
       return connections.slice(-100)
     })
@@ -249,7 +268,9 @@ export default () => {
       },
     },
     get data() {
-      return connectionsWithSpeed()
+      return activeTab() === ActiveTab.activeConnections
+        ? activeConnectionsWithSpeed()
+        : closedConnectionsWithSpeed()
     },
     sortDescFirst: true,
     enableHiding: true,
@@ -266,32 +287,52 @@ export default () => {
 
   const tableSizeClassName = () => {
     const size = tableSize()
+    let className = 'table-xs'
 
-    if (size === TAILWINDCSS_SIZE.XS) {
-      return 'table-xs'
+    switch (size) {
+      case TAILWINDCSS_SIZE.XS:
+        className = 'table-xs'
+        break
+      case TAILWINDCSS_SIZE.SM:
+        className = 'table-sm'
+        break
+      case TAILWINDCSS_SIZE.MD:
+        className = 'table-md'
+        break
+      case TAILWINDCSS_SIZE.LG:
+        className = 'table-lg'
+        break
     }
 
-    if (size === TAILWINDCSS_SIZE.SM) {
-      return 'table-sm'
-    }
-
-    if (size === TAILWINDCSS_SIZE.MD) {
-      return 'table-md'
-    }
-
-    if (size === TAILWINDCSS_SIZE.LG) {
-      return 'table-lg'
-    }
-
-    return ''
+    return className
   }
+
+  const tabs = () => [
+    {
+      type: ActiveTab.activeConnections,
+      name: t('activeConnections'),
+      count: activeConnectionsWithSpeed().length,
+    },
+    {
+      type: ActiveTab.closedConnections,
+      name: t('closedConnections'),
+      count: closedConnectionsWithSpeed().length,
+    },
+  ]
 
   return (
     <div class="flex h-full flex-col gap-4 overflow-y-auto p-1">
       <div class="tabs-boxed tabs">
-        <button class="tab tab-active">
-          {t('activeConnections')} ({connectionsWithSpeed().length})
-        </button>
+        <For each={tabs()}>
+          {(tab) => (
+            <button
+              class={twMerge(activeTab() === tab.type && 'tab-active', 'tab')}
+              onClick={() => setActiveTab(tab.type)}
+            >
+              {tab.name} ({tab.count})
+            </button>
+          )}
+        </For>
       </div>
 
       <div class="flex w-full items-center gap-2">

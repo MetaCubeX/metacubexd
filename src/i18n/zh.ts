@@ -67,4 +67,5 @@ export default {
   switchEndpoint: '切换后端',
   switchLanguage: '切换语言',
   requestTimeoutDuration: '请求超时时间',
+  closedConnections: '已关闭连接',
 }

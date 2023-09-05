@@ -67,4 +67,5 @@ export default {
   switchEndpoint: 'Switch Endpoint',
   switchLanguage: 'Switch Language',
   requestTimeoutDuration: 'Request Timeout Duration',
+  closedConnections: 'Closed Connections',
 }
