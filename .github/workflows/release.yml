@@ -33,7 +33,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           cache: pnpm
-          node-version: latest
+          node-version: 20.5
 
       - name: install dependencies
         run: pnpm install
