@@ -2,11 +2,9 @@ import { useI18n } from '@solid-primitives/i18n'
 import { IconReload } from '@tabler/icons-solidjs'
 import InfiniteScroll from 'solid-infinite-scroll'
 import { For, Show, createMemo, createSignal, onMount } from 'solid-js'
+import { twMerge } from 'tailwind-merge'
 import { Button } from '~/components'
-import {
-  formatTimeFromNow,
-  handleAnimatedBtnClickWithCallback,
-} from '~/helpers'
+import { formatTimeFromNow, useStringBooleanMap } from '~/helpers'
 import { useRules } from '~/signals'
 
 export default () => {
@@ -23,15 +21,22 @@ export default () => {
 
   onMount(updateRules)
 
+  const { map: updateingMap, setWithCallback: setUpdateingMap } =
+    useStringBooleanMap()
+  const [allProviderIsUpdating, setAllProviderIsUpdating] = createSignal(false)
+
   const onUpdateProviderClick = (e: MouseEvent, name: string) => {
-    handleAnimatedBtnClickWithCallback(
-      e,
-      updateRuleProviderByName.bind(null, name),
-    )
+    e.stopPropagation()
+    setUpdateingMap(name, async () => await updateRuleProviderByName(name))
   }
 
-  const onUpdateAllProviderClick = (e: MouseEvent) => {
-    handleAnimatedBtnClickWithCallback(e, updateAllRuleProvider)
+  const onUpdateAllProviderClick = async (e: MouseEvent) => {
+    e.stopPropagation()
+    setAllProviderIsUpdating(true)
+    try {
+      await updateAllRuleProvider()
+    } catch {}
+    setAllProviderIsUpdating(false)
   }
 
   return (
@@ -68,7 +73,9 @@ export default () => {
               class="btn-circle btn-ghost btn-sm ml-2"
               onClick={(e) => onUpdateAllProviderClick(e)}
             >
-              <IconReload />
+              <IconReload
+                class={twMerge(allProviderIsUpdating() && 'animate-spin')}
+              />
             </Button>
           </h1>
 
@@ -86,7 +93,11 @@ export default () => {
                         onUpdateProviderClick(e, rulesProvider.name)
                       }
                     >
-                      <IconReload />
+                      <IconReload
+                        class={twMerge(
+                          updateingMap()[rulesProvider.name] && 'animate-spin',
+                        )}
+                      />
                     </Button>
                   </div>
                 </div>

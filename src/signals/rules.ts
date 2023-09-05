@@ -9,16 +9,14 @@ export const useRules = () => {
   const [rulesProviders, setRulesProviders] = createSignal<RuleProvider[]>([])
 
   const updateRules = async () => {
-    const { rules } = await request
-      .get('rules')
-      .json<{ rules: Record<string, Rule> }>()
+    const [{ rules }, { providers }] = await Promise.all([
+      request.get('rules').json<{ rules: Record<string, Rule> }>(),
+      request
+        .get('providers/rules')
+        .json<{ providers: Record<string, RuleProvider> }>(),
+    ])
 
     setRules(Object.values(rules))
-
-    const { providers } = await request
-      .get('providers/rules')
-      .json<{ providers: Record<string, RuleProvider> }>()
-
     setRulesProviders(Object.values(providers))
   }
 

@@ -1,6 +1,7 @@
 import { useI18n } from '@solid-primitives/i18n'
 import { IconBrandSpeedtest, IconReload } from '@tabler/icons-solidjs'
 import { Show, createSignal } from 'solid-js'
+import { twMerge } from 'tailwind-merge'
 import {
   Button,
   Collapse,
@@ -11,8 +12,8 @@ import {
 } from '~/components'
 import {
   formatTimeFromNow,
-  handleAnimatedBtnClickWithCallback,
   sortProxiesByOrderingType,
+  useStringBooleanMap,
 } from '~/helpers'
 import { proxiesOrderingType, useProxies } from '~/signals'
 
@@ -26,27 +27,33 @@ export default () => {
     latencyMap,
   } = useProxies()
 
-  const [collapsedMap, setCollapsedMap] = createSignal<Record<string, boolean>>(
-    {},
-  )
+  const { map: collapsedMap, set: setCollapsedMap } = useStringBooleanMap()
+  const { map: healthCheckingMap, setWithCallback: setHealthCheckingMap } =
+    useStringBooleanMap()
+  const { map: updateingMap, setWithCallback: setUpdateingMap } =
+    useStringBooleanMap()
+  const [allProviderIsUpdating, setAllProviderIsUpdating] = createSignal(false)
 
-  const onHealthCheckClick = (e: MouseEvent, name: string) => {
-    handleAnimatedBtnClickWithCallback(
-      e,
-      healthCheckByProviderName.bind(null, name),
-      'animate-pulse',
+  const onHealthCheckClick = async (e: MouseEvent, name: string) => {
+    e.stopPropagation()
+    setHealthCheckingMap(
+      name,
+      async () => await healthCheckByProviderName(name),
     )
   }
 
-  const onUpdateProviderClick = (e: MouseEvent, name: string) => {
-    handleAnimatedBtnClickWithCallback(
-      e,
-      updateProviderByProviderName.bind(null, name),
-    )
+  const onUpdateProviderClick = async (e: MouseEvent, name: string) => {
+    e.stopPropagation()
+    setUpdateingMap(name, async () => await updateProviderByProviderName(name))
   }
 
-  const onUpdateAllProviderClick = (e: MouseEvent) => {
-    handleAnimatedBtnClickWithCallback(e, updateAllProvider)
+  const onUpdateAllProviderClick = async (e: MouseEvent) => {
+    e.stopPropagation()
+    setAllProviderIsUpdating(true)
+    try {
+      await updateAllProvider()
+    } catch {}
+    setAllProviderIsUpdating(false)
   }
 
   return (
@@ -58,7 +65,9 @@ export default () => {
           class="btn-circle btn-ghost btn-sm ml-2"
           onClick={(e) => onUpdateAllProviderClick(e)}
         >
-          <IconReload />
+          <IconReload
+            class={twMerge(allProviderIsUpdating() && 'animate-spin')}
+          />
         </Button>
       </h1>
       <ForTwoColumns
@@ -80,14 +89,23 @@ export default () => {
                       onUpdateProviderClick(e, proxyProvider.name)
                     }
                   >
-                    <IconReload />
+                    <IconReload
+                      class={twMerge(
+                        updateingMap()[proxyProvider.name] && 'animate-spin',
+                      )}
+                    />
                   </Button>
 
                   <Button
                     class="btn btn-circle btn-sm"
                     onClick={(e) => onHealthCheckClick(e, proxyProvider.name)}
                   >
-                    <IconBrandSpeedtest />
+                    <IconBrandSpeedtest
+                      class={twMerge(
+                        healthCheckingMap()[proxyProvider.name] &&
+                          'animate-pulse',
+                      )}
+                    />
                   </Button>
                 </div>
               </div>
@@ -112,10 +130,7 @@ export default () => {
               title={title}
               content={content}
               onCollapse={(val) =>
-                setCollapsedMap({
-                  ...collapsedMap(),
-                  [`provider-${proxyProvider.name}`]: val,
-                })
+                setCollapsedMap(`provider-${proxyProvider.name}`, val)
               }
             />
           )

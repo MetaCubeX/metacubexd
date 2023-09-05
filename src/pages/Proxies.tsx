@@ -1,6 +1,7 @@
 import { useI18n } from '@solid-primitives/i18n'
 import { IconBrandSpeedtest } from '@tabler/icons-solidjs'
-import { createSignal, Show } from 'solid-js'
+import { Show } from 'solid-js'
+import { twMerge } from 'tailwind-merge'
 import {
   Button,
   Collapse,
@@ -8,10 +9,7 @@ import {
   ProxyCardGroups,
   ProxyNodePreview,
 } from '~/components'
-import {
-  handleAnimatedBtnClickWithCallback,
-  sortProxiesByOrderingType,
-} from '~/helpers'
+import { sortProxiesByOrderingType, useStringBooleanMap } from '~/helpers'
 import {
   proxiesOrderingType,
   renderProxiesInSamePage,
@@ -29,19 +27,19 @@ export default () => {
     latencyMap,
   } = useProxies()
 
-  const [collapsedMap, setCollapsedMap] = createSignal<Record<string, boolean>>(
-    {},
-  )
+  const { map: collapsedMap, set: setCollapsedMap } = useStringBooleanMap()
+  const { map: speedTestingMap, setWithCallback: setSpeedTestingMap } =
+    useStringBooleanMap()
 
   const onProxyNodeClick = async (proxy: Proxy, proxyName: string) => {
     void setProxyGroupByProxyName(proxy, proxyName)
   }
 
-  const onSpeedTestClick = (e: MouseEvent, name: string) => {
-    handleAnimatedBtnClickWithCallback(
-      e,
-      latencyTestByProxyGroupName.bind(null, name),
-      'animate-pulse',
+  const onSpeedTestClick = async (e: MouseEvent, name: string) => {
+    e.stopPropagation()
+    setSpeedTestingMap(
+      name,
+      async () => await latencyTestByProxyGroupName(name),
     )
   }
 
@@ -67,7 +65,11 @@ export default () => {
                     class="btn-circle btn-sm"
                     onClick={(e) => onSpeedTestClick(e, proxy.name)}
                   >
-                    <IconBrandSpeedtest />
+                    <IconBrandSpeedtest
+                      class={twMerge(
+                        speedTestingMap()[proxy.name] && 'animate-pulse',
+                      )}
+                    />
                   </Button>
                 </div>
                 <div class="text-sm text-slate-500">
@@ -98,10 +100,7 @@ export default () => {
                 title={title}
                 content={content}
                 onCollapse={(val) =>
-                  setCollapsedMap({
-                    ...collapsedMap(),
-                    [`group-${proxy.name}`]: val,
-                  })
+                  setCollapsedMap(`group-${proxy.name}`, val)
                 }
               />
             )

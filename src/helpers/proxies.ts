@@ -1,27 +1,35 @@
 import dayjs from 'dayjs'
+import { createSignal } from 'solid-js'
 import { PROXIES_ORDERING_TYPE } from '~/constants'
 
 export const formatTimeFromNow = (time: number | string) => {
   return dayjs(time).fromNow()
 }
-
-export const handleAnimatedBtnClickWithCallback = async (
-  event: MouseEvent,
-  callback: () => Promise<void>,
-  className = 'animate-spin',
-) => {
-  let el = event.target as HTMLElement
-  event.stopPropagation()
-
-  while (el && !el.classList.contains('btn')) {
-    el = el.parentElement!
+export const useStringBooleanMap = () => {
+  const [map, setMap] = createSignal<Record<string, boolean>>({})
+  const set = (name: string, value: boolean) => {
+    setMap({
+      ...map(),
+      [name]: value,
+    })
   }
 
-  el.classList.add(className)
-  try {
-    await callback()
-  } catch {}
-  el.classList.remove(className)
+  const setWithCallback = async (
+    name: string,
+    callback: () => Promise<void>,
+  ) => {
+    set(name, true)
+    try {
+      await callback()
+    } catch {}
+    set(name, false)
+  }
+
+  return {
+    map,
+    set,
+    setWithCallback,
+  }
 }
 
 export const formatProxyType = (type = '') => {
