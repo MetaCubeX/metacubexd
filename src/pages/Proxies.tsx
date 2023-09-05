@@ -64,7 +64,8 @@ export default () => {
                   >
                     <IconBrandSpeedtest
                       class={twMerge(
-                        speedTestingMap()[proxy.name] && 'animate-pulse',
+                        speedTestingMap()[proxy.name] &&
+                          'animate-pulse text-success',
                       )}
                     />
                   </Button>
@@ -72,7 +73,7 @@ export default () => {
                 <div class="text-sm text-slate-500">
                   {proxy.type} {proxy.now?.length > 0 && ` :: ${proxy.now}`}
                 </div>
-                <Show when={!collapsedMap()[`group-${proxy.name}`]}>
+                <Show when={!collapsedMap()[proxy.name]}>
                   <ProxyNodePreview
                     proxyNameList={sortedProxyNames}
                     now={proxy.now}
@@ -93,12 +94,10 @@ export default () => {
 
             return (
               <Collapse
-                isOpen={collapsedMap()[`group-${proxy.name}`]}
+                isOpen={collapsedMap()[proxy.name]}
                 title={title}
                 content={content}
-                onCollapse={(val) =>
-                  setCollapsedMap(`group-${proxy.name}`, val)
-                }
+                onCollapse={(val) => setCollapsedMap(proxy.name, val)}
               />
             )
           })}

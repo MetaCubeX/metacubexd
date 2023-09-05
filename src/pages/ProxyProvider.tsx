@@ -63,7 +63,9 @@ export default () => {
           onClick={(e) => onUpdateAllProviderClick(e)}
         >
           <IconReload
-            class={twMerge(allProviderIsUpdating() && 'animate-spin')}
+            class={twMerge(
+              allProviderIsUpdating() && 'animate-spin text-success',
+            )}
           />
         </Button>
       </h1>
@@ -88,7 +90,8 @@ export default () => {
                   >
                     <IconReload
                       class={twMerge(
-                        updateingMap()[proxyProvider.name] && 'animate-spin',
+                        updateingMap()[proxyProvider.name] &&
+                          'animate-spin text-success',
                       )}
                     />
                   </Button>
@@ -100,7 +103,7 @@ export default () => {
                     <IconBrandSpeedtest
                       class={twMerge(
                         healthCheckingMap()[proxyProvider.name] &&
-                          'animate-pulse',
+                          'animate-pulse text-success',
                       )}
                     />
                   </Button>
@@ -113,7 +116,7 @@ export default () => {
                 {proxyProvider.vehicleType} :: {t('updated')}{' '}
                 {formatTimeFromNow(proxyProvider.updatedAt)}
               </div>
-              <Show when={!collapsedMap()[`provider-${proxyProvider.name}`]}>
+              <Show when={!collapsedMap()[proxyProvider.name]}>
                 <ProxyNodePreview proxyNameList={sortedProxyNames} />
               </Show>
             </>
@@ -123,12 +126,10 @@ export default () => {
 
           return (
             <Collapse
-              isOpen={collapsedMap()[`provider-${proxyProvider.name}`]}
+              isOpen={collapsedMap()[proxyProvider.name]}
               title={title}
               content={content}
-              onCollapse={(val) =>
-                setCollapsedMap(`provider-${proxyProvider.name}`, val)
-              }
+              onCollapse={(val) => setCollapsedMap(proxyProvider.name, val)}
             />
           )
         })}

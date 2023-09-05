@@ -74,7 +74,9 @@ export default () => {
               onClick={(e) => onUpdateAllProviderClick(e)}
             >
               <IconReload
-                class={twMerge(allProviderIsUpdating() && 'animate-spin')}
+                class={twMerge(
+                  allProviderIsUpdating() && 'animate-spin text-success',
+                )}
               />
             </Button>
           </h1>
@@ -95,7 +97,8 @@ export default () => {
                     >
                       <IconReload
                         class={twMerge(
-                          updatingMap()[rulesProvider.name] && 'animate-spin',
+                          updatingMap()[rulesProvider.name] &&
+                            'animate-spin text-success',
                         )}
                       />
                     </Button>
