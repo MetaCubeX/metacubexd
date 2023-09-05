@@ -1,11 +1,11 @@
+import { createWindowSize } from '@solid-primitives/resize-observer'
 import { JSX, Show, createMemo } from 'solid-js'
-import { useWindowWidth } from '~/helpers'
 import { renderInTwoColumn } from '~/signals'
 
 export const ForTwoColumns = (props: { subChild: JSX.Element[] }) => {
-  const { windowWidth } = useWindowWidth()
+  const windowSize = createWindowSize()
   const isShowTwoColumns = createMemo(
-    () => windowWidth() >= 640 && renderInTwoColumn(),
+    () => windowSize.width >= 640 && renderInTwoColumn(),
   ) // 640 is sm size in daisyui
   const leftCloumns = createMemo(() =>
     props.subChild.filter((_, index) => index % 2 === 0 || !isShowTwoColumns()),

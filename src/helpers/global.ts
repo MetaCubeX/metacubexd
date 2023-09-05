@@ -1,22 +1,4 @@
-import { createSignal, onCleanup } from 'solid-js'
-
-export const useWindowWidth = () => {
-  const [windowWidth, setWindowWidth] = createSignal(0)
-  const set = () => {
-    setWindowWidth(document.body?.clientWidth ?? 0)
-  }
-
-  set()
-  window.addEventListener('resize', set)
-
-  onCleanup(() => {
-    window.removeEventListener('resize', set)
-  })
-
-  return {
-    windowWidth,
-  }
-}
+import { createSignal } from 'solid-js'
 
 export const useStringBooleanMap = () => {
   const [map, setMap] = createSignal<Record<string, boolean>>({})
