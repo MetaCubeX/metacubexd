@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.67.4](https://github.com/MetaCubeX/metacubexd/compare/v1.67.3...v1.67.4) (2023-09-05)
+
+
+### Bug Fixes
+
+* update pnpm-lock.yaml ([0756f13](https://github.com/MetaCubeX/metacubexd/commit/0756f133a0bf8f750b4caa2f8d895038d3816611))
+
 ## [1.67.3](https://github.com/MetaCubeX/metacubexd/compare/v1.67.2...v1.67.3) (2023-09-05)
 
 
