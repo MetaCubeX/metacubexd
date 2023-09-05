@@ -24,6 +24,10 @@ export const [autoCloseConns, setAutoCloseConns] = makePersisted(
   createSignal(false),
   { name: 'autoCloseConns', storage: localStorage },
 )
+export const [useTwemoji, setTwemoji] = makePersisted(createSignal(false), {
+  name: 'useTwemoji',
+  storage: localStorage,
+})
 export const [autoSwitchTheme, setAutoSwitchTheme] = makePersisted(
   createSignal(false),
   { name: 'autoSwitchTheme', storage: localStorage },

@@ -27,9 +27,11 @@ import {
   setProxiesPreviewType,
   setRenderInTwoColumn,
   setRenderProxiesInSamePage,
+  setTwemoji,
   setUrlForLatencyTest,
   urlForLatencyTest,
   useRequest,
+  useTwemoji,
 } from '~/signals'
 import type { DNSQuery, Config as IConfig } from '~/types'
 
@@ -333,6 +335,17 @@ const ConfigForXd = () => {
           type="checkbox"
           checked={autoCloseConns()}
           onChange={(e) => setAutoCloseConns(e.target.checked)}
+        />
+      </div>
+
+      <div>
+        <div class="pb-4 text-lg font-semibold">{t('useTwemoji')}</div>
+
+        <input
+          class="toggle"
+          type="checkbox"
+          checked={useTwemoji()}
+          onChange={(e) => setTwemoji(e.target.checked)}
         />
       </div>
 

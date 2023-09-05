@@ -9,6 +9,7 @@ import {
   selectedEndpoint,
   useAutoSwitchTheme,
   useProxies,
+  useTwemoji,
 } from '~/signals'
 
 const Setup = lazy(() => import('~/pages/Setup'))
@@ -28,6 +29,20 @@ export const App = () => {
   createEffect(() => {
     if (selectedEndpoint() && endpoint()) {
       void useProxies().updateProxies()
+    }
+
+    const rootElement = document.querySelector(':root') as HTMLElement
+
+    if (useTwemoji()) {
+      rootElement.style.setProperty(
+        'font-family',
+        "'Fira Sans', 'Twemoji Mozilla', system-ui, monospace",
+      )
+    } else {
+      rootElement.style.setProperty(
+        'font-family',
+        "'Fira Sans', system-ui, monospace",
+      )
     }
   })
 
