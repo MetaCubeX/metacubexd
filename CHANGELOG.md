@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.67.5](https://github.com/MetaCubeX/metacubexd/compare/v1.67.4...v1.67.5) (2023-09-05)
+
+
+### Bug Fixes
+
+* build issue, `Cannot redefine property: File` ([b50c41e](https://github.com/MetaCubeX/metacubexd/commit/b50c41e3a588b843f7b5f35afd38b981fd0372b9))
+
 ## [1.67.4](https://github.com/MetaCubeX/metacubexd/compare/v1.67.3...v1.67.4) (2023-09-05)
 
 
