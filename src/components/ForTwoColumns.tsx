@@ -1,15 +1,9 @@
-import { JSX, Show, createMemo, createSignal } from 'solid-js'
+import { JSX, Show, createMemo } from 'solid-js'
+import { useWindowWidth } from '~/helpers'
 import { renderInTwoColumn } from '~/signals'
 
-const [windowWidth, setWindowWidth] = createSignal(0)
-
-setWindowWidth(document?.body?.clientWidth)
-
-window.addEventListener('resize', () => {
-  setWindowWidth(document.body.clientWidth)
-})
-
 export const ForTwoColumns = (props: { subChild: JSX.Element[] }) => {
+  const { windowWidth } = useWindowWidth()
   const isShowTwoColumns = createMemo(
     () => windowWidth() >= 640 && renderInTwoColumn(),
   ) // 640 is sm size in daisyui

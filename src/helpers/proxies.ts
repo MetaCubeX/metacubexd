@@ -1,35 +1,8 @@
 import dayjs from 'dayjs'
-import { createSignal } from 'solid-js'
 import { PROXIES_ORDERING_TYPE } from '~/constants'
 
 export const formatTimeFromNow = (time: number | string) => {
   return dayjs(time).fromNow()
-}
-export const useStringBooleanMap = () => {
-  const [map, setMap] = createSignal<Record<string, boolean>>({})
-  const set = (name: string, value: boolean) => {
-    setMap({
-      ...map(),
-      [name]: value,
-    })
-  }
-
-  const setWithCallback = async (
-    name: string,
-    callback: () => Promise<void>,
-  ) => {
-    set(name, true)
-    try {
-      await callback()
-    } catch {}
-    set(name, false)
-  }
-
-  return {
-    map,
-    set,
-    setWithCallback,
-  }
 }
 
 export const formatProxyType = (type = '') => {
