@@ -37,10 +37,7 @@ export default () => {
 
   const onSpeedTestClick = async (e: MouseEvent, name: string) => {
     e.stopPropagation()
-    setSpeedTestingMap(
-      name,
-      async () => await latencyTestByProxyGroupName(name),
-    )
+    setSpeedTestingMap(name, () => latencyTestByProxyGroupName(name))
   }
 
   return (

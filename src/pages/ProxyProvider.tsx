@@ -34,17 +34,14 @@ export default () => {
     useStringBooleanMap()
   const [allProviderIsUpdating, setAllProviderIsUpdating] = createSignal(false)
 
-  const onHealthCheckClick = async (e: MouseEvent, name: string) => {
+  const onHealthCheckClick = (e: MouseEvent, name: string) => {
     e.stopPropagation()
-    setHealthCheckingMap(
-      name,
-      async () => await healthCheckByProviderName(name),
-    )
+    setHealthCheckingMap(name, () => healthCheckByProviderName(name))
   }
 
-  const onUpdateProviderClick = async (e: MouseEvent, name: string) => {
+  const onUpdateProviderClick = (e: MouseEvent, name: string) => {
     e.stopPropagation()
-    setUpdateingMap(name, async () => await updateProviderByProviderName(name))
+    setUpdateingMap(name, () => updateProviderByProviderName(name))
   }
 
   const onUpdateAllProviderClick = async (e: MouseEvent) => {

@@ -40,7 +40,7 @@ export default () => {
   }
 
   return (
-    <div class="flex w-full flex-row gap-4">
+    <div class="flex w-full gap-4">
       <div class="flex-1">
         <h1 class="pb-4 text-lg font-semibold">{t('rules')}</h1>
 
@@ -82,11 +82,11 @@ export default () => {
           <For each={rulesProviders()}>
             {(rulesProvider) => (
               <div class="card card-bordered card-compact mb-2 bg-base-200 p-4">
-                <div class="flex h-6 items-center justify-between">
-                  <span>
+                <div class="flex items-center justify-between">
+                  <div class="break-all">
                     {rulesProvider.name} ({rulesProvider.ruleCount})
-                  </span>
-                  <div>
+                  </div>
+                  <div class="h-6">
                     <Button
                       class="btn-circle btn-sm mr-2"
                       onClick={(e) =>
