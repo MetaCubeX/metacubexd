@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.73.0](https://github.com/MetaCubeX/metacubexd/compare/v1.72.1...v1.73.0) (2023-09-05)
+
+
+### Features
+
+* **connections:** pausing support ([6076619](https://github.com/MetaCubeX/metacubexd/commit/60766194858e0c88f5af2a5f4c5f21946a0429ff))
+
 ## [1.72.1](https://github.com/MetaCubeX/metacubexd/compare/v1.72.0...v1.72.1) (2023-09-05)
 
 
