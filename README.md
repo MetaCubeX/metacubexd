@@ -41,14 +41,14 @@ git clone https://github.com/metacubex/metacubexd.git -b gh-pages /etc/clash-met
 
 Make sure you have external-ui directory set correctly in your config file
 
+```yaml
+external-ui: /etc/clash-meta/ui
+```
+
 > Update
 
 ```shell
 git -C /etc/clash-meta/ui pull
-```
-
-```yaml
-external-ui: /etc/clash-meta/ui
 ```
 
 ### Run inside Docker
