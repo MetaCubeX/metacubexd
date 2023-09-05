@@ -162,7 +162,7 @@ export const Header = () => {
 
       <Show when={location.pathname !== ROUTES.Setup}>
         <div class="navbar-center hidden lg:flex">
-          <ul class="menu menu-horizontal menu-lg gap-2">
+          <ul class="menu menu-horizontal menu-lg gap-2 p-0">
             <For each={navs()}>
               {({ href, name, icon }) => (
                 <Nav href={href} tooltip={name}>
