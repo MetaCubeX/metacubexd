@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.72.0](https://github.com/MetaCubeX/metacubexd/compare/v1.71.0...v1.72.0) (2023-09-05)
+
+
+### Features
+
+* **connections:** add closed connections tab ([f0e32d9](https://github.com/MetaCubeX/metacubexd/commit/f0e32d93f6d5ffa52a721ede1003d2f7ee20d0bc))
+
 ## [1.71.0](https://github.com/MetaCubeX/metacubexd/compare/v1.70.0...v1.71.0) (2023-09-05)
 
 
