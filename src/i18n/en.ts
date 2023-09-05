@@ -40,7 +40,7 @@ export default {
   auto: 'Auto',
   off: 'Off',
   proxiesPreviewType: 'Proxies preview type',
-  urlForLatencyTest: 'Url for latency test',
+  urlForLatencyTest: 'URL for latency test',
   autoCloseConns: 'Automatically close all connections',
   useTwemoji: 'Use Twemoji Mozilla Font',
   autoSwitchTheme: 'Automatically switch theme',
@@ -66,4 +66,5 @@ export default {
   lg: 'Large size',
   switchEndpoint: 'Switch Endpoint',
   switchLanguage: 'Switch Language',
+  requestTimeoutDuration: 'Request Timeout Duration',
 }

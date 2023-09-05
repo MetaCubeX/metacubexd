@@ -66,4 +66,5 @@ export default {
   lg: '超大尺寸',
   switchEndpoint: '切换后端',
   switchLanguage: '切换语言',
+  requestTimeoutDuration: '请求超时时间',
 }

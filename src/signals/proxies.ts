@@ -91,10 +91,7 @@ export const useProxies = () => {
   const latencyTestByProxyGroupName = async (proxyGroupName: string) => {
     const data: Record<string, number> = await request
       .get(`group/${proxyGroupName}/delay`, {
-        searchParams: {
-          url: urlForLatencyTest(),
-          timeout: 2000,
-        },
+        searchParams: { url: urlForLatencyTest() },
       })
       .json()
 
@@ -121,9 +118,7 @@ export const useProxies = () => {
   }
 
   const healthCheckByProviderName = async (providerName: string) => {
-    await request.get(`providers/proxies/${providerName}/healthcheck`, {
-      timeout: 30 * 1000, // this api is a little bit slow sometimes...
-    })
+    await request.get(`providers/proxies/${providerName}/healthcheck`)
     await updateProxies()
   }
 

@@ -2,7 +2,14 @@ import { createForm } from '@felte/solid'
 import { validator } from '@felte/validator-zod'
 import { useI18n } from '@solid-primitives/i18n'
 import { useNavigate } from '@solidjs/router'
-import { For, Show, createSignal, onMount } from 'solid-js'
+import {
+  For,
+  ParentComponent,
+  Show,
+  children,
+  createSignal,
+  onMount,
+} from 'solid-js'
 import { z } from 'zod'
 import { Button } from '~/components'
 import {
@@ -23,6 +30,7 @@ import {
   proxiesPreviewType,
   renderInTwoColumn,
   renderProxiesInSamePage,
+  requestTimeoutDuration,
   setAutoCloseConns,
   setAutoSwitchTheme,
   setFavDayTheme,
@@ -31,6 +39,7 @@ import {
   setProxiesPreviewType,
   setRenderInTwoColumn,
   setRenderProxiesInSamePage,
+  setRequestTimeoutDuration,
   setSelectedEndpoint,
   setTableSize,
   setTwemoji,
@@ -46,6 +55,12 @@ const dnsQueryFormSchema = z.object({
   name: z.string(),
   type: z.string(),
 })
+
+const ConfigTitle: ParentComponent = (props) => (
+  <div class="pb-4 text-lg font-semibold">
+    {children(() => props.children)()}
+  </div>
+)
 
 const DNSQueryForm = () => {
   const [t] = useI18n()
@@ -73,6 +88,7 @@ const DNSQueryForm = () => {
     <div class="flex flex-col">
       <form use:form={form} class="flex flex-col gap-2 sm:flex-row">
         <input name="name" class="input input-bordered w-full sm:flex-1" />
+
         <div class="flex items-center gap-2">
           <select name="type" class="select select-bordered">
             <option>A</option>
@@ -207,17 +223,30 @@ const ConfigForm = () => {
       </div>
 
       <div class="flex flex-col">
-        <div class="pb-4 text-lg font-semibold">{t('urlForLatencyTest')}</div>
+        <ConfigTitle>{t('urlForLatencyTest')}</ConfigTitle>
 
         <input
-          class="w-100 input input-bordered max-w-md"
+          class="input input-bordered max-w-md"
           value={urlForLatencyTest()}
           onChange={(e) => setUrlForLatencyTest(e.target.value)}
         />
       </div>
 
       <div>
-        <div class="pb-4 text-lg font-semibold">{t('autoCloseConns')}</div>
+        <ConfigTitle>
+          {t('requestTimeoutDuration')} ({t('ms')})
+        </ConfigTitle>
+
+        <input
+          type="number"
+          class="input input-bordered w-full max-w-md"
+          value={requestTimeoutDuration()}
+          onChange={(e) => setRequestTimeoutDuration(Number(e.target.value))}
+        />
+      </div>
+
+      <div>
+        <ConfigTitle>{t('autoCloseConns')}</ConfigTitle>
 
         <input
           class="toggle"
@@ -242,7 +271,8 @@ const ConfigForXd = () => {
   return (
     <div class="grid gap-4">
       <div class="flex flex-col">
-        <div class="pb-4 text-lg font-semibold">{t('renderInTwoColumns')}</div>
+        <ConfigTitle>{t('renderInTwoColumns')}</ConfigTitle>
+
         <input
           type="checkbox"
           class="toggle"
@@ -253,9 +283,8 @@ const ConfigForXd = () => {
         />
       </div>
       <div class="flex flex-col">
-        <div class="pb-4 text-lg font-semibold">
-          {t('renderProxiesInSamePage')}
-        </div>
+        <ConfigTitle>{t('renderProxiesInSamePage')}</ConfigTitle>
+
         <input
           type="checkbox"
           class="toggle"
@@ -265,8 +294,10 @@ const ConfigForXd = () => {
           }}
         />
       </div>
+
       <div class="flex flex-col">
-        <div class="pb-4 text-lg font-semibold">{t('autoSwitchTheme')}</div>
+        <ConfigTitle>{t('autoSwitchTheme')}</ConfigTitle>
+
         <input
           type="checkbox"
           class="toggle"
@@ -277,9 +308,11 @@ const ConfigForXd = () => {
           }}
         />
       </div>
+
       <Show when={autoSwitchTheme()}>
         <div class="flex flex-col">
-          <div class="pb-4 text-lg font-semibold">{t('favDayTheme')}</div>
+          <ConfigTitle>{t('favDayTheme')}</ConfigTitle>
+
           <select
             class="select select-bordered w-full max-w-xs"
             onChange={(e) => {
@@ -297,7 +330,7 @@ const ConfigForXd = () => {
           </select>
         </div>
         <div class="flex flex-col">
-          <div class="pb-4 text-lg font-semibold">{t('favNightTheme')}</div>
+          <ConfigTitle>{t('favNightTheme')}</ConfigTitle>
 
           <select
             class="select select-bordered w-full max-w-xs"
@@ -318,7 +351,7 @@ const ConfigForXd = () => {
       </Show>
 
       <div>
-        <div class="pb-4 text-lg font-semibold">{t('useTwemoji')}</div>
+        <ConfigTitle>{t('useTwemoji')}</ConfigTitle>
 
         <input
           class="toggle"
@@ -329,7 +362,7 @@ const ConfigForXd = () => {
       </div>
 
       <div>
-        <div class="pb-4 text-lg font-semibold">{t('proxiesPreviewType')}</div>
+        <ConfigTitle>{t('proxiesPreviewType')}</ConfigTitle>
 
         <select
           class="select select-bordered w-full max-w-xs"
@@ -345,7 +378,7 @@ const ConfigForXd = () => {
       </div>
 
       <div>
-        <div class="pb-4 text-lg font-semibold">{t('proxiesSorting')}</div>
+        <ConfigTitle>{t('proxiesSorting')}</ConfigTitle>
 
         <select
           class="select select-bordered w-full max-w-xs"
@@ -365,7 +398,7 @@ const ConfigForXd = () => {
       </div>
 
       <div>
-        <div class="pb-4 text-lg font-semibold">{t('tableSize')}</div>
+        <ConfigTitle>{t('tableSize')}</ConfigTitle>
 
         <select
           class="select select-bordered w-full max-w-xs"

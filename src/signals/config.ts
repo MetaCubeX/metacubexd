@@ -54,6 +54,11 @@ export const [tableSize, setTableSize] = makePersisted(
   createSignal<TAILWINDCSS_SIZE>(TAILWINDCSS_SIZE.XS),
   { name: 'tableSize', storage: localStorage },
 )
+export const [requestTimeoutDuration, setRequestTimeoutDuration] =
+  makePersisted(createSignal(10000), {
+    name: 'requestTimeoutDuration',
+    storage: localStorage,
+  })
 
 export const isLatencyTestByHttps = () =>
   urlForLatencyTest().startsWith('https')
