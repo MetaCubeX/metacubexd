@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.70.0](https://github.com/MetaCubeX/metacubexd/compare/v1.69.0...v1.70.0) (2023-09-05)
+
+
+### Features
+
+* **config:** add setting, requestTimeoutDuration ([d01d148](https://github.com/MetaCubeX/metacubexd/commit/d01d148cfffc785a9c57b021696db9e2b191eb1f))
+
 ## [1.69.0](https://github.com/MetaCubeX/metacubexd/compare/v1.68.0...v1.69.0) (2023-09-05)
 
 
