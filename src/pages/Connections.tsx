@@ -289,9 +289,9 @@ export default () => {
   return (
     <div class="flex h-full flex-col gap-4 overflow-y-auto p-1">
       <div class="tabs-boxed tabs">
-        <a class="tab tab-active">
+        <button class="tab tab-active">
           {t('activeConnections')} ({connectionsWithSpeed().length})
-        </a>
+        </button>
       </div>
 
       <div class="flex w-full items-center gap-2">

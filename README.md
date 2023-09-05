@@ -13,7 +13,8 @@
 
 ## Preview
 
-![preview](docs/preview.webp)
+![preview-overview](docs/preview-overview.webp)
+![preview-connections](docs/preview-connections.webp)
 
 ## Published Official Links
 
