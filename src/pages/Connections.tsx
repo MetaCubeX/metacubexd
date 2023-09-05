@@ -350,11 +350,14 @@ export default () => {
 
   return (
     <div class="flex h-full flex-col gap-4 overflow-y-auto p-1">
-      <div class="tabs-boxed tabs">
+      <div class="tabs-boxed tabs gap-2">
         <For each={tabs()}>
           {(tab) => (
             <button
-              class={twMerge(activeTab() === tab.type && 'tab-active', 'tab')}
+              class={twMerge(
+                activeTab() === tab.type && 'tab-active',
+                'tab tab-xs',
+              )}
               onClick={() => setActiveTab(tab.type)}
             >
               {tab.name} ({tab.count})
@@ -363,28 +366,28 @@ export default () => {
         </For>
       </div>
 
-      <div class="flex w-full items-center gap-2">
+      <div class="flex w-full flex-wrap items-center gap-2">
         <input
-          class="input input-primary flex-1"
+          class="input input-primary input-sm flex-1"
           placeholder={t('search')}
           onInput={(e) => setSearch(e.target.value)}
         />
 
         <Button
-          class="btn-circle"
+          class="btn-circle btn-sm"
           onClick={() => setPaused((paused) => !paused)}
         >
           {paused() ? <IconPlayerPause /> : <IconPlayerPlay />}
         </Button>
 
         <Button
-          class="btn-circle"
+          class="btn-circle btn-sm"
           onClick={() => request.delete('connections')}
         >
           <IconCircleX />
         </Button>
 
-        <label for="connection-modal" class="btn btn-circle">
+        <label for="connection-modal" class="btn btn-circle btn-sm">
           <IconSettings />
         </label>
 
