@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.69.0](https://github.com/MetaCubeX/metacubexd/compare/v1.68.0...v1.69.0) (2023-09-05)
+
+
+### Features
+
+* icon success color when updating ([6575e73](https://github.com/MetaCubeX/metacubexd/commit/6575e734392d63d959dacbb3b7ad733285828475))
+* make some changes in response to community suggestions ([cc78d4e](https://github.com/MetaCubeX/metacubexd/commit/cc78d4e2b1adf729d38a63f6b147544b100f94a3))
+* make some changes in response to community suggestions ([90ecb86](https://github.com/MetaCubeX/metacubexd/commit/90ecb866039b36b4fdd1bc420bd65ef10222cd23))
+
+
+### Bug Fixes
+
+* icon vertical align ([c6f3bee](https://github.com/MetaCubeX/metacubexd/commit/c6f3beec354f632584d77c4a5295203076410e21))
+* rule provider word break ([e6facf1](https://github.com/MetaCubeX/metacubexd/commit/e6facf11758500ebddb4b534f5e843fd8f016476))
+
 ## [1.68.0](https://github.com/MetaCubeX/metacubexd/compare/v1.67.5...v1.68.0) (2023-09-05)
 
 
