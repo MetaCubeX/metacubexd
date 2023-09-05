@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.74.1](https://github.com/MetaCubeX/metacubexd/compare/v1.74.0...v1.74.1) (2023-09-05)
+
+
+### Bug Fixes
+
+* **logs:** table size ([3a2560f](https://github.com/MetaCubeX/metacubexd/commit/3a2560f15291a60ed509cf8c32f5c699cda957e5))
+
 ## [1.74.0](https://github.com/MetaCubeX/metacubexd/compare/v1.73.0...v1.74.0) (2023-09-05)
 
 
