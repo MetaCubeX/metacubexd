@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.74.0](https://github.com/MetaCubeX/metacubexd/compare/v1.73.0...v1.74.0) (2023-09-05)
+
+
+### Features
+
+* **connections:** shrink the element sizes down ([0aa9779](https://github.com/MetaCubeX/metacubexd/commit/0aa97795246978003319684b1ea8a500f7b382ca))
+
 ## [1.73.0](https://github.com/MetaCubeX/metacubexd/compare/v1.72.1...v1.73.0) (2023-09-05)
 
 
