@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.67.3](https://github.com/MetaCubeX/metacubexd/compare/v1.67.2...v1.67.3) (2023-09-05)
+
+
+### Bug Fixes
+
+* better toggle twemoji implementation ([13abde7](https://github.com/MetaCubeX/metacubexd/commit/13abde7a9d62874dcab75de0cbba58b7285257a7))
+
 ## [1.67.2](https://github.com/MetaCubeX/metacubexd/compare/v1.67.1...v1.67.2) (2023-09-04)
 
 
