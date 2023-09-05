@@ -116,12 +116,12 @@ export default () => {
       enableSorting: false,
       header: () => <span>{t('close')}</span>,
       cell: ({ row }) => (
-        <div class="flex h-full items-center">
+        <div class="flex h-4 items-center">
           <Button
             class="btn-circle btn-xs"
             onClick={() => onCloseConnection(row.id)}
           >
-            <IconCircleX size="18" />
+            <IconCircleX size="16" />
           </Button>
         </div>
       ),
@@ -268,7 +268,7 @@ export default () => {
 
       <div class="overflow-x-auto whitespace-nowrap rounded-md bg-base-300">
         <table class="table table-zebra table-xs relative rounded-none">
-          <thead class="sticky top-0 z-10">
+          <thead class="sticky top-0 z-10 h-8">
             <For each={table.getHeaderGroups()}>
               {(headerGroup) => (
                 <tr>
@@ -308,11 +308,7 @@ export default () => {
           <tbody>
             <For each={table.getRowModel().rows}>
               {(row) => (
-                <tr
-                  class={twMerge(
-                    'hover:!bg-primary hover:text-primary-content',
-                  )}
-                >
+                <tr class="h-8 hover:!bg-primary hover:text-primary-content">
                   <For each={row.getVisibleCells()}>
                     {(cell) => (
                       <td
