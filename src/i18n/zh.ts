@@ -65,4 +65,5 @@ export default {
   md: '正常尺寸',
   lg: '超大尺寸',
   switchEndpoint: '切换后端',
+  switchLanguage: '切换语言',
 }

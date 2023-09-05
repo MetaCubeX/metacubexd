@@ -5,7 +5,6 @@ import {
   IconGlobe,
   IconGlobeFilled,
   IconHome,
-  IconLanguage,
   IconMenu,
   IconNetwork,
   IconPalette,
@@ -14,8 +13,7 @@ import {
 } from '@tabler/icons-solidjs'
 import { For, ParentComponent, Show, createMemo, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import { Button } from '~/components'
-import { LANG, ROUTES, themes } from '~/constants'
+import { ROUTES, themes } from '~/constants'
 import { renderProxiesInSamePage, setCurTheme, useProxies } from '~/signals'
 
 const Nav: ParentComponent<{ href: string; tooltip: string }> = ({
@@ -63,8 +61,19 @@ const ThemeSwitcher = () => (
   </div>
 )
 
+const LogoText = () => (
+  <a
+    class="flex gap-2 whitespace-nowrap text-xl font-bold uppercase"
+    href="https://github.com/metacubex/metacubexd"
+    target="_blank"
+  >
+    <span>metacube, </span>
+    <div class="transition-transform hover:rotate-90 hover:scale-125">xd</div>
+  </a>
+)
+
 export const Header = () => {
-  const [t, { locale }] = useI18n()
+  const [t] = useI18n()
   const { proxyProviders } = useProxies()
   const navs = createMemo(() => {
     const list = [
@@ -148,21 +157,12 @@ export const Header = () => {
           </div>
         </div>
 
-        <a
-          class="flex whitespace-nowrap text-xl font-bold uppercase"
-          href="https://github.com/metacubex/metacubexd"
-          target="_blank"
-        >
-          <span class="mr-2">metacube, </span>
-          <div class="transition-transform hover:rotate-90 hover:scale-125">
-            xd
-          </div>
-        </a>
+        <LogoText />
       </div>
 
       <Show when={location.pathname !== ROUTES.Setup}>
         <div class="navbar-center hidden lg:flex">
-          <ul class="menu menu-horizontal gap-2">
+          <ul class="menu menu-horizontal menu-lg gap-2">
             <For each={navs()}>
               {({ href, name, icon }) => (
                 <Nav href={href} tooltip={name}>
@@ -176,17 +176,6 @@ export const Header = () => {
 
       <div class="navbar-end">
         <div class="flex items-center gap-2">
-          <Button
-            class="btn-circle btn-sm"
-            onClick={() => {
-              const curLocale = locale()
-
-              locale(curLocale === LANG.EN ? LANG.ZH : LANG.EN)
-            }}
-          >
-            <IconLanguage />
-          </Button>
-
           <ThemeSwitcher />
         </div>
       </div>

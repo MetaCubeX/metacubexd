@@ -6,6 +6,7 @@ import { For, Show, createSignal, onMount } from 'solid-js'
 import { z } from 'zod'
 import { Button } from '~/components'
 import {
+  LANG,
   PROXIES_ORDERING_TYPE,
   PROXIES_PREVIEW_TYPE,
   ROUTES,
@@ -230,7 +231,7 @@ const ConfigForm = () => {
 }
 
 const ConfigForXd = () => {
-  const [t] = useI18n()
+  const [t, { locale }] = useI18n()
   const navigate = useNavigate()
 
   const onSwitchEndpointClick = () => {
@@ -375,6 +376,18 @@ const ConfigForXd = () => {
             {(value) => <option value={value}>{t(value)}</option>}
           </For>
         </select>
+      </div>
+
+      <div>
+        <Button
+          onClick={() => {
+            const curLocale = locale()
+
+            locale(curLocale === LANG.EN ? LANG.ZH : LANG.EN)
+          }}
+        >
+          {t('switchLanguage')}
+        </Button>
       </div>
 
       <div>

@@ -65,4 +65,5 @@ export default {
   md: 'Normal size',
   lg: 'Large size',
   switchEndpoint: 'Switch Endpoint',
+  switchLanguage: 'Switch Language',
 }
