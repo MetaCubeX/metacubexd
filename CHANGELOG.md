@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.68.0](https://github.com/MetaCubeX/metacubexd/compare/v1.67.5...v1.68.0) (2023-09-05)
+
+
+### Features
+
+* a stable table ([e19e53d](https://github.com/MetaCubeX/metacubexd/commit/e19e53d0f68bfd30d4aff3a630796678d7a7e97d))
+* table style ([0115daf](https://github.com/MetaCubeX/metacubexd/commit/0115daf014de9737de0a30ab07bde2c4b0337492))
+
+
+### Bug Fixes
+
+* speedtest icon align ([2caf0c4](https://github.com/MetaCubeX/metacubexd/commit/2caf0c41dd8f12855b79f894e0a6b8dddcf030f6))
+
 ## [1.67.5](https://github.com/MetaCubeX/metacubexd/compare/v1.67.4...v1.67.5) (2023-09-05)
 
 
