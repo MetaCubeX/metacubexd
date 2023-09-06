@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.76.1](https://github.com/MetaCubeX/metacubexd/compare/v1.76.0...v1.76.1) (2023-09-06)
+
+
+### Bug Fixes
+
+* **Connections:** disable grouping for time&speed ([#160](https://github.com/MetaCubeX/metacubexd/issues/160)) ([8398dff](https://github.com/MetaCubeX/metacubexd/commit/8398dff02d1bb254d806901f0a9ce49105be6d52))
+
 ## [1.76.0](https://github.com/MetaCubeX/metacubexd/compare/v1.75.1...v1.76.0) (2023-09-06)
 
 
