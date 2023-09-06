@@ -10,6 +10,23 @@
   src: url('assets/Twemoji.Mozilla.ttf') format('truetype');
 }
 
+:root {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--p)) transparent;
+}
+
 ::-webkit-scrollbar {
-  display: none;
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply rounded-box bg-primary;
+}
+
+::-webkit-scrollbar:vertical {
+  width: 6px;
+}
+
+::-webkit-scrollbar:horizontal {
+  height: 6px;
 }

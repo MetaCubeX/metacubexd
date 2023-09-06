@@ -306,7 +306,7 @@ export default () => {
   ]
 
   return (
-    <div class="flex h-full flex-col gap-4 p-1">
+    <div class="flex h-full flex-col gap-2 p-1">
       <div class="tabs-boxed tabs gap-2">
         <For each={tabs()}>
           {(tab) => (
