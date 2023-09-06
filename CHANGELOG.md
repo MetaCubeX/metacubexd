@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.77.0](https://github.com/MetaCubeX/metacubexd/compare/v1.76.1...v1.77.0) (2023-09-06)
+
+
+### Features
+
+* **proxy:** keep tab at the top ([1bb36a1](https://github.com/MetaCubeX/metacubexd/commit/1bb36a1bd618e41863baac694c2ff115d364dbd8))
+* update the overall look of the app ([08ed610](https://github.com/MetaCubeX/metacubexd/commit/08ed61045f199b0f2721e4a82c208f68ee70d476))
+
+
+### Bug Fixes
+
+* btn disable && var name ([6c88062](https://github.com/MetaCubeX/metacubexd/commit/6c880628ec6b3a32452b3d64c858e27f2e1c7b65))
+
 ## [1.76.1](https://github.com/MetaCubeX/metacubexd/compare/v1.76.0...v1.76.1) (2023-09-06)
 
 
