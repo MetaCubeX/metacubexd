@@ -76,6 +76,7 @@ export default () => {
             {t('ruleProviders')}
             <Button
               class="btn-circle btn-ghost btn-sm ml-2"
+              disabled={allProviderIsUpdating()}
               onClick={(e) => onUpdateAllProviderClick(e)}
             >
               <IconReload
@@ -98,6 +99,7 @@ export default () => {
                 </div>
                 <Button
                   class="btn-circle btn-sm absolute right-2 top-2 mr-2 h-4"
+                  disabled={updatingMap()[rulesProvider.name]}
                   onClick={(e) => onUpdateProviderClick(e, rulesProvider.name)}
                 >
                   <IconReload

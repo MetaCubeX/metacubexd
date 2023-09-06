@@ -73,12 +73,12 @@ export default () => {
 
   const [paused, setPaused] = createSignal(false)
 
-  const updateConnections =
-    (data: Connection[]) => (prevConnections: ConnectionWithSpeed[]) => {
+  const updateConnectionsWithSpeed =
+    (connections: Connection[]) => (prevConnections: ConnectionWithSpeed[]) => {
       const prevMap = new Map<string, Connection>()
       prevConnections.forEach((prev) => prevMap.set(prev.id, prev))
 
-      const connections = data.map((connection) => {
+      const connectionWithSpeed = connections.map((connection) => {
         const prevConn = prevMap.get(connection.id)
 
         if (!prevConn) {
@@ -96,7 +96,7 @@ export default () => {
 
       const closedConnections = differenceWith(
         prevConnections,
-        connections,
+        connectionWithSpeed,
         (a, b) => a.id === b.id,
       )
 
@@ -104,17 +104,17 @@ export default () => {
         [...prev, ...closedConnections].slice(-1000),
       )
 
-      return connections.slice(-200)
+      return connectionWithSpeed.slice(-200)
     }
 
   createEffect(() => {
-    const data = connections()?.connections
+    const connection = connections()?.connections
 
-    if (!data) {
+    if (!connection) {
       return
     }
 
-    const updater = updateConnections(data)
+    const updater = updateConnectionsWithSpeed(connection)
 
     setActiveConnectionsWithSpeed(updater)
   })

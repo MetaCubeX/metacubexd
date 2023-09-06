@@ -98,7 +98,7 @@ export default () => {
   return (
     <div class="flex flex-col gap-2">
       <div class="flex items-center justify-between gap-2">
-        <div class="tabs-boxed tabs gap-2">
+        <div class="tabs tabs-boxed gap-2">
           <For each={tabs()}>
             {(tab) => (
               <button
@@ -117,6 +117,7 @@ export default () => {
 
         <Button
           class="btn btn-circle"
+          disabled={isAllProviderUpdating()}
           onClick={(e) => onUpdateAllProviderClick(e)}
         >
           <IconReload
@@ -148,6 +149,7 @@ export default () => {
                   <div>
                     <Button
                       class="btn btn-circle btn-sm mr-2"
+                      disabled={updatingMap()[proxyProvider.name]}
                       onClick={(e) =>
                         onUpdateProviderClick(e, proxyProvider.name)
                       }
@@ -162,6 +164,7 @@ export default () => {
 
                     <Button
                       class="btn btn-circle btn-sm"
+                      disabled={healthCheckingMap()[proxyProvider.name]}
                       onClick={(e) => onHealthCheckClick(e, proxyProvider.name)}
                     >
                       <IconBrandSpeedtest
@@ -223,6 +226,7 @@ export default () => {
                   <span>{proxy.name}</span>
                   <Button
                     class="btn-circle btn-sm"
+                    disabled={latencyTestingMap()[proxy.name]}
                     onClick={(e) => onLatencyTestClick(e, proxy.name)}
                   >
                     <IconBrandSpeedtest

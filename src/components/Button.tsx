@@ -2,13 +2,20 @@ import { JSX, ParentComponent, Show, splitProps } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 
 export const Button: ParentComponent<
-  JSX.ButtonHTMLAttributes<HTMLButtonElement> & { loading?: boolean }
+  JSX.ButtonHTMLAttributes<HTMLButtonElement> & {
+    loading?: boolean
+    disabled?: boolean
+  }
 > = (props) => {
-  const [local, others] = splitProps(props, ['class', 'loading'])
+  const [local, others] = splitProps(props, ['class', 'loading', 'disabled'])
 
   return (
     <button
-      class={twMerge('btn', local.loading ? 'btn-disabled' : local.class)}
+      class={twMerge(
+        'btn',
+        local.disabled && 'btn-disabled',
+        local.loading ? 'btn-disabled' : local.class,
+      )}
       {...others}
     >
       <Show when={local.loading}>
