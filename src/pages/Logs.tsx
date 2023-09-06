@@ -60,7 +60,7 @@ export default () => {
   })
 
   return (
-    <div class="flex h-full flex-col gap-4 overflow-y-auto p-1">
+    <div class="flex h-full flex-col gap-4 p-1">
       <input
         class="input input-primary flex-shrink-0"
         placeholder={t('search')}

@@ -145,7 +145,13 @@ export default () => {
             const title = (
               <>
                 <div class="mr-8 flex items-center justify-between">
-                  <span>{proxyProvider.name}</span>
+                  <div class="flex items-center gap-2">
+                    <span>{proxyProvider.name}</span>
+                    <div class="badge badge-sm">
+                      {proxyProvider.proxies.length}
+                    </div>
+                  </div>
+
                   <div>
                     <Button
                       class="btn btn-circle btn-sm mr-2"
@@ -176,13 +182,16 @@ export default () => {
                     </Button>
                   </div>
                 </div>
+
                 <SubscriptionInfo
                   subscriptionInfo={proxyProvider.subscriptionInfo}
                 />
+
                 <div class="text-sm text-slate-500">
                   {proxyProvider.vehicleType} :: {t('updated')}{' '}
                   {formatTimeFromNow(proxyProvider.updatedAt)}
                 </div>
+
                 <Show when={!collapsedMap()[proxyProvider.name]}>
                   <ProxyNodePreview proxyNameList={sortedProxyNames} />
                 </Show>
@@ -223,7 +232,11 @@ export default () => {
             const title = (
               <>
                 <div class="mr-8 flex items-center justify-between">
-                  <span>{proxy.name}</span>
+                  <div class="flex items-center gap-2">
+                    <span>{proxy.name}</span>
+                    <div class="badge badge-sm">{proxy.all?.length}</div>
+                  </div>
+
                   <Button
                     class="btn-circle btn-sm"
                     disabled={latencyTestingMap()[proxy.name]}

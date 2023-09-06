@@ -91,7 +91,7 @@ export default () => {
   }>('connections')
 
   return (
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-2">
       <div class="stats stats-vertical w-full grid-cols-2 bg-primary shadow lg:stats-horizontal lg:flex">
         <TrafficWidget label={t('upload')}>
           {byteSize(traffic()?.up || 0).toString()}/s

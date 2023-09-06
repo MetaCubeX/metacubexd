@@ -62,7 +62,7 @@ const ThemeSwitcher = () => (
 
 const LogoText = () => (
   <a
-    class="flex gap-2 whitespace-nowrap text-xl font-bold uppercase"
+    class="text-md flex gap-2 whitespace-nowrap font-bold uppercase sm:text-xl"
     href="https://github.com/metacubex/metacubexd"
     target="_blank"
   >
@@ -111,7 +111,7 @@ export const Header = () => {
   const [openedDrawer, setOpenedDrawer] = createSignal(false)
 
   return (
-    <ul class="navbar rounded-box sticky inset-x-0 top-2 z-50 mx-2 mt-2 flex w-auto items-center justify-center bg-base-300 px-4">
+    <ul class="navbar rounded-box sticky inset-x-0 top-0 z-50 flex w-auto items-center justify-center bg-base-300 px-4">
       <div class="navbar-start gap-4">
         <div class={twMerge('drawer w-auto lg:hidden', '')}>
           <input

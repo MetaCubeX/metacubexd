@@ -56,11 +56,11 @@ export default () => {
         >
           {(rule) => (
             <div class="card card-bordered card-compact mb-2 bg-base-200 p-4">
-              <div class="break-all">
-                {rule.payload}
-                {typeof rule.size === 'number' &&
-                  rule.size !== -1 &&
-                  ` (${rule.size})`}
+              <div class="flex items-center gap-2">
+                <span class="break-all">{rule.payload}</span>
+                <Show when={typeof rule.size === 'number' && rule.size !== -1}>
+                  <div class="badge badge-sm">{rule.size}</div>
+                </Show>
               </div>
               <div class="text-xs text-slate-500">
                 {rule.type} :: {rule.proxy}
@@ -90,13 +90,16 @@ export default () => {
           <For each={rulesProviders()}>
             {(rulesProvider) => (
               <div class="card card-bordered card-compact mb-2 bg-base-200 p-4">
-                <div class="break-all pr-8">
-                  {rulesProvider.name} ({rulesProvider.ruleCount})
+                <div class="flex items-center gap-2 pr-8">
+                  <span class="break-all">{rulesProvider.name}</span>
+                  <div class="badge badge-sm">{rulesProvider.ruleCount}</div>
                 </div>
+
                 <div class="text-xs text-slate-500">
                   {rulesProvider.vehicleType} / {rulesProvider.behavior} /
                   {t('updated')} {formatTimeFromNow(rulesProvider.updatedAt)}
                 </div>
+
                 <Button
                   class="btn-circle btn-sm absolute right-2 top-2 mr-2 h-4"
                   disabled={updatingMap()[rulesProvider.name]}
