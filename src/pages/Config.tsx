@@ -236,7 +236,7 @@ const ConfigForm = () => {
 
       <div>
         <ConfigTitle>
-          {t('speedtestTimeoutDuration')} ({t('ms')})
+          {t('latencyTestTimeoutDuration')} ({t('ms')})
         </ConfigTitle>
 
         <input
