@@ -193,6 +193,7 @@ export default () => {
     },
     {
       header: () => t('connectTime'),
+      enableGrouping: false,
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.ConnectTime,
       accessorFn: (row) => formatTimeFromNow(row.start),
       sortingFn: (prev, next) =>
@@ -201,6 +202,7 @@ export default () => {
     },
     {
       header: () => t('dlSpeed'),
+      enableGrouping: false,
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.DlSpeed,
       accessorFn: (row) => `${byteSize(row.downloadSpeed)}/s`,
       sortingFn: (prev, next) =>
@@ -208,6 +210,7 @@ export default () => {
     },
     {
       header: () => t('ulSpeed'),
+      enableGrouping: false,
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.ULSpeed,
       accessorFn: (row) => `${byteSize(row.uploadSpeed)}/s`,
       sortingFn: (prev, next) =>
@@ -215,6 +218,7 @@ export default () => {
     },
     {
       header: () => t('dl'),
+      enableGrouping: false,
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Download,
       accessorFn: (row) => byteSize(row.download),
       sortingFn: (prev, next) =>
@@ -222,6 +226,7 @@ export default () => {
     },
     {
       header: () => t('ul'),
+      enableGrouping: false,
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Upload,
       accessorFn: (row) => byteSize(row.upload),
       sortingFn: (prev, next) => prev.original.upload - next.original.upload,
