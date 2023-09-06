@@ -1,7 +1,6 @@
 import { makePersisted } from '@solid-primitives/storage'
 import ky from 'ky'
 import { createSignal } from 'solid-js'
-import { requestTimeoutDuration } from '~/signals/config'
 
 export const [selectedEndpoint, setSelectedEndpoint] = makePersisted(
   createSignal(''),
@@ -27,7 +26,6 @@ export const useRequest = () => {
 
   return ky.create({
     prefixUrl: e?.url,
-    timeout: requestTimeoutDuration(),
     headers: { Authorization: e?.secret ? `Bearer ${e.secret}` : '' },
   })
 }

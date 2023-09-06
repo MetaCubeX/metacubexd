@@ -1,5 +1,10 @@
 import { createSignal } from 'solid-js'
-import { autoCloseConns, urlForLatencyTest, useRequest } from '~/signals'
+import {
+  autoCloseConns,
+  speedtestTimeoutDuration,
+  urlForLatencyTest,
+  useRequest,
+} from '~/signals'
 import type { Proxy, ProxyNode, ProxyProvider } from '~/types'
 
 type ProxyInfo = {
@@ -93,7 +98,7 @@ export const useProxies = () => {
       .get(`group/${proxyGroupName}/delay`, {
         searchParams: {
           url: urlForLatencyTest(),
-          timeout: 2000,
+          timeout: speedtestTimeoutDuration(),
         },
       })
       .json()
@@ -121,7 +126,9 @@ export const useProxies = () => {
   }
 
   const healthCheckByProviderName = async (providerName: string) => {
-    await request.get(`providers/proxies/${providerName}/healthcheck`)
+    await request.get(`providers/proxies/${providerName}/healthcheck`, {
+      timeout: 20 * 1000,
+    })
     await updateProxies()
   }
 

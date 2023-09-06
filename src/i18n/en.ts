@@ -66,6 +66,6 @@ export default {
   lg: 'Large size',
   switchEndpoint: 'Switch Endpoint',
   switchLanguage: 'Switch Language',
-  requestTimeoutDuration: 'Request Timeout Duration',
+  speedtestTimeoutDuration: 'Speedtest Timeout Duration',
   closedConnections: 'Closed Connections',
 }

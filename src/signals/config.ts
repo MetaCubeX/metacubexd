@@ -76,9 +76,9 @@ export const tableSizeClassName = (size: TAILWINDCSS_SIZE) => {
   return className
 }
 
-export const [requestTimeoutDuration, setRequestTimeoutDuration] =
-  makePersisted(createSignal(10000), {
-    name: 'requestTimeoutDuration',
+export const [speedtestTimeoutDuration, setSpeedtestTimeoutDuration] =
+  makePersisted(createSignal(2000), {
+    name: 'speedtestTimeoutDuration',
     storage: localStorage,
   })
 

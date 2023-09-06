@@ -30,7 +30,6 @@ import {
   proxiesPreviewType,
   renderInTwoColumn,
   renderProxiesInSamePage,
-  requestTimeoutDuration,
   setAutoCloseConns,
   setAutoSwitchTheme,
   setFavDayTheme,
@@ -39,11 +38,12 @@ import {
   setProxiesPreviewType,
   setRenderInTwoColumn,
   setRenderProxiesInSamePage,
-  setRequestTimeoutDuration,
   setSelectedEndpoint,
+  setSpeedtestTimeoutDuration,
   setTableSize,
   setTwemoji,
   setUrlForLatencyTest,
+  speedtestTimeoutDuration,
   tableSize,
   urlForLatencyTest,
   useRequest,
@@ -234,14 +234,14 @@ const ConfigForm = () => {
 
       <div>
         <ConfigTitle>
-          {t('requestTimeoutDuration')} ({t('ms')})
+          {t('speedtestTimeoutDuration')} ({t('ms')})
         </ConfigTitle>
 
         <input
           type="number"
           class="input input-bordered w-full max-w-md"
-          value={requestTimeoutDuration()}
-          onChange={(e) => setRequestTimeoutDuration(Number(e.target.value))}
+          value={speedtestTimeoutDuration()}
+          onChange={(e) => setSpeedtestTimeoutDuration(Number(e.target.value))}
         />
       </div>
 
