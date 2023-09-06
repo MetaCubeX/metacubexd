@@ -3,7 +3,6 @@ import { A, useLocation } from '@solidjs/router'
 import {
   IconFileStack,
   IconGlobe,
-  IconGlobeFilled,
   IconHome,
   IconMenu,
   IconNetwork,
@@ -11,10 +10,10 @@ import {
   IconRuler,
   IconSettings,
 } from '@tabler/icons-solidjs'
-import { For, ParentComponent, Show, createMemo, createSignal } from 'solid-js'
+import { For, ParentComponent, Show, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { ROUTES, themes } from '~/constants'
-import { renderProxiesInSamePage, setCurTheme, useProxies } from '~/signals'
+import { setCurTheme } from '~/signals'
 
 const Nav: ParentComponent<{ href: string; tooltip: string }> = ({
   href,
@@ -74,51 +73,38 @@ const LogoText = () => (
 
 export const Header = () => {
   const [t] = useI18n()
-  const { proxyProviders } = useProxies()
-  const navs = createMemo(() => {
-    const list = [
-      {
-        href: ROUTES.Overview,
-        name: t('overview'),
-        icon: <IconHome />,
-      },
-      {
-        href: ROUTES.Proxies,
-        name: t('proxies'),
-        icon: <IconGlobe />,
-      },
-      {
-        href: ROUTES.Rules,
-        name: t('rules'),
-        icon: <IconRuler />,
-      },
-      {
-        href: ROUTES.Conns,
-        name: t('connections'),
-        icon: <IconNetwork />,
-      },
-      {
-        href: ROUTES.Log,
-        name: t('logs'),
-        icon: <IconFileStack />,
-      },
-      {
-        href: ROUTES.Config,
-        name: t('config'),
-        icon: <IconSettings />,
-      },
-    ]
-
-    if (proxyProviders().length > 0 && !renderProxiesInSamePage()) {
-      list.splice(2, 0, {
-        href: ROUTES.ProxyProvider,
-        name: t('proxyProviders'),
-        icon: <IconGlobeFilled />,
-      })
-    }
-
-    return list
-  })
+  const navs = () => [
+    {
+      href: ROUTES.Overview,
+      name: t('overview'),
+      icon: <IconHome />,
+    },
+    {
+      href: ROUTES.Proxies,
+      name: t('proxies'),
+      icon: <IconGlobe />,
+    },
+    {
+      href: ROUTES.Rules,
+      name: t('rules'),
+      icon: <IconRuler />,
+    },
+    {
+      href: ROUTES.Conns,
+      name: t('connections'),
+      icon: <IconNetwork />,
+    },
+    {
+      href: ROUTES.Log,
+      name: t('logs'),
+      icon: <IconFileStack />,
+    },
+    {
+      href: ROUTES.Config,
+      name: t('config'),
+      icon: <IconSettings />,
+    },
+  ]
 
   const location = useLocation()
 

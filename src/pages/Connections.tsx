@@ -25,8 +25,8 @@ import {
 } from '@tanstack/solid-table'
 import byteSize from 'byte-size'
 import dayjs from 'dayjs'
-import { differenceWith, isEqualWith } from 'lodash'
-import { For, createEffect, createMemo, createSignal, untrack } from 'solid-js'
+import { differenceWith } from 'lodash'
+import { For, createEffect, createMemo, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Button, ConnectionsTableOrderingModal } from '~/components'
 import {
@@ -66,25 +66,15 @@ export default () => {
   const connections = useWsRequest<{ connections: Connection[] }>('connections')
 
   const [closedConnectionsWithSpeed, setClosedConnectionsWithSpeed] =
-    createSignal<ConnectionWithSpeed[]>([])
+    createSignal<ConnectionWithSpeed[]>([], { equals: () => paused() })
 
   const [activeConnectionsWithSpeed, setActiveConnectionsWithSpeed] =
-    createSignal<ConnectionWithSpeed[]>([])
+    createSignal<ConnectionWithSpeed[]>([], { equals: () => paused() })
 
   const [paused, setPaused] = createSignal(false)
-  const [pausedActiveConnectionsSnapshot, setPausedActiveConnectionsSnapshot] =
-    createSignal<ConnectionWithSpeed[]>([])
-  const [pausedClosedConnectionsSnapshot, setPausedClosedConnectionsSnapshot] =
-    createSignal<ConnectionWithSpeed[]>([])
 
-  createEffect(() => {
-    const data = connections()?.connections
-
-    if (!data) {
-      return
-    }
-
-    setActiveConnectionsWithSpeed((prevConnections) => {
+  const updateConnections =
+    (data: Connection[]) => (prevConnections: ConnectionWithSpeed[]) => {
       const prevMap = new Map<string, Connection>()
       prevConnections.forEach((prev) => prevMap.set(prev.id, prev))
 
@@ -97,48 +87,37 @@ export default () => {
 
         return {
           ...connection,
-          downloadSpeed: prevConn.download
-            ? connection.download - prevConn.download
-            : 0,
-          uploadSpeed: prevConn.upload
-            ? connection.upload - prevConn.upload
-            : 0,
+          downloadSpeed:
+            connection.download - (prevConn.download ?? connection.download),
+          uploadSpeed:
+            connection.upload - (prevConn.upload ?? connection.upload),
         }
       })
 
       const closedConnections = differenceWith(
         prevConnections,
         connections,
-        (a, b) => isEqualWith(a, b, (a, b) => a.id === b.id),
+        (a, b) => a.id === b.id,
       )
 
       setClosedConnectionsWithSpeed((prev) =>
-        [...prev, ...closedConnections].slice(-100),
+        [...prev, ...closedConnections].slice(-1000),
       )
 
-      return connections.slice(-100)
-    })
-  })
+      return connections.slice(-200)
+    }
 
   createEffect(() => {
-    if (paused()) {
-      setPausedActiveConnectionsSnapshot(
-        untrack(() => activeConnectionsWithSpeed()),
-      )
+    const data = connections()?.connections
 
-      setPausedClosedConnectionsSnapshot(
-        untrack(() => closedConnectionsWithSpeed()),
-      )
+    if (!data) {
+      return
     }
+
+    const updater = updateConnections(data)
+
+    setActiveConnectionsWithSpeed(updater)
   })
-
-  const activeConnectionsWithSpeedAndPausing = createMemo(() =>
-    paused() ? pausedActiveConnectionsSnapshot() : activeConnectionsWithSpeed(),
-  )
-
-  const closedConnectionsWithSpeedAndPausing = createMemo(() =>
-    paused() ? pausedClosedConnectionsSnapshot() : closedConnectionsWithSpeed(),
-  )
 
   const onCloseConnection = (id: string) => request.delete(`connections/${id}`)
 
@@ -157,7 +136,7 @@ export default () => {
     },
   )
 
-  const columns: ColumnDef<ConnectionWithSpeed>[] = [
+  const columns = createMemo<ColumnDef<ConnectionWithSpeed>[]>(() => [
     {
       header: () => t('close'),
       enableGrouping: false,
@@ -270,7 +249,7 @@ export default () => {
         row.metadata.destinationIP ||
         row.metadata.host,
     },
-  ]
+  ])
 
   const [grouping, setGrouping] = createSignal<GroupingState>([])
   const [sorting, setSorting] = createSignal<SortingState>([
@@ -297,12 +276,12 @@ export default () => {
     },
     get data() {
       return activeTab() === ActiveTab.activeConnections
-        ? activeConnectionsWithSpeedAndPausing()
-        : closedConnectionsWithSpeedAndPausing()
+        ? activeConnectionsWithSpeed()
+        : closedConnectionsWithSpeed()
     },
     sortDescFirst: true,
     enableHiding: true,
-    columns,
+    columns: columns(),
     onGlobalFilterChange: setSearch,
     onGroupingChange: setGrouping,
     onSortingChange: setSorting,
@@ -317,12 +296,12 @@ export default () => {
     {
       type: ActiveTab.activeConnections,
       name: t('activeConnections'),
-      count: activeConnectionsWithSpeedAndPausing().length,
+      count: activeConnectionsWithSpeed().length,
     },
     {
       type: ActiveTab.closedConnections,
       name: t('closedConnections'),
-      count: closedConnectionsWithSpeedAndPausing().length,
+      count: closedConnectionsWithSpeed().length,
     },
   ]
 
@@ -332,10 +311,14 @@ export default () => {
         <For each={tabs()}>
           {(tab) => (
             <button
-              class={twMerge(activeTab() === tab.type && 'tab-active', 'tab')}
+              class={twMerge(
+                activeTab() === tab.type && 'tab-active',
+                'tab gap-2',
+              )}
               onClick={() => setActiveTab(tab.type)}
             >
-              {tab.name} ({tab.count})
+              <span>{tab.name}</span>
+              <div class="badge badge-sm">{tab.count}</div>
             </button>
           )}
         </For>

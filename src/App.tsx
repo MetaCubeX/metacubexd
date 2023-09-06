@@ -6,7 +6,6 @@ import { ROUTES } from '~/constants'
 import {
   curTheme,
   endpoint,
-  renderProxiesInSamePage,
   selectedEndpoint,
   useAutoSwitchTheme,
   useProxies,
@@ -18,7 +17,6 @@ const Overview = lazy(() => import('~/pages/Overview'))
 const Connections = lazy(() => import('~/pages/Connections'))
 const Logs = lazy(() => import('~/pages/Logs'))
 const Proxies = lazy(() => import('~/pages/Proxies'))
-const ProxyProvider = lazy(() => import('~/pages/ProxyProvider'))
 const Rules = lazy(() => import('~/pages/Rules'))
 const Config = lazy(() => import('~/pages/Config'))
 
@@ -54,9 +52,6 @@ export const App = () => {
           <Show when={selectedEndpoint()}>
             <Route path={ROUTES.Overview} component={Overview} />
             <Route path={ROUTES.Proxies} component={Proxies} />
-            <Show when={!renderProxiesInSamePage()}>
-              <Route path={ROUTES.ProxyProvider} component={ProxyProvider} />
-            </Show>
             <Route path={ROUTES.Rules} component={Rules} />
             <Route path={ROUTES.Conns} component={Connections} />
             <Route path={ROUTES.Log} component={Logs} />

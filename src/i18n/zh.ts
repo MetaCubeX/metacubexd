@@ -70,4 +70,5 @@ export default {
   switchLanguage: '切换语言',
   latencyTestTimeoutDuration: '测速超时时间',
   closedConnections: '已关闭连接',
+  all: '全部',
 }

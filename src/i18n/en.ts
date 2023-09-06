@@ -71,4 +71,5 @@ export default {
   switchLanguage: 'Switch Language',
   latencyTestTimeoutDuration: 'Latency Test Timeout Duration',
   closedConnections: 'Closed Connections',
+  all: 'All',
 }
