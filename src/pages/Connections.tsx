@@ -1,8 +1,6 @@
 import { writeClipboard } from '@solid-primitives/clipboard'
-import { createEventSignal } from '@solid-primitives/event-listener'
 import { useI18n } from '@solid-primitives/i18n'
 import { makePersisted } from '@solid-primitives/storage'
-import { createReconnectingWS } from '@solid-primitives/websocket'
 import {
   IconCircleX,
   IconPlayerPause,
@@ -38,11 +36,10 @@ import {
 } from '~/constants'
 import { formatTimeFromNow } from '~/helpers'
 import {
-  secret,
   tableSize,
   tableSizeClassName,
   useRequest,
-  wsEndpointURL,
+  useWsRequest,
 } from '~/signals'
 import type { Connection } from '~/types'
 
@@ -66,13 +63,7 @@ export default () => {
   const [search, setSearch] = createSignal('')
   const [activeTab, setActiveTab] = createSignal(ActiveTab.activeConnections)
 
-  const ws = createReconnectingWS(
-    `${wsEndpointURL()}/connections?token=${secret()}`,
-  )
-
-  const messageEvent = createEventSignal<{
-    message: WebSocketEventMap['message']
-  }>(ws, 'message')
+  const connections = useWsRequest<{ connections: Connection[] }>('connections')
 
   const [closedConnectionsWithSpeed, setClosedConnectionsWithSpeed] =
     createSignal<ConnectionWithSpeed[]>([])
@@ -87,7 +78,7 @@ export default () => {
     createSignal<ConnectionWithSpeed[]>([])
 
   createEffect(() => {
-    const data = messageEvent()?.data
+    const data = connections()?.connections
 
     if (!data) {
       return
@@ -97,9 +88,7 @@ export default () => {
       const prevMap = new Map<string, Connection>()
       prevConnections.forEach((prev) => prevMap.set(prev.id, prev))
 
-      const connections = (
-        JSON.parse(data) as { connections: Connection[] }
-      ).connections.map((connection) => {
+      const connections = data.map((connection) => {
         const prevConn = prevMap.get(connection.id)
 
         if (!prevConn) {

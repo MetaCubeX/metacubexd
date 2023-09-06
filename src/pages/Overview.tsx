@@ -1,7 +1,5 @@
-import { createEventSignal } from '@solid-primitives/event-listener'
 import { useI18n } from '@solid-primitives/i18n'
 import { makeTimer } from '@solid-primitives/timer'
-import { createReconnectingWS } from '@solid-primitives/websocket'
 import type { ApexOptions } from 'apexcharts'
 import byteSize from 'byte-size'
 import { merge } from 'lodash'
@@ -15,7 +13,7 @@ import {
   createSignal,
 } from 'solid-js'
 import { CHART_MAX_XAXIS, DEFAULT_CHART_OPTIONS } from '~/constants'
-import { secret, wsEndpointURL } from '~/signals'
+import { useWsRequest } from '~/signals'
 import type { Connection } from '~/types'
 
 const TrafficWidget: ParentComponent<{ label: JSX.Element }> = (props) => (
@@ -47,17 +45,7 @@ export default () => {
     setInterval,
   )
 
-  const trafficWS = createReconnectingWS(
-    `${wsEndpointURL()}/traffic?token=${secret()}`,
-  )
-
-  const trafficWSMessageEvent = createEventSignal(trafficWS, 'message')
-
-  const traffic = () => {
-    const data = trafficWSMessageEvent()?.data
-
-    return data ? (JSON.parse(data) as { down: number; up: number }) : null
-  }
+  const traffic = useWsRequest<{ down: number; up: number }>('traffic')
 
   createEffect(() => {
     const t = traffic()
@@ -80,20 +68,10 @@ export default () => {
     },
   ])
 
-  const memoryWS = createReconnectingWS(
-    `${wsEndpointURL()}/memory?token=${secret()}`,
-  )
-
-  const memoryWSMessageEvent = createEventSignal(memoryWS, 'message')
-
-  const memory = () => {
-    const data = memoryWSMessageEvent()?.data
-
-    return data ? (JSON.parse(data) as { inuse: number }).inuse : null
-  }
+  const memory = useWsRequest<{ inuse: number }>('memory')
 
   createEffect(() => {
-    const m = memory()
+    const m = memory()?.inuse
 
     if (m) setMemories((memories) => [...memories, m])
   })
@@ -106,25 +84,11 @@ export default () => {
     { name: t('memory'), data: memories() },
   ])
 
-  const connectionsWS = createReconnectingWS(
-    `${wsEndpointURL()}/connections?token=${secret()}`,
-  )
-
-  const connectionsWSMessageEvent = createEventSignal<{
-    message: WebSocketEventMap['message']
-  }>(connectionsWS, 'message')
-
-  const connection = () => {
-    const data = connectionsWSMessageEvent()?.data
-
-    return data
-      ? (JSON.parse(data) as {
-          downloadTotal: number
-          uploadTotal: number
-          connections: Connection[]
-        })
-      : null
-  }
+  const connection = useWsRequest<{
+    downloadTotal: number
+    uploadTotal: number
+    connections: Connection[]
+  }>('connections')
 
   return (
     <div class="flex flex-col gap-4">
@@ -150,7 +114,7 @@ export default () => {
         </TrafficWidget>
 
         <TrafficWidget label={t('memoryUsage')}>
-          {byteSize(memory() || 0).toString()}
+          {byteSize(memory()?.inuse || 0).toString()}
         </TrafficWidget>
       </div>
 

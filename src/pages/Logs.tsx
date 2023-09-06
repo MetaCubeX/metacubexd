@@ -1,6 +1,4 @@
-import { createEventSignal } from '@solid-primitives/event-listener'
 import { useI18n } from '@solid-primitives/i18n'
-import { createReconnectingWS } from '@solid-primitives/websocket'
 import {
   ColumnDef,
   createSolidTable,
@@ -9,7 +7,7 @@ import {
 } from '@tanstack/solid-table'
 import { For, createEffect, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import { secret, tableSize, tableSizeClassName, wsEndpointURL } from '~/signals'
+import { tableSize, tableSizeClassName, useWsRequest } from '~/signals'
 import { Log } from '~/types'
 
 type LogWithSeq = Log & { seq: number }
@@ -20,22 +18,16 @@ export default () => {
   const [search, setSearch] = createSignal('')
   const [logs, setLogs] = createSignal<LogWithSeq[]>([])
 
-  const ws = createReconnectingWS(`${wsEndpointURL()}/logs?token=${secret()}`)
-
-  const messageEvent = createEventSignal<{
-    message: WebSocketEventMap['message']
-  }>(ws, 'message')
+  const logsData = useWsRequest<Log>('logs')
 
   createEffect(() => {
-    const data = messageEvent()?.data
+    const data = logsData()
 
     if (!data) {
       return
     }
 
-    setLogs((logs) =>
-      [{ ...(JSON.parse(data) as Log), seq }, ...logs].slice(0, 100),
-    )
+    setLogs((logs) => [{ ...data, seq }, ...logs].slice(0, 100))
 
     seq++
   })
