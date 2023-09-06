@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.75.1](https://github.com/MetaCubeX/metacubexd/compare/v1.75.0...v1.75.1) (2023-09-06)
+
+
+### Bug Fixes
+
+* **overview:** chart font size ([af70669](https://github.com/MetaCubeX/metacubexd/commit/af70669e7a035a6368e7620be7ed489db76648cd))
+
 ## [1.75.0](https://github.com/MetaCubeX/metacubexd/compare/v1.74.4...v1.75.0) (2023-09-06)
 
 
