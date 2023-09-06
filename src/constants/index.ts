@@ -47,7 +47,7 @@ export enum ROUTES {
 export const CHART_MAX_XAXIS = 10
 
 export const DEFAULT_CHART_OPTIONS: ApexOptions = {
-  title: { align: 'center', style: { color: 'gray', fontSize: '8px' } },
+  title: { align: 'center', style: { color: 'gray', fontSize: '16px' } },
   chart: {
     toolbar: { show: false },
     zoom: { enabled: false },
@@ -56,7 +56,7 @@ export const DEFAULT_CHART_OPTIONS: ApexOptions = {
   noData: { text: 'Loading...' },
   legend: {
     showForSingleSeries: true,
-    fontSize: '8px',
+    fontSize: '16px',
     labels: { colors: 'gray' },
     itemMargin: { horizontal: 32 },
   },
@@ -71,7 +71,7 @@ export const DEFAULT_CHART_OPTIONS: ApexOptions = {
   },
   yaxis: {
     labels: {
-      style: { colors: 'gray', fontSize: '8px' },
+      style: { colors: 'gray', fontSize: '13px' },
       formatter: (val) => byteSize(val).toString(),
     },
   },
