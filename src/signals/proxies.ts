@@ -91,7 +91,10 @@ export const useProxies = () => {
   const latencyTestByProxyGroupName = async (proxyGroupName: string) => {
     const data: Record<string, number> = await request
       .get(`group/${proxyGroupName}/delay`, {
-        searchParams: { url: urlForLatencyTest() },
+        searchParams: {
+          url: urlForLatencyTest(),
+          timeout: 2000,
+        },
       })
       .json()
 
