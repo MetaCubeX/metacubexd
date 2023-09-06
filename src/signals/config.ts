@@ -45,11 +45,6 @@ export const [renderInTwoColumns, setRenderInTwoColumns] = makePersisted(
   createSignal(true),
   { name: 'renderInTwoColumn', storage: localStorage },
 )
-export const [renderProxiesInSamePage, setRenderProxiesInSamePage] =
-  makePersisted(createSignal(false), {
-    name: 'renderProxiesInSamePage',
-    storage: localStorage,
-  })
 export const [
   renderRulesAndProviderInTwoColumns,
   setRenderRulesAndProviderInTwoColumns,

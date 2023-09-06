@@ -113,7 +113,7 @@ export default () => {
       )
 
       setClosedConnectionsWithSpeed((prev) =>
-        [...prev, ...closedConnections].slice(-100),
+        [...prev, ...closedConnections].slice(-1000),
       )
 
       return connections.slice(-100)
@@ -157,7 +157,7 @@ export default () => {
     },
   )
 
-  const columns: ColumnDef<ConnectionWithSpeed>[] = [
+  const columns = createMemo<ColumnDef<ConnectionWithSpeed>[]>(() => [
     {
       header: () => t('close'),
       enableGrouping: false,
@@ -265,7 +265,7 @@ export default () => {
         row.metadata.destinationIP ||
         row.metadata.host,
     },
-  ]
+  ])
 
   const [grouping, setGrouping] = createSignal<GroupingState>([])
   const [sorting, setSorting] = createSignal<SortingState>([
@@ -297,7 +297,7 @@ export default () => {
     },
     sortDescFirst: true,
     enableHiding: true,
-    columns,
+    columns: columns(),
     onGlobalFilterChange: setSearch,
     onGroupingChange: setGrouping,
     onSortingChange: setSorting,
@@ -327,10 +327,14 @@ export default () => {
         <For each={tabs()}>
           {(tab) => (
             <button
-              class={twMerge(activeTab() === tab.type && 'tab-active', 'tab')}
+              class={twMerge(
+                activeTab() === tab.type && 'tab-active',
+                'tab gap-2',
+              )}
               onClick={() => setActiveTab(tab.type)}
             >
-              {tab.name} ({tab.count})
+              <span>{tab.name}</span>
+              <div class="badge badge-sm">{tab.count}</div>
             </button>
           )}
         </For>
