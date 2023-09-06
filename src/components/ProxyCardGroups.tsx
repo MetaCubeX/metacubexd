@@ -20,9 +20,7 @@ export const ProxyCardGroups = (props: {
         <ProxyNodeCard
           proxyName={proxy}
           isSelected={props.now === proxy}
-          onClick={() => {
-            props.onClick?.(proxy!)
-          }}
+          onClick={props.onClick ? () => props.onClick?.(proxy!) : undefined}
         />
       )}
     </InfiniteScroll>
