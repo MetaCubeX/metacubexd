@@ -359,7 +359,7 @@ export default () => {
           class="btn-circle btn-sm"
           onClick={() => setPaused((paused) => !paused)}
         >
-          {paused() ? <IconPlayerPause /> : <IconPlayerPlay />}
+          {paused() ? <IconPlayerPlay /> : <IconPlayerPause />}
         </Button>
 
         <Button
