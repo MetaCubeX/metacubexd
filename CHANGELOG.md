@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.78.0](https://github.com/MetaCubeX/metacubexd/compare/v1.77.0...v1.78.0) (2023-09-06)
+
+
+### Features
+
+* customize scrollbar ([c27b192](https://github.com/MetaCubeX/metacubexd/commit/c27b19259bff444b21fd84502fa638fe8ac13c7b))
+
 ## [1.77.0](https://github.com/MetaCubeX/metacubexd/compare/v1.76.1...v1.77.0) (2023-09-06)
 
 
