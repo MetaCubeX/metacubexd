@@ -35,4 +35,5 @@ export const endpoint = () =>
 
 export const secret = () => endpoint()?.secret
 
-export const wsEndpointURL = () => endpoint()?.url.replace('http', 'ws')
+export const wsEndpointURL = () =>
+  new URL(endpoint()?.url ?? '').origin.replace('http', 'ws')
