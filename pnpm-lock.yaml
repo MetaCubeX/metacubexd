@@ -51,8 +51,8 @@ dependencies:
     specifier: ^2.33.0
     version: 2.33.0(solid-js@1.7.11)
   '@tanstack/solid-table':
-    specifier: ^8.9.3
-    version: 8.9.3(solid-js@1.7.11)
+    specifier: ^8.9.7
+    version: 8.9.7(solid-js@1.7.11)
   '@tanstack/solid-virtual':
     specifier: 3.0.0-beta.6
     version: 3.0.0-beta.6
@@ -2161,13 +2161,13 @@ packages:
     resolution: {integrity: sha512-cmVBeVANYGniLa0Q9gSUXU3SY0V9D3bfvHAq2bE+S0sdvnbMRNCHAmVQQv1lV6LT/aT7kzpwHAQz+6Iz1rPPsA==}
     dev: false
 
-  /@tanstack/solid-table@8.9.3(solid-js@1.7.11):
-    resolution: {integrity: sha512-/bd+cAZ/rGW+Z5hqv/z+Ow9KaGGTUO9/wgL73XY9fvubkRfMS4pa11vpnCxj8lNJk/H2llRVCwbZzAStakXbcQ==}
+  /@tanstack/solid-table@8.9.7(solid-js@1.7.11):
+    resolution: {integrity: sha512-ecCCmfQqdmCOt4hPEFrqnL37anLeCCuh0ma6SJ4PmWjyeO7aE4ZoG1Bc1/clSjJM3QzDcK7xgxAAA1iNgwWjWw==}
     engines: {node: '>=12'}
     peerDependencies:
       solid-js: ^1.3.13
     dependencies:
-      '@tanstack/table-core': 8.9.3
+      '@tanstack/table-core': 8.9.7
       solid-js: 1.7.11
     dev: false
 
@@ -2178,8 +2178,8 @@ packages:
       '@reach/observe-rect': 1.2.0
     dev: false
 
-  /@tanstack/table-core@8.9.3:
-    resolution: {integrity: sha512-NpHZBoHTfqyJk0m/s/+CSuAiwtebhYK90mDuf5eylTvgViNOujiaOaxNDxJkQQAsVvHWZftUGAx1EfO1rkKtLg==}
+  /@tanstack/table-core@8.9.7:
+    resolution: {integrity: sha512-lkhVcGDxa9GSoDFPkplPDvzsiUACPZrxT3U1edPs0DCMKFhBDgZ7d1DPd7cqHH0JoybfbQ/qiTQYOQBg8sinJg==}
     engines: {node: '>=12'}
     dev: false
 
