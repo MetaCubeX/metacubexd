@@ -30,7 +30,8 @@ export default {
   ulSpeed: '上传速度',
   dl: '下载量',
   ul: '上传量',
-  source: '源地址',
+  sourceIP: '源地址',
+  sourcePort: '源端口',
   destination: '目标地址',
   close: '关闭',
   reset: '重置',
@@ -66,6 +67,6 @@ export default {
   lg: '超大尺寸',
   switchEndpoint: '切换后端',
   switchLanguage: '切换语言',
-  speedtestTimeoutDuration: '测速超时时间',
+  latencyTestTimeoutDuration: '测速超时时间',
   closedConnections: '已关闭连接',
 }

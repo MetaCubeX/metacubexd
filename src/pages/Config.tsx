@@ -26,6 +26,7 @@ import {
   autoSwitchTheme,
   favDayTheme,
   favNightTheme,
+  latencyTestTimeoutDuration,
   proxiesOrderingType,
   proxiesPreviewType,
   renderInTwoColumn,
@@ -34,16 +35,15 @@ import {
   setAutoSwitchTheme,
   setFavDayTheme,
   setFavNightTheme,
+  setLatencyTestTimeoutDuration,
   setProxiesOrderingType,
   setProxiesPreviewType,
   setRenderInTwoColumn,
   setRenderProxiesInSamePage,
   setSelectedEndpoint,
-  setSpeedtestTimeoutDuration,
   setTableSize,
   setTwemoji,
   setUrlForLatencyTest,
-  speedtestTimeoutDuration,
   tableSize,
   urlForLatencyTest,
   useRequest,
@@ -240,8 +240,10 @@ const ConfigForm = () => {
         <input
           type="number"
           class="input input-bordered w-full max-w-md"
-          value={speedtestTimeoutDuration()}
-          onChange={(e) => setSpeedtestTimeoutDuration(Number(e.target.value))}
+          value={latencyTestTimeoutDuration()}
+          onChange={(e) =>
+            setLatencyTestTimeoutDuration(Number(e.target.value))
+          }
         />
       </div>
 

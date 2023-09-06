@@ -30,7 +30,8 @@ export default {
   ulSpeed: 'UL Speed',
   dl: 'DL',
   ul: 'UL',
-  source: 'Source',
+  sourceIP: 'Source IP',
+  sourcePort: 'Source Port',
   destination: 'Destination',
   close: 'Close',
   reset: 'Reset',
@@ -66,6 +67,6 @@ export default {
   lg: 'Large size',
   switchEndpoint: 'Switch Endpoint',
   switchLanguage: 'Switch Language',
-  speedtestTimeoutDuration: 'Speedtest Timeout Duration',
+  latencyTestTimeoutDuration: 'Latency Test Timeout Duration',
   closedConnections: 'Closed Connections',
 }

@@ -122,7 +122,8 @@ export enum CONNECTIONS_TABLE_ACCESSOR_KEY {
   Download = 'dl',
   Upload = 'ul',
   ConnectTime = 'connectTime',
-  Source = 'source',
+  SourceIP = 'sourceIP',
+  SourcePort = 'sourcePort',
   Destination = 'destination',
 }
 

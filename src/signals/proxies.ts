@@ -1,7 +1,7 @@
 import { createSignal } from 'solid-js'
 import {
   autoCloseConns,
-  speedtestTimeoutDuration,
+  latencyTestTimeoutDuration,
   urlForLatencyTest,
   useRequest,
 } from '~/signals'
@@ -98,7 +98,7 @@ export const useProxies = () => {
       .get(`group/${proxyGroupName}/delay`, {
         searchParams: {
           url: urlForLatencyTest(),
-          timeout: speedtestTimeoutDuration(),
+          timeout: latencyTestTimeoutDuration(),
         },
       })
       .json()

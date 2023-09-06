@@ -27,7 +27,6 @@ import {
 } from '@tanstack/solid-table'
 import byteSize from 'byte-size'
 import dayjs from 'dayjs'
-import { isIPv6 } from 'is-ip'
 import { differenceWith, isEqualWith } from 'lodash'
 import { For, createEffect, createMemo, createSignal, untrack } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
@@ -260,12 +259,14 @@ export default () => {
       sortingFn: (prev, next) => prev.original.upload - next.original.upload,
     },
     {
-      header: () => t('source'),
-      accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Source,
-      accessorFn: (row) =>
-        isIPv6(row.metadata.sourceIP)
-          ? `[${row.metadata.sourceIP}]:${row.metadata.sourcePort}`
-          : `${row.metadata.sourceIP}:${row.metadata.sourcePort}`,
+      header: () => t('sourceIP'),
+      accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.SourceIP,
+      accessorFn: (row) => row.metadata.sourceIP,
+    },
+    {
+      header: () => t('sourcePort'),
+      accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.SourcePort,
+      accessorFn: (row) => row.metadata.sourcePort,
     },
     {
       header: () => t('destination'),
@@ -468,6 +469,7 @@ export default () => {
                                 <IconZoomInFilled size={18} />
                               )}
                             </div>
+
                             <div>
                               {flexRender(
                                 cell.column.columnDef.cell,
