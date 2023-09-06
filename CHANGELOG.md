@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.76.0](https://github.com/MetaCubeX/metacubexd/compare/v1.75.1...v1.76.0) (2023-09-06)
+
+
+### Features
+
+* **proxy:** merge proxies and proxyProviders into one page ([93114b2](https://github.com/MetaCubeX/metacubexd/commit/93114b22a28b3e336b9fccbee4ec99b6eb8a4b61))
+* **rules:** config for render rules in two columns ([7e2fe6a](https://github.com/MetaCubeX/metacubexd/commit/7e2fe6acb0d2bc879cd724cfda7d80924abd5d40))
+
+
+### Bug Fixes
+
+* **connections:** table max row 200 ([0d61b46](https://github.com/MetaCubeX/metacubexd/commit/0d61b460cc16aa1a7c60015afe9b526c38d57ffc))
+* **proxy:** add small gap between update button and tabs ([ff7dab7](https://github.com/MetaCubeX/metacubexd/commit/ff7dab74b69b0527c721185fcdf94c005d7c5d3c))
+* **request:** ws request url ([a13060a](https://github.com/MetaCubeX/metacubexd/commit/a13060a056c9ac87c21ce7f8706ee6a5ae23be18))
+* **translation:** latencyTestTimeoutDuration ([2ebedcc](https://github.com/MetaCubeX/metacubexd/commit/2ebedcc1c97b675395cd0f55824bc11ee5af5fce))
+
 ## [1.75.1](https://github.com/MetaCubeX/metacubexd/compare/v1.75.0...v1.75.1) (2023-09-06)
 
 
