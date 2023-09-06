@@ -5,7 +5,7 @@ import { For, Show, createMemo, createSignal, onMount } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Button } from '~/components'
 import { formatTimeFromNow, useStringBooleanMap } from '~/helpers'
-import { useRules } from '~/signals'
+import { renderRulesAndProviderInTwoColumns, useRules } from '~/signals'
 
 export default () => {
   const [t] = useI18n()
@@ -40,7 +40,12 @@ export default () => {
   }
 
   return (
-    <div class="flex w-full gap-4">
+    <div
+      class={twMerge(
+        'flex w-full flex-col gap-4',
+        renderRulesAndProviderInTwoColumns() && 'flex-row',
+      )}
+    >
       <div class="flex-1">
         <h1 class="pb-4 text-lg font-semibold">{t('rules')}</h1>
 

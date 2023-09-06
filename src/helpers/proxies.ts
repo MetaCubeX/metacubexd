@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 import { PROXIES_ORDERING_TYPE } from '~/constants'
+import { latencyQualityMap } from '~/signals'
 
 export const formatTimeFromNow = (time: number | string) => {
   return dayjs(time).fromNow()
@@ -45,16 +46,16 @@ export const sortProxiesByOrderingType = (
 
     switch (orderingType) {
       case PROXIES_ORDERING_TYPE.LATENCY_ASC:
-        if (prevLatency === -1) return 1
+        if (prevLatency === latencyQualityMap().NOT_CONNECTED) return 1
 
-        if (nextLatency === -1) return -1
+        if (nextLatency === latencyQualityMap().NOT_CONNECTED) return -1
 
         return prevLatency - nextLatency
 
       case PROXIES_ORDERING_TYPE.LATENCY_DESC:
-        if (prevLatency === -1) return 1
+        if (prevLatency === latencyQualityMap().NOT_CONNECTED) return 1
 
-        if (nextLatency === -1) return -1
+        if (nextLatency === latencyQualityMap().NOT_CONNECTED) return -1
 
         return nextLatency - prevLatency
 

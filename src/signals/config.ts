@@ -41,7 +41,7 @@ export const [favNightTheme, setFavNightTheme] = makePersisted(
   createSignal('night'),
   { name: 'favNightTheme', storage: localStorage },
 )
-export const [renderInTwoColumn, setRenderInTwoColumn] = makePersisted(
+export const [renderInTwoColumns, setRenderInTwoColumns] = makePersisted(
   createSignal(true),
   { name: 'renderInTwoColumn', storage: localStorage },
 )
@@ -50,6 +50,13 @@ export const [renderProxiesInSamePage, setRenderProxiesInSamePage] =
     name: 'renderProxiesInSamePage',
     storage: localStorage,
   })
+export const [
+  renderRulesAndProviderInTwoColumns,
+  setRenderRulesAndProviderInTwoColumns,
+] = makePersisted(createSignal(true), {
+  name: 'renderRulesAndProviderInTwoColumns',
+  storage: localStorage,
+})
 export const [tableSize, setTableSize] = makePersisted(
   createSignal<TAILWINDCSS_SIZE>(TAILWINDCSS_SIZE.XS),
   { name: 'tableSize', storage: localStorage },

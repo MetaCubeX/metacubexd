@@ -29,8 +29,9 @@ import {
   latencyTestTimeoutDuration,
   proxiesOrderingType,
   proxiesPreviewType,
-  renderInTwoColumn,
+  renderInTwoColumns,
   renderProxiesInSamePage,
+  renderRulesAndProviderInTwoColumns,
   setAutoCloseConns,
   setAutoSwitchTheme,
   setFavDayTheme,
@@ -38,8 +39,9 @@ import {
   setLatencyTestTimeoutDuration,
   setProxiesOrderingType,
   setProxiesPreviewType,
-  setRenderInTwoColumn,
+  setRenderInTwoColumns,
   setRenderProxiesInSamePage,
+  setRenderRulesAndProviderInTwoColumns,
   setSelectedEndpoint,
   setTableSize,
   setTwemoji,
@@ -270,98 +272,102 @@ const ConfigForXd = () => {
     navigate(ROUTES.Setup)
   }
 
-  return (
-    <div class="grid gap-4">
+  const autoSwitchThemeSubChild = () => (
+    <Show when={autoSwitchTheme()}>
       <div class="flex flex-col">
-        <ConfigTitle>{t('renderInTwoColumns')}</ConfigTitle>
+        <ConfigTitle>{t('favDayTheme')}</ConfigTitle>
 
-        <input
-          type="checkbox"
-          class="toggle"
-          checked={renderInTwoColumn()}
+        <select
+          class="select select-bordered w-full max-w-xs"
           onChange={(e) => {
-            setRenderInTwoColumn(e.target.checked)
-          }}
-        />
-      </div>
-      <div class="flex flex-col">
-        <ConfigTitle>{t('renderProxiesInSamePage')}</ConfigTitle>
-
-        <input
-          type="checkbox"
-          class="toggle"
-          checked={renderProxiesInSamePage()}
-          onChange={(e) => {
-            setRenderProxiesInSamePage(e.target.checked)
-          }}
-        />
-      </div>
-
-      <div class="flex flex-col">
-        <ConfigTitle>{t('autoSwitchTheme')}</ConfigTitle>
-
-        <input
-          type="checkbox"
-          class="toggle"
-          checked={autoSwitchTheme()}
-          onChange={(e) => {
-            setAutoSwitchTheme(e.target.checked)
+            setFavDayTheme(e.target.value)
             applyThemeByMode()
           }}
-        />
+        >
+          <For each={themes}>
+            {(theme) => (
+              <option selected={favDayTheme() === theme} value={theme}>
+                {theme}
+              </option>
+            )}
+          </For>
+        </select>
       </div>
+      <div class="flex flex-col">
+        <ConfigTitle>{t('favNightTheme')}</ConfigTitle>
 
-      <Show when={autoSwitchTheme()}>
-        <div class="flex flex-col">
-          <ConfigTitle>{t('favDayTheme')}</ConfigTitle>
-
-          <select
-            class="select select-bordered w-full max-w-xs"
-            onChange={(e) => {
-              setFavDayTheme(e.target.value)
-              applyThemeByMode()
-            }}
-          >
-            <For each={themes}>
-              {(theme) => (
-                <option selected={favDayTheme() === theme} value={theme}>
-                  {theme}
-                </option>
-              )}
-            </For>
-          </select>
-        </div>
-        <div class="flex flex-col">
-          <ConfigTitle>{t('favNightTheme')}</ConfigTitle>
-
-          <select
-            class="select select-bordered w-full max-w-xs"
-            onChange={(e) => {
-              setFavNightTheme(e.target.value)
-              applyThemeByMode()
-            }}
-          >
-            <For each={themes}>
-              {(theme) => (
-                <option selected={favNightTheme() === theme} value={theme}>
-                  {theme}
-                </option>
-              )}
-            </For>
-          </select>
-        </div>
-      </Show>
-
-      <div>
-        <ConfigTitle>{t('useTwemoji')}</ConfigTitle>
-
-        <input
-          class="toggle"
-          type="checkbox"
-          checked={useTwemoji()}
-          onChange={(e) => setTwemoji(e.target.checked)}
-        />
+        <select
+          class="select select-bordered w-full max-w-xs"
+          onChange={(e) => {
+            setFavNightTheme(e.target.value)
+            applyThemeByMode()
+          }}
+        >
+          <For each={themes}>
+            {(theme) => (
+              <option selected={favNightTheme() === theme} value={theme}>
+                {theme}
+              </option>
+            )}
+          </For>
+        </select>
       </div>
+    </Show>
+  )
+
+  const checkboxList = [
+    {
+      label: 'renderInTwoColumns',
+      value: renderInTwoColumns,
+      onChange: setRenderInTwoColumns,
+    },
+    {
+      label: 'renderRulesAndProviderInTwoColumns',
+      value: renderRulesAndProviderInTwoColumns,
+      onChange: setRenderRulesAndProviderInTwoColumns,
+    },
+    {
+      label: 'renderProxiesInSamePage',
+      value: renderProxiesInSamePage,
+      onChange: setRenderProxiesInSamePage,
+    },
+    {
+      label: 'autoSwitchTheme',
+      value: autoSwitchTheme,
+      onChange: (value: boolean) => {
+        setAutoSwitchTheme(value)
+        applyThemeByMode()
+      },
+      subChild: autoSwitchThemeSubChild,
+    },
+    {
+      label: 'useTwemoji',
+      value: useTwemoji,
+      onChange: setTwemoji,
+    },
+  ]
+
+  return (
+    <div class="grid gap-4">
+      <For each={checkboxList}>
+        {(checkbox) => (
+          <>
+            <div class="flex flex-col">
+              <ConfigTitle>{t(checkbox.label)}</ConfigTitle>
+
+              <input
+                type="checkbox"
+                class="toggle"
+                checked={checkbox.value()}
+                onChange={(e) => {
+                  checkbox.onChange(e.target.checked)
+                }}
+              />
+            </div>
+            {checkbox.subChild?.()}
+          </>
+        )}
+      </For>
 
       <div>
         <ConfigTitle>{t('proxiesPreviewType')}</ConfigTitle>
