@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.75.0](https://github.com/MetaCubeX/metacubexd/compare/v1.74.4...v1.75.0) (2023-09-06)
+
+
+### Features
+
+* **connections:** split source info into sourceIP and sourcePort ([2d61f45](https://github.com/MetaCubeX/metacubexd/commit/2d61f45372ac65a01aa9f51fe010cfdee53d9d46))
+
 ## [1.74.4](https://github.com/MetaCubeX/metacubexd/compare/v1.74.3...v1.74.4) (2023-09-06)
 
 
