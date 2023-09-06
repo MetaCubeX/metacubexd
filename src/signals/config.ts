@@ -55,8 +55,7 @@ export const [tableSize, setTableSize] = makePersisted(
   { name: 'tableSize', storage: localStorage },
 )
 
-export const tableSizeClassName = () => {
-  const size = tableSize()
+export const tableSizeClassName = (size: TAILWINDCSS_SIZE) => {
   let className = 'table-xs'
 
   switch (size) {

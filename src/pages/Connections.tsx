@@ -40,6 +40,7 @@ import {
 import { formatTimeFromNow } from '~/helpers'
 import {
   secret,
+  tableSize,
   tableSizeClassName,
   useRequest,
   wsEndpointURL,
@@ -336,10 +337,7 @@ export default () => {
         <For each={tabs()}>
           {(tab) => (
             <button
-              class={twMerge(
-                activeTab() === tab.type && 'tab-active',
-                'tab tab-xs',
-              )}
+              class={twMerge(activeTab() === tab.type && 'tab-active', 'tab')}
               onClick={() => setActiveTab(tab.type)}
             >
               {tab.name} ({tab.count})
@@ -350,26 +348,26 @@ export default () => {
 
       <div class="flex w-full flex-wrap items-center gap-2">
         <input
-          class="input input-primary input-sm flex-1"
+          class="input input-primary flex-1"
           placeholder={t('search')}
           onInput={(e) => setSearch(e.target.value)}
         />
 
         <Button
-          class="btn-circle btn-sm"
+          class="btn-circle"
           onClick={() => setPaused((paused) => !paused)}
         >
           {paused() ? <IconPlayerPlay /> : <IconPlayerPause />}
         </Button>
 
         <Button
-          class="btn-circle btn-sm"
+          class="btn-circle"
           onClick={() => request.delete('connections')}
         >
           <IconCircleX />
         </Button>
 
-        <label for="connection-modal" class="btn btn-circle btn-sm">
+        <label for="connection-modal" class="btn btn-circle">
           <IconSettings />
         </label>
 
@@ -388,7 +386,7 @@ export default () => {
       <div class="overflow-x-auto whitespace-nowrap rounded-md bg-base-300">
         <table
           class={twMerge(
-            tableSizeClassName(),
+            tableSizeClassName(tableSize()),
             'table table-zebra relative rounded-none',
           )}
         >

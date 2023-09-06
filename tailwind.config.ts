@@ -5,7 +5,7 @@ import { Config } from 'tailwindcss'
 import safeArea from 'tailwindcss-safe-area'
 
 export default {
-  content: ['./src/**/*.{css,tsx}'],
+  content: ['./src/**/*.{css,ts,tsx}'],
   plugins: [daisyui, safeArea],
   daisyui: { themes: true },
   theme: {

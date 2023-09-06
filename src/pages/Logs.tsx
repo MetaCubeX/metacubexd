@@ -9,7 +9,7 @@ import {
 } from '@tanstack/solid-table'
 import { For, createEffect, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import { secret, tableSizeClassName, wsEndpointURL } from '~/signals'
+import { secret, tableSize, tableSizeClassName, wsEndpointURL } from '~/signals'
 import { Log } from '~/types'
 
 type LogWithSeq = Log & { seq: number }
@@ -77,7 +77,10 @@ export default () => {
 
       <div class="overflow-x-auto whitespace-nowrap rounded-md bg-base-300">
         <table
-          class={twMerge(tableSizeClassName(), 'table relative rounded-none')}
+          class={twMerge(
+            tableSizeClassName(tableSize()),
+            'table relative rounded-none',
+          )}
         >
           <thead class="sticky top-0 z-10">
             <For each={table.getHeaderGroups()}>
