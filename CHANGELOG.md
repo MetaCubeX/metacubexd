@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.78.1](https://github.com/MetaCubeX/metacubexd/compare/v1.78.0...v1.78.1) (2023-09-06)
+
+
+### Bug Fixes
+
+* unselectable ProxyNodeCard also has cursor-pointer applied ([d5112f2](https://github.com/MetaCubeX/metacubexd/commit/d5112f23da449e4cb74c9abc49d84f34a0859758))
+
 ## [1.78.0](https://github.com/MetaCubeX/metacubexd/compare/v1.77.0...v1.78.0) (2023-09-06)
 
 
