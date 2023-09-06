@@ -104,7 +104,7 @@ export default () => {
         [...prev, ...closedConnections].slice(-1000),
       )
 
-      return connections
+      return connections.slice(-200)
     }
 
   createEffect(() => {
