@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.74.4](https://github.com/MetaCubeX/metacubexd/compare/v1.74.3...v1.74.4) (2023-09-06)
+
+
+### Bug Fixes
+
+* **config:** speedtest timeout config ([5f1e773](https://github.com/MetaCubeX/metacubexd/commit/5f1e77320d82fbc5e2abfc1ebee70e4194c0ce98))
+
 ## [1.74.3](https://github.com/MetaCubeX/metacubexd/compare/v1.74.2...v1.74.3) (2023-09-06)
 
 
