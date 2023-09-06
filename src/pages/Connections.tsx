@@ -25,8 +25,8 @@ import {
 } from '@tanstack/solid-table'
 import byteSize from 'byte-size'
 import dayjs from 'dayjs'
-import { differenceWith, isEqualWith } from 'lodash'
-import { For, createEffect, createMemo, createSignal, untrack } from 'solid-js'
+import { differenceWith } from 'lodash'
+import { For, createEffect, createMemo, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Button, ConnectionsTableOrderingModal } from '~/components'
 import {
@@ -66,25 +66,15 @@ export default () => {
   const connections = useWsRequest<{ connections: Connection[] }>('connections')
 
   const [closedConnectionsWithSpeed, setClosedConnectionsWithSpeed] =
-    createSignal<ConnectionWithSpeed[]>([])
+    createSignal<ConnectionWithSpeed[]>([], { equals: () => paused() })
 
   const [activeConnectionsWithSpeed, setActiveConnectionsWithSpeed] =
-    createSignal<ConnectionWithSpeed[]>([])
+    createSignal<ConnectionWithSpeed[]>([], { equals: () => paused() })
 
   const [paused, setPaused] = createSignal(false)
-  const [pausedActiveConnectionsSnapshot, setPausedActiveConnectionsSnapshot] =
-    createSignal<ConnectionWithSpeed[]>([])
-  const [pausedClosedConnectionsSnapshot, setPausedClosedConnectionsSnapshot] =
-    createSignal<ConnectionWithSpeed[]>([])
 
-  createEffect(() => {
-    const data = connections()?.connections
-
-    if (!data) {
-      return
-    }
-
-    setActiveConnectionsWithSpeed((prevConnections) => {
+  const updateConnections =
+    (data: Connection[]) => (prevConnections: ConnectionWithSpeed[]) => {
       const prevMap = new Map<string, Connection>()
       prevConnections.forEach((prev) => prevMap.set(prev.id, prev))
 
@@ -97,48 +87,37 @@ export default () => {
 
         return {
           ...connection,
-          downloadSpeed: prevConn.download
-            ? connection.download - prevConn.download
-            : 0,
-          uploadSpeed: prevConn.upload
-            ? connection.upload - prevConn.upload
-            : 0,
+          downloadSpeed:
+            connection.download - (prevConn.download ?? connection.download),
+          uploadSpeed:
+            connection.upload - (prevConn.upload ?? connection.upload),
         }
       })
 
       const closedConnections = differenceWith(
         prevConnections,
         connections,
-        (a, b) => isEqualWith(a, b, (a, b) => a.id === b.id),
+        (a, b) => a.id === b.id,
       )
 
       setClosedConnectionsWithSpeed((prev) =>
         [...prev, ...closedConnections].slice(-1000),
       )
 
-      return connections.slice(-100)
-    })
-  })
+      return connections
+    }
 
   createEffect(() => {
-    if (paused()) {
-      setPausedActiveConnectionsSnapshot(
-        untrack(() => activeConnectionsWithSpeed()),
-      )
+    const data = connections()?.connections
 
-      setPausedClosedConnectionsSnapshot(
-        untrack(() => closedConnectionsWithSpeed()),
-      )
+    if (!data) {
+      return
     }
+
+    const updater = updateConnections(data)
+
+    setActiveConnectionsWithSpeed(updater)
   })
-
-  const activeConnectionsWithSpeedAndPausing = createMemo(() =>
-    paused() ? pausedActiveConnectionsSnapshot() : activeConnectionsWithSpeed(),
-  )
-
-  const closedConnectionsWithSpeedAndPausing = createMemo(() =>
-    paused() ? pausedClosedConnectionsSnapshot() : closedConnectionsWithSpeed(),
-  )
 
   const onCloseConnection = (id: string) => request.delete(`connections/${id}`)
 
@@ -292,8 +271,8 @@ export default () => {
     },
     get data() {
       return activeTab() === ActiveTab.activeConnections
-        ? activeConnectionsWithSpeedAndPausing()
-        : closedConnectionsWithSpeedAndPausing()
+        ? activeConnectionsWithSpeed()
+        : closedConnectionsWithSpeed()
     },
     sortDescFirst: true,
     enableHiding: true,
@@ -312,12 +291,12 @@ export default () => {
     {
       type: ActiveTab.activeConnections,
       name: t('activeConnections'),
-      count: activeConnectionsWithSpeedAndPausing().length,
+      count: activeConnectionsWithSpeed().length,
     },
     {
       type: ActiveTab.closedConnections,
       name: t('closedConnections'),
-      count: closedConnectionsWithSpeedAndPausing().length,
+      count: closedConnectionsWithSpeed().length,
     },
   ]
 
