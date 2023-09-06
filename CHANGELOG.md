@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.74.3](https://github.com/MetaCubeX/metacubexd/compare/v1.74.2...v1.74.3) (2023-09-06)
+
+
+### Bug Fixes
+
+* **Dockerfile:** lock node version to 20.5-alpine ([c370a84](https://github.com/MetaCubeX/metacubexd/commit/c370a84b8cc6546729c1c0db88ff8f6bba2244a6))
+* **proxies:** speedtest params error ([5f0fb23](https://github.com/MetaCubeX/metacubexd/commit/5f0fb23f15f7118a76e58c3a6b6e4d97533dcfdd))
+
 ## [1.74.2](https://github.com/MetaCubeX/metacubexd/compare/v1.74.1...v1.74.2) (2023-09-06)
 
 
