@@ -19,7 +19,6 @@ import { proxiesOrderingType, useProxies } from '~/signals'
 import type { Proxy } from '~/types'
 
 enum ActiveTab {
-  all = 'all',
   proxyProviders = 'proxyProviders',
   proxies = 'proxies',
 }
@@ -75,66 +74,60 @@ export default () => {
     setIsAllProviderUpdating(false)
   }
 
-  const [activeTab, setActiveTab] = createSignal(ActiveTab.all)
+  const [activeTab, setActiveTab] = createSignal(ActiveTab.proxies)
 
   const tabs = () => [
     {
-      type: ActiveTab.all,
-      name: t('all'),
-      count: proxyProviders().length + proxies().length,
+      type: ActiveTab.proxies,
+      name: t('proxies'),
+      count: proxies().length,
     },
     {
       type: ActiveTab.proxyProviders,
       name: t('proxyProviders'),
       count: proxyProviders().length,
     },
-    {
-      type: ActiveTab.proxies,
-      name: t('proxies'),
-      count: proxies().length,
-    },
   ]
 
   return (
     <div class="flex h-full flex-col gap-2">
-      <div class="flex items-center justify-between gap-2">
-        <div class="tabs tabs-boxed gap-2">
-          <For each={tabs()}>
-            {(tab) => (
-              <button
-                class={twMerge(
-                  activeTab() === tab.type && 'tab-active',
-                  'tab gap-2 px-2',
-                )}
-                onClick={() => setActiveTab(tab.type)}
-              >
-                <span>{tab.name}</span>
-                <div class="badge badge-sm">{tab.count}</div>
-              </button>
-            )}
-          </For>
-        </div>
+      <Show when={proxyProviders().length > 0}>
+        <div class="flex items-center justify-between gap-2">
+          <div class="tabs-boxed tabs gap-2">
+            <For each={tabs()}>
+              {(tab) => (
+                <button
+                  class={twMerge(
+                    activeTab() === tab.type && 'tab-active',
+                    'tab gap-2 px-2',
+                  )}
+                  onClick={() => setActiveTab(tab.type)}
+                >
+                  <span>{tab.name}</span>
+                  <div class="badge badge-sm">{tab.count}</div>
+                </button>
+              )}
+            </For>
+          </div>
 
-        <Button
-          class="btn btn-circle btn-sm"
-          disabled={isAllProviderUpdating()}
-          onClick={(e) => onUpdateAllProviderClick(e)}
-        >
-          <IconReload
-            class={twMerge(
-              isAllProviderUpdating() && 'animate-spin text-success',
-            )}
-          />
-        </Button>
-      </div>
+          <Show when={activeTab() === ActiveTab.proxyProviders}>
+            <Button
+              class="btn btn-circle btn-sm"
+              disabled={isAllProviderUpdating()}
+              onClick={(e) => onUpdateAllProviderClick(e)}
+            >
+              <IconReload
+                class={twMerge(
+                  isAllProviderUpdating() && 'animate-spin text-success',
+                )}
+              />
+            </Button>
+          </Show>
+        </div>
+      </Show>
 
       <div class="flex-1 overflow-y-auto">
-        <Show
-          when={
-            activeTab() === ActiveTab.all ||
-            activeTab() === ActiveTab.proxyProviders
-          }
-        >
+        <Show when={activeTab() === ActiveTab.proxyProviders}>
           <ForTwoColumns
             subChild={proxyProviders().map((proxyProvider) => {
               const sortedProxyNames = sortProxiesByOrderingType(
@@ -215,15 +208,7 @@ export default () => {
           />
         </Show>
 
-        <Show when={activeTab() === ActiveTab.all}>
-          <div class="divider" />
-        </Show>
-
-        <Show
-          when={
-            activeTab() === ActiveTab.all || activeTab() === ActiveTab.proxies
-          }
-        >
+        <Show when={activeTab() === ActiveTab.proxies}>
           <ForTwoColumns
             subChild={proxies().map((proxy) => {
               const sortedProxyNames = sortProxiesByOrderingType(
