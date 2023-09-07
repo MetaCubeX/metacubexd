@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.81.1](https://github.com/MetaCubeX/metacubexd/compare/v1.81.0...v1.81.1) (2023-09-07)
+
+
+### Bug Fixes
+
+* **proxy:** fixes [#174](https://github.com/MetaCubeX/metacubexd/issues/174) ([c0b0489](https://github.com/MetaCubeX/metacubexd/commit/c0b04892c8a1eb93a8d8ac25c3c2d35da45c81e6))
+* **setup:** fixes [#175](https://github.com/MetaCubeX/metacubexd/issues/175) ([8242706](https://github.com/MetaCubeX/metacubexd/commit/8242706290668f91578562d70e616a82ed5ce00c))
+
 ## [1.81.0](https://github.com/MetaCubeX/metacubexd/compare/v1.80.0...v1.81.0) (2023-09-07)
 
 
