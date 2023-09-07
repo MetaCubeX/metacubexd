@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.80.0](https://github.com/MetaCubeX/metacubexd/compare/v1.79.0...v1.80.0) (2023-09-07)
+
+
+### Features
+
+* hidden scrollbar for mobile ([2ce3016](https://github.com/MetaCubeX/metacubexd/commit/2ce30162752be27337c8e6dce7a81ee7bea6d6dd))
+
+
+### Bug Fixes
+
+* **connections:** padding fix ([8cea622](https://github.com/MetaCubeX/metacubexd/commit/8cea622251b93308a94c6ade29199a6f01dbf72d))
+* tab style for conns and proxies ([842ce9e](https://github.com/MetaCubeX/metacubexd/commit/842ce9e00fe5a3f9e117cafb6c181602ef618c94))
+
 ## [1.79.0](https://github.com/MetaCubeX/metacubexd/compare/v1.78.1...v1.79.0) (2023-09-07)
 
 
