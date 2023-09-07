@@ -92,8 +92,8 @@ export default () => {
   return (
     <div class="flex h-full flex-col gap-2">
       <Show when={proxyProviders().length > 0}>
-        <div class="flex items-center justify-between gap-2">
-          <div class="tabs-boxed tabs gap-2">
+        <div class="flex items-center gap-2">
+          <div class="tabs tabs-boxed gap-2">
             <For each={tabs()}>
               {(tab) => (
                 <button

@@ -307,47 +307,49 @@ export default () => {
 
   return (
     <div class="flex h-full flex-col gap-2 p-1">
-      <div class="tabs-boxed tabs gap-2">
-        <For each={tabs()}>
-          {(tab) => (
-            <button
-              class={twMerge(
-                activeTab() === tab.type && 'tab-active',
-                'tab gap-2',
-              )}
-              onClick={() => setActiveTab(tab.type)}
-            >
-              <span>{tab.name}</span>
-              <div class="badge badge-sm">{tab.count}</div>
-            </button>
-          )}
-        </For>
-      </div>
-
       <div class="flex w-full flex-wrap items-center gap-2">
-        <input
-          class="input input-primary input-sm flex-1"
-          placeholder={t('search')}
-          onInput={(e) => setSearch(e.target.value)}
-        />
+        <div class="tabs-boxed tabs gap-2">
+          <For each={tabs()}>
+            {(tab) => (
+              <button
+                class={twMerge(
+                  activeTab() === tab.type && 'tab-active',
+                  'tab gap-2 px-2',
+                )}
+                onClick={() => setActiveTab(tab.type)}
+              >
+                <span>{tab.name}</span>
+                <div class="badge badge-sm">{tab.count}</div>
+              </button>
+            )}
+          </For>
+        </div>
 
-        <Button
-          class="btn-circle btn-sm"
-          onClick={() => setPaused((paused) => !paused)}
-        >
-          {paused() ? <IconPlayerPlay /> : <IconPlayerPause />}
-        </Button>
+        <div class="flex w-full items-center gap-2 md:flex-1">
+          <input
+            class="input input-primary input-sm flex-1"
+            placeholder={t('search')}
+            onInput={(e) => setSearch(e.target.value)}
+          />
 
-        <Button
-          class="btn-circle btn-sm"
-          onClick={() => request.delete('connections')}
-        >
-          <IconCircleX />
-        </Button>
+          <Button
+            class="btn-circle btn-sm"
+            onClick={() => setPaused((paused) => !paused)}
+          >
+            {paused() ? <IconPlayerPlay /> : <IconPlayerPause />}
+          </Button>
 
-        <label for="connection-modal" class="btn btn-circle btn-sm">
-          <IconSettings />
-        </label>
+          <Button
+            class="btn-circle btn-sm"
+            onClick={() => request.delete('connections')}
+          >
+            <IconCircleX />
+          </Button>
+
+          <label for="connection-modal" class="btn btn-circle btn-sm">
+            <IconSettings />
+          </label>
+        </div>
 
         <ConnectionsTableOrderingModal
           order={columnOrder()}
