@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.81.0](https://github.com/MetaCubeX/metacubexd/compare/v1.80.0...v1.81.0) (2023-09-07)
+
+
+### Features
+
+* **connections:** update connections page top area ([64659b2](https://github.com/MetaCubeX/metacubexd/commit/64659b26f110a4c0271c584a892cc7943bb2cf41))
+* new logo color ([e31c1eb](https://github.com/MetaCubeX/metacubexd/commit/e31c1eb9e031bed4254596e593b71374dbefcd5d))
+
+
+### Bug Fixes
+
+* **conns:** input width ([62ff9c3](https://github.com/MetaCubeX/metacubexd/commit/62ff9c3f09131072585e5ebb5ccf515a0bc75a60))
+
 ## [1.80.0](https://github.com/MetaCubeX/metacubexd/compare/v1.79.0...v1.80.0) (2023-09-07)
 
 
