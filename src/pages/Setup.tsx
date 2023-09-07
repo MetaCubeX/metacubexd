@@ -98,15 +98,15 @@ export default () => {
 
     if (query.has('hostname')) {
       void onSubmit({
-        url: `http://${query.get('hostname')}${
-          query.get('port') && ':' + query.get('port')
+        url: `${window.location.protocol}//${query.get('hostname')}${
+          query.get('port') ? `:${query.get('port')}` : ''
         }`,
         secret: query.get('secret') ?? '',
       })
     } else if (endpointList().length === 0) {
-      /**   
+      /**
         we only try auto login when there is nothing in endpoint list
-        or user who is using default config wont be able to switch to another endpoint ever 
+        or user who is using default config won't be able to switch to another endpoint ever
       */
       void onSubmit({
         url: 'http://127.0.0.1:9090',
