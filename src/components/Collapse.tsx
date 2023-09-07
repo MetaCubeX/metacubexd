@@ -5,7 +5,7 @@ import { renderInTwoColumns } from '~/signals'
 type Props = {
   title: JSX.Element
   content: JSX.Element
-  isOpen: boolean | undefined
+  isOpen?: boolean
   onCollapse: (collapsed: boolean) => void
 }
 

@@ -3,10 +3,7 @@ import { twMerge } from 'tailwind-merge'
 import { Latency } from '~/components'
 import { latencyQualityMap, useProxies } from '~/signals'
 
-const LatencyDots = (props: {
-  latency: number | undefined
-  selected: boolean
-}) => {
+const LatencyDots = (props: { latency?: number; selected: boolean }) => {
   let dotClassName = props.selected
     ? 'bg-white border-4 border-success'
     : 'bg-success'
