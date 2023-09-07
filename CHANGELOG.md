@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.79.0](https://github.com/MetaCubeX/metacubexd/compare/v1.78.1...v1.79.0) (2023-09-07)
+
+
+### Features
+
+* **proxies:** default proxies and remove all tab ([66c7935](https://github.com/MetaCubeX/metacubexd/commit/66c793550ab4ef3c85d24422fe58dec644deb6d4))
+* update LogoText ([8d62c9f](https://github.com/MetaCubeX/metacubexd/commit/8d62c9f510de7268a3c0ead5e47a31fe938c196d))
+
+
+### Bug Fixes
+
+* btn size for mobile ([f729761](https://github.com/MetaCubeX/metacubexd/commit/f72976154df067d8c3fab3eda220dd386329b9be))
+* **rules:** request token error ([44739f6](https://github.com/MetaCubeX/metacubexd/commit/44739f6962792a5ae42684ee8e1edcb8a9a4216b))
+
 ## [1.78.1](https://github.com/MetaCubeX/metacubexd/compare/v1.78.0...v1.78.1) (2023-09-06)
 
 
