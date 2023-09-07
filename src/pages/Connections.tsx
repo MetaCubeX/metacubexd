@@ -326,26 +326,26 @@ export default () => {
 
       <div class="flex w-full flex-wrap items-center gap-2">
         <input
-          class="input input-primary flex-1"
+          class="input input-primary input-sm flex-1"
           placeholder={t('search')}
           onInput={(e) => setSearch(e.target.value)}
         />
 
         <Button
-          class="btn-circle"
+          class="btn-circle btn-sm"
           onClick={() => setPaused((paused) => !paused)}
         >
           {paused() ? <IconPlayerPlay /> : <IconPlayerPause />}
         </Button>
 
         <Button
-          class="btn-circle"
+          class="btn-circle btn-sm"
           onClick={() => request.delete('connections')}
         >
           <IconCircleX />
         </Button>
 
-        <label for="connection-modal" class="btn btn-circle">
+        <label for="connection-modal" class="btn btn-circle btn-sm">
           <IconSettings />
         </label>
 

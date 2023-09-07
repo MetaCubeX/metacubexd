@@ -98,13 +98,13 @@ export default () => {
   return (
     <div class="flex h-full flex-col gap-2">
       <div class="flex items-center justify-between gap-2">
-        <div class="tabs-boxed tabs gap-2">
+        <div class="tabs tabs-boxed gap-2">
           <For each={tabs()}>
             {(tab) => (
               <button
                 class={twMerge(
                   activeTab() === tab.type && 'tab-active',
-                  'tab gap-2',
+                  'tab gap-2 px-2',
                 )}
                 onClick={() => setActiveTab(tab.type)}
               >
@@ -116,7 +116,7 @@ export default () => {
         </div>
 
         <Button
-          class="btn btn-circle"
+          class="btn btn-circle btn-sm"
           disabled={isAllProviderUpdating()}
           onClick={(e) => onUpdateAllProviderClick(e)}
         >
