@@ -72,10 +72,10 @@ export default () => {
 
       <Show when={rulesProviders().length > 0}>
         <div class="flex-1">
-          <h1 class="flex h-11 items-center pb-4 text-lg font-semibold">
+          <h1 class="flex h-11 items-center gap-2 pb-4 text-lg font-semibold">
             {t('ruleProviders')}
             <Button
-              class="btn-circle btn-ghost btn-sm ml-2"
+              class="btn-circle btn-sm"
               disabled={allProviderIsUpdating()}
               onClick={(e) => onUpdateAllProviderClick(e)}
             >

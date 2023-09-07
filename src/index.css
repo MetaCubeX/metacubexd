@@ -19,14 +19,23 @@
   background: transparent;
 }
 
-::-webkit-scrollbar-thumb {
-  @apply rounded-box bg-primary;
-}
-
 ::-webkit-scrollbar:vertical {
-  width: 6px;
+  width: 0px;
 }
 
 ::-webkit-scrollbar:horizontal {
-  height: 6px;
+  height: 0px;
+}
+
+@media (min-width: 640px) {
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-box bg-primary;
+  }
+  ::-webkit-scrollbar:vertical {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar:horizontal {
+    height: 6px;
+  }
 }
