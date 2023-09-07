@@ -327,7 +327,7 @@ export default () => {
 
         <div class="flex w-full items-center gap-2 md:flex-1">
           <input
-            class="input input-primary input-sm flex-1"
+            class="input input-primary input-sm w-96"
             placeholder={t('search')}
             onInput={(e) => setSearch(e.target.value)}
           />
