@@ -292,7 +292,7 @@ export default () => {
     getCoreRowModel: getCoreRowModel(),
   })
 
-  const tabs = () => [
+  const tabs = createMemo(() => [
     {
       type: ActiveTab.activeConnections,
       name: t('activeConnections'),
@@ -303,7 +303,7 @@ export default () => {
       name: t('closedConnections'),
       count: closedConnectionsWithSpeed().length,
     },
-  ]
+  ])
 
   return (
     <div class="flex h-full flex-col gap-2">
@@ -314,7 +314,7 @@ export default () => {
               <button
                 class={twMerge(
                   activeTab() === tab.type && 'tab-active',
-                  'tab gap-2 px-2',
+                  'tab tab-sm gap-2 sm:tab-md',
                 )}
                 onClick={() => setActiveTab(tab.type)}
               >
@@ -327,26 +327,26 @@ export default () => {
 
         <div class="flex w-full items-center gap-2 md:flex-1">
           <input
-            class="input input-primary input-sm w-96"
+            class="input input-primary input-sm flex-1 sm:input-md"
             placeholder={t('search')}
             onInput={(e) => setSearch(e.target.value)}
           />
 
           <Button
-            class="btn-circle btn-sm"
+            class="btn-circle btn-sm sm:btn-md"
             onClick={() => setPaused((paused) => !paused)}
           >
             {paused() ? <IconPlayerPlay /> : <IconPlayerPause />}
           </Button>
 
           <Button
-            class="btn-circle btn-sm"
+            class="btn-circle btn-sm sm:btn-md"
             onClick={() => request.delete('connections')}
           >
             <IconCircleX />
           </Button>
 
-          <label for="connection-modal" class="btn btn-circle btn-sm">
+          <label for="connection-modal" class="btn btn-circle btn-sm sm:btn-md">
             <IconSettings />
           </label>
         </div>
