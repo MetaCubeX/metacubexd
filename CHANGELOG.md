@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.82.0](https://github.com/MetaCubeX/metacubexd/compare/v1.81.1...v1.82.0) (2023-09-07)
+
+
+### Features
+
+* add a gradient color to logo text ([4da1720](https://github.com/MetaCubeX/metacubexd/commit/4da1720e550355efdef147cae3c3cfbf31e319b7))
+* **proxy:** add more adapter types to be processed by formatProxyType ([8245268](https://github.com/MetaCubeX/metacubexd/commit/82452688c93ca9df8be225f0e46cf9760e297fcf))
+
 ## [1.81.1](https://github.com/MetaCubeX/metacubexd/compare/v1.81.0...v1.81.1) (2023-09-07)
 
 
