@@ -12,6 +12,7 @@ import {
 } from '@tabler/icons-solidjs'
 import { For, ParentComponent, Show, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
+import { LogoText } from '~/components'
 import { ROUTES, themes } from '~/constants'
 import { setCurTheme } from '~/signals'
 
@@ -58,17 +59,6 @@ const ThemeSwitcher = () => (
       </ul>
     </div>
   </div>
-)
-
-const LogoText = () => (
-  <a
-    class="text-md flex gap-2 whitespace-nowrap font-bold uppercase sm:text-xl"
-    href="https://github.com/metacubex/metacubexd"
-    target="_blank"
-  >
-    <span>metacube, </span>
-    <div class="transition-transform hover:rotate-90 hover:scale-125">xd</div>
-  </a>
 )
 
 export const Header = () => {
