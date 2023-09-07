@@ -17,6 +17,14 @@ export const formatProxyType = (type = '') => {
     return 'ssr'
   }
 
+  if (t === 'hysteria') {
+    return 'hy'
+  }
+
+  if (t === 'wireguard') {
+    return 'wg'
+  }
+
   return t
 }
 
