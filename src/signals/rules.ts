@@ -2,9 +2,8 @@ import { createSignal } from 'solid-js'
 import { useRequest } from '~/signals'
 import type { Rule, RuleProvider } from '~/types'
 
-const request = useRequest()
-
 export const useRules = () => {
+  const request = useRequest()
   const [rules, setRules] = createSignal<Rule[]>([])
   const [rulesProviders, setRulesProviders] = createSignal<RuleProvider[]>([])
 
