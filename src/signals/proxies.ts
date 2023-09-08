@@ -47,7 +47,7 @@ const setProxiesInfo = (proxies: (Proxy | ProxyNode)[]) => {
 
 export const useProxies = () => {
   const request = useRequest()
-  const { activeConnectionsWithSpeed } = useConnections()
+  const { activeConnections } = useConnections()
 
   const updateProxies = async () => {
     const [{ providers }, { proxies }] = await Promise.all([
@@ -83,7 +83,7 @@ export const useProxies = () => {
     const proxyGroup = proxyGroupList.find((i) => i.name === proxy.name)!
 
     if (autoCloseConns()) {
-      activeConnectionsWithSpeed().forEach(({ id, chains }) => {
+      activeConnections().forEach(({ id, chains }) => {
         if (chains.includes(proxy.name)) {
           request.delete(`connections/${id}`)
         }
