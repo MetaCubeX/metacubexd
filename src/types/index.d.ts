@@ -69,7 +69,7 @@ export type RuleProvider = {
   vehicleType: string
 }
 
-export type Connection = {
+export type ConnectionRawMessage = {
   id: string
   download: number
   upload: number
@@ -100,7 +100,7 @@ export type Connection = {
   }
 }
 
-export type ConnectionWithSpeed = Connection & {
+export type Connection = ConnectionRawMessage & {
   downloadSpeed: number
   uploadSpeed: number
 }

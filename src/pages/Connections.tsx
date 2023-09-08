@@ -42,11 +42,6 @@ import {
 } from '~/signals'
 import type { Connection } from '~/types'
 
-type ConnectionWithSpeed = Connection & {
-  downloadSpeed: number
-  uploadSpeed: number
-}
-
 type ColumnVisibility = Partial<Record<CONNECTIONS_TABLE_ACCESSOR_KEY, boolean>>
 type ColumnOrder = CONNECTIONS_TABLE_ACCESSOR_KEY[]
 
@@ -61,12 +56,8 @@ export default () => {
 
   const [search, setSearch] = createSignal('')
   const [activeTab, setActiveTab] = createSignal(ActiveTab.activeConnections)
-  const {
-    activeConnectionsWithSpeed,
-    closedConnectionsWithSpeed,
-    paused,
-    setPaused,
-  } = useConnections()
+  const { activeConnections, closedConnections, paused, setPaused } =
+    useConnections()
   const onCloseConnection = (id: string) => request.delete(`connections/${id}`)
 
   const [columnVisibility, setColumnVisibility] = makePersisted(
@@ -84,7 +75,7 @@ export default () => {
     },
   )
 
-  const columns = createMemo<ColumnDef<ConnectionWithSpeed>[]>(() => [
+  const columns = createMemo<ColumnDef<Connection>[]>(() => [
     {
       header: () => t('close'),
       enableGrouping: false,
@@ -229,8 +220,8 @@ export default () => {
     },
     get data() {
       return activeTab() === ActiveTab.activeConnections
-        ? activeConnectionsWithSpeed()
-        : closedConnectionsWithSpeed()
+        ? activeConnections()
+        : closedConnections()
     },
     sortDescFirst: true,
     enableHiding: true,
@@ -249,12 +240,12 @@ export default () => {
     {
       type: ActiveTab.activeConnections,
       name: t('activeConnections'),
-      count: activeConnectionsWithSpeed().length,
+      count: activeConnections().length,
     },
     {
       type: ActiveTab.closedConnections,
       name: t('closedConnections'),
-      count: closedConnectionsWithSpeed().length,
+      count: closedConnections().length,
     },
   ])
 

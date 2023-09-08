@@ -1,10 +1,10 @@
-import { differenceWith, unionWith } from 'lodash'
+import { differenceWith, isNumber, unionWith } from 'lodash'
 import { Accessor, createEffect, createSignal, untrack } from 'solid-js'
-import { Connection, ConnectionWithSpeed } from '~/types'
+import { Connection, ConnectionRawMessage } from '~/types'
 import { selectedEndpoint, useWsRequest } from './request'
 
 type WsMsg = {
-  connections: Connection[]
+  connections: ConnectionRawMessage[]
   uploadTotal: number
   downloadTotal: number
 } | null
@@ -12,11 +12,9 @@ type WsMsg = {
 // we make connections global, so we can keep track of connections when user in proxy page
 // when user selects proxy and close some connections they can back and check connections
 // they closed
-const [allConnectionsWithSpeed, setAllConnectionsWithSpeed] = createSignal<
-  ConnectionWithSpeed[]
->([])
+const [allConnections, setAllConnections] = createSignal<Connection[]>([])
 
-export let connections: Accessor<WsMsg> = () => ({
+export let latestConnectionMsg: Accessor<WsMsg> = () => ({
   uploadTotal: 0,
   downloadTotal: 0,
   connections: [],
@@ -24,82 +22,86 @@ export let connections: Accessor<WsMsg> = () => ({
 
 createEffect(() => {
   if (selectedEndpoint()) {
-    connections = useWsRequest<WsMsg>('connections')
+    setAllConnections([])
+    latestConnectionMsg = useWsRequest<WsMsg>('connections')
   }
 })
 
 export const useConnections = () => {
-  const [closedConnectionsWithSpeed, setClosedConnectionsWithSpeed] =
-    createSignal<ConnectionWithSpeed[]>([])
-  const [activeConnectionsWithSpeed, setActiveConnectionsWithSpeed] =
-    createSignal<ConnectionWithSpeed[]>([])
+  const [closedConnections, setClosedConnections] = createSignal<Connection[]>(
+    [],
+  )
+  const [activeConnections, setActiveConnections] = createSignal<Connection[]>(
+    [],
+  )
   const [paused, setPaused] = createSignal(false)
 
-  const updateConnectionsWithSpeed = (connections: Connection[]) => {
-    const prevActiveConnections = activeConnectionsWithSpeed()
-    const prevMap = new Map<string, Connection>()
-    prevActiveConnections.forEach((prev) => prevMap.set(prev.id, prev))
-
-    const activeConnections: ConnectionWithSpeed[] = connections.map(
-      (connection) => {
-        const prevConn = prevMap.get(connection.id)
-
-        if (!prevConn) {
-          return { ...connection, downloadSpeed: 0, uploadSpeed: 0 }
-        }
-
-        return {
-          ...connection,
-          downloadSpeed:
-            connection.download - (prevConn.download ?? connection.download),
-          uploadSpeed:
-            connection.upload - (prevConn.upload ?? connection.upload),
-        }
-      },
-    )
-
-    const allConnections = unionWith(
-      allConnectionsWithSpeed(),
-      activeConnections,
-      (a, b) => a.id === b.id,
-    )
-    const closedConnections = differenceWith(
-      allConnections,
-      activeConnections,
-      (a, b) => a.id === b.id,
-    )
-
-    return {
-      activeConns: activeConnections.slice(-200),
-      closedConns: closedConnections.slice(-200),
-      allConns: allConnections.slice(-400),
-    }
-  }
-
   createEffect(() => {
-    const connection = connections()?.connections
+    const rawConns = latestConnectionMsg()?.connections
 
-    if (!connection) {
+    if (!rawConns) {
       return
     }
 
     untrack(() => {
-      const { activeConns, closedConns, allConns } =
-        updateConnectionsWithSpeed(connection)
+      const activeConns = restructRawMsgToConnection(
+        rawConns,
+        activeConnections(),
+      )
+      const allConns = mergeAllConnections(activeConns)
 
       if (!paused()) {
-        setActiveConnectionsWithSpeed(activeConns)
-        setClosedConnectionsWithSpeed(closedConns)
+        const closedConns = diffClosedConnections(activeConns, allConns)
+
+        setActiveConnections(activeConns)
+        setClosedConnections(closedConns)
       }
 
-      setAllConnectionsWithSpeed(allConns)
+      setAllConnections(allConns)
     })
   })
 
   return {
-    closedConnectionsWithSpeed,
-    activeConnectionsWithSpeed,
+    closedConnections,
+    activeConnections,
     paused,
     setPaused,
   }
+}
+
+function restructRawMsgToConnection(
+  connections: ConnectionRawMessage[],
+  prevActiveConnections: Connection[],
+): Connection[] {
+  const prevMap = new Map<string, Connection>()
+  prevActiveConnections.forEach((prev) => prevMap.set(prev.id, prev))
+
+  return connections.map((connection) => {
+    const prevConn = prevMap.get(connection.id)
+
+    if (
+      !prevConn ||
+      !isNumber(prevConn.download) ||
+      !isNumber(prevConn.upload)
+    ) {
+      return { ...connection, downloadSpeed: 0, uploadSpeed: 0 }
+    }
+
+    return {
+      ...connection,
+      downloadSpeed: connection.download - prevConn.download,
+      uploadSpeed: connection.upload - prevConn.upload,
+    }
+  })
+}
+
+function mergeAllConnections(activeConns: Connection[]) {
+  return unionWith(allConnections(), activeConns, (a, b) => a.id === b.id)
+}
+
+function diffClosedConnections(
+  activeConns: Connection[],
+  allConns: Connection[],
+) {
+  return differenceWith(allConns, activeConns, (a, b) => a.id === b.id)
 }

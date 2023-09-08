@@ -13,7 +13,7 @@ import {
   createSignal,
 } from 'solid-js'
 import { CHART_MAX_XAXIS, DEFAULT_CHART_OPTIONS } from '~/constants'
-import { connections, useWsRequest } from '~/signals'
+import { latestConnectionMsg, useWsRequest } from '~/signals'
 
 const TrafficWidget: ParentComponent<{ label: JSX.Element }> = (props) => (
   <div class="stat flex-1 place-items-center">
@@ -95,15 +95,15 @@ export default () => {
         </TrafficWidget>
 
         <TrafficWidget label={t('uploadTotal')}>
-          {byteSize(connections()?.uploadTotal || 0).toString()}
+          {byteSize(latestConnectionMsg()?.uploadTotal || 0).toString()}
         </TrafficWidget>
 
         <TrafficWidget label={t('downloadTotal')}>
-          {byteSize(connections()?.downloadTotal || 0).toString()}
+          {byteSize(latestConnectionMsg()?.downloadTotal || 0).toString()}
         </TrafficWidget>
 
         <TrafficWidget label={t('activeConnections')}>
-          {connections()?.connections.length || 0}
+          {latestConnectionMsg()?.connections.length || 0}
         </TrafficWidget>
 
         <TrafficWidget label={t('memoryUsage')}>
