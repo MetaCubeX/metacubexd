@@ -196,9 +196,12 @@ export default () => {
   ])
 
   const [grouping, setGrouping] = createSignal<GroupingState>([])
-  const [sorting, setSorting] = createSignal<SortingState>([
-    { id: CONNECTIONS_TABLE_ACCESSOR_KEY.ConnectTime, desc: true },
-  ])
+  const [sorting, setSorting] = makePersisted(
+    createSignal<SortingState>([
+      { id: CONNECTIONS_TABLE_ACCESSOR_KEY.ConnectTime, desc: true },
+    ]),
+    { name: 'connectionsTableSorting', storage: localStorage },
+  )
 
   const table = createSolidTable({
     state: {
@@ -371,8 +374,9 @@ export default () => {
                       <td
                         onContextMenu={(e) => {
                           e.preventDefault()
-                          typeof cell.renderValue() === 'string' &&
-                            void writeClipboard(cell.renderValue() as string)
+
+                          const value = cell.renderValue() as null | string
+                          value && writeClipboard(value).catch(() => {})
                         }}
                       >
                         {cell.getIsGrouped() ? (
