@@ -72,10 +72,10 @@ export const useConnections = () => {
   }
 }
 
-export function restructRawMsgToConnection(
+export const restructRawMsgToConnection = (
   connections: ConnectionRawMessage[],
   prevActiveConnections: Connection[],
-): Connection[] {
+): Connection[] => {
   const prevMap = new Map<string, Connection>()
   prevActiveConnections.forEach((prev) => prevMap.set(prev.id, prev))
 
@@ -98,13 +98,13 @@ export function restructRawMsgToConnection(
   })
 }
 
-export function mergeAllConnections(activeConns: Connection[]) {
+export const mergeAllConnections = (activeConns: Connection[]) => {
   return unionWith(allConnections, activeConns, (a, b) => a.id === b.id)
 }
 
-function diffClosedConnections(
+const diffClosedConnections = (
   activeConns: Connection[],
   allConns: Connection[],
-) {
+) => {
   return differenceWith(allConns, activeConns, (a, b) => a.id === b.id)
 }
