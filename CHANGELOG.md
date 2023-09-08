@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.83.2](https://github.com/MetaCubeX/metacubexd/compare/v1.83.1...v1.83.2) (2023-09-08)
+
+
+### Bug Fixes
+
+* **proxies:** disconnect after proxy is changed ([a8cb75f](https://github.com/MetaCubeX/metacubexd/commit/a8cb75f29da3c4616237ec4918c92df91854f83b))
+
 ## [1.83.1](https://github.com/MetaCubeX/metacubexd/compare/v1.83.0...v1.83.1) (2023-09-08)
 
 
