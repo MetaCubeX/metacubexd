@@ -9,7 +9,7 @@ type WsMsg = {
   downloadTotal: number
 } | null
 
-// we make allconnections global so we can keep track of connections when user in proxy page
+// we make connections global, so we can keep track of connections when user in proxy page
 // when user selects proxy and close some connections they can back and check connections
 // they closed
 const [allConnectionsWithSpeed, setAllConnectionsWithSpeed] = createSignal<
@@ -40,7 +40,7 @@ export const useConnections = () => {
     const prevMap = new Map<string, Connection>()
     prevActiveConnections.forEach((prev) => prevMap.set(prev.id, prev))
 
-    const activeConnnections: ConnectionWithSpeed[] = connections.map(
+    const activeConnections: ConnectionWithSpeed[] = connections.map(
       (connection) => {
         const prevConn = prevMap.get(connection.id)
 
@@ -60,17 +60,17 @@ export const useConnections = () => {
 
     const allConnections = unionWith(
       allConnectionsWithSpeed(),
-      activeConnnections,
+      activeConnections,
       (a, b) => a.id === b.id,
     )
     const closedConnections = differenceWith(
       allConnections,
-      activeConnnections,
+      activeConnections,
       (a, b) => a.id === b.id,
     )
 
     return {
-      activeConns: activeConnnections.slice(-200),
+      activeConns: activeConnections.slice(-200),
       closedConns: closedConnections.slice(-200),
       allConns: allConnections.slice(-400),
     }
