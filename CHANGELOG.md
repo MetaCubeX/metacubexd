@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.83.0](https://github.com/MetaCubeX/metacubexd/compare/v1.82.0...v1.83.0) (2023-09-08)
+
+
+### Features
+
+* **proxies:** auto close connections when proxy selected ([15d20cd](https://github.com/MetaCubeX/metacubexd/commit/15d20cde4ad514d45a54845f18fb9b401a681208))
+
+
+### Bug Fixes
+
+* **button:** btn disable ([59a7273](https://github.com/MetaCubeX/metacubexd/commit/59a727366536588a8451ea40d305711dbfc6b36e))
+* **connections:** limit number of conns ([5263710](https://github.com/MetaCubeX/metacubexd/commit/5263710d30e08efdfcd976236f2eab76fa085264))
+* **connections:** table close conn ([d0c7c15](https://github.com/MetaCubeX/metacubexd/commit/d0c7c1569d8138724218d67c08195747be9492a0))
+* **connections:** ws error when switch end point ([b04b20f](https://github.com/MetaCubeX/metacubexd/commit/b04b20f8f01d4cfdd9f41591e03d675e1512b911))
+
 ## [1.82.0](https://github.com/MetaCubeX/metacubexd/compare/v1.81.1...v1.82.0) (2023-09-07)
 
 
