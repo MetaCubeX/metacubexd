@@ -33,8 +33,8 @@ dependencies:
     specifier: ^2.2.5
     version: 2.2.5(solid-js@1.7.11)
   '@solid-primitives/resize-observer':
-    specifier: ^2.0.21
-    version: 2.0.21(solid-js@1.7.11)
+    specifier: ^2.0.22
+    version: 2.0.22(solid-js@1.7.11)
   '@solid-primitives/storage':
     specifier: ^2.1.1
     version: 2.1.1(solid-js@1.7.11)
@@ -2064,8 +2064,8 @@ packages:
       solid-js: 1.7.11
     dev: false
 
-  /@solid-primitives/resize-observer@2.0.21(solid-js@1.7.11):
-    resolution: {integrity: sha512-73k3hfk6qSW4ok18DSHytHmbXh5vP1SXIBLu8N0lW6khhlHGdWt2q5Zu4iLhVoqO2kQ4zju/hcyDOx7UTablow==}
+  /@solid-primitives/resize-observer@2.0.22(solid-js@1.7.11):
+    resolution: {integrity: sha512-ps8UIFiGsNxZaWBKSH0Py0Nx5PDd7NtUGHkN/04SNRYgtTvlPF768rk0ksPlDgpIwYmBLIoC9qvQmQPaHF4F5w==}
     peerDependencies:
       solid-js: ^1.6.12
     dependencies:
