@@ -12,7 +12,10 @@ type WsMsg = {
 // we make connections global, so we can keep track of connections when user in proxy page
 // when user selects proxy and close some connections they can back and check connections
 // they closed
-const [allConnections, setAllConnections] = createSignal<Connection[]>([])
+let allConnections: Connection[] = []
+const setAllConnections = (allConns: Connection[]) => {
+  allConnections = allConns
+}
 
 export let latestConnectionMsg: Accessor<WsMsg> = () => ({
   uploadTotal: 0,
@@ -96,7 +99,7 @@ export function restructRawMsgToConnection(
 }
 
 export function mergeAllConnections(activeConns: Connection[]) {
-  return unionWith(allConnections(), activeConns, (a, b) => a.id === b.id)
+  return unionWith(allConnections, activeConns, (a, b) => a.id === b.id)
 }
 
 function diffClosedConnections(
