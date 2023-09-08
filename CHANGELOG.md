@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.83.1](https://github.com/MetaCubeX/metacubexd/compare/v1.83.0...v1.83.1) (2023-09-08)
+
+
+### Bug Fixes
+
+* **connections:** close conns ([f3423ab](https://github.com/MetaCubeX/metacubexd/commit/f3423abe921a470fc3ef1b9e6076643efcc799e0))
+
 ## [1.83.0](https://github.com/MetaCubeX/metacubexd/compare/v1.82.0...v1.83.0) (2023-09-08)
 
 
