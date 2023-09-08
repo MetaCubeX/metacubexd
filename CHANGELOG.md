@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.84.0](https://github.com/MetaCubeX/metacubexd/compare/v1.83.2...v1.84.0) (2023-09-08)
+
+
+### Features
+
+* **connections:** make connections table sorting state persisted ([6957cb4](https://github.com/MetaCubeX/metacubexd/commit/6957cb4ddf9616ab6eade404098d4b84c9ed2a97))
+* **connections:** show connection detail on click of a button ([daf1682](https://github.com/MetaCubeX/metacubexd/commit/daf168208e6a1e7bb4ab921ee5b235c926f6a13a))
+* **logs:** add i18n translation support ([965ec50](https://github.com/MetaCubeX/metacubexd/commit/965ec502aceeb206c0067e36a61f755a31002bc4))
+
 ## [1.83.2](https://github.com/MetaCubeX/metacubexd/compare/v1.83.1...v1.83.2) (2023-09-08)
 
 
