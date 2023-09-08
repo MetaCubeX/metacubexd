@@ -53,11 +53,11 @@ export const useConnections = () => {
       if (!paused()) {
         const closedConns = diffClosedConnections(activeConns, allConns)
 
-        setActiveConnections(activeConns)
-        setClosedConnections(closedConns)
+        setActiveConnections(activeConns.slice(-200))
+        setClosedConnections(closedConns.slice(-200))
       }
 
-      setAllConnections(allConns)
+      setAllConnections(allConns.slice(-400))
     })
   })
 
