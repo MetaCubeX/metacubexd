@@ -42,7 +42,7 @@ export default {
   off: '关闭',
   proxiesPreviewType: '节点组预览样式',
   urlForLatencyTest: '测速链接',
-  autoCloseConns: '切换代理时自动断开全部连接',
+  autoCloseConns: '切换代理时自动断开连接',
   useTwemoji: '使用 Twemoji Mozilla 字体',
   autoSwitchTheme: '自动切换主题',
   favDayTheme: '浅色主题偏好',

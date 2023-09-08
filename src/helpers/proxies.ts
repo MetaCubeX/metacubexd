@@ -9,12 +9,8 @@ export const formatTimeFromNow = (time: number | string) => {
 export const formatProxyType = (type = '') => {
   const t = type.toLowerCase()
 
-  if (t === 'shadowsocks') {
-    return 'ss'
-  }
-
-  if (t === 'shadowsocksr') {
-    return 'ssr'
+  if (t.includes('shadowsocks')) {
+    return type.replace('shadowsocks', 'ss') // for both ss and ssr
   }
 
   if (t === 'hysteria') {

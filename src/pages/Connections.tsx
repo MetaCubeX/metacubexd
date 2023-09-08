@@ -25,8 +25,7 @@ import {
 } from '@tanstack/solid-table'
 import byteSize from 'byte-size'
 import dayjs from 'dayjs'
-import { differenceWith } from 'lodash'
-import { For, createEffect, createMemo, createSignal } from 'solid-js'
+import { For, createMemo, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Button, ConnectionsTableOrderingModal } from '~/components'
 import {
@@ -38,8 +37,8 @@ import { formatTimeFromNow } from '~/helpers'
 import {
   tableSize,
   tableSizeClassName,
+  useConnections,
   useRequest,
-  useWsRequest,
 } from '~/signals'
 import type { Connection } from '~/types'
 
@@ -62,63 +61,12 @@ export default () => {
 
   const [search, setSearch] = createSignal('')
   const [activeTab, setActiveTab] = createSignal(ActiveTab.activeConnections)
-
-  const connections = useWsRequest<{ connections: Connection[] }>('connections')
-
-  const [closedConnectionsWithSpeed, setClosedConnectionsWithSpeed] =
-    createSignal<ConnectionWithSpeed[]>([], { equals: () => paused() })
-
-  const [activeConnectionsWithSpeed, setActiveConnectionsWithSpeed] =
-    createSignal<ConnectionWithSpeed[]>([], { equals: () => paused() })
-
-  const [paused, setPaused] = createSignal(false)
-
-  const updateConnectionsWithSpeed =
-    (connections: Connection[]) => (prevConnections: ConnectionWithSpeed[]) => {
-      const prevMap = new Map<string, Connection>()
-      prevConnections.forEach((prev) => prevMap.set(prev.id, prev))
-
-      const connectionWithSpeed = connections.map((connection) => {
-        const prevConn = prevMap.get(connection.id)
-
-        if (!prevConn) {
-          return { ...connection, downloadSpeed: 0, uploadSpeed: 0 }
-        }
-
-        return {
-          ...connection,
-          downloadSpeed:
-            connection.download - (prevConn.download ?? connection.download),
-          uploadSpeed:
-            connection.upload - (prevConn.upload ?? connection.upload),
-        }
-      })
-
-      const closedConnections = differenceWith(
-        prevConnections,
-        connectionWithSpeed,
-        (a, b) => a.id === b.id,
-      )
-
-      setClosedConnectionsWithSpeed((prev) =>
-        [...prev, ...closedConnections].slice(-1000),
-      )
-
-      return connectionWithSpeed.slice(-200)
-    }
-
-  createEffect(() => {
-    const connection = connections()?.connections
-
-    if (!connection) {
-      return
-    }
-
-    const updater = updateConnectionsWithSpeed(connection)
-
-    setActiveConnectionsWithSpeed(updater)
-  })
-
+  const {
+    activeConnectionsWithSpeed,
+    closedConnectionsWithSpeed,
+    paused,
+    setPaused,
+  } = useConnections()
   const onCloseConnection = (id: string) => request.delete(`connections/${id}`)
 
   const [columnVisibility, setColumnVisibility] = makePersisted(

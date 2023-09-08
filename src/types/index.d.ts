@@ -100,6 +100,11 @@ export type Connection = {
   }
 }
 
+export type ConnectionWithSpeed = Connection & {
+  downloadSpeed: number
+  uploadSpeed: number
+}
+
 export type Log = {
   type: string
   payload: string

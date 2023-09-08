@@ -6,6 +6,7 @@ import {
   useRequest,
 } from '~/signals'
 import type { Proxy, ProxyNode, ProxyProvider } from '~/types'
+import { useConnections } from './connections'
 
 type ProxyInfo = {
   name: string
@@ -46,6 +47,7 @@ const setProxiesInfo = (proxies: (Proxy | ProxyNode)[]) => {
 
 export const useProxies = () => {
   const request = useRequest()
+  const { activeConnectionsWithSpeed } = useConnections()
 
   const updateProxies = async () => {
     const [{ providers }, { proxies }] = await Promise.all([
@@ -80,7 +82,13 @@ export const useProxies = () => {
     const proxyGroupList = proxies().slice()
     const proxyGroup = proxyGroupList.find((i) => i.name === proxy.name)!
 
-    if (autoCloseConns()) request.delete('connections')
+    if (autoCloseConns()) {
+      activeConnectionsWithSpeed().forEach(({ id, chains }) => {
+        if (chains.includes(proxy.name)) {
+          request.delete(`connections/${id}`)
+        }
+      })
+    }
 
     await request.put(`proxies/${proxy.name}`, {
       body: JSON.stringify({

@@ -13,8 +13,7 @@ import {
   createSignal,
 } from 'solid-js'
 import { CHART_MAX_XAXIS, DEFAULT_CHART_OPTIONS } from '~/constants'
-import { useWsRequest } from '~/signals'
-import type { Connection } from '~/types'
+import { connections, useWsRequest } from '~/signals'
 
 const TrafficWidget: ParentComponent<{ label: JSX.Element }> = (props) => (
   <div class="stat flex-1 place-items-center">
@@ -84,12 +83,6 @@ export default () => {
     { name: t('memory'), data: memories() },
   ])
 
-  const connection = useWsRequest<{
-    downloadTotal: number
-    uploadTotal: number
-    connections: Connection[]
-  }>('connections')
-
   return (
     <div class="flex flex-col gap-2">
       <div class="stats stats-vertical w-full grid-cols-2 bg-primary shadow lg:stats-horizontal lg:flex">
@@ -102,15 +95,15 @@ export default () => {
         </TrafficWidget>
 
         <TrafficWidget label={t('uploadTotal')}>
-          {byteSize(connection()?.uploadTotal || 0).toString()}
+          {byteSize(connections()?.uploadTotal || 0).toString()}
         </TrafficWidget>
 
         <TrafficWidget label={t('downloadTotal')}>
-          {byteSize(connection()?.downloadTotal || 0).toString()}
+          {byteSize(connections()?.downloadTotal || 0).toString()}
         </TrafficWidget>
 
         <TrafficWidget label={t('activeConnections')}>
-          {connection()?.connections.length || 0}
+          {connections()?.connections.length || 0}
         </TrafficWidget>
 
         <TrafficWidget label={t('memoryUsage')}>
