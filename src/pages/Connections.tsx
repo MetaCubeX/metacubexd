@@ -94,7 +94,7 @@ export default () => {
         <div class="flex h-4 items-center">
           <Button
             class="btn-circle btn-xs"
-            onClick={() => onCloseConnection(row.id)}
+            onClick={() => onCloseConnection(row.original.id)}
           >
             <IconCircleX size="16" />
           </Button>
@@ -105,45 +105,50 @@ export default () => {
       header: () => t('ID'),
       enableGrouping: false,
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.ID,
-      accessorFn: (row) => row.id,
+      accessorFn: (original) => original.id,
     },
     {
       header: () => t('type'),
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Type,
-      accessorFn: (row) => `${row.metadata.type}(${row.metadata.network})`,
+      accessorFn: (original) =>
+        `${original.metadata.type}(${original.metadata.network})`,
     },
     {
       header: () => t('process'),
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Process,
-      accessorFn: (row) =>
-        row.metadata.process ||
-        row.metadata.processPath.replace(/^.*[/\\](.*)$/, '$1') ||
+      accessorFn: (original) =>
+        original.metadata.process ||
+        original.metadata.processPath.replace(/^.*[/\\](.*)$/, '$1') ||
         '-',
     },
     {
       header: () => t('host'),
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Host,
-      accessorFn: (row) =>
+      accessorFn: (original) =>
         `${
-          row.metadata.host ? row.metadata.host : row.metadata.destinationIP
-        }:${row.metadata.destinationPort}`,
+          original.metadata.host
+            ? original.metadata.host
+            : original.metadata.destinationIP
+        }:${original.metadata.destinationPort}`,
     },
     {
       header: () => t('rules'),
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Rule,
-      accessorFn: (row) =>
-        !row.rulePayload ? row.rule : `${row.rule} :: ${row.rulePayload}`,
+      accessorFn: (original) =>
+        !original.rulePayload
+          ? original.rule
+          : `${original.rule} :: ${original.rulePayload}`,
     },
     {
       header: () => t('chains'),
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Chains,
-      accessorFn: (row) => row.chains.slice().reverse().join(' :: '),
+      accessorFn: (original) => original.chains.slice().reverse().join(' :: '),
     },
     {
       header: () => t('connectTime'),
       enableGrouping: false,
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.ConnectTime,
-      accessorFn: (row) => formatTimeFromNow(row.start),
+      accessorFn: (original) => formatTimeFromNow(original.start),
       sortingFn: (prev, next) =>
         dayjs(prev.original.start).valueOf() -
         dayjs(next.original.start).valueOf(),
@@ -152,7 +157,7 @@ export default () => {
       header: () => t('dlSpeed'),
       enableGrouping: false,
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.DlSpeed,
-      accessorFn: (row) => `${byteSize(row.downloadSpeed)}/s`,
+      accessorFn: (original) => `${byteSize(original.downloadSpeed)}/s`,
       sortingFn: (prev, next) =>
         prev.original.downloadSpeed - next.original.downloadSpeed,
     },
@@ -160,7 +165,7 @@ export default () => {
       header: () => t('ulSpeed'),
       enableGrouping: false,
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.ULSpeed,
-      accessorFn: (row) => `${byteSize(row.uploadSpeed)}/s`,
+      accessorFn: (original) => `${byteSize(original.uploadSpeed)}/s`,
       sortingFn: (prev, next) =>
         prev.original.uploadSpeed - next.original.uploadSpeed,
     },
@@ -168,7 +173,7 @@ export default () => {
       header: () => t('dl'),
       enableGrouping: false,
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Download,
-      accessorFn: (row) => byteSize(row.download),
+      accessorFn: (original) => byteSize(original.download),
       sortingFn: (prev, next) =>
         prev.original.download - next.original.download,
     },
@@ -176,26 +181,26 @@ export default () => {
       header: () => t('ul'),
       enableGrouping: false,
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Upload,
-      accessorFn: (row) => byteSize(row.upload),
+      accessorFn: (original) => byteSize(original.upload),
       sortingFn: (prev, next) => prev.original.upload - next.original.upload,
     },
     {
       header: () => t('sourceIP'),
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.SourceIP,
-      accessorFn: (row) => row.metadata.sourceIP,
+      accessorFn: (original) => original.metadata.sourceIP,
     },
     {
       header: () => t('sourcePort'),
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.SourcePort,
-      accessorFn: (row) => row.metadata.sourcePort,
+      accessorFn: (original) => original.metadata.sourcePort,
     },
     {
       header: () => t('destination'),
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Destination,
-      accessorFn: (row) =>
-        row.metadata.remoteDestination ||
-        row.metadata.destinationIP ||
-        row.metadata.host,
+      accessorFn: (original) =>
+        original.metadata.remoteDestination ||
+        original.metadata.destinationIP ||
+        original.metadata.host,
     },
   ])
 
