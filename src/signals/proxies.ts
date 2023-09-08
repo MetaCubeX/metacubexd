@@ -1,4 +1,4 @@
-import { createSignal } from 'solid-js'
+import { createSignal, untrack } from 'solid-js'
 import {
   autoCloseConns,
   latencyTestTimeoutDuration,
@@ -94,20 +94,21 @@ export const useProxies = () => {
     if (autoCloseConns()) {
       // we dont use activeConns from useConnection here for better performance
       // and we use empty array to restruct msg because they are closed and they won't have speed anyway
+      untrack(() => {
+        const activeConns = restructRawMsgToConnection(
+          latestConnectionMsg()?.connections ?? [],
+          [],
+        )
 
-      const activeConns = restructRawMsgToConnection(
-        latestConnectionMsg()?.connections ?? [],
-        [],
-      )
-
-      if (activeConns.length > 0) {
-        activeConns.forEach(({ id, chains }) => {
-          if (chains.includes(proxy.name)) {
-            request.delete(`connections/${id}`)
-          }
-        })
-        mergeAllConnections(activeConns)
-      }
+        if (activeConns.length > 0) {
+          activeConns.forEach(({ id, chains }) => {
+            if (chains.includes(proxy.name)) {
+              request.delete(`connections/${id}`)
+            }
+          })
+          mergeAllConnections(activeConns)
+        }
+      })
     }
 
     proxyGroup.now = proxyName
