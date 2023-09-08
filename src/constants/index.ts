@@ -110,6 +110,7 @@ export enum LANG {
 }
 
 export enum CONNECTIONS_TABLE_ACCESSOR_KEY {
+  Details = 'details',
   Close = 'close',
   ID = 'ID',
   Type = 'type',

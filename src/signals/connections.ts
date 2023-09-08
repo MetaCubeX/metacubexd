@@ -11,7 +11,7 @@ export type WsMsg = {
 // we make connections global, so we can keep track of connections when user in proxy page
 // when user selects proxy and close some connections they can back and check connections
 // they closed
-let allConnections: Connection[] = []
+export let allConnections: Connection[] = []
 
 export const setAllConnections = (allConns: Connection[]) => {
   allConnections = allConns

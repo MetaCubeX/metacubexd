@@ -73,4 +73,5 @@ export default {
   all: '全部',
   sequence: '序列号',
   payload: '内容',
+  details: '详情',
 }

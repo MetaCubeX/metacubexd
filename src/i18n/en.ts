@@ -74,4 +74,5 @@ export default {
   all: 'All',
   sequence: 'Sequence',
   payload: 'Payload',
+  details: 'Details',
 }
