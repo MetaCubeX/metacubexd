@@ -72,4 +72,6 @@ export default {
   latencyTestTimeoutDuration: 'Latency Test Timeout Duration',
   closedConnections: 'Closed Connections',
   all: 'All',
+  sequence: 'Sequence',
+  payload: 'Payload',
 }

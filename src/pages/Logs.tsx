@@ -35,14 +35,17 @@ export default () => {
   const columns: ColumnDef<LogWithSeq>[] = [
     {
       accessorKey: 'Sequence',
+      header: t('sequence'),
       accessorFn: (row) => row.seq,
     },
     {
       accessorKey: 'Type',
+      header: t('type'),
       accessorFn: (row) => row.type,
     },
     {
       accessorKey: 'Payload',
+      header: t('payload'),
       accessorFn: (row) => row.payload,
     },
   ]
