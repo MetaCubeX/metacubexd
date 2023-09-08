@@ -69,7 +69,7 @@ export const useConnections = () => {
   }
 }
 
-function restructRawMsgToConnection(
+export function restructRawMsgToConnection(
   connections: ConnectionRawMessage[],
   prevActiveConnections: Connection[],
 ): Connection[] {
@@ -95,7 +95,7 @@ function restructRawMsgToConnection(
   })
 }
 
-function mergeAllConnections(activeConns: Connection[]) {
+export function mergeAllConnections(activeConns: Connection[]) {
   return unionWith(allConnections(), activeConns, (a, b) => a.id === b.id)
 }
 

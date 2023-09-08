@@ -6,7 +6,11 @@ import {
   useRequest,
 } from '~/signals'
 import type { Proxy, ProxyNode, ProxyProvider } from '~/types'
-import { useConnections } from './connections'
+import {
+  latestConnectionMsg,
+  mergeAllConnections,
+  restructRawMsgToConnection,
+} from './connections'
 
 type ProxyInfo = {
   name: string
@@ -47,7 +51,6 @@ const setProxiesInfo = (proxies: (Proxy | ProxyNode)[]) => {
 
 export const useProxies = () => {
   const request = useRequest()
-  const { activeConnections } = useConnections()
 
   const updateProxies = async () => {
     const [{ providers }, { proxies }] = await Promise.all([
@@ -89,11 +92,22 @@ export const useProxies = () => {
     })
 
     if (autoCloseConns()) {
-      activeConnections().forEach(({ id, chains }) => {
-        if (chains.includes(proxy.name)) {
-          request.delete(`connections/${id}`)
-        }
-      })
+      // we dont use activeConns from useConnection here for better performance
+      // and we use empty array to restruct msg because they are closed and they won't have speed anyway
+
+      const activeConns = restructRawMsgToConnection(
+        latestConnectionMsg()?.connections ?? [],
+        [],
+      )
+
+      if (activeConns.length > 0) {
+        activeConns.forEach(({ id, chains }) => {
+          if (chains.includes(proxy.name)) {
+            request.delete(`connections/${id}`)
+          }
+        })
+        mergeAllConnections(activeConns)
+      }
     }
 
     proxyGroup.now = proxyName
