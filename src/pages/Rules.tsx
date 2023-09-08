@@ -72,7 +72,7 @@ export default () => {
 
       <Show when={rulesProviders().length > 0}>
         <div class="flex-1">
-          <h1 class="flex h-11 items-center gap-2 pb-4 text-lg font-semibold">
+          <h1 class="flex items-center gap-2 pb-4 text-lg font-semibold">
             {t('ruleProviders')}
             <Button
               class="btn-circle btn-sm"
