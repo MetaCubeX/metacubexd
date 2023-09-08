@@ -11,12 +11,20 @@ export const Button: ParentComponent<
 
   return (
     <button
-      class={twMerge(
-        'btn',
-        local.disabled && 'btn-disabled',
-        local.loading ? 'btn-disabled' : local.class,
-      )}
+      class={twMerge('btn', local.loading ? 'btn-disabled' : local.class)}
       {...others}
+      onClick={(e) => {
+        if (props.disabled) {
+          e.preventDefault()
+          e.stopPropagation()
+
+          return
+        }
+
+        if (typeof props.onClick === 'function') {
+          props.onClick(e)
+        }
+      }}
     >
       <Show when={local.loading}>
         <span class="loading loading-spinner" />
