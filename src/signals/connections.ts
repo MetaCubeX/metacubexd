@@ -1,11 +1,5 @@
 import { differenceWith, unionWith } from 'lodash'
-import {
-  createEffect,
-  createMemo,
-  createResource,
-  createSignal,
-  untrack,
-} from 'solid-js'
+import { Accessor, createEffect, createSignal, untrack } from 'solid-js'
 import { Connection, ConnectionWithSpeed } from '~/types'
 import { selectedEndpoint, useWsRequest } from './request'
 
@@ -22,19 +16,17 @@ const [allConnectionsWithSpeed, setAllConnectionsWithSpeed] = createSignal<
   ConnectionWithSpeed[]
 >([])
 
-const [latestConnectionWsMessage] = createResource(async () => {
-  await new Promise<void>((resolve) => {
-    createEffect(() => {
-      if (selectedEndpoint()) {
-        resolve()
-      }
-    })
-  })
-
-  return useWsRequest<WsMsg>('connections')
+export let connections: Accessor<WsMsg> = () => ({
+  uploadTotal: 0,
+  downloadTotal: 0,
+  connections: [],
 })
 
-export const connections = createMemo(() => latestConnectionWsMessage()?.())
+createEffect(() => {
+  if (selectedEndpoint()) {
+    connections = useWsRequest<WsMsg>('connections')
+  }
+})
 
 export const useConnections = () => {
   const [closedConnectionsWithSpeed, setClosedConnectionsWithSpeed] =
