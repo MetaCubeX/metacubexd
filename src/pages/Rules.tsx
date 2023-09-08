@@ -3,15 +3,20 @@ import { IconReload } from '@tabler/icons-solidjs'
 import InfiniteScroll from 'solid-infinite-scroll'
 import { For, Show, createMemo, createSignal, onMount } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import { Button } from '~/components'
+import { Button, ForTwoColumns } from '~/components'
 import { formatTimeFromNow, useStringBooleanMap } from '~/helpers'
-import { renderRulesAndProviderInTwoColumns, useRules } from '~/signals'
+import { useRules } from '~/signals'
+
+enum ActiveTab {
+  ruleProviders = 'ruleProviders',
+  rules = 'rules',
+}
 
 export default () => {
   const [t] = useI18n()
   const {
     rules,
-    rulesProviders,
+    ruleProviders,
     updateRules,
     updateAllRuleProvider,
     updateRuleProviderByName,
@@ -39,43 +44,45 @@ export default () => {
     setAllProviderIsUpdating(false)
   }
 
+  const [activeTab, setActiveTab] = createSignal(ActiveTab.rules)
+
+  const tabs = () => [
+    {
+      type: ActiveTab.rules,
+      name: t('rules'),
+      count: rules().length,
+    },
+    {
+      type: ActiveTab.ruleProviders,
+      name: t('ruleProviders'),
+      count: ruleProviders().length,
+    },
+  ]
+
   return (
-    <div
-      class={twMerge(
-        'flex w-full flex-col gap-4',
-        renderRulesAndProviderInTwoColumns() && 'flex-row',
-      )}
-    >
-      <div class="flex-1">
-        <h1 class="pb-4 text-lg font-semibold">{t('rules')}</h1>
+    <div class="flex h-full flex-col gap-2">
+      <Show when={ruleProviders().length > 0}>
+        <div class="flex items-center gap-2">
+          <div class="tabs-boxed tabs gap-2">
+            <For each={tabs()}>
+              {(tab) => (
+                <button
+                  class={twMerge(
+                    activeTab() === tab.type && 'tab-active',
+                    'tab gap-2 px-2',
+                  )}
+                  onClick={() => setActiveTab(tab.type)}
+                >
+                  <span>{tab.name}</span>
+                  <div class="badge badge-sm">{tab.count}</div>
+                </button>
+              )}
+            </For>
+          </div>
 
-        <InfiniteScroll
-          each={renderRules()}
-          hasMore={renderRules().length < rules().length}
-          next={() => setMaxRuleRender(maxRuleRender() + 100)}
-        >
-          {(rule) => (
-            <div class="card card-bordered card-compact mb-2 bg-base-200 p-4">
-              <div class="flex items-center gap-2">
-                <span class="break-all">{rule.payload}</span>
-                <Show when={typeof rule.size === 'number' && rule.size !== -1}>
-                  <div class="badge badge-sm">{rule.size}</div>
-                </Show>
-              </div>
-              <div class="text-xs text-slate-500">
-                {rule.type} :: {rule.proxy}
-              </div>
-            </div>
-          )}
-        </InfiniteScroll>
-      </div>
-
-      <Show when={rulesProviders().length > 0}>
-        <div class="flex-1">
-          <h1 class="flex h-11 items-center gap-2 pb-4 text-lg font-semibold">
-            {t('ruleProviders')}
+          <Show when={activeTab() === ActiveTab.ruleProviders}>
             <Button
-              class="btn-circle btn-sm"
+              class="btn btn-circle btn-sm"
               disabled={allProviderIsUpdating()}
               onClick={(e) => onUpdateAllProviderClick(e)}
             >
@@ -85,38 +92,66 @@ export default () => {
                 )}
               />
             </Button>
-          </h1>
-
-          <For each={rulesProviders()}>
-            {(rulesProvider) => (
-              <div class="card card-bordered card-compact mb-2 bg-base-200 p-4">
-                <div class="flex items-center gap-2 pr-8">
-                  <span class="break-all">{rulesProvider.name}</span>
-                  <div class="badge badge-sm">{rulesProvider.ruleCount}</div>
-                </div>
-
-                <div class="text-xs text-slate-500">
-                  {rulesProvider.vehicleType} / {rulesProvider.behavior} /
-                  {t('updated')} {formatTimeFromNow(rulesProvider.updatedAt)}
-                </div>
-
-                <Button
-                  class="btn-circle btn-sm absolute right-2 top-2 mr-2 h-4"
-                  disabled={updatingMap()[rulesProvider.name]}
-                  onClick={(e) => onUpdateProviderClick(e, rulesProvider.name)}
-                >
-                  <IconReload
-                    class={twMerge(
-                      updatingMap()[rulesProvider.name] &&
-                        'animate-spin text-success',
-                    )}
-                  />
-                </Button>
-              </div>
-            )}
-          </For>
+          </Show>
         </div>
       </Show>
+
+      <div class="flex-1 overflow-y-auto">
+        <Show when={activeTab() === ActiveTab.ruleProviders}>
+          <ForTwoColumns
+            subChild={ruleProviders().map((ruleProvider) => {
+              return (
+                <div class="card card-bordered card-compact mb-2 bg-base-200 p-4">
+                  <div class="flex items-center gap-2 pr-8">
+                    <span class="break-all">{ruleProvider.name}</span>
+                    <div class="badge badge-sm">{ruleProvider.ruleCount}</div>
+                  </div>
+                  <div class="text-xs text-slate-500">
+                    {ruleProvider.vehicleType} / {ruleProvider.behavior} /
+                    {t('updated')} {formatTimeFromNow(ruleProvider.updatedAt)}
+                  </div>
+                  <Button
+                    class="btn-circle btn-sm absolute right-2 top-2 mr-2 h-4"
+                    disabled={updatingMap()[ruleProvider.name]}
+                    onClick={(e) => onUpdateProviderClick(e, ruleProvider.name)}
+                  >
+                    <IconReload
+                      class={twMerge(
+                        updatingMap()[ruleProvider.name] &&
+                          'animate-spin text-success',
+                      )}
+                    />
+                  </Button>
+                </div>
+              )
+            })}
+          />
+        </Show>
+
+        <Show when={activeTab() === ActiveTab.rules}>
+          <InfiniteScroll
+            each={renderRules()}
+            hasMore={renderRules().length < rules().length}
+            next={() => setMaxRuleRender(maxRuleRender() + 100)}
+          >
+            {(rule) => (
+              <div class="card card-bordered card-compact mb-2 bg-base-200 p-4">
+                <div class="flex items-center gap-2">
+                  <span class="break-all">{rule.payload}</span>
+                  <Show
+                    when={typeof rule.size === 'number' && rule.size !== -1}
+                  >
+                    <div class="badge badge-sm">{rule.size}</div>
+                  </Show>
+                </div>
+                <div class="text-xs text-slate-500">
+                  {rule.type} :: {rule.proxy}
+                </div>
+              </div>
+            )}
+          </InfiniteScroll>
+        </Show>
+      </div>
     </div>
   )
 }

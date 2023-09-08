@@ -47,7 +47,7 @@ export default {
   autoSwitchTheme: 'Automatically switch theme',
   favDayTheme: 'Favorite light theme',
   favNightTheme: 'Favorite dark theme',
-  renderInTwoColumns: 'Render proxies in two columns',
+  renderInTwoColumns: 'Render in two columns',
   updateGEODatabases: 'Update GEO Databases',
   restartCore: 'Restart Core',
   upgradeCore: 'Upgrade Core',
@@ -60,8 +60,6 @@ export default {
   ms: 'ms',
   updated: 'Updated',
   renderProxiesInSamePage: 'Render proxies and proxy provider in same page',
-  renderRulesAndProviderInTwoColumns:
-    'Render rules and rule provider in two columns',
   tableSize: 'Table size',
   xs: 'Extra small size',
   sm: 'Small size',
