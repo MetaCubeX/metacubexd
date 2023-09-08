@@ -82,6 +82,12 @@ export const useProxies = () => {
     const proxyGroupList = proxies().slice()
     const proxyGroup = proxyGroupList.find((i) => i.name === proxy.name)!
 
+    await request.put(`proxies/${proxy.name}`, {
+      body: JSON.stringify({
+        name: proxyName,
+      }),
+    })
+
     if (autoCloseConns()) {
       activeConnections().forEach(({ id, chains }) => {
         if (chains.includes(proxy.name)) {
@@ -90,14 +96,7 @@ export const useProxies = () => {
       })
     }
 
-    await request.put(`proxies/${proxy.name}`, {
-      body: JSON.stringify({
-        name: proxyName,
-      }),
-    })
-
     proxyGroup.now = proxyName
-
     setProxies(proxyGroupList)
   }
 
