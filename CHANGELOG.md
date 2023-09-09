@@ -2,1107 +2,948 @@
 
 ## [1.84.0](https://github.com/MetaCubeX/metacubexd/compare/v1.83.2...v1.84.0) (2023-09-08)
 
-
 ### Features
 
-* **connections:** make connections table sorting state persisted ([6957cb4](https://github.com/MetaCubeX/metacubexd/commit/6957cb4ddf9616ab6eade404098d4b84c9ed2a97))
-* **connections:** show connection detail on click of a button ([daf1682](https://github.com/MetaCubeX/metacubexd/commit/daf168208e6a1e7bb4ab921ee5b235c926f6a13a))
-* **logs:** add i18n translation support ([965ec50](https://github.com/MetaCubeX/metacubexd/commit/965ec502aceeb206c0067e36a61f755a31002bc4))
+- **connections:** make connections table sorting state persisted ([6957cb4](https://github.com/MetaCubeX/metacubexd/commit/6957cb4ddf9616ab6eade404098d4b84c9ed2a97))
+- **connections:** show connection detail on click of a button ([daf1682](https://github.com/MetaCubeX/metacubexd/commit/daf168208e6a1e7bb4ab921ee5b235c926f6a13a))
+- **logs:** add i18n translation support ([965ec50](https://github.com/MetaCubeX/metacubexd/commit/965ec502aceeb206c0067e36a61f755a31002bc4))
 
 ## [1.83.2](https://github.com/MetaCubeX/metacubexd/compare/v1.83.1...v1.83.2) (2023-09-08)
 
-
 ### Bug Fixes
 
-* **proxies:** disconnect after proxy is changed ([a8cb75f](https://github.com/MetaCubeX/metacubexd/commit/a8cb75f29da3c4616237ec4918c92df91854f83b))
+- **proxies:** disconnect after proxy is changed ([a8cb75f](https://github.com/MetaCubeX/metacubexd/commit/a8cb75f29da3c4616237ec4918c92df91854f83b))
 
 ## [1.83.1](https://github.com/MetaCubeX/metacubexd/compare/v1.83.0...v1.83.1) (2023-09-08)
 
-
 ### Bug Fixes
 
-* **connections:** close conns ([f3423ab](https://github.com/MetaCubeX/metacubexd/commit/f3423abe921a470fc3ef1b9e6076643efcc799e0))
+- **connections:** close conns ([f3423ab](https://github.com/MetaCubeX/metacubexd/commit/f3423abe921a470fc3ef1b9e6076643efcc799e0))
 
 ## [1.83.0](https://github.com/MetaCubeX/metacubexd/compare/v1.82.0...v1.83.0) (2023-09-08)
 
-
 ### Features
 
-* **proxies:** auto close connections when proxy selected ([15d20cd](https://github.com/MetaCubeX/metacubexd/commit/15d20cde4ad514d45a54845f18fb9b401a681208))
-
+- **proxies:** auto close connections when proxy selected ([15d20cd](https://github.com/MetaCubeX/metacubexd/commit/15d20cde4ad514d45a54845f18fb9b401a681208))
 
 ### Bug Fixes
 
-* **button:** btn disable ([59a7273](https://github.com/MetaCubeX/metacubexd/commit/59a727366536588a8451ea40d305711dbfc6b36e))
-* **connections:** limit number of conns ([5263710](https://github.com/MetaCubeX/metacubexd/commit/5263710d30e08efdfcd976236f2eab76fa085264))
-* **connections:** table close conn ([d0c7c15](https://github.com/MetaCubeX/metacubexd/commit/d0c7c1569d8138724218d67c08195747be9492a0))
-* **connections:** ws error when switch end point ([b04b20f](https://github.com/MetaCubeX/metacubexd/commit/b04b20f8f01d4cfdd9f41591e03d675e1512b911))
+- **button:** btn disable ([59a7273](https://github.com/MetaCubeX/metacubexd/commit/59a727366536588a8451ea40d305711dbfc6b36e))
+- **connections:** limit number of conns ([5263710](https://github.com/MetaCubeX/metacubexd/commit/5263710d30e08efdfcd976236f2eab76fa085264))
+- **connections:** table close conn ([d0c7c15](https://github.com/MetaCubeX/metacubexd/commit/d0c7c1569d8138724218d67c08195747be9492a0))
+- **connections:** ws error when switch end point ([b04b20f](https://github.com/MetaCubeX/metacubexd/commit/b04b20f8f01d4cfdd9f41591e03d675e1512b911))
 
 ## [1.82.0](https://github.com/MetaCubeX/metacubexd/compare/v1.81.1...v1.82.0) (2023-09-07)
 
-
 ### Features
 
-* add a gradient color to logo text ([4da1720](https://github.com/MetaCubeX/metacubexd/commit/4da1720e550355efdef147cae3c3cfbf31e319b7))
-* **proxy:** add more adapter types to be processed by formatProxyType ([8245268](https://github.com/MetaCubeX/metacubexd/commit/82452688c93ca9df8be225f0e46cf9760e297fcf))
+- add a gradient color to logo text ([4da1720](https://github.com/MetaCubeX/metacubexd/commit/4da1720e550355efdef147cae3c3cfbf31e319b7))
+- **proxy:** add more adapter types to be processed by formatProxyType ([8245268](https://github.com/MetaCubeX/metacubexd/commit/82452688c93ca9df8be225f0e46cf9760e297fcf))
 
 ## [1.81.1](https://github.com/MetaCubeX/metacubexd/compare/v1.81.0...v1.81.1) (2023-09-07)
 
-
 ### Bug Fixes
 
-* **proxy:** fixes [#174](https://github.com/MetaCubeX/metacubexd/issues/174) ([c0b0489](https://github.com/MetaCubeX/metacubexd/commit/c0b04892c8a1eb93a8d8ac25c3c2d35da45c81e6))
-* **setup:** fixes [#175](https://github.com/MetaCubeX/metacubexd/issues/175) ([8242706](https://github.com/MetaCubeX/metacubexd/commit/8242706290668f91578562d70e616a82ed5ce00c))
+- **proxy:** fixes [#174](https://github.com/MetaCubeX/metacubexd/issues/174) ([c0b0489](https://github.com/MetaCubeX/metacubexd/commit/c0b04892c8a1eb93a8d8ac25c3c2d35da45c81e6))
+- **setup:** fixes [#175](https://github.com/MetaCubeX/metacubexd/issues/175) ([8242706](https://github.com/MetaCubeX/metacubexd/commit/8242706290668f91578562d70e616a82ed5ce00c))
 
 ## [1.81.0](https://github.com/MetaCubeX/metacubexd/compare/v1.80.0...v1.81.0) (2023-09-07)
 
-
 ### Features
 
-* **connections:** update connections page top area ([64659b2](https://github.com/MetaCubeX/metacubexd/commit/64659b26f110a4c0271c584a892cc7943bb2cf41))
-* new logo color ([e31c1eb](https://github.com/MetaCubeX/metacubexd/commit/e31c1eb9e031bed4254596e593b71374dbefcd5d))
-
+- **connections:** update connections page top area ([64659b2](https://github.com/MetaCubeX/metacubexd/commit/64659b26f110a4c0271c584a892cc7943bb2cf41))
+- new logo color ([e31c1eb](https://github.com/MetaCubeX/metacubexd/commit/e31c1eb9e031bed4254596e593b71374dbefcd5d))
 
 ### Bug Fixes
 
-* **conns:** input width ([62ff9c3](https://github.com/MetaCubeX/metacubexd/commit/62ff9c3f09131072585e5ebb5ccf515a0bc75a60))
+- **conns:** input width ([62ff9c3](https://github.com/MetaCubeX/metacubexd/commit/62ff9c3f09131072585e5ebb5ccf515a0bc75a60))
 
 ## [1.80.0](https://github.com/MetaCubeX/metacubexd/compare/v1.79.0...v1.80.0) (2023-09-07)
 
-
 ### Features
 
-* hidden scrollbar for mobile ([2ce3016](https://github.com/MetaCubeX/metacubexd/commit/2ce30162752be27337c8e6dce7a81ee7bea6d6dd))
-
+- hidden scrollbar for mobile ([2ce3016](https://github.com/MetaCubeX/metacubexd/commit/2ce30162752be27337c8e6dce7a81ee7bea6d6dd))
 
 ### Bug Fixes
 
-* **connections:** padding fix ([8cea622](https://github.com/MetaCubeX/metacubexd/commit/8cea622251b93308a94c6ade29199a6f01dbf72d))
-* tab style for conns and proxies ([842ce9e](https://github.com/MetaCubeX/metacubexd/commit/842ce9e00fe5a3f9e117cafb6c181602ef618c94))
+- **connections:** padding fix ([8cea622](https://github.com/MetaCubeX/metacubexd/commit/8cea622251b93308a94c6ade29199a6f01dbf72d))
+- tab style for conns and proxies ([842ce9e](https://github.com/MetaCubeX/metacubexd/commit/842ce9e00fe5a3f9e117cafb6c181602ef618c94))
 
 ## [1.79.0](https://github.com/MetaCubeX/metacubexd/compare/v1.78.1...v1.79.0) (2023-09-07)
 
-
 ### Features
 
-* **proxies:** default proxies and remove all tab ([66c7935](https://github.com/MetaCubeX/metacubexd/commit/66c793550ab4ef3c85d24422fe58dec644deb6d4))
-* update LogoText ([8d62c9f](https://github.com/MetaCubeX/metacubexd/commit/8d62c9f510de7268a3c0ead5e47a31fe938c196d))
-
+- **proxies:** default proxies and remove all tab ([66c7935](https://github.com/MetaCubeX/metacubexd/commit/66c793550ab4ef3c85d24422fe58dec644deb6d4))
+- update LogoText ([8d62c9f](https://github.com/MetaCubeX/metacubexd/commit/8d62c9f510de7268a3c0ead5e47a31fe938c196d))
 
 ### Bug Fixes
 
-* btn size for mobile ([f729761](https://github.com/MetaCubeX/metacubexd/commit/f72976154df067d8c3fab3eda220dd386329b9be))
-* **rules:** request token error ([44739f6](https://github.com/MetaCubeX/metacubexd/commit/44739f6962792a5ae42684ee8e1edcb8a9a4216b))
+- btn size for mobile ([f729761](https://github.com/MetaCubeX/metacubexd/commit/f72976154df067d8c3fab3eda220dd386329b9be))
+- **rules:** request token error ([44739f6](https://github.com/MetaCubeX/metacubexd/commit/44739f6962792a5ae42684ee8e1edcb8a9a4216b))
 
 ## [1.78.1](https://github.com/MetaCubeX/metacubexd/compare/v1.78.0...v1.78.1) (2023-09-06)
 
-
 ### Bug Fixes
 
-* unselectable ProxyNodeCard also has cursor-pointer applied ([d5112f2](https://github.com/MetaCubeX/metacubexd/commit/d5112f23da449e4cb74c9abc49d84f34a0859758))
+- unselectable ProxyNodeCard also has cursor-pointer applied ([d5112f2](https://github.com/MetaCubeX/metacubexd/commit/d5112f23da449e4cb74c9abc49d84f34a0859758))
 
 ## [1.78.0](https://github.com/MetaCubeX/metacubexd/compare/v1.77.0...v1.78.0) (2023-09-06)
 
-
 ### Features
 
-* customize scrollbar ([c27b192](https://github.com/MetaCubeX/metacubexd/commit/c27b19259bff444b21fd84502fa638fe8ac13c7b))
+- customize scrollbar ([c27b192](https://github.com/MetaCubeX/metacubexd/commit/c27b19259bff444b21fd84502fa638fe8ac13c7b))
 
 ## [1.77.0](https://github.com/MetaCubeX/metacubexd/compare/v1.76.1...v1.77.0) (2023-09-06)
 
-
 ### Features
 
-* **proxy:** keep tab at the top ([1bb36a1](https://github.com/MetaCubeX/metacubexd/commit/1bb36a1bd618e41863baac694c2ff115d364dbd8))
-* update the overall look of the app ([08ed610](https://github.com/MetaCubeX/metacubexd/commit/08ed61045f199b0f2721e4a82c208f68ee70d476))
-
+- **proxy:** keep tab at the top ([1bb36a1](https://github.com/MetaCubeX/metacubexd/commit/1bb36a1bd618e41863baac694c2ff115d364dbd8))
+- update the overall look of the app ([08ed610](https://github.com/MetaCubeX/metacubexd/commit/08ed61045f199b0f2721e4a82c208f68ee70d476))
 
 ### Bug Fixes
 
-* btn disable && var name ([6c88062](https://github.com/MetaCubeX/metacubexd/commit/6c880628ec6b3a32452b3d64c858e27f2e1c7b65))
+- btn disable && var name ([6c88062](https://github.com/MetaCubeX/metacubexd/commit/6c880628ec6b3a32452b3d64c858e27f2e1c7b65))
 
 ## [1.76.1](https://github.com/MetaCubeX/metacubexd/compare/v1.76.0...v1.76.1) (2023-09-06)
 
-
 ### Bug Fixes
 
-* **Connections:** disable grouping for time&speed ([#160](https://github.com/MetaCubeX/metacubexd/issues/160)) ([8398dff](https://github.com/MetaCubeX/metacubexd/commit/8398dff02d1bb254d806901f0a9ce49105be6d52))
+- **Connections:** disable grouping for time&speed ([#160](https://github.com/MetaCubeX/metacubexd/issues/160)) ([8398dff](https://github.com/MetaCubeX/metacubexd/commit/8398dff02d1bb254d806901f0a9ce49105be6d52))
 
 ## [1.76.0](https://github.com/MetaCubeX/metacubexd/compare/v1.75.1...v1.76.0) (2023-09-06)
 
-
 ### Features
 
-* **proxy:** merge proxies and proxyProviders into one page ([93114b2](https://github.com/MetaCubeX/metacubexd/commit/93114b22a28b3e336b9fccbee4ec99b6eb8a4b61))
-* **rules:** config for render rules in two columns ([7e2fe6a](https://github.com/MetaCubeX/metacubexd/commit/7e2fe6acb0d2bc879cd724cfda7d80924abd5d40))
-
+- **proxy:** merge proxies and proxyProviders into one page ([93114b2](https://github.com/MetaCubeX/metacubexd/commit/93114b22a28b3e336b9fccbee4ec99b6eb8a4b61))
+- **rules:** config for render rules in two columns ([7e2fe6a](https://github.com/MetaCubeX/metacubexd/commit/7e2fe6acb0d2bc879cd724cfda7d80924abd5d40))
 
 ### Bug Fixes
 
-* **connections:** table max row 200 ([0d61b46](https://github.com/MetaCubeX/metacubexd/commit/0d61b460cc16aa1a7c60015afe9b526c38d57ffc))
-* **proxy:** add small gap between update button and tabs ([ff7dab7](https://github.com/MetaCubeX/metacubexd/commit/ff7dab74b69b0527c721185fcdf94c005d7c5d3c))
-* **request:** ws request url ([a13060a](https://github.com/MetaCubeX/metacubexd/commit/a13060a056c9ac87c21ce7f8706ee6a5ae23be18))
-* **translation:** latencyTestTimeoutDuration ([2ebedcc](https://github.com/MetaCubeX/metacubexd/commit/2ebedcc1c97b675395cd0f55824bc11ee5af5fce))
+- **connections:** table max row 200 ([0d61b46](https://github.com/MetaCubeX/metacubexd/commit/0d61b460cc16aa1a7c60015afe9b526c38d57ffc))
+- **proxy:** add small gap between update button and tabs ([ff7dab7](https://github.com/MetaCubeX/metacubexd/commit/ff7dab74b69b0527c721185fcdf94c005d7c5d3c))
+- **request:** ws request url ([a13060a](https://github.com/MetaCubeX/metacubexd/commit/a13060a056c9ac87c21ce7f8706ee6a5ae23be18))
+- **translation:** latencyTestTimeoutDuration ([2ebedcc](https://github.com/MetaCubeX/metacubexd/commit/2ebedcc1c97b675395cd0f55824bc11ee5af5fce))
 
 ## [1.75.1](https://github.com/MetaCubeX/metacubexd/compare/v1.75.0...v1.75.1) (2023-09-06)
 
-
 ### Bug Fixes
 
-* **overview:** chart font size ([af70669](https://github.com/MetaCubeX/metacubexd/commit/af70669e7a035a6368e7620be7ed489db76648cd))
+- **overview:** chart font size ([af70669](https://github.com/MetaCubeX/metacubexd/commit/af70669e7a035a6368e7620be7ed489db76648cd))
 
 ## [1.75.0](https://github.com/MetaCubeX/metacubexd/compare/v1.74.4...v1.75.0) (2023-09-06)
 
-
 ### Features
 
-* **connections:** split source info into sourceIP and sourcePort ([2d61f45](https://github.com/MetaCubeX/metacubexd/commit/2d61f45372ac65a01aa9f51fe010cfdee53d9d46))
+- **connections:** split source info into sourceIP and sourcePort ([2d61f45](https://github.com/MetaCubeX/metacubexd/commit/2d61f45372ac65a01aa9f51fe010cfdee53d9d46))
 
 ## [1.74.4](https://github.com/MetaCubeX/metacubexd/compare/v1.74.3...v1.74.4) (2023-09-06)
 
-
 ### Bug Fixes
 
-* **config:** speedtest timeout config ([5f1e773](https://github.com/MetaCubeX/metacubexd/commit/5f1e77320d82fbc5e2abfc1ebee70e4194c0ce98))
+- **config:** speedtest timeout config ([5f1e773](https://github.com/MetaCubeX/metacubexd/commit/5f1e77320d82fbc5e2abfc1ebee70e4194c0ce98))
 
 ## [1.74.3](https://github.com/MetaCubeX/metacubexd/compare/v1.74.2...v1.74.3) (2023-09-06)
 
-
 ### Bug Fixes
 
-* **Dockerfile:** lock node version to 20.5-alpine ([c370a84](https://github.com/MetaCubeX/metacubexd/commit/c370a84b8cc6546729c1c0db88ff8f6bba2244a6))
-* **proxies:** speedtest params error ([5f0fb23](https://github.com/MetaCubeX/metacubexd/commit/5f0fb23f15f7118a76e58c3a6b6e4d97533dcfdd))
+- **Dockerfile:** lock node version to 20.5-alpine ([c370a84](https://github.com/MetaCubeX/metacubexd/commit/c370a84b8cc6546729c1c0db88ff8f6bba2244a6))
+- **proxies:** speedtest params error ([5f0fb23](https://github.com/MetaCubeX/metacubexd/commit/5f0fb23f15f7118a76e58c3a6b6e4d97533dcfdd))
 
 ## [1.74.2](https://github.com/MetaCubeX/metacubexd/compare/v1.74.1...v1.74.2) (2023-09-06)
 
-
 ### Bug Fixes
 
-* tableSizeClassName not been generated by tailwindcss ([5f4f9a8](https://github.com/MetaCubeX/metacubexd/commit/5f4f9a8ae8d49c4ce9816860c04ffa0090f2ead0))
+- tableSizeClassName not been generated by tailwindcss ([5f4f9a8](https://github.com/MetaCubeX/metacubexd/commit/5f4f9a8ae8d49c4ce9816860c04ffa0090f2ead0))
 
 ## [1.74.1](https://github.com/MetaCubeX/metacubexd/compare/v1.74.0...v1.74.1) (2023-09-05)
 
-
 ### Bug Fixes
 
-* **logs:** table size ([3a2560f](https://github.com/MetaCubeX/metacubexd/commit/3a2560f15291a60ed509cf8c32f5c699cda957e5))
+- **logs:** table size ([3a2560f](https://github.com/MetaCubeX/metacubexd/commit/3a2560f15291a60ed509cf8c32f5c699cda957e5))
 
 ## [1.74.0](https://github.com/MetaCubeX/metacubexd/compare/v1.73.0...v1.74.0) (2023-09-05)
 
-
 ### Features
 
-* **connections:** shrink the element sizes down ([0aa9779](https://github.com/MetaCubeX/metacubexd/commit/0aa97795246978003319684b1ea8a500f7b382ca))
+- **connections:** shrink the element sizes down ([0aa9779](https://github.com/MetaCubeX/metacubexd/commit/0aa97795246978003319684b1ea8a500f7b382ca))
 
 ## [1.73.0](https://github.com/MetaCubeX/metacubexd/compare/v1.72.1...v1.73.0) (2023-09-05)
 
-
 ### Features
 
-* **connections:** pausing support ([6076619](https://github.com/MetaCubeX/metacubexd/commit/60766194858e0c88f5af2a5f4c5f21946a0429ff))
+- **connections:** pausing support ([6076619](https://github.com/MetaCubeX/metacubexd/commit/60766194858e0c88f5af2a5f4c5f21946a0429ff))
 
 ## [1.72.1](https://github.com/MetaCubeX/metacubexd/compare/v1.72.0...v1.72.1) (2023-09-05)
 
-
 ### Bug Fixes
 
-* **connections:** limit closed connection items count below 100 ([f97f467](https://github.com/MetaCubeX/metacubexd/commit/f97f46720a5ded52aa6b592f11b1dca2579bb0b5))
+- **connections:** limit closed connection items count below 100 ([f97f467](https://github.com/MetaCubeX/metacubexd/commit/f97f46720a5ded52aa6b592f11b1dca2579bb0b5))
 
 ## [1.72.0](https://github.com/MetaCubeX/metacubexd/compare/v1.71.0...v1.72.0) (2023-09-05)
 
-
 ### Features
 
-* **connections:** add closed connections tab ([f0e32d9](https://github.com/MetaCubeX/metacubexd/commit/f0e32d93f6d5ffa52a721ede1003d2f7ee20d0bc))
+- **connections:** add closed connections tab ([f0e32d9](https://github.com/MetaCubeX/metacubexd/commit/f0e32d93f6d5ffa52a721ede1003d2f7ee20d0bc))
 
 ## [1.71.0](https://github.com/MetaCubeX/metacubexd/compare/v1.70.0...v1.71.0) (2023-09-05)
 
-
 ### Features
 
-* **connections:** connections table now supports grouping ([4c8b38f](https://github.com/MetaCubeX/metacubexd/commit/4c8b38f7563b6c8c38c8295ff0a30ec995c88257))
-
+- **connections:** connections table now supports grouping ([4c8b38f](https://github.com/MetaCubeX/metacubexd/commit/4c8b38f7563b6c8c38c8295ff0a30ec995c88257))
 
 ### Bug Fixes
 
-* **proxy:** updateAllProvider, some of the proxy provider update may throw ([e09aac2](https://github.com/MetaCubeX/metacubexd/commit/e09aac2f4bd55bee816fb3d2a615dd4b14169607))
+- **proxy:** updateAllProvider, some of the proxy provider update may throw ([e09aac2](https://github.com/MetaCubeX/metacubexd/commit/e09aac2f4bd55bee816fb3d2a615dd4b14169607))
 
 ## [1.70.0](https://github.com/MetaCubeX/metacubexd/compare/v1.69.0...v1.70.0) (2023-09-05)
 
-
 ### Features
 
-* **config:** add setting, requestTimeoutDuration ([d01d148](https://github.com/MetaCubeX/metacubexd/commit/d01d148cfffc785a9c57b021696db9e2b191eb1f))
+- **config:** add setting, requestTimeoutDuration ([d01d148](https://github.com/MetaCubeX/metacubexd/commit/d01d148cfffc785a9c57b021696db9e2b191eb1f))
 
 ## [1.69.0](https://github.com/MetaCubeX/metacubexd/compare/v1.68.0...v1.69.0) (2023-09-05)
 
-
 ### Features
 
-* icon success color when updating ([6575e73](https://github.com/MetaCubeX/metacubexd/commit/6575e734392d63d959dacbb3b7ad733285828475))
-* make some changes in response to community suggestions ([cc78d4e](https://github.com/MetaCubeX/metacubexd/commit/cc78d4e2b1adf729d38a63f6b147544b100f94a3))
-* make some changes in response to community suggestions ([90ecb86](https://github.com/MetaCubeX/metacubexd/commit/90ecb866039b36b4fdd1bc420bd65ef10222cd23))
-
+- icon success color when updating ([6575e73](https://github.com/MetaCubeX/metacubexd/commit/6575e734392d63d959dacbb3b7ad733285828475))
+- make some changes in response to community suggestions ([cc78d4e](https://github.com/MetaCubeX/metacubexd/commit/cc78d4e2b1adf729d38a63f6b147544b100f94a3))
+- make some changes in response to community suggestions ([90ecb86](https://github.com/MetaCubeX/metacubexd/commit/90ecb866039b36b4fdd1bc420bd65ef10222cd23))
 
 ### Bug Fixes
 
-* icon vertical align ([c6f3bee](https://github.com/MetaCubeX/metacubexd/commit/c6f3beec354f632584d77c4a5295203076410e21))
-* rule provider word break ([e6facf1](https://github.com/MetaCubeX/metacubexd/commit/e6facf11758500ebddb4b534f5e843fd8f016476))
+- icon vertical align ([c6f3bee](https://github.com/MetaCubeX/metacubexd/commit/c6f3beec354f632584d77c4a5295203076410e21))
+- rule provider word break ([e6facf1](https://github.com/MetaCubeX/metacubexd/commit/e6facf11758500ebddb4b534f5e843fd8f016476))
 
 ## [1.68.0](https://github.com/MetaCubeX/metacubexd/compare/v1.67.5...v1.68.0) (2023-09-05)
 
-
 ### Features
 
-* a stable table ([e19e53d](https://github.com/MetaCubeX/metacubexd/commit/e19e53d0f68bfd30d4aff3a630796678d7a7e97d))
-* table style ([0115daf](https://github.com/MetaCubeX/metacubexd/commit/0115daf014de9737de0a30ab07bde2c4b0337492))
-
+- a stable table ([e19e53d](https://github.com/MetaCubeX/metacubexd/commit/e19e53d0f68bfd30d4aff3a630796678d7a7e97d))
+- table style ([0115daf](https://github.com/MetaCubeX/metacubexd/commit/0115daf014de9737de0a30ab07bde2c4b0337492))
 
 ### Bug Fixes
 
-* speedtest icon align ([2caf0c4](https://github.com/MetaCubeX/metacubexd/commit/2caf0c41dd8f12855b79f894e0a6b8dddcf030f6))
+- speedtest icon align ([2caf0c4](https://github.com/MetaCubeX/metacubexd/commit/2caf0c41dd8f12855b79f894e0a6b8dddcf030f6))
 
 ## [1.67.5](https://github.com/MetaCubeX/metacubexd/compare/v1.67.4...v1.67.5) (2023-09-05)
 
-
 ### Bug Fixes
 
-* build issue, `Cannot redefine property: File` ([b50c41e](https://github.com/MetaCubeX/metacubexd/commit/b50c41e3a588b843f7b5f35afd38b981fd0372b9))
+- build issue, `Cannot redefine property: File` ([b50c41e](https://github.com/MetaCubeX/metacubexd/commit/b50c41e3a588b843f7b5f35afd38b981fd0372b9))
 
 ## [1.67.4](https://github.com/MetaCubeX/metacubexd/compare/v1.67.3...v1.67.4) (2023-09-05)
 
-
 ### Bug Fixes
 
-* update pnpm-lock.yaml ([0756f13](https://github.com/MetaCubeX/metacubexd/commit/0756f133a0bf8f750b4caa2f8d895038d3816611))
+- update pnpm-lock.yaml ([0756f13](https://github.com/MetaCubeX/metacubexd/commit/0756f133a0bf8f750b4caa2f8d895038d3816611))
 
 ## [1.67.3](https://github.com/MetaCubeX/metacubexd/compare/v1.67.2...v1.67.3) (2023-09-05)
 
-
 ### Bug Fixes
 
-* better toggle twemoji implementation ([13abde7](https://github.com/MetaCubeX/metacubexd/commit/13abde7a9d62874dcab75de0cbba58b7285257a7))
+- better toggle twemoji implementation ([13abde7](https://github.com/MetaCubeX/metacubexd/commit/13abde7a9d62874dcab75de0cbba58b7285257a7))
 
 ## [1.67.2](https://github.com/MetaCubeX/metacubexd/compare/v1.67.1...v1.67.2) (2023-09-04)
 
-
 ### Bug Fixes
 
-* rollback to h-screen :) ([b68e0c6](https://github.com/MetaCubeX/metacubexd/commit/b68e0c62c09a727c9b55b59e26f81cc55fb5222b))
+- rollback to h-screen :) ([b68e0c6](https://github.com/MetaCubeX/metacubexd/commit/b68e0c62c09a727c9b55b59e26f81cc55fb5222b))
 
 ## [1.67.1](https://github.com/MetaCubeX/metacubexd/compare/v1.67.0...v1.67.1) (2023-09-04)
 
-
 ### Bug Fixes
 
-* use min-h-screen-safe instead of h-screen ([6f366fe](https://github.com/MetaCubeX/metacubexd/commit/6f366fe836d1759e6847de19ec64c0f182b242cb))
+- use min-h-screen-safe instead of h-screen ([6f366fe](https://github.com/MetaCubeX/metacubexd/commit/6f366fe836d1759e6847de19ec64c0f182b242cb))
 
 ## [1.67.0](https://github.com/MetaCubeX/metacubexd/compare/v1.66.0...v1.67.0) (2023-09-04)
 
-
 ### Features
 
-* add padding-bottom safe-area ([a55ec6f](https://github.com/MetaCubeX/metacubexd/commit/a55ec6f7b18fa8638d673c9c7c493752ae3dbbb1))
+- add padding-bottom safe-area ([a55ec6f](https://github.com/MetaCubeX/metacubexd/commit/a55ec6f7b18fa8638d673c9c7c493752ae3dbbb1))
 
 ## [1.66.0](https://github.com/MetaCubeX/metacubexd/compare/v1.65.0...v1.66.0) (2023-09-04)
 
-
 ### Features
 
-* add safe area paddings ([9840141](https://github.com/MetaCubeX/metacubexd/commit/9840141bce39188094db12373d8c358da771ffd1))
-
+- add safe area paddings ([9840141](https://github.com/MetaCubeX/metacubexd/commit/9840141bce39188094db12373d8c358da771ffd1))
 
 ### Bug Fixes
 
-* **proxies:** group type does not show UDP ([f0fbe09](https://github.com/MetaCubeX/metacubexd/commit/f0fbe098381c2b33c84b2eb5427f9db4b227e364))
+- **proxies:** group type does not show UDP ([f0fbe09](https://github.com/MetaCubeX/metacubexd/commit/f0fbe098381c2b33c84b2eb5427f9db4b227e364))
 
 ## [1.65.0](https://github.com/MetaCubeX/metacubexd/compare/v1.64.0...v1.65.0) (2023-09-04)
 
-
 ### Features
 
-* **connections:** optimized search ([17d9ae4](https://github.com/MetaCubeX/metacubexd/commit/17d9ae487226401d73ddf363bd76cebe9977f1b5))
+- **connections:** optimized search ([17d9ae4](https://github.com/MetaCubeX/metacubexd/commit/17d9ae487226401d73ddf363bd76cebe9977f1b5))
 
 ## [1.64.0](https://github.com/MetaCubeX/metacubexd/compare/v1.63.0...v1.64.0) (2023-09-04)
 
-
 ### Features
 
-* **logs:** sticky table thead ([5affd5b](https://github.com/MetaCubeX/metacubexd/commit/5affd5b91e253b433fc36e4e6d21f3a631790d3a))
+- **logs:** sticky table thead ([5affd5b](https://github.com/MetaCubeX/metacubexd/commit/5affd5b91e253b433fc36e4e6d21f3a631790d3a))
 
 ## [1.63.0](https://github.com/MetaCubeX/metacubexd/compare/v1.62.0...v1.63.0) (2023-09-04)
 
-
 ### Features
 
-* **connections:** sticky table thead ([7f8f8a9](https://github.com/MetaCubeX/metacubexd/commit/7f8f8a98816464f63cc19fcc6147a490bb58050d))
-* **overview:** reduce padding of the chart container ([3728cd2](https://github.com/MetaCubeX/metacubexd/commit/3728cd2e3289531fe61fd2da11e06aaa89a1a471))
+- **connections:** sticky table thead ([7f8f8a9](https://github.com/MetaCubeX/metacubexd/commit/7f8f8a98816464f63cc19fcc6147a490bb58050d))
+- **overview:** reduce padding of the chart container ([3728cd2](https://github.com/MetaCubeX/metacubexd/commit/3728cd2e3289531fe61fd2da11e06aaa89a1a471))
 
 ## [1.62.0](https://github.com/MetaCubeX/metacubexd/compare/v1.61.0...v1.62.0) (2023-09-04)
 
-
 ### Features
 
-* **overview:** update the overall look of the overview page ([c757850](https://github.com/MetaCubeX/metacubexd/commit/c757850c1a34b2757ab5ec89e850fe7c1976d533))
-
+- **overview:** update the overall look of the overview page ([c757850](https://github.com/MetaCubeX/metacubexd/commit/c757850c1a34b2757ab5ec89e850fe7c1976d533))
 
 ### Bug Fixes
 
-* **proxies:** also display latency when PROXIES_PREVIEW_TYPE is DOTS ([347ebb6](https://github.com/MetaCubeX/metacubexd/commit/347ebb6f84e1f316bd4551ca0f079ad1050a4f01))
-* rule size ([2ff31d4](https://github.com/MetaCubeX/metacubexd/commit/2ff31d40b1349c2213b999c57d9d7fe0ce9e0af4))
+- **proxies:** also display latency when PROXIES_PREVIEW_TYPE is DOTS ([347ebb6](https://github.com/MetaCubeX/metacubexd/commit/347ebb6f84e1f316bd4551ca0f079ad1050a4f01))
+- rule size ([2ff31d4](https://github.com/MetaCubeX/metacubexd/commit/2ff31d40b1349c2213b999c57d9d7fe0ce9e0af4))
 
 ## [1.61.0](https://github.com/MetaCubeX/metacubexd/compare/v1.60.3...v1.61.0) (2023-09-04)
 
-
 ### Features
 
-* config for render proxies in same page ([5bc540e](https://github.com/MetaCubeX/metacubexd/commit/5bc540eeffeefd289197283f7ebe491397f18376))
-* time column in conns ([98f6293](https://github.com/MetaCubeX/metacubexd/commit/98f6293290ecedf2f3fde4baa24f60cedfaa0445))
+- config for render proxies in same page ([5bc540e](https://github.com/MetaCubeX/metacubexd/commit/5bc540eeffeefd289197283f7ebe491397f18376))
+- time column in conns ([98f6293](https://github.com/MetaCubeX/metacubexd/commit/98f6293290ecedf2f3fde4baa24f60cedfaa0445))
 
 ## [1.60.3](https://github.com/MetaCubeX/metacubexd/compare/v1.60.2...v1.60.3) (2023-09-04)
 
-
 ### Bug Fixes
 
-* auto login ([d7f3649](https://github.com/MetaCubeX/metacubexd/commit/d7f3649eba6e2a6475e5b96b9fff51e414ca47f1))
-* **connections:** close column header translation result not updating ([5689034](https://github.com/MetaCubeX/metacubexd/commit/5689034f942145e35811bb8c2f063ba5632490da))
+- auto login ([d7f3649](https://github.com/MetaCubeX/metacubexd/commit/d7f3649eba6e2a6475e5b96b9fff51e414ca47f1))
+- **connections:** close column header translation result not updating ([5689034](https://github.com/MetaCubeX/metacubexd/commit/5689034f942145e35811bb8c2f063ba5632490da))
 
 ## [1.60.2](https://github.com/MetaCubeX/metacubexd/compare/v1.60.1...v1.60.2) (2023-09-04)
 
-
 ### Bug Fixes
 
-* setup onsubmit secret ([30fd139](https://github.com/MetaCubeX/metacubexd/commit/30fd13946b0a42528330d06994803d811838979e))
+- setup onsubmit secret ([30fd139](https://github.com/MetaCubeX/metacubexd/commit/30fd13946b0a42528330d06994803d811838979e))
 
 ## [1.60.1](https://github.com/MetaCubeX/metacubexd/compare/v1.60.0...v1.60.1) (2023-09-03)
 
-
 ### Bug Fixes
 
-* **overview:** only enable flex-row layout on large screen ([be8b54a](https://github.com/MetaCubeX/metacubexd/commit/be8b54a0f620acab8afdf9039555d89f7bf74083))
+- **overview:** only enable flex-row layout on large screen ([be8b54a](https://github.com/MetaCubeX/metacubexd/commit/be8b54a0f620acab8afdf9039555d89f7bf74083))
 
 ## [1.60.0](https://github.com/MetaCubeX/metacubexd/compare/v1.59.1...v1.60.0) (2023-09-03)
 
-
 ### Features
 
-* **connections:** move close connection button next to search input ([4b8175d](https://github.com/MetaCubeX/metacubexd/commit/4b8175d718211d139b4db17f9412b88608b089fe))
+- **connections:** move close connection button next to search input ([4b8175d](https://github.com/MetaCubeX/metacubexd/commit/4b8175d718211d139b4db17f9412b88608b089fe))
 
 ## [1.59.1](https://github.com/MetaCubeX/metacubexd/compare/v1.59.0...v1.59.1) (2023-09-03)
 
-
 ### Bug Fixes
 
-* **connections:** disable sorting for close column ([98b5d62](https://github.com/MetaCubeX/metacubexd/commit/98b5d62c0208efbd1cf501e031240d41ab434fc0))
+- **connections:** disable sorting for close column ([98b5d62](https://github.com/MetaCubeX/metacubexd/commit/98b5d62c0208efbd1cf501e031240d41ab434fc0))
 
 ## [1.59.0](https://github.com/MetaCubeX/metacubexd/compare/v1.58.0...v1.59.0) (2023-09-03)
 
-
 ### Features
 
-* display current version ([1765ada](https://github.com/MetaCubeX/metacubexd/commit/1765adacdad295101e3d0479841affcca8a9ec7e))
-* **overview:** add background color to charts container ([bd83d11](https://github.com/MetaCubeX/metacubexd/commit/bd83d113b169662e369355e655cf179a7704d311))
+- display current version ([1765ada](https://github.com/MetaCubeX/metacubexd/commit/1765adacdad295101e3d0479841affcca8a9ec7e))
+- **overview:** add background color to charts container ([bd83d11](https://github.com/MetaCubeX/metacubexd/commit/bd83d113b169662e369355e655cf179a7704d311))
 
 ## [1.58.0](https://github.com/MetaCubeX/metacubexd/compare/v1.57.3...v1.58.0) (2023-09-03)
 
-
 ### Features
 
-* **connections:** copy to clipboard on right click ([58afb5f](https://github.com/MetaCubeX/metacubexd/commit/58afb5fce29173b8041b8a93788bba361f3c43cd))
+- **connections:** copy to clipboard on right click ([58afb5f](https://github.com/MetaCubeX/metacubexd/commit/58afb5fce29173b8041b8a93788bba361f3c43cd))
 
 ## [1.57.3](https://github.com/MetaCubeX/metacubexd/compare/v1.57.2...v1.57.3) (2023-09-03)
 
-
 ### Bug Fixes
 
-* **font:** adapt to apple fonts ([84c70b0](https://github.com/MetaCubeX/metacubexd/commit/84c70b0550e6e1da5adf2f69ea530c45ff14561a))
+- **font:** adapt to apple fonts ([84c70b0](https://github.com/MetaCubeX/metacubexd/commit/84c70b0550e6e1da5adf2f69ea530c45ff14561a))
 
 ## [1.57.2](https://github.com/MetaCubeX/metacubexd/compare/v1.57.1...v1.57.2) (2023-09-03)
 
-
 ### Bug Fixes
 
-* bar latency ([197b0c7](https://github.com/MetaCubeX/metacubexd/commit/197b0c7d4b34dafb293ce398c9a59b043b4330eb))
+- bar latency ([197b0c7](https://github.com/MetaCubeX/metacubexd/commit/197b0c7d4b34dafb293ce398c9a59b043b4330eb))
 
 ## [1.57.1](https://github.com/MetaCubeX/metacubexd/compare/v1.57.0...v1.57.1) (2023-09-02)
 
-
 ### Bug Fixes
 
-* **latency:** invalid 0 latency scenario ([dd5f0f1](https://github.com/MetaCubeX/metacubexd/commit/dd5f0f14a070bb9a042bfab1a544a161d8187b58))
+- **latency:** invalid 0 latency scenario ([dd5f0f1](https://github.com/MetaCubeX/metacubexd/commit/dd5f0f14a070bb9a042bfab1a544a161d8187b58))
 
 ## [1.57.0](https://github.com/MetaCubeX/metacubexd/compare/v1.56.0...v1.57.0) (2023-09-02)
 
-
 ### Features
 
-* **config:** make config option titles more noticeable ([b9eb92f](https://github.com/MetaCubeX/metacubexd/commit/b9eb92fc0bd6ef5ce0aa35fd1c7ee46dd028621a))
+- **config:** make config option titles more noticeable ([b9eb92f](https://github.com/MetaCubeX/metacubexd/commit/b9eb92fc0bd6ef5ce0aa35fd1c7ee46dd028621a))
 
 ## [1.56.0](https://github.com/MetaCubeX/metacubexd/compare/v1.55.0...v1.56.0) (2023-09-02)
 
-
 ### Features
 
-* **proxies:** sortProxiesByOrderingType ([635b8ba](https://github.com/MetaCubeX/metacubexd/commit/635b8ba966da12dfe3879e97472014150deec0df))
-
+- **proxies:** sortProxiesByOrderingType ([635b8ba](https://github.com/MetaCubeX/metacubexd/commit/635b8ba966da12dfe3879e97472014150deec0df))
 
 ### Bug Fixes
 
-* **proxies:** latency widget ([b511b88](https://github.com/MetaCubeX/metacubexd/commit/b511b88cd1d426ef3252ba0a0d9f28c4fb6ad826))
+- **proxies:** latency widget ([b511b88](https://github.com/MetaCubeX/metacubexd/commit/b511b88cd1d426ef3252ba0a0d9f28c4fb6ad826))
 
 ## [1.55.0](https://github.com/MetaCubeX/metacubexd/compare/v1.54.0...v1.55.0) (2023-09-02)
 
-
 ### Features
 
-* add PROXIES_PREVIEW_TYPE - off ([fec6413](https://github.com/MetaCubeX/metacubexd/commit/fec64133fa8b5a3f14905d7910097d790314471f))
-* relax https latency test range ([1b09fa3](https://github.com/MetaCubeX/metacubexd/commit/1b09fa39af2c5bfc9fd8374c9b2ec53e59595184))
+- add PROXIES_PREVIEW_TYPE - off ([fec6413](https://github.com/MetaCubeX/metacubexd/commit/fec64133fa8b5a3f14905d7910097d790314471f))
+- relax https latency test range ([1b09fa3](https://github.com/MetaCubeX/metacubexd/commit/1b09fa39af2c5bfc9fd8374c9b2ec53e59595184))
 
 ## [1.54.0](https://github.com/MetaCubeX/metacubexd/compare/v1.53.0...v1.54.0) (2023-09-02)
 
-
 ### Features
 
-* add buttons - updateGEODatabases, restart, upgrade ([8e56543](https://github.com/MetaCubeX/metacubexd/commit/8e5654332ddfce03399e24864b856fed882480c3))
+- add buttons - updateGEODatabases, restart, upgrade ([8e56543](https://github.com/MetaCubeX/metacubexd/commit/8e5654332ddfce03399e24864b856fed882480c3))
 
 ## [1.53.0](https://github.com/MetaCubeX/metacubexd/compare/v1.52.1...v1.53.0) (2023-09-02)
 
-
 ### Features
 
-* config for render in two col ([5d43ea0](https://github.com/MetaCubeX/metacubexd/commit/5d43ea0b5f48b2d84984bdf94dcef87d8e780432))
-
+- config for render in two col ([5d43ea0](https://github.com/MetaCubeX/metacubexd/commit/5d43ea0b5f48b2d84984bdf94dcef87d8e780432))
 
 ### Bug Fixes
 
-* btn animate ([a29e638](https://github.com/MetaCubeX/metacubexd/commit/a29e638c1e02fc8fb25ac1806d9e9e9d9af288f9))
+- btn animate ([a29e638](https://github.com/MetaCubeX/metacubexd/commit/a29e638c1e02fc8fb25ac1806d9e9e9d9af288f9))
 
 ## [1.52.1](https://github.com/MetaCubeX/metacubexd/compare/v1.52.0...v1.52.1) (2023-09-02)
 
-
 ### Bug Fixes
 
-* update proxies ([467d0bc](https://github.com/MetaCubeX/metacubexd/commit/467d0bcce2bd7e0764c847ae3a8231a6ddcf034b))
+- update proxies ([467d0bc](https://github.com/MetaCubeX/metacubexd/commit/467d0bcce2bd7e0764c847ae3a8231a6ddcf034b))
 
 ## [1.52.0](https://github.com/MetaCubeX/metacubexd/compare/v1.51.1...v1.52.0) (2023-09-02)
 
-
 ### Features
 
-* auto switch theme ([0bbc661](https://github.com/MetaCubeX/metacubexd/commit/0bbc661e93698312e162e0b8391aea20b553c9a9))
+- auto switch theme ([0bbc661](https://github.com/MetaCubeX/metacubexd/commit/0bbc661e93698312e162e0b8391aea20b553c9a9))
 
 ## [1.51.1](https://github.com/MetaCubeX/metacubexd/compare/v1.51.0...v1.51.1) (2023-09-02)
 
-
 ### Bug Fixes
 
-* rules page && dns query for mobile ([86fd0d7](https://github.com/MetaCubeX/metacubexd/commit/86fd0d7d9db1aec5841f1b2e4931b98e789e5a93))
+- rules page && dns query for mobile ([86fd0d7](https://github.com/MetaCubeX/metacubexd/commit/86fd0d7d9db1aec5841f1b2e4931b98e789e5a93))
 
 ## [1.51.0](https://github.com/MetaCubeX/metacubexd/compare/v1.50.0...v1.51.0) (2023-09-02)
 
-
 ### Features
 
-* reset visible ([350fd56](https://github.com/MetaCubeX/metacubexd/commit/350fd56bc98b25dadf5675b4ecdff323565afe97))
-* rules provider pages ([65346ca](https://github.com/MetaCubeX/metacubexd/commit/65346ca743bf823da841d73c1f31022b1292c53a))
-
+- reset visible ([350fd56](https://github.com/MetaCubeX/metacubexd/commit/350fd56bc98b25dadf5675b4ecdff323565afe97))
+- rules provider pages ([65346ca](https://github.com/MetaCubeX/metacubexd/commit/65346ca743bf823da841d73c1f31022b1292c53a))
 
 ### Bug Fixes
 
-* update proxy provider api may throw ([ad46745](https://github.com/MetaCubeX/metacubexd/commit/ad46745329343dea2fe69e0b3b3561cab6b54436))
+- update proxy provider api may throw ([ad46745](https://github.com/MetaCubeX/metacubexd/commit/ad46745329343dea2fe69e0b3b3561cab6b54436))
 
 ## [1.50.0](https://github.com/MetaCubeX/metacubexd/compare/v1.49.0...v1.50.0) (2023-09-02)
 
-
 ### Features
 
-* separate provider page ([419d3e3](https://github.com/MetaCubeX/metacubexd/commit/419d3e33f31a80c21e2ba16864bcad70d9dd4665))
-
+- separate provider page ([419d3e3](https://github.com/MetaCubeX/metacubexd/commit/419d3e33f31a80c21e2ba16864bcad70d9dd4665))
 
 ### Bug Fixes
 
-* better update provider all ([68ef377](https://github.com/MetaCubeX/metacubexd/commit/68ef377f4bf8690cf3bd371d945e11fd5dcf9b50))
+- better update provider all ([68ef377](https://github.com/MetaCubeX/metacubexd/commit/68ef377f4bf8690cf3bd371d945e11fd5dcf9b50))
 
 ## [1.49.0](https://github.com/MetaCubeX/metacubexd/compare/v1.48.0...v1.49.0) (2023-09-02)
 
-
 ### Features
 
-* auto close all connections before switch proxy ([b79f10f](https://github.com/MetaCubeX/metacubexd/commit/b79f10f528e5a501f8d2b2e3d7e66eae820a00dd))
-* collapse proxies and provider ([8757924](https://github.com/MetaCubeX/metacubexd/commit/875792432a7d9ea495b0d76c22dd3876bef4c34a))
+- auto close all connections before switch proxy ([b79f10f](https://github.com/MetaCubeX/metacubexd/commit/b79f10f528e5a501f8d2b2e3d7e66eae820a00dd))
+- collapse proxies and provider ([8757924](https://github.com/MetaCubeX/metacubexd/commit/875792432a7d9ea495b0d76c22dd3876bef4c34a))
 
 ## [1.48.0](https://github.com/MetaCubeX/metacubexd/compare/v1.47.0...v1.48.0) (2023-09-02)
 
-
 ### Features
 
-* try defalut host and secret && adapt openclash ([fa612a1](https://github.com/MetaCubeX/metacubexd/commit/fa612a12d362a66f9506a7010d209f2bb7967b4b))
+- try defalut host and secret && adapt openclash ([fa612a1](https://github.com/MetaCubeX/metacubexd/commit/fa612a12d362a66f9506a7010d209f2bb7967b4b))
 
 ## [1.47.0](https://github.com/MetaCubeX/metacubexd/compare/v1.46.0...v1.47.0) (2023-09-02)
 
-
 ### Features
 
-* config for delay test ([e92ce75](https://github.com/MetaCubeX/metacubexd/commit/e92ce752251b107423ff945a10a23abce867c5b3))
+- config for delay test ([e92ce75](https://github.com/MetaCubeX/metacubexd/commit/e92ce752251b107423ff945a10a23abce867c5b3))
 
 ## [1.46.0](https://github.com/MetaCubeX/metacubexd/compare/v1.45.2...v1.46.0) (2023-09-02)
 
-
 ### Features
 
-* preview by auto ([3257791](https://github.com/MetaCubeX/metacubexd/commit/3257791dec6851cb02cb627cbba469bf93d9ad90))
-
+- preview by auto ([3257791](https://github.com/MetaCubeX/metacubexd/commit/3257791dec6851cb02cb627cbba469bf93d9ad90))
 
 ### Bug Fixes
 
-* init scroll from 30 && revert delay map ([c260db1](https://github.com/MetaCubeX/metacubexd/commit/c260db13df031152d02bcd5328da3b373d3b8741))
-* show option ([1351119](https://github.com/MetaCubeX/metacubexd/commit/135111914d58a5817781b3d657e0803f20e9e5e7))
+- init scroll from 30 && revert delay map ([c260db1](https://github.com/MetaCubeX/metacubexd/commit/c260db13df031152d02bcd5328da3b373d3b8741))
+- show option ([1351119](https://github.com/MetaCubeX/metacubexd/commit/135111914d58a5817781b3d657e0803f20e9e5e7))
 
 ## [1.45.2](https://github.com/MetaCubeX/metacubexd/compare/v1.45.1...v1.45.2) (2023-09-02)
 
-
 ### Bug Fixes
 
-* tool tip for mobile ([b0bac89](https://github.com/MetaCubeX/metacubexd/commit/b0bac89488b6f3a0b9fbe32f74f3ae0f0593cbe7))
+- tool tip for mobile ([b0bac89](https://github.com/MetaCubeX/metacubexd/commit/b0bac89488b6f3a0b9fbe32f74f3ae0f0593cbe7))
 
 ## [1.45.1](https://github.com/MetaCubeX/metacubexd/compare/v1.45.0...v1.45.1) (2023-09-02)
 
-
 ### Bug Fixes
 
-* dns query component layout ([2464896](https://github.com/MetaCubeX/metacubexd/commit/2464896a4635cf04377485316695807519104cd7))
+- dns query component layout ([2464896](https://github.com/MetaCubeX/metacubexd/commit/2464896a4635cf04377485316695807519104cd7))
 
 ## [1.45.0](https://github.com/MetaCubeX/metacubexd/compare/v1.44.1...v1.45.0) (2023-09-02)
 
-
 ### Features
 
-* **connections:** reset the ordering of columns ([9d3706f](https://github.com/MetaCubeX/metacubexd/commit/9d3706f39013b0c58860872a95b0c9266628e93c))
-* i18n for conn table ([33fa191](https://github.com/MetaCubeX/metacubexd/commit/33fa191cfed4e05aeb5bb94aaa7ead792ec8a736))
+- **connections:** reset the ordering of columns ([9d3706f](https://github.com/MetaCubeX/metacubexd/commit/9d3706f39013b0c58860872a95b0c9266628e93c))
+- i18n for conn table ([33fa191](https://github.com/MetaCubeX/metacubexd/commit/33fa191cfed4e05aeb5bb94aaa7ead792ec8a736))
 
 ## [1.44.1](https://github.com/MetaCubeX/metacubexd/compare/v1.44.0...v1.44.1) (2023-09-02)
 
-
 ### Bug Fixes
 
-* bar and delay reactive ([9ed0540](https://github.com/MetaCubeX/metacubexd/commit/9ed05401a891bf02af90541e08ec9358ada73cff))
+- bar and delay reactive ([9ed0540](https://github.com/MetaCubeX/metacubexd/commit/9ed05401a891bf02af90541e08ec9358ada73cff))
 
 ## [1.44.0](https://github.com/MetaCubeX/metacubexd/compare/v1.43.0...v1.44.0) (2023-09-02)
 
-
 ### Features
 
-* preview by bar ([4d29e7c](https://github.com/MetaCubeX/metacubexd/commit/4d29e7c16e64278f2172af4e00b34cf4b10a50ee))
+- preview by bar ([4d29e7c](https://github.com/MetaCubeX/metacubexd/commit/4d29e7c16e64278f2172af4e00b34cf4b10a50ee))
 
 ## [1.43.0](https://github.com/MetaCubeX/metacubexd/compare/v1.42.1...v1.43.0) (2023-09-02)
 
-
 ### Features
 
-* choose halloween as default theme ([a1dee05](https://github.com/MetaCubeX/metacubexd/commit/a1dee058255946a5d9e45f72773e9a1260f8bc51))
+- choose halloween as default theme ([a1dee05](https://github.com/MetaCubeX/metacubexd/commit/a1dee058255946a5d9e45f72773e9a1260f8bc51))
 
 ## [1.42.1](https://github.com/MetaCubeX/metacubexd/compare/v1.42.0...v1.42.1) (2023-09-02)
 
-
 ### Bug Fixes
 
-* bytesize in subs info ([4aa7c24](https://github.com/MetaCubeX/metacubexd/commit/4aa7c24ba4d56c49d25d55e69389c966872f5356))
+- bytesize in subs info ([4aa7c24](https://github.com/MetaCubeX/metacubexd/commit/4aa7c24ba4d56c49d25d55e69389c966872f5356))
 
 ## [1.42.0](https://github.com/MetaCubeX/metacubexd/compare/v1.41.2...v1.42.0) (2023-09-01)
 
-
 ### Features
 
-* adjust table border radius ([9a9b1b4](https://github.com/MetaCubeX/metacubexd/commit/9a9b1b4abef693d48dfa79c5cccd6f808d98e7ac))
+- adjust table border radius ([9a9b1b4](https://github.com/MetaCubeX/metacubexd/commit/9a9b1b4abef693d48dfa79c5cccd6f808d98e7ac))
 
 ## [1.41.2](https://github.com/MetaCubeX/metacubexd/compare/v1.41.1...v1.41.2) (2023-09-01)
 
-
 ### Bug Fixes
 
-* header tooltip on menu items instead of inner links ([2619b4f](https://github.com/MetaCubeX/metacubexd/commit/2619b4fd2f2e1f2921e5503196c11644d6e21708))
+- header tooltip on menu items instead of inner links ([2619b4f](https://github.com/MetaCubeX/metacubexd/commit/2619b4fd2f2e1f2921e5503196c11644d6e21708))
 
 ## [1.41.1](https://github.com/MetaCubeX/metacubexd/compare/v1.41.0...v1.41.1) (2023-09-01)
 
-
 ### Bug Fixes
 
-* some themes is overriding global font-family ([c8a41bd](https://github.com/MetaCubeX/metacubexd/commit/c8a41bd29f5b60dc79c6fc623c27d1fbba700408))
+- some themes is overriding global font-family ([c8a41bd](https://github.com/MetaCubeX/metacubexd/commit/c8a41bd29f5b60dc79c6fc623c27d1fbba700408))
 
 ## [1.41.0](https://github.com/MetaCubeX/metacubexd/compare/v1.40.0...v1.41.0) (2023-09-01)
 
-
 ### Features
 
-* publish gh-pages to a custom domain ([4b548fb](https://github.com/MetaCubeX/metacubexd/commit/4b548fb219581ad7fe7eea56eb52aeb082ab5bb9))
+- publish gh-pages to a custom domain ([4b548fb](https://github.com/MetaCubeX/metacubexd/commit/4b548fb219581ad7fe7eea56eb52aeb082ab5bb9))
 
 ## [1.40.0](https://github.com/MetaCubeX/metacubexd/compare/v1.39.0...v1.40.0) (2023-09-01)
 
-
 ### Features
 
-* **i18n:** setup page i18n support ([07ee55d](https://github.com/MetaCubeX/metacubexd/commit/07ee55d8d9a9551d1de3da5836436673433d4ba2))
+- **i18n:** setup page i18n support ([07ee55d](https://github.com/MetaCubeX/metacubexd/commit/07ee55d8d9a9551d1de3da5836436673433d4ba2))
 
 ## [1.39.0](https://github.com/MetaCubeX/metacubexd/compare/v1.38.0...v1.39.0) (2023-09-01)
 
-
 ### Features
 
-* **i18n:** add i18n support for navs ([3c7f01a](https://github.com/MetaCubeX/metacubexd/commit/3c7f01aefc4567886c4610aaf0753d037eeaf838))
-* **i18n:** add more i18n resources ([b3172da](https://github.com/MetaCubeX/metacubexd/commit/b3172da302ddf53a33f6ca092f11eac153401feb))
-* **i18n:** add toggle i18n button ([5620011](https://github.com/MetaCubeX/metacubexd/commit/56200111bd3dcb147e41dbcec2be6a7481b90f67))
-
+- **i18n:** add i18n support for navs ([3c7f01a](https://github.com/MetaCubeX/metacubexd/commit/3c7f01aefc4567886c4610aaf0753d037eeaf838))
+- **i18n:** add more i18n resources ([b3172da](https://github.com/MetaCubeX/metacubexd/commit/b3172da302ddf53a33f6ca092f11eac153401feb))
+- **i18n:** add toggle i18n button ([5620011](https://github.com/MetaCubeX/metacubexd/commit/56200111bd3dcb147e41dbcec2be6a7481b90f67))
 
 ### Bug Fixes
 
-* default lang ([508e19a](https://github.com/MetaCubeX/metacubexd/commit/508e19a247e90a7a83d1f386851eb13d19e2b58a))
+- default lang ([508e19a](https://github.com/MetaCubeX/metacubexd/commit/508e19a247e90a7a83d1f386851eb13d19e2b58a))
 
 ## [1.38.0](https://github.com/MetaCubeX/metacubexd/compare/v1.37.0...v1.38.0) (2023-09-01)
 
-
 ### Features
 
-* **logs:** render logs in table ([7eee024](https://github.com/MetaCubeX/metacubexd/commit/7eee024cdc2c831a75710d62e842ae648818dec8))
+- **logs:** render logs in table ([7eee024](https://github.com/MetaCubeX/metacubexd/commit/7eee024cdc2c831a75710d62e842ae648818dec8))
 
 ## [1.37.0](https://github.com/MetaCubeX/metacubexd/compare/v1.36.1...v1.37.0) (2023-09-01)
 
-
 ### Features
 
-* render in two line ([1807340](https://github.com/MetaCubeX/metacubexd/commit/18073407a6a096ef03433e5f8e4fafd2ebfc27c4))
+- render in two line ([1807340](https://github.com/MetaCubeX/metacubexd/commit/18073407a6a096ef03433e5f8e4fafd2ebfc27c4))
 
 ## [1.36.1](https://github.com/MetaCubeX/metacubexd/compare/v1.36.0...v1.36.1) (2023-09-01)
 
-
 ### Bug Fixes
 
-* card click ([25cbdad](https://github.com/MetaCubeX/metacubexd/commit/25cbdad8bc28021131dcadd4339b1b77942e6f71))
+- card click ([25cbdad](https://github.com/MetaCubeX/metacubexd/commit/25cbdad8bc28021131dcadd4339b1b77942e6f71))
 
 ## [1.36.0](https://github.com/MetaCubeX/metacubexd/compare/v1.35.1...v1.36.0) (2023-09-01)
 
-
 ### Features
 
-* infinite scroll for proxy card ([2584223](https://github.com/MetaCubeX/metacubexd/commit/258422353f340ae93cab791802a7ae54ae6c8046))
+- infinite scroll for proxy card ([2584223](https://github.com/MetaCubeX/metacubexd/commit/258422353f340ae93cab791802a7ae54ae6c8046))
 
 ## [1.35.1](https://github.com/MetaCubeX/metacubexd/compare/v1.35.0...v1.35.1) (2023-09-01)
 
-
 ### Bug Fixes
 
-* collapse render ([b26e033](https://github.com/MetaCubeX/metacubexd/commit/b26e03373fcc2516cf21acc51756dc2237406000))
+- collapse render ([b26e033](https://github.com/MetaCubeX/metacubexd/commit/b26e03373fcc2516cf21acc51756dc2237406000))
 
 ## [1.35.0](https://github.com/MetaCubeX/metacubexd/compare/v1.34.0...v1.35.0) (2023-09-01)
 
-
 ### Features
 
-* add PWA support ([a8c9c21](https://github.com/MetaCubeX/metacubexd/commit/a8c9c218985cd3cc470589aa3699a47bf280fd5e))
+- add PWA support ([a8c9c21](https://github.com/MetaCubeX/metacubexd/commit/a8c9c218985cd3cc470589aa3699a47bf280fd5e))
 
 ## [1.34.0](https://github.com/MetaCubeX/metacubexd/compare/v1.33.1...v1.34.0) (2023-09-01)
 
-
 ### Features
 
-* **stats:** flexible size stat on large screen ([f5866dc](https://github.com/MetaCubeX/metacubexd/commit/f5866dcd9dfcdf7d5377d34070d0315500f65742))
+- **stats:** flexible size stat on large screen ([f5866dc](https://github.com/MetaCubeX/metacubexd/commit/f5866dcd9dfcdf7d5377d34070d0315500f65742))
 
 ## [1.33.1](https://github.com/MetaCubeX/metacubexd/compare/v1.33.0...v1.33.1) (2023-09-01)
 
-
 ### Bug Fixes
 
-* cannot import module from connection ([3b774b9](https://github.com/MetaCubeX/metacubexd/commit/3b774b942358ffb2afa78e119093c2e696fda578))
-* **connections:** destination and host ([bbfd514](https://github.com/MetaCubeX/metacubexd/commit/bbfd5142a3bb8ac2ea1888befaff64c7b522010e))
-* import path ([13ff26c](https://github.com/MetaCubeX/metacubexd/commit/13ff26c9d3340c68483423d3adfa5dac31f25aed))
+- cannot import module from connection ([3b774b9](https://github.com/MetaCubeX/metacubexd/commit/3b774b942358ffb2afa78e119093c2e696fda578))
+- **connections:** destination and host ([bbfd514](https://github.com/MetaCubeX/metacubexd/commit/bbfd5142a3bb8ac2ea1888befaff64c7b522010e))
+- import path ([13ff26c](https://github.com/MetaCubeX/metacubexd/commit/13ff26c9d3340c68483423d3adfa5dac31f25aed))
 
 ## [1.33.0](https://github.com/MetaCubeX/metacubexd/compare/v1.32.0...v1.33.0) (2023-09-01)
 
-
 ### Features
 
-* speed test dot for proxy ([e9c6666](https://github.com/MetaCubeX/metacubexd/commit/e9c6666606c511be4f54582bb73d9bdcb3afd417))
-
+- speed test dot for proxy ([e9c6666](https://github.com/MetaCubeX/metacubexd/commit/e9c6666606c511be4f54582bb73d9bdcb3afd417))
 
 ### Bug Fixes
 
-* delay dot class import ([09a8ede](https://github.com/MetaCubeX/metacubexd/commit/09a8ede9690b0159e5becb294db51379ad21bc90))
+- delay dot class import ([09a8ede](https://github.com/MetaCubeX/metacubexd/commit/09a8ede9690b0159e5becb294db51379ad21bc90))
 
 ## [1.32.0](https://github.com/MetaCubeX/metacubexd/compare/v1.31.0...v1.32.0) (2023-09-01)
 
-
 ### Features
 
-* add a dns query form ([b42bba7](https://github.com/MetaCubeX/metacubexd/commit/b42bba784a11156cb7964f25de840197dedceee7))
+- add a dns query form ([b42bba7](https://github.com/MetaCubeX/metacubexd/commit/b42bba784a11156cb7964f25de840197dedceee7))
 
 ## [1.31.0](https://github.com/MetaCubeX/metacubexd/compare/v1.30.0...v1.31.0) (2023-09-01)
 
-
 ### Features
 
-* show subscription usage in a progress bar ([24bfadd](https://github.com/MetaCubeX/metacubexd/commit/24bfaddfc80f0373c181ea873fdc39885f67fe58))
-* subs info ([45da766](https://github.com/MetaCubeX/metacubexd/commit/45da766ed006ef51312206c17c9d65b9aa4a274b))
-
+- show subscription usage in a progress bar ([24bfadd](https://github.com/MetaCubeX/metacubexd/commit/24bfaddfc80f0373c181ea873fdc39885f67fe58))
+- subs info ([45da766](https://github.com/MetaCubeX/metacubexd/commit/45da766ed006ef51312206c17c9d65b9aa4a274b))
 
 ### Bug Fixes
 
-* process not shown ([f5d65eb](https://github.com/MetaCubeX/metacubexd/commit/f5d65eb018f8d2b706d99118e828cf47822cd435))
+- process not shown ([f5d65eb](https://github.com/MetaCubeX/metacubexd/commit/f5d65eb018f8d2b706d99118e828cf47822cd435))
 
 ## [1.30.0](https://github.com/MetaCubeX/metacubexd/compare/v1.29.0...v1.30.0) (2023-09-01)
 
-
 ### Features
 
-* fira sans font ([a00c28e](https://github.com/MetaCubeX/metacubexd/commit/a00c28e601ac587a68500084a76f28e503bde706))
-
+- fira sans font ([a00c28e](https://github.com/MetaCubeX/metacubexd/commit/a00c28e601ac587a68500084a76f28e503bde706))
 
 ### Bug Fixes
 
-* default listen port ([75e7c64](https://github.com/MetaCubeX/metacubexd/commit/75e7c64007e006ab1b502de4940bae1a4f3cf048))
+- default listen port ([75e7c64](https://github.com/MetaCubeX/metacubexd/commit/75e7c64007e006ab1b502de4940bae1a4f3cf048))
 
 ## [1.29.0](https://github.com/MetaCubeX/metacubexd/compare/v1.28.3...v1.29.0) (2023-09-01)
 
-
 ### Features
 
-* infinite scroll for rules ([a05c548](https://github.com/MetaCubeX/metacubexd/commit/a05c54854a3ffb1b9d079e14f9d48c0d2e79d2f3))
-
+- infinite scroll for rules ([a05c548](https://github.com/MetaCubeX/metacubexd/commit/a05c54854a3ffb1b9d079e14f9d48c0d2e79d2f3))
 
 ### Bug Fixes
 
-* set proxy both from proxies and provider ([2549bfe](https://github.com/MetaCubeX/metacubexd/commit/2549bfe89cc5dd97ff2eb17d2d66ec659f5f046c))
+- set proxy both from proxies and provider ([2549bfe](https://github.com/MetaCubeX/metacubexd/commit/2549bfe89cc5dd97ff2eb17d2d66ec659f5f046c))
 
 ## [1.28.3](https://github.com/MetaCubeX/metacubexd/compare/v1.28.2...v1.28.3) (2023-09-01)
 
-
 ### Bug Fixes
 
-* proxy from proxies ([42d9e7b](https://github.com/MetaCubeX/metacubexd/commit/42d9e7bc9f19169d9928157b97a948205ca9cff6))
+- proxy from proxies ([42d9e7b](https://github.com/MetaCubeX/metacubexd/commit/42d9e7bc9f19169d9928157b97a948205ca9cff6))
 
 ## [1.28.2](https://github.com/MetaCubeX/metacubexd/compare/v1.28.1...v1.28.2) (2023-09-01)
 
-
 ### Bug Fixes
 
-* card info color theme ([80d5138](https://github.com/MetaCubeX/metacubexd/commit/80d5138423312f4c11cd864a01fa353526cde127))
+- card info color theme ([80d5138](https://github.com/MetaCubeX/metacubexd/commit/80d5138423312f4c11cd864a01fa353526cde127))
 
 ## [1.28.1](https://github.com/MetaCubeX/metacubexd/compare/v1.28.0...v1.28.1) (2023-09-01)
 
-
 ### Bug Fixes
 
-* card color theme ([4e5c8bf](https://github.com/MetaCubeX/metacubexd/commit/4e5c8bfe8d525c0857b113447b690d48c953a56b))
+- card color theme ([4e5c8bf](https://github.com/MetaCubeX/metacubexd/commit/4e5c8bfe8d525c0857b113447b690d48c953a56b))
 
 ## [1.28.0](https://github.com/MetaCubeX/metacubexd/compare/v1.27.1...v1.28.0) (2023-09-01)
 
-
 ### Features
 
-* add twemoji font ([e4a89fc](https://github.com/MetaCubeX/metacubexd/commit/e4a89fc89ecf17420f15c88ea4c30d6ed62ba92a))
+- add twemoji font ([e4a89fc](https://github.com/MetaCubeX/metacubexd/commit/e4a89fc89ecf17420f15c88ea4c30d6ed62ba92a))
 
 ## [1.27.1](https://github.com/MetaCubeX/metacubexd/compare/v1.27.0...v1.27.1) (2023-08-31)
 
-
 ### Bug Fixes
 
-* border color ([c2cb607](https://github.com/MetaCubeX/metacubexd/commit/c2cb607a452b15da3fbfe9c1d2f5007f8b9fbcb6))
+- border color ([c2cb607](https://github.com/MetaCubeX/metacubexd/commit/c2cb607a452b15da3fbfe9c1d2f5007f8b9fbcb6))
 
 ## [1.27.0](https://github.com/MetaCubeX/metacubexd/compare/v1.26.0...v1.27.0) (2023-08-31)
 
-
 ### Features
 
-* sortable column ([4c4011a](https://github.com/MetaCubeX/metacubexd/commit/4c4011a617a5589da13dafcf357b9caef7bf5b32))
+- sortable column ([4c4011a](https://github.com/MetaCubeX/metacubexd/commit/4c4011a617a5589da13dafcf357b9caef7bf5b32))
 
 ## [1.26.0](https://github.com/MetaCubeX/metacubexd/compare/v1.25.1...v1.26.0) (2023-08-31)
 
-
 ### Features
 
-* columns hide ([cb9970c](https://github.com/MetaCubeX/metacubexd/commit/cb9970c29eae947d85e2ba196f92db360fd5add9))
+- columns hide ([cb9970c](https://github.com/MetaCubeX/metacubexd/commit/cb9970c29eae947d85e2ba196f92db360fd5add9))
 
 ## [1.25.1](https://github.com/MetaCubeX/metacubexd/compare/v1.25.0...v1.25.1) (2023-08-31)
 
-
 ### Bug Fixes
 
-* **connections:** update the look of close button ([eee81e6](https://github.com/MetaCubeX/metacubexd/commit/eee81e62585605794c6f77b99b5c82b0e3d03774))
+- **connections:** update the look of close button ([eee81e6](https://github.com/MetaCubeX/metacubexd/commit/eee81e62585605794c6f77b99b5c82b0e3d03774))
 
 ## [1.25.0](https://github.com/MetaCubeX/metacubexd/compare/v1.24.0...v1.25.0) (2023-08-31)
 
-
 ### Features
 
-* update secret when changed ([#48](https://github.com/MetaCubeX/metacubexd/issues/48)) ([935908e](https://github.com/MetaCubeX/metacubexd/commit/935908e0c1f4885a89a27008d5d7f6cd5e52ff68))
+- update secret when changed ([#48](https://github.com/MetaCubeX/metacubexd/issues/48)) ([935908e](https://github.com/MetaCubeX/metacubexd/commit/935908e0c1f4885a89a27008d5d7f6cd5e52ff68))
 
 ## [1.24.0](https://github.com/MetaCubeX/metacubexd/compare/v1.23.0...v1.24.0) (2023-08-31)
 
-
 ### Features
 
-* dayjs ([b4fc1b4](https://github.com/MetaCubeX/metacubexd/commit/b4fc1b4c983cebe7a52dd08f4b2b49dd6eb6a17d))
-* health check for provider ([03dda3c](https://github.com/MetaCubeX/metacubexd/commit/03dda3ccad684a326022022c7c83155ee9d32410))
+- dayjs ([b4fc1b4](https://github.com/MetaCubeX/metacubexd/commit/b4fc1b4c983cebe7a52dd08f4b2b49dd6eb6a17d))
+- health check for provider ([03dda3c](https://github.com/MetaCubeX/metacubexd/commit/03dda3ccad684a326022022c7c83155ee9d32410))
 
 ## [1.23.0](https://github.com/MetaCubeX/metacubexd/compare/v1.22.0...v1.23.0) (2023-08-31)
 
-
 ### Features
 
-* config port && hide id in table by default ([e0f5c46](https://github.com/MetaCubeX/metacubexd/commit/e0f5c46a2eb1876b7d412b773139c752414888e4))
-* update provider && rule pages style ([c0fee9d](https://github.com/MetaCubeX/metacubexd/commit/c0fee9d9298f807fb6380e72d49166609e9ac262))
+- config port && hide id in table by default ([e0f5c46](https://github.com/MetaCubeX/metacubexd/commit/e0f5c46a2eb1876b7d412b773139c752414888e4))
+- update provider && rule pages style ([c0fee9d](https://github.com/MetaCubeX/metacubexd/commit/c0fee9d9298f807fb6380e72d49166609e9ac262))
 
 ## [1.22.0](https://github.com/MetaCubeX/metacubexd/compare/v1.21.0...v1.22.0) (2023-08-30)
 
-
 ### Features
 
-* hide drawer on menu click ([7ce001c](https://github.com/MetaCubeX/metacubexd/commit/7ce001caa11c7aa5c177957777708316e731231d))
+- hide drawer on menu click ([7ce001c](https://github.com/MetaCubeX/metacubexd/commit/7ce001caa11c7aa5c177957777708316e731231d))
 
 ## [1.21.0](https://github.com/MetaCubeX/metacubexd/compare/v1.20.0...v1.21.0) (2023-08-30)
 
-
 ### Features
 
-* hide scrollbar, update overlay menu ([9919cca](https://github.com/MetaCubeX/metacubexd/commit/9919cca00e4315d0efd4dc0e8dcba9287de79f9b))
-* update header ([7a32ec4](https://github.com/MetaCubeX/metacubexd/commit/7a32ec4fe37fca26642e44402ef4309453c252c4))
-* update proxy layout ([b60c855](https://github.com/MetaCubeX/metacubexd/commit/b60c85566cbe4704dffe065a9e41c9c5c83c9365))
+- hide scrollbar, update overlay menu ([9919cca](https://github.com/MetaCubeX/metacubexd/commit/9919cca00e4315d0efd4dc0e8dcba9287de79f9b))
+- update header ([7a32ec4](https://github.com/MetaCubeX/metacubexd/commit/7a32ec4fe37fca26642e44402ef4309453c252c4))
+- update proxy layout ([b60c855](https://github.com/MetaCubeX/metacubexd/commit/b60c85566cbe4704dffe065a9e41c9c5c83c9365))
 
 ## [1.20.0](https://github.com/MetaCubeX/metacubexd/compare/v1.19.0...v1.20.0) (2023-08-30)
 
-
 ### Features
 
-* render protocl and udp ([44df379](https://github.com/MetaCubeX/metacubexd/commit/44df379fd6a18ef7d855dac91897480421e494e5))
-* truncate proxy node name ([6db7ced](https://github.com/MetaCubeX/metacubexd/commit/6db7ceddac226e81e4009d4e333f73bac985bd67))
-* update proxy layout ([83b0de8](https://github.com/MetaCubeX/metacubexd/commit/83b0de831a6d6eedc1c2b8ad74de1416752dd835))
-
+- render protocl and udp ([44df379](https://github.com/MetaCubeX/metacubexd/commit/44df379fd6a18ef7d855dac91897480421e494e5))
+- truncate proxy node name ([6db7ced](https://github.com/MetaCubeX/metacubexd/commit/6db7ceddac226e81e4009d4e333f73bac985bd67))
+- update proxy layout ([83b0de8](https://github.com/MetaCubeX/metacubexd/commit/83b0de831a6d6eedc1c2b8ad74de1416752dd835))
 
 ### Bug Fixes
 
-* card protocol text style ([4a03662](https://github.com/MetaCubeX/metacubexd/commit/4a03662bbd3a64a481bca96f0c81c78efd8bab7e))
+- card protocol text style ([4a03662](https://github.com/MetaCubeX/metacubexd/commit/4a03662bbd3a64a481bca96f0c81c78efd8bab7e))
 
 ## [1.19.0](https://github.com/MetaCubeX/metacubexd/compare/v1.18.0...v1.19.0) (2023-08-30)
 
-
 ### Features
 
-* proxy page style ([#47](https://github.com/MetaCubeX/metacubexd/issues/47)) ([51f7121](https://github.com/MetaCubeX/metacubexd/commit/51f712157fac4d727d7dedbb6f67428f05515e06))
+- proxy page style ([#47](https://github.com/MetaCubeX/metacubexd/issues/47)) ([51f7121](https://github.com/MetaCubeX/metacubexd/commit/51f712157fac4d727d7dedbb6f67428f05515e06))
 
 ## [1.18.0](https://github.com/MetaCubeX/metacubexd/compare/v1.17.0...v1.18.0) (2023-08-30)
 
-
 ### Features
 
-* **connections:** reverse chains ([43edb25](https://github.com/MetaCubeX/metacubexd/commit/43edb25c10e7ead51591b62ffe8e128275803c16))
-* prevent duplicate endpoints from being stored ([#45](https://github.com/MetaCubeX/metacubexd/issues/45)) ([e966288](https://github.com/MetaCubeX/metacubexd/commit/e96628845b2efc32d978f273c9e245a4e83c2246))
+- **connections:** reverse chains ([43edb25](https://github.com/MetaCubeX/metacubexd/commit/43edb25c10e7ead51591b62ffe8e128275803c16))
+- prevent duplicate endpoints from being stored ([#45](https://github.com/MetaCubeX/metacubexd/issues/45)) ([e966288](https://github.com/MetaCubeX/metacubexd/commit/e96628845b2efc32d978f273c9e245a4e83c2246))
 
 ## [1.17.0](https://github.com/MetaCubeX/metacubexd/compare/v1.16.0...v1.17.0) (2023-08-30)
 
-
 ### Features
 
-* redirect illegal path to overview ([#41](https://github.com/MetaCubeX/metacubexd/issues/41)) ([a114b35](https://github.com/MetaCubeX/metacubexd/commit/a114b35c1abcc5eb3b53c497ab689f9eb138deb7))
+- redirect illegal path to overview ([#41](https://github.com/MetaCubeX/metacubexd/issues/41)) ([a114b35](https://github.com/MetaCubeX/metacubexd/commit/a114b35c1abcc5eb3b53c497ab689f9eb138deb7))
 
 ## [1.16.0](https://github.com/MetaCubeX/metacubexd/compare/v1.15.0...v1.16.0) (2023-08-30)
 
-
 ### Features
 
-* route to override immediately after checking ([#39](https://github.com/MetaCubeX/metacubexd/issues/39)) ([b178161](https://github.com/MetaCubeX/metacubexd/commit/b178161dbd108f4ae9ed59352d0d0450113051f0))
-
+- route to override immediately after checking ([#39](https://github.com/MetaCubeX/metacubexd/issues/39)) ([b178161](https://github.com/MetaCubeX/metacubexd/commit/b178161dbd108f4ae9ed59352d0d0450113051f0))
 
 ### Bug Fixes
 
-* proxies title height ([b64cfa3](https://github.com/MetaCubeX/metacubexd/commit/b64cfa3f9a774143ceab492c26c67215dad6b195))
+- proxies title height ([b64cfa3](https://github.com/MetaCubeX/metacubexd/commit/b64cfa3f9a774143ceab492c26c67215dad6b195))
 
 ## [1.15.0](https://github.com/MetaCubeX/metacubexd/compare/v1.14.2...v1.15.0) (2023-08-30)
 
-
 ### Features
 
-* speed test ([#38](https://github.com/MetaCubeX/metacubexd/issues/38)) ([a57741b](https://github.com/MetaCubeX/metacubexd/commit/a57741baf6a2b435c5349fa64adcec7210910a78))
-
+- speed test ([#38](https://github.com/MetaCubeX/metacubexd/issues/38)) ([a57741b](https://github.com/MetaCubeX/metacubexd/commit/a57741baf6a2b435c5349fa64adcec7210910a78))
 
 ### Bug Fixes
 
-* support sing-box ([#36](https://github.com/MetaCubeX/metacubexd/issues/36)) ([4eeb345](https://github.com/MetaCubeX/metacubexd/commit/4eeb3458ccf389dda2a6e883877355da55149b66))
+- support sing-box ([#36](https://github.com/MetaCubeX/metacubexd/issues/36)) ([4eeb345](https://github.com/MetaCubeX/metacubexd/commit/4eeb3458ccf389dda2a6e883877355da55149b66))
 
 ## [1.14.2](https://github.com/MetaCubeX/metacubexd/compare/v1.14.1...v1.14.2) (2023-08-30)
 
-
 ### Bug Fixes
 
-* drop linux/arm/v7 ([f03c6fd](https://github.com/MetaCubeX/metacubexd/commit/f03c6fdf4cb5ff0916165c75c66ba54abb68c2d8))
+- drop linux/arm/v7 ([f03c6fd](https://github.com/MetaCubeX/metacubexd/commit/f03c6fdf4cb5ff0916165c75c66ba54abb68c2d8))
 
 ## [1.14.1](https://github.com/MetaCubeX/metacubexd/compare/v1.14.0...v1.14.1) (2023-08-30)
 
-
 ### Bug Fixes
 
-* support child path to fix router issue ([1091234](https://github.com/MetaCubeX/metacubexd/commit/10912347032f02e87c6754bb109510e1873a429f))
+- support child path to fix router issue ([1091234](https://github.com/MetaCubeX/metacubexd/commit/10912347032f02e87c6754bb109510e1873a429f))
 
 ## [1.14.0](https://github.com/MetaCubeX/metacubexd/compare/v1.13.2...v1.14.0) (2023-08-29)
 
-
 ### Features
 
-* **docker:** multi-platform support ([c7a8af4](https://github.com/MetaCubeX/metacubexd/commit/c7a8af420f35b1681680df48a4713e0639b586a5))
-
+- **docker:** multi-platform support ([c7a8af4](https://github.com/MetaCubeX/metacubexd/commit/c7a8af420f35b1681680df48a4713e0639b586a5))
 
 ### Bug Fixes
 
-* **dependabot:** package-ecosystem field is not a valid value ([567ffa8](https://github.com/MetaCubeX/metacubexd/commit/567ffa889463183a6a849af8fc03dd6de06fe81e))
+- **dependabot:** package-ecosystem field is not a valid value ([567ffa8](https://github.com/MetaCubeX/metacubexd/commit/567ffa889463183a6a849af8fc03dd6de06fe81e))
 
 ## [1.13.2](https://github.com/MetaCubeX/metacubexd/compare/v1.13.1...v1.13.2) (2023-08-29)
 
-
 ### Bug Fixes
 
-* remove permissions definition ([154d780](https://github.com/MetaCubeX/metacubexd/commit/154d7809f65f1b9794c4586219b4566161573538))
+- remove permissions definition ([154d780](https://github.com/MetaCubeX/metacubexd/commit/154d7809f65f1b9794c4586219b4566161573538))
 
 ## [1.13.1](https://github.com/MetaCubeX/metacubexd/compare/v1.13.0...v1.13.1) (2023-08-29)
 
-
 ### Bug Fixes
 
-* repository name should be lowercase ([5d5b9f2](https://github.com/MetaCubeX/metacubexd/commit/5d5b9f290e8dbc236cd70ba476a5769c0fbda25e))
+- repository name should be lowercase ([5d5b9f2](https://github.com/MetaCubeX/metacubexd/commit/5d5b9f290e8dbc236cd70ba476a5769c0fbda25e))
 
 ## [1.13.0](https://github.com/MetaCubeX/metacubexd/compare/v1.12.0...v1.13.0) (2023-08-29)
 
-
 ### Features
 
-* publish docker image ([7d5b3cd](https://github.com/MetaCubeX/metacubexd/commit/7d5b3cddccbb3eba86af2367d163664d2c8e8ba4))
+- publish docker image ([7d5b3cd](https://github.com/MetaCubeX/metacubexd/commit/7d5b3cddccbb3eba86af2367d163664d2c8e8ba4))
 
 ## [1.12.0](https://github.com/MetaCubeX/metacubexd/compare/v1.11.0...v1.12.0) (2023-08-29)
 
-
 ### Features
 
-* **footer:** drop footer ([fc0fbf9](https://github.com/MetaCubeX/metacubexd/commit/fc0fbf9daef45054a3f5e13e64e472823a6fe072))
-* **header:** responsive layout ([2d9daa9](https://github.com/MetaCubeX/metacubexd/commit/2d9daa96cc3bd0b947cd7b34dafcb56eca91cfbe))
+- **footer:** drop footer ([fc0fbf9](https://github.com/MetaCubeX/metacubexd/commit/fc0fbf9daef45054a3f5e13e64e472823a6fe072))
+- **header:** responsive layout ([2d9daa9](https://github.com/MetaCubeX/metacubexd/commit/2d9daa96cc3bd0b947cd7b34dafcb56eca91cfbe))
 
 ## [1.11.0](https://github.com/MetaCubeX/metacubexd/compare/v1.10.0...v1.11.0) (2023-08-29)
 
-
 ### Features
 
-* **connections:** fallback host column to destinationIP ([4e5f8d2](https://github.com/MetaCubeX/metacubexd/commit/4e5f8d2b3d6c6dc7519f8a12b1060ecf2bb32771))
-* show downlaod and upload speed in per-second form ([49bf6c7](https://github.com/MetaCubeX/metacubexd/commit/49bf6c7e2d76c7de0bf9cb6f538a369460080628))
+- **connections:** fallback host column to destinationIP ([4e5f8d2](https://github.com/MetaCubeX/metacubexd/commit/4e5f8d2b3d6c6dc7519f8a12b1060ecf2bb32771))
+- show downlaod and upload speed in per-second form ([49bf6c7](https://github.com/MetaCubeX/metacubexd/commit/49bf6c7e2d76c7de0bf9cb6f538a369460080628))
 
 ## [1.10.0](https://github.com/MetaCubeX/metacubexd/compare/v1.9.0...v1.10.0) (2023-08-29)
 
-
 ### Features
 
-* calculate download speed and upload speed ([6a1c1ab](https://github.com/MetaCubeX/metacubexd/commit/6a1c1abcbceffbc91c70a18e689a778be51c951c))
-* update connection columns ([7336948](https://github.com/MetaCubeX/metacubexd/commit/7336948ad3a5c422bd20b46e99ae056f8b4b53d9))
+- calculate download speed and upload speed ([6a1c1ab](https://github.com/MetaCubeX/metacubexd/commit/6a1c1abcbceffbc91c70a18e689a778be51c951c))
+- update connection columns ([7336948](https://github.com/MetaCubeX/metacubexd/commit/7336948ad3a5c422bd20b46e99ae056f8b4b53d9))
 
 ## [1.9.0](https://github.com/MetaCubeX/metacubexd/compare/v1.8.1...v1.9.0) (2023-08-29)
 
-
 ### Features
 
-* proxy selectable ([#19](https://github.com/MetaCubeX/metacubexd/issues/19)) ([6b08020](https://github.com/MetaCubeX/metacubexd/commit/6b0802023d3eeb41a76e7a3ee1087c5321a19100))
+- proxy selectable ([#19](https://github.com/MetaCubeX/metacubexd/issues/19)) ([6b08020](https://github.com/MetaCubeX/metacubexd/commit/6b0802023d3eeb41a76e7a3ee1087c5321a19100))
 
 ## [1.8.1](https://github.com/MetaCubeX/metacubexd/compare/v1.8.0...v1.8.1) (2023-08-29)
 
-
 ### Bug Fixes
 
-* charts data slice ([#17](https://github.com/MetaCubeX/metacubexd/issues/17)) ([35f8042](https://github.com/MetaCubeX/metacubexd/commit/35f80426ce083265ef469bf0d20b0ba219a37495))
+- charts data slice ([#17](https://github.com/MetaCubeX/metacubexd/issues/17)) ([35f8042](https://github.com/MetaCubeX/metacubexd/commit/35f80426ce083265ef469bf0d20b0ba219a37495))
 
 ## [1.8.0](https://github.com/MetaCubeX/metacubexd/compare/v1.7.0...v1.8.0) (2023-08-29)
 
-
 ### Features
 
-* proxy point && delay ([#15](https://github.com/MetaCubeX/metacubexd/issues/15)) ([341cdd0](https://github.com/MetaCubeX/metacubexd/commit/341cdd0113e80c21c267fd3f7286e3a90a1cc414))
+- proxy point && delay ([#15](https://github.com/MetaCubeX/metacubexd/issues/15)) ([341cdd0](https://github.com/MetaCubeX/metacubexd/commit/341cdd0113e80c21c267fd3f7286e3a90a1cc414))
 
 ## [1.7.0](https://github.com/MetaCubeX/metacubexd/compare/v1.6.0...v1.7.0) (2023-08-28)
 
-
 ### Features
 
-* add footer ([e4bfb3f](https://github.com/MetaCubeX/metacubexd/commit/e4bfb3f2a8e22ce2e32f4cc5a4493a40e81b6f5a))
-* small size table ([9b56558](https://github.com/MetaCubeX/metacubexd/commit/9b56558f84a644fa38c87916c5761b380518c910))
+- add footer ([e4bfb3f](https://github.com/MetaCubeX/metacubexd/commit/e4bfb3f2a8e22ce2e32f4cc5a4493a40e81b6f5a))
+- small size table ([9b56558](https://github.com/MetaCubeX/metacubexd/commit/9b56558f84a644fa38c87916c5761b380518c910))
 
 ## [1.6.0](https://github.com/MetaCubeX/metacubexd/compare/v1.5.0...v1.6.0) (2023-08-28)
 
-
 ### Features
 
-* update header layout ([07c82e8](https://github.com/MetaCubeX/metacubexd/commit/07c82e87d83b8117ad603857723b995f37a058f6))
-
+- update header layout ([07c82e8](https://github.com/MetaCubeX/metacubexd/commit/07c82e87d83b8117ad603857723b995f37a058f6))
 
 ### Bug Fixes
 
-* theme icon height ([#13](https://github.com/MetaCubeX/metacubexd/issues/13)) ([2889de2](https://github.com/MetaCubeX/metacubexd/commit/2889de205f1f9f862021fed96a808bb69b207f5d))
+- theme icon height ([#13](https://github.com/MetaCubeX/metacubexd/issues/13)) ([2889de2](https://github.com/MetaCubeX/metacubexd/commit/2889de205f1f9f862021fed96a808bb69b207f5d))
 
 ## [1.5.0](https://github.com/MetaCubeX/metacubexd/compare/v1.4.0...v1.5.0) (2023-08-28)
 
-
 ### Features
 
-* rules page ([#10](https://github.com/MetaCubeX/metacubexd/issues/10)) ([457b498](https://github.com/MetaCubeX/metacubexd/commit/457b49827dd38b61e63fd73e90a3736c956b4157))
+- rules page ([#10](https://github.com/MetaCubeX/metacubexd/issues/10)) ([457b498](https://github.com/MetaCubeX/metacubexd/commit/457b49827dd38b61e63fd73e90a3736c956b4157))
 
 ## [1.4.0](https://github.com/MetaCubeX/metacubexd/compare/v1.3.0...v1.4.0) (2023-08-27)
 
-
 ### Features
 
-* **connections:** add sorting and close connection support ([45c9740](https://github.com/MetaCubeX/metacubexd/commit/45c9740d3bee08e8cf874c3d866b9c9c3249a26e))
+- **connections:** add sorting and close connection support ([45c9740](https://github.com/MetaCubeX/metacubexd/commit/45c9740d3bee08e8cf874c3d866b9c9c3249a26e))
 
 ## [1.3.0](https://github.com/MetaCubeX/metacubexd/compare/v1.2.0...v1.3.0) (2023-08-27)
 
-
 ### Features
 
-* show vertical stats on small screen devices ([841161a](https://github.com/MetaCubeX/metacubexd/commit/841161a0da9f753bff3d9754b29fc0a653c97af9))
+- show vertical stats on small screen devices ([841161a](https://github.com/MetaCubeX/metacubexd/commit/841161a0da9f753bff3d9754b29fc0a653c97af9))
 
 ## [1.2.0](https://github.com/MetaCubeX/metacubexd/compare/v1.1.0...v1.2.0) (2023-08-27)
 
-
 ### Features
 
-* update proxies page layout ([54e5e1f](https://github.com/MetaCubeX/metacubexd/commit/54e5e1fc2407eff607b6225a957a13258164584c))
+- update proxies page layout ([54e5e1f](https://github.com/MetaCubeX/metacubexd/commit/54e5e1fc2407eff607b6225a957a13258164584c))
 
 ## [1.1.0](https://github.com/MetaCubeX/metacubexd/compare/v1.0.3...v1.1.0) (2023-08-27)
 
-
 ### Features
 
-* add bg color and text color for stats ([c273169](https://github.com/MetaCubeX/metacubexd/commit/c27316967b8685e600a3af9dd7698498f838bdda))
+- add bg color and text color for stats ([c273169](https://github.com/MetaCubeX/metacubexd/commit/c27316967b8685e600a3af9dd7698498f838bdda))
 
 ## [1.0.3](https://github.com/MetaCubeX/metacubexd/compare/v1.0.2...v1.0.3) (2023-08-27)
 
-
 ### Bug Fixes
 
-* publish zip instead of assets ([f7ee4f7](https://github.com/MetaCubeX/metacubexd/commit/f7ee4f7faa362afa60487f90b2ddae051f85b535))
+- publish zip instead of assets ([f7ee4f7](https://github.com/MetaCubeX/metacubexd/commit/f7ee4f7faa362afa60487f90b2ddae051f85b535))
 
 ## [1.0.2](https://github.com/MetaCubeX/metacubexd/compare/v1.0.1...v1.0.2) (2023-08-27)
 
-
 ### Bug Fixes
 
-* release artifacts ([3bab638](https://github.com/MetaCubeX/metacubexd/commit/3bab638f502efb6aedd1372feed829d95c3fd806))
+- release artifacts ([3bab638](https://github.com/MetaCubeX/metacubexd/commit/3bab638f502efb6aedd1372feed829d95c3fd806))
 
 ## [1.0.1](https://github.com/MetaCubeX/metacubexd/compare/v1.0.0...v1.0.1) (2023-08-27)
 
-
 ### Bug Fixes
 
-* publish issue ([a3897da](https://github.com/MetaCubeX/metacubexd/commit/a3897da0f631c12612ff8eb945cad5c9ab6eef24))
+- publish issue ([a3897da](https://github.com/MetaCubeX/metacubexd/commit/a3897da0f631c12612ff8eb945cad5c9ab6eef24))
 
 ## 1.0.0 (2023-08-27)
 
-
 ### Features
 
-* use hash router instead of browser ([#1](https://github.com/MetaCubeX/metacubexd/issues/1)) ([b9ab6a9](https://github.com/MetaCubeX/metacubexd/commit/b9ab6a924487a241719928ae00c3965efcbcc71b))
-
+- use hash router instead of browser ([#1](https://github.com/MetaCubeX/metacubexd/issues/1)) ([b9ab6a9](https://github.com/MetaCubeX/metacubexd/commit/b9ab6a924487a241719928ae00c3965efcbcc71b))
 
 ### Bug Fixes
 
-* layout issue on mobile platform ([35a02e4](https://github.com/MetaCubeX/metacubexd/commit/35a02e4174194efd09a3d1ac98dfd1817828e0f7))
-* setup failed when secret is required ([b660847](https://github.com/MetaCubeX/metacubexd/commit/b660847efee6e00461017244adaa63b1e7c2230a))
+- layout issue on mobile platform ([35a02e4](https://github.com/MetaCubeX/metacubexd/commit/35a02e4174194efd09a3d1ac98dfd1817828e0f7))
+- setup failed when secret is required ([b660847](https://github.com/MetaCubeX/metacubexd/commit/b660847efee6e00461017244adaa63b1e7c2230a))

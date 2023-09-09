@@ -30,7 +30,6 @@ import {
   proxiesOrderingType,
   proxiesPreviewType,
   renderInTwoColumns,
-  renderRulesAndProviderInTwoColumns,
   setAutoCloseConns,
   setAutoSwitchTheme,
   setFavDayTheme,
@@ -39,7 +38,6 @@ import {
   setProxiesOrderingType,
   setProxiesPreviewType,
   setRenderInTwoColumns,
-  setRenderRulesAndProviderInTwoColumns,
   setSelectedEndpoint,
   setTableSize,
   setTwemoji,
@@ -318,11 +316,6 @@ const ConfigForXd = () => {
       label: 'renderInTwoColumns',
       value: renderInTwoColumns,
       onChange: setRenderInTwoColumns,
-    },
-    {
-      label: 'renderRulesAndProviderInTwoColumns',
-      value: renderRulesAndProviderInTwoColumns,
-      onChange: setRenderRulesAndProviderInTwoColumns,
     },
     {
       label: 'autoSwitchTheme',
