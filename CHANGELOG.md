@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.85.0](https://github.com/MetaCubeX/metacubexd/compare/v1.84.0...v1.85.0) (2023-09-09)
+
+
+### Features
+
+* **rules:** tab style for rules page [#163](https://github.com/MetaCubeX/metacubexd/issues/163) ([#187](https://github.com/MetaCubeX/metacubexd/issues/187)) ([a9aa8e5](https://github.com/MetaCubeX/metacubexd/commit/a9aa8e540e975d27ed7a843f1e1b9ba3abcc02bd))
+
 ## [1.84.0](https://github.com/MetaCubeX/metacubexd/compare/v1.83.2...v1.84.0) (2023-09-08)
 
 ### Features
