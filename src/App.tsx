@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes, useNavigate } from '@solidjs/router'
 import { Show, createEffect, lazy, onMount } from 'solid-js'
+import { Toaster } from 'solid-toast'
 import { twMerge } from 'tailwind-merge'
 import { Header } from '~/components'
 import { ROUTES } from '~/constants'
@@ -71,6 +72,8 @@ export const App = () => {
           />
         </Routes>
       </div>
+
+      <Toaster position="bottom-center" />
     </div>
   )
 }

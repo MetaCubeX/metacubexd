@@ -73,4 +73,6 @@ export default {
   sequence: '序列号',
   payload: '内容',
   details: '详情',
+  endpointURL: '后端地址',
+  secret: '密钥',
 }

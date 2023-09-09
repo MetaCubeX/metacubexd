@@ -137,6 +137,9 @@ dependencies:
   solid-js:
     specifier: ^1.7.11
     version: 1.7.11
+  solid-toast:
+    specifier: ^0.5.0
+    version: 0.5.0(solid-js@1.7.11)
   sort-package-json:
     specifier: ^2.5.1
     version: 2.5.1
@@ -2913,13 +2916,6 @@ packages:
       }
     dev: false
 
-  /@types/node@20.5.9:
-    resolution:
-      {
-        integrity: sha512-PcGNd//40kHAS3sTlzKB9C9XL4K0sTup8nbG5lC14kzEteTNuAFh9u5nA0o5TWnSG2r/JNPRXFVcHJIIeRlmqQ==,
-      }
-    dev: false
-
   /@types/node@20.6.0:
     resolution:
       {
@@ -2940,7 +2936,7 @@ packages:
         integrity: sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==,
       }
     dependencies:
-      '@types/node': 20.5.9
+      '@types/node': 20.6.0
     dev: false
 
   /@types/semver@7.5.1:
@@ -5580,7 +5576,7 @@ packages:
       }
     engines: { node: '>= 10.13.0' }
     dependencies:
-      '@types/node': 20.5.9
+      '@types/node': 20.6.0
       merge-stream: 2.0.0
       supports-color: 7.2.0
     dev: false
@@ -7174,6 +7170,17 @@ packages:
       '@babel/generator': 7.22.15
       '@babel/helper-module-imports': 7.22.15
       '@babel/types': 7.22.15
+      solid-js: 1.7.11
+    dev: false
+
+  /solid-toast@0.5.0(solid-js@1.7.11):
+    resolution:
+      {
+        integrity: sha512-t770JakjyS2P9b8Qa1zMLOD51KYKWXbTAyJePVUoYex5c5FH5S/HtUBUbZAWFcqRCKmAE8KhyIiCvDZA8bOnxQ==,
+      }
+    peerDependencies:
+      solid-js: ^1.5.4
+    dependencies:
       solid-js: 1.7.11
     dev: false
 

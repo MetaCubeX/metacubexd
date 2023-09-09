@@ -5,9 +5,11 @@ import { useNavigate } from '@solidjs/router'
 import { IconX } from '@tabler/icons-solidjs'
 import ky from 'ky'
 import { For, onMount } from 'solid-js'
+import { toast } from 'solid-toast'
 import { v4 as uuid } from 'uuid'
 import { z } from 'zod'
 import { Button } from '~/components'
+import { transformEndpointURL } from '~/helpers'
 import {
   endpointList,
   selectedEndpoint,
@@ -16,7 +18,7 @@ import {
 } from '~/signals'
 
 const schema = z.object({
-  url: z.string().url().nonempty(),
+  url: z.string().nonempty(),
   secret: z.string(),
 })
 
@@ -39,7 +41,11 @@ export default () => {
           : {},
       })
       .then(({ ok }) => ok)
-      .catch(() => false)
+      .catch((err) => {
+        const { message } = err as Error
+
+        toast.error(message)
+      })
 
   const onEndpointSelect = async (id: string) => {
     const endpoint = endpointList().find((e) => e.id === id)
@@ -56,17 +62,19 @@ export default () => {
   }
 
   const onSubmit = async ({ url, secret }: { url: string; secret: string }) => {
-    if (!(await checkEndpoint(url, secret))) {
+    const transformedURL = transformEndpointURL(url)
+
+    if (!(await checkEndpoint(transformedURL, secret))) {
       return
     }
 
     const id = uuid()
     const list = endpointList().slice()
-    const point = list.find((history) => history.url === url)
+    const point = list.find((history) => history.url === transformedURL)
 
     if (!point) {
       // new host and secret
-      setEndpointList([{ id, url, secret }, ...list])
+      setEndpointList([{ id, url: transformedURL, secret }, ...list])
       onSetupSuccess(id)
 
       return
@@ -80,9 +88,16 @@ export default () => {
     onSetupSuccess(id)
   }
 
+  const onError = (err: unknown) => {
+    const { message } = err as Error
+
+    toast.error(message)
+  }
+
   const { form } = createForm<z.infer<typeof schema>>({
     extend: validator({ schema }),
     onSubmit,
+    onError,
   })
 
   const onRemove = (id: string) => {
@@ -116,27 +131,39 @@ export default () => {
   })
 
   return (
-    <div class="mx-auto flex flex-col items-center gap-4 py-10 sm:w-2/3">
+    <div class="mx-auto flex max-w-screen-md flex-col items-center gap-4 py-10">
       <form class="contents" use:form={form}>
         <div class="flex w-full flex-col gap-4">
-          <input
-            name="url"
-            type="url"
-            class="input input-bordered"
-            placeholder="host url"
-            list="defaultEndpoints"
-          />
+          <div class="flex-1">
+            <label class="label">
+              <span class="label-text">{t('endpointURL')}</span>
+            </label>
 
-          <datalist id="defaultEndpoints">
-            <option value="http://127.0.0.1:9090" />
-          </datalist>
+            <input
+              name="url"
+              type="url"
+              class="input input-bordered w-full"
+              placeholder="http://127.0.0.1:9090"
+              list="defaultEndpoints"
+            />
 
-          <input
-            name="secret"
-            type="password"
-            class="input input-bordered"
-            placeholder="secret"
-          />
+            <datalist id="defaultEndpoints">
+              <option value="http://127.0.0.1:9090" />
+            </datalist>
+          </div>
+
+          <div class="flex-1">
+            <label class="label">
+              <span class="label-text">{t('secret')}</span>
+            </label>
+
+            <input
+              name="secret"
+              type="password"
+              class="input input-bordered w-full"
+              placeholder="secret"
+            />
+          </div>
 
           <Button type="submit" class="btn-primary join-item uppercase">
             {t('add')}

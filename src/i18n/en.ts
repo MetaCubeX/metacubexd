@@ -73,4 +73,6 @@ export default {
   sequence: 'Sequence',
   payload: 'Payload',
   details: 'Details',
+  endpointURL: 'Endpoint URL',
+  secret: 'Secret',
 }
