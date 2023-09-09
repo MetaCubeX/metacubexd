@@ -1,9 +1,8 @@
 import { differenceWith, isNumber, unionWith } from 'lodash'
 import { Accessor, createEffect, createSignal, untrack } from 'solid-js'
 import { Connection, ConnectionRawMessage } from '~/types'
-import { selectedEndpoint, useWsRequest } from './request'
 
-type WsMsg = {
+export type WsMsg = {
   connections: ConnectionRawMessage[]
   uploadTotal: number
   downloadTotal: number
@@ -12,8 +11,9 @@ type WsMsg = {
 // we make connections global, so we can keep track of connections when user in proxy page
 // when user selects proxy and close some connections they can back and check connections
 // they closed
-let allConnections: Connection[] = []
-const setAllConnections = (allConns: Connection[]) => {
+export let allConnections: Connection[] = []
+
+export const setAllConnections = (allConns: Connection[]) => {
   allConnections = allConns
 }
 
@@ -23,12 +23,9 @@ export let latestConnectionMsg: Accessor<WsMsg> = () => ({
   connections: [],
 })
 
-createEffect(() => {
-  if (selectedEndpoint()) {
-    setAllConnections([])
-    latestConnectionMsg = useWsRequest<WsMsg>('connections')
-  }
-})
+export const setLatestConnectionMsg = (accessor: Accessor<WsMsg>) => {
+  latestConnectionMsg = accessor
+}
 
 export const useConnections = () => {
   const [closedConnections, setClosedConnections] = createSignal<Connection[]>(

@@ -3,6 +3,7 @@ import { useI18n } from '@solid-primitives/i18n'
 import { makePersisted } from '@solid-primitives/storage'
 import {
   IconCircleX,
+  IconInfoCircle,
   IconPlayerPause,
   IconPlayerPlay,
   IconSettings,
@@ -25,7 +26,7 @@ import {
 } from '@tanstack/solid-table'
 import byteSize from 'byte-size'
 import dayjs from 'dayjs'
-import { For, createMemo, createSignal } from 'solid-js'
+import { Component, For, Show, createMemo, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Button, ConnectionsTableOrderingModal } from '~/components'
 import {
@@ -35,6 +36,7 @@ import {
 } from '~/constants'
 import { formatTimeFromNow } from '~/helpers'
 import {
+  allConnections,
   tableSize,
   tableSizeClassName,
   useConnections,
@@ -48,6 +50,34 @@ type ColumnOrder = CONNECTIONS_TABLE_ACCESSOR_KEY[]
 enum ActiveTab {
   activeConnections = 'activeConnections',
   closedConnections = 'closedConnections',
+}
+
+const ConnectionDetailsModal: Component<{
+  selectedConnectionID?: string
+}> = (props) => {
+  return (
+    <dialog id="connections-table-details-modal" class="modal">
+      <div class="modal-box">
+        <Show when={props.selectedConnectionID}>
+          <pre>
+            <code>
+              {JSON.stringify(
+                allConnections.find(
+                  ({ id }) => id === props.selectedConnectionID,
+                ),
+                null,
+                2,
+              )}
+            </code>
+          </pre>
+        </Show>
+      </div>
+
+      <form method="dialog" class="modal-backdrop">
+        <button />
+      </form>
+    </dialog>
+  )
 }
 
 export default () => {
@@ -75,7 +105,33 @@ export default () => {
     },
   )
 
+  const [selectedConnectionID, setSelectedConnectionID] = createSignal<string>()
+
   const columns = createMemo<ColumnDef<Connection>[]>(() => [
+    {
+      header: () => t('details'),
+      enableGrouping: false,
+      enableSorting: false,
+      accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Details,
+      cell: ({ row }) => (
+        <div class="flex h-4 items-center">
+          <Button
+            class="btn-circle btn-xs"
+            onClick={() => {
+              setSelectedConnectionID(row.original.id)
+
+              const modal = document.querySelector(
+                '#connections-table-details-modal',
+              ) as HTMLDialogElement | null
+
+              modal?.showModal()
+            }}
+          >
+            <IconInfoCircle size="16" />
+          </Button>
+        </div>
+      ),
+    },
     {
       header: () => t('close'),
       enableGrouping: false,
@@ -196,9 +252,12 @@ export default () => {
   ])
 
   const [grouping, setGrouping] = createSignal<GroupingState>([])
-  const [sorting, setSorting] = createSignal<SortingState>([
-    { id: CONNECTIONS_TABLE_ACCESSOR_KEY.ConnectTime, desc: true },
-  ])
+  const [sorting, setSorting] = makePersisted(
+    createSignal<SortingState>([
+      { id: CONNECTIONS_TABLE_ACCESSOR_KEY.ConnectTime, desc: true },
+    ]),
+    { name: 'connectionsTableSorting', storage: localStorage },
+  )
 
   const table = createSolidTable({
     state: {
@@ -290,21 +349,19 @@ export default () => {
             <IconCircleX />
           </Button>
 
-          <label for="connection-modal" class="btn btn-circle btn-sm sm:btn-md">
-            <IconSettings />
-          </label>
-        </div>
+          <Button
+            class="btn btn-circle btn-sm sm:btn-md"
+            onClick={() => {
+              const modal = document.querySelector(
+                '#connections-table-ordering-modal',
+              ) as HTMLDialogElement | null
 
-        <ConnectionsTableOrderingModal
-          order={columnOrder()}
-          visible={columnVisibility()}
-          onOrderChange={(data: ColumnOrder) => {
-            setColumnOrder([...data])
-          }}
-          onVisibleChange={(data: ColumnVisibility) =>
-            setColumnVisibility({ ...data })
-          }
-        />
+              modal?.showModal()
+            }}
+          >
+            <IconSettings />
+          </Button>
+        </div>
       </div>
 
       <div class="overflow-x-auto whitespace-nowrap rounded-md bg-base-300">
@@ -371,8 +428,9 @@ export default () => {
                       <td
                         onContextMenu={(e) => {
                           e.preventDefault()
-                          typeof cell.renderValue() === 'string' &&
-                            void writeClipboard(cell.renderValue() as string)
+
+                          const value = cell.renderValue() as null | string
+                          value && writeClipboard(value).catch(() => {})
                         }}
                       >
                         {cell.getIsGrouped() ? (
@@ -423,6 +481,17 @@ export default () => {
           </tbody>
         </table>
       </div>
+
+      <ConnectionsTableOrderingModal
+        order={columnOrder()}
+        visible={columnVisibility()}
+        onOrderChange={(data: ColumnOrder) => setColumnOrder(data)}
+        onVisibleChange={(data: ColumnVisibility) =>
+          setColumnVisibility({ ...data })
+        }
+      />
+
+      <ConnectionDetailsModal selectedConnectionID={selectedConnectionID()} />
     </div>
   )
 }
