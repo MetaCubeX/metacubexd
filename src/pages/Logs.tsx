@@ -34,17 +34,32 @@ export default () => {
 
   const columns: ColumnDef<LogWithSeq>[] = [
     {
-      accessorKey: 'Sequence',
       header: t('sequence'),
       accessorFn: (row) => row.seq,
     },
     {
-      accessorKey: 'Type',
       header: t('type'),
-      accessorFn: (row) => row.type,
+      cell: ({ row }) => {
+        const type = row.original.type
+
+        let className = ''
+
+        switch (type) {
+          case 'error':
+            className = 'text-error'
+            break
+          case 'warning':
+            className = 'text-warning'
+            break
+          case 'info':
+            className = 'text-info'
+            break
+        }
+
+        return <span class={className}>{`[${row.original.type}]`}</span>
+      },
     },
     {
-      accessorKey: 'Payload',
       header: t('payload'),
       accessorFn: (row) => row.payload,
     },
