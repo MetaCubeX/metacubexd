@@ -41,7 +41,7 @@
     "commitlint": "^17.7.1",
     "daisyui": "^3.7.3",
     "dayjs": "^1.11.9",
-    "eslint": "^8.48.0",
+    "eslint": "^8.49.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
     "husky": "^8.0.3",
