@@ -20,17 +20,18 @@
 }
 
 ::-webkit-scrollbar:vertical {
-  width: 0px;
+  width: 0;
 }
 
 ::-webkit-scrollbar:horizontal {
-  height: 0px;
+  height: 0;
 }
 
-@media (min-width: 640px) {
+@media (width >= 640px) {
   ::-webkit-scrollbar-thumb {
     @apply rounded-box bg-primary;
   }
+
   ::-webkit-scrollbar:vertical {
     width: 6px;
   }
