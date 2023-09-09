@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.86.0](https://github.com/MetaCubeX/metacubexd/compare/v1.85.0...v1.86.0) (2023-09-09)
+
+
+### Features
+
+* **logs:** fixes [#194](https://github.com/MetaCubeX/metacubexd/issues/194) ([b000f91](https://github.com/MetaCubeX/metacubexd/commit/b000f919fc1db24ba03ab3eb4a327e8687564330))
+* **setup:** prefix endpoint url with current url protocol if missing ([e935aed](https://github.com/MetaCubeX/metacubexd/commit/e935aedfcf3629d038c084dc3491fb07bac1e54b))
+
 ## [1.85.0](https://github.com/MetaCubeX/metacubexd/compare/v1.84.0...v1.85.0) (2023-09-09)
 
 
