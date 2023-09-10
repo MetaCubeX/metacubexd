@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.88.0](https://github.com/MetaCubeX/metacubexd/compare/v1.87.0...v1.88.0) (2023-09-10)
+
+
+### Features
+
+* **connections:** close filtered connections ([4f8c4b2](https://github.com/MetaCubeX/metacubexd/commit/4f8c4b2d15fdee6a546f0290b9c42c860aa334fb))
+* **connections:** fuzzy filter ([9a144e8](https://github.com/MetaCubeX/metacubexd/commit/9a144e882dc7b33fd6a6e055b122533941a0361f))
+* **connections:** keyed connection rows and cells ([e7eb3dd](https://github.com/MetaCubeX/metacubexd/commit/e7eb3dd331e0059ccf366f1411a1be208fec2a2a))
+* **connections:** set CONNECTIONS_TABLE_MAX_CLOSED_ROWS to 200 ([b34ceb3](https://github.com/MetaCubeX/metacubexd/commit/b34ceb334d1b0df41d720ea471c9af7b694ae202))
+* **connections:** use Index instead of key ([07f461f](https://github.com/MetaCubeX/metacubexd/commit/07f461f1105f3bbb1322ea4d246227a313ce02a4))
+* **logs:** use Index instead of For ([669492f](https://github.com/MetaCubeX/metacubexd/commit/669492f22c2d72ab9c6c18d1630bd0179f0f933b))
+
 ## [1.87.0](https://github.com/MetaCubeX/metacubexd/compare/v1.86.1...v1.87.0) (2023-09-10)
 
 
