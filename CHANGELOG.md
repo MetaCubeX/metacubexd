@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.86.1](https://github.com/MetaCubeX/metacubexd/compare/v1.86.0...v1.86.1) (2023-09-10)
+
+
+### Bug Fixes
+
+* **proxies:** format proxy type ([1c61df8](https://github.com/MetaCubeX/metacubexd/commit/1c61df8b8b39fd587393bdaf8ee52c2da12e89ad))
+
 ## [1.86.0](https://github.com/MetaCubeX/metacubexd/compare/v1.85.0...v1.86.0) (2023-09-09)
 
 
