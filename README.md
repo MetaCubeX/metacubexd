@@ -1,15 +1,14 @@
-# metacubexd
-
-<p align="center">
-  <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fmetacubex%2Fmetacubexd&count_bg=%235C3DC8&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false" alt="hits" />
-  <img src="https://custom-icon-badges.herokuapp.com/github/issues-pr-closed/metacubex/metacubexd?color=purple&logo=git-pull-request&logoColor=white" alt="pr/issue" />
-  <img src="https://custom-icon-badges.herokuapp.com/github/last-commit/metacubex/metacubexd?logo=history&logoColor=white" alt="lastcommit" />
-  <img src="https://github.com/metacubex/metacubexd/actions/workflows/release.yml/badge.svg" alt="build-status" />
-  <img src="https://custom-icon-badges.herokuapp.com/github/v/release/metacubex/metacubexd?logo=rocket" alt="version">
-  <img src="https://custom-icon-badges.herokuapp.com/github/license/metacubex/metacubexd?logo=law&color=orange" alt="license" />
-</p>
+<h1 align="center">metacubexd</h1>
 
 <p align="center">Clash-Meta Dashboard</p>
+
+<p align="center">
+  <img src="https://img.shields.io/github/issues-pr-closed/metacubex/metacubexd?style=for-the-badge" alt="pr-closed" />
+  <img src="https://img.shields.io/github/last-commit/metacubex/metacubexd?style=for-the-badge" alt="last-commit" />
+  <img src="https://img.shields.io/github/actions/workflow/status/metacubex/metacubexd/release.yml?style=for-the-badge" alt="build" />
+  <img src="https://img.shields.io/github/downloads/metacubex/metacubexd/total?style=for-the-badge" alt="downloads">
+  <img src="https://img.shields.io/github/license/metacubex/metacubexd?style=for-the-badge" alt="license" />
+</p>
 
 ## Preview
 
