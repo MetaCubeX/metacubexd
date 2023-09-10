@@ -432,72 +432,66 @@ export default () => {
           </thead>
 
           <tbody>
-            <Index each={table.getRowModel().rows}>
-              {(keyedRow) => {
-                const row = keyedRow()
+            <For each={table.getRowModel().rows}>
+              {(row) => (
+                <tr class="h-8 hover:!bg-primary hover:text-primary-content">
+                  <For each={row.getVisibleCells()}>
+                    {(cell) => {
+                      return (
+                        <td
+                          onContextMenu={(e) => {
+                            e.preventDefault()
 
-                return (
-                  <tr class="h-8 hover:!bg-primary hover:text-primary-content">
-                    <Index each={row.getVisibleCells()}>
-                      {(keyedCell) => {
-                        const cell = keyedCell()
-
-                        return (
-                          <td
-                            onContextMenu={(e) => {
-                              e.preventDefault()
-
-                              const value = cell.renderValue() as null | string
-                              value && writeClipboard(value).catch(() => {})
-                            }}
-                          >
-                            {cell.getIsGrouped() ? (
-                              <button
-                                class={twMerge(
-                                  row.getCanExpand()
-                                    ? 'cursor-pointer'
-                                    : 'cursor-normal',
-                                  'flex items-center gap-2',
+                            const value = cell.renderValue() as null | string
+                            value && writeClipboard(value).catch(() => {})
+                          }}
+                        >
+                          {cell.getIsGrouped() ? (
+                            <button
+                              class={twMerge(
+                                row.getCanExpand()
+                                  ? 'cursor-pointer'
+                                  : 'cursor-normal',
+                                'flex items-center gap-2',
+                              )}
+                              onClick={row.getToggleExpandedHandler()}
+                            >
+                              <div>
+                                {row.getIsExpanded() ? (
+                                  <IconZoomOutFilled size={18} />
+                                ) : (
+                                  <IconZoomInFilled size={18} />
                                 )}
-                                onClick={row.getToggleExpandedHandler()}
-                              >
-                                <div>
-                                  {row.getIsExpanded() ? (
-                                    <IconZoomOutFilled size={18} />
-                                  ) : (
-                                    <IconZoomInFilled size={18} />
-                                  )}
-                                </div>
+                              </div>
 
-                                <div>
-                                  {flexRender(
-                                    cell.column.columnDef.cell,
-                                    cell.getContext(),
-                                  )}
-                                </div>
-
-                                <div>({row.subRows.length})</div>
-                              </button>
-                            ) : cell.getIsAggregated() ? (
-                              flexRender(
-                                cell.column.columnDef.aggregatedCell ??
+                              <div>
+                                {flexRender(
                                   cell.column.columnDef.cell,
-                                cell.getContext(),
-                              )
-                            ) : cell.getIsPlaceholder() ? null : (
-                              flexRender(
+                                  cell.getContext(),
+                                )}
+                              </div>
+
+                              <div>({row.subRows.length})</div>
+                            </button>
+                          ) : cell.getIsAggregated() ? (
+                            flexRender(
+                              cell.column.columnDef.aggregatedCell ??
                                 cell.column.columnDef.cell,
-                                cell.getContext(),
-                              )
-                            )}
-                          </td>
-                        )
-                      }}
-                    </Index>
-                  </tr>
-                )
-              }}
-            </Index>
+                              cell.getContext(),
+                            )
+                          ) : cell.getIsPlaceholder() ? null : (
+                            flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            )
+                          )}
+                        </td>
+                      )
+                    }}
+                  </For>
+                </tr>
+              )}
+            </For>
           </tbody>
         </table>
       </div>

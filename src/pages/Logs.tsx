@@ -5,8 +5,9 @@ import {
   flexRender,
   getCoreRowModel,
 } from '@tanstack/solid-table'
-import { For, createEffect, createSignal } from 'solid-js'
+import { For, Index, createEffect, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
+import { LOGS_TABLE_MAX_ROWS } from '~/constants'
 import { tableSize, tableSizeClassName, useWsRequest } from '~/signals'
 import { Log } from '~/types'
 
@@ -14,7 +15,7 @@ type LogWithSeq = Log & { seq: number }
 
 export default () => {
   const [t] = useI18n()
-  let seq = 0
+  let seq = 1
   const [search, setSearch] = createSignal('')
   const [logs, setLogs] = createSignal<LogWithSeq[]>([])
 
@@ -27,7 +28,7 @@ export default () => {
       return
     }
 
-    setLogs((logs) => [{ ...data, seq }, ...logs].slice(0, 100))
+    setLogs((logs) => [{ ...data, seq }, ...logs].slice(0, LOGS_TABLE_MAX_ROWS))
 
     seq++
   })
@@ -94,26 +95,34 @@ export default () => {
           )}
         >
           <thead class="sticky top-0 z-10">
-            <For each={table.getHeaderGroups()}>
-              {(headerGroup) => (
-                <tr>
-                  <For each={headerGroup.headers}>
-                    {(header) => (
-                      <th class="bg-base-300">
-                        <div>
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
-                        </div>
-                      </th>
-                    )}
-                  </For>
-                </tr>
-              )}
-            </For>
+            <Index each={table.getHeaderGroups()}>
+              {(keyedHeaderGroup) => {
+                const headerGroup = keyedHeaderGroup()
+
+                return (
+                  <tr>
+                    <Index each={headerGroup.headers}>
+                      {(keyedHeader) => {
+                        const header = keyedHeader()
+
+                        return (
+                          <th class="bg-base-300">
+                            <div>
+                              {header.isPlaceholder
+                                ? null
+                                : flexRender(
+                                    header.column.columnDef.header,
+                                    header.getContext(),
+                                  )}
+                            </div>
+                          </th>
+                        )
+                      }}
+                    </Index>
+                  </tr>
+                )
+              }}
+            </Index>
           </thead>
 
           <tbody>
