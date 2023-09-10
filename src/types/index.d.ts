@@ -169,3 +169,8 @@ export type DNSQuery = {
     type: number
   }[]
 }
+
+export type BackendVersion = {
+  meta: boolean
+  version: string
+}

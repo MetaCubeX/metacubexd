@@ -11,7 +11,6 @@ import {
   IconSettings,
 } from '@tabler/icons-solidjs'
 import { For, ParentComponent, Show, createSignal } from 'solid-js'
-import { twMerge } from 'tailwind-merge'
 import { LogoText } from '~/components'
 import { ROUTES, themes } from '~/constants'
 import { setCurTheme } from '~/signals'
@@ -44,7 +43,7 @@ const ThemeSwitcher = () => (
     <div class="drawer-side">
       <label for="themes" class="drawer-overlay" />
 
-      <ul class="menu rounded-l-box gap-2 bg-base-300 p-2 shadow">
+      <ul class="menu rounded-l-box gap-2 bg-base-300 p-2">
         <For each={themes}>
           {(theme) => (
             <li
@@ -101,9 +100,9 @@ export const Header = () => {
   const [openedDrawer, setOpenedDrawer] = createSignal(false)
 
   return (
-    <ul class="navbar sticky inset-x-0 top-0 z-50 flex w-auto items-center justify-center bg-base-300 px-4">
+    <ul class="navbar sticky inset-x-0 top-0 z-50 flex w-auto items-center justify-center bg-base-300 px-4 shadow-lg">
       <div class="navbar-start gap-4">
-        <div class={twMerge('drawer w-auto lg:hidden', '')}>
+        <div class="drawer w-auto lg:hidden">
           <input
             id="navs"
             type="checkbox"
@@ -121,7 +120,7 @@ export const Header = () => {
           <div class="drawer-side">
             <label for="navs" class="drawer-overlay" />
 
-            <ul class="menu rounded-r-box min-h-full w-2/5 gap-2 bg-base-300 pt-20 shadow">
+            <ul class="menu rounded-r-box min-h-full w-2/5 gap-2 bg-base-300 pt-20">
               <For each={navs()}>
                 {({ href, name }) => (
                   <li onClick={() => setOpenedDrawer(false)}>

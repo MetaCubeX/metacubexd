@@ -80,6 +80,7 @@ export default () => {
   return (
     <div class="flex h-full flex-col gap-4 p-1">
       <input
+        type="search"
         class="input input-primary flex-shrink-0"
         placeholder={t('search')}
         onInput={(e) => setSearch(e.target.value)}
