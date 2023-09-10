@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.88.1](https://github.com/MetaCubeX/metacubexd/compare/v1.88.0...v1.88.1) (2023-09-10)
+
+
+### Bug Fixes
+
+* **Dockerfile:** lock node alpine version ([6f5c1da](https://github.com/MetaCubeX/metacubexd/commit/6f5c1dade011dc0359366b832bbb0879e079e99f))
+
 ## [1.88.0](https://github.com/MetaCubeX/metacubexd/compare/v1.87.0...v1.88.0) (2023-09-10)
 
 
