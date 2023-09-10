@@ -128,6 +128,8 @@ export enum CONNECTIONS_TABLE_ACCESSOR_KEY {
   Destination = 'destination',
 }
 
+export const CONNECTIONS_TABLE_MAX_CLOSED_ROWS = 1000
+
 export const CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER = Object.values(
   CONNECTIONS_TABLE_ACCESSOR_KEY,
 )

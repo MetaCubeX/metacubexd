@@ -1,5 +1,6 @@
 import { differenceWith, isNumber, unionWith } from 'lodash'
 import { Accessor, createEffect, createSignal, untrack } from 'solid-js'
+import { CONNECTIONS_TABLE_MAX_CLOSED_ROWS } from '~/constants'
 import { Connection, ConnectionRawMessage } from '~/types'
 
 export type WsMsg = {
@@ -53,11 +54,17 @@ export const useConnections = () => {
       if (!paused()) {
         const closedConns = diffClosedConnections(activeConns, allConns)
 
-        setActiveConnections(activeConns.slice(-200))
-        setClosedConnections(closedConns.slice(-200))
+        setActiveConnections(activeConns)
+        setClosedConnections(
+          closedConns.slice(-CONNECTIONS_TABLE_MAX_CLOSED_ROWS),
+        )
       }
 
-      setAllConnections(allConns.slice(-400))
+      setAllConnections(
+        allConns.slice(
+          -(activeConns.length + CONNECTIONS_TABLE_MAX_CLOSED_ROWS),
+        ),
+      )
     })
   })
 

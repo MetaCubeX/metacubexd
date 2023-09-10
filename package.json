@@ -18,7 +18,6 @@
     "@solid-primitives/clipboard": "^1.5.7",
     "@solid-primitives/event-listener": "^2.3.0",
     "@solid-primitives/i18n": "^1.4.1",
-    "@solid-primitives/keyed": "^1.2.0",
     "@solid-primitives/media": "^2.2.5",
     "@solid-primitives/resize-observer": "^2.0.22",
     "@solid-primitives/storage": "^2.1.1",

@@ -1,6 +1,5 @@
 import { writeClipboard } from '@solid-primitives/clipboard'
 import { useI18n } from '@solid-primitives/i18n'
-import { Key } from '@solid-primitives/keyed'
 import { makePersisted } from '@solid-primitives/storage'
 import {
   IconCircleX,
@@ -29,7 +28,7 @@ import {
 } from '@tanstack/solid-table'
 import byteSize from 'byte-size'
 import dayjs from 'dayjs'
-import { For, createMemo, createSignal } from 'solid-js'
+import { For, Index, createMemo, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import {
   Button,
@@ -316,7 +315,7 @@ export default () => {
     <div class="flex h-full flex-col gap-2">
       <div class="flex w-full flex-wrap items-center gap-2">
         <div class="tabs-boxed tabs gap-2">
-          <Key each={tabs()} by={({ type }) => type}>
+          <Index each={tabs()}>
             {(tab) => (
               <button
                 class={twMerge(
@@ -329,7 +328,7 @@ export default () => {
                 <div class="badge badge-sm">{tab().count}</div>
               </button>
             )}
-          </Key>
+          </Index>
         </div>
 
         <div class="join flex w-full items-center md:flex-1">
@@ -433,16 +432,13 @@ export default () => {
           </thead>
 
           <tbody>
-            <Key each={table.getRowModel().rows} by={({ id }) => id}>
+            <Index each={table.getRowModel().rows}>
               {(keyedRow) => {
                 const row = keyedRow()
 
                 return (
                   <tr class="h-8 hover:!bg-primary hover:text-primary-content">
-                    <Key
-                      each={row.getVisibleCells()}
-                      by={({ row }) => row.original.id}
-                    >
+                    <Index each={row.getVisibleCells()}>
                       {(keyedCell) => {
                         const cell = keyedCell()
 
@@ -497,11 +493,11 @@ export default () => {
                           </td>
                         )
                       }}
-                    </Key>
+                    </Index>
                   </tr>
                 )
               }}
-            </Key>
+            </Index>
           </tbody>
         </table>
       </div>
