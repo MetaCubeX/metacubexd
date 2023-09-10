@@ -76,7 +76,7 @@ export const ConnectionsTableOrderingModal = (props: {
           'transition-transform': !!state.active.draggable,
         }}
       >
-        <div class="m-1 flex cursor-grab justify-between p-1">
+        <div class="my-1 flex cursor-grab justify-between p-1">
           <span class="select-none">{t(key)}</span>
           <input
             type="checkbox"
@@ -96,21 +96,21 @@ export const ConnectionsTableOrderingModal = (props: {
 
   return (
     <dialog id="connections-table-ordering-modal" class="modal">
-      <div class="modal-box w-80">
+      <div class="modal-box w-80" onContextMenu={(e) => e.preventDefault()}>
         <DragDropProvider
           onDragStart={onDragStart}
           onDragEnd={onDragEnd as DragEventHandler}
           collisionDetector={closestCenter}
         >
           <DragDropSensors />
-          <div class="column self-stretch">
-            <SortableProvider ids={props.order}>
-              <For each={props.order}>{(key) => <FormRow key={key} />}</For>
-            </SortableProvider>
-          </div>
+
+          <SortableProvider ids={props.order}>
+            <For each={props.order}>{(key) => <FormRow key={key} />}</For>
+          </SortableProvider>
+
           <DragOverlay>
             <Show when={activeKey()}>
-              <div class="sortable">{t(activeKey()!)}</div>
+              <div>{t(activeKey()!)}</div>
             </Show>
           </DragOverlay>
         </DragDropProvider>
