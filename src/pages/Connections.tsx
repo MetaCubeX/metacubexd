@@ -88,7 +88,9 @@ export default () => {
   const [activeTab, setActiveTab] = createSignal(ActiveTab.activeConnections)
   const { activeConnections, closedConnections, paused, setPaused } =
     useConnections()
-  const onCloseConnection = (id: string) => request.delete(`connections/${id}`)
+  const onAllConnectionsClose = () => request.delete('connections')
+  const onSingleConnectionClose = (id: string) =>
+    request.delete(`connections/${id}`)
 
   const [columnVisibility, setColumnVisibility] = makePersisted(
     createSignal<ColumnVisibility>(CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY),
@@ -112,6 +114,8 @@ export default () => {
       header: () => t('details'),
       enableGrouping: false,
       enableSorting: false,
+      enableColumnFilter: false,
+      enableGlobalFilter: false,
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Details,
       cell: ({ row }) => (
         <div class="flex h-4 items-center">
@@ -136,12 +140,14 @@ export default () => {
       header: () => t('close'),
       enableGrouping: false,
       enableSorting: false,
+      enableColumnFilter: false,
+      enableGlobalFilter: false,
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Close,
       cell: ({ row }) => (
         <div class="flex h-4 items-center">
           <Button
             class="btn-circle btn-xs"
-            onClick={() => onCloseConnection(row.original.id)}
+            onClick={() => onSingleConnectionClose(row.original.id)}
           >
             <IconCircleX size="16" />
           </Button>
@@ -276,6 +282,9 @@ export default () => {
       get globalFilter() {
         return search()
       },
+      get columnFilters() {
+        return []
+      },
     },
     get data() {
       return activeTab() === ActiveTab.activeConnections
@@ -328,30 +337,38 @@ export default () => {
           </For>
         </div>
 
-        <div class="flex w-full items-center gap-2 md:flex-1">
+        <div class="join flex w-full items-center md:flex-1">
           <input
             type="search"
-            class="input input-primary input-sm flex-1 sm:input-md"
+            class="input join-item input-primary flex-1 sm:input-md"
             placeholder={t('search')}
             onInput={(e) => setSearch(e.target.value)}
           />
 
           <Button
-            class="btn-circle btn-sm sm:btn-md"
+            class="join-item sm:btn-md"
             onClick={() => setPaused((paused) => !paused)}
           >
             {paused() ? <IconPlayerPlay /> : <IconPlayerPause />}
           </Button>
 
           <Button
-            class="btn-circle btn-sm sm:btn-md"
-            onClick={() => request.delete('connections')}
+            class="join-item sm:btn-md"
+            onClick={() => {
+              if (table.getState().globalFilter) {
+                table
+                  .getFilteredRowModel()
+                  .rows.forEach(({ id }) => onSingleConnectionClose(id))
+              } else {
+                onAllConnectionsClose()
+              }
+            }}
           >
             <IconCircleX />
           </Button>
 
           <Button
-            class="btn btn-circle btn-sm sm:btn-md"
+            class="btn join-item sm:btn-md"
             onClick={() => {
               const modal = document.querySelector(
                 '#connections-table-ordering-modal',
