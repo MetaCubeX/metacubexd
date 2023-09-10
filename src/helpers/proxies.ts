@@ -10,7 +10,7 @@ export const formatProxyType = (type = '') => {
   const t = type.toLowerCase()
 
   if (t.includes('shadowsocks')) {
-    return type.replace('shadowsocks', 'ss') // for both ss and ssr
+    return t.replace('shadowsocks', 'ss') // for both ss and ssr
   }
 
   if (t === 'hysteria') {
