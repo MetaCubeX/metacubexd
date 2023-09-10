@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.87.0](https://github.com/MetaCubeX/metacubexd/compare/v1.86.1...v1.87.0) (2023-09-10)
+
+
+### Features
+
+* minor improvements ([f4788bb](https://github.com/MetaCubeX/metacubexd/commit/f4788bb4634d73bac8ad0030849b0f60f971a610))
+
 ## [1.86.1](https://github.com/MetaCubeX/metacubexd/compare/v1.86.0...v1.86.1) (2023-09-10)
 
 
