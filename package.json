@@ -26,6 +26,7 @@
     "@solid-primitives/websocket": "^1.1.0",
     "@solidjs/router": "^0.8.3",
     "@tabler/icons-solidjs": "^2.34.0",
+    "@tanstack/match-sorter-utils": "^8.8.4",
     "@tanstack/solid-table": "^8.9.7",
     "@tanstack/solid-virtual": "3.0.0-beta.6",
     "@thisbeyond/solid-dnd": "^0.7.4",

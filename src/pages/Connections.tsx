@@ -13,8 +13,10 @@ import {
   IconZoomInFilled,
   IconZoomOutFilled,
 } from '@tabler/icons-solidjs'
+import { rankItem } from '@tanstack/match-sorter-utils'
 import {
   ColumnDef,
+  FilterFn,
   GroupingState,
   SortingState,
   createSolidTable,
@@ -27,9 +29,13 @@ import {
 } from '@tanstack/solid-table'
 import byteSize from 'byte-size'
 import dayjs from 'dayjs'
-import { Component, For, Show, createMemo, createSignal } from 'solid-js'
+import { For, createMemo, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import { Button, ConnectionsTableOrderingModal } from '~/components'
+import {
+  Button,
+  ConnectionsTableDetailsModal,
+  ConnectionsTableOrderingModal,
+} from '~/components'
 import {
   CONNECTIONS_TABLE_ACCESSOR_KEY,
   CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
@@ -37,7 +43,6 @@ import {
 } from '~/constants'
 import { formatTimeFromNow } from '~/helpers'
 import {
-  allConnections,
   tableSize,
   tableSizeClassName,
   useConnections,
@@ -53,39 +58,23 @@ enum ActiveTab {
   closedConnections = 'closedConnections',
 }
 
-const ConnectionDetailsModal: Component<{
-  selectedConnectionID?: string
-}> = (props) => {
-  return (
-    <dialog id="connections-table-details-modal" class="modal">
-      <div class="modal-box">
-        <Show when={props.selectedConnectionID}>
-          <pre>
-            <code>
-              {JSON.stringify(
-                allConnections.find(
-                  ({ id }) => id === props.selectedConnectionID,
-                ),
-                null,
-                2,
-              )}
-            </code>
-          </pre>
-        </Show>
-      </div>
+const fuzzyFilter: FilterFn<Connection> = (row, columnId, value, addMeta) => {
+  // Rank the item
+  const itemRank = rankItem(row.getValue(columnId), value)
 
-      <form method="dialog" class="modal-backdrop">
-        <button />
-      </form>
-    </dialog>
-  )
+  // Store the itemRank info
+  addMeta({
+    itemRank,
+  })
+
+  // Return if the item should be filtered in/out
+  return itemRank.passed
 }
 
 export default () => {
   const [t] = useI18n()
   const request = useRequest()
 
-  const [search, setSearch] = createSignal('')
   const [activeTab, setActiveTab] = createSignal(ActiveTab.activeConnections)
   const { activeConnections, closedConnections, paused, setPaused } =
     useConnections()
@@ -93,6 +82,7 @@ export default () => {
   const onSingleConnectionClose = (id: string) =>
     request.delete(`connections/${id}`)
 
+  const [globalFilter, setGlobalFilter] = createSignal('')
   const [columnVisibility, setColumnVisibility] = makePersisted(
     createSignal<ColumnVisibility>(CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY),
     {
@@ -267,6 +257,9 @@ export default () => {
   )
 
   const table = createSolidTable({
+    filterFns: {
+      fuzzy: fuzzyFilter,
+    },
     state: {
       get columnOrder() {
         return columnOrder()
@@ -281,7 +274,7 @@ export default () => {
         return columnVisibility()
       },
       get globalFilter() {
-        return search()
+        return globalFilter()
       },
       get columnFilters() {
         return []
@@ -295,7 +288,8 @@ export default () => {
     sortDescFirst: true,
     enableHiding: true,
     columns: columns(),
-    onGlobalFilterChange: setSearch,
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: fuzzyFilter,
     onGroupingChange: setGrouping,
     onSortingChange: setSorting,
     getFilteredRowModel: getFilteredRowModel(),
@@ -343,7 +337,7 @@ export default () => {
             type="search"
             class="input join-item input-primary flex-1 sm:input-md"
             placeholder={t('search')}
-            onInput={(e) => setSearch(e.target.value)}
+            onInput={(e) => setGlobalFilter(e.target.value)}
           />
 
           <Button
@@ -521,7 +515,9 @@ export default () => {
         }
       />
 
-      <ConnectionDetailsModal selectedConnectionID={selectedConnectionID()} />
+      <ConnectionsTableDetailsModal
+        selectedConnectionID={selectedConnectionID()}
+      />
     </div>
   )
 }

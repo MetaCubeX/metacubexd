@@ -50,6 +50,9 @@ dependencies:
   '@tabler/icons-solidjs':
     specifier: ^2.34.0
     version: 2.34.0(solid-js@1.7.11)
+  '@tanstack/match-sorter-utils':
+    specifier: ^8.8.4
+    version: 8.8.4
   '@tanstack/solid-table':
     specifier: ^8.9.7
     version: 8.9.7(solid-js@1.7.11)
@@ -2761,6 +2764,16 @@ packages:
       {
         integrity: sha512-65GsJsT4ZBETWcdrNxbsjsbRoZvbVk3CcU2SafaElrzP1wpOeuAn9aELVEbxhdyZyP9dg2SCfgH6iAArJgp7lw==,
       }
+    dev: false
+
+  /@tanstack/match-sorter-utils@8.8.4:
+    resolution:
+      {
+        integrity: sha512-rKH8LjZiszWEvmi01NR72QWZ8m4xmXre0OOwlRGnjU01Eqz/QnN+cqpty2PJ0efHblq09+KilvyR7lsbzmXVEw==,
+      }
+    engines: { node: '>=12' }
+    dependencies:
+      remove-accents: 0.4.2
     dev: false
 
   /@tanstack/solid-table@8.9.7(solid-js@1.7.11):
@@ -6839,6 +6852,13 @@ packages:
     hasBin: true
     dependencies:
       jsesc: 0.5.0
+    dev: false
+
+  /remove-accents@0.4.2:
+    resolution:
+      {
+        integrity: sha512-7pXIJqJOq5tFgG1A2Zxti3Ht8jJF337m4sowbuHsW30ZnkQFnDzy9qBNhgzX8ZLW4+UBcXiiR7SwR6pokHsxiA==,
+      }
     dev: false
 
   /require-directory@2.1.1:
