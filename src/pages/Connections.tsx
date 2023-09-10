@@ -1,5 +1,6 @@
 import { writeClipboard } from '@solid-primitives/clipboard'
 import { useI18n } from '@solid-primitives/i18n'
+import { Key } from '@solid-primitives/keyed'
 import { makePersisted } from '@solid-primitives/storage'
 import {
   IconCircleX,
@@ -321,20 +322,20 @@ export default () => {
     <div class="flex h-full flex-col gap-2">
       <div class="flex w-full flex-wrap items-center gap-2">
         <div class="tabs-boxed tabs gap-2">
-          <For each={tabs()}>
+          <Key each={tabs()} by={({ type }) => type}>
             {(tab) => (
               <button
                 class={twMerge(
-                  activeTab() === tab.type && 'tab-active',
+                  activeTab() === tab().type && 'tab-active',
                   'tab tab-sm gap-2 sm:tab-md',
                 )}
-                onClick={() => setActiveTab(tab.type)}
+                onClick={() => setActiveTab(tab().type)}
               >
-                <span>{tab.name}</span>
-                <div class="badge badge-sm">{tab.count}</div>
+                <span>{tab().name}</span>
+                <div class="badge badge-sm">{tab().count}</div>
               </button>
             )}
-          </For>
+          </Key>
         </div>
 
         <div class="join flex w-full items-center md:flex-1">
@@ -438,64 +439,75 @@ export default () => {
           </thead>
 
           <tbody>
-            <For each={table.getRowModel().rows}>
-              {(row) => (
-                <tr class="h-8 hover:!bg-primary hover:text-primary-content">
-                  <For each={row.getVisibleCells()}>
-                    {(cell) => (
-                      <td
-                        onContextMenu={(e) => {
-                          e.preventDefault()
+            <Key each={table.getRowModel().rows} by={({ id }) => id}>
+              {(keyedRow) => {
+                const row = keyedRow()
 
-                          const value = cell.renderValue() as null | string
-                          value && writeClipboard(value).catch(() => {})
-                        }}
-                      >
-                        {cell.getIsGrouped() ? (
-                          <button
-                            class={twMerge(
-                              row.getCanExpand()
-                                ? 'cursor-pointer'
-                                : 'cursor-normal',
-                              'flex items-center gap-2',
-                            )}
-                            onClick={row.getToggleExpandedHandler()}
+                return (
+                  <tr class="h-8 hover:!bg-primary hover:text-primary-content">
+                    <Key
+                      each={row.getVisibleCells()}
+                      by={({ row }) => row.original.id}
+                    >
+                      {(keyedCell) => {
+                        const cell = keyedCell()
+
+                        return (
+                          <td
+                            onContextMenu={(e) => {
+                              e.preventDefault()
+
+                              const value = cell.renderValue() as null | string
+                              value && writeClipboard(value).catch(() => {})
+                            }}
                           >
-                            <div>
-                              {row.getIsExpanded() ? (
-                                <IconZoomOutFilled size={18} />
-                              ) : (
-                                <IconZoomInFilled size={18} />
-                              )}
-                            </div>
+                            {cell.getIsGrouped() ? (
+                              <button
+                                class={twMerge(
+                                  row.getCanExpand()
+                                    ? 'cursor-pointer'
+                                    : 'cursor-normal',
+                                  'flex items-center gap-2',
+                                )}
+                                onClick={row.getToggleExpandedHandler()}
+                              >
+                                <div>
+                                  {row.getIsExpanded() ? (
+                                    <IconZoomOutFilled size={18} />
+                                  ) : (
+                                    <IconZoomInFilled size={18} />
+                                  )}
+                                </div>
 
-                            <div>
-                              {flexRender(
+                                <div>
+                                  {flexRender(
+                                    cell.column.columnDef.cell,
+                                    cell.getContext(),
+                                  )}
+                                </div>
+
+                                <div>({row.subRows.length})</div>
+                              </button>
+                            ) : cell.getIsAggregated() ? (
+                              flexRender(
+                                cell.column.columnDef.aggregatedCell ??
+                                  cell.column.columnDef.cell,
+                                cell.getContext(),
+                              )
+                            ) : cell.getIsPlaceholder() ? null : (
+                              flexRender(
                                 cell.column.columnDef.cell,
                                 cell.getContext(),
-                              )}
-                            </div>
-
-                            <div>({row.subRows.length})</div>
-                          </button>
-                        ) : cell.getIsAggregated() ? (
-                          flexRender(
-                            cell.column.columnDef.aggregatedCell ??
-                              cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )
-                        ) : cell.getIsPlaceholder() ? null : (
-                          flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )
-                        )}
-                      </td>
-                    )}
-                  </For>
-                </tr>
-              )}
-            </For>
+                              )
+                            )}
+                          </td>
+                        )
+                      }}
+                    </Key>
+                  </tr>
+                )
+              }}
+            </Key>
           </tbody>
         </table>
       </div>
