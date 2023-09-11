@@ -4,7 +4,7 @@ import { Connection, ConnectionRawMessage } from '~/types'
 import { selectedEndpoint, useWsRequest } from './request'
 
 type WsMsg = {
-  connections: ConnectionRawMessage[]
+  connections: ConnectionRawMessage[] | null
   uploadTotal: number
   downloadTotal: number
 } | null
