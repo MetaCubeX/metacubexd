@@ -5,8 +5,9 @@ import {
   flexRender,
   getCoreRowModel,
 } from '@tanstack/solid-table'
-import { For, createEffect, createSignal } from 'solid-js'
+import { For, Index, createEffect, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
+import { LOGS_TABLE_MAX_ROWS } from '~/constants'
 import { tableSize, tableSizeClassName, useWsRequest } from '~/signals'
 import { Log } from '~/types'
 
@@ -14,7 +15,7 @@ type LogWithSeq = Log & { seq: number }
 
 export default () => {
   const [t] = useI18n()
-  let seq = 0
+  let seq = 1
   const [search, setSearch] = createSignal('')
   const [logs, setLogs] = createSignal<LogWithSeq[]>([])
 
@@ -27,22 +28,40 @@ export default () => {
       return
     }
 
-    setLogs((logs) => [{ ...data, seq }, ...logs].slice(0, 100))
+    setLogs((logs) => [{ ...data, seq }, ...logs].slice(0, LOGS_TABLE_MAX_ROWS))
 
     seq++
   })
 
   const columns: ColumnDef<LogWithSeq>[] = [
     {
-      accessorKey: 'Sequence',
+      header: t('sequence'),
       accessorFn: (row) => row.seq,
     },
     {
-      accessorKey: 'Type',
-      accessorFn: (row) => row.type,
+      header: t('type'),
+      cell: ({ row }) => {
+        const type = row.original.type
+
+        let className = ''
+
+        switch (type) {
+          case 'error':
+            className = 'text-error'
+            break
+          case 'warning':
+            className = 'text-warning'
+            break
+          case 'info':
+            className = 'text-info'
+            break
+        }
+
+        return <span class={className}>{`[${row.original.type}]`}</span>
+      },
     },
     {
-      accessorKey: 'Payload',
+      header: t('payload'),
       accessorFn: (row) => row.payload,
     },
   ]
@@ -62,6 +81,7 @@ export default () => {
   return (
     <div class="flex h-full flex-col gap-4 p-1">
       <input
+        type="search"
         class="input input-primary flex-shrink-0"
         placeholder={t('search')}
         onInput={(e) => setSearch(e.target.value)}
@@ -75,26 +95,34 @@ export default () => {
           )}
         >
           <thead class="sticky top-0 z-10">
-            <For each={table.getHeaderGroups()}>
-              {(headerGroup) => (
-                <tr>
-                  <For each={headerGroup.headers}>
-                    {(header) => (
-                      <th class="bg-base-300">
-                        <div>
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
-                        </div>
-                      </th>
-                    )}
-                  </For>
-                </tr>
-              )}
-            </For>
+            <Index each={table.getHeaderGroups()}>
+              {(keyedHeaderGroup) => {
+                const headerGroup = keyedHeaderGroup()
+
+                return (
+                  <tr>
+                    <Index each={headerGroup.headers}>
+                      {(keyedHeader) => {
+                        const header = keyedHeader()
+
+                        return (
+                          <th class="bg-base-300">
+                            <div>
+                              {header.isPlaceholder
+                                ? null
+                                : flexRender(
+                                    header.column.columnDef.header,
+                                    header.getContext(),
+                                  )}
+                            </div>
+                          </th>
+                        )
+                      }}
+                    </Index>
+                  </tr>
+                )
+              }}
+            </Index>
           </thead>
 
           <tbody>

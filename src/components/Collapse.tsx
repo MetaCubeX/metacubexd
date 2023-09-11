@@ -51,7 +51,7 @@ export const Collapse: ParentComponent<Props> = (props) => {
         class={twMerge(
           getCollapseContentClassName(),
           mediaQueryClassName(),
-          'collapse-content grid auto-rows-min grid-cols-2 gap-2 transition-opacity duration-1000',
+          'collapse-content grid grid-cols-2 gap-2 transition-opacity duration-1000',
         )}
       >
         <Show when={props.isOpen}>{content}</Show>

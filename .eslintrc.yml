@@ -11,12 +11,13 @@ env:
 
 plugins:
   - '@typescript-eslint'
-  - 'prettier'
+  - prettier
 
 extends:
   - eslint:recommended
   - plugin:@typescript-eslint/eslint-recommended
   - plugin:@typescript-eslint/recommended
+  - prettier
 
 settings:
   import/resolver:
@@ -39,7 +40,7 @@ rules:
       prev: '*'
       next: if
     - blankLine: always
-      prev: 'if'
+      prev: if
       next: '*'
     - blankLine: always
       prev: '*'

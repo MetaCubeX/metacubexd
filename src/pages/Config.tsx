@@ -30,7 +30,6 @@ import {
   proxiesOrderingType,
   proxiesPreviewType,
   renderInTwoColumns,
-  renderRulesAndProviderInTwoColumns,
   setAutoCloseConns,
   setAutoSwitchTheme,
   setFavDayTheme,
@@ -39,7 +38,6 @@ import {
   setProxiesOrderingType,
   setProxiesPreviewType,
   setRenderInTwoColumns,
-  setRenderRulesAndProviderInTwoColumns,
   setSelectedEndpoint,
   setTableSize,
   setTwemoji,
@@ -49,7 +47,7 @@ import {
   useRequest,
   useTwemoji,
 } from '~/signals'
-import type { DNSQuery, Config as IConfig } from '~/types'
+import type { BackendVersion, DNSQuery, Config as IConfig } from '~/types'
 
 const dnsQueryFormSchema = z.object({
   name: z.string(),
@@ -87,7 +85,11 @@ const DNSQueryForm = () => {
   return (
     <div class="flex flex-col">
       <form use:form={form} class="flex flex-col gap-2 sm:flex-row">
-        <input name="name" class="input input-bordered w-full sm:flex-1" />
+        <input
+          type="search"
+          name="name"
+          class="input input-bordered w-full sm:flex-1"
+        />
 
         <div class="flex items-center gap-2">
           <select name="type" class="select select-bordered">
@@ -320,11 +322,6 @@ const ConfigForXd = () => {
       onChange: setRenderInTwoColumns,
     },
     {
-      label: 'renderRulesAndProviderInTwoColumns',
-      value: renderRulesAndProviderInTwoColumns,
-      onChange: setRenderRulesAndProviderInTwoColumns,
-    },
-    {
       label: 'autoSwitchTheme',
       value: autoSwitchTheme,
       onChange: (value: boolean) => {
@@ -431,6 +428,25 @@ const ConfigForXd = () => {
   )
 }
 
+const Versions = () => {
+  const request = useRequest()
+
+  const [backendVersion, setBackendVersion] = createSignal('')
+
+  onMount(async () => {
+    const { version } = await request.get('version').json<BackendVersion>()
+
+    setBackendVersion(version)
+  })
+
+  return (
+    <div class="flex gap-4">
+      <kbd class="kbd">{import.meta.env.version}</kbd>
+      <kbd class="kbd">{backendVersion()}</kbd>
+    </div>
+  )
+}
+
 export default () => {
   return (
     <div class="flex flex-col gap-4">
@@ -438,7 +454,7 @@ export default () => {
       <ConfigForm />
       <ConfigForXd />
 
-      <kbd class="kbd">{import.meta.env.version}</kbd>
+      <Versions />
     </div>
   )
 }

@@ -106,7 +106,7 @@ export type Connection = ConnectionRawMessage & {
 }
 
 export type Log = {
-  type: string
+  type: 'error' | 'warning' | 'info' | 'debug' | 'silent'
   payload: string
 }
 
@@ -168,4 +168,9 @@ export type DNSQuery = {
     name: string
     type: number
   }[]
+}
+
+export type BackendVersion = {
+  meta: boolean
+  version: string
 }

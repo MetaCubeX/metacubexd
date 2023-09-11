@@ -7,18 +7,18 @@ export const ForTwoColumns = (props: { subChild: JSX.Element[] }) => {
   const isShowTwoColumns = createMemo(
     () => windowSize.width >= 640 && renderInTwoColumns(),
   ) // 640 is sm size in daisyui
-  const leftCloumns = createMemo(() =>
+  const leftColumns = createMemo(() =>
     props.subChild.filter((_, index) => index % 2 === 0 || !isShowTwoColumns()),
   )
-  const rightCloumns = createMemo(() =>
+  const rightColumns = createMemo(() =>
     props.subChild.filter((_, index) => index % 2 === 1),
   )
 
   return (
     <div class="flex">
-      <div class="flex flex-1 flex-col">{leftCloumns()}</div>
+      <div class="flex flex-1 flex-col">{leftColumns()}</div>
       <Show when={isShowTwoColumns()}>
-        <div class="ml-2 flex flex-1 flex-col">{rightCloumns()}</div>
+        <div class="ml-2 flex flex-1 flex-col">{rightColumns()}</div>
       </Show>
     </div>
   )

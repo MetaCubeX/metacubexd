@@ -1,9 +1,9 @@
 import { differenceWith, isNumber, unionWith } from 'lodash'
 import { Accessor, createEffect, createSignal, untrack } from 'solid-js'
+import { CONNECTIONS_TABLE_MAX_CLOSED_ROWS } from '~/constants'
 import { Connection, ConnectionRawMessage } from '~/types'
-import { selectedEndpoint, useWsRequest } from './request'
 
-type WsMsg = {
+export type WsMsg = {
   connections: ConnectionRawMessage[] | null
   uploadTotal: number
   downloadTotal: number
@@ -12,8 +12,9 @@ type WsMsg = {
 // we make connections global, so we can keep track of connections when user in proxy page
 // when user selects proxy and close some connections they can back and check connections
 // they closed
-let allConnections: Connection[] = []
-const setAllConnections = (allConns: Connection[]) => {
+export let allConnections: Connection[] = []
+
+export const setAllConnections = (allConns: Connection[]) => {
   allConnections = allConns
 }
 
@@ -23,12 +24,9 @@ export let latestConnectionMsg: Accessor<WsMsg> = () => ({
   connections: [],
 })
 
-createEffect(() => {
-  if (selectedEndpoint()) {
-    setAllConnections([])
-    latestConnectionMsg = useWsRequest<WsMsg>('connections')
-  }
-})
+export const setLatestConnectionMsg = (accessor: Accessor<WsMsg>) => {
+  latestConnectionMsg = accessor
+}
 
 export const useConnections = () => {
   const [closedConnections, setClosedConnections] = createSignal<Connection[]>(
@@ -56,11 +54,17 @@ export const useConnections = () => {
       if (!paused()) {
         const closedConns = diffClosedConnections(activeConns, allConns)
 
-        setActiveConnections(activeConns.slice(-200))
-        setClosedConnections(closedConns.slice(-200))
+        setActiveConnections(activeConns)
+        setClosedConnections(
+          closedConns.slice(-CONNECTIONS_TABLE_MAX_CLOSED_ROWS),
+        )
       }
 
-      setAllConnections(allConns.slice(-400))
+      setAllConnections(
+        allConns.slice(
+          -(activeConns.length + CONNECTIONS_TABLE_MAX_CLOSED_ROWS),
+        ),
+      )
     })
   })
 

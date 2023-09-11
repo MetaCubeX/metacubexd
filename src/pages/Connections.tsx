@@ -3,6 +3,7 @@ import { useI18n } from '@solid-primitives/i18n'
 import { makePersisted } from '@solid-primitives/storage'
 import {
   IconCircleX,
+  IconInfoCircle,
   IconPlayerPause,
   IconPlayerPlay,
   IconSettings,
@@ -11,8 +12,10 @@ import {
   IconZoomInFilled,
   IconZoomOutFilled,
 } from '@tabler/icons-solidjs'
+import { rankItem } from '@tanstack/match-sorter-utils'
 import {
   ColumnDef,
+  FilterFn,
   GroupingState,
   SortingState,
   createSolidTable,
@@ -25,9 +28,13 @@ import {
 } from '@tanstack/solid-table'
 import byteSize from 'byte-size'
 import dayjs from 'dayjs'
-import { For, createMemo, createSignal } from 'solid-js'
+import { For, Index, createMemo, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import { Button, ConnectionsTableOrderingModal } from '~/components'
+import {
+  Button,
+  ConnectionsTableDetailsModal,
+  ConnectionsTableOrderingModal,
+} from '~/components'
 import {
   CONNECTIONS_TABLE_ACCESSOR_KEY,
   CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
@@ -50,16 +57,31 @@ enum ActiveTab {
   closedConnections = 'closedConnections',
 }
 
+const fuzzyFilter: FilterFn<Connection> = (row, columnId, value, addMeta) => {
+  // Rank the item
+  const itemRank = rankItem(row.getValue(columnId), value)
+
+  // Store the itemRank info
+  addMeta({
+    itemRank,
+  })
+
+  // Return if the item should be filtered in/out
+  return itemRank.passed
+}
+
 export default () => {
   const [t] = useI18n()
   const request = useRequest()
 
-  const [search, setSearch] = createSignal('')
   const [activeTab, setActiveTab] = createSignal(ActiveTab.activeConnections)
   const { activeConnections, closedConnections, paused, setPaused } =
     useConnections()
-  const onCloseConnection = (id: string) => request.delete(`connections/${id}`)
+  const onAllConnectionsClose = () => request.delete('connections')
+  const onSingleConnectionClose = (id: string) =>
+    request.delete(`connections/${id}`)
 
+  const [globalFilter, setGlobalFilter] = createSignal('')
   const [columnVisibility, setColumnVisibility] = makePersisted(
     createSignal<ColumnVisibility>(CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY),
     {
@@ -75,17 +97,47 @@ export default () => {
     },
   )
 
+  const [selectedConnectionID, setSelectedConnectionID] = createSignal<string>()
+
   const columns = createMemo<ColumnDef<Connection>[]>(() => [
+    {
+      header: () => t('details'),
+      enableGrouping: false,
+      enableSorting: false,
+      enableColumnFilter: false,
+      enableGlobalFilter: false,
+      accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Details,
+      cell: ({ row }) => (
+        <div class="flex h-4 items-center">
+          <Button
+            class="btn-circle btn-xs"
+            onClick={() => {
+              setSelectedConnectionID(row.original.id)
+
+              const modal = document.querySelector(
+                '#connections-table-details-modal',
+              ) as HTMLDialogElement | null
+
+              modal?.showModal()
+            }}
+          >
+            <IconInfoCircle size="16" />
+          </Button>
+        </div>
+      ),
+    },
     {
       header: () => t('close'),
       enableGrouping: false,
       enableSorting: false,
+      enableColumnFilter: false,
+      enableGlobalFilter: false,
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Close,
       cell: ({ row }) => (
         <div class="flex h-4 items-center">
           <Button
             class="btn-circle btn-xs"
-            onClick={() => onCloseConnection(row.original.id)}
+            onClick={() => onSingleConnectionClose(row.original.id)}
           >
             <IconCircleX size="16" />
           </Button>
@@ -196,11 +248,17 @@ export default () => {
   ])
 
   const [grouping, setGrouping] = createSignal<GroupingState>([])
-  const [sorting, setSorting] = createSignal<SortingState>([
-    { id: CONNECTIONS_TABLE_ACCESSOR_KEY.ConnectTime, desc: true },
-  ])
+  const [sorting, setSorting] = makePersisted(
+    createSignal<SortingState>([
+      { id: CONNECTIONS_TABLE_ACCESSOR_KEY.ConnectTime, desc: true },
+    ]),
+    { name: 'connectionsTableSorting', storage: localStorage },
+  )
 
   const table = createSolidTable({
+    filterFns: {
+      fuzzy: fuzzyFilter,
+    },
     state: {
       get columnOrder() {
         return columnOrder()
@@ -215,7 +273,10 @@ export default () => {
         return columnVisibility()
       },
       get globalFilter() {
-        return search()
+        return globalFilter()
+      },
+      get columnFilters() {
+        return []
       },
     },
     get data() {
@@ -226,7 +287,8 @@ export default () => {
     sortDescFirst: true,
     enableHiding: true,
     columns: columns(),
-    onGlobalFilterChange: setSearch,
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: fuzzyFilter,
     onGroupingChange: setGrouping,
     onSortingChange: setSorting,
     getFilteredRowModel: getFilteredRowModel(),
@@ -253,58 +315,65 @@ export default () => {
     <div class="flex h-full flex-col gap-2">
       <div class="flex w-full flex-wrap items-center gap-2">
         <div class="tabs-boxed tabs gap-2">
-          <For each={tabs()}>
+          <Index each={tabs()}>
             {(tab) => (
               <button
                 class={twMerge(
-                  activeTab() === tab.type && 'tab-active',
+                  activeTab() === tab().type && 'tab-active',
                   'tab tab-sm gap-2 sm:tab-md',
                 )}
-                onClick={() => setActiveTab(tab.type)}
+                onClick={() => setActiveTab(tab().type)}
               >
-                <span>{tab.name}</span>
-                <div class="badge badge-sm">{tab.count}</div>
+                <span>{tab().name}</span>
+                <div class="badge badge-sm">{tab().count}</div>
               </button>
             )}
-          </For>
+          </Index>
         </div>
 
-        <div class="flex w-full items-center gap-2 md:flex-1">
+        <div class="join flex w-full items-center md:flex-1">
           <input
-            class="input input-primary input-sm flex-1 sm:input-md"
+            type="search"
+            class="input join-item input-primary flex-1 sm:input-md"
             placeholder={t('search')}
-            onInput={(e) => setSearch(e.target.value)}
+            onInput={(e) => setGlobalFilter(e.target.value)}
           />
 
           <Button
-            class="btn-circle btn-sm sm:btn-md"
+            class="join-item sm:btn-md"
             onClick={() => setPaused((paused) => !paused)}
           >
             {paused() ? <IconPlayerPlay /> : <IconPlayerPause />}
           </Button>
 
           <Button
-            class="btn-circle btn-sm sm:btn-md"
-            onClick={() => request.delete('connections')}
+            class="join-item sm:btn-md"
+            onClick={() => {
+              if (table.getState().globalFilter) {
+                table
+                  .getFilteredRowModel()
+                  .rows.forEach(({ id }) => onSingleConnectionClose(id))
+              } else {
+                onAllConnectionsClose()
+              }
+            }}
           >
             <IconCircleX />
           </Button>
 
-          <label for="connection-modal" class="btn btn-circle btn-sm sm:btn-md">
-            <IconSettings />
-          </label>
-        </div>
+          <Button
+            class="btn join-item sm:btn-md"
+            onClick={() => {
+              const modal = document.querySelector(
+                '#connections-table-ordering-modal',
+              ) as HTMLDialogElement | null
 
-        <ConnectionsTableOrderingModal
-          order={columnOrder()}
-          visible={columnVisibility()}
-          onOrderChange={(data: ColumnOrder) => {
-            setColumnOrder([...data])
-          }}
-          onVisibleChange={(data: ColumnVisibility) =>
-            setColumnVisibility({ ...data })
-          }
-        />
+              modal?.showModal()
+            }}
+          >
+            <IconSettings />
+          </Button>
+        </div>
       </div>
 
       <div class="overflow-x-auto whitespace-nowrap rounded-md bg-base-300">
@@ -367,55 +436,58 @@ export default () => {
               {(row) => (
                 <tr class="h-8 hover:!bg-primary hover:text-primary-content">
                   <For each={row.getVisibleCells()}>
-                    {(cell) => (
-                      <td
-                        onContextMenu={(e) => {
-                          e.preventDefault()
-                          typeof cell.renderValue() === 'string' &&
-                            void writeClipboard(cell.renderValue() as string)
-                        }}
-                      >
-                        {cell.getIsGrouped() ? (
-                          <button
-                            class={twMerge(
-                              row.getCanExpand()
-                                ? 'cursor-pointer'
-                                : 'cursor-normal',
-                              'flex items-center gap-2',
-                            )}
-                            onClick={row.getToggleExpandedHandler()}
-                          >
-                            <div>
-                              {row.getIsExpanded() ? (
-                                <IconZoomOutFilled size={18} />
-                              ) : (
-                                <IconZoomInFilled size={18} />
-                              )}
-                            </div>
+                    {(cell) => {
+                      return (
+                        <td
+                          onContextMenu={(e) => {
+                            e.preventDefault()
 
-                            <div>
-                              {flexRender(
+                            const value = cell.renderValue() as null | string
+                            value && writeClipboard(value).catch(() => {})
+                          }}
+                        >
+                          {cell.getIsGrouped() ? (
+                            <button
+                              class={twMerge(
+                                row.getCanExpand()
+                                  ? 'cursor-pointer'
+                                  : 'cursor-normal',
+                                'flex items-center gap-2',
+                              )}
+                              onClick={row.getToggleExpandedHandler()}
+                            >
+                              <div>
+                                {row.getIsExpanded() ? (
+                                  <IconZoomOutFilled size={18} />
+                                ) : (
+                                  <IconZoomInFilled size={18} />
+                                )}
+                              </div>
+
+                              <div>
+                                {flexRender(
+                                  cell.column.columnDef.cell,
+                                  cell.getContext(),
+                                )}
+                              </div>
+
+                              <div>({row.subRows.length})</div>
+                            </button>
+                          ) : cell.getIsAggregated() ? (
+                            flexRender(
+                              cell.column.columnDef.aggregatedCell ??
                                 cell.column.columnDef.cell,
-                                cell.getContext(),
-                              )}
-                            </div>
-
-                            <div>({row.subRows.length})</div>
-                          </button>
-                        ) : cell.getIsAggregated() ? (
-                          flexRender(
-                            cell.column.columnDef.aggregatedCell ??
+                              cell.getContext(),
+                            )
+                          ) : cell.getIsPlaceholder() ? null : (
+                            flexRender(
                               cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )
-                        ) : cell.getIsPlaceholder() ? null : (
-                          flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )
-                        )}
-                      </td>
-                    )}
+                              cell.getContext(),
+                            )
+                          )}
+                        </td>
+                      )
+                    }}
                   </For>
                 </tr>
               )}
@@ -423,6 +495,19 @@ export default () => {
           </tbody>
         </table>
       </div>
+
+      <ConnectionsTableOrderingModal
+        order={columnOrder()}
+        visible={columnVisibility()}
+        onOrderChange={(data: ColumnOrder) => setColumnOrder(data)}
+        onVisibleChange={(data: ColumnVisibility) =>
+          setColumnVisibility({ ...data })
+        }
+      />
+
+      <ConnectionsTableDetailsModal
+        selectedConnectionID={selectedConnectionID()}
+      />
     </div>
   )
 }

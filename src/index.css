@@ -12,30 +12,32 @@
 
 :root {
   scrollbar-width: thin;
-  scrollbar-color: hsl(var(--p)) transparent;
+  scrollbar-color: transparent transparent;
 }
 
 ::-webkit-scrollbar {
   background: transparent;
+  display: none;
 }
 
 ::-webkit-scrollbar:vertical {
-  width: 0px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar:horizontal {
-  height: 0px;
+  height: 6px;
 }
 
-@media (min-width: 640px) {
-  ::-webkit-scrollbar-thumb {
-    @apply rounded-box bg-primary;
-  }
-  ::-webkit-scrollbar:vertical {
-    width: 6px;
+@media (width >= 640px) {
+  :root {
+    scrollbar-color: hsl(var(--p)) transparent;
   }
 
-  ::-webkit-scrollbar:horizontal {
-    height: 6px;
+  ::-webkit-scrollbar {
+    display: block;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-box bg-primary;
   }
 }

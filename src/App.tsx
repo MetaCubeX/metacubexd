@@ -1,15 +1,20 @@
 import { Navigate, Route, Routes, useNavigate } from '@solidjs/router'
 import { Show, createEffect, lazy, onMount } from 'solid-js'
+import { Toaster } from 'solid-toast'
 import { twMerge } from 'tailwind-merge'
 import { Header } from '~/components'
 import { ROUTES } from '~/constants'
 import {
+  WsMsg,
   curTheme,
   endpoint,
   selectedEndpoint,
+  setAllConnections,
+  setLatestConnectionMsg,
   useAutoSwitchTheme,
   useProxies,
   useTwemoji,
+  useWsRequest,
 } from '~/signals'
 
 const Setup = lazy(() => import('~/pages/Setup'))
@@ -28,6 +33,8 @@ export const App = () => {
   createEffect(() => {
     if (selectedEndpoint() && endpoint()) {
       void useProxies().updateProxies()
+      setAllConnections([])
+      setLatestConnectionMsg(useWsRequest<WsMsg>('connections'))
     }
   })
 
@@ -65,6 +72,8 @@ export const App = () => {
           />
         </Routes>
       </div>
+
+      <Toaster position="bottom-center" />
     </div>
   )
 }

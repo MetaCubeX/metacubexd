@@ -110,6 +110,7 @@ export enum LANG {
 }
 
 export enum CONNECTIONS_TABLE_ACCESSOR_KEY {
+  Details = 'details',
   Close = 'close',
   ID = 'ID',
   Type = 'type',
@@ -127,6 +128,8 @@ export enum CONNECTIONS_TABLE_ACCESSOR_KEY {
   Destination = 'destination',
 }
 
+export const CONNECTIONS_TABLE_MAX_CLOSED_ROWS = 200
+
 export const CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER = Object.values(
   CONNECTIONS_TABLE_ACCESSOR_KEY,
 )
@@ -136,6 +139,8 @@ export const CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY = {
   ),
   [CONNECTIONS_TABLE_ACCESSOR_KEY.ID]: false,
 }
+
+export const LOGS_TABLE_MAX_ROWS = 1000
 
 export enum TAILWINDCSS_SIZE {
   XS = 'xs',

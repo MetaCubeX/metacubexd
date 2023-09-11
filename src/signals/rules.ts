@@ -5,7 +5,7 @@ import type { Rule, RuleProvider } from '~/types'
 export const useRules = () => {
   const request = useRequest()
   const [rules, setRules] = createSignal<Rule[]>([])
-  const [rulesProviders, setRulesProviders] = createSignal<RuleProvider[]>([])
+  const [ruleProviders, setRuleProviders] = createSignal<RuleProvider[]>([])
 
   const updateRules = async () => {
     const [{ rules }, { providers }] = await Promise.all([
@@ -16,12 +16,12 @@ export const useRules = () => {
     ])
 
     setRules(Object.values(rules))
-    setRulesProviders(Object.values(providers))
+    setRuleProviders(Object.values(providers))
   }
 
   const updateAllRuleProvider = async () => {
     await Promise.all(
-      rulesProviders().map((provider) => {
+      ruleProviders().map((provider) => {
         return request.put(`providers/rules/${provider.name}`)
       }),
     )
@@ -35,7 +35,7 @@ export const useRules = () => {
 
   return {
     rules,
-    rulesProviders,
+    ruleProviders,
     updateRules,
     updateAllRuleProvider,
     updateRuleProviderByName,

@@ -76,7 +76,7 @@ export const ConnectionsTableOrderingModal = (props: {
           'transition-transform': !!state.active.draggable,
         }}
       >
-        <div class="m-1 flex cursor-grab justify-between p-1">
+        <div class="my-1 flex cursor-grab justify-between p-1">
           <span class="select-none">{t(key)}</span>
           <input
             type="checkbox"
@@ -95,41 +95,40 @@ export const ConnectionsTableOrderingModal = (props: {
   }
 
   return (
-    <>
-      <input type="checkbox" id="connection-modal" class="modal-toggle" />
-      <div class="modal">
-        <div class="modal-box w-80">
-          <DragDropProvider
-            onDragStart={onDragStart}
-            onDragEnd={onDragEnd as DragEventHandler}
-            collisionDetector={closestCenter}
-          >
-            <DragDropSensors />
-            <div class="column self-stretch">
-              <SortableProvider ids={props.order}>
-                <For each={props.order}>{(key) => <FormRow key={key} />}</For>
-              </SortableProvider>
-            </div>
-            <DragOverlay>
-              <Show when={activeKey()}>
-                <div class="sortable">{t(activeKey()!)}</div>
-              </Show>
-            </DragOverlay>
-          </DragDropProvider>
+    <dialog id="connections-table-ordering-modal" class="modal">
+      <div class="modal-box w-80" onContextMenu={(e) => e.preventDefault()}>
+        <DragDropProvider
+          onDragStart={onDragStart}
+          onDragEnd={onDragEnd as DragEventHandler}
+          collisionDetector={closestCenter}
+        >
+          <DragDropSensors />
 
-          <Button
-            class="btn-neutral btn-sm ml-auto mt-4 block"
-            onClick={() => {
-              props.onOrderChange(CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER)
-              props.onVisibleChange(CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY)
-            }}
-          >
-            {t('reset')}
-          </Button>
-        </div>
+          <SortableProvider ids={props.order}>
+            <For each={props.order}>{(key) => <FormRow key={key} />}</For>
+          </SortableProvider>
 
-        <label class="modal-backdrop" for="connection-modal" />
+          <DragOverlay>
+            <Show when={activeKey()}>
+              <div>{t(activeKey()!)}</div>
+            </Show>
+          </DragOverlay>
+        </DragDropProvider>
+
+        <Button
+          class="btn-neutral btn-sm ml-auto mt-4 block"
+          onClick={() => {
+            props.onOrderChange(CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER)
+            props.onVisibleChange(CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY)
+          }}
+        >
+          {t('reset')}
+        </Button>
       </div>
-    </>
+
+      <form method="dialog" class="modal-backdrop">
+        <button />
+      </form>
+    </dialog>
   )
 }
