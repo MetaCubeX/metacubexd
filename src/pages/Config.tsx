@@ -11,6 +11,17 @@ import {
   onMount,
 } from 'solid-js'
 import { z } from 'zod'
+import {
+  fetchBackendConfigAPI,
+  fetchBackendVersionAPI,
+  restartBackendAPI,
+  restartingBackend,
+  updateBackendConfigAPI,
+  updateGEODatabasesAPI,
+  updatingGEODatabases,
+  upgradeBackendAPI,
+  upgradingBackend,
+} from '~/apis'
 import { Button } from '~/components'
 import {
   LANG,
@@ -28,7 +39,6 @@ import {
   backendConfig,
   favDayTheme,
   favNightTheme,
-  fetchBackendConfig,
   latencyTestTimeoutDuration,
   proxiesOrderingType,
   proxiesPreviewType,
@@ -47,12 +57,11 @@ import {
   setTwemoji,
   setUrlForLatencyTest,
   tableSize,
-  updateBackendConfig,
   urlForLatencyTest,
   useRequest,
   useTwemoji,
 } from '~/signals'
-import type { BackendVersion, DNSQuery } from '~/types'
+import type { DNSQuery } from '~/types'
 
 const dnsQueryFormSchema = z.object({
   name: z.string(),
@@ -130,7 +139,6 @@ const configFormSchema = z.object({
 
 const ConfigForm = () => {
   const [t] = useI18n()
-  const request = useRequest()
 
   const portsList = [
     {
@@ -160,46 +168,18 @@ const ConfigForm = () => {
   >({ extend: validator({ schema: configFormSchema }) })
 
   onMount(async () => {
-    const configs = await fetchBackendConfig()
+    const configs = await fetchBackendConfigAPI()
     setBackendConfig(configs)
     setInitialValues(configs)
     reset()
   })
-
-  const [updatingGEODatabases, setUpdatingGEODatabases] = createSignal(false)
-  const [upgrading, setUpgrading] = createSignal(false)
-  const [restarting, setRestarting] = createSignal(false)
-
-  const onUpdateGEODatabases = async () => {
-    setUpdatingGEODatabases(true)
-    try {
-      await request.post('configs/geo')
-    } catch {}
-    setUpdatingGEODatabases(false)
-  }
-
-  const onUpgrade = async () => {
-    setUpgrading(true)
-    try {
-      await request.post('upgrade')
-    } catch {}
-    setUpgrading(false)
-  }
-
-  const onRestart = async () => {
-    setRestarting(true)
-    try {
-      await request.post('restart')
-    } catch {}
-    setRestarting(false)
-  }
 
   return (
     <div class="flex flex-col gap-4">
       <select
         class="select select-bordered"
         value={backendConfig()?.mode}
-        onChange={(e) => updateBackendConfig('mode', e.target.value)}
+        onChange={(e) => updateBackendConfigAPI('mode', e.target.value)}
       >
         <option value={MODE_OPTIONS.Global}>{t('global')}</option>
         <option value={MODE_OPTIONS.Rule}>{t('rule')}</option>
@@ -226,15 +206,18 @@ const ConfigForm = () => {
       </form>
 
       <div class="flex flex-wrap items-center gap-2">
-        <Button loading={updatingGEODatabases()} onClick={onUpdateGEODatabases}>
+        <Button
+          loading={updatingGEODatabases()}
+          onClick={updateGEODatabasesAPI}
+        >
           {t('updateGEODatabases')}
         </Button>
 
-        <Button loading={upgrading()} onClick={onUpgrade}>
+        <Button loading={upgradingBackend()} onClick={upgradeBackendAPI}>
           {t('upgradeCore')}
         </Button>
 
-        <Button loading={restarting()} onClick={onRestart}>
+        <Button loading={restartingBackend()} onClick={restartBackendAPI}>
           {t('restartCore')}
         </Button>
       </div>
@@ -332,12 +315,12 @@ const ConfigForXd = () => {
 
   const checkboxList = [
     {
-      label: 'renderInTwoColumns',
+      label: t('renderInTwoColumns'),
       value: renderInTwoColumns,
       onChange: setRenderInTwoColumns,
     },
     {
-      label: 'autoSwitchTheme',
+      label: t('autoSwitchTheme'),
       value: autoSwitchTheme,
       onChange: (value: boolean) => {
         setAutoSwitchTheme(value)
@@ -346,7 +329,7 @@ const ConfigForXd = () => {
       subChild: autoSwitchThemeSubChild,
     },
     {
-      label: 'useTwemoji',
+      label: t('useTwemoji'),
       value: useTwemoji,
       onChange: setTwemoji,
     },
@@ -358,7 +341,7 @@ const ConfigForXd = () => {
         {(checkbox) => (
           <>
             <div class="flex flex-col">
-              <ConfigTitle>{t(checkbox.label)}</ConfigTitle>
+              <ConfigTitle>{checkbox.label}</ConfigTitle>
 
               <input
                 type="checkbox"
@@ -444,12 +427,10 @@ const ConfigForXd = () => {
 }
 
 const Versions = () => {
-  const request = useRequest()
-
   const [backendVersion, setBackendVersion] = createSignal('')
 
   onMount(async () => {
-    const { version } = await request.get('version').json<BackendVersion>()
+    const version = await fetchBackendVersionAPI()
 
     setBackendVersion(version)
   })

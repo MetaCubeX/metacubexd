@@ -30,6 +30,7 @@ import byteSize from 'byte-size'
 import dayjs from 'dayjs'
 import { For, Index, createMemo, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
+import { closeAllConnectionsAPI, closeSingleConnectionAPI } from '~/apis'
 import {
   Button,
   ConnectionsTableDetailsModal,
@@ -41,12 +42,7 @@ import {
   CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY,
 } from '~/constants'
 import { formatTimeFromNow } from '~/helpers'
-import {
-  tableSize,
-  tableSizeClassName,
-  useConnections,
-  useRequest,
-} from '~/signals'
+import { tableSize, tableSizeClassName, useConnections } from '~/signals'
 import type { Connection } from '~/types'
 
 type ColumnVisibility = Partial<Record<CONNECTIONS_TABLE_ACCESSOR_KEY, boolean>>
@@ -72,14 +68,10 @@ const fuzzyFilter: FilterFn<Connection> = (row, columnId, value, addMeta) => {
 
 export default () => {
   const [t] = useI18n()
-  const request = useRequest()
 
   const [activeTab, setActiveTab] = createSignal(ActiveTab.activeConnections)
   const { activeConnections, closedConnections, paused, setPaused } =
     useConnections()
-  const onAllConnectionsClose = () => request.delete('connections')
-  const onSingleConnectionClose = (id: string) =>
-    request.delete(`connections/${id}`)
 
   const [globalFilter, setGlobalFilter] = createSignal('')
   const [columnVisibility, setColumnVisibility] = makePersisted(
@@ -137,7 +129,7 @@ export default () => {
         <div class="flex h-4 items-center">
           <Button
             class="btn-circle btn-xs"
-            onClick={() => onSingleConnectionClose(row.original.id)}
+            onClick={() => closeSingleConnectionAPI(row.original.id)}
           >
             <IconCircleX size="16" />
           </Button>
@@ -352,9 +344,9 @@ export default () => {
               if (table.getState().globalFilter) {
                 table
                   .getFilteredRowModel()
-                  .rows.forEach(({ id }) => onSingleConnectionClose(id))
+                  .rows.forEach(({ id }) => closeSingleConnectionAPI(id))
               } else {
-                onAllConnectionsClose()
+                closeAllConnectionsAPI()
               }
             }}
           >

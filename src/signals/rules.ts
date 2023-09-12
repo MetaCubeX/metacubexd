@@ -1,18 +1,19 @@
 import { createSignal } from 'solid-js'
-import { useRequest } from '~/signals'
+import {
+  fetchRuleProvidersAPI,
+  fetchRulesAPI,
+  updateRuleProviderAPI,
+} from '~/apis'
 import type { Rule, RuleProvider } from '~/types'
 
 export const useRules = () => {
-  const request = useRequest()
   const [rules, setRules] = createSignal<Rule[]>([])
   const [ruleProviders, setRuleProviders] = createSignal<RuleProvider[]>([])
 
   const updateRules = async () => {
     const [{ rules }, { providers }] = await Promise.all([
-      request.get('rules').json<{ rules: Record<string, Rule> }>(),
-      request
-        .get('providers/rules')
-        .json<{ providers: Record<string, RuleProvider> }>(),
+      fetchRulesAPI(),
+      fetchRuleProvidersAPI(),
     ])
 
     setRules(Object.values(rules))
@@ -21,15 +22,13 @@ export const useRules = () => {
 
   const updateAllRuleProvider = async () => {
     await Promise.all(
-      ruleProviders().map((provider) => {
-        return request.put(`providers/rules/${provider.name}`)
-      }),
+      ruleProviders().map((provider) => updateRuleProviderAPI(provider.name)),
     )
     await updateRules()
   }
 
-  const updateRuleProviderByName = async (name: string) => {
-    await request.put(`providers/rules/${name}`)
+  const updateRuleProviderByName = async (providerName: string) => {
+    await updateRuleProviderAPI(providerName)
     await updateRules()
   }
 

@@ -1,16 +1,22 @@
 import { createSignal, untrack } from 'solid-js'
 import {
+  closeSingleConnectionAPI,
+  fetchProxiesAPI,
+  fetchProxyProvidersAPI,
+  proxyGroupLatencyTestAPI,
+  proxyProviderHealthCheck,
+  selectProxyInGroupAPI,
+  updateProxyProviderAPI,
+} from '~/apis'
+import {
   autoCloseConns,
   latencyTestTimeoutDuration,
-  urlForLatencyTest,
-  useRequest,
-} from '~/signals'
-import type { Proxy, ProxyNode, ProxyProvider } from '~/types'
-import {
   latestConnectionMsg,
   mergeAllConnections,
   restructRawMsgToConnection,
-} from './connections'
+  urlForLatencyTest,
+} from '~/signals'
+import type { Proxy, ProxyNode, ProxyProvider } from '~/types'
 
 type ProxyInfo = {
   name: string
@@ -50,14 +56,10 @@ const setProxiesInfo = (proxies: (Proxy | ProxyNode)[]) => {
 }
 
 export const useProxies = () => {
-  const request = useRequest()
-
   const updateProxies = async () => {
     const [{ providers }, { proxies }] = await Promise.all([
-      request
-        .get('providers/proxies')
-        .json<{ providers: Record<string, ProxyProvider> }>(),
-      request.get('proxies').json<{ proxies: Record<string, Proxy> }>(),
+      fetchProxyProvidersAPI(),
+      fetchProxiesAPI(),
     ])
 
     const sortIndex = [...(proxies['GLOBAL'].all ?? []), 'GLOBAL']
@@ -85,15 +87,11 @@ export const useProxies = () => {
     const proxyGroupList = proxies().slice()
     const proxyGroup = proxyGroupList.find((i) => i.name === proxy.name)!
 
-    await request.put(`proxies/${proxy.name}`, {
-      body: JSON.stringify({
-        name: proxyName,
-      }),
-    })
+    await selectProxyInGroupAPI(proxy.name, proxyName)
 
     if (autoCloseConns()) {
-      // we dont use activeConns from useConnection here for better performance
-      // and we use empty array to restruct msg because they are closed and they won't have speed anyway
+      // we don't use activeConns from useConnection here for better performance,
+      // and we use empty array to restruct msg because they are closed, they won't have speed anyway
       untrack(() => {
         const activeConns = restructRawMsgToConnection(
           latestConnectionMsg()?.connections ?? [],
@@ -103,7 +101,7 @@ export const useProxies = () => {
         if (activeConns.length > 0) {
           activeConns.forEach(({ id, chains }) => {
             if (chains.includes(proxy.name)) {
-              request.delete(`connections/${id}`)
+              closeSingleConnectionAPI(id)
             }
           })
           mergeAllConnections(activeConns)
@@ -116,14 +114,11 @@ export const useProxies = () => {
   }
 
   const latencyTestByProxyGroupName = async (proxyGroupName: string) => {
-    const data: Record<string, number> = await request
-      .get(`group/${proxyGroupName}/delay`, {
-        searchParams: {
-          url: urlForLatencyTest(),
-          timeout: latencyTestTimeoutDuration(),
-        },
-      })
-      .json()
+    const data = await proxyGroupLatencyTestAPI(
+      proxyGroupName,
+      urlForLatencyTest(),
+      latencyTestTimeoutDuration(),
+    )
 
     setLatencyMap({
       ...latencyMap(),
@@ -131,26 +126,22 @@ export const useProxies = () => {
     })
   }
 
-  const updateProviderByProviderName = async (proxyProviderName: string) => {
+  const updateProviderByProviderName = async (providerName: string) => {
     try {
-      await request.put(`providers/proxies/${proxyProviderName}`)
+      await updateProxyProviderAPI(providerName)
     } catch {}
     await updateProxies()
   }
 
   const updateAllProvider = async () => {
     await Promise.allSettled(
-      proxyProviders().map((provider) =>
-        request.put(`providers/proxies/${provider.name}`),
-      ),
+      proxyProviders().map((provider) => updateProxyProviderAPI(provider.name)),
     )
     await updateProxies()
   }
 
   const healthCheckByProviderName = async (providerName: string) => {
-    await request.get(`providers/proxies/${providerName}/healthcheck`, {
-      timeout: 20 * 1000,
-    })
+    await proxyProviderHealthCheck(providerName)
     await updateProxies()
   }
 
