@@ -111,6 +111,7 @@ export type Log = {
 }
 
 export type Config = {
+  mode: 'global' | 'rule' | 'direct'
   port: number
   'socks-port': number
   'redir-port': number
@@ -137,7 +138,6 @@ export type Config = {
   'allow-lan': boolean
   'bind-address': string
   'inbound-tfo': boolean
-  mode: 'rule' | 'global'
   UnifiedDelay: boolean
   'log-level': string
   ipv6: boolean

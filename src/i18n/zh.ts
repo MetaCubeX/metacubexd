@@ -75,4 +75,7 @@ export default {
   details: '详情',
   endpointURL: '后端地址',
   secret: '密钥',
+  global: '全局',
+  rule: '规则',
+  direct: '直连',
 }

@@ -75,4 +75,7 @@ export default {
   details: 'Details',
   endpointURL: 'Endpoint URL',
   secret: 'Secret',
+  global: 'Global',
+  rule: 'Rule',
+  direct: 'Direct',
 }

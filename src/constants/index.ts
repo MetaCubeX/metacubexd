@@ -36,7 +36,6 @@ export const themes = [
 export enum ROUTES {
   Overview = '/overview',
   Proxies = '/proxies',
-  ProxyProvider = '/proxyprovider',
   Rules = '/rules',
   Conns = '/conns',
   Log = '/logs',
@@ -147,4 +146,10 @@ export enum TAILWINDCSS_SIZE {
   SM = 'sm',
   MD = 'md',
   LG = 'lg',
+}
+
+export enum MODE_OPTIONS {
+  Global = 'global',
+  Rule = 'rule',
+  Direct = 'direct',
 }

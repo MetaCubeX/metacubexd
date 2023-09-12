@@ -14,6 +14,7 @@ import { z } from 'zod'
 import { Button } from '~/components'
 import {
   LANG,
+  MODE_OPTIONS,
   PROXIES_ORDERING_TYPE,
   PROXIES_PREVIEW_TYPE,
   ROUTES,
@@ -24,14 +25,17 @@ import {
   applyThemeByMode,
   autoCloseConns,
   autoSwitchTheme,
+  backendConfig,
   favDayTheme,
   favNightTheme,
+  fetchBackendConfig,
   latencyTestTimeoutDuration,
   proxiesOrderingType,
   proxiesPreviewType,
   renderInTwoColumns,
   setAutoCloseConns,
   setAutoSwitchTheme,
+  setBackendConfig,
   setFavDayTheme,
   setFavNightTheme,
   setLatencyTestTimeoutDuration,
@@ -43,11 +47,12 @@ import {
   setTwemoji,
   setUrlForLatencyTest,
   tableSize,
+  updateBackendConfig,
   urlForLatencyTest,
   useRequest,
   useTwemoji,
 } from '~/signals'
-import type { BackendVersion, DNSQuery, Config as IConfig } from '~/types'
+import type { BackendVersion, DNSQuery } from '~/types'
 
 const dnsQueryFormSchema = z.object({
   name: z.string(),
@@ -155,8 +160,8 @@ const ConfigForm = () => {
   >({ extend: validator({ schema: configFormSchema }) })
 
   onMount(async () => {
-    const configs = await request.get('configs').json<IConfig>()
-
+    const configs = await fetchBackendConfig()
+    setBackendConfig(configs)
     setInitialValues(configs)
     reset()
   })
@@ -191,6 +196,16 @@ const ConfigForm = () => {
 
   return (
     <div class="flex flex-col gap-4">
+      <select
+        class="select select-bordered"
+        value={backendConfig()?.mode}
+        onChange={(e) => updateBackendConfig('mode', e.target.value)}
+      >
+        <option value={MODE_OPTIONS.Global}>{t('global')}</option>
+        <option value={MODE_OPTIONS.Rule}>{t('rule')}</option>
+        <option value={MODE_OPTIONS.Direct}>{t('direct')}</option>
+      </select>
+
       <form class="contents" use:form={form}>
         <For each={portsList}>
           {(item) => (

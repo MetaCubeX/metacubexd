@@ -1,5 +1,6 @@
 import { makePersisted } from '@solid-primitives/storage'
 import { createSignal } from 'solid-js'
+import { toast } from 'solid-toast'
 import {
   LATENCY_QUALITY_MAP_HTTP,
   LATENCY_QUALITY_MAP_HTTPS,
@@ -7,7 +8,8 @@ import {
   PROXIES_PREVIEW_TYPE,
   TAILWINDCSS_SIZE,
 } from '~/constants'
-import { setCurTheme } from '~/signals'
+import { setCurTheme, useRequest } from '~/signals'
+import { Config } from '~/types'
 
 export const [proxiesPreviewType, setProxiesPreviewType] = makePersisted(
   createSignal(PROXIES_PREVIEW_TYPE.Auto),
@@ -102,4 +104,35 @@ export const useAutoSwitchTheme = () => {
   window
     .matchMedia('(prefers-color-scheme: dark)')
     .addEventListener('change', (event) => setTheme(event.matches))
+}
+
+export const [backendConfig, setBackendConfig] = createSignal<Config>()
+
+export const fetchBackendConfig = () => {
+  const request = useRequest()
+
+  return request.get('configs').json<Config>()
+}
+
+export const updateBackendConfig = async (
+  key: keyof Config,
+  value: Config[keyof Config],
+) => {
+  try {
+    const request = useRequest()
+
+    await request
+      .patch('configs', {
+        body: JSON.stringify({
+          [key]: value,
+        }),
+      })
+      .json<Config>()
+
+    const updatedConfig = await fetchBackendConfig()
+
+    setBackendConfig(updatedConfig)
+  } catch (err) {
+    toast.error((err as Error).message)
+  }
 }

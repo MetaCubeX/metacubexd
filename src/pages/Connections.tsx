@@ -334,20 +334,20 @@ export default () => {
         <div class="join flex w-full items-center md:flex-1">
           <input
             type="search"
-            class="input join-item input-primary flex-1 sm:input-md"
+            class="input join-item input-primary input-sm min-w-0 flex-1 sm:input-md"
             placeholder={t('search')}
             onInput={(e) => setGlobalFilter(e.target.value)}
           />
 
           <Button
-            class="join-item sm:btn-md"
+            class="join-item btn-sm sm:btn-md"
             onClick={() => setPaused((paused) => !paused)}
           >
             {paused() ? <IconPlayerPlay /> : <IconPlayerPause />}
           </Button>
 
           <Button
-            class="join-item sm:btn-md"
+            class="join-item btn-sm sm:btn-md"
             onClick={() => {
               if (table.getState().globalFilter) {
                 table
@@ -362,7 +362,7 @@ export default () => {
           </Button>
 
           <Button
-            class="btn join-item sm:btn-md"
+            class="btn join-item btn-sm sm:btn-md"
             onClick={() => {
               const modal = document.querySelector(
                 '#connections-table-ordering-modal',
