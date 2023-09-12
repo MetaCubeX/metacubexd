@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.89.0](https://github.com/MetaCubeX/metacubexd/compare/v1.88.1...v1.89.0) (2023-09-12)
+
+
+### Features
+
+* **config:** select tunnel mode ([34ea1f1](https://github.com/MetaCubeX/metacubexd/commit/34ea1f1c5657d466c360b1b1771571b06f67e423))
+
+
+### Bug Fixes
+
+* **overview:** error when reading length ([#188](https://github.com/MetaCubeX/metacubexd/issues/188)) ([9f227c9](https://github.com/MetaCubeX/metacubexd/commit/9f227c9c2c38718bf540bb5c9c5959a647d00af2))
+
 ## [1.88.1](https://github.com/MetaCubeX/metacubexd/compare/v1.88.0...v1.88.1) (2023-09-10)
 
 
