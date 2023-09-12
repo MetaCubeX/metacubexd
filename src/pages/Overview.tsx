@@ -103,7 +103,7 @@ export default () => {
         </TrafficWidget>
 
         <TrafficWidget label={t('activeConnections')}>
-          {latestConnectionMsg()?.connections.length || 0}
+          {latestConnectionMsg()?.connections?.length || 0}
         </TrafficWidget>
 
         <TrafficWidget label={t('memoryUsage')}>
