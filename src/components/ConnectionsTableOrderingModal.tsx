@@ -95,8 +95,11 @@ export const ConnectionsTableOrderingModal = (props: {
   }
 
   return (
-    <dialog id="connections-table-ordering-modal" class="modal">
-      <div class="modal-box w-80" onContextMenu={(e) => e.preventDefault()}>
+    <dialog
+      id="connections-table-ordering-modal"
+      class="modal modal-bottom sm:modal-middle"
+    >
+      <div class="modal-box" onContextMenu={(e) => e.preventDefault()}>
         <DragDropProvider
           onDragStart={onDragStart}
           onDragEnd={onDragEnd as DragEventHandler}
@@ -115,15 +118,17 @@ export const ConnectionsTableOrderingModal = (props: {
           </DragOverlay>
         </DragDropProvider>
 
-        <Button
-          class="btn-neutral btn-sm ml-auto mt-4 block"
-          onClick={() => {
-            props.onOrderChange(CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER)
-            props.onVisibleChange(CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY)
-          }}
-        >
-          {t('reset')}
-        </Button>
+        <div class="modal-action">
+          <Button
+            class="btn-neutral btn-sm ml-auto mt-4 block"
+            onClick={() => {
+              props.onOrderChange(CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER)
+              props.onVisibleChange(CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY)
+            }}
+          >
+            {t('reset')}
+          </Button>
+        </div>
       </div>
 
       <form method="dialog" class="modal-backdrop">

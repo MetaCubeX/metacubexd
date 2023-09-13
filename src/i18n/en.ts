@@ -69,7 +69,6 @@ export default {
   switchEndpoint: 'Switch Endpoint',
   switchLanguage: 'Switch Language',
   latencyTestTimeoutDuration: 'Latency Test Timeout Duration',
-  closedConnections: 'Closed Connections',
   all: 'All',
   sequence: 'Sequence',
   payload: 'Payload',
@@ -79,4 +78,6 @@ export default {
   global: 'Global',
   rule: 'Rule',
   direct: 'Direct',
+  active: 'Active',
+  closed: 'Closed',
 }
