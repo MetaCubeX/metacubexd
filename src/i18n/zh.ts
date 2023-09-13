@@ -68,7 +68,6 @@ export default {
   switchEndpoint: '切换后端',
   switchLanguage: '切换语言',
   latencyTestTimeoutDuration: '测速超时时间',
-  closedConnections: '已关闭连接',
   all: '全部',
   sequence: '序列号',
   payload: '内容',
@@ -78,4 +77,6 @@ export default {
   global: '全局',
   rule: '规则',
   direct: '直连',
+  active: '活动',
+  closed: '已关闭',
 }

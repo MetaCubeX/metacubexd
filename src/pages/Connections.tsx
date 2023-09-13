@@ -2,13 +2,13 @@ import { writeClipboard } from '@solid-primitives/clipboard'
 import { useI18n } from '@solid-primitives/i18n'
 import { makePersisted } from '@solid-primitives/storage'
 import {
-  IconCircleX,
-  IconInfoCircle,
+  IconInfoSmall,
   IconPlayerPause,
   IconPlayerPlay,
   IconSettings,
   IconSortAscending,
   IconSortDescending,
+  IconX,
   IconZoomInFilled,
   IconZoomOutFilled,
 } from '@tabler/icons-solidjs'
@@ -113,7 +113,7 @@ export default () => {
               modal?.showModal()
             }}
           >
-            <IconInfoCircle size="16" />
+            <IconInfoSmall size="16" />
           </Button>
         </div>
       ),
@@ -131,7 +131,7 @@ export default () => {
             class="btn-circle btn-xs"
             onClick={() => closeSingleConnectionAPI(row.original.id)}
           >
-            <IconCircleX size="16" />
+            <IconX size="16" />
           </Button>
         </div>
       ),
@@ -293,12 +293,12 @@ export default () => {
   const tabs = createMemo(() => [
     {
       type: ActiveTab.activeConnections,
-      name: t('activeConnections'),
+      name: t('active'),
       count: activeConnections().length,
     },
     {
       type: ActiveTab.closedConnections,
-      name: t('closedConnections'),
+      name: t('closed'),
       count: closedConnections().length,
     },
   ])
@@ -350,7 +350,7 @@ export default () => {
               }
             }}
           >
-            <IconCircleX />
+            <IconX />
           </Button>
 
           <Button
