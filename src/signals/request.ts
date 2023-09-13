@@ -26,9 +26,19 @@ export const [endpointList, setEndpointList] = makePersisted(
 export const useRequest = () => {
   const e = endpoint()
 
+  if (!e) {
+    return ky.create({})
+  }
+
+  const headers = new Headers()
+
+  if (e.secret) {
+    headers.set('Authorization', `Bearer ${e.secret}`)
+  }
+
   return ky.create({
-    prefixUrl: e?.url,
-    headers: { Authorization: e?.secret ? `Bearer ${e.secret}` : '' },
+    prefixUrl: e.url,
+    headers,
   })
 }
 
