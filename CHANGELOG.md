@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.90.0](https://github.com/MetaCubeX/metacubexd/compare/v1.89.0...v1.90.0) (2023-09-13)
+
+
+### Features
+
+* **connections:** shorten the tab names ([1a37a10](https://github.com/MetaCubeX/metacubexd/commit/1a37a106f8c421829854ffcb75b64b7885b00005))
+
 ## [1.89.0](https://github.com/MetaCubeX/metacubexd/compare/v1.88.1...v1.89.0) (2023-09-12)
 
 
