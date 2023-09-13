@@ -50,6 +50,7 @@ export default {
   renderInTwoColumns: '双列渲染',
   updateGEODatabases: '更新 GEO 数据库文件',
   restartCore: '重启核心',
+  flushFakeIP: '清空 FakeIP',
   upgradeCore: '更新核心',
   proxiesSorting: '节点排序',
   orderNatural: '原配置文件中的排序',

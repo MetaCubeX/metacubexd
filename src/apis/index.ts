@@ -45,6 +45,15 @@ export const upgradeBackendAPI = async () => {
   setUpgradingBackend(false)
 }
 
+export const flushFakeIP = async () => {
+  const request = useRequest()
+  setUpgradingBackend(true)
+  try {
+    await request.post('cache/fakeip/flush')
+  } catch {}
+  setUpgradingBackend(false)
+}
+
 export const restartBackendAPI = async () => {
   const request = useRequest()
   setRestartingBackend(true)
