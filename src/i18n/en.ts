@@ -50,6 +50,7 @@ export default {
   renderInTwoColumns: 'Render in two columns',
   updateGEODatabases: 'Update GEO Databases',
   restartCore: 'Restart Core',
+  flushFakeIP: 'Flush fake-ip',
   upgradeCore: 'Upgrade Core',
   proxiesSorting: 'Proxies Sorting',
   orderNatural: 'Original order in config file',

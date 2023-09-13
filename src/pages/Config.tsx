@@ -15,6 +15,7 @@ import {
   fetchBackendConfigAPI,
   fetchBackendVersionAPI,
   restartBackendAPI,
+  flushFakeIP,
   restartingBackend,
   updateBackendConfigAPI,
   updateGEODatabasesAPI,
@@ -215,6 +216,10 @@ const ConfigForm = () => {
 
         <Button loading={upgradingBackend()} onClick={upgradeBackendAPI}>
           {t('upgradeCore')}
+        </Button>
+
+        <Button loading={upgradingBackend()} onClick={flushFakeIP}>
+          {t('flushFakeIP')}
         </Button>
 
         <Button loading={restartingBackend()} onClick={restartBackendAPI}>
