@@ -61,6 +61,7 @@ export default {
   updated: 'Updated',
   renderProxiesInSamePage: 'Render proxies and proxy provider in same page',
   tableSize: 'Table size',
+  logLevel: "Log Level",
   xs: 'Extra small size',
   sm: 'Small size',
   md: 'Normal size',

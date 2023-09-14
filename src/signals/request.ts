@@ -3,6 +3,7 @@ import { makePersisted } from '@solid-primitives/storage'
 import { createReconnectingWS } from '@solid-primitives/websocket'
 import ky from 'ky'
 import { createMemo, createSignal } from 'solid-js'
+import { LogType } from '~/types'
 
 export const [selectedEndpoint, setSelectedEndpoint] = makePersisted(
   createSignal(''),
@@ -69,3 +70,38 @@ export const useWsRequest = <T>(path: string) => {
     return JSON.parse(event()?.data)
   })
 }
+
+type MaybeQuery = {
+	level?: LogType
+};
+
+export const useWsRequestWithQuerys = <T>(path: string, querys?: MaybeQuery) => {
+
+	let querys_append = ""
+	
+	if (querys && Object.keys(querys).length > 0) {
+		const keys = Object.keys(querys) as (keyof  MaybeQuery)[];
+		keys.forEach(k => {
+			querys_append += `&${k}=${querys[k]}`
+		})
+	}
+
+	const ws = createReconnectingWS(
+	  `${wsEndpointURL()}/${path}?token=${secret()}${querys_append}`,
+	)
+  
+	const event = createEventSignal<{
+	  message: MessageEvent
+	}>(ws, 'message')
+  
+	return createMemo<T | null>(() => {
+	  const e = event()
+  
+	  if (!e) {
+		return null
+	  }
+  
+	  return JSON.parse(event()?.data)
+	})
+  }
+  

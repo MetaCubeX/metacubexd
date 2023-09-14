@@ -61,6 +61,7 @@ export default {
   updated: '更新于',
   renderProxiesInSamePage: '将代理和代理提供者显示在同一页',
   tableSize: '表格大小',
+  logLevel: "日志等级",
   xs: '超小尺寸',
   sm: '小尺寸',
   md: '正常尺寸',

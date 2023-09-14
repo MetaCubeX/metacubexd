@@ -40,6 +40,7 @@ import {
   favDayTheme,
   favNightTheme,
   latencyTestTimeoutDuration,
+  logLevel,
   proxiesOrderingType,
   proxiesPreviewType,
   renderInTwoColumns,
@@ -49,6 +50,7 @@ import {
   setFavDayTheme,
   setFavNightTheme,
   setLatencyTestTimeoutDuration,
+  setLogLevel,
   setProxiesOrderingType,
   setProxiesPreviewType,
   setRenderInTwoColumns,
@@ -61,7 +63,7 @@ import {
   useRequest,
   useTwemoji,
 } from '~/signals'
-import type { DNSQuery } from '~/types'
+import type { DNSQuery, LogType } from '~/types'
 
 const dnsQueryFormSchema = z.object({
   name: z.string(),
@@ -407,6 +409,26 @@ const ConfigForXd = () => {
         </select>
       </div>
 
+	  <div>
+        <ConfigTitle>{t('logLevel')}</ConfigTitle>
+
+        <select
+          class="select select-bordered w-full max-w-xs"
+          onChange={(e) => {
+            setLogLevel(e.target.value as LogType)
+          }}
+        >
+          <For each={["info", 'error' , 'warning' , 'info' , 'debug' , 'silent']}>
+            {(level) => (
+              <option selected={logLevel() === level} value={level}>
+                {level}
+              </option>
+            )}
+          </For>
+        </select>
+      </div>
+
+
       <div>
         <Button
           onClick={() => {
@@ -418,6 +440,7 @@ const ConfigForXd = () => {
           {t('switchLanguage')}
         </Button>
       </div>
+
 
       <div>
         <Button onClick={onSwitchEndpointClick}>{t('switchEndpoint')}</Button>

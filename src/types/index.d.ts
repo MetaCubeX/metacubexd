@@ -106,9 +106,12 @@ export type Connection = ConnectionRawMessage & {
 }
 
 export type Log = {
-  type: 'error' | 'warning' | 'info' | 'debug' | 'silent'
+  type: LogType
   payload: string
 }
+
+export type LogType =  'error' | 'warning' | 'info' | 'debug' | 'silent'
+
 
 export type Config = {
   mode: 'global' | 'rule' | 'direct'

@@ -8,7 +8,7 @@ import {
   TAILWINDCSS_SIZE,
 } from '~/constants'
 import { setCurTheme } from '~/signals'
-import { Config } from '~/types'
+import { Config, LogType } from '~/types'
 
 export const [proxiesPreviewType, setProxiesPreviewType] = makePersisted(
   createSignal(PROXIES_PREVIEW_TYPE.Auto),
@@ -49,6 +49,11 @@ export const [renderInTwoColumns, setRenderInTwoColumns] = makePersisted(
 export const [tableSize, setTableSize] = makePersisted(
   createSignal<TAILWINDCSS_SIZE>(TAILWINDCSS_SIZE.XS),
   { name: 'tableSize', storage: localStorage },
+)
+
+export const [logLevel, setLogLevel] = makePersisted(
+	createSignal<LogType>('info'),
+	{name: "logLevel", storage: localStorage},
 )
 
 export const tableSizeClassName = (size: TAILWINDCSS_SIZE) => {
