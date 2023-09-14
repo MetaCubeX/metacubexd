@@ -57,7 +57,7 @@ export default () => {
             className = 'text-info'
 			break
 		  case 'debug':
-			className = 'text-debug'
+			className = 'text-success'
             break
         }
 
