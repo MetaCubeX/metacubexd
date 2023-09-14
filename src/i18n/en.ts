@@ -67,6 +67,7 @@ export default {
   debug: 'debug',
   warning: 'warning',
   error: 'error',
+  logMaxRows: 'Log Maxinum Reserved Rows',
   xs: 'Extra small size',
   sm: 'Small size',
   md: 'Normal size',

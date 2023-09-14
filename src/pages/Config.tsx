@@ -25,6 +25,7 @@ import {
 import { Button } from '~/components'
 import {
   LANG,
+  LOGS_TABLE_MAX_ROWS_LIST,
   LOG_LEVEL,
   MODE_OPTIONS,
   PROXIES_ORDERING_TYPE,
@@ -41,6 +42,7 @@ import {
   favNightTheme,
   latencyTestTimeoutDuration,
   logLevel,
+  logMaxRows,
   proxiesOrderingType,
   proxiesPreviewType,
   renderInTwoColumns,
@@ -51,6 +53,7 @@ import {
   setFavNightTheme,
   setLatencyTestTimeoutDuration,
   setLogLevel,
+  setLogMaxRows,
   setProxiesOrderingType,
   setProxiesPreviewType,
   setRenderInTwoColumns,
@@ -423,6 +426,26 @@ const ConfigForXd = () => {
             {(level) => (
               <option selected={logLevel() === level} value={level}>
                 {t(level)}
+              </option>
+            )}
+          </For>
+        </select>
+      </div>
+
+      <div>
+        <ConfigTitle>{t('logMaxRows')}</ConfigTitle>
+
+        <select
+          class="select select-bordered w-full max-w-xs"
+          value={rows}
+          onChange={(e) => {
+            setLogMaxRows(parseInt(e.target.value))
+          }}
+        >
+          <For each={LOGS_TABLE_MAX_ROWS_LIST}>
+            {(rows) => (
+              <option value={rows}>
+                {rows}
               </option>
             )}
           </For>
