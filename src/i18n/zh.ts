@@ -67,6 +67,7 @@ export default {
   debug: '调试',
   warning: '警告',
   error: '错误',
+  logMaxRows: '日志最大保留行数',
   xs: '超小尺寸',
   sm: '小尺寸',
   md: '正常尺寸',

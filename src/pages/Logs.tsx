@@ -7,9 +7,9 @@ import {
 } from '@tanstack/solid-table'
 import { For, Index, createEffect, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import { LOGS_TABLE_MAX_ROWS, LOG_LEVEL } from '~/constants'
+import { LOG_LEVEL } from '~/constants'
 import { tableSize, tableSizeClassName, useWsRequest } from '~/signals'
-import { logLevel } from '~/signals/config'
+import { logLevel, logMaxRows } from '~/signals/config'
 import { Log } from '~/types'
 
 type LogWithSeq = Log & { seq: number }
@@ -21,6 +21,7 @@ export default () => {
   const [logs, setLogs] = createSignal<LogWithSeq[]>([])
 
   const logsData = useWsRequest<Log>('logs', { level: logLevel() })
+	const maxRows = logMaxRows()
 
   createEffect(() => {
     const data = logsData()
@@ -29,7 +30,7 @@ export default () => {
       return
     }
 
-    setLogs((logs) => [{ ...data, seq }, ...logs].slice(0, LOGS_TABLE_MAX_ROWS))
+    setLogs((logs) => [{ ...data, seq }, ...logs].slice(0, maxRows))
 
     seq++
   })
