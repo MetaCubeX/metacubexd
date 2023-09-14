@@ -1,4 +1,3 @@
-
 import { LOG_LEVEL } from '~/constants'
 
 declare module 'solid-js' {

@@ -21,7 +21,7 @@ export default () => {
   const [logs, setLogs] = createSignal<LogWithSeq[]>([])
 
   const logsData = useWsRequest<Log>('logs', { level: logLevel() })
-	const maxRows = logMaxRows()
+  const maxRows = logMaxRows()
 
   createEffect(() => {
     const data = logsData()

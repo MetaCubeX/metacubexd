@@ -162,4 +162,4 @@ export enum LOG_LEVEL {
   Silent = 'silent',
 }
 
-export const LOGS_TABLE_MAX_ROWS_LIST = [200, 300, 500, 800, 1000];
+export const LOGS_TABLE_MAX_ROWS_LIST = [200, 300, 500, 800, 1000]

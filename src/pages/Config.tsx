@@ -440,7 +440,7 @@ const ConfigForXd = () => {
         </select>
       </div>
 
-	  <div>
+      <div>
         <ConfigTitle>{t('logMaxRows')}</ConfigTitle>
 
         <select
@@ -449,9 +449,7 @@ const ConfigForXd = () => {
             setLogMaxRows(parseInt(e.target.value))
           }}
         >
-          <For
-            each={LOGS_TABLE_MAX_ROWS_LIST}
-          >
+          <For each={LOGS_TABLE_MAX_ROWS_LIST}>
             {(rows) => (
               <option selected={logMaxRows() == rows} value={rows}>
                 {rows}

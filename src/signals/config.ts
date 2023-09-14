@@ -57,10 +57,10 @@ export const [logLevel, setLogLevel] = makePersisted(
   { name: 'logLevel', storage: localStorage },
 )
 
-export const [logMaxRows, setLogMaxRows] = makePersisted(
-	createSignal(300),
-	{name: 'logMaxRows', storage: localStorage },
-);
+export const [logMaxRows, setLogMaxRows] = makePersisted(createSignal(300), {
+  name: 'logMaxRows',
+  storage: localStorage,
+})
 
 export const tableSizeClassName = (size: TAILWINDCSS_SIZE) => {
   let className = 'table-xs'
