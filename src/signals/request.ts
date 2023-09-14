@@ -52,9 +52,9 @@ export const wsEndpointURL = () =>
 
 export const useWsRequest = <T>(
   path: string,
-  queries?: Record<string, unknown> = {}
+  queries: Record<string, string> = {}
 ) => {
-  const queryParams = new URLSearchParams(querys)
+  const queryParams = new URLSearchParams(queries)
   queryParams.set('token', secret() ?? '')
 
   const ws = createReconnectingWS(
