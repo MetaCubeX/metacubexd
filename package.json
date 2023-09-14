@@ -7,7 +7,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
-    "lint:fix": "pnpm prettier -w .",
+    "format": "prettier -w .",
     "prepare": "husky install",
     "serve": "vite preview"
   },
