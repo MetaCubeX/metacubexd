@@ -25,6 +25,7 @@ import {
 import { Button } from '~/components'
 import {
   LANG,
+  LOG_LEVEL,
   MODE_OPTIONS,
   PROXIES_ORDERING_TYPE,
   PROXIES_PREVIEW_TYPE,
@@ -40,6 +41,7 @@ import {
   favDayTheme,
   favNightTheme,
   latencyTestTimeoutDuration,
+  logLevel,
   proxiesOrderingType,
   proxiesPreviewType,
   renderInTwoColumns,
@@ -49,6 +51,7 @@ import {
   setFavDayTheme,
   setFavNightTheme,
   setLatencyTestTimeoutDuration,
+  setLogLevel,
   setProxiesOrderingType,
   setProxiesPreviewType,
   setRenderInTwoColumns,
@@ -403,6 +406,33 @@ const ConfigForXd = () => {
         >
           <For each={Object.values(TAILWINDCSS_SIZE)}>
             {(value) => <option value={value}>{t(value)}</option>}
+          </For>
+        </select>
+      </div>
+
+      <div>
+        <ConfigTitle>{t('logLevel')}</ConfigTitle>
+
+        <select
+          class="select select-bordered w-full max-w-xs"
+          onChange={(e) => {
+            setLogLevel(e.target.value as LOG_LEVEL)
+          }}
+        >
+          <For
+            each={[
+              LOG_LEVEL.Info,
+              LOG_LEVEL.Error,
+              LOG_LEVEL.Warning,
+              LOG_LEVEL.Debug,
+              LOG_LEVEL.Silent,
+            ]}
+          >
+            {(level) => (
+              <option selected={logLevel() === level} value={level}>
+                {t(level)}
+              </option>
+            )}
           </For>
         </select>
       </div>

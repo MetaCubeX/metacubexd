@@ -1,3 +1,6 @@
+
+import { LOG_LEVEL } from '~/constants'
+
 declare module 'solid-js' {
   namespace JSX {
     interface Directives {
@@ -106,7 +109,7 @@ export type Connection = ConnectionRawMessage & {
 }
 
 export type Log = {
-  type: 'error' | 'warning' | 'info' | 'debug' | 'silent'
+  type: LOG_LEVEL
   payload: string
 }
 

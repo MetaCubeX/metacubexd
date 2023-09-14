@@ -3,6 +3,7 @@ import { createSignal } from 'solid-js'
 import {
   LATENCY_QUALITY_MAP_HTTP,
   LATENCY_QUALITY_MAP_HTTPS,
+  LOG_LEVEL,
   PROXIES_ORDERING_TYPE,
   PROXIES_PREVIEW_TYPE,
   TAILWINDCSS_SIZE,
@@ -49,6 +50,11 @@ export const [renderInTwoColumns, setRenderInTwoColumns] = makePersisted(
 export const [tableSize, setTableSize] = makePersisted(
   createSignal<TAILWINDCSS_SIZE>(TAILWINDCSS_SIZE.XS),
   { name: 'tableSize', storage: localStorage },
+)
+
+export const [logLevel, setLogLevel] = makePersisted(
+  createSignal<LOG_LEVEL>(LOG_LEVEL.Info),
+  { name: 'logLevel', storage: localStorage },
 )
 
 export const tableSizeClassName = (size: TAILWINDCSS_SIZE) => {

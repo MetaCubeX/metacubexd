@@ -50,9 +50,15 @@ export const secret = () => endpoint()?.secret
 export const wsEndpointURL = () =>
   new URL(endpoint()?.url ?? '').origin.replace('http', 'ws')
 
-export const useWsRequest = <T>(path: string) => {
+export const useWsRequest = <T>(
+  path: string,
+  queries: Record<string, string> = {}
+) => {
+  const queryParams = new URLSearchParams(queries)
+  queryParams.set('token', secret() ?? '')
+
   const ws = createReconnectingWS(
-    `${wsEndpointURL()}/${path}?token=${secret()}`,
+    `${wsEndpointURL()}/${path}?${queryParams.toString()}`,
   )
 
   const event = createEventSignal<{

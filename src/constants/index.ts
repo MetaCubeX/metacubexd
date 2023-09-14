@@ -153,3 +153,11 @@ export enum MODE_OPTIONS {
   Rule = 'rule',
   Direct = 'direct',
 }
+
+export enum LOG_LEVEL {
+  Info = 'info',
+  Error = 'error',
+  Warning = 'warning',
+  Debug = 'debug',
+  Silent = 'silent',
+}
