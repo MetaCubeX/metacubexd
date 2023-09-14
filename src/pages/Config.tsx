@@ -437,6 +437,7 @@ const ConfigForXd = () => {
 
         <select
           class="select select-bordered w-full max-w-xs"
+          value={rows}
           onChange={(e) => {
             setLogMaxRows(parseInt(e.target.value))
           }}
