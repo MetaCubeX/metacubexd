@@ -1,4 +1,5 @@
-import { LogLevel } from 'vite'
+
+import { LOG_LEVEL } from '~/constants'
 
 declare module 'solid-js' {
   namespace JSX {
@@ -108,7 +109,7 @@ export type Connection = ConnectionRawMessage & {
 }
 
 export type Log = {
-  type: LogLevel
+  type: LOG_LEVEL
   payload: string
 }
 
