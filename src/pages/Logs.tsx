@@ -7,7 +7,7 @@ import {
 } from '@tanstack/solid-table'
 import { For, Index, createEffect, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import { LOGS_TABLE_MAX_ROWS } from '~/constants'
+import { LOGS_TABLE_MAX_ROWS, LOG_LEVEL } from '~/constants'
 import { tableSize, tableSizeClassName, useWsRequest } from '~/signals'
 import { logLevel } from '~/signals/config'
 import { Log } from '~/types'
@@ -42,21 +42,21 @@ export default () => {
     {
       header: t('type'),
       cell: ({ row }) => {
-        const type = row.original.type
+        const type = row.original.type as LOG_LEVEL
 
         let className = ''
 
         switch (type) {
-          case 'error':
+          case LOG_LEVEL.Error:
             className = 'text-error'
             break
-          case 'warning':
+          case LOG_LEVEL.Warning:
             className = 'text-warning'
             break
-          case 'info':
+          case LOG_LEVEL.Info:
             className = 'text-info'
             break
-          case 'debug':
+          case LOG_LEVEL.Debug:
             className = 'text-success'
             break
         }

@@ -3,12 +3,13 @@ import { createSignal } from 'solid-js'
 import {
   LATENCY_QUALITY_MAP_HTTP,
   LATENCY_QUALITY_MAP_HTTPS,
+  LOG_LEVEL,
   PROXIES_ORDERING_TYPE,
   PROXIES_PREVIEW_TYPE,
   TAILWINDCSS_SIZE,
 } from '~/constants'
 import { setCurTheme } from '~/signals'
-import { Config, LogType } from '~/types'
+import { Config } from '~/types'
 
 export const [proxiesPreviewType, setProxiesPreviewType] = makePersisted(
   createSignal(PROXIES_PREVIEW_TYPE.Auto),
@@ -52,7 +53,7 @@ export const [tableSize, setTableSize] = makePersisted(
 )
 
 export const [logLevel, setLogLevel] = makePersisted(
-  createSignal<LogType>('info'),
+  createSignal<LOG_LEVEL>(LOG_LEVEL.Info),
   { name: 'logLevel', storage: localStorage },
 )
 

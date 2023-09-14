@@ -64,7 +64,7 @@ import {
   useRequest,
   useTwemoji,
 } from '~/signals'
-import type { DNSQuery, LogType } from '~/types'
+import type { DNSQuery } from '~/types'
 
 const dnsQueryFormSchema = z.object({
   name: z.string(),
@@ -416,16 +416,16 @@ const ConfigForXd = () => {
         <select
           class="select select-bordered w-full max-w-xs"
           onChange={(e) => {
-            setLogLevel(e.target.value as LogType)
+            setLogLevel(e.target.value as LOG_LEVEL)
           }}
         >
           <For
             each={[
-              LOG_LEVEL.LogLevelInfo,
-              LOG_LEVEL.LogLevelError,
-              LOG_LEVEL.LogLevelWarning,
-              LOG_LEVEL.LogLevelDebug,
-              LOG_LEVEL.LogLevelSilent,
+              LOG_LEVEL.Info,
+              LOG_LEVEL.Error,
+              LOG_LEVEL.Warning,
+              LOG_LEVEL.Debug,
+              LOG_LEVEL.Silent,
             ]}
           >
             {(level) => (

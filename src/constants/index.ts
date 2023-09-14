@@ -155,9 +155,9 @@ export enum MODE_OPTIONS {
 }
 
 export enum LOG_LEVEL {
-  LogLevelInfo = 'info',
-  LogLevelError = 'error',
-  LogLevelWarning = 'warning',
-  LogLevelDebug = 'debug',
-  LogLevelSilent = 'silent',
+  Info = 'info',
+  Error = 'error',
+  Warning = 'warning',
+  Debug = 'debug',
+  Silent = 'silent',
 }

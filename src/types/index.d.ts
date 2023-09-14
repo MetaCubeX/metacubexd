@@ -1,3 +1,5 @@
+import { LogLevel } from 'vite'
+
 declare module 'solid-js' {
   namespace JSX {
     interface Directives {
@@ -106,11 +108,9 @@ export type Connection = ConnectionRawMessage & {
 }
 
 export type Log = {
-  type: LogType
+  type: LogLevel
   payload: string
 }
-
-export type LogType = 'error' | 'warning' | 'info' | 'debug' | 'silent'
 
 export type Config = {
   mode: 'global' | 'rule' | 'direct'
