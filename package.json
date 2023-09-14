@@ -8,7 +8,7 @@
     "build": "vite build",
     "dev": "vite",
     "format": "prettier -w .",
-	"lint": "eslint --fix .",
+    "lint": "eslint --fix .",
     "prepare": "husky install",
     "serve": "vite preview"
   },
