@@ -110,8 +110,7 @@ export type Log = {
   payload: string
 }
 
-export type LogType =  'error' | 'warning' | 'info' | 'debug' | 'silent'
-
+export type LogType = 'error' | 'warning' | 'info' | 'debug' | 'silent'
 
 export type Config = {
   mode: 'global' | 'rule' | 'direct'

@@ -25,6 +25,7 @@ import {
 import { Button } from '~/components'
 import {
   LANG,
+  LOG_LEVEL,
   MODE_OPTIONS,
   PROXIES_ORDERING_TYPE,
   PROXIES_PREVIEW_TYPE,
@@ -409,7 +410,7 @@ const ConfigForXd = () => {
         </select>
       </div>
 
-	  <div>
+      <div>
         <ConfigTitle>{t('logLevel')}</ConfigTitle>
 
         <select
@@ -418,16 +419,23 @@ const ConfigForXd = () => {
             setLogLevel(e.target.value as LogType)
           }}
         >
-          <For each={["info", 'error' , 'warning' , 'info' , 'debug' , 'silent']}>
+          <For
+            each={[
+              LOG_LEVEL.LogLevelInfo,
+              LOG_LEVEL.LogLevelError,
+              LOG_LEVEL.LogLevelWarning,
+              LOG_LEVEL.LogLevelDebug,
+              LOG_LEVEL.LogLevelSilent,
+            ]}
+          >
             {(level) => (
               <option selected={logLevel() === level} value={level}>
-                {level}
+                {t(level)}
               </option>
             )}
           </For>
         </select>
       </div>
-
 
       <div>
         <Button
@@ -440,7 +448,6 @@ const ConfigForXd = () => {
           {t('switchLanguage')}
         </Button>
       </div>
-
 
       <div>
         <Button onClick={onSwitchEndpointClick}>{t('switchEndpoint')}</Button>

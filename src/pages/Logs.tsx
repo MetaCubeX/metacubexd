@@ -8,9 +8,9 @@ import {
 import { For, Index, createEffect, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { LOGS_TABLE_MAX_ROWS } from '~/constants'
-import { tableSize, tableSizeClassName, useWsRequestWithQuerys } from '~/signals'
-import { Log, LogType } from '~/types'
-import { logLevel, setLogLevel } from "~/signals/config"
+import { tableSize, tableSizeClassName, useWsRequest } from '~/signals'
+import { logLevel } from '~/signals/config'
+import { Log } from '~/types'
 
 type LogWithSeq = Log & { seq: number }
 
@@ -20,7 +20,7 @@ export default () => {
   const [search, setSearch] = createSignal('')
   const [logs, setLogs] = createSignal<LogWithSeq[]>([])
 
-  const logsData = useWsRequestWithQuerys<Log>('logs', { level: logLevel() })
+  const logsData = useWsRequest<Log>('logs', { level: logLevel() })
 
   createEffect(() => {
     const data = logsData()
@@ -55,9 +55,9 @@ export default () => {
             break
           case 'info':
             className = 'text-info'
-			break
-		  case 'debug':
-			className = 'text-success'
+            break
+          case 'debug':
+            className = 'text-success'
             break
         }
 

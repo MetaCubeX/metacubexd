@@ -52,8 +52,8 @@ export const [tableSize, setTableSize] = makePersisted(
 )
 
 export const [logLevel, setLogLevel] = makePersisted(
-	createSignal<LogType>('info'),
-	{name: "logLevel", storage: localStorage},
+  createSignal<LogType>('info'),
+  { name: 'logLevel', storage: localStorage },
 )
 
 export const tableSizeClassName = (size: TAILWINDCSS_SIZE) => {
