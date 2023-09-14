@@ -443,7 +443,7 @@ const ConfigForXd = () => {
         >
           <For each={LOGS_TABLE_MAX_ROWS_LIST}>
             {(rows) => (
-              <option selected={logMaxRows() == rows} value={rows}>
+              <option value={rows}>
                 {rows}
               </option>
             )}
