@@ -1,5 +1,6 @@
+import { usePrefersDark } from '@solid-primitives/media'
 import { makePersisted } from '@solid-primitives/storage'
-import { createSignal } from 'solid-js'
+import { createEffect, createSignal } from 'solid-js'
 import {
   LATENCY_QUALITY_MAP_HTTP,
   LATENCY_QUALITY_MAP_HTTPS,
@@ -95,25 +96,14 @@ export const isLatencyTestByHttps = () =>
 export const latencyQualityMap = () =>
   isLatencyTestByHttps() ? LATENCY_QUALITY_MAP_HTTPS : LATENCY_QUALITY_MAP_HTTP
 
-const setTheme = (isDark: boolean) => {
-  if (autoSwitchTheme()) {
-    if (isDark) {
-      setCurTheme(favNightTheme())
-    } else {
-      setCurTheme(favDayTheme())
-    }
-  }
-}
-
-export const applyThemeByMode = () =>
-  setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches)
-
 export const useAutoSwitchTheme = () => {
-  applyThemeByMode()
+  const prefersDark = usePrefersDark()
 
-  window
-    .matchMedia('(prefers-color-scheme: dark)')
-    .addEventListener('change', (event) => setTheme(event.matches))
+  createEffect(() => {
+    if (autoSwitchTheme()) {
+      setCurTheme(prefersDark() ? favNightTheme() : favDayTheme())
+    }
+  })
 }
 
 export const [backendConfig, setBackendConfig] = createSignal<Config>()

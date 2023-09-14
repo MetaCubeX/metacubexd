@@ -52,7 +52,7 @@ export const wsEndpointURL = () =>
 
 export const useWsRequest = <T>(
   path: string,
-  queries: Record<string, string> = {},
+  queries: Record<string, unknown> = {},
 ) => {
   const queryParams = new URLSearchParams(queries)
   queryParams.set('token', secret() ?? '')

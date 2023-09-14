@@ -35,7 +35,6 @@ import {
   themes,
 } from '~/constants'
 import {
-  applyThemeByMode,
   autoCloseConns,
   autoSwitchTheme,
   backendConfig,
@@ -283,10 +282,7 @@ const ConfigForXd = () => {
 
         <select
           class="select select-bordered w-full max-w-xs"
-          onChange={(e) => {
-            setFavDayTheme(e.target.value)
-            applyThemeByMode()
-          }}
+          onChange={(e) => setFavDayTheme(e.target.value)}
         >
           <For each={themes}>
             {(theme) => (
@@ -302,10 +298,7 @@ const ConfigForXd = () => {
 
         <select
           class="select select-bordered w-full max-w-xs"
-          onChange={(e) => {
-            setFavNightTheme(e.target.value)
-            applyThemeByMode()
-          }}
+          onChange={(e) => setFavNightTheme(e.target.value)}
         >
           <For each={themes}>
             {(theme) => (
@@ -330,7 +323,6 @@ const ConfigForXd = () => {
       value: autoSwitchTheme,
       onChange: (value: boolean) => {
         setAutoSwitchTheme(value)
-        applyThemeByMode()
       },
       subChild: autoSwitchThemeSubChild,
     },
