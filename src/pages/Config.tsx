@@ -437,17 +437,11 @@ const ConfigForXd = () => {
 
         <select
           class="select select-bordered w-full max-w-xs"
-          value={rows}
-          onChange={(e) => {
-            setLogMaxRows(parseInt(e.target.value))
-          }}
+          value={logMaxRows()}
+          onChange={(e) => setLogMaxRows(parseInt(e.target.value))}
         >
           <For each={LOGS_TABLE_MAX_ROWS_LIST}>
-            {(rows) => (
-              <option value={rows}>
-                {rows}
-              </option>
-            )}
+            {(rows) => <option value={rows}>{rows}</option>}
           </For>
         </select>
       </div>
