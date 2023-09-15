@@ -86,4 +86,5 @@ export default {
   active: '活动',
   closed: '已关闭',
   sort: '排序',
+  hideUnAvailableProxies: '隐藏不可用节点',
 }

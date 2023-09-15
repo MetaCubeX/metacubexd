@@ -17,11 +17,16 @@ import {
 } from '~/components'
 import { MODAL } from '~/constants'
 import {
+  filterProxiesByAvailability,
   formatTimeFromNow,
   sortProxiesByOrderingType,
   useStringBooleanMap,
 } from '~/helpers'
-import { proxiesOrderingType, useProxies } from '~/signals'
+import {
+  hideUnAvailableProxies,
+  proxiesOrderingType,
+  useProxies,
+} from '~/signals'
 import type { Proxy } from '~/types'
 
 enum ActiveTab {
@@ -99,7 +104,7 @@ export default () => {
     <div class="flex h-full flex-col gap-2">
       <Show when={proxyProviders().length > 0}>
         <div class="flex items-center gap-2">
-          <div class="tabs tabs-boxed gap-2">
+          <div class="tabs-boxed tabs gap-2">
             <For each={tabs()}>
               {(tab) => (
                 <button
@@ -151,10 +156,14 @@ export default () => {
         <Show when={activeTab() === ActiveTab.proxyProviders}>
           <ForTwoColumns
             subChild={proxyProviders().map((proxyProvider) => {
-              const sortedProxyNames = sortProxiesByOrderingType(
-                proxyProvider.proxies.map((i) => i.name) ?? [],
+              const sortedProxyNames = filterProxiesByAvailability(
+                sortProxiesByOrderingType(
+                  proxyProvider.proxies.map((i) => i.name) ?? [],
+                  latencyMap(),
+                  proxiesOrderingType(),
+                ),
                 latencyMap(),
-                proxiesOrderingType(),
+                hideUnAvailableProxies(),
               )
 
               const title = (
@@ -232,10 +241,14 @@ export default () => {
         <Show when={activeTab() === ActiveTab.proxies}>
           <ForTwoColumns
             subChild={proxies().map((proxy) => {
-              const sortedProxyNames = sortProxiesByOrderingType(
-                proxy.all ?? [],
+              const sortedProxyNames = filterProxiesByAvailability(
+                sortProxiesByOrderingType(
+                  proxy.all ?? [],
+                  latencyMap(),
+                  proxiesOrderingType(),
+                ),
                 latencyMap(),
-                proxiesOrderingType(),
+                hideUnAvailableProxies(),
               )
 
               const title = (

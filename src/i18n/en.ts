@@ -86,4 +86,5 @@ export default {
   active: 'Active',
   closed: 'Closed',
   sort: 'Sort',
+  hideUnAvailableProxies: 'Hide UnAvailable Proxies',
 }

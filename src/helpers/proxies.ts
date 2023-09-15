@@ -78,3 +78,14 @@ export const sortProxiesByOrderingType = (
     }
   })
 }
+
+export const filterProxiesByAvailability = (
+  proxyNames: string[],
+  proxyLatencyMap: Record<string, number>,
+  enabled?: boolean,
+) =>
+  enabled
+    ? proxyNames.filter(
+        (name) => proxyLatencyMap[name] !== latencyQualityMap().NOT_CONNECTED,
+      )
+    : proxyNames

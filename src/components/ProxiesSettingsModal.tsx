@@ -4,10 +4,12 @@ import { ConfigTitle } from '~/components'
 import { MODAL, PROXIES_ORDERING_TYPE, PROXIES_PREVIEW_TYPE } from '~/constants'
 import {
   autoCloseConns,
+  hideUnAvailableProxies,
   latencyTestTimeoutDuration,
   proxiesOrderingType,
   proxiesPreviewType,
   setAutoCloseConns,
+  setHideUnAvailableProxies,
   setLatencyTestTimeoutDuration,
   setProxiesOrderingType,
   setProxiesPreviewType,
@@ -80,6 +82,19 @@ export const ProxiesSettingsModal = () => {
               )}
             </For>
           </select>
+        </div>
+
+        <div>
+          <ConfigTitle withDivider>{t('hideUnAvailableProxies')}</ConfigTitle>
+
+          <div class="flex w-full justify-center">
+            <input
+              class="toggle"
+              type="checkbox"
+              checked={hideUnAvailableProxies()}
+              onChange={(e) => setHideUnAvailableProxies(e.target.checked)}
+            />
+          </div>
         </div>
 
         <div>

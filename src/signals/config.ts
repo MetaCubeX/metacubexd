@@ -20,6 +20,13 @@ export const [proxiesOrderingType, setProxiesOrderingType] = makePersisted(
   createSignal(PROXIES_ORDERING_TYPE.NATURAL),
   { name: 'proxiesOrderingType', storage: localStorage },
 )
+
+export const [hideUnAvailableProxies, setHideUnAvailableProxies] =
+  makePersisted(createSignal(false), {
+    name: 'hideUnAvailableProxies',
+    storage: localStorage,
+  })
+
 export const [urlForLatencyTest, setUrlForLatencyTest] = makePersisted(
   createSignal('https://www.gstatic.com/generate_204'),
   { name: 'urlForLatencyTest', storage: localStorage },
