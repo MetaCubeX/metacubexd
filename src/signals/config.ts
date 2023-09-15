@@ -10,7 +10,6 @@ import {
   TAILWINDCSS_SIZE,
 } from '~/constants'
 import { setCurTheme } from '~/signals'
-import { Config } from '~/types'
 
 export const [proxiesPreviewType, setProxiesPreviewType] = makePersisted(
   createSignal(PROXIES_PREVIEW_TYPE.Auto),
@@ -112,5 +111,3 @@ export const useAutoSwitchTheme = () => {
     }
   })
 }
-
-export const [backendConfig, setBackendConfig] = createSignal<Config>()

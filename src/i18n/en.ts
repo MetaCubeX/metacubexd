@@ -87,4 +87,6 @@ export default {
   closed: 'Closed',
   sort: 'Sort',
   hideUnAvailableProxies: 'Hide UnAvailable Proxies',
+  reloadConfigFile: 'Reload Config File',
+  flushFakeIPData: 'Flush Fake-IP Data',
 }

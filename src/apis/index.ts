@@ -1,6 +1,6 @@
-import { createSignal } from 'solid-js'
+import { createSignal, ResourceActions } from 'solid-js'
 import { toast } from 'solid-toast'
-import { setBackendConfig, useRequest } from '~/signals'
+import { useRequest } from '~/signals'
 import {
   BackendVersion,
   Config,
@@ -22,10 +22,33 @@ export const closeSingleConnectionAPI = (id: string) => {
   return request.delete(`connections/${id}`)
 }
 
+export const [reloadingConfigFile, setReloadingConfigFile] = createSignal(false)
 export const [updatingGEODatabases, setUpdatingGEODatabases] =
   createSignal(false)
+export const [flushingFakeIPData, setFlushingFakeIPData] = createSignal(false)
 export const [upgradingBackend, setUpgradingBackend] = createSignal(false)
 export const [restartingBackend, setRestartingBackend] = createSignal(false)
+
+export const reloadConfigFileAPI = async () => {
+  const request = useRequest()
+  setReloadingConfigFile(true)
+  try {
+    await request.put('configs', {
+      searchParams: { force: true },
+      json: { path: '', payload: '' },
+    })
+  } catch {}
+  setReloadingConfigFile(false)
+}
+
+export const flushFakeIPDataAPI = async () => {
+  const request = useRequest()
+  setFlushingFakeIPData(true)
+  try {
+    await request.post('cache/fakeip/flush')
+  } catch {}
+  setFlushingFakeIPData(false)
+}
 
 export const updateGEODatabasesAPI = async () => {
   const request = useRequest()
@@ -63,21 +86,14 @@ export const fetchBackendConfigAPI = () => {
 export const updateBackendConfigAPI = async (
   key: keyof Config,
   value: Config[keyof Config],
+  refetch: ResourceActions<Config | undefined>['refetch'],
 ) => {
   try {
     const request = useRequest()
 
-    await request
-      .patch('configs', {
-        body: JSON.stringify({
-          [key]: value,
-        }),
-      })
-      .json<Config>()
+    await request.patch('configs', { json: { [key]: value } }).json<Config>()
 
-    const updatedConfig = await fetchBackendConfigAPI()
-
-    setBackendConfig(updatedConfig)
+    await refetch()
   } catch (err) {
     toast.error((err as Error).message)
   }

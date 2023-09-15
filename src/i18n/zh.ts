@@ -87,4 +87,6 @@ export default {
   closed: '已关闭',
   sort: '排序',
   hideUnAvailableProxies: '隐藏不可用节点',
+  reloadConfigFile: '重新加载配置文件',
+  flushFakeIPData: '清空 Fake-IP 数据',
 }

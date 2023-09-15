@@ -2,11 +2,22 @@ import { createForm } from '@felte/solid'
 import { validator } from '@felte/validator-zod'
 import { useI18n } from '@solid-primitives/i18n'
 import { useNavigate } from '@solidjs/router'
-import { For, Show, createSignal, onMount } from 'solid-js'
+import {
+  For,
+  Show,
+  createEffect,
+  createResource,
+  createSignal,
+  onMount,
+} from 'solid-js'
 import { z } from 'zod'
 import {
   fetchBackendConfigAPI,
   fetchBackendVersionAPI,
+  flushFakeIPDataAPI,
+  flushingFakeIPData,
+  reloadConfigFileAPI,
+  reloadingConfigFile,
   restartBackendAPI,
   restartingBackend,
   updateBackendConfigAPI,
@@ -19,11 +30,9 @@ import { Button, ConfigTitle } from '~/components'
 import { LANG, MODE_OPTIONS, ROUTES, themes } from '~/constants'
 import {
   autoSwitchTheme,
-  backendConfig,
   favDayTheme,
   favNightTheme,
   setAutoSwitchTheme,
-  setBackendConfig,
   setFavDayTheme,
   setFavNightTheme,
   setSelectedEndpoint,
@@ -103,27 +112,54 @@ const configFormSchema = z.object({
 
 const ConfigForm = () => {
   const [t] = useI18n()
+  const navigate = useNavigate()
 
   const portsList = [
     {
       label: 'HTTP Port',
       key: 'port',
+      onChange: (e: Event & { target: HTMLInputElement }) =>
+        void updateBackendConfigAPI('port', Number(e.target.value), refetch),
     },
     {
       label: 'Socks Port',
       key: 'socks-port',
+      onChange: (e: Event & { target: HTMLInputElement }) =>
+        void updateBackendConfigAPI(
+          'socks-port',
+          Number(e.target.value),
+          refetch,
+        ),
     },
     {
       label: 'Redir Port',
       key: 'redir-port',
+      onChange: (e: Event & { target: HTMLInputElement }) =>
+        void updateBackendConfigAPI(
+          'redir-port',
+          Number(e.target.value),
+          refetch,
+        ),
     },
     {
       label: 'TProxy Port',
       key: 'tproxy-port',
+      onChange: (e: Event & { target: HTMLInputElement }) =>
+        void updateBackendConfigAPI(
+          'tproxy-port',
+          Number(e.target.value),
+          refetch,
+        ),
     },
     {
       label: 'Mixed Port',
       key: 'mixed-port',
+      onChange: (e: Event & { target: HTMLInputElement }) =>
+        void updateBackendConfigAPI(
+          'mixed-port',
+          Number(e.target.value),
+          refetch,
+        ),
     },
   ]
 
@@ -131,19 +167,30 @@ const ConfigForm = () => {
     z.infer<typeof configFormSchema>
   >({ extend: validator({ schema: configFormSchema }) })
 
-  onMount(async () => {
-    const configs = await fetchBackendConfigAPI()
-    setBackendConfig(configs)
-    setInitialValues(configs)
-    reset()
+  const [configsData, { refetch }] = createResource(fetchBackendConfigAPI)
+
+  createEffect(() => {
+    const configs = configsData()
+
+    if (configs) {
+      setInitialValues(configs)
+      reset()
+    }
   })
+
+  const onSwitchEndpointClick = () => {
+    setSelectedEndpoint('')
+    navigate(ROUTES.Setup)
+  }
 
   return (
     <div class="flex flex-col gap-4">
       <select
         class="select select-bordered"
-        value={backendConfig()?.mode}
-        onChange={(e) => updateBackendConfigAPI('mode', e.target.value)}
+        value={configsData()?.mode}
+        onChange={(e) =>
+          void updateBackendConfigAPI('mode', e.target.value, refetch)
+        }
       >
         <option value={MODE_OPTIONS.Global}>{t('global')}</option>
         <option value={MODE_OPTIONS.Rule}>{t('rule')}</option>
@@ -163,6 +210,7 @@ const ConfigForm = () => {
                 type="number"
                 class="input input-bordered"
                 placeholder={item.label}
+                onChange={item.onChange}
               />
             </div>
           )}
@@ -170,6 +218,14 @@ const ConfigForm = () => {
       </form>
 
       <div class="flex flex-wrap items-center gap-2">
+        <Button loading={reloadingConfigFile()} onClick={reloadConfigFileAPI}>
+          {t('reloadConfigFile')}
+        </Button>
+
+        <Button loading={flushingFakeIPData()} onClick={flushFakeIPDataAPI}>
+          {t('flushFakeIPData')}
+        </Button>
+
         <Button
           loading={updatingGEODatabases()}
           onClick={updateGEODatabasesAPI}
@@ -184,6 +240,8 @@ const ConfigForm = () => {
         <Button loading={restartingBackend()} onClick={restartBackendAPI}>
           {t('restartCore')}
         </Button>
+
+        <Button onClick={onSwitchEndpointClick}>{t('switchEndpoint')}</Button>
       </div>
     </div>
   )
@@ -191,12 +249,6 @@ const ConfigForm = () => {
 
 const ConfigForXd = () => {
   const [t, { locale }] = useI18n()
-  const navigate = useNavigate()
-
-  const onSwitchEndpointClick = () => {
-    setSelectedEndpoint('')
-    navigate(ROUTES.Setup)
-  }
 
   const autoSwitchThemeSubChild = () => (
     <Show when={autoSwitchTheme()}>
@@ -283,10 +335,6 @@ const ConfigForXd = () => {
         >
           {t('switchLanguage')}
         </Button>
-      </div>
-
-      <div>
-        <Button onClick={onSwitchEndpointClick}>{t('switchEndpoint')}</Button>
       </div>
     </div>
   )

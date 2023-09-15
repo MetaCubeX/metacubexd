@@ -25,6 +25,7 @@ type ProxyInfo = {
   xudp: boolean
   type: string
 }
+
 // these signals should be global state
 const [proxies, setProxies] = createSignal<Proxy[]>([])
 const [proxyProviders, setProxyProviders] = createSignal<ProxyProvider[]>([])
