@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.93.0](https://github.com/MetaCubeX/metacubexd/compare/v1.92.0...v1.93.0) (2023-09-15)
+
+
+### Features
+
+* **config:** reload config file, flush fake-ip data ([6ffd1a8](https://github.com/MetaCubeX/metacubexd/commit/6ffd1a860538f82ef92e2fb97ed19d67e4452ad7))
+
 ## [1.92.0](https://github.com/MetaCubeX/metacubexd/compare/v1.91.0...v1.92.0) (2023-09-15)
 
 
