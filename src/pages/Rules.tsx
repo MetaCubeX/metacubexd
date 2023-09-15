@@ -1,11 +1,11 @@
 import { useI18n } from '@solid-primitives/i18n'
-import { IconReload } from '@tabler/icons-solidjs'
-import InfiniteScroll from 'solid-infinite-scroll'
-import { For, Show, createMemo, createSignal, onMount } from 'solid-js'
+import { IconReload, IconSettings } from '@tabler/icons-solidjs'
+import { For, Show, createSignal, onMount } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import { Button, ForTwoColumns } from '~/components'
+import { Button, RulesSettingsModal } from '~/components'
+import { MODAL } from '~/constants'
 import { formatTimeFromNow, useStringBooleanMap } from '~/helpers'
-import { useRules } from '~/signals'
+import { rulesRenderInTwoColumns, useRules } from '~/signals'
 
 enum ActiveTab {
   ruleProviders = 'ruleProviders',
@@ -21,8 +21,6 @@ export default () => {
     updateAllRuleProvider,
     updateRuleProviderByName,
   } = useRules()
-  const [maxRuleRender, setMaxRuleRender] = createSignal(100)
-  const renderRules = createMemo(() => rules().slice(0, maxRuleRender()))
 
   onMount(updateRules)
 
@@ -61,55 +59,102 @@ export default () => {
 
   return (
     <div class="flex h-full flex-col gap-2">
-      <Show when={ruleProviders().length > 0}>
-        <div class="flex items-center gap-2">
-          <div class="tabs tabs-boxed gap-2">
-            <For each={tabs()}>
-              {(tab) => (
-                <button
-                  class={twMerge(
-                    activeTab() === tab.type && 'tab-active',
-                    'tab tab-sm gap-2 px-2 md:tab-md',
-                  )}
-                  onClick={() => setActiveTab(tab.type)}
-                >
-                  <span>{tab.name}</span>
-                  <div class="badge badge-sm">{tab.count}</div>
-                </button>
+      <div class="flex items-center gap-2">
+        <div class="tabs-boxed tabs gap-2">
+          <For each={tabs()}>
+            {(tab) => (
+              <button
+                class={twMerge(
+                  activeTab() === tab.type && 'tab-active',
+                  'tab tab-sm gap-2 px-2 md:tab-md',
+                )}
+                onClick={() => setActiveTab(tab.type)}
+              >
+                <span>{tab.name}</span>
+                <div class="badge badge-sm">{tab.count}</div>
+              </button>
+            )}
+          </For>
+        </div>
+
+        <Show when={activeTab() === ActiveTab.ruleProviders}>
+          <Button
+            class="btn btn-circle btn-sm"
+            disabled={allProviderIsUpdating()}
+            onClick={(e) => onUpdateAllProviderClick(e)}
+          >
+            <IconReload
+              class={twMerge(
+                allProviderIsUpdating() && 'animate-spin text-success',
+              )}
+            />
+          </Button>
+        </Show>
+
+        <div class="ml-auto">
+          <Button
+            class="btn-circle btn-sm sm:btn-md"
+            onClick={() => {
+              const modal = document.querySelector(
+                `#${MODAL.RULES_SETTINGS}`,
+              ) as HTMLDialogElement | null
+
+              modal?.showModal()
+            }}
+          >
+            <IconSettings />
+          </Button>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto">
+        <Show when={activeTab() === ActiveTab.rules}>
+          <div
+            class="grid gap-2"
+            classList={{
+              'grid-cols-2': rulesRenderInTwoColumns(),
+            }}
+          >
+            <For each={rules()}>
+              {(rule) => (
+                <div class="card card-bordered card-compact bg-base-200 p-4">
+                  <div class="flex items-center gap-2">
+                    <span class="break-all">{rule.payload}</span>
+                    <Show
+                      when={typeof rule.size === 'number' && rule.size !== -1}
+                    >
+                      <div class="badge badge-sm">{rule.size}</div>
+                    </Show>
+                  </div>
+                  <div class="text-xs text-slate-500">
+                    {rule.type} :: {rule.proxy}
+                  </div>
+                </div>
               )}
             </For>
           </div>
+        </Show>
 
-          <Show when={activeTab() === ActiveTab.ruleProviders}>
-            <Button
-              class="btn btn-circle btn-sm"
-              disabled={allProviderIsUpdating()}
-              onClick={(e) => onUpdateAllProviderClick(e)}
-            >
-              <IconReload
-                class={twMerge(
-                  allProviderIsUpdating() && 'animate-spin text-success',
-                )}
-              />
-            </Button>
-          </Show>
-        </div>
-      </Show>
-
-      <div class="flex-1 overflow-y-auto">
         <Show when={activeTab() === ActiveTab.ruleProviders}>
-          <ForTwoColumns
-            subChild={ruleProviders().map((ruleProvider) => {
-              return (
-                <div class="card card-bordered card-compact mb-2 bg-base-200 p-4">
+          <div
+            class="grid gap-2"
+            classList={{
+              'grid-cols-2': rulesRenderInTwoColumns(),
+            }}
+          >
+            <For each={ruleProviders()}>
+              {(ruleProvider) => (
+                <div class="card card-bordered card-compact bg-base-200 p-4">
                   <div class="flex items-center gap-2 pr-8">
                     <span class="break-all">{ruleProvider.name}</span>
                     <div class="badge badge-sm">{ruleProvider.ruleCount}</div>
                   </div>
+
                   <div class="text-xs text-slate-500">
                     {ruleProvider.vehicleType} / {ruleProvider.behavior} /
                     {t('updated')} {formatTimeFromNow(ruleProvider.updatedAt)}
                   </div>
+
                   <Button
                     class="btn-circle btn-sm absolute right-2 top-2 mr-2 h-4"
                     disabled={updatingMap()[ruleProvider.name]}
@@ -123,35 +168,13 @@ export default () => {
                     />
                   </Button>
                 </div>
-              )
-            })}
-          />
-        </Show>
-
-        <Show when={activeTab() === ActiveTab.rules}>
-          <InfiniteScroll
-            each={renderRules()}
-            hasMore={renderRules().length < rules().length}
-            next={() => setMaxRuleRender(maxRuleRender() + 100)}
-          >
-            {(rule) => (
-              <div class="card card-bordered card-compact mb-2 bg-base-200 p-4">
-                <div class="flex items-center gap-2">
-                  <span class="break-all">{rule.payload}</span>
-                  <Show
-                    when={typeof rule.size === 'number' && rule.size !== -1}
-                  >
-                    <div class="badge badge-sm">{rule.size}</div>
-                  </Show>
-                </div>
-                <div class="text-xs text-slate-500">
-                  {rule.type} :: {rule.proxy}
-                </div>
-              </div>
-            )}
-          </InfiniteScroll>
+              )}
+            </For>
+          </div>
         </Show>
       </div>
+
+      <RulesSettingsModal />
     </div>
   )
 }

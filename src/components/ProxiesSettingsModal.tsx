@@ -8,11 +8,13 @@ import {
   latencyTestTimeoutDuration,
   proxiesOrderingType,
   proxiesPreviewType,
+  proxiesRenderInTwoColumns,
   setAutoCloseConns,
   setHideUnAvailableProxies,
   setLatencyTestTimeoutDuration,
   setProxiesOrderingType,
   setProxiesPreviewType,
+  setProxiesRenderInTwoColumns,
   setUrlForLatencyTest,
   urlForLatencyTest,
 } from '~/signals'
@@ -111,6 +113,19 @@ export const ProxiesSettingsModal = () => {
               {(value) => <option value={value}>{t(value)}</option>}
             </For>
           </select>
+        </div>
+
+        <div>
+          <ConfigTitle withDivider>{t('renderInTwoColumns')}</ConfigTitle>
+
+          <div class="flex w-full justify-center">
+            <input
+              type="checkbox"
+              class="toggle"
+              checked={proxiesRenderInTwoColumns()}
+              onChange={(e) => setProxiesRenderInTwoColumns(e.target.checked)}
+            />
+          </div>
         </div>
       </div>
 

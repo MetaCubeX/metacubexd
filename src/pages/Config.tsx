@@ -22,12 +22,10 @@ import {
   backendConfig,
   favDayTheme,
   favNightTheme,
-  renderInTwoColumns,
   setAutoSwitchTheme,
   setBackendConfig,
   setFavDayTheme,
   setFavNightTheme,
-  setRenderInTwoColumns,
   setSelectedEndpoint,
   setTwemoji,
   useRequest,
@@ -238,11 +236,6 @@ const ConfigForXd = () => {
   )
 
   const checkboxList = [
-    {
-      label: t('renderInTwoColumns'),
-      value: renderInTwoColumns,
-      onChange: setRenderInTwoColumns,
-    },
     {
       label: t('autoSwitchTheme'),
       value: autoSwitchTheme,

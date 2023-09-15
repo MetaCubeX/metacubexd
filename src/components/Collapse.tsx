@@ -1,6 +1,6 @@
 import { JSX, ParentComponent, Show, createMemo } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import { renderInTwoColumns } from '~/signals'
+import { proxiesRenderInTwoColumns } from '~/signals'
 
 type Props = {
   title: JSX.Element
@@ -27,7 +27,7 @@ export const Collapse: ParentComponent<Props> = (props) => {
   }
 
   const mediaQueryClassName = createMemo(() => {
-    if (renderInTwoColumns()) {
+    if (proxiesRenderInTwoColumns()) {
       return 'lg:grid-cols-3 xl:grid-cols-4'
     } else {
       return 'sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7'
