@@ -1,5 +1,4 @@
-import InfiniteScroll from 'solid-infinite-scroll'
-import { createMemo, createSignal } from 'solid-js'
+import { For } from 'solid-js'
 import { ProxyNodeCard } from '~/components'
 
 export const ProxyCardGroups = (props: {
@@ -7,15 +6,8 @@ export const ProxyCardGroups = (props: {
   now?: string
   onClick?: (name: string) => void
 }) => {
-  const [maxRender, setMaxRender] = createSignal(100)
-  const proxyNames = createMemo(() => props.proxyNames.slice(0, maxRender()))
-
   return (
-    <InfiniteScroll
-      each={proxyNames()}
-      hasMore={proxyNames().length < props.proxyNames.length}
-      next={() => setMaxRender(maxRender() + 30)}
-    >
+    <For each={props.proxyNames}>
       {(proxy) => (
         <ProxyNodeCard
           proxyName={proxy}
@@ -23,6 +15,6 @@ export const ProxyCardGroups = (props: {
           onClick={props.onClick && (() => props.onClick?.(proxy))}
         />
       )}
-    </InfiniteScroll>
+    </For>
   )
 }

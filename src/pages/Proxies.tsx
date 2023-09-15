@@ -224,13 +224,11 @@ export default () => {
                 </>
               )
 
-              const content = <ProxyCardGroups proxyNames={sortedProxyNames} />
-
               return (
                 <Collapse
                   isOpen={collapsedMap()[proxyProvider.name]}
                   title={title}
-                  content={content}
+                  content={<ProxyCardGroups proxyNames={sortedProxyNames} />}
                   onCollapse={(val) => setCollapsedMap(proxyProvider.name, val)}
                 />
               )
@@ -286,21 +284,19 @@ export default () => {
                 </>
               )
 
-              const content = (
-                <ProxyCardGroups
-                  proxyNames={sortedProxyNames}
-                  now={proxy.now}
-                  onClick={(name) => {
-                    void onProxyNodeClick(proxy, name)
-                  }}
-                />
-              )
-
               return (
                 <Collapse
                   isOpen={collapsedMap()[proxy.name]}
                   title={title}
-                  content={content}
+                  content={
+                    <ProxyCardGroups
+                      proxyNames={sortedProxyNames}
+                      now={proxy.now}
+                      onClick={(name) => {
+                        void onProxyNodeClick(proxy, name)
+                      }}
+                    />
+                  }
                   onCollapse={(val) => setCollapsedMap(proxy.name, val)}
                 />
               )
