@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.92.0](https://github.com/MetaCubeX/metacubexd/compare/v1.91.0...v1.92.0) (2023-09-15)
+
+
+### Features
+
+* drop ForTwoColumns renderer ([353b5eb](https://github.com/MetaCubeX/metacubexd/commit/353b5ebff3457c4a804836ee1428efeb7f8ad633))
+
+
+### Bug Fixes
+
+* proxy providers grid layout ([6d242a4](https://github.com/MetaCubeX/metacubexd/commit/6d242a44579522c65e086a5c5c89824329643c0b))
+* **proxy:** tabs won't be shown in proxies page when proxy provider list is empty ([6c5662a](https://github.com/MetaCubeX/metacubexd/commit/6c5662a7a9a99ccd6b6d570a8da983fa37effc0b))
+
 ## [1.91.0](https://github.com/MetaCubeX/metacubexd/compare/v1.90.0...v1.91.0) (2023-09-15)
 
 
