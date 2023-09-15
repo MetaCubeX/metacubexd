@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.91.0](https://github.com/MetaCubeX/metacubexd/compare/v1.90.0...v1.91.0) (2023-09-15)
+
+
+### Features
+
+* **proxy:** hideUnAvailableProxies, closes [#200](https://github.com/MetaCubeX/metacubexd/issues/200) ([9e556d9](https://github.com/MetaCubeX/metacubexd/commit/9e556d959eb6ad801be30570118c942d9c31dc03))
+* **rules:** renderInTwoColumns ([6743ebd](https://github.com/MetaCubeX/metacubexd/commit/6743ebde8f5e13f32b27f913c620629517f63da2))
+* settings per-page ([d776260](https://github.com/MetaCubeX/metacubexd/commit/d77626058af9a3d22f22e410918d2aafb3f2ea46))
+
+
+### Bug Fixes
+
+* failed to resolve import solid-infinite-scroll ([ebc95fe](https://github.com/MetaCubeX/metacubexd/commit/ebc95fe58592a6f187f733ea1da3b56d738a7406))
+* logMaxRows value ([b3c924e](https://github.com/MetaCubeX/metacubexd/commit/b3c924e33bdca68fed59092c107cc38324a418d0))
+
 ## [1.90.0](https://github.com/MetaCubeX/metacubexd/compare/v1.89.0...v1.90.0) (2023-09-13)
 
 
