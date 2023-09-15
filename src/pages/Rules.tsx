@@ -1,11 +1,10 @@
 import { useI18n } from '@solid-primitives/i18n'
-import { IconReload, IconSettings } from '@tabler/icons-solidjs'
+import { IconReload } from '@tabler/icons-solidjs'
 import { For, Show, createSignal, onMount } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import { Button, RulesSettingsModal } from '~/components'
-import { MODAL } from '~/constants'
+import { Button } from '~/components'
 import { formatTimeFromNow, useStringBooleanMap } from '~/helpers'
-import { rulesRenderInTwoColumns, useRules } from '~/signals'
+import { useRules } from '~/signals'
 
 enum ActiveTab {
   ruleProviders = 'ruleProviders',
@@ -60,7 +59,7 @@ export default () => {
   return (
     <div class="flex h-full flex-col gap-2">
       <div class="flex items-center gap-2">
-        <div class="tabs-boxed tabs gap-2">
+        <div class="tabs tabs-boxed gap-2">
           <For each={tabs()}>
             {(tab) => (
               <button
@@ -90,31 +89,11 @@ export default () => {
             />
           </Button>
         </Show>
-
-        <div class="ml-auto">
-          <Button
-            class="btn-circle btn-sm sm:btn-md"
-            onClick={() => {
-              const modal = document.querySelector(
-                `#${MODAL.RULES_SETTINGS}`,
-              ) as HTMLDialogElement | null
-
-              modal?.showModal()
-            }}
-          >
-            <IconSettings />
-          </Button>
-        </div>
       </div>
 
       <div class="flex-1 overflow-y-auto">
         <Show when={activeTab() === ActiveTab.rules}>
-          <div
-            class="grid gap-2"
-            classList={{
-              'grid-cols-2': rulesRenderInTwoColumns(),
-            }}
-          >
+          <div class="grid gap-2">
             <For each={rules()}>
               {(rule) => (
                 <div class="card card-bordered card-compact bg-base-200 p-4">
@@ -136,12 +115,7 @@ export default () => {
         </Show>
 
         <Show when={activeTab() === ActiveTab.ruleProviders}>
-          <div
-            class="grid gap-2"
-            classList={{
-              'grid-cols-2': rulesRenderInTwoColumns(),
-            }}
-          >
+          <div class="grid gap-2">
             <For each={ruleProviders()}>
               {(ruleProvider) => (
                 <div class="card card-bordered card-compact bg-base-200 p-4">
@@ -173,8 +147,6 @@ export default () => {
           </div>
         </Show>
       </div>
-
-      <RulesSettingsModal />
     </div>
   )
 }

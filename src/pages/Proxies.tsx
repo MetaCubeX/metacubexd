@@ -9,7 +9,6 @@ import { twMerge } from 'tailwind-merge'
 import {
   Button,
   Collapse,
-  ForTwoColumns,
   ProxiesSettingsModal,
   ProxyCardGroups,
   ProxyNodePreview,
@@ -152,154 +151,160 @@ export default () => {
 
       <div class="flex-1 overflow-y-auto">
         <Show when={activeTab() === ActiveTab.proxies}>
-          <ForTwoColumns
-            subChild={proxies().map((proxy) => {
-              const sortedProxyNames = filterProxiesByAvailability(
-                sortProxiesByOrderingType(
-                  proxy.all ?? [],
+          <div class="grid grid-cols-1 place-items-start gap-2 sm:grid-cols-2">
+            <For each={proxies()}>
+              {(proxy) => {
+                const sortedProxyNames = filterProxiesByAvailability(
+                  sortProxiesByOrderingType(
+                    proxy.all ?? [],
+                    latencyMap(),
+                    proxiesOrderingType(),
+                  ),
                   latencyMap(),
-                  proxiesOrderingType(),
-                ),
-                latencyMap(),
-                hideUnAvailableProxies(),
-              )
+                  hideUnAvailableProxies(),
+                )
 
-              const title = (
-                <>
-                  <div class="mr-8 flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                      <span>{proxy.name}</span>
-                      <div class="badge badge-sm">{proxy.all?.length}</div>
-                    </div>
-
-                    <Button
-                      class="btn-circle btn-sm"
-                      disabled={latencyTestingMap()[proxy.name]}
-                      onClick={(e) => onLatencyTestClick(e, proxy.name)}
-                    >
-                      <IconBrandSpeedtest
-                        class={twMerge(
-                          latencyTestingMap()[proxy.name] &&
-                            'animate-pulse text-success',
-                        )}
-                      />
-                    </Button>
-                  </div>
-
-                  <div class="text-sm text-slate-500">
-                    {proxy.type} {proxy.now?.length > 0 && ` :: ${proxy.now}`}
-                  </div>
-
-                  <Show when={!collapsedMap()[proxy.name]}>
-                    <ProxyNodePreview
-                      proxyNameList={sortedProxyNames}
-                      now={proxy.now}
-                    />
-                  </Show>
-                </>
-              )
-
-              return (
-                <Collapse
-                  isOpen={collapsedMap()[proxy.name]}
-                  title={title}
-                  content={
-                    <ProxyCardGroups
-                      proxyNames={sortedProxyNames}
-                      now={proxy.now}
-                      onClick={(name) => {
-                        void onProxyNodeClick(proxy, name)
-                      }}
-                    />
-                  }
-                  onCollapse={(val) => setCollapsedMap(proxy.name, val)}
-                />
-              )
-            })}
-          />
-        </Show>
-
-        <Show when={activeTab() === ActiveTab.proxyProviders}>
-          <ForTwoColumns
-            subChild={proxyProviders().map((proxyProvider) => {
-              const sortedProxyNames = filterProxiesByAvailability(
-                sortProxiesByOrderingType(
-                  proxyProvider.proxies.map((i) => i.name) ?? [],
-                  latencyMap(),
-                  proxiesOrderingType(),
-                ),
-                latencyMap(),
-                hideUnAvailableProxies(),
-              )
-
-              const title = (
-                <>
-                  <div class="mr-8 flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                      <span>{proxyProvider.name}</span>
-                      <div class="badge badge-sm">
-                        {proxyProvider.proxies.length}
+                const title = (
+                  <>
+                    <div class="mr-8 flex items-center justify-between">
+                      <div class="flex items-center gap-2">
+                        <span>{proxy.name}</span>
+                        <div class="badge badge-sm">{proxy.all?.length}</div>
                       </div>
-                    </div>
-
-                    <div>
-                      <Button
-                        class="btn btn-circle btn-sm mr-2"
-                        disabled={updatingMap()[proxyProvider.name]}
-                        onClick={(e) =>
-                          onUpdateProviderClick(e, proxyProvider.name)
-                        }
-                      >
-                        <IconReload
-                          class={twMerge(
-                            updatingMap()[proxyProvider.name] &&
-                              'animate-spin text-success',
-                          )}
-                        />
-                      </Button>
 
                       <Button
-                        class="btn btn-circle btn-sm"
-                        disabled={healthCheckingMap()[proxyProvider.name]}
-                        onClick={(e) =>
-                          onHealthCheckClick(e, proxyProvider.name)
-                        }
+                        class="btn-circle btn-sm"
+                        disabled={latencyTestingMap()[proxy.name]}
+                        onClick={(e) => onLatencyTestClick(e, proxy.name)}
                       >
                         <IconBrandSpeedtest
                           class={twMerge(
-                            healthCheckingMap()[proxyProvider.name] &&
+                            latencyTestingMap()[proxy.name] &&
                               'animate-pulse text-success',
                           )}
                         />
                       </Button>
                     </div>
-                  </div>
 
-                  <SubscriptionInfo
-                    subscriptionInfo={proxyProvider.subscriptionInfo}
+                    <div class="text-sm text-slate-500">
+                      {proxy.type} {proxy.now?.length > 0 && ` :: ${proxy.now}`}
+                    </div>
+
+                    <Show when={!collapsedMap()[proxy.name]}>
+                      <ProxyNodePreview
+                        proxyNameList={sortedProxyNames}
+                        now={proxy.now}
+                      />
+                    </Show>
+                  </>
+                )
+
+                return (
+                  <Collapse
+                    isOpen={collapsedMap()[proxy.name]}
+                    title={title}
+                    content={
+                      <ProxyCardGroups
+                        proxyNames={sortedProxyNames}
+                        now={proxy.now}
+                        onClick={(name) => {
+                          void onProxyNodeClick(proxy, name)
+                        }}
+                      />
+                    }
+                    onCollapse={(val) => setCollapsedMap(proxy.name, val)}
                   />
+                )
+              }}
+            </For>
+          </div>
+        </Show>
 
-                  <div class="text-sm text-slate-500">
-                    {proxyProvider.vehicleType} :: {t('updated')}{' '}
-                    {formatTimeFromNow(proxyProvider.updatedAt)}
-                  </div>
+        <Show when={activeTab() === ActiveTab.proxyProviders}>
+          <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <For each={proxyProviders()}>
+              {(proxyProvider) => {
+                const sortedProxyNames = filterProxiesByAvailability(
+                  sortProxiesByOrderingType(
+                    proxyProvider.proxies.map((i) => i.name) ?? [],
+                    latencyMap(),
+                    proxiesOrderingType(),
+                  ),
+                  latencyMap(),
+                  hideUnAvailableProxies(),
+                )
 
-                  <Show when={!collapsedMap()[proxyProvider.name]}>
-                    <ProxyNodePreview proxyNameList={sortedProxyNames} />
-                  </Show>
-                </>
-              )
+                const title = (
+                  <>
+                    <div class="mr-8 flex items-center justify-between">
+                      <div class="flex items-center gap-2">
+                        <span>{proxyProvider.name}</span>
+                        <div class="badge badge-sm">
+                          {proxyProvider.proxies.length}
+                        </div>
+                      </div>
 
-              return (
-                <Collapse
-                  isOpen={collapsedMap()[proxyProvider.name]}
-                  title={title}
-                  content={<ProxyCardGroups proxyNames={sortedProxyNames} />}
-                  onCollapse={(val) => setCollapsedMap(proxyProvider.name, val)}
-                />
-              )
-            })}
-          />
+                      <div>
+                        <Button
+                          class="btn btn-circle btn-sm mr-2"
+                          disabled={updatingMap()[proxyProvider.name]}
+                          onClick={(e) =>
+                            onUpdateProviderClick(e, proxyProvider.name)
+                          }
+                        >
+                          <IconReload
+                            class={twMerge(
+                              updatingMap()[proxyProvider.name] &&
+                                'animate-spin text-success',
+                            )}
+                          />
+                        </Button>
+
+                        <Button
+                          class="btn btn-circle btn-sm"
+                          disabled={healthCheckingMap()[proxyProvider.name]}
+                          onClick={(e) =>
+                            onHealthCheckClick(e, proxyProvider.name)
+                          }
+                        >
+                          <IconBrandSpeedtest
+                            class={twMerge(
+                              healthCheckingMap()[proxyProvider.name] &&
+                                'animate-pulse text-success',
+                            )}
+                          />
+                        </Button>
+                      </div>
+                    </div>
+
+                    <SubscriptionInfo
+                      subscriptionInfo={proxyProvider.subscriptionInfo}
+                    />
+
+                    <div class="text-sm text-slate-500">
+                      {proxyProvider.vehicleType} :: {t('updated')}{' '}
+                      {formatTimeFromNow(proxyProvider.updatedAt)}
+                    </div>
+
+                    <Show when={!collapsedMap()[proxyProvider.name]}>
+                      <ProxyNodePreview proxyNameList={sortedProxyNames} />
+                    </Show>
+                  </>
+                )
+
+                return (
+                  <Collapse
+                    isOpen={collapsedMap()[proxyProvider.name]}
+                    title={title}
+                    content={<ProxyCardGroups proxyNames={sortedProxyNames} />}
+                    onCollapse={(val) =>
+                      setCollapsedMap(proxyProvider.name, val)
+                    }
+                  />
+                )
+              }}
+            </For>
+          </div>
         </Show>
       </div>
 
