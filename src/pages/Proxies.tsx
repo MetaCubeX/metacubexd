@@ -203,17 +203,14 @@ export default () => {
                   <Collapse
                     isOpen={collapsedMap()[proxy.name]}
                     title={title}
-                    content={
-                      <ProxyCardGroups
-                        proxyNames={sortedProxyNames}
-                        now={proxy.now}
-                        onClick={(name) => {
-                          void onProxyNodeClick(proxy, name)
-                        }}
-                      />
-                    }
                     onCollapse={(val) => setCollapsedMap(proxy.name, val)}
-                  />
+                  >
+                    <ProxyCardGroups
+                      proxyNames={sortedProxyNames}
+                      now={proxy.now}
+                      onClick={(name) => void onProxyNodeClick(proxy, name)}
+                    />
+                  </Collapse>
                 )
               }}
             </For>
@@ -221,7 +218,7 @@ export default () => {
         </Show>
 
         <Show when={activeTab() === ActiveTab.proxyProviders}>
-          <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <div class="grid grid-cols-1 place-items-start gap-2 sm:grid-cols-2">
             <For each={proxyProviders()}>
               {(proxyProvider) => {
                 const sortedProxyNames = filterProxiesByAvailability(
@@ -296,11 +293,12 @@ export default () => {
                   <Collapse
                     isOpen={collapsedMap()[proxyProvider.name]}
                     title={title}
-                    content={<ProxyCardGroups proxyNames={sortedProxyNames} />}
                     onCollapse={(val) =>
                       setCollapsedMap(proxyProvider.name, val)
                     }
-                  />
+                  >
+                    <ProxyCardGroups proxyNames={sortedProxyNames} />
+                  </Collapse>
                 )
               }}
             </For>

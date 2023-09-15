@@ -1,15 +1,14 @@
-import { JSX, ParentComponent, Show } from 'solid-js'
+import { children, JSX, ParentComponent, Show } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 
 type Props = {
   title: JSX.Element
-  content: JSX.Element
   isOpen?: boolean
   onCollapse: (collapsed: boolean) => void
 }
 
 export const Collapse: ParentComponent<Props> = (props) => {
-  const { title, content, onCollapse } = props
+  const { title, onCollapse } = props
 
   const getCollapseClassName = () => {
     const openedClassName = 'collapse-open'
@@ -44,7 +43,7 @@ export const Collapse: ParentComponent<Props> = (props) => {
           'collapse-content grid grid-cols-2 gap-2 transition-opacity duration-1000',
         )}
       >
-        <Show when={props.isOpen}>{content}</Show>
+        <Show when={props.isOpen}>{children(() => props.children)()}</Show>
       </div>
     </div>
   )
