@@ -1,4 +1,5 @@
 import { useI18n } from '@solid-primitives/i18n'
+import { IconSettings } from '@tabler/icons-solidjs'
 import {
   ColumnDef,
   createSolidTable,
@@ -7,8 +8,9 @@ import {
 } from '@tanstack/solid-table'
 import { For, Index, createEffect, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import { LOG_LEVEL } from '~/constants'
-import { tableSize, tableSizeClassName, useWsRequest } from '~/signals'
+import { Button, LogsSettingsModal } from '~/components'
+import { LOG_LEVEL, MODAL } from '~/constants'
+import { logsTableSize, tableSizeClassName, useWsRequest } from '~/signals'
 import { logLevel, logMaxRows } from '~/signals/config'
 import { Log } from '~/types'
 
@@ -85,17 +87,32 @@ export default () => {
 
   return (
     <div class="flex h-full flex-col gap-4 p-1">
-      <input
-        type="search"
-        class="input input-primary input-sm flex-shrink-0 sm:input-md"
-        placeholder={t('search')}
-        onInput={(e) => setSearch(e.target.value)}
-      />
+      <div class="join w-full">
+        <input
+          type="search"
+          class="input join-item input-primary input-sm flex-1 flex-shrink-0 sm:input-md"
+          placeholder={t('search')}
+          onInput={(e) => setSearch(e.target.value)}
+        />
+
+        <Button
+          class="join-item btn-sm sm:btn-md"
+          onClick={() => {
+            const modal = document.querySelector(
+              `#${MODAL.LOGS_SETTINGS}`,
+            ) as HTMLDialogElement | null
+
+            modal?.showModal()
+          }}
+        >
+          <IconSettings />
+        </Button>
+      </div>
 
       <div class="overflow-x-auto whitespace-nowrap rounded-md bg-base-300">
         <table
           class={twMerge(
-            tableSizeClassName(tableSize()),
+            tableSizeClassName(logsTableSize()),
             'table relative rounded-none',
           )}
         >
@@ -150,6 +167,8 @@ export default () => {
           </tbody>
         </table>
       </div>
+
+      <LogsSettingsModal />
     </div>
   )
 }

@@ -2,14 +2,7 @@ import { createForm } from '@felte/solid'
 import { validator } from '@felte/validator-zod'
 import { useI18n } from '@solid-primitives/i18n'
 import { useNavigate } from '@solidjs/router'
-import {
-  For,
-  ParentComponent,
-  Show,
-  children,
-  createSignal,
-  onMount,
-} from 'solid-js'
+import { For, Show, createSignal, onMount } from 'solid-js'
 import { z } from 'zod'
 import {
   fetchBackendConfigAPI,
@@ -22,47 +15,21 @@ import {
   upgradeBackendAPI,
   upgradingBackend,
 } from '~/apis'
-import { Button } from '~/components'
+import { Button, ConfigTitle } from '~/components'
+import { LANG, MODE_OPTIONS, ROUTES, themes } from '~/constants'
 import {
-  LANG,
-  LOGS_TABLE_MAX_ROWS_LIST,
-  LOG_LEVEL,
-  MODE_OPTIONS,
-  PROXIES_ORDERING_TYPE,
-  PROXIES_PREVIEW_TYPE,
-  ROUTES,
-  TAILWINDCSS_SIZE,
-  themes,
-} from '~/constants'
-import {
-  autoCloseConns,
   autoSwitchTheme,
   backendConfig,
   favDayTheme,
   favNightTheme,
-  latencyTestTimeoutDuration,
-  logLevel,
-  logMaxRows,
-  proxiesOrderingType,
-  proxiesPreviewType,
   renderInTwoColumns,
-  setAutoCloseConns,
   setAutoSwitchTheme,
   setBackendConfig,
   setFavDayTheme,
   setFavNightTheme,
-  setLatencyTestTimeoutDuration,
-  setLogLevel,
-  setLogMaxRows,
-  setProxiesOrderingType,
-  setProxiesPreviewType,
   setRenderInTwoColumns,
   setSelectedEndpoint,
-  setTableSize,
   setTwemoji,
-  setUrlForLatencyTest,
-  tableSize,
-  urlForLatencyTest,
   useRequest,
   useTwemoji,
 } from '~/signals'
@@ -72,12 +39,6 @@ const dnsQueryFormSchema = z.object({
   name: z.string(),
   type: z.string(),
 })
-
-const ConfigTitle: ParentComponent = (props) => (
-  <div class="pb-4 text-lg font-semibold">
-    {children(() => props.children)()}
-  </div>
-)
 
 const DNSQueryForm = () => {
   const [t] = useI18n()
@@ -147,7 +108,7 @@ const ConfigForm = () => {
 
   const portsList = [
     {
-      label: 'Http Port',
+      label: 'HTTP Port',
       key: 'port',
     },
     {
@@ -159,7 +120,7 @@ const ConfigForm = () => {
       key: 'redir-port',
     },
     {
-      label: 'Tproxy Port',
+      label: 'TProxy Port',
       key: 'tproxy-port',
     },
     {
@@ -225,42 +186,6 @@ const ConfigForm = () => {
         <Button loading={restartingBackend()} onClick={restartBackendAPI}>
           {t('restartCore')}
         </Button>
-      </div>
-
-      <div class="flex flex-col">
-        <ConfigTitle>{t('urlForLatencyTest')}</ConfigTitle>
-
-        <input
-          class="input input-bordered max-w-md"
-          value={urlForLatencyTest()}
-          onChange={(e) => setUrlForLatencyTest(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <ConfigTitle>
-          {t('latencyTestTimeoutDuration')} ({t('ms')})
-        </ConfigTitle>
-
-        <input
-          type="number"
-          class="input input-bordered w-full max-w-md"
-          value={latencyTestTimeoutDuration()}
-          onChange={(e) =>
-            setLatencyTestTimeoutDuration(Number(e.target.value))
-          }
-        />
-      </div>
-
-      <div>
-        <ConfigTitle>{t('autoCloseConns')}</ConfigTitle>
-
-        <input
-          class="toggle"
-          type="checkbox"
-          checked={autoCloseConns()}
-          onChange={(e) => setAutoCloseConns(e.target.checked)}
-        />
       </div>
     </div>
   )
@@ -354,97 +279,6 @@ const ConfigForXd = () => {
           </>
         )}
       </For>
-
-      <div>
-        <ConfigTitle>{t('proxiesPreviewType')}</ConfigTitle>
-
-        <select
-          class="select select-bordered w-full max-w-xs"
-          value={proxiesPreviewType()}
-          onChange={(e) =>
-            setProxiesPreviewType(e.target.value as PROXIES_PREVIEW_TYPE)
-          }
-        >
-          <For each={Object.values(PROXIES_PREVIEW_TYPE)}>
-            {(value) => <option value={value}>{t(value)}</option>}
-          </For>
-        </select>
-      </div>
-
-      <div>
-        <ConfigTitle>{t('proxiesSorting')}</ConfigTitle>
-
-        <select
-          class="select select-bordered w-full max-w-xs"
-          value={proxiesOrderingType()}
-          onChange={(e) =>
-            setProxiesOrderingType(e.target.value as PROXIES_ORDERING_TYPE)
-          }
-        >
-          <For each={Object.values(PROXIES_ORDERING_TYPE)}>
-            {(value) => (
-              <option class="flex items-center gap-2" value={value}>
-                {t(value)}
-              </option>
-            )}
-          </For>
-        </select>
-      </div>
-
-      <div>
-        <ConfigTitle>{t('tableSize')}</ConfigTitle>
-
-        <select
-          class="select select-bordered w-full max-w-xs"
-          value={tableSize()}
-          onChange={(e) => setTableSize(e.target.value as TAILWINDCSS_SIZE)}
-        >
-          <For each={Object.values(TAILWINDCSS_SIZE)}>
-            {(value) => <option value={value}>{t(value)}</option>}
-          </For>
-        </select>
-      </div>
-
-      <div>
-        <ConfigTitle>{t('logLevel')}</ConfigTitle>
-
-        <select
-          class="select select-bordered w-full max-w-xs"
-          onChange={(e) => {
-            setLogLevel(e.target.value as LOG_LEVEL)
-          }}
-        >
-          <For
-            each={[
-              LOG_LEVEL.Info,
-              LOG_LEVEL.Error,
-              LOG_LEVEL.Warning,
-              LOG_LEVEL.Debug,
-              LOG_LEVEL.Silent,
-            ]}
-          >
-            {(level) => (
-              <option selected={logLevel() === level} value={level}>
-                {t(level)}
-              </option>
-            )}
-          </For>
-        </select>
-      </div>
-
-      <div>
-        <ConfigTitle>{t('logMaxRows')}</ConfigTitle>
-
-        <select
-          class="select select-bordered w-full max-w-xs"
-          value={logMaxRows()}
-          onChange={(e) => setLogMaxRows(parseInt(e.target.value))}
-        >
-          <For each={LOGS_TABLE_MAX_ROWS_LIST}>
-            {(rows) => <option value={rows}>{rows}</option>}
-          </For>
-        </select>
-      </div>
 
       <div>
         <Button

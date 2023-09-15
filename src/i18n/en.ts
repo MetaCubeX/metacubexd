@@ -59,7 +59,6 @@ export default {
   orderName_desc: 'By name alphabetically (Z-A)',
   ms: 'ms',
   updated: 'Updated',
-  renderProxiesInSamePage: 'Render proxies and proxy provider in same page',
   tableSize: 'Table size',
   logLevel: 'Log Level',
   info: 'info',
@@ -67,7 +66,7 @@ export default {
   debug: 'debug',
   warning: 'warning',
   error: 'error',
-  logMaxRows: 'Log Maxinum Reserved Rows',
+  logMaxRows: 'Log Maximum Reserved Rows',
   xs: 'Extra small size',
   sm: 'Small size',
   md: 'Normal size',
@@ -86,4 +85,5 @@ export default {
   direct: 'Direct',
   active: 'Active',
   closed: 'Closed',
+  sort: 'Sort',
 }

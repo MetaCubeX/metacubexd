@@ -33,16 +33,21 @@ import { twMerge } from 'tailwind-merge'
 import { closeAllConnectionsAPI, closeSingleConnectionAPI } from '~/apis'
 import {
   Button,
+  ConnectionsSettingsModal,
   ConnectionsTableDetailsModal,
-  ConnectionsTableOrderingModal,
 } from '~/components'
 import {
   CONNECTIONS_TABLE_ACCESSOR_KEY,
   CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
   CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY,
+  MODAL,
 } from '~/constants'
 import { formatTimeFromNow } from '~/helpers'
-import { tableSize, tableSizeClassName, useConnections } from '~/signals'
+import {
+  connectionsTableSize,
+  tableSizeClassName,
+  useConnections,
+} from '~/signals'
 import type { Connection } from '~/types'
 
 type ColumnVisibility = Partial<Record<CONNECTIONS_TABLE_ACCESSOR_KEY, boolean>>
@@ -107,7 +112,7 @@ export default () => {
               setSelectedConnectionID(row.original.id)
 
               const modal = document.querySelector(
-                '#connections-table-details-modal',
+                `#${MODAL.CONNECTIONS_TABLE_DETAILS}`,
               ) as HTMLDialogElement | null
 
               modal?.showModal()
@@ -357,7 +362,7 @@ export default () => {
             class="btn join-item btn-sm sm:btn-md"
             onClick={() => {
               const modal = document.querySelector(
-                '#connections-table-ordering-modal',
+                `#${MODAL.CONNECTIONS_SETTINGS}`,
               ) as HTMLDialogElement | null
 
               modal?.showModal()
@@ -371,7 +376,7 @@ export default () => {
       <div class="overflow-x-auto whitespace-nowrap rounded-md bg-base-300">
         <table
           class={twMerge(
-            tableSizeClassName(tableSize()),
+            tableSizeClassName(connectionsTableSize()),
             'table table-zebra relative rounded-none',
           )}
         >
@@ -488,7 +493,7 @@ export default () => {
         </table>
       </div>
 
-      <ConnectionsTableOrderingModal
+      <ConnectionsSettingsModal
         order={columnOrder()}
         visible={columnVisibility()}
         onOrderChange={(data: ColumnOrder) => setColumnOrder(data)}

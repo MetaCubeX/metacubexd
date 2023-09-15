@@ -1,15 +1,21 @@
 import { useI18n } from '@solid-primitives/i18n'
-import { IconBrandSpeedtest, IconReload } from '@tabler/icons-solidjs'
+import {
+  IconBrandSpeedtest,
+  IconReload,
+  IconSettings,
+} from '@tabler/icons-solidjs'
 import { For, Show, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import {
   Button,
   Collapse,
   ForTwoColumns,
+  ProxiesSettingsModal,
   ProxyCardGroups,
   ProxyNodePreview,
   SubscriptionInfo,
 } from '~/components'
+import { MODAL } from '~/constants'
 import {
   formatTimeFromNow,
   sortProxiesByOrderingType,
@@ -123,6 +129,21 @@ export default () => {
               />
             </Button>
           </Show>
+
+          <div class="ml-auto">
+            <Button
+              class="btn-circle btn-sm sm:btn-md"
+              onClick={() => {
+                const modal = document.querySelector(
+                  `#${MODAL.PROXIES_SETTINGS}`,
+                ) as HTMLDialogElement | null
+
+                modal?.showModal()
+              }}
+            >
+              <IconSettings />
+            </Button>
+          </div>
         </div>
       </Show>
 
@@ -274,6 +295,8 @@ export default () => {
           />
         </Show>
       </div>
+
+      <ProxiesSettingsModal />
     </div>
   )
 }

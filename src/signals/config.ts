@@ -48,9 +48,13 @@ export const [renderInTwoColumns, setRenderInTwoColumns] = makePersisted(
   createSignal(true),
   { name: 'renderInTwoColumn', storage: localStorage },
 )
-export const [tableSize, setTableSize] = makePersisted(
+export const [connectionsTableSize, setConnectionsTableSize] = makePersisted(
   createSignal<TAILWINDCSS_SIZE>(TAILWINDCSS_SIZE.XS),
-  { name: 'tableSize', storage: localStorage },
+  { name: 'connectionsTableSize', storage: localStorage },
+)
+export const [logsTableSize, setLogsTableSize] = makePersisted(
+  createSignal<TAILWINDCSS_SIZE>(TAILWINDCSS_SIZE.XS),
+  { name: 'logsTableSize', storage: localStorage },
 )
 
 export const [logLevel, setLogLevel] = makePersisted(

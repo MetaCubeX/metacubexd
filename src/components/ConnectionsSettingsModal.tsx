@@ -14,17 +14,20 @@ import {
   useDragDropContext,
 } from '@thisbeyond/solid-dnd'
 import { Component, For, Show, createSignal } from 'solid-js'
-import { Button } from '~/components'
+import { Button, ConfigTitle } from '~/components'
 import {
   CONNECTIONS_TABLE_ACCESSOR_KEY,
   CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
   CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY,
+  MODAL,
+  TAILWINDCSS_SIZE,
 } from '~/constants'
+import { connectionsTableSize, setConnectionsTableSize } from '~/signals'
 
 type ColumnVisibility = Partial<Record<CONNECTIONS_TABLE_ACCESSOR_KEY, boolean>>
 type ColumnOrder = CONNECTIONS_TABLE_ACCESSOR_KEY[]
 
-export const ConnectionsTableOrderingModal = (props: {
+export const ConnectionsSettingsModal = (props: {
   order: ColumnOrder
   visible: ColumnVisibility
   onOrderChange: (value: ColumnOrder) => void
@@ -76,8 +79,9 @@ export const ConnectionsTableOrderingModal = (props: {
           'transition-transform': !!state.active.draggable,
         }}
       >
-        <div class="my-1 flex cursor-grab justify-between p-1">
+        <div class="flex cursor-grab justify-between py-2">
           <span class="select-none">{t(key)}</span>
+
           <input
             type="checkbox"
             class="toggle"
@@ -96,27 +100,50 @@ export const ConnectionsTableOrderingModal = (props: {
 
   return (
     <dialog
-      id="connections-table-ordering-modal"
+      id={MODAL.CONNECTIONS_SETTINGS}
       class="modal modal-bottom sm:modal-middle"
     >
-      <div class="modal-box" onContextMenu={(e) => e.preventDefault()}>
-        <DragDropProvider
-          onDragStart={onDragStart}
-          onDragEnd={onDragEnd as DragEventHandler}
-          collisionDetector={closestCenter}
-        >
-          <DragDropSensors />
+      <div
+        class="modal-box flex flex-col gap-4"
+        onContextMenu={(e) => e.preventDefault()}
+      >
+        <div>
+          <ConfigTitle withDivider>{t('tableSize')}</ConfigTitle>
 
-          <SortableProvider ids={props.order}>
-            <For each={props.order}>{(key) => <FormRow key={key} />}</For>
-          </SortableProvider>
+          <select
+            class="select select-bordered w-full"
+            value={connectionsTableSize()}
+            onChange={(e) =>
+              setConnectionsTableSize(e.target.value as TAILWINDCSS_SIZE)
+            }
+          >
+            <For each={Object.values(TAILWINDCSS_SIZE)}>
+              {(value) => <option value={value}>{t(value)}</option>}
+            </For>
+          </select>
+        </div>
 
-          <DragOverlay>
-            <Show when={activeKey()}>
-              <div>{t(activeKey()!)}</div>
-            </Show>
-          </DragOverlay>
-        </DragDropProvider>
+        <div>
+          <ConfigTitle withDivider>{t('sort')}</ConfigTitle>
+
+          <DragDropProvider
+            onDragStart={onDragStart}
+            onDragEnd={onDragEnd as DragEventHandler}
+            collisionDetector={closestCenter}
+          >
+            <DragDropSensors />
+
+            <SortableProvider ids={props.order}>
+              <For each={props.order}>{(key) => <FormRow key={key} />}</For>
+            </SortableProvider>
+
+            <DragOverlay>
+              <Show when={activeKey()}>
+                <div>{t(activeKey()!)}</div>
+              </Show>
+            </DragOverlay>
+          </DragDropProvider>
+        </div>
 
         <div class="modal-action">
           <Button

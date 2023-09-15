@@ -1,4 +1,5 @@
 import { Component, Show } from 'solid-js'
+import { MODAL } from '~/constants'
 import { allConnections } from '~/signals'
 
 export const ConnectionsTableDetailsModal: Component<{
@@ -6,7 +7,7 @@ export const ConnectionsTableDetailsModal: Component<{
 }> = (props) => {
   return (
     <dialog
-      id="connections-table-details-modal"
+      id={MODAL.CONNECTIONS_TABLE_DETAILS}
       class="modal modal-bottom sm:modal-middle"
     >
       <div class="modal-box">

@@ -59,7 +59,6 @@ export default {
   orderName_desc: '按名称字母排序 (Z-A)',
   ms: '毫秒',
   updated: '更新于',
-  renderProxiesInSamePage: '将代理和代理提供者显示在同一页',
   tableSize: '表格大小',
   logLevel: '日志等级',
   info: '信息',
@@ -86,4 +85,5 @@ export default {
   direct: '直连',
   active: '活动',
   closed: '已关闭',
+  sort: '排序',
 }
