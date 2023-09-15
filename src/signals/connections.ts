@@ -4,7 +4,7 @@ import { CONNECTIONS_TABLE_MAX_CLOSED_ROWS } from '~/constants'
 import { Connection, ConnectionRawMessage } from '~/types'
 
 export type WsMsg = {
-  connections: ConnectionRawMessage[] | null
+  connections?: ConnectionRawMessage[]
   uploadTotal: number
   downloadTotal: number
 } | null

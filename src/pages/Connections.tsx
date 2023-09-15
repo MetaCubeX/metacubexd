@@ -49,8 +49,8 @@ type ColumnVisibility = Partial<Record<CONNECTIONS_TABLE_ACCESSOR_KEY, boolean>>
 type ColumnOrder = CONNECTIONS_TABLE_ACCESSOR_KEY[]
 
 enum ActiveTab {
-  activeConnections = 'activeConnections',
-  closedConnections = 'closedConnections',
+  activeConnections,
+  closedConnections,
 }
 
 const fuzzyFilter: FilterFn<Connection> = (row, columnId, value, addMeta) => {
