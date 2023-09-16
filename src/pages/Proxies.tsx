@@ -4,7 +4,7 @@ import {
   IconReload,
   IconSettings,
 } from '@tabler/icons-solidjs'
-import { For, Show, createSignal } from 'solid-js'
+import { For, Show, createMemo, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import {
   Button,
@@ -154,14 +154,16 @@ export default () => {
           <div class="grid grid-cols-1 place-items-start gap-2 sm:grid-cols-2">
             <For each={proxies()}>
               {(proxy) => {
-                const sortedProxyNames = filterProxiesByAvailability(
-                  sortProxiesByOrderingType(
-                    proxy.all ?? [],
+                const sortedProxyNames = createMemo(() =>
+                  filterProxiesByAvailability(
+                    sortProxiesByOrderingType(
+                      proxy.all ?? [],
+                      latencyMap(),
+                      proxiesOrderingType(),
+                    ),
                     latencyMap(),
-                    proxiesOrderingType(),
+                    hideUnAvailableProxies(),
                   ),
-                  latencyMap(),
-                  hideUnAvailableProxies(),
                 )
 
                 const title = (
@@ -192,7 +194,7 @@ export default () => {
 
                     <Show when={!collapsedMap()[proxy.name]}>
                       <ProxyNodePreview
-                        proxyNameList={sortedProxyNames}
+                        proxyNameList={sortedProxyNames()}
                         now={proxy.now}
                       />
                     </Show>
@@ -206,7 +208,7 @@ export default () => {
                     onCollapse={(val) => setCollapsedMap(proxy.name, val)}
                   >
                     <ProxyCardGroups
-                      proxyNames={sortedProxyNames}
+                      proxyNames={sortedProxyNames()}
                       now={proxy.now}
                       onClick={(name) => void onProxyNodeClick(proxy, name)}
                     />
@@ -221,14 +223,12 @@ export default () => {
           <div class="grid grid-cols-1 place-items-start gap-2 sm:grid-cols-2">
             <For each={proxyProviders()}>
               {(proxyProvider) => {
-                const sortedProxyNames = filterProxiesByAvailability(
+                const sortedProxyNames = createMemo(() =>
                   sortProxiesByOrderingType(
                     proxyProvider.proxies.map((i) => i.name) ?? [],
                     latencyMap(),
                     proxiesOrderingType(),
                   ),
-                  latencyMap(),
-                  hideUnAvailableProxies(),
                 )
 
                 const title = (
@@ -284,7 +284,7 @@ export default () => {
                     </div>
 
                     <Show when={!collapsedMap()[proxyProvider.name]}>
-                      <ProxyNodePreview proxyNameList={sortedProxyNames} />
+                      <ProxyNodePreview proxyNameList={sortedProxyNames()} />
                     </Show>
                   </>
                 )
@@ -297,7 +297,7 @@ export default () => {
                       setCollapsedMap(proxyProvider.name, val)
                     }
                   >
-                    <ProxyCardGroups proxyNames={sortedProxyNames} />
+                    <ProxyCardGroups proxyNames={sortedProxyNames()} />
                   </Collapse>
                 )
               }}

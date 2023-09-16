@@ -291,9 +291,7 @@ const ConfigForXd = () => {
     {
       label: t('autoSwitchTheme'),
       value: autoSwitchTheme,
-      onChange: (value: boolean) => {
-        setAutoSwitchTheme(value)
-      },
+      onChange: (value: boolean) => setAutoSwitchTheme(value),
       subChild: autoSwitchThemeSubChild,
     },
     {
