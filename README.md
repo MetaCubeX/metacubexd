@@ -2,15 +2,13 @@
 
 Clash.Meta Dashboard, The Official One, XD
 
-<img src="https://assets.solidjs.com/banner?project=metacubexd" alt="solidjs" />
+![preview-overview](https://assets.solidjs.com/banner?project=metacubexd)
 
-<p>
-  <img src="https://img.shields.io/github/issues-pr-closed/metacubex/metacubexd?style=for-the-badge" alt="pr-closed" />
-  <img src="https://img.shields.io/github/last-commit/metacubex/metacubexd?style=for-the-badge" alt="last-commit" />
-  <img src="https://img.shields.io/github/actions/workflow/status/metacubex/metacubexd/release.yml?style=for-the-badge" alt="build" />
-  <img src="https://img.shields.io/github/downloads/metacubex/metacubexd/total?style=for-the-badge" alt="downloads">
-  <img src="https://img.shields.io/github/license/metacubex/metacubexd?style=for-the-badge" alt="license" />
-</p>
+![pr-closed](https://img.shields.io/github/issues-pr-closed/metacubex/metacubexd?style=for-the-badge)
+![last-commit](https://img.shields.io/github/last-commit/metacubex/metacubexd?style=for-the-badge)
+![build](https://img.shields.io/github/actions/workflow/status/metacubex/metacubexd/release.yml?style=for-the-badge)
+![downloads](https://img.shields.io/github/downloads/metacubex/metacubexd/total?style=for-the-badge)
+![license](https://img.shields.io/github/license/metacubex/metacubexd?style=for-the-badge)
 
 ## Preview
 
