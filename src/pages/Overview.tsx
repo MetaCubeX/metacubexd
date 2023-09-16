@@ -7,6 +7,7 @@ import { SolidApexCharts } from 'solid-apexcharts'
 import {
   JSX,
   ParentComponent,
+  batch,
   children,
   createEffect,
   createMemo,
@@ -36,8 +37,10 @@ export default () => {
   // TODO: needs a better way
   makeTimer(
     () => {
-      setTraffics((traffics) => traffics.slice(-CHART_MAX_XAXIS))
-      setMemories((memo) => memo.slice(-CHART_MAX_XAXIS))
+      batch(() => {
+        setTraffics((traffics) => traffics.slice(-CHART_MAX_XAXIS))
+        setMemories((memo) => memo.slice(-CHART_MAX_XAXIS))
+      })
     },
     // we shrink the chart data array size down every 10 minutes to prevent memory leaks
     10 * 60 * 1000,
