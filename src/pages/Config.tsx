@@ -36,7 +36,7 @@ import {
   setFavDayTheme,
   setFavNightTheme,
   setSelectedEndpoint,
-  setTwemoji,
+  setUseTwemoji,
   useRequest,
   useTwemoji,
 } from '~/signals'
@@ -250,78 +250,69 @@ const ConfigForm = () => {
 const ConfigForXd = () => {
   const [t, { locale }] = useI18n()
 
-  const autoSwitchThemeSubChild = () => (
-    <Show when={autoSwitchTheme()}>
-      <div class="flex flex-col">
-        <ConfigTitle>{t('favDayTheme')}</ConfigTitle>
-
-        <select
-          class="select select-bordered w-full max-w-xs"
-          onChange={(e) => setFavDayTheme(e.target.value)}
-        >
-          <For each={themes}>
-            {(theme) => (
-              <option selected={favDayTheme() === theme} value={theme}>
-                {theme}
-              </option>
-            )}
-          </For>
-        </select>
-      </div>
-      <div class="flex flex-col">
-        <ConfigTitle>{t('favNightTheme')}</ConfigTitle>
-
-        <select
-          class="select select-bordered w-full max-w-xs"
-          onChange={(e) => setFavNightTheme(e.target.value)}
-        >
-          <For each={themes}>
-            {(theme) => (
-              <option selected={favNightTheme() === theme} value={theme}>
-                {theme}
-              </option>
-            )}
-          </For>
-        </select>
-      </div>
-    </Show>
-  )
-
-  const checkboxList = [
-    {
-      label: t('autoSwitchTheme'),
-      value: autoSwitchTheme,
-      onChange: (value: boolean) => setAutoSwitchTheme(value),
-      subChild: autoSwitchThemeSubChild,
-    },
-    {
-      label: t('useTwemoji'),
-      value: useTwemoji,
-      onChange: setTwemoji,
-    },
-  ]
-
   return (
-    <div class="grid gap-4">
-      <For each={checkboxList}>
-        {(checkbox) => (
-          <>
-            <div class="flex flex-col">
-              <ConfigTitle>{checkbox.label}</ConfigTitle>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="flex flex-col gap-4">
+        <div>
+          <ConfigTitle>{t('autoSwitchTheme')}</ConfigTitle>
 
-              <input
-                type="checkbox"
-                class="toggle"
-                checked={checkbox.value()}
-                onChange={(e) => {
-                  checkbox.onChange(e.target.checked)
-                }}
-              />
+          <input
+            type="checkbox"
+            class="toggle"
+            checked={autoSwitchTheme()}
+            onChange={(e) => setAutoSwitchTheme(e.target.checked)}
+          />
+        </div>
+
+        <Show when={autoSwitchTheme()}>
+          <div class="flex flex-col gap-4">
+            <div class="flex flex-col">
+              <ConfigTitle>{t('favDayTheme')}</ConfigTitle>
+
+              <select
+                class="select select-bordered"
+                onChange={(e) => setFavDayTheme(e.target.value)}
+              >
+                <For each={themes}>
+                  {(theme) => (
+                    <option selected={favDayTheme() === theme} value={theme}>
+                      {theme}
+                    </option>
+                  )}
+                </For>
+              </select>
             </div>
-            {checkbox.subChild?.()}
-          </>
-        )}
-      </For>
+
+            <div class="flex flex-col">
+              <ConfigTitle>{t('favNightTheme')}</ConfigTitle>
+
+              <select
+                class="select select-bordered"
+                onChange={(e) => setFavNightTheme(e.target.value)}
+              >
+                <For each={themes}>
+                  {(theme) => (
+                    <option selected={favNightTheme() === theme} value={theme}>
+                      {theme}
+                    </option>
+                  )}
+                </For>
+              </select>
+            </div>
+          </div>
+        </Show>
+      </div>
+
+      <div>
+        <ConfigTitle>{t('useTwemoji')}</ConfigTitle>
+
+        <input
+          type="checkbox"
+          class="toggle"
+          checked={useTwemoji()}
+          onChange={(e) => setUseTwemoji(e.target.checked)}
+        />
+      </div>
 
       <div>
         <Button
@@ -357,7 +348,7 @@ const Versions = () => {
 
 export default () => {
   return (
-    <div class="mx-auto flex w-full max-w-screen-md flex-col gap-4">
+    <div class="mx-auto flex max-w-screen-md flex-col gap-4">
       <DNSQueryForm />
       <ConfigForm />
       <ConfigForXd />
