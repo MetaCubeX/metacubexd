@@ -207,12 +207,12 @@ export const ConnectionsSettingsModal = (props: {
           <div class="flex flex-col gap-4">
             <TagClientSourceIPWithNameForm />
 
-            <div class="flex flex-wrap gap-2">
+            <div class="grid grid-cols-2 gap-2">
               <For each={clientSourceIPTags()}>
                 {({ tagName, sourceIP }) => (
-                  <div class="badge badge-primary badge-lg items-center gap-2">
-                    <span>
-                      {tagName} - {sourceIP}
+                  <div class="badge badge-primary w-full items-center gap-2 py-4">
+                    <span class="truncate">
+                      {tagName}({sourceIP})
                     </span>
 
                     <Button
