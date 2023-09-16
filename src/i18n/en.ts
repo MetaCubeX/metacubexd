@@ -91,4 +91,7 @@ export default {
   flushFakeIPData: 'Flush Fake-IP Data',
   tagClientSourceIPWithName: 'Tag Client Source IP With Name',
   tag: 'Tag',
+  coreConfig: 'Core Config',
+  xdConfig: 'XD Config',
+  version: 'Version',
 }

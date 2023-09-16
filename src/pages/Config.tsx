@@ -251,7 +251,19 @@ const ConfigForXd = () => {
   const [t, { locale }] = useI18n()
 
   return (
-    <div class="grid grid-cols-2 gap-4">
+    <div class="grid grid-cols-2 place-items-center gap-4">
+      <div class="col-span-2">
+        <Button
+          onClick={() => {
+            const curLocale = locale()
+
+            locale(curLocale === LANG.EN ? LANG.ZH : LANG.EN)
+          }}
+        >
+          {t('switchLanguage')}
+        </Button>
+      </div>
+
       <div class="flex flex-col gap-4">
         <div>
           <ConfigTitle>{t('autoSwitchTheme')}</ConfigTitle>
@@ -313,18 +325,6 @@ const ConfigForXd = () => {
           onChange={(e) => setUseTwemoji(e.target.checked)}
         />
       </div>
-
-      <div>
-        <Button
-          onClick={() => {
-            const curLocale = locale()
-
-            locale(curLocale === LANG.EN ? LANG.ZH : LANG.EN)
-          }}
-        >
-          {t('switchLanguage')}
-        </Button>
-      </div>
     </div>
   )
 }
@@ -339,7 +339,7 @@ const Versions = () => {
   })
 
   return (
-    <div class="flex gap-4">
+    <div class="flex items-center justify-center gap-4">
       <kbd class="kbd">{import.meta.env.version}</kbd>
       <kbd class="kbd">{backendVersion()}</kbd>
     </div>
@@ -347,11 +347,23 @@ const Versions = () => {
 }
 
 export default () => {
+  const [t] = useI18n()
+
   return (
     <div class="mx-auto flex max-w-screen-md flex-col gap-4">
+      <ConfigTitle withDivider>{t('dnsQuery')}</ConfigTitle>
+
       <DNSQueryForm />
+
+      <ConfigTitle withDivider>{t('coreConfig')}</ConfigTitle>
+
       <ConfigForm />
+
+      <ConfigTitle withDivider>{t('xdConfig')}</ConfigTitle>
+
       <ConfigForXd />
+
+      <ConfigTitle withDivider>{t('version')}</ConfigTitle>
 
       <Versions />
     </div>

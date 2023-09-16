@@ -91,4 +91,7 @@ export default {
   flushFakeIPData: '清空 Fake-IP 数据',
   tagClientSourceIPWithName: '为客户端源 IP 地址添加名称标记',
   tag: '标记',
+  coreConfig: '核心配置',
+  xdConfig: 'XD 配置',
+  version: '版本',
 }
