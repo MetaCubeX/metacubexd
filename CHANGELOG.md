@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.93.2](https://github.com/MetaCubeX/metacubexd/compare/v1.93.1...v1.93.2) (2023-09-16)
+
+
+### Bug Fixes
+
+* **log:** log level value not selected ([3fbed0d](https://github.com/MetaCubeX/metacubexd/commit/3fbed0d69482da005bfa109eed9acae203a08ce2))
+
 ## [1.93.1](https://github.com/MetaCubeX/metacubexd/compare/v1.93.0...v1.93.1) (2023-09-16)
 
 
