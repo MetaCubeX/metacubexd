@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.96.0](https://github.com/MetaCubeX/metacubexd/compare/v1.95.0...v1.96.0) (2023-09-16)
+
+
+### Features
+
+* **connection:** update tag badges layout ([b7a0407](https://github.com/MetaCubeX/metacubexd/commit/b7a0407e42b4433766bda53c4dd7866dfe7c1cb3))
+
+
+### Performance Improvements
+
+* batch signals ([0015468](https://github.com/MetaCubeX/metacubexd/commit/0015468077c146e1d7526863873b3af16f01fccc))
+* batch signals ([e04ec71](https://github.com/MetaCubeX/metacubexd/commit/e04ec712ea5582d32dc723cc1ebcef4d192ab185))
+
 ## [1.95.0](https://github.com/MetaCubeX/metacubexd/compare/v1.94.0...v1.95.0) (2023-09-16)
 
 
