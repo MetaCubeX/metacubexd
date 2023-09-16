@@ -1,8 +1,10 @@
-<h1 align="center">metacubexd</h1>
+# metacubexd
 
-<p align="center">Clash-Meta Dashboard</p>
+Clash.Meta Dashboard, The Official One, XD
 
-<p align="center">
+<img src="https://assets.solidjs.com/banner?project=metacubexd" alt="solidjs" />
+
+<p>
   <img src="https://img.shields.io/github/issues-pr-closed/metacubex/metacubexd?style=for-the-badge" alt="pr-closed" />
   <img src="https://img.shields.io/github/last-commit/metacubex/metacubexd?style=for-the-badge" alt="last-commit" />
   <img src="https://img.shields.io/github/actions/workflow/status/metacubex/metacubexd/release.yml?style=for-the-badge" alt="build" />
