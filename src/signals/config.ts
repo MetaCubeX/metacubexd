@@ -58,12 +58,10 @@ export const [logsTableSize, setLogsTableSize] = makePersisted(
   createSignal<TAILWINDCSS_SIZE>(TAILWINDCSS_SIZE.XS),
   { name: 'logsTableSize', storage: localStorage },
 )
-
 export const [logLevel, setLogLevel] = makePersisted(
   createSignal<LOG_LEVEL>(LOG_LEVEL.Info),
   { name: 'logLevel', storage: localStorage },
 )
-
 export const [logMaxRows, setLogMaxRows] = makePersisted(createSignal(300), {
   name: 'logMaxRows',
   storage: localStorage,

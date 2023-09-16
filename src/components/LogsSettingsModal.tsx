@@ -8,6 +8,7 @@ import {
   TAILWINDCSS_SIZE,
 } from '~/constants'
 import {
+  logLevel,
   logMaxRows,
   logsTableSize,
   setLogLevel,
@@ -42,6 +43,7 @@ export const LogsSettingsModal = () => {
 
           <select
             class="select select-bordered w-full"
+            value={logLevel()}
             onChange={(e) => setLogLevel(e.target.value as LOG_LEVEL)}
           >
             <For
