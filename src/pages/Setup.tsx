@@ -131,7 +131,7 @@ export default () => {
   })
 
   return (
-    <div class="mx-auto flex max-w-screen-md flex-col items-center gap-4 py-10">
+    <div class="mx-auto flex max-w-screen-sm flex-col items-center gap-4 py-10">
       <form class="contents" use:form={form}>
         <div class="flex w-full flex-col gap-4">
           <div class="flex-1">
@@ -165,20 +165,20 @@ export default () => {
             />
           </div>
 
-          <Button type="submit" class="btn-primary join-item uppercase">
+          <Button type="submit" class="btn-primary uppercase">
             {t('add')}
           </Button>
         </div>
       </form>
 
-      <div class="flex w-full flex-col gap-4">
+      <div class="grid w-full grid-cols-2 gap-4">
         <For each={endpointList()}>
           {({ id, url }) => (
             <div
-              class="badge badge-info flex w-full cursor-pointer items-center gap-4 py-4"
+              class="badge badge-info flex w-full cursor-pointer items-center justify-between gap-4 py-4"
               onClick={() => onEndpointSelect(id)}
             >
-              {url}
+              <span class="truncate">{url}</span>
 
               <Button
                 class="btn-circle btn-ghost btn-xs text-white"

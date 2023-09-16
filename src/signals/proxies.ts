@@ -1,4 +1,4 @@
-import { createSignal, untrack } from 'solid-js'
+import { batch, createSignal, untrack } from 'solid-js'
 import {
   closeSingleConnectionAPI,
   fetchProxiesAPI,
@@ -10,6 +10,7 @@ import {
 } from '~/apis'
 import {
   autoCloseConns,
+  latencyQualityMap,
   latencyTestTimeoutDuration,
   latestConnectionMsg,
   mergeAllConnections,
@@ -40,7 +41,8 @@ const setProxiesInfo = (proxies: (Proxy | ProxyNode)[]) => {
   const newLatencyMap = { ...latencyMap() }
 
   proxies.forEach((proxy) => {
-    const latency = proxy.history.at(-1)?.delay || -1
+    const latency =
+      proxy.history.at(-1)?.delay || latencyQualityMap().NOT_CONNECTED
 
     newProxyNodeMap[proxy.name] = {
       udp: proxy.udp,
@@ -52,8 +54,10 @@ const setProxiesInfo = (proxies: (Proxy | ProxyNode)[]) => {
     newLatencyMap[proxy.name] = latency
   })
 
-  setProxyNodeMap(newProxyNodeMap)
-  setLatencyMap(newLatencyMap)
+  batch(() => {
+    setProxyNodeMap(newProxyNodeMap)
+    setLatencyMap(newLatencyMap)
+  })
 }
 
 export const useProxies = () => {
@@ -79,9 +83,11 @@ export const useProxies = () => {
       ...sortedProviders.flatMap((provider) => provider.proxies),
     ]
 
-    setProxies(sortedProxies)
-    setProxyProviders(sortedProviders)
-    setProxiesInfo(allProxies)
+    batch(() => {
+      setProxies(sortedProxies)
+      setProxyProviders(sortedProviders)
+      setProxiesInfo(allProxies)
+    })
   }
 
   const setProxyGroupByProxyName = async (proxy: Proxy, proxyName: string) => {
