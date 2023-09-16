@@ -89,4 +89,6 @@ export default {
   hideUnAvailableProxies: '隐藏不可用节点',
   reloadConfigFile: '重新加载配置文件',
   flushFakeIPData: '清空 Fake-IP 数据',
+  tagClientSourceIPWithName: '为客户端源 IP 地址添加名称标记',
+  tag: '标记',
 }

@@ -36,22 +36,19 @@ import {
   ConnectionsSettingsModal,
   ConnectionsTableDetailsModal,
 } from '~/components'
-import {
-  CONNECTIONS_TABLE_ACCESSOR_KEY,
-  CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
-  CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY,
-  MODAL,
-} from '~/constants'
+import { CONNECTIONS_TABLE_ACCESSOR_KEY, MODAL } from '~/constants'
 import { formatTimeFromNow } from '~/helpers'
 import {
+  clientSourceIPTags,
+  connectionsTableColumnOrder,
+  connectionsTableColumnVisibility,
   connectionsTableSize,
+  setConnectionsTableColumnOrder,
+  setConnectionsTableColumnVisibility,
   tableSizeClassName,
   useConnections,
 } from '~/signals'
 import type { Connection } from '~/types'
-
-type ColumnVisibility = Partial<Record<CONNECTIONS_TABLE_ACCESSOR_KEY, boolean>>
-type ColumnOrder = CONNECTIONS_TABLE_ACCESSOR_KEY[]
 
 enum ActiveTab {
   activeConnections,
@@ -79,20 +76,6 @@ export default () => {
     useConnections()
 
   const [globalFilter, setGlobalFilter] = createSignal('')
-  const [columnVisibility, setColumnVisibility] = makePersisted(
-    createSignal<ColumnVisibility>(CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY),
-    {
-      name: 'columnVisibility',
-      storage: localStorage,
-    },
-  )
-  const [columnOrder, setColumnOrder] = makePersisted(
-    createSignal<ColumnOrder>(CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER),
-    {
-      name: 'columnOrder',
-      storage: localStorage,
-    },
-  )
 
   const [selectedConnectionID, setSelectedConnectionID] = createSignal<string>()
 
@@ -227,7 +210,13 @@ export default () => {
     {
       header: () => t('sourceIP'),
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.SourceIP,
-      accessorFn: (original) => original.metadata.sourceIP,
+      accessorFn: (original) => {
+        const tag = clientSourceIPTags().find(
+          (tag) => tag.sourceIP === original.metadata.sourceIP,
+        )
+
+        return tag ? tag.tagName : original.metadata.sourceIP
+      },
     },
     {
       header: () => t('sourcePort'),
@@ -258,7 +247,7 @@ export default () => {
     },
     state: {
       get columnOrder() {
-        return columnOrder()
+        return connectionsTableColumnOrder()
       },
       get grouping() {
         return grouping()
@@ -267,7 +256,7 @@ export default () => {
         return sorting()
       },
       get columnVisibility() {
-        return columnVisibility()
+        return connectionsTableColumnVisibility()
       },
       get globalFilter() {
         return globalFilter()
@@ -494,11 +483,11 @@ export default () => {
       </div>
 
       <ConnectionsSettingsModal
-        order={columnOrder()}
-        visible={columnVisibility()}
-        onOrderChange={(data: ColumnOrder) => setColumnOrder(data)}
-        onVisibleChange={(data: ColumnVisibility) =>
-          setColumnVisibility({ ...data })
+        order={connectionsTableColumnOrder()}
+        visible={connectionsTableColumnVisibility()}
+        onOrderChange={(data) => setConnectionsTableColumnOrder(data)}
+        onVisibleChange={(data) =>
+          setConnectionsTableColumnVisibility({ ...data })
         }
       />
 

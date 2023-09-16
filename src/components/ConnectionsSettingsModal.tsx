@@ -1,4 +1,7 @@
+import { createForm } from '@felte/solid'
+import { validator } from '@felte/validator-zod'
 import { useI18n } from '@solid-primitives/i18n'
+import { IconX } from '@tabler/icons-solidjs'
 import type {
   DragEventHandler,
   Draggable,
@@ -13,7 +16,9 @@ import {
   createSortable,
   useDragDropContext,
 } from '@thisbeyond/solid-dnd'
-import { Component, For, Show, createSignal } from 'solid-js'
+import { uniq } from 'lodash'
+import { Component, For, Index, Show, createSignal } from 'solid-js'
+import { z } from 'zod'
 import { Button, ConfigTitle } from '~/components'
 import {
   CONNECTIONS_TABLE_ACCESSOR_KEY,
@@ -22,16 +27,87 @@ import {
   MODAL,
   TAILWINDCSS_SIZE,
 } from '~/constants'
-import { connectionsTableSize, setConnectionsTableSize } from '~/signals'
+import {
+  allConnections,
+  clientSourceIPTags,
+  connectionsTableSize,
+  setClientSourceIPTags,
+  setConnectionsTableSize,
+} from '~/signals'
+import {
+  ConnectionsTableColumnOrder,
+  ConnectionsTableColumnVisibility,
+} from '~/types'
 
-type ColumnVisibility = Partial<Record<CONNECTIONS_TABLE_ACCESSOR_KEY, boolean>>
-type ColumnOrder = CONNECTIONS_TABLE_ACCESSOR_KEY[]
+const TagClientSourceIPWithNameForm: Component = () => {
+  const schema = z.object({
+    tagName: z.string().nonempty(),
+    sourceIP: z.string().nonempty(),
+  })
+
+  const [t] = useI18n()
+
+  const { form } = createForm<z.infer<typeof schema>>({
+    extend: validator({ schema }),
+    onSubmit: ({ tagName, sourceIP }) =>
+      setClientSourceIPTags((tags) => {
+        if (
+          tags.some(
+            (tag) => tag.tagName === tagName || tag.sourceIP === sourceIP,
+          )
+        ) {
+          return tags
+        }
+
+        return [...tags, { tagName, sourceIP }]
+      }),
+  })
+
+  return (
+    <form use:form={form}>
+      <div class="join flex">
+        <select name="sourceIP" class="select join-item select-bordered">
+          <option />
+
+          <Index
+            each={uniq(
+              allConnections().map(({ metadata: { sourceIP } }) => sourceIP),
+            )
+              .sort()
+              .filter(
+                (sourceIP) =>
+                  !clientSourceIPTags().some(
+                    ({ sourceIP: tagSourceIP }) => tagSourceIP === sourceIP,
+                  ),
+              )}
+          >
+            {(sourceIP) => (
+              <option class="badge" value={sourceIP()}>
+                {sourceIP()}
+              </option>
+            )}
+          </Index>
+        </select>
+
+        <input
+          name="tagName"
+          class="input join-item input-bordered min-w-0 flex-1"
+          placeholder="name"
+        />
+
+        <Button type="submit" class="join-item">
+          {t('tag')}
+        </Button>
+      </div>
+    </form>
+  )
+}
 
 export const ConnectionsSettingsModal = (props: {
-  order: ColumnOrder
-  visible: ColumnVisibility
-  onOrderChange: (value: ColumnOrder) => void
-  onVisibleChange: (value: ColumnVisibility) => void
+  order: ConnectionsTableColumnOrder
+  visible: ConnectionsTableColumnVisibility
+  onOrderChange: (value: ConnectionsTableColumnOrder) => void
+  onVisibleChange: (value: ConnectionsTableColumnVisibility) => void
 }) => {
   const [t] = useI18n()
   const [activeKey, setActiveKey] =
@@ -121,6 +197,39 @@ export const ConnectionsSettingsModal = (props: {
               {(value) => <option value={value}>{t(value)}</option>}
             </For>
           </select>
+        </div>
+
+        <div>
+          <ConfigTitle withDivider>
+            {t('tagClientSourceIPWithName')}
+          </ConfigTitle>
+
+          <div class="flex flex-col gap-4">
+            <TagClientSourceIPWithNameForm />
+
+            <div class="flex flex-wrap gap-2">
+              <For each={clientSourceIPTags()}>
+                {({ tagName, sourceIP }) => (
+                  <div class="badge badge-primary badge-lg items-center gap-2">
+                    <span>
+                      {tagName} - {sourceIP}
+                    </span>
+
+                    <Button
+                      class="btn-circle btn-ghost btn-xs"
+                      onClick={() =>
+                        setClientSourceIPTags((tags) =>
+                          tags.filter((tag) => tag.tagName !== tagName),
+                        )
+                      }
+                    >
+                      <IconX size={12} />
+                    </Button>
+                  </div>
+                )}
+              </For>
+            </div>
+          </div>
         </div>
 
         <div>

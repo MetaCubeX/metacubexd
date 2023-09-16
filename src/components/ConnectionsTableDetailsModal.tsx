@@ -15,7 +15,7 @@ export const ConnectionsTableDetailsModal: Component<{
           <pre>
             <code>
               {JSON.stringify(
-                allConnections.find(
+                allConnections().find(
                   ({ id }) => id === props.selectedConnectionID,
                 ),
                 null,

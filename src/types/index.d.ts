@@ -1,4 +1,4 @@
-import { LOG_LEVEL } from '~/constants'
+import { CONNECTIONS_TABLE_ACCESSOR_KEY, LOG_LEVEL } from '~/constants'
 
 declare module 'solid-js' {
   namespace JSX {
@@ -176,3 +176,8 @@ export type BackendVersion = {
   meta: boolean
   version: string
 }
+
+export type ConnectionsTableColumnVisibility = Partial<
+  Record<CONNECTIONS_TABLE_ACCESSOR_KEY, boolean>
+>
+export type ConnectionsTableColumnOrder = CONNECTIONS_TABLE_ACCESSOR_KEY[]

@@ -89,4 +89,6 @@ export default {
   hideUnAvailableProxies: 'Hide UnAvailable Proxies',
   reloadConfigFile: 'Reload Config File',
   flushFakeIPData: 'Flush Fake-IP Data',
+  tagClientSourceIPWithName: 'Tag Client Source IP With Name',
+  tag: 'Tag',
 }

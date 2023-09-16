@@ -2,6 +2,8 @@ import { usePrefersDark } from '@solid-primitives/media'
 import { makePersisted } from '@solid-primitives/storage'
 import { createEffect, createSignal } from 'solid-js'
 import {
+  CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
+  CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY,
   LATENCY_QUALITY_MAP_HTTP,
   LATENCY_QUALITY_MAP_HTTPS,
   LOG_LEVEL,
@@ -10,6 +12,10 @@ import {
   TAILWINDCSS_SIZE,
 } from '~/constants'
 import { setCurTheme } from '~/signals'
+import {
+  ConnectionsTableColumnOrder,
+  ConnectionsTableColumnVisibility,
+} from '~/types'
 
 export const [proxiesPreviewType, setProxiesPreviewType] = makePersisted(
   createSignal(PROXIES_PREVIEW_TYPE.Auto),
@@ -53,6 +59,35 @@ export const [favNightTheme, setFavNightTheme] = makePersisted(
 export const [connectionsTableSize, setConnectionsTableSize] = makePersisted(
   createSignal<TAILWINDCSS_SIZE>(TAILWINDCSS_SIZE.XS),
   { name: 'connectionsTableSize', storage: localStorage },
+)
+export const [
+  connectionsTableColumnVisibility,
+  setConnectionsTableColumnVisibility,
+] = makePersisted(
+  createSignal<ConnectionsTableColumnVisibility>(
+    CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY,
+  ),
+  {
+    name: 'connectionsTableColumnVisibility',
+    storage: localStorage,
+  },
+)
+export const [connectionsTableColumnOrder, setConnectionsTableColumnOrder] =
+  makePersisted(
+    createSignal<ConnectionsTableColumnOrder>(
+      CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
+    ),
+    {
+      name: 'connectionsTableColumnOrder',
+      storage: localStorage,
+    },
+  )
+export const [clientSourceIPTags, setClientSourceIPTags] = makePersisted(
+  createSignal<{ tagName: string; sourceIP: string }[]>([]),
+  {
+    name: 'clientSourceIPTags',
+    storage: localStorage,
+  },
 )
 export const [logsTableSize, setLogsTableSize] = makePersisted(
   createSignal<TAILWINDCSS_SIZE>(TAILWINDCSS_SIZE.XS),
