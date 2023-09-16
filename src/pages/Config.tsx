@@ -71,11 +71,11 @@ const DNSQueryForm = () => {
 
   return (
     <div class="flex flex-col">
-      <form use:form={form} class="flex flex-col gap-2 sm:flex-row">
+      <form use:form={form} class="flex gap-2 sm:flex-row">
         <input
           type="search"
           name="name"
-          class="input input-bordered w-full sm:flex-1"
+          class="input input-bordered min-w-0 flex-1"
         />
 
         <div class="flex items-center gap-2">
@@ -114,7 +114,7 @@ const ConfigForm = () => {
   const [t] = useI18n()
   const navigate = useNavigate()
 
-  const portsList = [
+  const portList = [
     {
       label: 'HTTP Port',
       key: 'port',
@@ -197,10 +197,10 @@ const ConfigForm = () => {
         <option value={MODE_OPTIONS.Direct}>{t('direct')}</option>
       </select>
 
-      <form class="contents" use:form={form}>
-        <For each={portsList}>
+      <form class="grid grid-cols-2 gap-2" use:form={form}>
+        <For each={portList}>
           {(item) => (
-            <div class="form-control w-64 max-w-sm">
+            <div class="form-control">
               <label class="label">
                 <span class="label-text">{item.label}</span>
               </label>
@@ -357,7 +357,7 @@ const Versions = () => {
 
 export default () => {
   return (
-    <div class="flex flex-col gap-4">
+    <div class="mx-auto flex w-full max-w-screen-md flex-col gap-4">
       <DNSQueryForm />
       <ConfigForm />
       <ConfigForXd />
