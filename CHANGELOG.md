@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.94.0](https://github.com/MetaCubeX/metacubexd/compare/v1.93.2...v1.94.0) (2023-09-16)
+
+
+### Features
+
+* **connections:** tag client source ip with name, closes [#181](https://github.com/MetaCubeX/metacubexd/issues/181) ([e538f9d](https://github.com/MetaCubeX/metacubexd/commit/e538f9d057570871cac0ac94aeae9b40c99d0217))
+
 ## [1.93.2](https://github.com/MetaCubeX/metacubexd/compare/v1.93.1...v1.93.2) (2023-09-16)
 
 
