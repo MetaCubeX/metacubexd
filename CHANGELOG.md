@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.93.1](https://github.com/MetaCubeX/metacubexd/compare/v1.93.0...v1.93.1) (2023-09-16)
+
+
+### Bug Fixes
+
+* **proxy:** dont hideUnAvailableProxies in proxy providers ([be6edd9](https://github.com/MetaCubeX/metacubexd/commit/be6edd914a32b05125337fd113d571f6066b0265))
+
 ## [1.93.0](https://github.com/MetaCubeX/metacubexd/compare/v1.92.0...v1.93.0) (2023-09-15)
 
 
