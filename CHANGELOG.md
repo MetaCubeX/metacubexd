@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.95.0](https://github.com/MetaCubeX/metacubexd/compare/v1.94.0...v1.95.0) (2023-09-16)
+
+
+### Features
+
+* **config:** update page layout ([95200a5](https://github.com/MetaCubeX/metacubexd/commit/95200a56b8902e443f5e8d2c8fa38ff6c6e28c2a))
+* **config:** update page layout ([2be357e](https://github.com/MetaCubeX/metacubexd/commit/2be357e73c51c52709fe8b911b9e595ed281a7fa))
+* **config:** update page layout, limit the max width of the container ([d059ea8](https://github.com/MetaCubeX/metacubexd/commit/d059ea85b3efd8c25e1ebed158b556df7eb2b5ae))
+
 ## [1.94.0](https://github.com/MetaCubeX/metacubexd/compare/v1.93.2...v1.94.0) (2023-09-16)
 
 
