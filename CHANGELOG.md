@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.97.0](https://github.com/MetaCubeX/metacubexd/compare/v1.96.0...v1.97.0) (2023-09-17)
+
+
+### Features
+
+* **logs:** fuzzy filter, sorting ([67345cf](https://github.com/MetaCubeX/metacubexd/commit/67345cf1e34eb309fa0a1ba5eb1bbfe441fc61fd))
+* **proxy:** show more proxy nodes on larger screen ([5277c7b](https://github.com/MetaCubeX/metacubexd/commit/5277c7bbc99f7407ef195b8c2508332efbc59a07))
+
+
+### Bug Fixes
+
+* **logs:** inconsistent gap between search input and table ([477fb22](https://github.com/MetaCubeX/metacubexd/commit/477fb2233a56e5d3a015a27292580eac0267b7d8))
+* **logs:** inconsistent padding ([3076487](https://github.com/MetaCubeX/metacubexd/commit/30764873a834f04dd7855a69b03cfb9c68f549fd))
+
 ## [1.96.0](https://github.com/MetaCubeX/metacubexd/compare/v1.95.0...v1.96.0) (2023-09-16)
 
 
