@@ -128,7 +128,7 @@ export default () => {
   })
 
   return (
-    <div class="flex h-full flex-col gap-2 p-1">
+    <div class="flex h-full flex-col gap-2">
       <div class="join w-full">
         <input
           type="search"
