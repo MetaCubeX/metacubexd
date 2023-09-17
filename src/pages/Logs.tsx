@@ -1,12 +1,22 @@
 import { useI18n } from '@solid-primitives/i18n'
-import { IconSettings } from '@tabler/icons-solidjs'
+import { makePersisted } from '@solid-primitives/storage'
+import {
+  IconSettings,
+  IconSortAscending,
+  IconSortDescending,
+} from '@tabler/icons-solidjs'
+import { rankItem } from '@tanstack/match-sorter-utils'
 import {
   ColumnDef,
+  FilterFn,
+  SortingState,
   createSolidTable,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
 } from '@tanstack/solid-table'
-import { For, Index, createEffect, createSignal } from 'solid-js'
+import { For, Index, createEffect, createMemo, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Button, LogsSettingsModal } from '~/components'
 import { LOG_LEVEL, MODAL } from '~/constants'
@@ -16,10 +26,22 @@ import { Log } from '~/types'
 
 type LogWithSeq = Log & { seq: number }
 
+const fuzzyFilter: FilterFn<LogWithSeq> = (row, columnId, value, addMeta) => {
+  // Rank the item
+  const itemRank = rankItem(row.getValue(columnId), value)
+
+  // Store the itemRank info
+  addMeta({
+    itemRank,
+  })
+
+  // Return if the item should be filtered in/out
+  return itemRank.passed
+}
+
 export default () => {
   const [t] = useI18n()
   let seq = 1
-  const [search, setSearch] = createSignal('')
   const [logs, setLogs] = createSignal<LogWithSeq[]>([])
 
   const logsData = useWsRequest<Log>('logs', { level: logLevel() })
@@ -36,13 +58,21 @@ export default () => {
     seq++
   })
 
-  const columns: ColumnDef<LogWithSeq>[] = [
+  const [globalFilter, setGlobalFilter] = createSignal('')
+
+  const [sorting, setSorting] = makePersisted(createSignal<SortingState>([]), {
+    name: 'logsTableSorting',
+    storage: localStorage,
+  })
+
+  const columns = createMemo<ColumnDef<LogWithSeq>[]>(() => [
     {
       header: t('sequence'),
       accessorFn: (row) => row.seq,
     },
     {
       header: t('type'),
+      accessorFn: (row) => row.type,
       cell: ({ row }) => {
         const type = row.original.type as LOG_LEVEL
 
@@ -70,17 +100,30 @@ export default () => {
       header: t('payload'),
       accessorFn: (row) => row.payload,
     },
-  ]
+  ])
 
   const table = createSolidTable({
-    get data() {
-      return search()
-        ? logs().filter((log) =>
-            log.payload.toLowerCase().includes(search().toLowerCase()),
-          )
-        : logs()
+    filterFns: {
+      fuzzy: fuzzyFilter,
     },
-    columns,
+    state: {
+      get globalFilter() {
+        return globalFilter()
+      },
+      get sorting() {
+        return sorting()
+      },
+    },
+    get data() {
+      return logs()
+    },
+    sortDescFirst: true,
+    columns: columns(),
+    onGlobalFilterChange: setGlobalFilter,
+    onSortingChange: setSorting,
+    globalFilterFn: fuzzyFilter,
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     getCoreRowModel: getCoreRowModel(),
   })
 
@@ -91,7 +134,7 @@ export default () => {
           type="search"
           class="input join-item input-primary input-sm flex-1 flex-shrink-0 sm:input-md"
           placeholder={t('search')}
-          onInput={(e) => setSearch(e.target.value)}
+          onInput={(e) => setGlobalFilter(e.target.value)}
         />
 
         <Button
@@ -127,14 +170,26 @@ export default () => {
                         const header = keyedHeader()
 
                         return (
-                          <th class="bg-base-300">
-                            <div>
-                              {header.isPlaceholder
-                                ? null
-                                : flexRender(
-                                    header.column.columnDef.header,
-                                    header.getContext(),
-                                  )}
+                          <th class="bg-base-200">
+                            <div class="flex items-center">
+                              <div
+                                class={twMerge(
+                                  header.column.getCanSort() &&
+                                    'cursor-pointer select-none',
+                                  'flex-1',
+                                )}
+                                onClick={header.column.getToggleSortingHandler()}
+                              >
+                                {flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext(),
+                                )}
+                              </div>
+
+                              {{
+                                asc: <IconSortAscending />,
+                                desc: <IconSortDescending />,
+                              }[header.column.getIsSorted() as string] ?? null}
                             </div>
                           </th>
                         )

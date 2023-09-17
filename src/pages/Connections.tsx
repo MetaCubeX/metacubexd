@@ -261,9 +261,6 @@ export default () => {
       get globalFilter() {
         return globalFilter()
       },
-      get columnFilters() {
-        return []
-      },
     },
     get data() {
       return activeTab() === ActiveTab.activeConnections
@@ -420,7 +417,7 @@ export default () => {
           <tbody>
             <For each={table.getRowModel().rows}>
               {(row) => (
-                <tr class="h-8 hover:!bg-primary hover:text-primary-content">
+                <tr class="hover:!bg-primary hover:text-primary-content">
                   <For each={row.getVisibleCells()}>
                     {(cell) => {
                       return (
