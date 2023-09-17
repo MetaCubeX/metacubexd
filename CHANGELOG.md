@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.98.0](https://github.com/MetaCubeX/metacubexd/compare/v1.97.0...v1.98.0) (2023-09-17)
+
+
+### Features
+
+* **pwa:** add pwa shortcut icon, closes [#201](https://github.com/MetaCubeX/metacubexd/issues/201) ([3a23e99](https://github.com/MetaCubeX/metacubexd/commit/3a23e99c269373bbbaae95cdca65d7a0dbdddc10))
+
 ## [1.97.0](https://github.com/MetaCubeX/metacubexd/compare/v1.96.0...v1.97.0) (2023-09-17)
 
 
