@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.98.3](https://github.com/MetaCubeX/metacubexd/compare/v1.98.2...v1.98.3) (2023-09-17)
+
+
+### Bug Fixes
+
+* **proxy:** wrap subscription info usage percentage with toFinite ([ed947f6](https://github.com/MetaCubeX/metacubexd/commit/ed947f62a26c30a6f30aaf73066d7aea6f520bb0))
+
 ## [1.98.2](https://github.com/MetaCubeX/metacubexd/compare/v1.98.1...v1.98.2) (2023-09-17)
 
 
