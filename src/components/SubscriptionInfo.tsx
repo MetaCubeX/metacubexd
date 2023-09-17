@@ -3,21 +3,20 @@ import dayjs from 'dayjs'
 import type { SubscriptionInfo as ISubscriptionInfo } from '~/types'
 
 const getSubscriptionsInfo = (subscriptionInfo: ISubscriptionInfo) => {
-  const total = byteSize(subscriptionInfo.Total, { units: 'iec' })
-  const used = byteSize(subscriptionInfo.Download + subscriptionInfo.Upload, {
+  const { Download = 0, Upload = 0, Total = 0, Expire = 0 } = subscriptionInfo
+
+  const total = byteSize(Total, { units: 'iec' })
+  const used = byteSize(Download + Upload, {
     units: 'iec',
   })
-  const percentage = (
-    ((subscriptionInfo.Download + subscriptionInfo.Upload) /
-      subscriptionInfo.Total) *
-    100
-  ).toFixed(2)
+  const percentage = (((Download + Upload) / Total) * 100).toFixed(2)
+
   const expireStr = () => {
     if (subscriptionInfo.Expire === 0) {
       return 'Null'
     }
 
-    return dayjs(subscriptionInfo.Expire * 1000).format('YYYY-MM-DD')
+    return dayjs(Expire * 1000).format('YYYY-MM-DD')
   }
 
   return {
@@ -29,7 +28,7 @@ const getSubscriptionsInfo = (subscriptionInfo: ISubscriptionInfo) => {
 }
 
 export const SubscriptionInfo = (props: {
-  subscriptionInfo: ISubscriptionInfo
+  subscriptionInfo?: ISubscriptionInfo
 }) => {
   if (!props.subscriptionInfo) {
     return

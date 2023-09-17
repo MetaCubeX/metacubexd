@@ -38,15 +38,16 @@ export type ProxyNode = {
     delay: number
   }[]
 }
+
 export type SubscriptionInfo = {
-  Download: number
-  Upload: number
-  Total: number
-  Expire: number
+  Download?: number
+  Upload?: number
+  Total?: number
+  Expire?: number
 }
 
 export type ProxyProvider = {
-  subscriptionInfo: SubscriptionInfo
+  subscriptionInfo?: SubscriptionInfo
   name: string
   proxies: ProxyNode[]
   testUrl: string
