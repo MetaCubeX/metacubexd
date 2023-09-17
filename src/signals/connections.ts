@@ -47,10 +47,11 @@ export const useConnections = () => {
         rawConns,
         activeConnections(),
       )
-      const allConns = mergeAllConnections(activeConns)
+
+      mergeAllConnections(activeConnections())
 
       if (!paused()) {
-        const closedConns = diffClosedConnections(activeConns, allConns)
+        const closedConns = diffClosedConnections(activeConns, allConnections())
 
         setActiveConnections(activeConns)
         setClosedConnections(
@@ -58,8 +59,8 @@ export const useConnections = () => {
         )
       }
 
-      setAllConnections(
-        allConns.slice(
+      setAllConnections((allConnections) =>
+        allConnections.slice(
           -(activeConns.length + CONNECTIONS_TABLE_MAX_CLOSED_ROWS),
         ),
       )
@@ -101,12 +102,12 @@ export const restructRawMsgToConnection = (
 }
 
 export const mergeAllConnections = (activeConns: Connection[]) => {
-  return unionWith(allConnections(), activeConns, (a, b) => a.id === b.id)
+  setAllConnections((allConnections) =>
+    unionWith(allConnections, activeConns, (a, b) => a.id === b.id),
+  )
 }
 
 const diffClosedConnections = (
   activeConns: Connection[],
   allConns: Connection[],
-) => {
-  return differenceWith(allConns, activeConns, (a, b) => a.id === b.id)
-}
+) => differenceWith(allConns, activeConns, (a, b) => a.id === b.id)

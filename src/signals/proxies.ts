@@ -13,7 +13,6 @@ import {
   latencyQualityMap,
   latencyTestTimeoutDuration,
   latestConnectionMsg,
-  mergeAllConnections,
   restructRawMsgToConnection,
   urlForLatencyTest,
 } from '~/signals'
@@ -90,11 +89,9 @@ export const useProxies = () => {
     })
   }
 
-  const setProxyGroupByProxyName = async (proxy: Proxy, proxyName: string) => {
-    const proxyGroupList = proxies().slice()
-    const proxyGroup = proxyGroupList.find((i) => i.name === proxy.name)!
-
+  const selectProxyInGroup = async (proxy: Proxy, proxyName: string) => {
     await selectProxyInGroupAPI(proxy.name, proxyName)
+    await updateProxies()
 
     if (autoCloseConns()) {
       // we don't use activeConns from useConnection here for better performance,
@@ -111,13 +108,9 @@ export const useProxies = () => {
               closeSingleConnectionAPI(id)
             }
           })
-          mergeAllConnections(activeConns)
         }
       })
     }
-
-    proxyGroup.now = proxyName
-    setProxies(proxyGroupList)
   }
 
   const latencyTestByProxyGroupName = async (proxyGroupName: string) => {
@@ -159,7 +152,7 @@ export const useProxies = () => {
     latencyMap,
     proxyNodeMap,
     updateProxies,
-    setProxyGroupByProxyName,
+    selectProxyInGroup,
     updateProviderByProviderName,
     updateAllProvider,
     healthCheckByProviderName,

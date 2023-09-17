@@ -26,7 +26,6 @@ import {
   proxiesOrderingType,
   useProxies,
 } from '~/signals'
-import type { Proxy } from '~/types'
 
 enum ActiveTab {
   proxyProviders = 'proxyProviders',
@@ -37,7 +36,7 @@ export default () => {
   const [t] = useI18n()
   const {
     proxies,
-    setProxyGroupByProxyName,
+    selectProxyInGroup,
     latencyTestByProxyGroupName,
     latencyMap,
     proxyProviders,
@@ -49,10 +48,6 @@ export default () => {
   const { map: collapsedMap, set: setCollapsedMap } = useStringBooleanMap()
   const { map: latencyTestingMap, setWithCallback: setLatencyTestingMap } =
     useStringBooleanMap()
-
-  const onProxyNodeClick = async (proxy: Proxy, proxyName: string) => {
-    void setProxyGroupByProxyName(proxy, proxyName)
-  }
 
   const onLatencyTestClick = async (e: MouseEvent, name: string) => {
     e.stopPropagation()
@@ -153,11 +148,11 @@ export default () => {
         <Show when={activeTab() === ActiveTab.proxies}>
           <div class="grid grid-cols-1 place-items-start gap-2 sm:grid-cols-2">
             <For each={proxies()}>
-              {(proxy) => {
+              {(proxyGroup) => {
                 const sortedProxyNames = createMemo(() =>
                   filterProxiesByAvailability(
                     sortProxiesByOrderingType(
-                      proxy.all ?? [],
+                      proxyGroup.all ?? [],
                       latencyMap(),
                       proxiesOrderingType(),
                     ),
@@ -170,18 +165,20 @@ export default () => {
                   <>
                     <div class="mr-8 flex items-center justify-between">
                       <div class="flex items-center gap-2">
-                        <span>{proxy.name}</span>
-                        <div class="badge badge-sm">{proxy.all?.length}</div>
+                        <span>{proxyGroup.name}</span>
+                        <div class="badge badge-sm">
+                          {proxyGroup.all?.length}
+                        </div>
                       </div>
 
                       <Button
                         class="btn-circle btn-sm"
-                        disabled={latencyTestingMap()[proxy.name]}
-                        onClick={(e) => onLatencyTestClick(e, proxy.name)}
+                        disabled={latencyTestingMap()[proxyGroup.name]}
+                        onClick={(e) => onLatencyTestClick(e, proxyGroup.name)}
                       >
                         <IconBrandSpeedtest
                           class={twMerge(
-                            latencyTestingMap()[proxy.name] &&
+                            latencyTestingMap()[proxyGroup.name] &&
                               'animate-pulse text-success',
                           )}
                         />
@@ -189,13 +186,14 @@ export default () => {
                     </div>
 
                     <div class="text-sm text-slate-500">
-                      {proxy.type} {proxy.now?.length > 0 && ` :: ${proxy.now}`}
+                      {proxyGroup.type}{' '}
+                      {proxyGroup.now?.length > 0 && ` :: ${proxyGroup.now}`}
                     </div>
 
-                    <Show when={!collapsedMap()[proxy.name]}>
+                    <Show when={!collapsedMap()[proxyGroup.name]}>
                       <ProxyNodePreview
                         proxyNameList={sortedProxyNames()}
-                        now={proxy.now}
+                        now={proxyGroup.now}
                       />
                     </Show>
                   </>
@@ -203,14 +201,16 @@ export default () => {
 
                 return (
                   <Collapse
-                    isOpen={collapsedMap()[proxy.name]}
+                    isOpen={collapsedMap()[proxyGroup.name]}
                     title={title}
-                    onCollapse={(val) => setCollapsedMap(proxy.name, val)}
+                    onCollapse={(val) => setCollapsedMap(proxyGroup.name, val)}
                   >
                     <ProxyCardGroups
                       proxyNames={sortedProxyNames()}
-                      now={proxy.now}
-                      onClick={(name) => void onProxyNodeClick(proxy, name)}
+                      now={proxyGroup.now}
+                      onClick={(name) =>
+                        void selectProxyInGroup(proxyGroup, name)
+                      }
                     />
                   </Collapse>
                 )
