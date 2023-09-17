@@ -10,6 +10,7 @@
     "format": "prettier -w .",
     "lint": "eslint --fix .",
     "prepare": "husky install",
+    "pwa-assets-generator": "pwa-assets-generator",
     "serve": "vite preview"
   },
   "dependencies": {
@@ -38,6 +39,7 @@
     "@types/uuid": "^9.0.4",
     "@typescript-eslint/eslint-plugin": "^6.7.0",
     "@typescript-eslint/parser": "^6.7.0",
+    "@vite-pwa/assets-generator": "^0.0.10",
     "apexcharts": "^3.42.0",
     "autoprefixer": "^10.4.15",
     "byte-size": "^8.1.1",
