@@ -1,5 +1,6 @@
 import byteSize from 'byte-size'
 import dayjs from 'dayjs'
+import { toFinite } from 'lodash'
 import type { SubscriptionInfo as ISubscriptionInfo } from '~/types'
 
 const getSubscriptionsInfo = (subscriptionInfo: ISubscriptionInfo) => {
@@ -9,10 +10,10 @@ const getSubscriptionsInfo = (subscriptionInfo: ISubscriptionInfo) => {
   const used = byteSize(Download + Upload, {
     units: 'iec',
   })
-  const percentage = (((Download + Upload) / Total) * 100).toFixed(2)
+  const percentage = toFinite((((Download + Upload) / Total) * 100).toFixed(2))
 
   const expireStr = () => {
-    if (subscriptionInfo.Expire === 0) {
+    if (Expire === 0) {
       return 'Null'
     }
 

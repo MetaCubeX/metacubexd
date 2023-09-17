@@ -204,10 +204,10 @@ export default () => {
           <tbody>
             <For each={table.getRowModel().rows}>
               {(row) => (
-                <tr class="hover">
+                <tr class="hover:!bg-primary hover:text-primary-content">
                   <For each={row.getVisibleCells()}>
                     {(cell) => (
-                      <td>
+                      <td class="py-2">
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext(),

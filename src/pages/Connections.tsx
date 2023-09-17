@@ -422,6 +422,7 @@ export default () => {
                     {(cell) => {
                       return (
                         <td
+                          class="py-2"
                           onContextMenu={(e) => {
                             e.preventDefault()
 
