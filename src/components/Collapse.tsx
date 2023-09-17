@@ -28,7 +28,7 @@ export const Collapse: ParentComponent<Props> = (props) => {
     <div
       class={twMerge(
         getCollapseClassName(),
-        'collapse collapse-arrow select-none border-secondary bg-base-200',
+        'collapse collapse-arrow select-none overflow-visible border-secondary bg-base-200',
       )}
     >
       <div
@@ -40,7 +40,7 @@ export const Collapse: ParentComponent<Props> = (props) => {
       <div
         class={twMerge(
           getCollapseContentClassName(),
-          'collapse-content grid grid-cols-2 gap-2 transition-opacity duration-1000',
+          'collapse-content grid grid-cols-2 gap-2 transition-opacity duration-1000 lg:grid-cols-3 xl:grid-cols-4',
         )}
       >
         <Show when={props.isOpen}>{children(() => props.children)()}</Show>
