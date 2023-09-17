@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.98.2](https://github.com/MetaCubeX/metacubexd/compare/v1.98.1...v1.98.2) (2023-09-17)
+
+
+### Bug Fixes
+
+* subscriptionInfo may not be valid ([e7ba6c7](https://github.com/MetaCubeX/metacubexd/commit/e7ba6c7c34ceae395cd59337d965ee74b672e799))
+
 ## [1.98.1](https://github.com/MetaCubeX/metacubexd/compare/v1.98.0...v1.98.1) (2023-09-17)
 
 
