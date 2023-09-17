@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.98.1](https://github.com/MetaCubeX/metacubexd/compare/v1.98.0...v1.98.1) (2023-09-17)
+
+
+### Bug Fixes
+
+* **proxy:** selectProxyInGroup ([dc0b286](https://github.com/MetaCubeX/metacubexd/commit/dc0b286a888085352be54de1dda50962330318cf))
+
 ## [1.98.0](https://github.com/MetaCubeX/metacubexd/compare/v1.97.0...v1.98.0) (2023-09-17)
 
 
