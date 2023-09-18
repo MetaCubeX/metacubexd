@@ -1,3 +1,4 @@
+import { useI18n } from '@solid-primitives/i18n'
 import byteSize from 'byte-size'
 import dayjs from 'dayjs'
 import { toFinite } from 'lodash'
@@ -12,9 +13,17 @@ const getSubscriptionsInfo = (subscriptionInfo: ISubscriptionInfo) => {
   })
   const percentage = toFinite((((Download + Upload) / Total) * 100).toFixed(2))
 
+  const expirePrefix = () => {
+    const [t] = useI18n()
+
+    return t('expire')
+  }
+
   const expireStr = () => {
+    const [t] = useI18n()
+
     if (Expire === 0) {
-      return 'Null'
+      return t('noExpire')
     }
 
     return dayjs(Expire * 1000).format('YYYY-MM-DD')
@@ -24,6 +33,7 @@ const getSubscriptionsInfo = (subscriptionInfo: ISubscriptionInfo) => {
     total,
     used,
     percentage,
+    expirePrefix,
     expireStr,
   }
 }
@@ -45,7 +55,9 @@ export const SubscriptionInfo = (props: {
         {`${info.used}`} / {`${info.total}`} ( {info.percentage}% )
       </div>
 
-      <div class="text-sm text-slate-500">Expire: {info.expireStr()} </div>
+      <div class="text-sm text-slate-500">
+        {info.expirePrefix()}: {info.expireStr()}
+      </div>
     </>
   )
 }
