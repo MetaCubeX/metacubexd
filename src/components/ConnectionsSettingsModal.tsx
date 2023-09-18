@@ -109,6 +109,7 @@ export const ConnectionsSettingsModal = (props: {
   onOrderChange: (value: ConnectionsTableColumnOrder) => void
   onVisibleChange: (value: ConnectionsTableColumnVisibility) => void
 }) => {
+  const modalID = MODAL.CONNECTIONS_SETTINGS
   const [t] = useI18n()
   const [activeKey, setActiveKey] =
     createSignal<CONNECTIONS_TABLE_ACCESSOR_KEY | null>(null)
@@ -175,14 +176,26 @@ export const ConnectionsSettingsModal = (props: {
   }
 
   return (
-    <dialog
-      id={MODAL.CONNECTIONS_SETTINGS}
-      class="modal modal-bottom sm:modal-middle"
-    >
+    <dialog id={modalID} class="modal modal-bottom sm:modal-middle">
       <div
         class="modal-box flex flex-col gap-4"
         onContextMenu={(e) => e.preventDefault()}
       >
+        <div class="sticky top-0 z-50 flex items-center justify-end">
+          <Button
+            class="btn-circle btn-sm"
+            onClick={() => {
+              const modal = document.querySelector(
+                `#${modalID}`,
+              ) as HTMLDialogElement | null
+
+              modal?.close()
+            }}
+          >
+            <IconX size={20} />
+          </Button>
+        </div>
+
         <div>
           <ConfigTitle withDivider>{t('tableSize')}</ConfigTitle>
 

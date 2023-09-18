@@ -1,16 +1,32 @@
+import { IconX } from '@tabler/icons-solidjs'
 import { Component, Show } from 'solid-js'
 import { MODAL } from '~/constants'
 import { allConnections } from '~/signals'
+import { Button } from './Button'
 
 export const ConnectionsTableDetailsModal: Component<{
   selectedConnectionID?: string
 }> = (props) => {
+  const modalID = MODAL.CONNECTIONS_TABLE_DETAILS
+
   return (
-    <dialog
-      id={MODAL.CONNECTIONS_TABLE_DETAILS}
-      class="modal modal-bottom sm:modal-middle"
-    >
+    <dialog id={modalID} class="modal modal-bottom sm:modal-middle">
       <div class="modal-box">
+        <div class="sticky top-0 z-50 flex items-center justify-end">
+          <Button
+            class="btn-circle btn-sm"
+            onClick={() => {
+              const modal = document.querySelector(
+                `#${modalID}`,
+              ) as HTMLDialogElement | null
+
+              modal?.close()
+            }}
+          >
+            <IconX size={20} />
+          </Button>
+        </div>
+
         <Show when={props.selectedConnectionID}>
           <pre>
             <code>
