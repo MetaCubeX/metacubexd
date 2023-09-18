@@ -1,9 +1,9 @@
 import { useI18n } from '@solid-primitives/i18n'
 import { For } from 'solid-js'
-import { ConfigTitle } from '~/components'
+import { Button, ConfigTitle } from '~/components'
 import {
-  LOG_LEVEL,
   LOGS_TABLE_MAX_ROWS_LIST,
+  LOG_LEVEL,
   MODAL,
   TAILWINDCSS_SIZE,
 } from '~/constants'
@@ -18,10 +18,26 @@ import {
 
 export const LogsSettingsModal = () => {
   const [t] = useI18n()
+  const modalID = MODAL.LOGS_SETTINGS
 
   return (
-    <dialog id={MODAL.LOGS_SETTINGS} class="modal modal-bottom sm:modal-middle">
+    <dialog id={modalID} class="modal modal-bottom sm:modal-middle">
       <div class="modal-box flex flex-col gap-4">
+        <div class="sticky top-0 z-50 flex items-center justify-end">
+          <Button
+            class="btn-circle btn-sm text-xl"
+            onClick={() => {
+              const modal = document.querySelector(
+                `#${modalID}`,
+              ) as HTMLDialogElement | null
+
+              modal?.close()
+            }}
+          >
+            ✕
+          </Button>
+        </div>
+
         <div>
           <ConfigTitle withDivider>{t('tableSize')}</ConfigTitle>
 

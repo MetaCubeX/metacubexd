@@ -1,6 +1,6 @@
 import { useI18n } from '@solid-primitives/i18n'
 import { For } from 'solid-js'
-import { ConfigTitle } from '~/components'
+import { Button, ConfigTitle } from '~/components'
 import { MODAL, PROXIES_ORDERING_TYPE, PROXIES_PREVIEW_TYPE } from '~/constants'
 import {
   autoCloseConns,
@@ -18,14 +18,27 @@ import {
 } from '~/signals'
 
 export const ProxiesSettingsModal = () => {
+  const modalID = MODAL.PROXIES_SETTINGS
   const [t] = useI18n()
 
   return (
-    <dialog
-      id={MODAL.PROXIES_SETTINGS}
-      class="modal modal-bottom sm:modal-middle"
-    >
+    <dialog id={modalID} class="modal modal-bottom sm:modal-middle">
       <div class="modal-box flex flex-col gap-4">
+        <div class="sticky top-0 z-50 flex items-center justify-end">
+          <Button
+            class="btn-circle btn-sm text-xl"
+            onClick={() => {
+              const modal = document.querySelector(
+                `#${modalID}`,
+              ) as HTMLDialogElement | null
+
+              modal?.close()
+            }}
+          >
+            ✕
+          </Button>
+        </div>
+
         <div>
           <ConfigTitle withDivider>{t('autoCloseConns')}</ConfigTitle>
 
