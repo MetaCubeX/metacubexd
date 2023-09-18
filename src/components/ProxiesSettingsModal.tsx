@@ -1,4 +1,5 @@
 import { useI18n } from '@solid-primitives/i18n'
+import { IconX } from '@tabler/icons-solidjs'
 import { For } from 'solid-js'
 import { Button, ConfigTitle } from '~/components'
 import { MODAL, PROXIES_ORDERING_TYPE, PROXIES_PREVIEW_TYPE } from '~/constants'
@@ -26,7 +27,7 @@ export const ProxiesSettingsModal = () => {
       <div class="modal-box flex flex-col gap-4">
         <div class="sticky top-0 z-50 flex items-center justify-end">
           <Button
-            class="btn-circle btn-sm text-xl"
+            class="btn-circle btn-sm"
             onClick={() => {
               const modal = document.querySelector(
                 `#${modalID}`,
@@ -35,7 +36,7 @@ export const ProxiesSettingsModal = () => {
               modal?.close()
             }}
           >
-            ✕
+            <IconX size={20} />
           </Button>
         </div>
 

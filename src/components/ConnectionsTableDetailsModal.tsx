@@ -1,3 +1,4 @@
+import { IconX } from '@tabler/icons-solidjs'
 import { Component, Show } from 'solid-js'
 import { MODAL } from '~/constants'
 import { allConnections } from '~/signals'
@@ -13,7 +14,7 @@ export const ConnectionsTableDetailsModal: Component<{
       <div class="modal-box">
         <div class="sticky top-0 z-50 flex items-center justify-end">
           <Button
-            class="btn-circle btn-sm text-xl"
+            class="btn-circle btn-sm"
             onClick={() => {
               const modal = document.querySelector(
                 `#${modalID}`,
@@ -22,7 +23,7 @@ export const ConnectionsTableDetailsModal: Component<{
               modal?.close()
             }}
           >
-            ✕
+            <IconX size={20} />
           </Button>
         </div>
 

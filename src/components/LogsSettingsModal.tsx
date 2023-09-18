@@ -1,4 +1,5 @@
 import { useI18n } from '@solid-primitives/i18n'
+import { IconX } from '@tabler/icons-solidjs'
 import { For } from 'solid-js'
 import { Button, ConfigTitle } from '~/components'
 import {
@@ -17,15 +18,15 @@ import {
 } from '~/signals'
 
 export const LogsSettingsModal = () => {
-  const [t] = useI18n()
   const modalID = MODAL.LOGS_SETTINGS
+  const [t] = useI18n()
 
   return (
     <dialog id={modalID} class="modal modal-bottom sm:modal-middle">
       <div class="modal-box flex flex-col gap-4">
         <div class="sticky top-0 z-50 flex items-center justify-end">
           <Button
-            class="btn-circle btn-sm text-xl"
+            class="btn-circle btn-sm"
             onClick={() => {
               const modal = document.querySelector(
                 `#${modalID}`,
@@ -34,7 +35,7 @@ export const LogsSettingsModal = () => {
               modal?.close()
             }}
           >
-            ✕
+            <IconX size={20} />
           </Button>
         </div>
 
