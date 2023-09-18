@@ -94,4 +94,6 @@ export default {
   coreConfig: '核心配置',
   xdConfig: 'XD 配置',
   version: '版本',
+  expire: '到期时间',
+  noExpire: '不限时',
 }

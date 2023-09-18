@@ -94,4 +94,6 @@ export default {
   coreConfig: 'Core Config',
   xdConfig: 'XD Config',
   version: 'Version',
+  expire: 'Expire',
+  noExpire: 'Null',
 }
