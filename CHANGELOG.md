@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.99.0](https://github.com/MetaCubeX/metacubexd/compare/v1.98.3...v1.99.0) (2023-09-18)
+
+
+### Features
+
+* show provider expire message with i18n ([#237](https://github.com/MetaCubeX/metacubexd/issues/237)) ([b9e9a95](https://github.com/MetaCubeX/metacubexd/commit/b9e9a955f26e1ebf9f45fd951fbbfe295f487c85))
+
 ## [1.98.3](https://github.com/MetaCubeX/metacubexd/compare/v1.98.2...v1.98.3) (2023-09-17)
 
 
