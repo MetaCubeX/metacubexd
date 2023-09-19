@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.100.0](https://github.com/MetaCubeX/metacubexd/compare/v1.99.0...v1.100.0) (2023-09-19)
+
+
+### Features
+
+* add a close button to the modal ([#239](https://github.com/MetaCubeX/metacubexd/issues/239)) ([737f1b0](https://github.com/MetaCubeX/metacubexd/commit/737f1b018975f3e13a566c0dd744e1d1f545421f))
+
 ## [1.99.0](https://github.com/MetaCubeX/metacubexd/compare/v1.98.3...v1.99.0) (2023-09-18)
 
 
