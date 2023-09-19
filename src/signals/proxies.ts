@@ -60,7 +60,7 @@ const setProxiesInfo = (proxies: (Proxy | ProxyNode)[]) => {
 }
 
 export const useProxies = () => {
-  const updateProxies = async () => {
+  const fetchProxies = async () => {
     const [{ providers }, { proxies }] = await Promise.all([
       fetchProxyProvidersAPI(),
       fetchProxiesAPI(),
@@ -91,7 +91,7 @@ export const useProxies = () => {
 
   const selectProxyInGroup = async (proxy: Proxy, proxyName: string) => {
     await selectProxyInGroupAPI(proxy.name, proxyName)
-    await updateProxies()
+    await fetchProxies()
 
     if (autoCloseConns()) {
       // we don't use activeConns from useConnection here for better performance,
@@ -130,19 +130,19 @@ export const useProxies = () => {
     try {
       await updateProxyProviderAPI(providerName)
     } catch {}
-    await updateProxies()
+    await fetchProxies()
   }
 
   const updateAllProvider = async () => {
     await Promise.allSettled(
       proxyProviders().map((provider) => updateProxyProviderAPI(provider.name)),
     )
-    await updateProxies()
+    await fetchProxies()
   }
 
   const healthCheckByProviderName = async (providerName: string) => {
     await proxyProviderHealthCheck(providerName)
-    await updateProxies()
+    await fetchProxies()
   }
 
   return {
@@ -151,7 +151,7 @@ export const useProxies = () => {
     latencyTestByProxyGroupName,
     latencyMap,
     proxyNodeMap,
-    updateProxies,
+    fetchProxies,
     selectProxyInGroup,
     updateProviderByProviderName,
     updateAllProvider,

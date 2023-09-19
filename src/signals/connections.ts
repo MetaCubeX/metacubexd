@@ -1,5 +1,5 @@
 import { differenceWith, isNumber, unionWith } from 'lodash'
-import { Accessor, createEffect, createSignal, untrack } from 'solid-js'
+import { createEffect, createSignal, untrack } from 'solid-js'
 import { CONNECTIONS_TABLE_MAX_CLOSED_ROWS } from '~/constants'
 import { Connection, ConnectionRawMessage } from '~/types'
 
@@ -15,16 +15,8 @@ export type WsMsg = {
 export const [allConnections, setAllConnections] = createSignal<Connection[]>(
   [],
 )
-
-export let latestConnectionMsg: Accessor<WsMsg> = () => ({
-  uploadTotal: 0,
-  downloadTotal: 0,
-  connections: [],
-})
-
-export const setLatestConnectionMsg = (accessor: Accessor<WsMsg>) => {
-  latestConnectionMsg = accessor
-}
+export const [latestConnectionMsg, setLatestConnectionMsg] =
+  createSignal<WsMsg>(null)
 
 export const useConnections = () => {
   const [closedConnections, setClosedConnections] = createSignal<Connection[]>(

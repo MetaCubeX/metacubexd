@@ -1,6 +1,5 @@
-import { usePrefersDark } from '@solid-primitives/media'
 import { makePersisted } from '@solid-primitives/storage'
-import { createEffect, createSignal } from 'solid-js'
+import { createSignal } from 'solid-js'
 import {
   CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
   CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY,
@@ -11,7 +10,6 @@ import {
   PROXIES_PREVIEW_TYPE,
   TAILWINDCSS_SIZE,
 } from '~/constants'
-import { setCurTheme } from '~/signals'
 import {
   ConnectionsTableColumnOrder,
   ConnectionsTableColumnVisibility,
@@ -134,13 +132,3 @@ export const isLatencyTestByHttps = () =>
 
 export const latencyQualityMap = () =>
   isLatencyTestByHttps() ? LATENCY_QUALITY_MAP_HTTPS : LATENCY_QUALITY_MAP_HTTP
-
-export const useAutoSwitchTheme = () => {
-  const prefersDark = usePrefersDark()
-
-  createEffect(() => {
-    if (autoSwitchTheme()) {
-      setCurTheme(prefersDark() ? favNightTheme() : favDayTheme())
-    }
-  })
-}

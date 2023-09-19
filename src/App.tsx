@@ -1,3 +1,4 @@
+import { usePrefersDark } from '@solid-primitives/media'
 import { Navigate, Route, Routes, useNavigate } from '@solidjs/router'
 import { Show, createEffect, lazy, onMount } from 'solid-js'
 import { Toaster } from 'solid-toast'
@@ -6,12 +7,13 @@ import { Header } from '~/components'
 import { ROUTES } from '~/constants'
 import {
   WsMsg,
+  autoSwitchTheme,
   curTheme,
   endpoint,
-  selectedEndpoint,
-  setAllConnections,
+  favDayTheme,
+  favNightTheme,
+  setCurTheme,
   setLatestConnectionMsg,
-  useAutoSwitchTheme,
   useProxies,
   useTwemoji,
   useWsRequest,
@@ -25,21 +27,33 @@ const Proxies = lazy(() => import('~/pages/Proxies'))
 const Rules = lazy(() => import('~/pages/Rules'))
 const Config = lazy(() => import('~/pages/Config'))
 
+const ProtectedResources = () => {
+  const { fetchProxies } = useProxies()
+
+  onMount(fetchProxies)
+
+  const latestConnectionMsg = useWsRequest<WsMsg>('connections')
+
+  createEffect(() => {
+    setLatestConnectionMsg(latestConnectionMsg())
+  })
+
+  return null
+}
+
 export const App = () => {
   const navigate = useNavigate()
 
-  useAutoSwitchTheme()
+  const prefersDark = usePrefersDark()
 
   createEffect(() => {
-    if (selectedEndpoint() && endpoint()) {
-      void useProxies().updateProxies()
-      setAllConnections([])
-      setLatestConnectionMsg(useWsRequest<WsMsg>('connections'))
+    if (autoSwitchTheme()) {
+      setCurTheme(prefersDark() ? favNightTheme() : favDayTheme())
     }
   })
 
   onMount(() => {
-    if (!selectedEndpoint()) {
+    if (!endpoint()) {
       navigate(ROUTES.Setup)
     }
   })
@@ -56,7 +70,7 @@ export const App = () => {
 
       <div class="flex-1 overflow-y-auto p-2 sm:p-4">
         <Routes>
-          <Show when={selectedEndpoint()}>
+          <Show when={endpoint()}>
             <Route path={ROUTES.Overview} component={Overview} />
             <Route path={ROUTES.Proxies} component={Proxies} />
             <Route path={ROUTES.Rules} component={Rules} />
@@ -66,11 +80,12 @@ export const App = () => {
             <Route path="*" element={<Navigate href={ROUTES.Overview} />} />
           </Show>
 
-          <Route
-            path={selectedEndpoint() ? ROUTES.Setup : '*'}
-            component={Setup}
-          />
+          <Route path={endpoint() ? ROUTES.Setup : '*'} component={Setup} />
         </Routes>
+
+        <Show when={endpoint()}>
+          <ProtectedResources />
+        </Show>
       </div>
 
       <Toaster position="bottom-center" />
