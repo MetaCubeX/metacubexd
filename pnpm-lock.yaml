@@ -96,8 +96,8 @@ dependencies:
     specifier: ^17.7.1
     version: 17.7.1
   daisyui:
-    specifier: ^3.7.4
-    version: 3.7.4(ts-node@10.9.1)
+    specifier: ^3.7.6
+    version: 3.7.6(ts-node@10.9.1)
   dayjs:
     specifier: ^1.11.9
     version: 1.11.9
@@ -3098,8 +3098,8 @@ packages:
     resolution: {integrity: sha512-I7K1Uu0MBPzaFKg4nI5Q7Vs2t+3gWWW648spaF+Rg7pI9ds18Ugn+lvg4SHczUdKlHI5LWBXyqfS8+DufyBsgQ==}
     dev: false
 
-  /daisyui@3.7.4(ts-node@10.9.1):
-    resolution: {integrity: sha512-hAgTomIK8RDQ/RLH9Z2NxZiNVAO40w08FlhgYS/8CTFF+wggeHeNJ0qNBHWAJJzhjD8UU2u4PZ4nc4r9rwfTLw==}
+  /daisyui@3.7.6(ts-node@10.9.1):
+    resolution: {integrity: sha512-7MsD3J1/LpRkxvkjm0OQBjmVhzEhQdi6lTfEP2Wrvgl/fjKst4KmfkM39g0iInroaFq1fEJbB/vobGDqFgXoYw==}
     engines: {node: '>=16.9.0'}
     dependencies:
       colord: 2.9.3
