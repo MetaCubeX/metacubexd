@@ -42,8 +42,8 @@ export default () => {
         setMemories((memo) => memo.slice(-CHART_MAX_XAXIS))
       })
     },
-    // we shrink the chart data array size down every 10 minutes to prevent memory leaks
-    10 * 60 * 1000,
+    // we shrink the chart data array size down every minute to prevent memory leaks
+    60 * 1000,
     setInterval,
   )
 
