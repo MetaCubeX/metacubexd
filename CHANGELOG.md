@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.100.1](https://github.com/MetaCubeX/metacubexd/compare/v1.100.0...v1.100.1) (2023-09-19)
+
+
+### Performance Improvements
+
+* **overview:** shrink the data size every minute, closes [#234](https://github.com/MetaCubeX/metacubexd/issues/234) ([e0766fc](https://github.com/MetaCubeX/metacubexd/commit/e0766fc2c829b51728e16a587b68d13bd34c3bd9))
+
 ## [1.100.0](https://github.com/MetaCubeX/metacubexd/compare/v1.99.0...v1.100.0) (2023-09-19)
 
 
