@@ -45,7 +45,7 @@
     "byte-size": "^8.1.1",
     "commitlint": "^17.7.1",
     "daisyui": "^3.7.6",
-    "dayjs": "^1.11.9",
+    "dayjs": "^1.11.10",
     "eslint": "^8.49.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
