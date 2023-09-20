@@ -54,8 +54,8 @@ dependencies:
     specifier: ^8.8.4
     version: 8.8.4
   '@tanstack/solid-table':
-    specifier: ^8.10.0
-    version: 8.10.0(solid-js@1.7.12)
+    specifier: ^8.10.1
+    version: 8.10.1(solid-js@1.7.12)
   '@tanstack/solid-virtual':
     specifier: 3.0.0-beta.6
     version: 3.0.0-beta.6
@@ -2182,13 +2182,13 @@ packages:
       remove-accents: 0.4.2
     dev: false
 
-  /@tanstack/solid-table@8.10.0(solid-js@1.7.12):
-    resolution: {integrity: sha512-J4zf48VBb3XprNvZPMN3HsTrrDkRGzV18y+yY5XjdG3laWLTVklVxr+iBOHD4tJ+gjUMYQo9mOfMEr7SYiadqQ==}
+  /@tanstack/solid-table@8.10.1(solid-js@1.7.12):
+    resolution: {integrity: sha512-57W5bPb5QhBAu1oT5V22iW/rqBx+87UEsQfS6eQ2gxz13OrA8pVbHpDjkDKf7ayqZRSkgnVJuiMIB3VzLyQIMg==}
     engines: {node: '>=12'}
     peerDependencies:
       solid-js: ^1.3.13
     dependencies:
-      '@tanstack/table-core': 8.10.0
+      '@tanstack/table-core': 8.10.1
       solid-js: 1.7.12
     dev: false
 
@@ -2199,8 +2199,8 @@ packages:
       '@reach/observe-rect': 1.2.0
     dev: false
 
-  /@tanstack/table-core@8.10.0:
-    resolution: {integrity: sha512-e701yAJ18aGDP6mzVworlFAmQ+gi3Wtqx5mGZUe2BUv4W4D80dJxUfkHdtEGJ6GryAnlCCNTej7eaJiYmPhyYg==}
+  /@tanstack/table-core@8.10.1:
+    resolution: {integrity: sha512-dvO7wz+WjnT+7KI6ZZ+GAe9tljIFResDaV/TfOhfpeTB0ud9pILsavuM22HAXG2NsVaIG2Zax2OaVIsNt0z7Og==}
     engines: {node: '>=12'}
     dev: false
 
