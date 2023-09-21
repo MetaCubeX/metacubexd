@@ -120,6 +120,7 @@ export const useProxies = () => {
       latencyTestTimeoutDuration(),
     )
 
+    await fetchProxies()
     setLatencyMap({
       ...latencyMap(),
       ...data,
