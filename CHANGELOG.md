@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.102.0](https://github.com/MetaCubeX/metacubexd/compare/v1.101.0...v1.102.0) (2023-09-21)
+
+
+### Features
+
+* **config:** three columns on small screen device, five on larger ([f4e82e0](https://github.com/MetaCubeX/metacubexd/commit/f4e82e0e270ff1cc6ec5ad0cec04cda807febcfa))
+* **proxy:** regression on render proxies in two columns ([8502a6e](https://github.com/MetaCubeX/metacubexd/commit/8502a6e4896e7a1c5e2049fcd2521a5434fcf70e))
+
 ## [1.101.0](https://github.com/MetaCubeX/metacubexd/compare/v1.100.1...v1.101.0) (2023-09-21)
 
 
