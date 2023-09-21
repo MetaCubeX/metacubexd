@@ -1,16 +1,22 @@
+import { A } from '@solidjs/router'
+import { endpoint } from '~/signals'
+
 export const LogoText = () => (
-  <a
-    class="text-md flex items-center gap-1 whitespace-nowrap font-bold uppercase sm:text-xl"
-    href="https://github.com/metacubex/metacubexd"
-    target="_blank"
-  >
-    <span class="bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent">
+  <div class="text-md flex items-center gap-1 whitespace-nowrap font-bold uppercase sm:text-xl">
+    <A
+      class="bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent"
+      href={endpoint() ? '/' : '/setup'}
+    >
       metacube
-    </span>
+    </A>
     <span>(</span>
-    <div class="text-primary transition-transform hover:rotate-90 hover:scale-125">
+    <a
+      class="text-primary transition-transform hover:rotate-90 hover:scale-125"
+      href="https://github.com/metacubex/metacubexd"
+      target="_blank"
+    >
       xd
-    </div>
+    </a>
     <span>)</span>
-  </a>
+  </div>
 )
