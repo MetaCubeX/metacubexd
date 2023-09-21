@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.105.0](https://github.com/MetaCubeX/metacubexd/compare/v1.104.0...v1.105.0) (2023-09-21)
+
+
+### Features
+
+* **LogoText:** update logo navigation links ([d7e8c2f](https://github.com/MetaCubeX/metacubexd/commit/d7e8c2f4a43f8805681de725208036fdd0150496))
+
 ## [1.104.0](https://github.com/MetaCubeX/metacubexd/compare/v1.103.0...v1.104.0) (2023-09-21)
 
 
