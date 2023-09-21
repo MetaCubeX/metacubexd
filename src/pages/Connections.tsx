@@ -28,6 +28,7 @@ import {
 } from '@tanstack/solid-table'
 import byteSize from 'byte-size'
 import dayjs from 'dayjs'
+import { uniq } from 'lodash'
 import { For, Index, createMemo, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { closeAllConnectionsAPI, closeSingleConnectionAPI } from '~/apis'
@@ -39,6 +40,7 @@ import {
 import { CONNECTIONS_TABLE_ACCESSOR_KEY, MODAL } from '~/constants'
 import { formatTimeFromNow } from '~/helpers'
 import {
+  allConnections,
   clientSourceIPTags,
   connectionsTableColumnOrder,
   connectionsTableColumnVisibility,
@@ -286,6 +288,12 @@ export default () => {
     getCoreRowModel: getCoreRowModel(),
   })
 
+  const sourceIPHeader = createMemo(() =>
+    table
+      .getFlatHeaders()
+      .find(({ id }) => id === CONNECTIONS_TABLE_ACCESSOR_KEY.SourceIP),
+  )
+
   const tabs = createMemo(() => [
     {
       type: ActiveTab.activeConnections,
@@ -302,21 +310,40 @@ export default () => {
   return (
     <div class="flex h-full flex-col gap-2">
       <div class="flex w-full flex-wrap items-center gap-2">
-        <div class="tabs-boxed tabs gap-2">
-          <Index each={tabs()}>
-            {(tab) => (
-              <button
-                class={twMerge(
-                  activeTab() === tab().type && 'tab-active',
-                  'tab tab-sm gap-2 sm:tab-md',
-                )}
-                onClick={() => setActiveTab(tab().type)}
-              >
-                <span>{tab().name}</span>
-                <div class="badge badge-sm">{tab().count}</div>
-              </button>
-            )}
-          </Index>
+        <div class="join items-center">
+          <div class="tabs-boxed join-item tabs items-center gap-2 self-stretch">
+            <Index each={tabs()}>
+              {(tab) => (
+                <button
+                  class={twMerge(
+                    activeTab() === tab().type && 'tab-active',
+                    'tab tab-sm gap-2 sm:tab-md',
+                  )}
+                  onClick={() => setActiveTab(tab().type)}
+                >
+                  <span>{tab().name}</span>
+                  <div class="badge badge-sm">{tab().count}</div>
+                </button>
+              )}
+            </Index>
+          </div>
+
+          <select
+            class="select join-item select-bordered select-primary"
+            onChange={(e) =>
+              sourceIPHeader()?.column.setFilterValue(e.target.value)
+            }
+          >
+            <option value="">{t('all')}</option>
+
+            <Index
+              each={uniq(
+                allConnections().map(({ metadata: { sourceIP } }) => sourceIP),
+              ).sort()}
+            >
+              {(sourceIP) => <option value={sourceIP()}>{sourceIP()}</option>}
+            </Index>
+          </select>
         </div>
 
         <div class="join flex w-full items-center md:flex-1">
