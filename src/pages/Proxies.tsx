@@ -12,6 +12,7 @@ import {
   ProxiesSettingsModal,
   ProxyCardGroups,
   ProxyNodePreview,
+  RenderInTwoColumns,
   SubscriptionInfo,
 } from '~/components'
 import { MODAL } from '~/constants'
@@ -146,7 +147,7 @@ export default () => {
 
       <div class="flex-1 overflow-y-auto">
         <Show when={activeTab() === ActiveTab.proxies}>
-          <div class="grid grid-cols-1 place-items-start gap-2 sm:grid-cols-2">
+          <RenderInTwoColumns>
             <For each={proxies()}>
               {(proxyGroup) => {
                 const sortedProxyNames = createMemo(() =>
@@ -216,11 +217,11 @@ export default () => {
                 )
               }}
             </For>
-          </div>
+          </RenderInTwoColumns>
         </Show>
 
         <Show when={activeTab() === ActiveTab.proxyProviders}>
-          <div class="grid grid-cols-1 place-items-start gap-2 sm:grid-cols-2">
+          <RenderInTwoColumns>
             <For each={proxyProviders()}>
               {(proxyProvider) => {
                 const sortedProxyNames = createMemo(() =>
@@ -302,7 +303,7 @@ export default () => {
                 )
               }}
             </For>
-          </div>
+          </RenderInTwoColumns>
         </Show>
       </div>
 
