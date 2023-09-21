@@ -197,7 +197,7 @@ const ConfigForm = () => {
         <option value={MODE_OPTIONS.Direct}>{t('direct')}</option>
       </select>
 
-      <form class="grid grid-cols-2 gap-2" use:form={form}>
+      <form class="grid grid-cols-3 gap-2 sm:grid-cols-5" use:form={form}>
         <For each={portList}>
           {(item) => (
             <div class="form-control">
