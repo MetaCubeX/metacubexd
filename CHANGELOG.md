@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.101.0](https://github.com/MetaCubeX/metacubexd/compare/v1.100.1...v1.101.0) (2023-09-21)
+
+
+### Features
+
+* **proxy:** fetch proxies after latency test ([2a0b21b](https://github.com/MetaCubeX/metacubexd/commit/2a0b21bcc7bd0b096e1bc8008fef3ccf1649496a))
+
 ## [1.100.1](https://github.com/MetaCubeX/metacubexd/compare/v1.100.0...v1.100.1) (2023-09-19)
 
 
