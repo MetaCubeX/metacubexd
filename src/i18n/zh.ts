@@ -24,6 +24,7 @@ export default {
   name: '名字',
   process: '进程',
   host: '主机',
+  sniffHost: '嗅探域名',
   chains: '链路',
   connectTime: '连接时间',
   dlSpeed: '下载速度',

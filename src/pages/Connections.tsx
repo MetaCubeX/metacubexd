@@ -155,6 +155,11 @@ export default () => {
         }:${original.metadata.destinationPort}`,
     },
     {
+      header: () => t('sniffHost'),
+      accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.SniffHost,
+      accessorFn: (original) => original.metadata.sniffHost || '-',
+    },
+    {
       header: () => t('rules'),
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Rule,
       accessorFn: (original) =>

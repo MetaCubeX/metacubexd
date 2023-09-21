@@ -24,6 +24,7 @@ export default {
   name: 'Name',
   process: 'Process',
   host: 'Host',
+  sniffHost: 'Sniff Host',
   chains: 'Chains',
   connectTime: 'Time',
   dlSpeed: 'DL Speed',

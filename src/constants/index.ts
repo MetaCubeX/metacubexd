@@ -115,6 +115,7 @@ export enum CONNECTIONS_TABLE_ACCESSOR_KEY {
   Type = 'type',
   Process = 'process',
   Host = 'host',
+  SniffHost = 'sniffHost',
   Rule = 'rules',
   Chains = 'chains',
   DlSpeed = 'dlSpeed',
@@ -139,8 +140,6 @@ export const CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY = {
   [CONNECTIONS_TABLE_ACCESSOR_KEY.ID]: false,
 }
 
-export const LOGS_TABLE_MAX_ROWS = 1000
-
 export enum TAILWINDCSS_SIZE {
   XS = 'xs',
   SM = 'sm',
@@ -163,6 +162,7 @@ export enum LOG_LEVEL {
 }
 
 export const LOGS_TABLE_MAX_ROWS_LIST = [200, 300, 500, 800, 1000]
+export const DEFAULT_LOGS_TABLE_MAX_ROWS = LOGS_TABLE_MAX_ROWS_LIST[0]
 
 export enum MODAL {
   PROXIES_SETTINGS = 'proxies-settings',

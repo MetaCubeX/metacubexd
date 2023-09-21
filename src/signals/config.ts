@@ -3,6 +3,7 @@ import { createSignal } from 'solid-js'
 import {
   CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
   CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY,
+  DEFAULT_LOGS_TABLE_MAX_ROWS,
   LATENCY_QUALITY_MAP_HTTP,
   LATENCY_QUALITY_MAP_HTTPS,
   LOG_LEVEL,
@@ -95,10 +96,13 @@ export const [logLevel, setLogLevel] = makePersisted(
   createSignal<LOG_LEVEL>(LOG_LEVEL.Info),
   { name: 'logLevel', storage: localStorage },
 )
-export const [logMaxRows, setLogMaxRows] = makePersisted(createSignal(300), {
-  name: 'logMaxRows',
-  storage: localStorage,
-})
+export const [logMaxRows, setLogMaxRows] = makePersisted(
+  createSignal(DEFAULT_LOGS_TABLE_MAX_ROWS),
+  {
+    name: 'logMaxRows',
+    storage: localStorage,
+  },
+)
 
 export const tableSizeClassName = (size: TAILWINDCSS_SIZE) => {
   let className = 'table-xs'
