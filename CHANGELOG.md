@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.103.0](https://github.com/MetaCubeX/metacubexd/compare/v1.102.0...v1.103.0) (2023-09-21)
+
+
+### Features
+
+* **connection:** add sniffHost support, [#246](https://github.com/MetaCubeX/metacubexd/issues/246) ([2b16de1](https://github.com/MetaCubeX/metacubexd/commit/2b16de18b0bad7886baabe34ee7769c3e33bfff8))
+
 ## [1.102.0](https://github.com/MetaCubeX/metacubexd/compare/v1.101.0...v1.102.0) (2023-09-21)
 
 
