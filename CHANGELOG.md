@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.104.0](https://github.com/MetaCubeX/metacubexd/compare/v1.103.0...v1.104.0) (2023-09-21)
+
+
+### Features
+
+* **connection:** filter connections with sourceIP, closes [#246](https://github.com/MetaCubeX/metacubexd/issues/246) ([ffa2447](https://github.com/MetaCubeX/metacubexd/commit/ffa244760f639309c64f0a41b721921a4b57e558))
+
 ## [1.103.0](https://github.com/MetaCubeX/metacubexd/compare/v1.102.0...v1.103.0) (2023-09-21)
 
 
