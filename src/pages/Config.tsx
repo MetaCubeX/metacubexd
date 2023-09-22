@@ -27,7 +27,7 @@ import {
   upgradingBackend,
 } from '~/apis'
 import { Button, ConfigTitle } from '~/components'
-import { LANG, MODE_OPTIONS, ROUTES, themes } from '~/constants'
+import { MODE_OPTIONS, ROUTES, themes } from '~/constants'
 import {
   autoSwitchTheme,
   favDayTheme,
@@ -269,22 +269,10 @@ const ConfigForm = () => {
 }
 
 const ConfigForXd = () => {
-  const [t, { locale }] = useI18n()
+  const [t] = useI18n()
 
   return (
     <div class="grid grid-cols-2 place-items-center gap-4">
-      <div class="col-span-2">
-        <Button
-          onClick={() => {
-            const curLocale = locale()
-
-            locale(curLocale === LANG.EN ? LANG.ZH : LANG.EN)
-          }}
-        >
-          {t('switchLanguage')}
-        </Button>
-      </div>
-
       <div class="flex flex-col gap-4">
         <div>
           <ConfigTitle>{t('autoSwitchTheme')}</ConfigTitle>

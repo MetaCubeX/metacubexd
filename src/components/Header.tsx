@@ -4,6 +4,7 @@ import {
   IconFileStack,
   IconGlobe,
   IconHome,
+  IconLanguage,
   IconMenu,
   IconNetwork,
   IconPalette,
@@ -11,8 +12,8 @@ import {
   IconSettings,
 } from '@tabler/icons-solidjs'
 import { For, ParentComponent, Show, createSignal } from 'solid-js'
-import { LogoText } from '~/components'
-import { ROUTES, themes } from '~/constants'
+import { Button, LogoText } from '~/components'
+import { LANG, ROUTES, themes } from '~/constants'
 import { setCurTheme } from '~/signals'
 
 const Nav: ParentComponent<{ href: string; tooltip: string }> = ({
@@ -61,7 +62,7 @@ const ThemeSwitcher = () => (
 )
 
 export const Header = () => {
-  const [t] = useI18n()
+  const [t, { locale }] = useI18n()
   const navs = () => [
     {
       href: ROUTES.Overview,
@@ -151,6 +152,17 @@ export const Header = () => {
 
       <div class="navbar-end">
         <div class="flex items-center gap-2">
+          <Button
+            class="btn-circle btn-secondary btn-sm"
+            onClick={() => {
+              const curLocale = locale()
+
+              locale(curLocale === LANG.EN ? LANG.ZH : LANG.EN)
+            }}
+          >
+            <IconLanguage />
+          </Button>
+
           <ThemeSwitcher />
         </div>
       </div>
