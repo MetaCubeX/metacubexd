@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.106.0](https://github.com/MetaCubeX/metacubexd/compare/v1.105.0...v1.106.0) (2023-09-22)
+
+
+### Features
+
+* **connection:** filter client sourceIP with tag name support, closes [#264](https://github.com/MetaCubeX/metacubexd/issues/264) ([8df4d7a](https://github.com/MetaCubeX/metacubexd/commit/8df4d7a7e93570c9d4d76b5903907e1bcb2ab45a))
+
 ## [1.105.0](https://github.com/MetaCubeX/metacubexd/compare/v1.104.0...v1.105.0) (2023-09-21)
 
 
