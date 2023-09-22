@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.108.1](https://github.com/MetaCubeX/metacubexd/compare/v1.108.0...v1.108.1) (2023-09-22)
+
+
+### Bug Fixes
+
+* **connection:** cannot filter by undefined ([08776a5](https://github.com/MetaCubeX/metacubexd/commit/08776a5bee855d3d7d7fa32b1ca43b41272ce988))
+
 ## [1.108.0](https://github.com/MetaCubeX/metacubexd/compare/v1.107.0...v1.108.0) (2023-09-22)
 
 
