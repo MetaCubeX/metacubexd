@@ -217,31 +217,52 @@ const ConfigForm = () => {
         </For>
       </form>
 
-      <div class="flex flex-wrap items-center gap-2">
-        <Button loading={reloadingConfigFile()} onClick={reloadConfigFileAPI}>
-          {t('reloadConfigFile')}
-        </Button>
-
-        <Button loading={flushingFakeIPData()} onClick={flushFakeIPDataAPI}>
-          {t('flushFakeIPData')}
+      <div class="flex flex-wrap items-center justify-center gap-2">
+        <Button
+          class="btn-primary"
+          loading={reloadingConfigFile()}
+          onClick={reloadConfigFileAPI}
+        >
+          {t('reloadConfig')}
         </Button>
 
         <Button
+          class="btn-secondary"
           loading={updatingGEODatabases()}
           onClick={updateGEODatabasesAPI}
         >
           {t('updateGEODatabases')}
         </Button>
 
-        <Button loading={upgradingBackend()} onClick={upgradeBackendAPI}>
+        <Button
+          class="btn-accent"
+          loading={flushingFakeIPData()}
+          onClick={flushFakeIPDataAPI}
+        >
+          {t('flushFakeIP')}
+        </Button>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-center gap-2">
+        <Button
+          class="btn-error"
+          loading={upgradingBackend()}
+          onClick={upgradeBackendAPI}
+        >
           {t('upgradeCore')}
         </Button>
 
-        <Button loading={restartingBackend()} onClick={restartBackendAPI}>
+        <Button
+          class="btn-warning"
+          loading={restartingBackend()}
+          onClick={restartBackendAPI}
+        >
           {t('restartCore')}
         </Button>
 
-        <Button onClick={onSwitchEndpointClick}>{t('switchEndpoint')}</Button>
+        <Button class="btn-info" onClick={onSwitchEndpointClick}>
+          {t('switchEndpoint')}
+        </Button>
       </div>
     </div>
   )
