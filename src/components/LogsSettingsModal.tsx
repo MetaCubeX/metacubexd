@@ -1,4 +1,3 @@
-import { useI18n } from '@solid-primitives/i18n'
 import { IconX } from '@tabler/icons-solidjs'
 import { For } from 'solid-js'
 import { Button, ConfigTitle } from '~/components'
@@ -8,6 +7,7 @@ import {
   MODAL,
   TAILWINDCSS_SIZE,
 } from '~/constants'
+import { useI18n } from '~/i18n'
 import {
   logLevel,
   logMaxRows,
@@ -19,7 +19,7 @@ import {
 
 export const LogsSettingsModal = () => {
   const modalID = MODAL.LOGS_SETTINGS
-  const [t] = useI18n()
+  const { t } = useI18n()
 
   return (
     <dialog id={modalID} class="modal modal-bottom sm:modal-middle">

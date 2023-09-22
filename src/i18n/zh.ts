@@ -1,3 +1,5 @@
+import { Dict } from '~/i18n/dict'
+
 export default {
   add: '添加',
   overview: '概览',
@@ -97,4 +99,4 @@ export default {
   version: '版本',
   expire: '到期时间',
   noExpire: '不限时',
-}
+} satisfies Dict

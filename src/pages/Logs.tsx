@@ -1,4 +1,3 @@
-import { useI18n } from '@solid-primitives/i18n'
 import { makePersisted } from '@solid-primitives/storage'
 import {
   IconSettings,
@@ -20,6 +19,7 @@ import { For, Index, createEffect, createMemo, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Button, LogsSettingsModal } from '~/components'
 import { LOG_LEVEL, MODAL } from '~/constants'
+import { useI18n } from '~/i18n'
 import { logsTableSize, tableSizeClassName, useWsRequest } from '~/signals'
 import { logLevel, logMaxRows } from '~/signals/config'
 import { Log } from '~/types'
@@ -40,7 +40,7 @@ const fuzzyFilter: FilterFn<LogWithSeq> = (row, columnId, value, addMeta) => {
 }
 
 export default () => {
-  const [t] = useI18n()
+  const { t } = useI18n()
   let seq = 1
   const [logs, setLogs] = createSignal<LogWithSeq[]>([])
 

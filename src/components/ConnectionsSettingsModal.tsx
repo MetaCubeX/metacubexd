@@ -1,6 +1,5 @@
 import { createForm } from '@felte/solid'
 import { validator } from '@felte/validator-zod'
-import { useI18n } from '@solid-primitives/i18n'
 import { IconX } from '@tabler/icons-solidjs'
 import type {
   DragEventHandler,
@@ -27,6 +26,7 @@ import {
   MODAL,
   TAILWINDCSS_SIZE,
 } from '~/constants'
+import { useI18n } from '~/i18n'
 import {
   allConnections,
   clientSourceIPTags,
@@ -45,7 +45,7 @@ const TagClientSourceIPWithNameForm: Component = () => {
     sourceIP: z.string().nonempty(),
   })
 
-  const [t] = useI18n()
+  const { t } = useI18n()
 
   const { form, reset } = createForm<z.infer<typeof schema>>({
     extend: validator({ schema }),
@@ -113,7 +113,7 @@ export const ConnectionsSettingsModal = (props: {
   onVisibleChange: (value: ConnectionsTableColumnVisibility) => void
 }) => {
   const modalID = MODAL.CONNECTIONS_SETTINGS
-  const [t] = useI18n()
+  const { t } = useI18n()
   const [activeKey, setActiveKey] =
     createSignal<CONNECTIONS_TABLE_ACCESSOR_KEY | null>(null)
 

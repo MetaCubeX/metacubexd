@@ -1,9 +1,9 @@
-import { useI18n } from '@solid-primitives/i18n'
 import { IconReload } from '@tabler/icons-solidjs'
 import { For, Show, createSignal, onMount } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Button } from '~/components'
 import { formatTimeFromNow, useStringBooleanMap } from '~/helpers'
+import { useI18n } from '~/i18n'
 import { useRules } from '~/signals'
 
 enum ActiveTab {
@@ -12,7 +12,7 @@ enum ActiveTab {
 }
 
 export default () => {
-  const [t] = useI18n()
+  const { t } = useI18n()
   const {
     rules,
     ruleProviders,

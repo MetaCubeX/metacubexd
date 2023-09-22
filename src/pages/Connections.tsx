@@ -1,5 +1,4 @@
 import { writeClipboard } from '@solid-primitives/clipboard'
-import { useI18n } from '@solid-primitives/i18n'
 import { makePersisted } from '@solid-primitives/storage'
 import {
   IconInfoSmall,
@@ -46,6 +45,7 @@ import {
 } from '~/components'
 import { CONNECTIONS_TABLE_ACCESSOR_KEY, MODAL } from '~/constants'
 import { formatTimeFromNow } from '~/helpers'
+import { useI18n } from '~/i18n'
 import {
   allConnections,
   clientSourceIPTags,
@@ -78,7 +78,7 @@ const fuzzyFilter: FilterFn<Connection> = (row, columnId, value, addMeta) => {
 }
 
 export default () => {
-  const [t] = useI18n()
+  const { t } = useI18n()
 
   const [activeTab, setActiveTab] = createSignal(ActiveTab.activeConnections)
   const { activeConnections, closedConnections, paused, setPaused } =
@@ -346,7 +346,7 @@ export default () => {
           </div>
 
           <select
-            class="select join-item select-bordered select-primary"
+            class="join-item select select-bordered select-primary"
             onChange={(e) => setSourceIPFilter(e.target.value)}
           >
             <option value="">{t('all')}</option>

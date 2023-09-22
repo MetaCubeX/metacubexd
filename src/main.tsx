@@ -7,17 +7,14 @@ import 'dayjs/locale/zh-cn'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { render } from 'solid-js/web'
 import { App } from '~/App'
-import { I18nProvider } from '~/i18n'
 
 dayjs.extend(relativeTime)
 
 render(
   () => (
-    <I18nProvider>
-      <Router source={hashIntegration()}>
-        <App />
-      </Router>
-    </I18nProvider>
+    <Router source={hashIntegration()}>
+      <App />
+    </Router>
   ),
   document.getElementById('root')!,
 )

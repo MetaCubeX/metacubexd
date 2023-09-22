@@ -1,6 +1,5 @@
 import { createForm } from '@felte/solid'
 import { validator } from '@felte/validator-zod'
-import { useI18n } from '@solid-primitives/i18n'
 import { useNavigate } from '@solidjs/router'
 import {
   For,
@@ -28,6 +27,7 @@ import {
 } from '~/apis'
 import { Button, ConfigTitle } from '~/components'
 import { MODE_OPTIONS, ROUTES, themes } from '~/constants'
+import { useI18n } from '~/i18n'
 import {
   autoSwitchTheme,
   favDayTheme,
@@ -48,7 +48,7 @@ const dnsQueryFormSchema = z.object({
 })
 
 const DNSQueryForm = () => {
-  const [t] = useI18n()
+  const { t } = useI18n()
   const request = useRequest()
 
   const { form, isSubmitting } = createForm<z.infer<typeof dnsQueryFormSchema>>(
@@ -111,7 +111,7 @@ const configFormSchema = z.object({
 })
 
 const ConfigForm = () => {
-  const [t] = useI18n()
+  const { t } = useI18n()
   const navigate = useNavigate()
 
   const portList = [
@@ -267,7 +267,7 @@ const ConfigForm = () => {
 }
 
 const ConfigForXd = () => {
-  const [t] = useI18n()
+  const { t } = useI18n()
 
   return (
     <div class="grid grid-cols-2 place-items-center gap-4">
@@ -354,7 +354,7 @@ const Versions = () => {
 }
 
 export default () => {
-  const [t] = useI18n()
+  const { t } = useI18n()
 
   return (
     <div class="mx-auto flex max-w-screen-md flex-col gap-4">

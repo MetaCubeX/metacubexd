@@ -1,4 +1,3 @@
-import { useI18n } from '@solid-primitives/i18n'
 import {
   IconBrandSpeedtest,
   IconReload,
@@ -22,6 +21,7 @@ import {
   sortProxiesByOrderingType,
   useStringBooleanMap,
 } from '~/helpers'
+import { useI18n } from '~/i18n'
 import {
   hideUnAvailableProxies,
   proxiesOrderingType,
@@ -34,7 +34,7 @@ enum ActiveTab {
 }
 
 export default () => {
-  const [t] = useI18n()
+  const { t } = useI18n()
   const {
     proxies,
     selectProxyInGroup,

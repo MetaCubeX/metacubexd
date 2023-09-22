@@ -1,6 +1,5 @@
 import { createForm } from '@felte/solid'
 import { validator } from '@felte/validator-zod'
-import { useI18n } from '@solid-primitives/i18n'
 import { useNavigate } from '@solidjs/router'
 import { IconX } from '@tabler/icons-solidjs'
 import ky from 'ky'
@@ -10,6 +9,7 @@ import { v4 as uuid } from 'uuid'
 import { z } from 'zod'
 import { Button } from '~/components'
 import { transformEndpointURL } from '~/helpers'
+import { useI18n } from '~/i18n'
 import {
   endpointList,
   selectedEndpoint,
@@ -23,7 +23,7 @@ const schema = z.object({
 })
 
 export default () => {
-  const [t] = useI18n()
+  const { t } = useI18n()
   const navigate = useNavigate()
 
   const onSetupSuccess = (id: string) => {

@@ -1,4 +1,3 @@
-import { useI18n } from '@solid-primitives/i18n'
 import { makeTimer } from '@solid-primitives/timer'
 import type { ApexOptions } from 'apexcharts'
 import byteSize from 'byte-size'
@@ -14,6 +13,7 @@ import {
   createSignal,
 } from 'solid-js'
 import { CHART_MAX_XAXIS, DEFAULT_CHART_OPTIONS } from '~/constants'
+import { useI18n } from '~/i18n'
 import { latestConnectionMsg, useWsRequest } from '~/signals'
 
 const TrafficWidget: ParentComponent<{ label: JSX.Element }> = (props) => (
@@ -26,7 +26,7 @@ const TrafficWidget: ParentComponent<{ label: JSX.Element }> = (props) => (
 )
 
 export default () => {
-  const [t] = useI18n()
+  const { t } = useI18n()
 
   const [traffics, setTraffics] = createSignal<{ down: number; up: number }[]>(
     [],

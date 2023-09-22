@@ -1,4 +1,3 @@
-import { useI18n } from '@solid-primitives/i18n'
 import { A, useLocation } from '@solidjs/router'
 import {
   IconFileStack,
@@ -14,6 +13,7 @@ import {
 import { For, ParentComponent, Show, createSignal } from 'solid-js'
 import { Button, LogoText } from '~/components'
 import { LANG, ROUTES, themes } from '~/constants'
+import { useI18n } from '~/i18n'
 import { setCurTheme } from '~/signals'
 
 const Nav: ParentComponent<{ href: string; tooltip: string }> = ({
@@ -62,7 +62,7 @@ const ThemeSwitcher = () => (
 )
 
 export const Header = () => {
-  const [t, { locale }] = useI18n()
+  const { t, locale } = useI18n()
   const navs = () => [
     {
       href: ROUTES.Overview,

@@ -1,7 +1,7 @@
-import { useI18n } from '@solid-primitives/i18n'
 import byteSize from 'byte-size'
 import dayjs from 'dayjs'
 import { toFinite } from 'lodash'
+import { useI18n } from '~/i18n'
 import type { SubscriptionInfo as ISubscriptionInfo } from '~/types'
 
 const getSubscriptionsInfo = (subscriptionInfo: ISubscriptionInfo) => {
@@ -14,13 +14,13 @@ const getSubscriptionsInfo = (subscriptionInfo: ISubscriptionInfo) => {
   const percentage = toFinite((((Download + Upload) / Total) * 100).toFixed(2))
 
   const expirePrefix = () => {
-    const [t] = useI18n()
+    const { t } = useI18n()
 
     return t('expire')
   }
 
   const expireStr = () => {
-    const [t] = useI18n()
+    const { t } = useI18n()
 
     if (Expire === 0) {
       return t('noExpire')
