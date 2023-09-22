@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.108.2](https://github.com/MetaCubeX/metacubexd/compare/v1.108.1...v1.108.2) (2023-09-22)
+
+
+### Bug Fixes
+
+* time from now date string not following locale changes ([ba21999](https://github.com/MetaCubeX/metacubexd/commit/ba21999ed17cdf8997207ac7727525ba07ce0676))
+
 ## [1.108.1](https://github.com/MetaCubeX/metacubexd/compare/v1.108.0...v1.108.1) (2023-09-22)
 
 
