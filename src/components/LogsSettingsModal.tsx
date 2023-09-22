@@ -34,9 +34,8 @@ export const LogsSettingsModal = () => {
 
               modal?.close()
             }}
-          >
-            <IconX size={20} />
-          </Button>
+            icon={<IconX size={20} />}
+          />
         </div>
 
         <div>
