@@ -178,11 +178,6 @@ const ConfigForm = () => {
     }
   })
 
-  const onSwitchEndpointClick = () => {
-    setSelectedEndpoint('')
-    navigate(ROUTES.Setup)
-  }
-
   return (
     <div class="flex flex-col gap-4">
       <select
@@ -201,11 +196,12 @@ const ConfigForm = () => {
         <For each={portList}>
           {(item) => (
             <div class="form-control">
-              <label class="label">
+              <label for={item.key} class="label">
                 <span class="label-text">{item.label}</span>
               </label>
 
               <input
+                id={item.key}
                 name={item.key}
                 type="number"
                 class="input input-bordered"
@@ -216,6 +212,89 @@ const ConfigForm = () => {
           )}
         </For>
       </form>
+
+      <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <div class="form-control">
+          <label for="enable-tun-device" class="label gap-2">
+            <span class="label-text">{t('enableTunDevice')}</span>
+          </label>
+
+          <input
+            id="enable-tun-device"
+            type="checkbox"
+            class="toggle"
+            checked={configsData()?.tun.enable}
+            onChange={(e) =>
+              void updateBackendConfigAPI(
+                'tun',
+                { enable: e.target.checked },
+                refetch,
+              )
+            }
+          />
+        </div>
+
+        <div class="form-control">
+          <label for="tun-ip-stack" class="label gap-2">
+            <span class="label-text">{t('tunModeStack')}</span>
+          </label>
+
+          <select
+            id="tun-ip-stack"
+            class="select select-bordered flex-1"
+            value={configsData()?.tun.stack}
+            onChange={(e) =>
+              void updateBackendConfigAPI(
+                'tun',
+                { stack: e.target.value },
+                refetch,
+              )
+            }
+          >
+            <option>gVisor</option>
+            <option>System</option>
+            <option>LWIP</option>
+          </select>
+        </div>
+
+        <div class="form-control">
+          <label for="device-name" class="label gap-2">
+            <span class="label-text">{t('tunDeviceName')}</span>
+          </label>
+
+          <input
+            id="device-name"
+            class="input input-bordered min-w-0"
+            value={configsData()?.tun.device}
+            onChange={(e) =>
+              void updateBackendConfigAPI(
+                'tun',
+                { device: e.target.value },
+                refetch,
+              )
+            }
+          />
+        </div>
+
+        <div class="form-control">
+          <label for="interface-name" class="label gap-2">
+            <span class="label-text">{t('interfaceName')}</span>
+          </label>
+
+          <input
+            id="interface-name"
+            class="input input-bordered min-w-0"
+            value={configsData()?.['interface-name']}
+            onChange={(e) =>
+              void updateBackendConfigAPI(
+                'interface-name',
+                e.target.value,
+                refetch,
+              )
+            }
+          />
+        </div>
+      </div>
 
       <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <Button
@@ -258,7 +337,13 @@ const ConfigForm = () => {
           {t('restartCore')}
         </Button>
 
-        <Button class="btn-info" onClick={onSwitchEndpointClick}>
+        <Button
+          class="btn-info"
+          onClick={() => {
+            setSelectedEndpoint('')
+            navigate(ROUTES.Setup)
+          }}
+        >
           {t('switchEndpoint')}
         </Button>
       </div>
@@ -270,9 +355,9 @@ const ConfigForXd = () => {
   const { t } = useI18n()
 
   return (
-    <div class="grid grid-cols-2 place-items-center gap-4">
-      <div class="flex flex-col gap-4">
-        <div>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div class="flex flex-col gap-2">
+        <div class="flex flex-col items-center">
           <ConfigTitle>{t('autoSwitchTheme')}</ConfigTitle>
 
           <input
@@ -284,7 +369,7 @@ const ConfigForXd = () => {
         </div>
 
         <Show when={autoSwitchTheme()}>
-          <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-2">
             <div class="flex flex-col">
               <ConfigTitle>{t('favDayTheme')}</ConfigTitle>
 
@@ -322,7 +407,7 @@ const ConfigForXd = () => {
         </Show>
       </div>
 
-      <div>
+      <div class="flex flex-col items-center">
         <ConfigTitle>{t('useTwemoji')}</ConfigTitle>
 
         <input

@@ -85,7 +85,7 @@ export const fetchBackendConfigAPI = () => {
 
 export const updateBackendConfigAPI = async (
   key: keyof Config,
-  value: Config[keyof Config],
+  value: Partial<Config[keyof Config]>,
   refetch: ResourceActions<Config | undefined>['refetch'],
 ) => {
   try {

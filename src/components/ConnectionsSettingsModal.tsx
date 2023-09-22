@@ -237,9 +237,8 @@ export const ConnectionsSettingsModal = (props: {
                           tags.filter((tag) => tag.tagName !== tagName),
                         )
                       }
-                    >
-                      <IconX size={12} />
-                    </Button>
+                      icon={<IconX size={12} />}
+                    />
                   </div>
                 )}
               </For>

@@ -4,7 +4,7 @@ export const ConfigTitle: ParentComponent<{ withDivider?: boolean }> = (
   props,
 ) => (
   <div
-    class="pb-4 text-lg font-semibold"
+    class="py-2 text-center text-lg font-semibold"
     classList={{
       divider: props.withDivider,
     }}
