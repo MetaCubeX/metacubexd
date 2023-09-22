@@ -26,8 +26,8 @@ import {
   upgradingBackend,
 } from '~/apis'
 import { Button, ConfigTitle } from '~/components'
-import { MODE_OPTIONS, ROUTES, themes } from '~/constants'
-import { useI18n } from '~/i18n'
+import { LANG, MODE_OPTIONS, ROUTES, themes } from '~/constants'
+import { locale, setLocale, useI18n } from '~/i18n'
 import {
   autoSwitchTheme,
   favDayTheme,
@@ -354,6 +354,17 @@ const ConfigForm = () => {
 const ConfigForXd = () => {
   const [t] = useI18n()
 
+  const languages = [
+    {
+      label: () => t('en'),
+      value: LANG.EN,
+    },
+    {
+      label: () => t('zh'),
+      value: LANG.ZH,
+    },
+  ]
+
   return (
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
       <div class="flex flex-col gap-2">
@@ -375,14 +386,11 @@ const ConfigForXd = () => {
 
               <select
                 class="select select-bordered"
+                value={favDayTheme()}
                 onChange={(e) => setFavDayTheme(e.target.value)}
               >
                 <For each={themes}>
-                  {(theme) => (
-                    <option selected={favDayTheme() === theme} value={theme}>
-                      {theme}
-                    </option>
-                  )}
+                  {(theme) => <option value={theme}>{theme}</option>}
                 </For>
               </select>
             </div>
@@ -392,14 +400,11 @@ const ConfigForXd = () => {
 
               <select
                 class="select select-bordered"
+                value={favNightTheme()}
                 onChange={(e) => setFavNightTheme(e.target.value)}
               >
                 <For each={themes}>
-                  {(theme) => (
-                    <option selected={favNightTheme() === theme} value={theme}>
-                      {theme}
-                    </option>
-                  )}
+                  {(theme) => <option value={theme}>{theme}</option>}
                 </For>
               </select>
             </div>
@@ -407,15 +412,34 @@ const ConfigForXd = () => {
         </Show>
       </div>
 
-      <div class="flex flex-col items-center">
-        <ConfigTitle>{t('useTwemoji')}</ConfigTitle>
+      <div class="flex flex-col gap-2">
+        <div class="flex flex-col items-center">
+          <ConfigTitle>{t('useTwemoji')}</ConfigTitle>
 
-        <input
-          type="checkbox"
-          class="toggle"
-          checked={useTwemoji()}
-          onChange={(e) => setUseTwemoji(e.target.checked)}
-        />
+          <input
+            type="checkbox"
+            class="toggle"
+            checked={useTwemoji()}
+            onChange={(e) => setUseTwemoji(e.target.checked)}
+          />
+        </div>
+
+        <div class="flex flex-col">
+          <ConfigTitle>{t('switchLanguage')}</ConfigTitle>
+
+          <select
+            class="select select-bordered"
+            onChange={(e) => setLocale(e.target.value as LANG)}
+          >
+            <For each={languages}>
+              {(lang) => (
+                <option selected={locale() === lang.value} value={lang.value}>
+                  {lang.label()}
+                </option>
+              )}
+            </For>
+          </select>
+        </div>
       </div>
     </div>
   )

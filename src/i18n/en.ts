@@ -101,4 +101,6 @@ export default {
   tunModeStack: 'TUN Mode Stack',
   tunDeviceName: 'TUN Device Name',
   interfaceName: 'Interface Name',
+  en: 'English',
+  zh: 'Chinese',
 }

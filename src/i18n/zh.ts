@@ -103,4 +103,6 @@ export default {
   tunModeStack: 'TUN 模式堆栈',
   tunDeviceName: 'TUN 设备名称',
   interfaceName: '接口名称',
+  en: '英文',
+  zh: '中文',
 } satisfies Dict

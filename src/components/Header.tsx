@@ -3,7 +3,6 @@ import {
   IconFileStack,
   IconGlobe,
   IconHome,
-  IconLanguage,
   IconMenu,
   IconNetwork,
   IconPalette,
@@ -11,9 +10,9 @@ import {
   IconSettings,
 } from '@tabler/icons-solidjs'
 import { For, ParentComponent, Show, createSignal } from 'solid-js'
-import { Button, LogoText } from '~/components'
-import { LANG, ROUTES, themes } from '~/constants'
-import { setLocale, useI18n } from '~/i18n'
+import { LogoText } from '~/components'
+import { ROUTES, themes } from '~/constants'
+import { useI18n } from '~/i18n'
 import { setCurTheme } from '~/signals'
 
 const Nav: ParentComponent<{ href: string; tooltip: string }> = ({
@@ -152,14 +151,6 @@ export const Header = () => {
 
       <div class="navbar-end">
         <div class="flex items-center gap-2">
-          <Button
-            class="btn-circle btn-secondary btn-sm"
-            onClick={() =>
-              setLocale((locale) => (locale === LANG.EN ? LANG.ZH : LANG.EN))
-            }
-            icon={<IconLanguage />}
-          />
-
           <ThemeSwitcher />
         </div>
       </div>
