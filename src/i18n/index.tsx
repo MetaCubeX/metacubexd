@@ -1,10 +1,11 @@
+import { createContextProvider } from '@solid-primitives/context'
 import * as i18n from '@solid-primitives/i18n'
 import { makePersisted } from '@solid-primitives/storage'
-import { createMemo, createSignal } from 'solid-js'
+import { createSignal } from 'solid-js'
 import { LANG } from '~/constants'
-import dict from './dict'
+import dict, { Dict } from './dict'
 
-export const [curLocale, setCurLocale] = makePersisted(
+export const [locale, setLocale] = makePersisted(
   createSignal<LANG>(
     Reflect.has(dict, navigator.language)
       ? (navigator.language as LANG)
@@ -16,12 +17,9 @@ export const [curLocale, setCurLocale] = makePersisted(
   },
 )
 
-const locale = (localeName?: LANG) =>
-  localeName ? setCurLocale(localeName) : curLocale()
+export const [I18nProvider, useMaybeI18n] = createContextProvider<
+  [i18n.Translator<Dict>],
+  { locale: LANG }
+>((props) => [i18n.translator(() => i18n.flatten(dict[props.locale]))])
 
-export const useI18n = () => {
-  const curDict = createMemo(() => i18n.flatten(dict[curLocale()]))!
-  const t = createMemo(() => i18n.translator(() => curDict()))
-
-  return { t: t(), locale }
-}
+export const useI18n = () => useMaybeI18n()!

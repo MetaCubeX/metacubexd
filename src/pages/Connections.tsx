@@ -78,7 +78,7 @@ const fuzzyFilter: FilterFn<Connection> = (row, columnId, value, addMeta) => {
 }
 
 export default () => {
-  const { t } = useI18n()
+  const [t] = useI18n()
 
   const [activeTab, setActiveTab] = createSignal(ActiveTab.activeConnections)
   const { activeConnections, closedConnections, paused, setPaused } =
@@ -88,7 +88,7 @@ export default () => {
 
   const [selectedConnectionID, setSelectedConnectionID] = createSignal<string>()
 
-  const columns = createMemo<ColumnDef<Connection>[]>(() => [
+  const columns: ColumnDef<Connection>[] = [
     {
       header: () => t('details'),
       enableGrouping: false,
@@ -243,7 +243,7 @@ export default () => {
         original.metadata.destinationIP ||
         original.metadata.host,
     },
-  ])
+  ]
 
   const [grouping, setGrouping] = createSignal<GroupingState>([])
   const [sorting, setSorting] = makePersisted(
@@ -281,7 +281,7 @@ export default () => {
     },
     sortDescFirst: true,
     enableHiding: true,
-    columns: columns(),
+    columns,
     onGlobalFilterChange: setGlobalFilter,
     globalFilterFn: fuzzyFilter,
     onGroupingChange: setGrouping,

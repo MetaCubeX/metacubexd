@@ -19,6 +19,7 @@
     "@felte/validator-zod": "^1.0.17",
     "@fontsource/fira-sans": "^5.0.12",
     "@solid-primitives/clipboard": "^1.5.7",
+    "@solid-primitives/context": "^0.2.1",
     "@solid-primitives/event-listener": "^2.3.0",
     "@solid-primitives/i18n": "^2.0.0",
     "@solid-primitives/keyed": "^1.2.0",

@@ -19,7 +19,7 @@ import {
 
 export const LogsSettingsModal = () => {
   const modalID = MODAL.LOGS_SETTINGS
-  const { t } = useI18n()
+  const [t] = useI18n()
 
   return (
     <dialog id={modalID} class="modal modal-bottom sm:modal-middle">

@@ -34,7 +34,7 @@ enum ActiveTab {
 }
 
 export default () => {
-  const { t } = useI18n()
+  const [t] = useI18n()
   const {
     proxies,
     selectProxyInGroup,

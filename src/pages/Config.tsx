@@ -48,7 +48,7 @@ const dnsQueryFormSchema = z.object({
 })
 
 const DNSQueryForm = () => {
-  const { t } = useI18n()
+  const [t] = useI18n()
   const request = useRequest()
 
   const { form, isSubmitting } = createForm<z.infer<typeof dnsQueryFormSchema>>(
@@ -111,7 +111,7 @@ const configFormSchema = z.object({
 })
 
 const ConfigForm = () => {
-  const { t } = useI18n()
+  const [t] = useI18n()
   const navigate = useNavigate()
 
   const portList = [
@@ -352,7 +352,7 @@ const ConfigForm = () => {
 }
 
 const ConfigForXd = () => {
-  const { t } = useI18n()
+  const [t] = useI18n()
 
   return (
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -439,7 +439,7 @@ const Versions = () => {
 }
 
 export default () => {
-  const { t } = useI18n()
+  const [t] = useI18n()
 
   return (
     <div class="mx-auto flex max-w-screen-md flex-col gap-4">

@@ -26,7 +26,7 @@ const TrafficWidget: ParentComponent<{ label: JSX.Element }> = (props) => (
 )
 
 export default () => {
-  const { t } = useI18n()
+  const [t] = useI18n()
 
   const [traffics, setTraffics] = createSignal<{ down: number; up: number }[]>(
     [],

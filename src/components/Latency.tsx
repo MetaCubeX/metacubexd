@@ -4,7 +4,7 @@ import { useI18n } from '~/i18n'
 import { latencyQualityMap, useProxies } from '~/signals'
 
 export const Latency = (props: { name?: string }) => {
-  const { t } = useI18n()
+  const [t] = useI18n()
   const { latencyMap } = useProxies()
   const [textClassName, setTextClassName] = createSignal('')
   const latency = createMemo(() => {

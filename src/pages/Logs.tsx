@@ -40,7 +40,7 @@ const fuzzyFilter: FilterFn<LogWithSeq> = (row, columnId, value, addMeta) => {
 }
 
 export default () => {
-  const { t } = useI18n()
+  const [t] = useI18n()
   let seq = 1
   const [logs, setLogs] = createSignal<LogWithSeq[]>([])
 

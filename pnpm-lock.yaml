@@ -20,6 +20,9 @@ dependencies:
   '@solid-primitives/clipboard':
     specifier: ^1.5.7
     version: 1.5.7(solid-js@1.7.12)
+  '@solid-primitives/context':
+    specifier: ^0.2.1
+    version: 0.2.1(solid-js@1.7.12)
   '@solid-primitives/event-listener':
     specifier: ^2.3.0
     version: 2.3.0(solid-js@1.7.12)
@@ -2029,6 +2032,14 @@ packages:
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/utils': 6.2.1(solid-js@1.7.12)
+      solid-js: 1.7.12
+    dev: false
+
+  /@solid-primitives/context@0.2.1(solid-js@1.7.12):
+    resolution: {integrity: sha512-XIIwCOWpRKDersgkR9LNFXaJHIV8QlCFo/tq5bV0cAOZklcwOFcqi2bN+uWgEIQSWGjWXU2kc1H1/TzgYzVDlg==}
+    peerDependencies:
+      solid-js: ^1.6.12
+    dependencies:
       solid-js: 1.7.12
     dev: false
 

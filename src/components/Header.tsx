@@ -13,7 +13,7 @@ import {
 import { For, ParentComponent, Show, createSignal } from 'solid-js'
 import { Button, LogoText } from '~/components'
 import { LANG, ROUTES, themes } from '~/constants'
-import { useI18n } from '~/i18n'
+import { setLocale, useI18n } from '~/i18n'
 import { setCurTheme } from '~/signals'
 
 const Nav: ParentComponent<{ href: string; tooltip: string }> = ({
@@ -62,7 +62,7 @@ const ThemeSwitcher = () => (
 )
 
 export const Header = () => {
-  const { t, locale } = useI18n()
+  const [t] = useI18n()
   const navs = () => [
     {
       href: ROUTES.Overview,
@@ -154,11 +154,9 @@ export const Header = () => {
         <div class="flex items-center gap-2">
           <Button
             class="btn-circle btn-secondary btn-sm"
-            onClick={() => {
-              const curLocale = locale()
-
-              locale(curLocale === LANG.EN ? LANG.ZH : LANG.EN)
-            }}
+            onClick={() =>
+              setLocale((locale) => (locale === LANG.EN ? LANG.ZH : LANG.EN))
+            }
             icon={<IconLanguage />}
           />
 

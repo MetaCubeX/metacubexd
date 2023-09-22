@@ -14,13 +14,13 @@ const getSubscriptionsInfo = (subscriptionInfo: ISubscriptionInfo) => {
   const percentage = toFinite((((Download + Upload) / Total) * 100).toFixed(2))
 
   const expirePrefix = () => {
-    const { t } = useI18n()
+    const [t] = useI18n()
 
     return t('expire')
   }
 
   const expireStr = () => {
-    const { t } = useI18n()
+    const [t] = useI18n()
 
     if (Expire === 0) {
       return t('noExpire')
