@@ -63,7 +63,7 @@ export const App = () => {
     <I18nProvider locale={locale()}>
       <div
         class={twMerge(
-          'relative flex h-screen flex-col subpixel-antialiased p-safe',
+          'relative flex h-screen flex-col overscroll-y-none subpixel-antialiased p-safe',
           useTwemoji() ? 'font-twemoji' : 'font-no-twemoji',
         )}
         data-theme={curTheme()}
