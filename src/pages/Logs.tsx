@@ -15,7 +15,7 @@ import {
   getFilteredRowModel,
   getSortedRowModel,
 } from '@tanstack/solid-table'
-import { For, Index, createEffect, createMemo, createSignal } from 'solid-js'
+import { For, Index, createEffect, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Button, LogsSettingsModal } from '~/components'
 import { LOG_LEVEL, MODAL } from '~/constants'
@@ -65,7 +65,7 @@ export default () => {
     storage: localStorage,
   })
 
-  const columns = createMemo<ColumnDef<LogWithSeq>[]>(() => [
+  const columns: ColumnDef<LogWithSeq>[] = [
     {
       header: t('sequence'),
       accessorFn: (row) => row.seq,
@@ -100,7 +100,7 @@ export default () => {
       header: t('payload'),
       accessorFn: (row) => row.payload,
     },
-  ])
+  ]
 
   const table = createSolidTable({
     filterFns: {
@@ -118,7 +118,7 @@ export default () => {
       return logs()
     },
     sortDescFirst: true,
-    columns: columns(),
+    columns,
     onGlobalFilterChange: setGlobalFilter,
     onSortingChange: setSorting,
     globalFilterFn: fuzzyFilter,

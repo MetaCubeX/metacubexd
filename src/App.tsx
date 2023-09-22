@@ -5,6 +5,7 @@ import { Toaster } from 'solid-toast'
 import { twMerge } from 'tailwind-merge'
 import { Header } from '~/components'
 import { ROUTES } from '~/constants'
+import { I18nProvider, locale } from '~/i18n'
 import {
   WsMsg,
   autoSwitchTheme,
@@ -59,36 +60,38 @@ export const App = () => {
   })
 
   return (
-    <div
-      class={twMerge(
-        'relative flex h-screen flex-col subpixel-antialiased p-safe',
-        useTwemoji() ? 'font-twemoji' : 'font-no-twemoji',
-      )}
-      data-theme={curTheme()}
-    >
-      <Header />
+    <I18nProvider locale={locale()}>
+      <div
+        class={twMerge(
+          'relative flex h-screen flex-col subpixel-antialiased p-safe',
+          useTwemoji() ? 'font-twemoji' : 'font-no-twemoji',
+        )}
+        data-theme={curTheme()}
+      >
+        <Header />
 
-      <div class="flex-1 overflow-y-auto p-2 sm:p-4">
-        <Routes>
+        <div class="flex-1 overflow-y-auto p-2 sm:p-4">
+          <Routes>
+            <Show when={endpoint()}>
+              <Route path={ROUTES.Overview} component={Overview} />
+              <Route path={ROUTES.Proxies} component={Proxies} />
+              <Route path={ROUTES.Rules} component={Rules} />
+              <Route path={ROUTES.Conns} component={Connections} />
+              <Route path={ROUTES.Log} component={Logs} />
+              <Route path={ROUTES.Config} component={Config} />
+              <Route path="*" element={<Navigate href={ROUTES.Overview} />} />
+            </Show>
+
+            <Route path={endpoint() ? ROUTES.Setup : '*'} component={Setup} />
+          </Routes>
+
           <Show when={endpoint()}>
-            <Route path={ROUTES.Overview} component={Overview} />
-            <Route path={ROUTES.Proxies} component={Proxies} />
-            <Route path={ROUTES.Rules} component={Rules} />
-            <Route path={ROUTES.Conns} component={Connections} />
-            <Route path={ROUTES.Log} component={Logs} />
-            <Route path={ROUTES.Config} component={Config} />
-            <Route path="*" element={<Navigate href={ROUTES.Overview} />} />
+            <ProtectedResources />
           </Show>
+        </div>
 
-          <Route path={endpoint() ? ROUTES.Setup : '*'} component={Setup} />
-        </Routes>
-
-        <Show when={endpoint()}>
-          <ProtectedResources />
-        </Show>
+        <Toaster position="bottom-center" />
       </div>
-
-      <Toaster position="bottom-center" />
-    </div>
+    </I18nProvider>
   )
 }
