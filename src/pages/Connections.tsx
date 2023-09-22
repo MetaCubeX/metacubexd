@@ -109,9 +109,8 @@ export default () => {
 
               modal?.showModal()
             }}
-          >
-            <IconInfoSmall size="16" />
-          </Button>
+            icon={<IconInfoSmall size="16" />}
+          />
         </div>
       ),
     },
@@ -127,9 +126,8 @@ export default () => {
           <Button
             class="btn-circle btn-xs"
             onClick={() => closeSingleConnectionAPI(row.original.id)}
-          >
-            <IconX size="16" />
-          </Button>
+            icon={<IconX size="16" />}
+          />
         </div>
       ),
     },
@@ -348,7 +346,7 @@ export default () => {
           </div>
 
           <select
-            class="join-item select select-bordered select-primary"
+            class="select join-item select-bordered select-primary"
             onChange={(e) => setSourceIPFilter(e.target.value)}
           >
             <option value="">{t('all')}</option>
@@ -380,9 +378,8 @@ export default () => {
           <Button
             class="join-item btn-sm sm:btn-md"
             onClick={() => setPaused((paused) => !paused)}
-          >
-            {paused() ? <IconPlayerPlay /> : <IconPlayerPause />}
-          </Button>
+            icon={paused() ? <IconPlayerPlay /> : <IconPlayerPause />}
+          />
 
           <Button
             class="join-item btn-sm sm:btn-md"
@@ -395,9 +392,8 @@ export default () => {
                 closeAllConnectionsAPI()
               }
             }}
-          >
-            <IconX />
-          </Button>
+            icon={<IconX />}
+          />
 
           <Button
             class="btn join-item btn-sm sm:btn-md"
@@ -408,9 +404,8 @@ export default () => {
 
               modal?.showModal()
             }}
-          >
-            <IconSettings />
-          </Button>
+            icon={<IconSettings />}
+          />
         </div>
       </div>
 

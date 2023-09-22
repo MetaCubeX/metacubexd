@@ -146,9 +146,8 @@ export default () => {
 
             modal?.showModal()
           }}
-        >
-          <IconSettings />
-        </Button>
+          icon={<IconSettings />}
+        />
       </div>
 
       <div class="overflow-x-auto whitespace-nowrap rounded-md bg-base-300">

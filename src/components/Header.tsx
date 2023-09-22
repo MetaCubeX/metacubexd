@@ -159,9 +159,8 @@ export const Header = () => {
 
               locale(curLocale === LANG.EN ? LANG.ZH : LANG.EN)
             }}
-          >
-            <IconLanguage />
-          </Button>
+            icon={<IconLanguage />}
+          />
 
           <ThemeSwitcher />
         </div>

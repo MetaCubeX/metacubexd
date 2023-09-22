@@ -98,7 +98,7 @@ export default () => {
   return (
     <div class="flex h-full flex-col gap-2">
       <div class="flex items-center gap-2">
-        <div class="tabs-boxed tabs gap-2">
+        <div class="tabs tabs-boxed gap-2">
           <For each={tabs()}>
             {(tab) => (
               <button
@@ -120,13 +120,14 @@ export default () => {
             class="btn btn-circle btn-sm"
             disabled={isAllProviderUpdating()}
             onClick={(e) => onUpdateAllProviderClick(e)}
-          >
-            <IconReload
-              class={twMerge(
-                isAllProviderUpdating() && 'animate-spin text-success',
-              )}
-            />
-          </Button>
+            icon={
+              <IconReload
+                class={twMerge(
+                  isAllProviderUpdating() && 'animate-spin text-success',
+                )}
+              />
+            }
+          />
         </Show>
 
         <div class="ml-auto">
@@ -139,9 +140,8 @@ export default () => {
 
               modal?.showModal()
             }}
-          >
-            <IconSettings />
-          </Button>
+            icon={<IconSettings />}
+          />
         </div>
       </div>
 
@@ -176,14 +176,15 @@ export default () => {
                         class="btn-circle btn-sm"
                         disabled={latencyTestingMap()[proxyGroup.name]}
                         onClick={(e) => onLatencyTestClick(e, proxyGroup.name)}
-                      >
-                        <IconBrandSpeedtest
-                          class={twMerge(
-                            latencyTestingMap()[proxyGroup.name] &&
-                              'animate-pulse text-success',
-                          )}
-                        />
-                      </Button>
+                        icon={
+                          <IconBrandSpeedtest
+                            class={twMerge(
+                              latencyTestingMap()[proxyGroup.name] &&
+                                'animate-pulse text-success',
+                            )}
+                          />
+                        }
+                      />
                     </div>
 
                     <div class="text-sm text-slate-500">
@@ -242,21 +243,22 @@ export default () => {
                         </div>
                       </div>
 
-                      <div>
+                      <div class="flex items-center gap-2">
                         <Button
-                          class="btn btn-circle btn-sm mr-2"
+                          class="btn btn-circle btn-sm"
                           disabled={updatingMap()[proxyProvider.name]}
                           onClick={(e) =>
                             onUpdateProviderClick(e, proxyProvider.name)
                           }
-                        >
-                          <IconReload
-                            class={twMerge(
-                              updatingMap()[proxyProvider.name] &&
-                                'animate-spin text-success',
-                            )}
-                          />
-                        </Button>
+                          icon={
+                            <IconReload
+                              class={twMerge(
+                                updatingMap()[proxyProvider.name] &&
+                                  'animate-spin text-success',
+                              )}
+                            />
+                          }
+                        />
 
                         <Button
                           class="btn btn-circle btn-sm"
@@ -264,14 +266,15 @@ export default () => {
                           onClick={(e) =>
                             onHealthCheckClick(e, proxyProvider.name)
                           }
-                        >
-                          <IconBrandSpeedtest
-                            class={twMerge(
-                              healthCheckingMap()[proxyProvider.name] &&
-                                'animate-pulse text-success',
-                            )}
-                          />
-                        </Button>
+                          icon={
+                            <IconBrandSpeedtest
+                              class={twMerge(
+                                healthCheckingMap()[proxyProvider.name] &&
+                                  'animate-pulse text-success',
+                              )}
+                            />
+                          }
+                        />
                       </div>
                     </div>
 

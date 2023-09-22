@@ -217,7 +217,7 @@ const ConfigForm = () => {
         </For>
       </form>
 
-      <div class="flex flex-wrap items-center justify-center gap-2">
+      <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <Button
           class="btn-primary"
           loading={reloadingConfigFile()}
@@ -241,9 +241,7 @@ const ConfigForm = () => {
         >
           {t('flushFakeIP')}
         </Button>
-      </div>
 
-      <div class="flex flex-wrap items-center justify-center gap-2">
         <Button
           class="btn-error"
           loading={upgradingBackend()}

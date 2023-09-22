@@ -5,13 +5,22 @@ export const Button: ParentComponent<
   JSX.ButtonHTMLAttributes<HTMLButtonElement> & {
     loading?: boolean
     disabled?: boolean
+    icon?: JSX.Element
   }
 > = (props) => {
-  const [local, others] = splitProps(props, ['class', 'loading', 'disabled'])
+  const [local, others] = splitProps(props, [
+    'class',
+    'loading',
+    'disabled',
+    'icon',
+  ])
 
   return (
     <button
-      class={twMerge('btn', local.loading ? 'btn-disabled' : local.class)}
+      class={twMerge(
+        'btn flex items-center',
+        local.loading ? 'btn-disabled' : local.class,
+      )}
       {...others}
       onClick={(e) => {
         if (props.disabled) {
@@ -27,10 +36,17 @@ export const Button: ParentComponent<
       }}
     >
       <Show when={local.loading}>
-        <span class="loading loading-spinner" />
+        <div class="loading loading-spinner" />
       </Show>
 
-      {props.children}
+      <span
+        class="truncate"
+        classList={{
+          'flex-1': !local.icon,
+        }}
+      >
+        {props.icon || props.children}
+      </span>
     </button>
   )
 }
