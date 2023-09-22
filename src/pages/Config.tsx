@@ -15,6 +15,7 @@ import {
   fetchBackendVersionAPI,
   flushFakeIPDataAPI,
   flushingFakeIPData,
+  isUpdateAvailableAPI,
   reloadConfigFileAPI,
   reloadingConfigFile,
   restartBackendAPI,
@@ -448,17 +449,28 @@ const ConfigForXd = () => {
 
 const Versions = () => {
   const [backendVersion, setBackendVersion] = createSignal('')
+  const [isUpdateAvailable, setIsUpdateAvailable] = createSignal(false)
 
   onMount(async () => {
     const version = await fetchBackendVersionAPI()
-
     setBackendVersion(version)
+    setIsUpdateAvailable(await isUpdateAvailableAPI(version))
   })
 
   return (
     <div class="grid grid-cols-2 gap-4">
       <kbd class="kbd">{import.meta.env.version}</kbd>
-      <kbd class="kbd">{backendVersion()}</kbd>
+
+      <div class="relative">
+        <Show when={isUpdateAvailable()}>
+          <span class="absolute right-[-4px] top-[-4px] flex h-3 w-3">
+            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-info opacity-75" />
+            <span class="inline-flex h-3 w-3 rounded-full bg-info" />
+          </span>
+        </Show>
+
+        <kbd class="kbd w-full">{backendVersion()}</kbd>
+      </div>
     </div>
   )
 }
