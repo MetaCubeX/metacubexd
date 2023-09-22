@@ -116,13 +116,13 @@ const ConfigForm = () => {
 
   const portList = [
     {
-      label: 'HTTP Port',
+      label: () => t('port', { name: 'HTTP' }),
       key: 'port',
       onChange: (e: Event & { target: HTMLInputElement }) =>
         void updateBackendConfigAPI('port', Number(e.target.value), refetch),
     },
     {
-      label: 'Socks Port',
+      label: () => t('port', { name: 'Socks' }),
       key: 'socks-port',
       onChange: (e: Event & { target: HTMLInputElement }) =>
         void updateBackendConfigAPI(
@@ -132,7 +132,7 @@ const ConfigForm = () => {
         ),
     },
     {
-      label: 'Redir Port',
+      label: () => t('port', { name: 'Redir' }),
       key: 'redir-port',
       onChange: (e: Event & { target: HTMLInputElement }) =>
         void updateBackendConfigAPI(
@@ -142,7 +142,7 @@ const ConfigForm = () => {
         ),
     },
     {
-      label: 'TProxy Port',
+      label: () => t('port', { name: 'TProxy' }),
       key: 'tproxy-port',
       onChange: (e: Event & { target: HTMLInputElement }) =>
         void updateBackendConfigAPI(
@@ -152,7 +152,7 @@ const ConfigForm = () => {
         ),
     },
     {
-      label: 'Mixed Port',
+      label: () => t('port', { name: 'Mixed' }),
       key: 'mixed-port',
       onChange: (e: Event & { target: HTMLInputElement }) =>
         void updateBackendConfigAPI(
@@ -197,7 +197,7 @@ const ConfigForm = () => {
           {(item) => (
             <div class="form-control">
               <label for={item.key} class="label">
-                <span class="label-text">{item.label}</span>
+                <span class="label-text">{item.label()}</span>
               </label>
 
               <input
@@ -205,7 +205,7 @@ const ConfigForm = () => {
                 name={item.key}
                 type="number"
                 class="input input-bordered"
-                placeholder={item.label}
+                placeholder={item.label()}
                 onChange={item.onChange}
               />
             </div>

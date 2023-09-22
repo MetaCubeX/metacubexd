@@ -20,6 +20,8 @@ export const [locale, setLocale] = makePersisted(
 export const [I18nProvider, useMaybeI18n] = createContextProvider<
   [i18n.Translator<Dict>],
   { locale: LANG }
->((props) => [i18n.translator(() => i18n.flatten(dict[props.locale]))])
+>((props) => [
+  i18n.translator(() => i18n.flatten(dict[props.locale]), i18n.resolveTemplate),
+])
 
 export const useI18n = () => useMaybeI18n()!

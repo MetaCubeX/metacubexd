@@ -105,4 +105,5 @@ export default {
   interfaceName: '接口名称',
   en: '英文',
   zh: '中文',
+  port: '{{ name }} 端口',
 } satisfies Dict

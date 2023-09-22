@@ -103,4 +103,5 @@ export default {
   interfaceName: 'Interface Name',
   en: 'English',
   zh: 'Chinese',
+  port: '{{ name }} Port',
 }
