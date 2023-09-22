@@ -1,50 +1,38 @@
-import { IconX } from '@tabler/icons-solidjs'
+import { IconNetwork } from '@tabler/icons-solidjs'
 import { Component, Show } from 'solid-js'
-import { MODAL } from '~/constants'
+import { useI18n } from '~/i18n'
 import { allConnections } from '~/signals'
-import { Button } from './Button'
+import { Modal } from './Modal'
 
 export const ConnectionsTableDetailsModal: Component<{
+  ref?: (el: HTMLDialogElement) => void
   selectedConnectionID?: string
 }> = (props) => {
-  const modalID = MODAL.CONNECTIONS_TABLE_DETAILS
+  const { t } = useI18n()
 
   return (
-    <dialog id={modalID} class="modal modal-bottom sm:modal-middle">
-      <div class="modal-box">
-        <div class="sticky top-0 z-50 flex items-center justify-end">
-          <Button
-            class="btn-circle btn-sm"
-            onClick={() => {
-              const modal = document.querySelector(
-                `#${modalID}`,
-              ) as HTMLDialogElement | null
-
-              modal?.close()
-            }}
-          >
-            <IconX size={20} />
-          </Button>
-        </div>
-
-        <Show when={props.selectedConnectionID}>
-          <pre>
-            <code>
-              {JSON.stringify(
-                allConnections().find(
-                  ({ id }) => id === props.selectedConnectionID,
-                ),
-                null,
-                2,
-              )}
-            </code>
-          </pre>
-        </Show>
-      </div>
-
-      <form method="dialog" class="modal-backdrop">
-        <button />
-      </form>
-    </dialog>
+    <Modal
+      ref={(el) => props.ref?.(el)}
+      title={
+        <>
+          <IconNetwork size={24} />
+          <span>{t('connectionsDetails')}</span>
+        </>
+      }
+    >
+      <Show when={props.selectedConnectionID}>
+        <pre>
+          <code>
+            {JSON.stringify(
+              allConnections().find(
+                ({ id }) => id === props.selectedConnectionID,
+              ),
+              null,
+              2,
+            )}
+          </code>
+        </pre>
+      </Show>
+    </Modal>
   )
 }

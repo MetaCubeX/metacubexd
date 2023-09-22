@@ -1,6 +1,6 @@
 import { createForm } from '@felte/solid'
 import { validator } from '@felte/validator-zod'
-import { IconX } from '@tabler/icons-solidjs'
+import { IconNetwork, IconX } from '@tabler/icons-solidjs'
 import type {
   DragEventHandler,
   Draggable,
@@ -23,7 +23,6 @@ import {
   CONNECTIONS_TABLE_ACCESSOR_KEY,
   CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
   CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY,
-  MODAL,
   TAILWINDCSS_SIZE,
 } from '~/constants'
 import { useI18n } from '~/i18n'
@@ -38,6 +37,7 @@ import {
   ConnectionsTableColumnOrder,
   ConnectionsTableColumnVisibility,
 } from '~/types'
+import { Modal } from './Modal'
 
 const TagClientSourceIPWithNameForm: Component = () => {
   const schema = z.object({
@@ -107,12 +107,12 @@ const TagClientSourceIPWithNameForm: Component = () => {
 }
 
 export const ConnectionsSettingsModal = (props: {
+  ref?: (el: HTMLDialogElement) => void
   order: ConnectionsTableColumnOrder
   visible: ConnectionsTableColumnVisibility
   onOrderChange: (value: ConnectionsTableColumnOrder) => void
   onVisibleChange: (value: ConnectionsTableColumnVisibility) => void
 }) => {
-  const modalID = MODAL.CONNECTIONS_SETTINGS
   const { t } = useI18n()
   const [activeKey, setActiveKey] =
     createSignal<CONNECTIONS_TABLE_ACCESSOR_KEY | null>(null)
@@ -179,25 +179,29 @@ export const ConnectionsSettingsModal = (props: {
   }
 
   return (
-    <dialog id={modalID} class="modal modal-bottom sm:modal-middle">
-      <div
-        class="modal-box flex flex-col gap-4"
-        onContextMenu={(e) => e.preventDefault()}
-      >
-        <div class="sticky top-0 z-50 flex items-center justify-end">
+    <Modal
+      ref={(el) => props.ref?.(el)}
+      title={
+        <>
+          <IconNetwork size={24} />
+          <span>{t('connectionsSettings')}</span>
+        </>
+      }
+      action={
+        <>
           <Button
-            class="btn-circle btn-sm"
+            class="btn-neutral btn-sm"
             onClick={() => {
-              const modal = document.querySelector(
-                `#${modalID}`,
-              ) as HTMLDialogElement | null
-
-              modal?.close()
+              props.onOrderChange(CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER)
+              props.onVisibleChange(CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY)
             }}
-            icon={<IconX size={20} />}
-          />
-        </div>
-
+          >
+            {t('reset')}
+          </Button>
+        </>
+      }
+    >
+      <div class="flex flex-col gap-4">
         <div>
           <ConfigTitle withDivider>{t('tableSize')}</ConfigTitle>
 
@@ -267,23 +271,7 @@ export const ConnectionsSettingsModal = (props: {
             </DragOverlay>
           </DragDropProvider>
         </div>
-
-        <div class="modal-action">
-          <Button
-            class="btn-neutral btn-sm ml-auto mt-4 block"
-            onClick={() => {
-              props.onOrderChange(CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER)
-              props.onVisibleChange(CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY)
-            }}
-          >
-            {t('reset')}
-          </Button>
-        </div>
       </div>
-
-      <form method="dialog" class="modal-backdrop">
-        <button />
-      </form>
-    </dialog>
+    </Modal>
   )
 }
