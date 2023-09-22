@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.108.0](https://github.com/MetaCubeX/metacubexd/compare/v1.107.0...v1.108.0) (2023-09-22)
+
+
+### Features
+
+* **config:** support tun related configurations ([512accd](https://github.com/MetaCubeX/metacubexd/commit/512accd4257a8f11cd412fb78224eb0b7c832f3e))
+
+
+### Bug Fixes
+
+* **connection:** limit the max width of client source ip select, closes [#270](https://github.com/MetaCubeX/metacubexd/issues/270) ([ca1e3ce](https://github.com/MetaCubeX/metacubexd/commit/ca1e3ce82c7a200abb0dd2ac744827a57a410763))
+
 ## [1.107.0](https://github.com/MetaCubeX/metacubexd/compare/v1.106.0...v1.107.0) (2023-09-22)
 
 
