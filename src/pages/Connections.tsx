@@ -349,7 +349,7 @@ export default () => {
             class="select select-bordered select-primary select-sm w-full max-w-full flex-1 sm:select-md"
             onChange={(e) => setSourceIPFilter(e.target.value)}
           >
-            <option>{t('all')}</option>
+            <option value="">{t('all')}</option>
 
             <Index
               each={uniq(
