@@ -47,9 +47,9 @@ const TagClientSourceIPWithNameForm: Component = () => {
 
   const [t] = useI18n()
 
-  const { form } = createForm<z.infer<typeof schema>>({
+  const { form, reset } = createForm<z.infer<typeof schema>>({
     extend: validator({ schema }),
-    onSubmit: ({ tagName, sourceIP }) =>
+    onSubmit: ({ tagName, sourceIP }) => {
       setClientSourceIPTags((tags) => {
         if (
           tags.some(
@@ -60,7 +60,10 @@ const TagClientSourceIPWithNameForm: Component = () => {
         }
 
         return [...tags, { tagName, sourceIP }]
-      }),
+      })
+
+      reset()
+    },
   })
 
   return (
@@ -220,12 +223,12 @@ export const ConnectionsSettingsModal = (props: {
           <div class="flex flex-col gap-4">
             <TagClientSourceIPWithNameForm />
 
-            <div class="grid grid-cols-2 gap-2">
+            <div class="flex flex-col gap-2">
               <For each={clientSourceIPTags()}>
                 {({ tagName, sourceIP }) => (
-                  <div class="badge badge-primary w-full items-center gap-2 py-4">
+                  <div class="badge badge-primary w-full items-center justify-between gap-2 py-4">
                     <span class="truncate">
-                      {tagName}({sourceIP})
+                      {tagName} ({sourceIP})
                     </span>
 
                     <Button

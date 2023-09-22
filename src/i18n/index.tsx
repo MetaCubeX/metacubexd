@@ -19,7 +19,7 @@ const useLanguage = () => {
   return { lang, setLang }
 }
 
-const I18nUpdator: ParentComponent = (props) => {
+const I18nUpdater: ParentComponent = (props) => {
   const { setLang } = useLanguage()
   const [, { locale }] = useI18n()
 
@@ -37,7 +37,7 @@ export const I18nProvider: ParentComponent = (props) => {
 
   return (
     <I18nContext.Provider value={value}>
-      <I18nUpdator>{props.children}</I18nUpdator>
+      <I18nUpdater>{props.children}</I18nUpdater>
     </I18nContext.Provider>
   )
 }

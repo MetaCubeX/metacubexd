@@ -29,7 +29,14 @@ import {
 import byteSize from 'byte-size'
 import dayjs from 'dayjs'
 import { uniq } from 'lodash'
-import { For, Index, createMemo, createSignal } from 'solid-js'
+import {
+  For,
+  Index,
+  createEffect,
+  createMemo,
+  createSignal,
+  on,
+} from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { closeAllConnectionsAPI, closeSingleConnectionAPI } from '~/apis'
 import {
@@ -288,10 +295,22 @@ export default () => {
     getCoreRowModel: getCoreRowModel(),
   })
 
-  const sourceIPHeader = createMemo(() =>
-    table
-      .getFlatHeaders()
-      .find(({ id }) => id === CONNECTIONS_TABLE_ACCESSOR_KEY.SourceIP),
+  const sourceIPHeader = table
+    .getFlatHeaders()
+    .find(({ id }) => id === CONNECTIONS_TABLE_ACCESSOR_KEY.SourceIP)
+
+  const [sourceIPFilter, setSourceIPFilter] = createSignal('')
+
+  createEffect(
+    on(sourceIPFilter, () => {
+      const tagged = clientSourceIPTags().find(
+        (tag) => tag.sourceIP === sourceIPFilter(),
+      )
+
+      sourceIPHeader?.column.setFilterValue(
+        tagged ? tagged.tagName : sourceIPFilter(),
+      )
+    }),
   )
 
   const tabs = createMemo(() => [
@@ -329,16 +348,20 @@ export default () => {
           </div>
 
           <select
-            class="select join-item select-bordered select-primary"
-            onChange={(e) =>
-              sourceIPHeader()?.column.setFilterValue(e.target.value)
-            }
+            class="join-item select select-bordered select-primary"
+            onChange={(e) => setSourceIPFilter(e.target.value)}
           >
             <option value="">{t('all')}</option>
 
             <Index
               each={uniq(
-                allConnections().map(({ metadata: { sourceIP } }) => sourceIP),
+                allConnections().map(({ metadata: { sourceIP } }) => {
+                  const tagged = clientSourceIPTags().find(
+                    (tag) => tag.sourceIP === sourceIP,
+                  )
+
+                  return tagged ? tagged.tagName : sourceIP
+                }),
               ).sort()}
             >
               {(sourceIP) => <option value={sourceIP()}>{sourceIP()}</option>}
