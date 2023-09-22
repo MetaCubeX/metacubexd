@@ -44,7 +44,6 @@ import {
   ConnectionsTableDetailsModal,
 } from '~/components'
 import { CONNECTIONS_TABLE_ACCESSOR_KEY, MODAL } from '~/constants'
-import { formatTimeFromNow } from '~/helpers'
 import { useI18n } from '~/i18n'
 import {
   allConnections,
@@ -52,6 +51,7 @@ import {
   connectionsTableColumnOrder,
   connectionsTableColumnVisibility,
   connectionsTableSize,
+  formatTimeFromNow,
   setConnectionsTableColumnOrder,
   setConnectionsTableColumnVisibility,
   tableSizeClassName,

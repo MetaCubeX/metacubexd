@@ -1,10 +1,5 @@
-import dayjs from 'dayjs'
 import { PROXIES_ORDERING_TYPE } from '~/constants'
 import { latencyQualityMap } from '~/signals'
-
-export const formatTimeFromNow = (time: number | string) => {
-  return dayjs(time).fromNow()
-}
 
 export const formatProxyType = (type = '') => {
   const t = type.toLowerCase()

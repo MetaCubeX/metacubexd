@@ -2,9 +2,9 @@ import { IconReload } from '@tabler/icons-solidjs'
 import { For, Show, createSignal, onMount } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Button } from '~/components'
-import { formatTimeFromNow, useStringBooleanMap } from '~/helpers'
+import { useStringBooleanMap } from '~/helpers'
 import { useI18n } from '~/i18n'
-import { useRules } from '~/signals'
+import { formatTimeFromNow, useRules } from '~/signals'
 
 enum ActiveTab {
   ruleProviders = 'ruleProviders',

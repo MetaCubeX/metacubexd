@@ -17,12 +17,12 @@ import {
 import { MODAL } from '~/constants'
 import {
   filterProxiesByAvailability,
-  formatTimeFromNow,
   sortProxiesByOrderingType,
   useStringBooleanMap,
 } from '~/helpers'
 import { useI18n } from '~/i18n'
 import {
+  formatTimeFromNow,
   hideUnAvailableProxies,
   proxiesOrderingType,
   useProxies,

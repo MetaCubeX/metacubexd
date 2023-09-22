@@ -4,7 +4,7 @@ import { createMemo, createSignal } from 'solid-js'
 import { LANG } from '~/constants'
 import dict from './dict'
 
-const [curLocale, setCurLocale] = makePersisted(
+export const [curLocale, setCurLocale] = makePersisted(
   createSignal<LANG>(
     Reflect.has(dict, navigator.language)
       ? (navigator.language as LANG)
@@ -16,17 +16,12 @@ const [curLocale, setCurLocale] = makePersisted(
   },
 )
 
-const locale = (localeName?: LANG) => {
-  if (localeName) {
-    return setCurLocale(localeName)
-  }
-
-  return curLocale()
-}
+const locale = (localeName?: LANG) =>
+  localeName ? setCurLocale(localeName) : curLocale()
 
 export const useI18n = () => {
   const curDict = createMemo(() => i18n.flatten(dict[curLocale()]))!
-  const t = i18n.translator(() => curDict())
+  const t = createMemo(() => i18n.translator(() => curDict()))
 
-  return { t, locale }
+  return { t: t(), locale }
 }
