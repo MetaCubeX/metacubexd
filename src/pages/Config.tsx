@@ -76,6 +76,7 @@ const DNSQueryForm = () => {
           type="search"
           name="name"
           class="input input-bordered min-w-0 flex-1"
+          placeholder="google.com"
         />
 
         <div class="flex items-center gap-2">
@@ -455,7 +456,7 @@ const Versions = () => {
   })
 
   return (
-    <div class="flex items-center justify-center gap-4">
+    <div class="grid grid-cols-2 gap-4">
       <kbd class="kbd">{import.meta.env.version}</kbd>
       <kbd class="kbd">{backendVersion()}</kbd>
     </div>
