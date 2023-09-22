@@ -327,8 +327,8 @@ export default () => {
   return (
     <div class="flex h-full flex-col gap-2">
       <div class="flex w-full flex-wrap items-center gap-2">
-        <div class="join items-center">
-          <div class="tabs-boxed join-item tabs items-center gap-2 self-stretch">
+        <div class="flex items-center gap-2">
+          <div class="tabs-boxed tabs gap-2">
             <Index each={tabs()}>
               {(tab) => (
                 <button
@@ -346,10 +346,10 @@ export default () => {
           </div>
 
           <select
-            class="join-item select select-bordered select-primary"
+            class="select select-bordered select-primary select-sm w-full max-w-full flex-1 sm:select-md"
             onChange={(e) => setSourceIPFilter(e.target.value)}
           >
-            <option value="">{t('all')}</option>
+            <option>{t('all')}</option>
 
             <Index
               each={uniq(
@@ -367,7 +367,7 @@ export default () => {
           </select>
         </div>
 
-        <div class="join flex w-full items-center md:flex-1">
+        <div class="join flex flex-1 items-center md:flex-1">
           <input
             type="search"
             class="input join-item input-primary input-sm min-w-0 flex-1 sm:input-md"
