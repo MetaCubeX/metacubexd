@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.110.0](https://github.com/MetaCubeX/metacubexd/compare/v1.109.0...v1.110.0) (2023-09-22)
+
+
+### Features
+
+* **config:** new version update available indicator ([857d0c5](https://github.com/MetaCubeX/metacubexd/commit/857d0c5387e9a19c6ca27d408461f10aa8b6ef9e))
+
 ## [1.109.0](https://github.com/MetaCubeX/metacubexd/compare/v1.108.2...v1.109.0) (2023-09-22)
 
 
