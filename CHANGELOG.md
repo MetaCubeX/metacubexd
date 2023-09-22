@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.107.0](https://github.com/MetaCubeX/metacubexd/compare/v1.106.0...v1.107.0) (2023-09-22)
+
+
+### Features
+
+* **button:** icon button ([5ef8410](https://github.com/MetaCubeX/metacubexd/commit/5ef8410da5cbc67ad7fc6bd63775e325aaf57828))
+* **config:** move switch language button into header ([9cc99eb](https://github.com/MetaCubeX/metacubexd/commit/9cc99ebb8e380f9b5e855b6d3250dfe96e237134))
+* **config:** update config page buttons layout, closes [#263](https://github.com/MetaCubeX/metacubexd/issues/263) ([dd0452d](https://github.com/MetaCubeX/metacubexd/commit/dd0452dcd3f68bad959f756cf191ea1c2470b2c1))
+
+
+### Bug Fixes
+
+* **modals:** close icon button style issue ([7f8d71c](https://github.com/MetaCubeX/metacubexd/commit/7f8d71ccc5b847ddb39e332199e21ede43483ea6))
+
 ## [1.106.0](https://github.com/MetaCubeX/metacubexd/compare/v1.105.0...v1.106.0) (2023-09-22)
 
 
