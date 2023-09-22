@@ -17,7 +17,7 @@ export const Modal: ParentComponent<Props> = (props) => {
       class="modal modal-bottom sm:modal-middle"
     >
       <div class="modal-box p-0" onContextMenu={(e) => e.preventDefault()}>
-        <div class="sticky top-0 z-50 flex items-center justify-between bg-base-100 bg-opacity-80 p-6 backdrop-blur-xl">
+        <div class="sticky top-0 z-50 flex items-center justify-between bg-base-100 bg-opacity-80 p-6 backdrop-blur">
           <div class="flex items-center gap-4 text-xl font-bold">
             {props.title}
           </div>
@@ -30,15 +30,13 @@ export const Modal: ParentComponent<Props> = (props) => {
           />
         </div>
 
-        <div class="p-6 pt-3">
-          {children(() => props.children)()}
+        <div class="p-6 pt-3">{children(() => props.children)()}</div>
 
-          <Show when={props.action}>
-            <div class="modal-action">
-              <div class="flex justify-end gap-2">{props.action}</div>
-            </div>
-          </Show>
-        </div>
+        <Show when={props.action}>
+          <div class="sticky bottom-0 z-50 flex items-center justify-end bg-base-100 bg-opacity-80 p-6 backdrop-blur">
+            <div class="flex justify-end gap-2">{props.action}</div>
+          </div>
+        </Show>
       </div>
 
       <form method="dialog" class="modal-backdrop">
