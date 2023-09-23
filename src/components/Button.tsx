@@ -1,19 +1,25 @@
 import { JSX, ParentComponent, Show, splitProps } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 
+interface ButtonBaseProps extends JSX.ButtonHTMLAttributes<HTMLButtonElement> {
+  loading?: boolean
+  disabled?: boolean
+}
+
+interface ButtonWithIconProps extends ButtonBaseProps {
+  icon: JSX.Element
+  children?: JSX.Element
+}
+
+interface ButtonWithoutIconProps extends ButtonBaseProps {
+  icon?: JSX.Element
+  children: JSX.Element
+}
+
 export const Button: ParentComponent<
-  JSX.ButtonHTMLAttributes<HTMLButtonElement> & {
-    loading?: boolean
-    disabled?: boolean
-    icon?: JSX.Element
-  }
+  ButtonWithIconProps | ButtonWithoutIconProps
 > = (props) => {
-  const [local, others] = splitProps(props, [
-    'class',
-    'loading',
-    'disabled',
-    'icon',
-  ])
+  const [local, others] = splitProps(props, ['class', 'loading', 'icon'])
 
   return (
     <button
@@ -22,18 +28,6 @@ export const Button: ParentComponent<
         local.loading ? 'btn-disabled' : local.class,
       )}
       {...others}
-      onClick={(e) => {
-        if (props.disabled) {
-          e.preventDefault()
-          e.stopPropagation()
-
-          return
-        }
-
-        if (typeof props.onClick === 'function') {
-          props.onClick(e)
-        }
-      }}
     >
       <Show when={local.loading}>
         <div class="loading loading-spinner" />

@@ -16,12 +16,12 @@ import {
 } from '~/components'
 import {
   filterProxiesByAvailability,
-  formatTimeFromNow,
   sortProxiesByOrderingType,
   useStringBooleanMap,
 } from '~/helpers'
 import { useI18n } from '~/i18n'
 import {
+  formatTimeFromNow,
   hideUnAvailableProxies,
   proxiesOrderingType,
   useProxies,
@@ -35,7 +35,8 @@ enum ActiveTab {
 export default () => {
   let proxiesSettingsModalRef: HTMLDialogElement | undefined
 
-  const { t } = useI18n()
+  const [t] = useI18n()
+
   const {
     proxies,
     selectProxyInGroup,

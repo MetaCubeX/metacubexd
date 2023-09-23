@@ -1,5 +1,36 @@
 # Changelog
 
+## [1.110.0](https://github.com/MetaCubeX/metacubexd/compare/v1.109.0...v1.110.0) (2023-09-22)
+
+
+### Features
+
+* **config:** new version update available indicator ([857d0c5](https://github.com/MetaCubeX/metacubexd/commit/857d0c5387e9a19c6ca27d408461f10aa8b6ef9e))
+
+## [1.109.0](https://github.com/MetaCubeX/metacubexd/compare/v1.108.2...v1.109.0) (2023-09-22)
+
+
+### Features
+
+* **config:** i18n support for port numbers ([07d3e7f](https://github.com/MetaCubeX/metacubexd/commit/07d3e7fdce396fcdfb5740d943fa16c0187f4b63))
+* **config:** render versions in two grid columns ([64f2d71](https://github.com/MetaCubeX/metacubexd/commit/64f2d7139a036ec4abcd56baab6d0ca0429ecd39))
+* **i18n:** new language switcher in config page ([21d479a](https://github.com/MetaCubeX/metacubexd/commit/21d479a1df14c5fa0947e1824c7ce77609180d69))
+* overscroll-y-none ([063cb31](https://github.com/MetaCubeX/metacubexd/commit/063cb31f151e56c6caa46f868bf861fe5748b4c6))
+
+## [1.108.2](https://github.com/MetaCubeX/metacubexd/compare/v1.108.1...v1.108.2) (2023-09-22)
+
+
+### Bug Fixes
+
+* time from now date string not following locale changes ([ba21999](https://github.com/MetaCubeX/metacubexd/commit/ba21999ed17cdf8997207ac7727525ba07ce0676))
+
+## [1.108.1](https://github.com/MetaCubeX/metacubexd/compare/v1.108.0...v1.108.1) (2023-09-22)
+
+
+### Bug Fixes
+
+* **connection:** cannot filter by undefined ([08776a5](https://github.com/MetaCubeX/metacubexd/commit/08776a5bee855d3d7d7fa32b1ca43b41272ce988))
+
 ## [1.108.0](https://github.com/MetaCubeX/metacubexd/compare/v1.107.0...v1.108.0) (2023-09-22)
 
 

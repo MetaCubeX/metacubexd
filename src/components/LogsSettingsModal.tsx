@@ -19,7 +19,7 @@ import {
 export const LogsSettingsModal: Component<{
   ref?: (el: HTMLDialogElement) => void
 }> = (props) => {
-  const { t } = useI18n()
+  const [t] = useI18n()
 
   return (
     <Modal

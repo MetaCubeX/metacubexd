@@ -44,7 +44,7 @@ const TagClientSourceIPWithNameForm: Component = () => {
     sourceIP: z.string().nonempty(),
   })
 
-  const { t } = useI18n()
+  const [t] = useI18n()
 
   const { form, reset } = createForm<z.infer<typeof schema>>({
     extend: validator({ schema }),
@@ -112,7 +112,8 @@ export const ConnectionsSettingsModal = (props: {
   onOrderChange: (value: ConnectionsTableColumnOrder) => void
   onVisibleChange: (value: ConnectionsTableColumnVisibility) => void
 }) => {
-  const { t } = useI18n()
+  const [t] = useI18n()
+
   const [activeKey, setActiveKey] =
     createSignal<CONNECTIONS_TABLE_ACCESSOR_KEY | null>(null)
 

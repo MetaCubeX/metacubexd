@@ -15,6 +15,7 @@ import {
   fetchBackendVersionAPI,
   flushFakeIPDataAPI,
   flushingFakeIPData,
+  isUpdateAvailableAPI,
   reloadConfigFileAPI,
   reloadingConfigFile,
   restartBackendAPI,
@@ -26,8 +27,8 @@ import {
   upgradingBackend,
 } from '~/apis'
 import { Button, ConfigTitle } from '~/components'
-import { MODE_OPTIONS, ROUTES, themes } from '~/constants'
-import { useI18n } from '~/i18n'
+import { LANG, MODE_OPTIONS, ROUTES, themes } from '~/constants'
+import { locale, setLocale, useI18n } from '~/i18n'
 import {
   autoSwitchTheme,
   favDayTheme,
@@ -48,7 +49,7 @@ const dnsQueryFormSchema = z.object({
 })
 
 const DNSQueryForm = () => {
-  const { t } = useI18n()
+  const [t] = useI18n()
   const request = useRequest()
 
   const { form, isSubmitting } = createForm<z.infer<typeof dnsQueryFormSchema>>(
@@ -76,6 +77,7 @@ const DNSQueryForm = () => {
           type="search"
           name="name"
           class="input input-bordered min-w-0 flex-1"
+          placeholder="google.com"
         />
 
         <div class="flex items-center gap-2">
@@ -111,18 +113,18 @@ const configFormSchema = z.object({
 })
 
 const ConfigForm = () => {
-  const { t } = useI18n()
+  const [t] = useI18n()
   const navigate = useNavigate()
 
   const portList = [
     {
-      label: 'HTTP Port',
+      label: () => t('port', { name: 'HTTP' }),
       key: 'port',
       onChange: (e: Event & { target: HTMLInputElement }) =>
         void updateBackendConfigAPI('port', Number(e.target.value), refetch),
     },
     {
-      label: 'Socks Port',
+      label: () => t('port', { name: 'Socks' }),
       key: 'socks-port',
       onChange: (e: Event & { target: HTMLInputElement }) =>
         void updateBackendConfigAPI(
@@ -132,7 +134,7 @@ const ConfigForm = () => {
         ),
     },
     {
-      label: 'Redir Port',
+      label: () => t('port', { name: 'Redir' }),
       key: 'redir-port',
       onChange: (e: Event & { target: HTMLInputElement }) =>
         void updateBackendConfigAPI(
@@ -142,7 +144,7 @@ const ConfigForm = () => {
         ),
     },
     {
-      label: 'TProxy Port',
+      label: () => t('port', { name: 'TProxy' }),
       key: 'tproxy-port',
       onChange: (e: Event & { target: HTMLInputElement }) =>
         void updateBackendConfigAPI(
@@ -152,7 +154,7 @@ const ConfigForm = () => {
         ),
     },
     {
-      label: 'Mixed Port',
+      label: () => t('port', { name: 'Mixed' }),
       key: 'mixed-port',
       onChange: (e: Event & { target: HTMLInputElement }) =>
         void updateBackendConfigAPI(
@@ -197,7 +199,7 @@ const ConfigForm = () => {
           {(item) => (
             <div class="form-control">
               <label for={item.key} class="label">
-                <span class="label-text">{item.label}</span>
+                <span class="label-text">{item.label()}</span>
               </label>
 
               <input
@@ -205,7 +207,7 @@ const ConfigForm = () => {
                 name={item.key}
                 type="number"
                 class="input input-bordered"
-                placeholder={item.label}
+                placeholder={item.label()}
                 onChange={item.onChange}
               />
             </div>
@@ -352,7 +354,18 @@ const ConfigForm = () => {
 }
 
 const ConfigForXd = () => {
-  const { t } = useI18n()
+  const [t] = useI18n()
+
+  const languages = [
+    {
+      label: () => t('en'),
+      value: LANG.EN,
+    },
+    {
+      label: () => t('zh'),
+      value: LANG.ZH,
+    },
+  ]
 
   return (
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -375,14 +388,11 @@ const ConfigForXd = () => {
 
               <select
                 class="select select-bordered"
+                value={favDayTheme()}
                 onChange={(e) => setFavDayTheme(e.target.value)}
               >
                 <For each={themes}>
-                  {(theme) => (
-                    <option selected={favDayTheme() === theme} value={theme}>
-                      {theme}
-                    </option>
-                  )}
+                  {(theme) => <option value={theme}>{theme}</option>}
                 </For>
               </select>
             </div>
@@ -392,14 +402,11 @@ const ConfigForXd = () => {
 
               <select
                 class="select select-bordered"
+                value={favNightTheme()}
                 onChange={(e) => setFavNightTheme(e.target.value)}
               >
                 <For each={themes}>
-                  {(theme) => (
-                    <option selected={favNightTheme() === theme} value={theme}>
-                      {theme}
-                    </option>
-                  )}
+                  {(theme) => <option value={theme}>{theme}</option>}
                 </For>
               </select>
             </div>
@@ -407,15 +414,34 @@ const ConfigForXd = () => {
         </Show>
       </div>
 
-      <div class="flex flex-col items-center">
-        <ConfigTitle>{t('useTwemoji')}</ConfigTitle>
+      <div class="flex flex-col gap-2">
+        <div class="flex flex-col items-center">
+          <ConfigTitle>{t('useTwemoji')}</ConfigTitle>
 
-        <input
-          type="checkbox"
-          class="toggle"
-          checked={useTwemoji()}
-          onChange={(e) => setUseTwemoji(e.target.checked)}
-        />
+          <input
+            type="checkbox"
+            class="toggle"
+            checked={useTwemoji()}
+            onChange={(e) => setUseTwemoji(e.target.checked)}
+          />
+        </div>
+
+        <div class="flex flex-col">
+          <ConfigTitle>{t('switchLanguage')}</ConfigTitle>
+
+          <select
+            class="select select-bordered"
+            onChange={(e) => setLocale(e.target.value as LANG)}
+          >
+            <For each={languages}>
+              {(lang) => (
+                <option selected={locale() === lang.value} value={lang.value}>
+                  {lang.label()}
+                </option>
+              )}
+            </For>
+          </select>
+        </div>
       </div>
     </div>
   )
@@ -423,23 +449,34 @@ const ConfigForXd = () => {
 
 const Versions = () => {
   const [backendVersion, setBackendVersion] = createSignal('')
+  const [isUpdateAvailable, setIsUpdateAvailable] = createSignal(false)
 
   onMount(async () => {
     const version = await fetchBackendVersionAPI()
-
     setBackendVersion(version)
+    setIsUpdateAvailable(await isUpdateAvailableAPI(version))
   })
 
   return (
-    <div class="flex items-center justify-center gap-4">
+    <div class="grid grid-cols-2 gap-4">
       <kbd class="kbd">{import.meta.env.version}</kbd>
-      <kbd class="kbd">{backendVersion()}</kbd>
+
+      <div class="relative">
+        <Show when={isUpdateAvailable()}>
+          <span class="absolute right-[-4px] top-[-4px] flex h-3 w-3">
+            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-info opacity-75" />
+            <span class="inline-flex h-3 w-3 rounded-full bg-info" />
+          </span>
+        </Show>
+
+        <kbd class="kbd w-full">{backendVersion()}</kbd>
+      </div>
     </div>
   )
 }
 
 export default () => {
-  const { t } = useI18n()
+  const [t] = useI18n()
 
   return (
     <div class="mx-auto flex max-w-screen-md flex-col gap-4">

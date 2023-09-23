@@ -1,4 +1,5 @@
-import { createSignal, ResourceActions } from 'solid-js'
+import ky from 'ky'
+import { ResourceActions, createSignal } from 'solid-js'
 import { toast } from 'solid-toast'
 import { useRequest } from '~/signals'
 import {
@@ -180,4 +181,47 @@ export const updateRuleProviderAPI = (providerName: string) => {
   const request = useRequest()
 
   return request.put(`providers/rules/${providerName}`)
+}
+
+export const isUpdateAvailableAPI = async (versionResponse: string) => {
+  const match = /(alpha|beta|meta)-?(\w+)/.exec(versionResponse)
+
+  if (!match) {
+    return false
+  }
+
+  const channel = match[1],
+    version = match[2]
+
+  if (channel === 'meta') {
+    const { assets } = await ky
+      .get('https://api.github.com/repos/MetaCubeX/Clash.Meta/releases/latest')
+      .json<{
+        assets: {
+          name: string
+        }[]
+      }>()
+
+    const alreadyLatest = assets.some(({ name }) => name.includes(version))
+
+    return !alreadyLatest
+  }
+
+  if (channel === 'alpha') {
+    const { assets } = await ky
+      .get(
+        'https://api.github.com/repos/MetaCubeX/Clash.Meta/releases/tags/Prerelease-Alpha',
+      )
+      .json<{
+        assets: {
+          name: string
+        }[]
+      }>()
+
+    const alreadyLatest = assets.some(({ name }) => name.includes(version))
+
+    return !alreadyLatest
+  }
+
+  return false
 }

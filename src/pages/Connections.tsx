@@ -44,7 +44,6 @@ import {
   ConnectionsTableDetailsModal,
 } from '~/components'
 import { CONNECTIONS_TABLE_ACCESSOR_KEY } from '~/constants'
-import { formatTimeFromNow } from '~/helpers'
 import { useI18n } from '~/i18n'
 import {
   allConnections,
@@ -52,6 +51,7 @@ import {
   connectionsTableColumnOrder,
   connectionsTableColumnVisibility,
   connectionsTableSize,
+  formatTimeFromNow,
   setConnectionsTableColumnOrder,
   setConnectionsTableColumnVisibility,
   tableSizeClassName,
@@ -81,7 +81,7 @@ export default () => {
   let connectionsSettingsModalRef: HTMLDialogElement | undefined
   let connectionsDetailsModalRef: HTMLDialogElement | undefined
 
-  const { t } = useI18n()
+  const [t] = useI18n()
 
   const [activeTab, setActiveTab] = createSignal(ActiveTab.activeConnections)
   const { activeConnections, closedConnections, paused, setPaused } =
@@ -91,7 +91,7 @@ export default () => {
 
   const [selectedConnectionID, setSelectedConnectionID] = createSignal<string>()
 
-  const columns = createMemo<ColumnDef<Connection>[]>(() => [
+  const columns: ColumnDef<Connection>[] = [
     {
       header: () => t('details'),
       enableGrouping: false,
@@ -242,7 +242,7 @@ export default () => {
         original.metadata.destinationIP ||
         original.metadata.host,
     },
-  ])
+  ]
 
   const [grouping, setGrouping] = createSignal<GroupingState>([])
   const [sorting, setSorting] = makePersisted(
@@ -280,7 +280,7 @@ export default () => {
     },
     sortDescFirst: true,
     enableHiding: true,
-    columns: columns(),
+    columns,
     onGlobalFilterChange: setGlobalFilter,
     globalFilterFn: fuzzyFilter,
     onGroupingChange: setGrouping,
@@ -348,7 +348,7 @@ export default () => {
             class="select select-bordered select-primary select-sm w-full max-w-full flex-1 sm:select-md"
             onChange={(e) => setSourceIPFilter(e.target.value)}
           >
-            <option>{t('all')}</option>
+            <option value="">{t('all')}</option>
 
             <Index
               each={uniq(
