@@ -59,7 +59,7 @@ export default () => {
   return (
     <div class="flex h-full flex-col gap-2">
       <div class="flex items-center gap-2">
-        <div class="tabs tabs-boxed gap-2">
+        <div class="tabs-boxed tabs gap-2">
           <For each={tabs()}>
             {(tab) => (
               <button
@@ -81,13 +81,14 @@ export default () => {
             class="btn btn-circle btn-sm"
             disabled={allProviderIsUpdating()}
             onClick={(e) => onUpdateAllProviderClick(e)}
-          >
-            <IconReload
-              class={twMerge(
-                allProviderIsUpdating() && 'animate-spin text-success',
-              )}
-            />
-          </Button>
+            icon={
+              <IconReload
+                class={twMerge(
+                  allProviderIsUpdating() && 'animate-spin text-success',
+                )}
+              />
+            }
+          />
         </Show>
       </div>
 
@@ -133,14 +134,15 @@ export default () => {
                     class="btn-circle btn-sm absolute right-2 top-2 mr-2 h-4"
                     disabled={updatingMap()[ruleProvider.name]}
                     onClick={(e) => onUpdateProviderClick(e, ruleProvider.name)}
-                  >
-                    <IconReload
-                      class={twMerge(
-                        updatingMap()[ruleProvider.name] &&
-                          'animate-spin text-success',
-                      )}
-                    />
-                  </Button>
+                    icon={
+                      <IconReload
+                        class={twMerge(
+                          updatingMap()[ruleProvider.name] &&
+                            'animate-spin text-success',
+                        )}
+                      />
+                    }
+                  />
                 </div>
               )}
             </For>
