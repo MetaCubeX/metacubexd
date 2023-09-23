@@ -1,10 +1,9 @@
-import { IconX } from '@tabler/icons-solidjs'
-import { For } from 'solid-js'
-import { Button, ConfigTitle } from '~/components'
+import { IconFileStack } from '@tabler/icons-solidjs'
+import { Component, For } from 'solid-js'
+import { ConfigTitle, Modal } from '~/components'
 import {
   LOGS_TABLE_MAX_ROWS_LIST,
   LOG_LEVEL,
-  MODAL,
   TAILWINDCSS_SIZE,
 } from '~/constants'
 import { useI18n } from '~/i18n'
@@ -17,27 +16,18 @@ import {
   setLogsTableSize,
 } from '~/signals'
 
-export const LogsSettingsModal = () => {
-  const modalID = MODAL.LOGS_SETTINGS
+export const LogsSettingsModal: Component<{
+  ref?: (el: HTMLDialogElement) => void
+}> = (props) => {
   const [t] = useI18n()
 
   return (
-    <dialog id={modalID} class="modal modal-bottom sm:modal-middle">
-      <div class="modal-box flex flex-col gap-4">
-        <div class="sticky top-0 z-50 flex items-center justify-end">
-          <Button
-            class="btn-circle btn-sm"
-            onClick={() => {
-              const modal = document.querySelector(
-                `#${modalID}`,
-              ) as HTMLDialogElement | null
-
-              modal?.close()
-            }}
-            icon={<IconX size={20} />}
-          />
-        </div>
-
+    <Modal
+      ref={(el) => props.ref?.(el)}
+      icon={<IconFileStack size={24} />}
+      title={t('logsSettings')}
+    >
+      <div class="flex flex-col gap-4">
         <div>
           <ConfigTitle withDivider>{t('tableSize')}</ConfigTitle>
 
@@ -90,10 +80,6 @@ export const LogsSettingsModal = () => {
           </select>
         </div>
       </div>
-
-      <form method="dialog" class="modal-backdrop">
-        <button />
-      </form>
-    </dialog>
+    </Modal>
   )
 }

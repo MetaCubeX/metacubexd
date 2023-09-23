@@ -33,7 +33,12 @@ export const Button: ParentComponent<
         <div class="loading loading-spinner" />
       </Show>
 
-      <span class="truncate" classList={{ 'flex-1': !local.icon }}>
+      <span
+        class="truncate rounded-none"
+        classList={{
+          'flex-1': !local.icon,
+        }}
+      >
         {props.icon || props.children}
       </span>
     </button>

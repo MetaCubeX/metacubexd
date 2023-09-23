@@ -1,7 +1,7 @@
-import { IconX } from '@tabler/icons-solidjs'
-import { For } from 'solid-js'
-import { Button, ConfigTitle } from '~/components'
-import { MODAL, PROXIES_ORDERING_TYPE, PROXIES_PREVIEW_TYPE } from '~/constants'
+import { IconGlobe } from '@tabler/icons-solidjs'
+import { Component, For } from 'solid-js'
+import { ConfigTitle, Modal } from '~/components'
+import { PROXIES_ORDERING_TYPE, PROXIES_PREVIEW_TYPE } from '~/constants'
 import { useI18n } from '~/i18n'
 import {
   autoCloseConns,
@@ -18,27 +18,18 @@ import {
   urlForLatencyTest,
 } from '~/signals'
 
-export const ProxiesSettingsModal = () => {
-  const modalID = MODAL.PROXIES_SETTINGS
+export const ProxiesSettingsModal: Component<{
+  ref?: (el: HTMLDialogElement) => void
+}> = (props) => {
   const [t] = useI18n()
 
   return (
-    <dialog id={modalID} class="modal modal-bottom sm:modal-middle">
-      <div class="modal-box flex flex-col gap-4">
-        <div class="sticky top-0 z-50 flex items-center justify-end">
-          <Button
-            class="btn-circle btn-sm"
-            onClick={() => {
-              const modal = document.querySelector(
-                `#${modalID}`,
-              ) as HTMLDialogElement | null
-
-              modal?.close()
-            }}
-            icon={<IconX size={20} />}
-          />
-        </div>
-
+    <Modal
+      ref={(el) => props.ref?.(el)}
+      icon={<IconGlobe size={24} />}
+      title={t('proxiesSettings')}
+    >
+      <div class="flex flex-col gap-4">
         <div>
           <ConfigTitle withDivider>{t('autoCloseConns')}</ConfigTitle>
 
@@ -126,10 +117,6 @@ export const ProxiesSettingsModal = () => {
           </select>
         </div>
       </div>
-
-      <form method="dialog" class="modal-backdrop">
-        <button />
-      </form>
-    </dialog>
+    </Modal>
   )
 }

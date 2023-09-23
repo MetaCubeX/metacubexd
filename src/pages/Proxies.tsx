@@ -14,7 +14,6 @@ import {
   RenderInTwoColumns,
   SubscriptionInfo,
 } from '~/components'
-import { MODAL } from '~/constants'
 import {
   filterProxiesByAvailability,
   sortProxiesByOrderingType,
@@ -34,7 +33,10 @@ enum ActiveTab {
 }
 
 export default () => {
+  let proxiesSettingsModalRef: HTMLDialogElement | undefined
+
   const [t] = useI18n()
+
   const {
     proxies,
     selectProxyInGroup,
@@ -133,13 +135,7 @@ export default () => {
         <div class="ml-auto">
           <Button
             class="btn-circle btn-sm sm:btn-md"
-            onClick={() => {
-              const modal = document.querySelector(
-                `#${MODAL.PROXIES_SETTINGS}`,
-              ) as HTMLDialogElement | null
-
-              modal?.showModal()
-            }}
+            onClick={() => proxiesSettingsModalRef?.showModal()}
             icon={<IconSettings />}
           />
         </div>
@@ -310,7 +306,7 @@ export default () => {
         </Show>
       </div>
 
-      <ProxiesSettingsModal />
+      <ProxiesSettingsModal ref={(el) => (proxiesSettingsModalRef = el)} />
     </div>
   )
 }

@@ -163,11 +163,3 @@ export enum LOG_LEVEL {
 
 export const LOGS_TABLE_MAX_ROWS_LIST = [200, 300, 500, 800, 1000]
 export const DEFAULT_LOGS_TABLE_MAX_ROWS = LOGS_TABLE_MAX_ROWS_LIST[0]
-
-export enum MODAL {
-  PROXIES_SETTINGS = 'proxies-settings',
-  RULES_SETTINGS = 'rules-settings',
-  CONNECTIONS_SETTINGS = 'connections-settings',
-  CONNECTIONS_TABLE_DETAILS = 'connections-table-details',
-  LOGS_SETTINGS = 'logs-settings',
-}

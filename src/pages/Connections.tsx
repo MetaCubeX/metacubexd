@@ -43,7 +43,7 @@ import {
   ConnectionsSettingsModal,
   ConnectionsTableDetailsModal,
 } from '~/components'
-import { CONNECTIONS_TABLE_ACCESSOR_KEY, MODAL } from '~/constants'
+import { CONNECTIONS_TABLE_ACCESSOR_KEY } from '~/constants'
 import { useI18n } from '~/i18n'
 import {
   allConnections,
@@ -78,6 +78,9 @@ const fuzzyFilter: FilterFn<Connection> = (row, columnId, value, addMeta) => {
 }
 
 export default () => {
+  let connectionsSettingsModalRef: HTMLDialogElement | undefined
+  let connectionsDetailsModalRef: HTMLDialogElement | undefined
+
   const [t] = useI18n()
 
   const [activeTab, setActiveTab] = createSignal(ActiveTab.activeConnections)
@@ -103,11 +106,7 @@ export default () => {
             onClick={() => {
               setSelectedConnectionID(row.original.id)
 
-              const modal = document.querySelector(
-                `#${MODAL.CONNECTIONS_TABLE_DETAILS}`,
-              ) as HTMLDialogElement | null
-
-              modal?.showModal()
+              connectionsDetailsModalRef?.showModal()
             }}
             icon={<IconInfoSmall size="16" />}
           />
@@ -397,13 +396,7 @@ export default () => {
 
           <Button
             class="btn join-item btn-sm sm:btn-md"
-            onClick={() => {
-              const modal = document.querySelector(
-                `#${MODAL.CONNECTIONS_SETTINGS}`,
-              ) as HTMLDialogElement | null
-
-              modal?.showModal()
-            }}
+            onClick={() => connectionsSettingsModalRef?.showModal()}
             icon={<IconSettings />}
           />
         </div>
@@ -531,6 +524,7 @@ export default () => {
       </div>
 
       <ConnectionsSettingsModal
+        ref={(el) => (connectionsSettingsModalRef = el)}
         order={connectionsTableColumnOrder()}
         visible={connectionsTableColumnVisibility()}
         onOrderChange={(data) => setConnectionsTableColumnOrder(data)}
@@ -540,6 +534,7 @@ export default () => {
       />
 
       <ConnectionsTableDetailsModal
+        ref={(el) => (connectionsDetailsModalRef = el)}
         selectedConnectionID={selectedConnectionID()}
       />
     </div>

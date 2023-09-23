@@ -18,7 +18,7 @@ import {
 import { For, Index, createEffect, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Button, LogsSettingsModal } from '~/components'
-import { LOG_LEVEL, MODAL } from '~/constants'
+import { LOG_LEVEL } from '~/constants'
 import { useI18n } from '~/i18n'
 import { logsTableSize, tableSizeClassName, useWsRequest } from '~/signals'
 import { logLevel, logMaxRows } from '~/signals/config'
@@ -40,7 +40,10 @@ const fuzzyFilter: FilterFn<LogWithSeq> = (row, columnId, value, addMeta) => {
 }
 
 export default () => {
+  let logsSettingsModalRef: HTMLDialogElement | undefined
+
   const [t] = useI18n()
+
   let seq = 1
   const [logs, setLogs] = createSignal<LogWithSeq[]>([])
 
@@ -139,13 +142,7 @@ export default () => {
 
         <Button
           class="join-item btn-sm sm:btn-md"
-          onClick={() => {
-            const modal = document.querySelector(
-              `#${MODAL.LOGS_SETTINGS}`,
-            ) as HTMLDialogElement | null
-
-            modal?.showModal()
-          }}
+          onClick={() => logsSettingsModalRef?.showModal()}
           icon={<IconSettings />}
         />
       </div>
@@ -221,7 +218,7 @@ export default () => {
         </table>
       </div>
 
-      <LogsSettingsModal />
+      <LogsSettingsModal ref={(el) => (logsSettingsModalRef = el)} />
     </div>
   )
 }
