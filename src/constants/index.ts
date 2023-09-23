@@ -31,7 +31,7 @@ export const themes = [
   'night',
   'coffee',
   'winter',
-]
+] as const
 
 export enum ROUTES {
   Overview = '/overview',

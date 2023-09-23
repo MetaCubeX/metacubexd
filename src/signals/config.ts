@@ -10,6 +10,7 @@ import {
   PROXIES_ORDERING_TYPE,
   PROXIES_PREVIEW_TYPE,
   TAILWINDCSS_SIZE,
+  themes,
 } from '~/constants'
 import {
   ConnectionsTableColumnOrder,
@@ -48,11 +49,11 @@ export const [autoSwitchTheme, setAutoSwitchTheme] = makePersisted(
   { name: 'autoSwitchTheme', storage: localStorage },
 )
 export const [favDayTheme, setFavDayTheme] = makePersisted(
-  createSignal('light'),
+  createSignal<(typeof themes)[number]>('lofi'),
   { name: 'favDayTheme', storage: localStorage },
 )
 export const [favNightTheme, setFavNightTheme] = makePersisted(
-  createSignal('night'),
+  createSignal<(typeof themes)[number]>('business'),
   { name: 'favNightTheme', storage: localStorage },
 )
 export const [connectionsTableSize, setConnectionsTableSize] = makePersisted(
