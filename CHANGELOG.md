@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.111.0](https://github.com/MetaCubeX/metacubexd/compare/v1.110.0...v1.111.0) (2023-09-23)
+
+
+### Features
+
+* **modal:** adjust padding of the modal header and footer ([53ee2f3](https://github.com/MetaCubeX/metacubexd/commit/53ee2f31b397b3abd6a208a88492be2f6eaaeebe))
+* **modals:** add modal component ([#268](https://github.com/MetaCubeX/metacubexd/issues/268)) ([eca9a16](https://github.com/MetaCubeX/metacubexd/commit/eca9a160cc1db5558eb1a7ed14c9e544295ca7b4))
+* **proxy:** shorten the autoCloseConns i18n text ([2ee48c8](https://github.com/MetaCubeX/metacubexd/commit/2ee48c8ac90c79844254ff07a98fe48b50ca68c0))
+* **theme:** update default theme ([be0bc55](https://github.com/MetaCubeX/metacubexd/commit/be0bc55317006725c0a155162a2b604a888b6847))
+
+
+### Bug Fixes
+
+* **rules:** reload button style issue ([04c8d25](https://github.com/MetaCubeX/metacubexd/commit/04c8d2524b6d6b0fb1b2f36b98a0ffe2a20fbf8c))
+
 ## [1.110.0](https://github.com/MetaCubeX/metacubexd/compare/v1.109.0...v1.110.0) (2023-09-22)
 
 
