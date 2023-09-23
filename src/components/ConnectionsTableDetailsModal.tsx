@@ -8,7 +8,7 @@ export const ConnectionsTableDetailsModal: Component<{
   ref?: (el: HTMLDialogElement) => void
   selectedConnectionID?: string
 }> = (props) => {
-  const { t } = useI18n()
+  const [t] = useI18n()
 
   return (
     <Modal
