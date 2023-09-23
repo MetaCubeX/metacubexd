@@ -40,7 +40,7 @@ export const Button: ParentComponent<
       </Show>
 
       <span
-        class="truncate"
+        class="truncate rounded-none"
         classList={{
           'flex-1': !local.icon,
         }}
