@@ -47,7 +47,7 @@ export default {
   off: 'Off',
   proxiesPreviewType: 'Proxies preview type',
   urlForLatencyTest: 'URL for latency test',
-  autoCloseConns: 'Automatically close connections when proxy is selected',
+  autoCloseConns: 'Automatically Close connections',
   useTwemoji: 'Use Twemoji Mozilla Font',
   autoSwitchTheme: 'Automatically switch theme',
   favDayTheme: 'Favorite light theme',
