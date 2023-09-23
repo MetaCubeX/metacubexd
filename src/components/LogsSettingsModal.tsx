@@ -1,6 +1,6 @@
 import { IconFileStack } from '@tabler/icons-solidjs'
 import { Component, For } from 'solid-js'
-import { ConfigTitle } from '~/components'
+import { ConfigTitle, Modal } from '~/components'
 import {
   LOGS_TABLE_MAX_ROWS_LIST,
   LOG_LEVEL,
@@ -15,7 +15,6 @@ import {
   setLogMaxRows,
   setLogsTableSize,
 } from '~/signals'
-import { Modal } from './Modal'
 
 export const LogsSettingsModal: Component<{
   ref?: (el: HTMLDialogElement) => void
@@ -25,12 +24,8 @@ export const LogsSettingsModal: Component<{
   return (
     <Modal
       ref={(el) => props.ref?.(el)}
-      title={
-        <>
-          <IconFileStack size={24} />
-          <span>{t('logsSettings')}</span>
-        </>
-      }
+      icon={<IconFileStack size={24} />}
+      title={t('logsSettings')}
     >
       <div class="flex flex-col gap-4">
         <div>

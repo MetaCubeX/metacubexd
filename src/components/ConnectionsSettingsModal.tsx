@@ -18,7 +18,7 @@ import {
 import { uniq } from 'lodash'
 import { Component, For, Index, Show, createSignal } from 'solid-js'
 import { z } from 'zod'
-import { Button, ConfigTitle } from '~/components'
+import { Button, ConfigTitle, Modal } from '~/components'
 import {
   CONNECTIONS_TABLE_ACCESSOR_KEY,
   CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
@@ -37,7 +37,6 @@ import {
   ConnectionsTableColumnOrder,
   ConnectionsTableColumnVisibility,
 } from '~/types'
-import { Modal } from './Modal'
 
 const TagClientSourceIPWithNameForm: Component = () => {
   const schema = z.object({
@@ -181,24 +180,18 @@ export const ConnectionsSettingsModal = (props: {
   return (
     <Modal
       ref={(el) => props.ref?.(el)}
-      title={
-        <>
-          <IconNetwork size={24} />
-          <span>{t('connectionsSettings')}</span>
-        </>
-      }
+      icon={<IconNetwork size={24} />}
+      title={t('connectionsSettings')}
       action={
-        <>
-          <Button
-            class="btn-neutral btn-sm"
-            onClick={() => {
-              props.onOrderChange(CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER)
-              props.onVisibleChange(CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY)
-            }}
-          >
-            {t('reset')}
-          </Button>
-        </>
+        <Button
+          class="btn-neutral btn-sm"
+          onClick={() => {
+            props.onOrderChange(CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER)
+            props.onVisibleChange(CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY)
+          }}
+        >
+          {t('reset')}
+        </Button>
       }
     >
       <div class="flex flex-col gap-4">

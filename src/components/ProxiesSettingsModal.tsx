@@ -1,6 +1,6 @@
 import { IconGlobe } from '@tabler/icons-solidjs'
 import { Component, For } from 'solid-js'
-import { ConfigTitle } from '~/components'
+import { ConfigTitle, Modal } from '~/components'
 import { PROXIES_ORDERING_TYPE, PROXIES_PREVIEW_TYPE } from '~/constants'
 import { useI18n } from '~/i18n'
 import {
@@ -17,7 +17,6 @@ import {
   setUrlForLatencyTest,
   urlForLatencyTest,
 } from '~/signals'
-import { Modal } from './Modal'
 
 export const ProxiesSettingsModal: Component<{
   ref?: (el: HTMLDialogElement) => void
@@ -27,12 +26,8 @@ export const ProxiesSettingsModal: Component<{
   return (
     <Modal
       ref={(el) => props.ref?.(el)}
-      title={
-        <>
-          <IconGlobe size={24} />
-          <span>{t('proxiesSettings')}</span>
-        </>
-      }
+      icon={<IconGlobe size={24} />}
+      title={t('proxiesSettings')}
     >
       <div class="flex flex-col gap-4">
         <div>

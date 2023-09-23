@@ -1,8 +1,8 @@
 import { IconNetwork } from '@tabler/icons-solidjs'
 import { Component, Show } from 'solid-js'
+import { Modal } from '~/components'
 import { useI18n } from '~/i18n'
 import { allConnections } from '~/signals'
-import { Modal } from './Modal'
 
 export const ConnectionsTableDetailsModal: Component<{
   ref?: (el: HTMLDialogElement) => void
@@ -13,12 +13,8 @@ export const ConnectionsTableDetailsModal: Component<{
   return (
     <Modal
       ref={(el) => props.ref?.(el)}
-      title={
-        <>
-          <IconNetwork size={24} />
-          <span>{t('connectionsDetails')}</span>
-        </>
-      }
+      icon={<IconNetwork size={24} />}
+      title={t('connectionsDetails')}
     >
       <Show when={props.selectedConnectionID}>
         <pre>

@@ -134,9 +134,7 @@ export default () => {
         <div class="ml-auto">
           <Button
             class="btn-circle btn-sm sm:btn-md"
-            onClick={() => {
-              proxiesSettingsModalRef?.showModal()
-            }}
+            onClick={() => proxiesSettingsModalRef?.showModal()}
             icon={<IconSettings />}
           />
         </div>

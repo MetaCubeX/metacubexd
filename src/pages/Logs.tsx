@@ -141,9 +141,7 @@ export default () => {
 
         <Button
           class="join-item btn-sm sm:btn-md"
-          onClick={() => {
-            logsSettingsModalRef?.showModal()
-          }}
+          onClick={() => logsSettingsModalRef?.showModal()}
           icon={<IconSettings />}
         />
       </div>
