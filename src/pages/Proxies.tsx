@@ -9,7 +9,7 @@ import {
   Button,
   Collapse,
   ProxiesSettingsModal,
-  ProxyCardGroups,
+  ProxyNodeCard,
   ProxyNodePreview,
   RenderInTwoColumns,
   SubscriptionInfo,
@@ -17,7 +17,6 @@ import {
 import {
   filterProxiesByAvailability,
   sortProxiesByOrderingType,
-  useStringBooleanMap,
 } from '~/helpers'
 import { useI18n } from '~/i18n'
 import {
@@ -41,48 +40,46 @@ export default () => {
     fetchProxies,
     proxies,
     selectProxyInGroup,
-    proxyGroupLatencyTest,
     latencyMap,
     proxyProviders,
     updateProviderByProviderName,
     updateAllProvider,
-    healthCheckByProviderName,
+    proxyGroupLatencyTest,
+    proxyProviderLatencyTest,
     collapsedMap,
     setCollapsedMap,
     latencyTestingMap,
-    setLatencyTestingMap,
+    healthCheckingMap,
+    isAllProviderUpdating,
+    updatingMap,
   } = useProxies()
 
   onMount(fetchProxies)
 
-  const onLatencyTestClick = async (e: MouseEvent, name: string) => {
+  const onProxyGroupLatencyTestClick = async (
+    e: MouseEvent,
+    groupName: string,
+  ) => {
     e.stopPropagation()
-    void setLatencyTestingMap(name, () => proxyGroupLatencyTest(name))
+    void proxyGroupLatencyTest(groupName)
   }
 
-  const { map: healthCheckingMap, setWithCallback: setHealthCheckingMap } =
-    useStringBooleanMap()
-  const { map: updatingMap, setWithCallback: setUpdatingMap } =
-    useStringBooleanMap()
-  const [isAllProviderUpdating, setIsAllProviderUpdating] = createSignal(false)
-
-  const onHealthCheckClick = (e: MouseEvent, name: string) => {
+  const onProxyProviderLatencyTestClick = (
+    e: MouseEvent,
+    providerName: string,
+  ) => {
     e.stopPropagation()
-    void setHealthCheckingMap(name, () => healthCheckByProviderName(name))
+    void proxyProviderLatencyTest(providerName)
   }
 
-  const onUpdateProviderClick = (e: MouseEvent, name: string) => {
+  const onUpdateProxyProviderClick = (e: MouseEvent, providerName: string) => {
     e.stopPropagation()
-    void setUpdatingMap(name, () => updateProviderByProviderName(name))
+    void updateProviderByProviderName(providerName)
   }
 
   const onUpdateAllProviderClick = async (e: MouseEvent) => {
     e.stopPropagation()
-    setIsAllProviderUpdating(true)
-    try {
-      await updateAllProvider()
-    } catch {}
-    setIsAllProviderUpdating(false)
+    void updateAllProvider()
   }
 
   const [activeTab, setActiveTab] = createSignal(ActiveTab.proxies)
@@ -163,7 +160,7 @@ export default () => {
 
                 const title = (
                   <>
-                    <div class="mr-8 flex items-center justify-between">
+                    <div class="flex items-center justify-between pr-8">
                       <div class="flex items-center gap-2">
                         <span>{proxyGroup.name}</span>
                         <div class="badge badge-sm">
@@ -174,7 +171,9 @@ export default () => {
                       <Button
                         class="btn-circle btn-sm"
                         disabled={latencyTestingMap()[proxyGroup.name]}
-                        onClick={(e) => onLatencyTestClick(e, proxyGroup.name)}
+                        onClick={(e) =>
+                          onProxyGroupLatencyTestClick(e, proxyGroup.name)
+                        }
                         icon={
                           <IconBrandSpeedtest
                             class={twMerge(
@@ -206,13 +205,17 @@ export default () => {
                     title={title}
                     onCollapse={(val) => setCollapsedMap(proxyGroup.name, val)}
                   >
-                    <ProxyCardGroups
-                      proxyNames={sortedProxyNames()}
-                      now={proxyGroup.now}
-                      onClick={(name) =>
-                        void selectProxyInGroup(proxyGroup, name)
-                      }
-                    />
+                    <For each={sortedProxyNames()}>
+                      {(proxyName) => (
+                        <ProxyNodeCard
+                          proxyName={proxyName}
+                          isSelected={proxyGroup.now === proxyName}
+                          onClick={() =>
+                            void selectProxyInGroup(proxyGroup, proxyName)
+                          }
+                        />
+                      )}
+                    </For>
                   </Collapse>
                 )
               }}
@@ -234,7 +237,7 @@ export default () => {
 
                 const title = (
                   <>
-                    <div class="mr-8 flex items-center justify-between">
+                    <div class="flex items-center justify-between pr-8">
                       <div class="flex items-center gap-2">
                         <span>{proxyProvider.name}</span>
                         <div class="badge badge-sm">
@@ -247,7 +250,7 @@ export default () => {
                           class="btn btn-circle btn-sm"
                           disabled={updatingMap()[proxyProvider.name]}
                           onClick={(e) =>
-                            onUpdateProviderClick(e, proxyProvider.name)
+                            onUpdateProxyProviderClick(e, proxyProvider.name)
                           }
                           icon={
                             <IconReload
@@ -263,7 +266,10 @@ export default () => {
                           class="btn btn-circle btn-sm"
                           disabled={healthCheckingMap()[proxyProvider.name]}
                           onClick={(e) =>
-                            onHealthCheckClick(e, proxyProvider.name)
+                            onProxyProviderLatencyTestClick(
+                              e,
+                              proxyProvider.name,
+                            )
                           }
                           icon={
                             <IconBrandSpeedtest
@@ -300,7 +306,9 @@ export default () => {
                       setCollapsedMap(proxyProvider.name, val)
                     }
                   >
-                    <ProxyCardGroups proxyNames={sortedProxyNames()} />
+                    <For each={sortedProxyNames()}>
+                      {(proxyName) => <ProxyNodeCard proxyName={proxyName} />}
+                    </For>
                   </Collapse>
                 )
               }}
