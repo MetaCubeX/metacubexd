@@ -15,7 +15,6 @@ import {
   favNightTheme,
   setCurTheme,
   setLatestConnectionMsg,
-  useProxies,
   useTwemoji,
   useWsRequest,
 } from '~/signals'
@@ -29,10 +28,6 @@ const Rules = lazy(() => import('~/pages/Rules'))
 const Config = lazy(() => import('~/pages/Config'))
 
 const ProtectedResources = () => {
-  const { fetchProxies } = useProxies()
-
-  onMount(fetchProxies)
-
   const latestConnectionMsg = useWsRequest<WsMsg>('connections')
 
   createEffect(() => {

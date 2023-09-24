@@ -120,11 +120,12 @@ export const useProxies = () => {
       latencyTestTimeoutDuration(),
     )
 
-    await fetchProxies()
     setLatencyMap({
       ...latencyMap(),
       ...data,
     })
+
+    await fetchProxies()
   }
 
   const updateProviderByProviderName = async (providerName: string) => {

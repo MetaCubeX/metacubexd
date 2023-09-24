@@ -3,7 +3,7 @@ import {
   IconReload,
   IconSettings,
 } from '@tabler/icons-solidjs'
-import { For, Show, createMemo, createSignal } from 'solid-js'
+import { For, Show, createMemo, createSignal, onMount } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import {
   Button,
@@ -38,6 +38,7 @@ export default () => {
   const [t] = useI18n()
 
   const {
+    fetchProxies,
     proxies,
     selectProxyInGroup,
     latencyTestByProxyGroupName,
@@ -47,6 +48,8 @@ export default () => {
     updateAllProvider,
     healthCheckByProviderName,
   } = useProxies()
+
+  onMount(fetchProxies)
 
   const { map: collapsedMap, set: setCollapsedMap } = useStringBooleanMap()
   const { map: latencyTestingMap, setWithCallback: setLatencyTestingMap } =
@@ -100,7 +103,7 @@ export default () => {
   return (
     <div class="flex h-full flex-col gap-2">
       <div class="flex items-center gap-2">
-        <div class="tabs tabs-boxed gap-2">
+        <div class="tabs-boxed tabs gap-2">
           <For each={tabs()}>
             {(tab) => (
               <button
