@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.111.1](https://github.com/MetaCubeX/metacubexd/compare/v1.111.0...v1.111.1) (2023-09-24)
+
+
+### Bug Fixes
+
+* **proxy:** fetch proxies after latency test ([81fe550](https://github.com/MetaCubeX/metacubexd/commit/81fe55091292015b623e2545fd7d0547cfffbed0))
+
 ## [1.111.0](https://github.com/MetaCubeX/metacubexd/compare/v1.110.0...v1.111.0) (2023-09-23)
 
 
