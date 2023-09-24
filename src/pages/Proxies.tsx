@@ -48,8 +48,8 @@ export default () => {
     proxyProviderLatencyTest,
     collapsedMap,
     setCollapsedMap,
-    latencyTestingMap,
-    healthCheckingMap,
+    proxyGroupLatencyTestingMap,
+    proxyProviderLatencyTestingMap,
     isAllProviderUpdating,
     updatingMap,
   } = useProxies()
@@ -170,14 +170,16 @@ export default () => {
 
                       <Button
                         class="btn-circle btn-sm"
-                        disabled={latencyTestingMap()[proxyGroup.name]}
+                        disabled={
+                          proxyGroupLatencyTestingMap()[proxyGroup.name]
+                        }
                         onClick={(e) =>
                           onProxyGroupLatencyTestClick(e, proxyGroup.name)
                         }
                         icon={
                           <IconBrandSpeedtest
                             class={twMerge(
-                              latencyTestingMap()[proxyGroup.name] &&
+                              proxyGroupLatencyTestingMap()[proxyGroup.name] &&
                                 'animate-pulse text-success',
                             )}
                           />
@@ -264,7 +266,9 @@ export default () => {
 
                         <Button
                           class="btn btn-circle btn-sm"
-                          disabled={healthCheckingMap()[proxyProvider.name]}
+                          disabled={
+                            proxyProviderLatencyTestingMap()[proxyProvider.name]
+                          }
                           onClick={(e) =>
                             onProxyProviderLatencyTestClick(
                               e,
@@ -274,8 +278,9 @@ export default () => {
                           icon={
                             <IconBrandSpeedtest
                               class={twMerge(
-                                healthCheckingMap()[proxyProvider.name] &&
-                                  'animate-pulse text-success',
+                                proxyProviderLatencyTestingMap()[
+                                  proxyProvider.name
+                                ] && 'animate-pulse text-success',
                               )}
                             />
                           }

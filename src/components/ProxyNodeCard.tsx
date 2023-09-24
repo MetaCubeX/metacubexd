@@ -10,7 +10,7 @@ export const ProxyNodeCard = (props: {
   isSelected?: boolean
   onClick?: () => void
 }) => {
-  const { proxyLatencyTest } = useProxies()
+  const { proxyLatencyTest, proxyLatencyTestingMap } = useProxies()
   const { proxyName, isSelected, onClick } = props
   const { proxyNodeMap } = useProxies()
   const proxyNode = createMemo(() => proxyNodeMap()[proxyName])
@@ -38,7 +38,14 @@ export const ProxyNodeCard = (props: {
 
         <Button
           class="btn-circle btn-ghost btn-sm"
-          icon={<IconBrandSpeedtest />}
+          icon={
+            <IconBrandSpeedtest
+              class={twMerge(
+                proxyLatencyTestingMap()[proxyName] &&
+                  'animate-pulse text-success',
+              )}
+            />
+          }
           onClick={(e) => {
             e.stopPropagation()
 

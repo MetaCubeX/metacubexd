@@ -28,10 +28,18 @@ type ProxyInfo = {
 }
 
 const { map: collapsedMap, set: setCollapsedMap } = useStringBooleanMap()
-const { map: latencyTestingMap, setWithCallback: setLatencyTestingMap } =
-  useStringBooleanMap()
-const { map: healthCheckingMap, setWithCallback: setHealthCheckingMap } =
-  useStringBooleanMap()
+const {
+  map: proxyLatencyTestingMap,
+  setWithCallback: setProxyLatencyTestingMap,
+} = useStringBooleanMap()
+const {
+  map: proxyGroupLatencyTestingMap,
+  setWithCallback: setProxyGroupLatencyTestingMap,
+} = useStringBooleanMap()
+const {
+  map: proxyProviderLatencyTestingMap,
+  setWithCallback: setProxyProviderLatencyTestingMap,
+} = useStringBooleanMap()
 const { map: updatingMap, setWithCallback: setUpdatingMap } =
   useStringBooleanMap()
 const [isAllProviderUpdating, setIsAllProviderUpdating] = createSignal(false)
@@ -123,21 +131,22 @@ export const useProxies = () => {
     }
   }
 
-  const proxyLatencyTest = async (proxyName: string) => {
-    const { delay } = await proxyLatencyTestAPI(
-      proxyName,
-      urlForLatencyTest(),
-      latencyTestTimeoutDuration(),
-    )
+  const proxyLatencyTest = (proxyName: string) =>
+    setProxyLatencyTestingMap(proxyName, async () => {
+      const { delay } = await proxyLatencyTestAPI(
+        proxyName,
+        urlForLatencyTest(),
+        latencyTestTimeoutDuration(),
+      )
 
-    setLatencyMap((latencyMap) => ({
-      ...latencyMap,
-      [proxyName]: delay,
-    }))
-  }
+      setLatencyMap((latencyMap) => ({
+        ...latencyMap,
+        [proxyName]: delay,
+      }))
+    })
 
-  const proxyGroupLatencyTest = async (proxyGroupName: string) =>
-    setLatencyTestingMap(proxyGroupName, async () => {
+  const proxyGroupLatencyTest = (proxyGroupName: string) =>
+    setProxyGroupLatencyTestingMap(proxyGroupName, async () => {
       const newLatencyMap = await proxyGroupLatencyTestAPI(
         proxyGroupName,
         urlForLatencyTest(),
@@ -152,7 +161,7 @@ export const useProxies = () => {
       await fetchProxies()
     })
 
-  const updateProviderByProviderName = async (providerName: string) =>
+  const updateProviderByProviderName = (providerName: string) =>
     setUpdatingMap(providerName, async () => {
       try {
         await updateProxyProviderAPI(providerName)
@@ -175,7 +184,7 @@ export const useProxies = () => {
   }
 
   const proxyProviderLatencyTest = (providerName: string) =>
-    setHealthCheckingMap(providerName, async () => {
+    setProxyProviderLatencyTestingMap(providerName, async () => {
       await proxyProviderLatencyTest(providerName)
       await fetchProxies()
     })
@@ -183,8 +192,9 @@ export const useProxies = () => {
   return {
     collapsedMap,
     setCollapsedMap,
-    latencyTestingMap,
-    healthCheckingMap,
+    proxyLatencyTestingMap,
+    proxyGroupLatencyTestingMap,
+    proxyProviderLatencyTestingMap,
     updatingMap,
     isAllProviderUpdating,
     proxies,
