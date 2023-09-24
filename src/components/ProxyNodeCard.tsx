@@ -1,6 +1,7 @@
+import { IconBrandSpeedtest } from '@tabler/icons-solidjs'
 import { createMemo, Show } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import { Latency } from '~/components'
+import { Button, Latency } from '~/components'
 import { filterSpecialProxyType, formatProxyType } from '~/helpers'
 import { useProxies } from '~/signals'
 
@@ -9,6 +10,7 @@ export const ProxyNodeCard = (props: {
   isSelected?: boolean
   onClick?: () => void
 }) => {
+  const { proxyLatencyTest } = useProxies()
   const { proxyName, isSelected, onClick } = props
   const { proxyNodeMap } = useProxies()
   const proxyNode = createMemo(() => proxyNodeMap()[proxyName])
@@ -28,10 +30,23 @@ export const ProxyNodeCard = (props: {
         isSelected && 'border-primary bg-primary-content text-primary',
         onClick && 'cursor-pointer',
       )}
-      onClick={() => onClick?.()}
+      onClick={onClick}
       data-tip={proxyName}
     >
-      <div class="truncate text-left">{proxyName}</div>
+      <div class="flex items-center justify-between gap-2">
+        <span class="truncate text-left">{proxyName}</span>
+
+        <Button
+          class="btn-circle btn-ghost btn-sm"
+          icon={<IconBrandSpeedtest />}
+          onClick={(e) => {
+            e.stopPropagation()
+
+            void proxyLatencyTest(proxyName)
+          }}
+        />
+      </div>
+
       <div class="flex items-center justify-between gap-1">
         <div
           class={twMerge(
@@ -40,8 +55,10 @@ export const ProxyNodeCard = (props: {
           )}
         >
           {formatProxyType(proxyNode()?.type)}
+
           <Show when={specialType()}>{` :: ${specialType()}`}</Show>
         </div>
+
         <div class="text-xs">
           <Latency name={props.proxyName} />
         </div>

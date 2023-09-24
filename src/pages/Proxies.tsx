@@ -41,23 +41,23 @@ export default () => {
     fetchProxies,
     proxies,
     selectProxyInGroup,
-    latencyTestByProxyGroupName,
+    proxyGroupLatencyTest,
     latencyMap,
     proxyProviders,
     updateProviderByProviderName,
     updateAllProvider,
     healthCheckByProviderName,
+    collapsedMap,
+    setCollapsedMap,
+    latencyTestingMap,
+    setLatencyTestingMap,
   } = useProxies()
 
   onMount(fetchProxies)
 
-  const { map: collapsedMap, set: setCollapsedMap } = useStringBooleanMap()
-  const { map: latencyTestingMap, setWithCallback: setLatencyTestingMap } =
-    useStringBooleanMap()
-
   const onLatencyTestClick = async (e: MouseEvent, name: string) => {
     e.stopPropagation()
-    void setLatencyTestingMap(name, () => latencyTestByProxyGroupName(name))
+    void setLatencyTestingMap(name, () => proxyGroupLatencyTest(name))
   }
 
   const { map: healthCheckingMap, setWithCallback: setHealthCheckingMap } =

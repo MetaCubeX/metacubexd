@@ -4,10 +4,12 @@ import {
   fetchProxiesAPI,
   fetchProxyProvidersAPI,
   proxyGroupLatencyTestAPI,
+  proxyLatencyTestAPI,
   proxyProviderHealthCheck,
   selectProxyInGroupAPI,
   updateProxyProviderAPI,
 } from '~/apis'
+import { useStringBooleanMap } from '~/helpers'
 import {
   autoCloseConns,
   latencyQualityMap,
@@ -25,6 +27,10 @@ type ProxyInfo = {
   xudp: boolean
   type: string
 }
+
+const { map: collapsedMap, set: setCollapsedMap } = useStringBooleanMap()
+const { map: latencyTestingMap, setWithCallback: setLatencyTestingMap } =
+  useStringBooleanMap()
 
 // these signals should be global state
 const [proxies, setProxies] = createSignal<Proxy[]>([])
@@ -113,17 +119,30 @@ export const useProxies = () => {
     }
   }
 
-  const latencyTestByProxyGroupName = async (proxyGroupName: string) => {
+  const proxyLatencyTest = async (proxyName: string) => {
+    const { delay } = await proxyLatencyTestAPI(
+      proxyName,
+      urlForLatencyTest(),
+      latencyTestTimeoutDuration(),
+    )
+
+    setLatencyMap((latencyMap) => ({
+      ...latencyMap,
+      [proxyName]: delay,
+    }))
+  }
+
+  const proxyGroupLatencyTest = async (proxyGroupName: string) => {
     const data = await proxyGroupLatencyTestAPI(
       proxyGroupName,
       urlForLatencyTest(),
       latencyTestTimeoutDuration(),
     )
 
-    setLatencyMap({
-      ...latencyMap(),
+    setLatencyMap((latencyMap) => ({
+      ...latencyMap,
       ...data,
-    })
+    }))
 
     await fetchProxies()
   }
@@ -148,9 +167,14 @@ export const useProxies = () => {
   }
 
   return {
+    collapsedMap,
+    setCollapsedMap,
+    latencyTestingMap,
+    setLatencyTestingMap,
     proxies,
     proxyProviders,
-    latencyTestByProxyGroupName,
+    proxyLatencyTest,
+    proxyGroupLatencyTest,
     latencyMap,
     proxyNodeMap,
     fetchProxies,

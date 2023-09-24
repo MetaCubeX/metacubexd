@@ -30,9 +30,7 @@ const Config = lazy(() => import('~/pages/Config'))
 const ProtectedResources = () => {
   const latestConnectionMsg = useWsRequest<WsMsg>('connections')
 
-  createEffect(() => {
-    setLatestConnectionMsg(latestConnectionMsg())
-  })
+  createEffect(() => setLatestConnectionMsg(latestConnectionMsg()))
 
   return null
 }

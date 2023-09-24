@@ -146,6 +146,23 @@ export const selectProxyInGroupAPI = (groupName: string, proxyName: string) => {
   })
 }
 
+export const proxyLatencyTestAPI = (
+  proxyName: string,
+  url: string,
+  timeout: number,
+) => {
+  const request = useRequest()
+
+  return request
+    .get(`proxies/${proxyName}/delay`, {
+      searchParams: {
+        url,
+        timeout,
+      },
+    })
+    .json<{ delay: number }>()
+}
+
 export const proxyGroupLatencyTestAPI = (
   groupName: string,
   url: string,
