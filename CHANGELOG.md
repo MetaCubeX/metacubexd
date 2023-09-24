@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.113.0](https://github.com/MetaCubeX/metacubexd/compare/v1.112.0...v1.113.0) (2023-09-24)
+
+
+### Features
+
+* **proxy:** single proxy node latency testing state indicator ([0052ce4](https://github.com/MetaCubeX/metacubexd/commit/0052ce4325fec2d185df98ad187efa70171d0a28))
+
 ## [1.112.0](https://github.com/MetaCubeX/metacubexd/compare/v1.111.1...v1.112.0) (2023-09-24)
 
 
