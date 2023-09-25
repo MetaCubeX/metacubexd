@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.115.0](https://github.com/MetaCubeX/metacubexd/compare/v1.114.0...v1.115.0) (2023-09-25)
+
+
+### Features
+
+* publish gh-pages with force_orphan option enabled ([067bedd](https://github.com/MetaCubeX/metacubexd/commit/067bedd43f9f75310335bc3b97f003ca06ea4d38))
+
 ## [1.114.0](https://github.com/MetaCubeX/metacubexd/compare/v1.113.1...v1.114.0) (2023-09-25)
 
 
