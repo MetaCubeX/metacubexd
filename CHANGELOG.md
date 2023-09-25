@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.115.1](https://github.com/MetaCubeX/metacubexd/compare/v1.115.0...v1.115.1) (2023-09-25)
+
+
+### Bug Fixes
+
+* **proxy:** proxy preview dots layout issue ([4b7f4c8](https://github.com/MetaCubeX/metacubexd/commit/4b7f4c899f4549ffc89d84a0a93f5f837918fdb3))
+
 ## [1.115.0](https://github.com/MetaCubeX/metacubexd/compare/v1.114.0...v1.115.0) (2023-09-25)
 
 
