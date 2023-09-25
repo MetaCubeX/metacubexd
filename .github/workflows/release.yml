@@ -49,15 +49,13 @@ jobs:
           publish_dir: ./dist
           cname: d.metacubex.one
 
-      - name: zip
-        run: |
-          zip -r ../dist.zip .
-        working-directory: dist
+      - name: compress dist
+        run: tar czvf compressed-dist.tgz -C dist .
 
       - name: attach github release artifacts
         uses: softprops/action-gh-release@v1
         with:
-          files: dist.zip
+          files: compressed-dist.tgz
           tag_name: ${{ needs.release-please.outputs.tag_name }}
 
   release-image:
