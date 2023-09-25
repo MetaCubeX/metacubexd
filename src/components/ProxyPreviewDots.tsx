@@ -25,7 +25,7 @@ const LatencyDots = (props: { latency?: number; selected: boolean }) => {
       : 'bg-warning'
   }
 
-  return <div class={twMerge('m-1 h-4 w-4 rounded-full', dotClassName)}></div>
+  return <div class={twMerge('h-4 w-4 rounded-full', dotClassName)} />
 }
 
 export const ProxyPreviewDots = (props: {
@@ -35,8 +35,8 @@ export const ProxyPreviewDots = (props: {
   const { latencyMap } = useProxies()
 
   return (
-    <div class="flex items-center gap-2">
-      <div class="flex flex-1 flex-wrap items-center">
+    <div class="flex h-6 items-center gap-2">
+      <div class="flex flex-1 flex-wrap items-center gap-1">
         <For
           each={props.proxyNameList.map((name): [string, number] => [
             name,
