@@ -133,7 +133,7 @@ export const proxyProviderHealthCheckAPI = (providerName: string) => {
 
   return request
     .get(`providers/proxies/${providerName}/healthcheck`, {
-      timeout: 20 * 1000,
+      timeout: 5 * 1000,
     })
     .json<Record<string, number>>()
 }
