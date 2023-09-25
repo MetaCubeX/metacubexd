@@ -131,9 +131,11 @@ export const updateProxyProviderAPI = (providerName: string) => {
 export const proxyProviderHealthCheckAPI = (providerName: string) => {
   const request = useRequest()
 
-  return request.get(`providers/proxies/${providerName}/healthcheck`, {
-    timeout: 20 * 1000,
-  })
+  return request
+    .get(`providers/proxies/${providerName}/healthcheck`, {
+      timeout: 20 * 1000,
+    })
+    .json<Record<string, number>>()
 }
 
 export const selectProxyInGroupAPI = (groupName: string, proxyName: string) => {
@@ -152,14 +154,13 @@ export const proxyLatencyTestAPI = (
   url: string,
   timeout: number,
 ) => {
-  if (provider !== '') {
-    return proxyProviderHealthCheckAPI(provider)
-      .json()
-      .then((r) => {
-        return { delay: r[proxyName] }
-      })
-  }
   const request = useRequest()
+
+  if (provider !== '') {
+    return proxyProviderHealthCheckAPI(provider).then((latencyMap) => ({
+      delay: latencyMap[proxyName],
+    }))
+  }
 
   return request
     .get(`proxies/${proxyName}/delay`, {

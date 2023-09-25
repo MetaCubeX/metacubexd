@@ -29,6 +29,9 @@ type ProxyInfo = {
   provider: string
 }
 
+export type ProxyWithProvider = Proxy & { provider?: string }
+export type ProxyNodeWithProvider = ProxyNode & { provider?: string }
+
 const { map: collapsedMap, set: setCollapsedMap } = useStringBooleanMap()
 const {
   map: proxyLatencyTestingMap,
@@ -47,8 +50,10 @@ const { map: updatingMap, setWithCallback: setUpdatingMap } =
 const [isAllProviderUpdating, setIsAllProviderUpdating] = createSignal(false)
 
 // these signals should be global state
-const [proxies, setProxies] = createSignal<Proxy[]>([])
-const [proxyProviders, setProxyProviders] = createSignal<ProxyProvider[]>([])
+const [proxies, setProxies] = createSignal<ProxyWithProvider[]>([])
+const [proxyProviders, setProxyProviders] = createSignal<
+  (ProxyProvider & { proxies: ProxyNodeWithProvider[] })[]
+>([])
 
 const [latencyMap, setLatencyMap] = createSignal<Record<string, number>>({})
 const [proxyNodeMap, setProxyNodeMap] = createSignal<Record<string, ProxyInfo>>(
@@ -56,10 +61,7 @@ const [proxyNodeMap, setProxyNodeMap] = createSignal<Record<string, ProxyInfo>>(
 )
 
 const setProxiesInfo = (
-  proxies: (
-    | (Proxy & { provider?: string })
-    | (ProxyNode & { provider?: string })
-  )[],
+  proxies: (ProxyWithProvider | ProxyNodeWithProvider)[],
 ) => {
   const newProxyNodeMap = { ...proxyNodeMap() }
   const newLatencyMap = { ...latencyMap() }
@@ -98,17 +100,16 @@ export const useProxies = () => {
       (provider) =>
         provider.name !== 'default' && provider.vehicleType !== 'Compatible',
     )
-    const allProxies: (
-      | (Proxy & { provider?: string })
-      | (ProxyNode & { provider?: string })
-    )[] = [
+
+    const allProxies = [
       ...Object.values(proxies),
       ...sortedProviders.flatMap((provider) =>
         provider.proxies
           .filter((proxy) => !(proxy.name in proxies))
-          .map((proxy) => {
-            return { ...proxy, provider: provider.name }
-          }),
+          .map((proxy) => ({
+            ...proxy,
+            provider: provider.name,
+          })),
       ),
     ]
 
