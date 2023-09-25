@@ -41,7 +41,7 @@ export const ProxyPreviewBar = (props: {
   )
 
   return (
-    <div class="flex h-6 w-full items-center gap-2">
+    <div class="flex items-center gap-2 py-2">
       <div class="flex flex-1 overflow-hidden rounded-2xl">
         <div
           class="h-2 bg-success"

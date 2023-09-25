@@ -3,7 +3,11 @@ import { twMerge } from 'tailwind-merge'
 import { Latency } from '~/components'
 import { latencyQualityMap, useProxies } from '~/signals'
 
-const LatencyDots = (props: { latency?: number; selected: boolean }) => {
+const LatencyDots = (props: {
+  name: string
+  latency?: number
+  selected: boolean
+}) => {
   let dotClassName = props.selected
     ? 'bg-white border-4 border-success'
     : 'bg-success'
@@ -25,7 +29,12 @@ const LatencyDots = (props: { latency?: number; selected: boolean }) => {
       : 'bg-warning'
   }
 
-  return <div class={twMerge('h-4 w-4 rounded-full', dotClassName)} />
+  return (
+    <div
+      class={twMerge('h-4 w-4 rounded-full', dotClassName)}
+      title={props.name}
+    />
+  )
 }
 
 export const ProxyPreviewDots = (props: {
@@ -35,7 +44,7 @@ export const ProxyPreviewDots = (props: {
   const { latencyMap } = useProxies()
 
   return (
-    <div class="flex h-6 items-center gap-2">
+    <div class="flex items-center gap-2 py-2">
       <div class="flex flex-1 flex-wrap items-center gap-1">
         <For
           each={props.proxyNameList.map((name): [string, number] => [
@@ -46,7 +55,13 @@ export const ProxyPreviewDots = (props: {
           {([name, latency]) => {
             const isSelected = props.now === name
 
-            return <LatencyDots latency={latency} selected={isSelected} />
+            return (
+              <LatencyDots
+                name={name}
+                latency={latency}
+                selected={isSelected}
+              />
+            )
           }}
         </For>
       </div>
