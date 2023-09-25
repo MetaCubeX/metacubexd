@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.114.0](https://github.com/MetaCubeX/metacubexd/compare/v1.113.1...v1.114.0) (2023-09-25)
+
+
+### Features
+
+* publish compressed dist with tar gzip format ([0c9b31d](https://github.com/MetaCubeX/metacubexd/commit/0c9b31d03f9d6670e1fabbeee4e3791a2d17a775))
+
 ## [1.113.1](https://github.com/MetaCubeX/metacubexd/compare/v1.113.0...v1.113.1) (2023-09-25)
 
 
