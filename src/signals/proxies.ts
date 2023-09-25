@@ -5,6 +5,7 @@ import {
   fetchProxyProvidersAPI,
   proxyGroupLatencyTestAPI,
   proxyLatencyTestAPI,
+  proxyProviderHealthCheckAPI,
   selectProxyInGroupAPI,
   updateProxyProviderAPI,
 } from '~/apis'
@@ -185,7 +186,7 @@ export const useProxies = () => {
 
   const proxyProviderLatencyTest = (providerName: string) =>
     setProxyProviderLatencyTestingMap(providerName, async () => {
-      await proxyProviderLatencyTest(providerName)
+      await proxyProviderHealthCheckAPI(providerName)
       await fetchProxies()
     })
 

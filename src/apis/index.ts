@@ -128,7 +128,7 @@ export const updateProxyProviderAPI = (providerName: string) => {
   return request.put(`providers/proxies/${providerName}`)
 }
 
-export const proxyProviderHealthCheck = (providerName: string) => {
+export const proxyProviderHealthCheckAPI = (providerName: string) => {
   const request = useRequest()
 
   return request.get(`providers/proxies/${providerName}/healthcheck`, {
