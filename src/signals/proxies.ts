@@ -26,6 +26,7 @@ type ProxyInfo = {
   now: string
   xudp: boolean
   type: string
+  provider: string
 }
 
 const { map: collapsedMap, set: setCollapsedMap } = useStringBooleanMap()
@@ -54,21 +55,22 @@ const [proxyNodeMap, setProxyNodeMap] = createSignal<Record<string, ProxyInfo>>(
   {},
 )
 
-const setProxiesInfo = (proxies: (Proxy | ProxyNode)[]) => {
+const setProxiesInfo = (
+  proxies: (
+    | (Proxy & { provider?: string })
+    | (ProxyNode & { provider?: string })
+  )[],
+) => {
   const newProxyNodeMap = { ...proxyNodeMap() }
   const newLatencyMap = { ...latencyMap() }
 
   proxies.forEach((proxy) => {
+    const { udp, xudp, type, now, name, provider = '' } = proxy
+
     const latency =
       proxy.history.at(-1)?.delay || latencyQualityMap().NOT_CONNECTED
 
-    newProxyNodeMap[proxy.name] = {
-      udp: proxy.udp,
-      xudp: proxy.xudp,
-      type: proxy.type,
-      now: proxy.now,
-      name: proxy.name,
-    }
+    newProxyNodeMap[proxy.name] = { udp, xudp, type, now, name, provider }
     newLatencyMap[proxy.name] = latency
   })
 
@@ -96,9 +98,18 @@ export const useProxies = () => {
       (provider) =>
         provider.name !== 'default' && provider.vehicleType !== 'Compatible',
     )
-    const allProxies: (Proxy | ProxyNode)[] = [
+    const allProxies: (
+      | (Proxy & { provider?: string })
+      | (ProxyNode & { provider?: string })
+    )[] = [
       ...Object.values(proxies),
-      ...sortedProviders.flatMap((provider) => provider.proxies),
+      ...sortedProviders.flatMap((provider) =>
+        provider.proxies
+          .filter((proxy) => !(proxy.name in proxies))
+          .map((proxy) => {
+            return { ...proxy, provider: provider.name }
+          }),
+      ),
     ]
 
     batch(() => {
@@ -132,10 +143,11 @@ export const useProxies = () => {
     }
   }
 
-  const proxyLatencyTest = (proxyName: string) =>
+  const proxyLatencyTest = (proxyName: string, provider: string) =>
     setProxyLatencyTestingMap(proxyName, async () => {
       const { delay } = await proxyLatencyTestAPI(
         proxyName,
+        provider,
         urlForLatencyTest(),
         latencyTestTimeoutDuration(),
       )

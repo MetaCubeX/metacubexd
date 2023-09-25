@@ -14,6 +14,7 @@ export const ProxyNodeCard = (props: {
   const { proxyName, isSelected, onClick } = props
   const { proxyNodeMap } = useProxies()
   const proxyNode = createMemo(() => proxyNodeMap()[proxyName])
+  const { provider } = proxyNode()
   const specialType = () =>
     filterSpecialProxyType(proxyNode()?.type)
       ? proxyNode()?.xudp
@@ -49,7 +50,7 @@ export const ProxyNodeCard = (props: {
           onClick={(e) => {
             e.stopPropagation()
 
-            void proxyLatencyTest(proxyName)
+            void proxyLatencyTest(proxyName, provider)
           }}
         />
       </div>

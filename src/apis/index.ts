@@ -148,9 +148,17 @@ export const selectProxyInGroupAPI = (groupName: string, proxyName: string) => {
 
 export const proxyLatencyTestAPI = (
   proxyName: string,
+  provider: string,
   url: string,
   timeout: number,
 ) => {
+  if (provider !== '') {
+    return proxyProviderHealthCheckAPI(provider)
+      .json()
+      .then((r) => {
+        return { delay: r[proxyName] }
+      })
+  }
   const request = useRequest()
 
   return request
