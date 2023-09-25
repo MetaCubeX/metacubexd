@@ -26,7 +26,11 @@ type ProxyInfo = {
   now: string
   xudp: boolean
   type: string
+  provider: string
 }
+
+export type ProxyWithProvider = Proxy & { provider?: string }
+export type ProxyNodeWithProvider = ProxyNode & { provider?: string }
 
 const { map: collapsedMap, set: setCollapsedMap } = useStringBooleanMap()
 const {
@@ -46,29 +50,29 @@ const { map: updatingMap, setWithCallback: setUpdatingMap } =
 const [isAllProviderUpdating, setIsAllProviderUpdating] = createSignal(false)
 
 // these signals should be global state
-const [proxies, setProxies] = createSignal<Proxy[]>([])
-const [proxyProviders, setProxyProviders] = createSignal<ProxyProvider[]>([])
+const [proxies, setProxies] = createSignal<ProxyWithProvider[]>([])
+const [proxyProviders, setProxyProviders] = createSignal<
+  (ProxyProvider & { proxies: ProxyNodeWithProvider[] })[]
+>([])
 
 const [latencyMap, setLatencyMap] = createSignal<Record<string, number>>({})
 const [proxyNodeMap, setProxyNodeMap] = createSignal<Record<string, ProxyInfo>>(
   {},
 )
 
-const setProxiesInfo = (proxies: (Proxy | ProxyNode)[]) => {
+const setProxiesInfo = (
+  proxies: (ProxyWithProvider | ProxyNodeWithProvider)[],
+) => {
   const newProxyNodeMap = { ...proxyNodeMap() }
   const newLatencyMap = { ...latencyMap() }
 
   proxies.forEach((proxy) => {
+    const { udp, xudp, type, now, name, provider = '' } = proxy
+
     const latency =
       proxy.history.at(-1)?.delay || latencyQualityMap().NOT_CONNECTED
 
-    newProxyNodeMap[proxy.name] = {
-      udp: proxy.udp,
-      xudp: proxy.xudp,
-      type: proxy.type,
-      now: proxy.now,
-      name: proxy.name,
-    }
+    newProxyNodeMap[proxy.name] = { udp, xudp, type, now, name, provider }
     newLatencyMap[proxy.name] = latency
   })
 
@@ -96,9 +100,17 @@ export const useProxies = () => {
       (provider) =>
         provider.name !== 'default' && provider.vehicleType !== 'Compatible',
     )
-    const allProxies: (Proxy | ProxyNode)[] = [
+
+    const allProxies = [
       ...Object.values(proxies),
-      ...sortedProviders.flatMap((provider) => provider.proxies),
+      ...sortedProviders.flatMap((provider) =>
+        provider.proxies
+          .filter((proxy) => !(proxy.name in proxies))
+          .map((proxy) => ({
+            ...proxy,
+            provider: provider.name,
+          })),
+      ),
     ]
 
     batch(() => {
@@ -132,10 +144,11 @@ export const useProxies = () => {
     }
   }
 
-  const proxyLatencyTest = (proxyName: string) =>
+  const proxyLatencyTest = (proxyName: string, provider: string) =>
     setProxyLatencyTestingMap(proxyName, async () => {
       const { delay } = await proxyLatencyTestAPI(
         proxyName,
+        provider,
         urlForLatencyTest(),
         latencyTestTimeoutDuration(),
       )

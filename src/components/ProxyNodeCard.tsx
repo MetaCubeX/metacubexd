@@ -49,7 +49,7 @@ export const ProxyNodeCard = (props: {
           onClick={(e) => {
             e.stopPropagation()
 
-            void proxyLatencyTest(proxyName)
+            void proxyLatencyTest(proxyName, proxyNode().provider)
           }}
         />
       </div>

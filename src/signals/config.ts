@@ -127,7 +127,7 @@ export const tableSizeClassName = (size: TAILWINDCSS_SIZE) => {
 }
 
 export const [latencyTestTimeoutDuration, setLatencyTestTimeoutDuration] =
-  makePersisted(createSignal(2000), {
+  makePersisted(createSignal(5000), {
     name: 'latencyTestTimeoutDuration',
     storage: localStorage,
   })
