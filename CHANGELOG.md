@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.113.1](https://github.com/MetaCubeX/metacubexd/compare/v1.113.0...v1.113.1) (2023-09-25)
+
+
+### Bug Fixes
+
+* **proxy:** proxy provider health check not working, closes [#282](https://github.com/MetaCubeX/metacubexd/issues/282) ([db24ad2](https://github.com/MetaCubeX/metacubexd/commit/db24ad20bb5fbfcf195dc4c71f3024091bf16f1b))
+
 ## [1.113.0](https://github.com/MetaCubeX/metacubexd/compare/v1.112.0...v1.113.0) (2023-09-24)
 
 
