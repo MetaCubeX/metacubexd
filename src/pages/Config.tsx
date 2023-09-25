@@ -389,7 +389,9 @@ const ConfigForXd = () => {
               <select
                 class="select select-bordered"
                 value={favDayTheme()}
-                onChange={(e) => setFavDayTheme(e.target.value)}
+                onChange={(e) =>
+                  setFavDayTheme(e.target.value as (typeof themes)[number])
+                }
               >
                 <For each={themes}>
                   {(theme) => <option value={theme}>{theme}</option>}
@@ -403,7 +405,9 @@ const ConfigForXd = () => {
               <select
                 class="select select-bordered"
                 value={favNightTheme()}
-                onChange={(e) => setFavNightTheme(e.target.value)}
+                onChange={(e) =>
+                  setFavNightTheme(e.target.value as (typeof themes)[number])
+                }
               >
                 <For each={themes}>
                   {(theme) => <option value={theme}>{theme}</option>}
