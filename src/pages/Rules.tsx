@@ -1,6 +1,6 @@
 import { IconReload } from '@tabler/icons-solidjs'
 import { createVirtualizer } from '@tanstack/solid-virtual'
-import { For, Show, createSignal, onMount } from 'solid-js'
+import { For, Show, createMemo, createSignal, onMount } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Button } from '~/components'
 import { useStringBooleanMap } from '~/helpers'
@@ -57,13 +57,38 @@ export default () => {
     },
   ]
 
-  let parentRef: HTMLDivElement | undefined
+  const [globalFilter, setGlobalFilter] = createSignal('')
+
+  const filteredRules = createMemo(() =>
+    rules().filter((rule) => {
+      if (!globalFilter()) {
+        return true
+      }
+
+      return rule.payload.toLowerCase().includes(globalFilter().toLowerCase())
+    }),
+  )
+
+  const filteredRuleProviders = createMemo(() =>
+    ruleProviders().filter((ruleProvider) => {
+      if (!globalFilter()) {
+        return true
+      }
+
+      return ruleProvider.name
+        .toLowerCase()
+        .includes(globalFilter().toLowerCase())
+    }),
+  )
+
+  let scrollElementRef: HTMLDivElement | undefined
 
   const ruleVirtualizer = createVirtualizer({
     get count() {
-      return rules().length
+      return filteredRules().length
     },
-    getScrollElement: () => parentRef!,
+    getItemKey: (index) => filteredRules()[index].payload,
+    getScrollElement: () => scrollElementRef!,
     estimateSize: () => 74,
     overscan: 5,
   })
@@ -72,9 +97,10 @@ export default () => {
 
   const ruleProviderVirtualizer = createVirtualizer({
     get count() {
-      return ruleProviders().length
+      return filteredRuleProviders().length
     },
-    getScrollElement: () => parentRef!,
+    getItemKey: (index) => filteredRuleProviders()[index].name,
+    getScrollElement: () => scrollElementRef!,
     estimateSize: () => 74,
     overscan: 5,
   })
@@ -117,14 +143,26 @@ export default () => {
         </Show>
       </div>
 
-      <div ref={(ref) => (parentRef = ref)} class="flex-1 overflow-y-auto">
+      <input
+        class="input input-bordered input-primary"
+        placeholder={t('search')}
+        value={globalFilter()}
+        onInput={(e) => setGlobalFilter(e.currentTarget.value)}
+      />
+
+      <div
+        ref={(ref) => (scrollElementRef = ref)}
+        class="flex-1 overflow-y-auto"
+      >
         <Show when={activeTab() === ActiveTab.rules}>
           <div
             class="relative"
             style={{ height: `${ruleVirtualizer.getTotalSize()}px` }}
           >
             {ruleVirtualizerItems.map((virtualizerItem) => {
-              const rule = rules()[virtualizerItem.index]
+              const rule = filteredRules().find(
+                (rule) => rule.payload === virtualizerItem.key,
+              )!
 
               return (
                 <div
@@ -157,9 +195,14 @@ export default () => {
         </Show>
 
         <Show when={activeTab() === ActiveTab.ruleProviders}>
-          <div class="relative">
+          <div
+            class="relative"
+            style={{ height: `${ruleProviderVirtualizer.getTotalSize()}px` }}
+          >
             {ruleProviderVirtualizerItems.map((virtualizerItem) => {
-              const ruleProvider = ruleProviders()[virtualizerItem.index]
+              const ruleProvider = ruleProviders().find(
+                (ruleProvider) => ruleProvider.name === virtualizerItem.key,
+              )!
 
               return (
                 <div
