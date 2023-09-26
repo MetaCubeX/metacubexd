@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.116.0](https://github.com/MetaCubeX/metacubexd/compare/v1.115.1...v1.116.0) (2023-09-26)
+
+
+### Features
+
+* bump version ([66d92a9](https://github.com/MetaCubeX/metacubexd/commit/66d92a9b529504e2edbfd087a7d6783b8f257354))
+
 ## [1.115.1](https://github.com/MetaCubeX/metacubexd/compare/v1.115.0...v1.115.1) (2023-09-25)
 
 
