@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.119.0](https://github.com/MetaCubeX/metacubexd/compare/v1.118.0...v1.119.0) (2023-09-26)
+
+
+### Features
+
+* **rule:** fuzzy filter ([f53a1a4](https://github.com/MetaCubeX/metacubexd/commit/f53a1a4cb34211d1a9b6c14ed7938702d194eb1d))
+
 ## [1.118.0](https://github.com/MetaCubeX/metacubexd/compare/v1.117.0...v1.118.0) (2023-09-26)
 
 
