@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.117.0](https://github.com/MetaCubeX/metacubexd/compare/v1.116.0...v1.117.0) (2023-09-26)
+
+
+### Features
+
+* **rule:** implement virtual scroll on rules and rule providers, fixes [#285](https://github.com/MetaCubeX/metacubexd/issues/285) ([7145cec](https://github.com/MetaCubeX/metacubexd/commit/7145cec62fd4fc409d3f0e46f7aaaf0bea354abd))
+
 ## [1.116.0](https://github.com/MetaCubeX/metacubexd/compare/v1.115.1...v1.116.0) (2023-09-26)
 
 
