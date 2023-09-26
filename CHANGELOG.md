@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.118.0](https://github.com/MetaCubeX/metacubexd/compare/v1.117.0...v1.118.0) (2023-09-26)
+
+
+### Features
+
+* **rule:** filter rules and rule providers by search input ([db16200](https://github.com/MetaCubeX/metacubexd/commit/db16200b1ce42f31a813a41b6c3eedbab63baeac))
+
 ## [1.117.0](https://github.com/MetaCubeX/metacubexd/compare/v1.116.0...v1.117.0) (2023-09-26)
 
 
