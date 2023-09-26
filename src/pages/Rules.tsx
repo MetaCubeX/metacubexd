@@ -1,4 +1,5 @@
 import { IconReload } from '@tabler/icons-solidjs'
+import { createVirtualizer } from '@tanstack/solid-virtual'
 import { For, Show, createSignal, onMount } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Button } from '~/components'
@@ -56,6 +57,30 @@ export default () => {
     },
   ]
 
+  let parentRef: HTMLDivElement | undefined
+
+  const ruleVirtualizer = createVirtualizer({
+    get count() {
+      return rules().length
+    },
+    getScrollElement: () => parentRef!,
+    estimateSize: () => 74,
+    overscan: 5,
+  })
+
+  const ruleVirtualizerItems = ruleVirtualizer.getVirtualItems()
+
+  const ruleProviderVirtualizer = createVirtualizer({
+    get count() {
+      return ruleProviders().length
+    },
+    getScrollElement: () => parentRef!,
+    estimateSize: () => 74,
+    overscan: 5,
+  })
+
+  const ruleProviderVirtualizerItems = ruleProviderVirtualizer.getVirtualItems()
+
   return (
     <div class="flex h-full flex-col gap-2">
       <div class="flex items-center gap-2">
@@ -92,60 +117,91 @@ export default () => {
         </Show>
       </div>
 
-      <div class="flex-1 overflow-y-auto">
+      <div ref={(ref) => (parentRef = ref)} class="flex-1 overflow-y-auto">
         <Show when={activeTab() === ActiveTab.rules}>
-          <div class="grid gap-2">
-            <For each={rules()}>
-              {(rule) => (
-                <div class="card card-bordered card-compact bg-base-200 p-4">
-                  <div class="flex items-center gap-2">
-                    <span class="break-all">{rule.payload}</span>
-                    <Show
-                      when={typeof rule.size === 'number' && rule.size !== -1}
-                    >
-                      <div class="badge badge-sm">{rule.size}</div>
-                    </Show>
-                  </div>
-                  <div class="text-xs text-slate-500">
-                    {rule.type} :: {rule.proxy}
+          <div
+            class="relative"
+            style={{ height: `${ruleVirtualizer.getTotalSize()}px` }}
+          >
+            {ruleVirtualizerItems.map((virtualizerItem) => {
+              const rule = rules()[virtualizerItem.index]
+
+              return (
+                <div
+                  ref={(el) =>
+                    onMount(() => ruleVirtualizer.measureElement(el))
+                  }
+                  data-index={virtualizerItem.index}
+                  class="absolute inset-x-0 top-0 pb-2 last:pb-0"
+                  style={{
+                    transform: `translateY(${virtualizerItem.start}px)`,
+                  }}
+                >
+                  <div class="card card-bordered card-compact bg-base-200 p-4">
+                    <div class="flex items-center gap-2">
+                      <span class="break-all">{rule.payload}</span>
+
+                      <Show when={rule.size !== -1}>
+                        <div class="badge badge-sm">{rule.size}</div>
+                      </Show>
+                    </div>
+
+                    <div class="text-xs text-slate-500">
+                      {rule.type} :: {rule.proxy}
+                    </div>
                   </div>
                 </div>
-              )}
-            </For>
+              )
+            })}
           </div>
         </Show>
 
         <Show when={activeTab() === ActiveTab.ruleProviders}>
-          <div class="grid gap-2">
-            <For each={ruleProviders()}>
-              {(ruleProvider) => (
-                <div class="card card-bordered card-compact bg-base-200 p-4">
-                  <div class="flex items-center gap-2 pr-8">
-                    <span class="break-all">{ruleProvider.name}</span>
-                    <div class="badge badge-sm">{ruleProvider.ruleCount}</div>
-                  </div>
+          <div class="relative">
+            {ruleProviderVirtualizerItems.map((virtualizerItem) => {
+              const ruleProvider = ruleProviders()[virtualizerItem.index]
 
-                  <div class="text-xs text-slate-500">
-                    {ruleProvider.vehicleType} / {ruleProvider.behavior} /
-                    {t('updated')} {formatTimeFromNow(ruleProvider.updatedAt)}
-                  </div>
+              return (
+                <div
+                  ref={(el) =>
+                    onMount(() => ruleProviderVirtualizer.measureElement(el))
+                  }
+                  data-index={virtualizerItem.index}
+                  class="absolute inset-x-0 top-0 pb-2 last:pb-0"
+                  style={{
+                    transform: `translateY(${virtualizerItem.start}px)`,
+                  }}
+                >
+                  <div class="card card-bordered card-compact bg-base-200 p-4">
+                    <div class="flex items-center gap-2 pr-8">
+                      <span class="break-all">{ruleProvider.name}</span>
+                      <div class="badge badge-sm">{ruleProvider.ruleCount}</div>
+                    </div>
 
-                  <Button
-                    class="btn-circle btn-sm absolute right-2 top-2 mr-2 h-4"
-                    disabled={updatingMap()[ruleProvider.name]}
-                    onClick={(e) => onUpdateProviderClick(e, ruleProvider.name)}
-                    icon={
-                      <IconReload
-                        class={twMerge(
-                          updatingMap()[ruleProvider.name] &&
-                            'animate-spin text-success',
-                        )}
-                      />
-                    }
-                  />
+                    <div class="text-xs text-slate-500">
+                      {ruleProvider.vehicleType} / {ruleProvider.behavior} /
+                      {t('updated')} {formatTimeFromNow(ruleProvider.updatedAt)}
+                    </div>
+
+                    <Button
+                      class="btn-circle btn-sm absolute right-2 top-2 mr-2 h-4"
+                      disabled={updatingMap()[ruleProvider.name]}
+                      onClick={(e) =>
+                        onUpdateProviderClick(e, ruleProvider.name)
+                      }
+                      icon={
+                        <IconReload
+                          class={twMerge(
+                            updatingMap()[ruleProvider.name] &&
+                              'animate-spin text-success',
+                          )}
+                        />
+                      }
+                    />
+                  </div>
                 </div>
-              )}
-            </For>
+              )
+            })}
           </div>
         </Show>
       </div>
