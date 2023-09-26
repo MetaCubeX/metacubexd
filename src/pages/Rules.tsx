@@ -1,11 +1,13 @@
 import { IconReload } from '@tabler/icons-solidjs'
 import { createVirtualizer } from '@tanstack/solid-virtual'
+import { matchSorter } from 'match-sorter'
 import { For, Show, createMemo, createSignal, onMount } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Button } from '~/components'
 import { useStringBooleanMap } from '~/helpers'
 import { useI18n } from '~/i18n'
 import { formatTimeFromNow, useRules } from '~/signals'
+import { Rule, RuleProvider } from '~/types'
 
 enum ActiveTab {
   ruleProviders = 'ruleProviders',
@@ -60,25 +62,19 @@ export default () => {
   const [globalFilter, setGlobalFilter] = createSignal('')
 
   const filteredRules = createMemo(() =>
-    rules().filter((rule) => {
-      if (!globalFilter()) {
-        return true
-      }
-
-      return rule.payload.toLowerCase().includes(globalFilter().toLowerCase())
-    }),
+    globalFilter()
+      ? matchSorter(rules(), globalFilter(), {
+          keys: ['type', 'payload', 'type'] as (keyof Rule)[],
+        })
+      : rules(),
   )
 
   const filteredRuleProviders = createMemo(() =>
-    ruleProviders().filter((ruleProvider) => {
-      if (!globalFilter()) {
-        return true
-      }
-
-      return ruleProvider.name
-        .toLowerCase()
-        .includes(globalFilter().toLowerCase())
-    }),
+    globalFilter()
+      ? matchSorter(ruleProviders(), globalFilter(), {
+          keys: ['name', 'vehicleType', 'behavior'] as (keyof RuleProvider)[],
+        })
+      : ruleProviders(),
   )
 
   let scrollElementRef: HTMLDivElement | undefined

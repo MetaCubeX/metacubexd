@@ -131,6 +131,9 @@ dependencies:
   lodash:
     specifier: ^4.17.21
     version: 4.17.21
+  match-sorter:
+    specifier: ^6.3.1
+    version: 6.3.1
   prettier:
     specifier: ^3.0.3
     version: 3.0.3
@@ -4577,6 +4580,13 @@ packages:
   /map-obj@4.3.0:
     resolution: {integrity: sha512-hdN1wVrZbb29eBGiGjJbeP8JbKjq1urkHJ/LIP/NY48MZ1QVXUsQBV1G1zvYFHn1XE06cwjBsOI2K3Ulnj1YXQ==}
     engines: {node: '>=8'}
+    dev: false
+
+  /match-sorter@6.3.1:
+    resolution: {integrity: sha512-mxybbo3pPNuA+ZuCUhm5bwNkXrJTbsk5VWbR5wiwz/GC6LIiegBGn2w3O08UG/jdbYLinw51fSQ5xNU1U3MgBw==}
+    dependencies:
+      '@babel/runtime': 7.22.15
+      remove-accents: 0.4.2
     dev: false
 
   /meow@8.1.2:
