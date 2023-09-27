@@ -28,7 +28,7 @@ export const Collapse: ParentComponent<Props> = (props) => {
     <div
       class={twMerge(
         getCollapseClassName(),
-        'collapse collapse-arrow select-none overflow-visible border-secondary bg-base-200 shadow-md',
+        'collapse collapse-arrow select-none border-secondary bg-base-200 shadow-md',
       )}
     >
       <div
@@ -37,6 +37,7 @@ export const Collapse: ParentComponent<Props> = (props) => {
       >
         {title}
       </div>
+
       <div
         class={twMerge(
           getCollapseContentClassName(),
