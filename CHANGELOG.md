@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.121.0](https://github.com/MetaCubeX/metacubexd/compare/v1.120.0...v1.121.0) (2023-09-27)
+
+
+### Features
+
+* **proxy:** remove collapse component overflow-visible class ([389af52](https://github.com/MetaCubeX/metacubexd/commit/389af52c74e249fac957addd43eeeb8976957022))
+
 ## [1.120.0](https://github.com/MetaCubeX/metacubexd/compare/v1.119.0...v1.120.0) (2023-09-27)
 
 
