@@ -26,20 +26,21 @@ export const ProxyNodeCard = (props: {
   return (
     <div
       class={twMerge(
-        'card card-bordered tooltip-bottom card-compact flex gap-1 border-neutral-focus bg-neutral p-3 text-neutral-content shadow-lg sm:tooltip',
+        'card card-bordered tooltip-bottom flex flex-col gap-1 border-neutral-focus bg-neutral p-2 text-neutral-content shadow-lg',
         isSelected && 'border-primary bg-primary-content text-primary',
         onClick && 'cursor-pointer',
       )}
       onClick={onClick}
-      data-tip={proxyName}
+      title={proxyName}
     >
       <div class="flex items-center justify-between gap-2">
-        <span class="truncate text-left">{proxyName}</span>
+        <span class="truncate text-left text-sm">{proxyName}</span>
 
         <Button
-          class="btn-circle btn-ghost btn-sm"
+          class="btn-circle btn-ghost h-auto min-h-0 w-auto"
           icon={
             <IconBrandSpeedtest
+              size={20}
               class={twMerge(
                 proxyLatencyTestingMap()[proxyName] &&
                   'animate-pulse text-success',
