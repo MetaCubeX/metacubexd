@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.120.0](https://github.com/MetaCubeX/metacubexd/compare/v1.119.0...v1.120.0) (2023-09-27)
+
+
+### Features
+
+* **proxy:** compact proxy node card ([40f07b8](https://github.com/MetaCubeX/metacubexd/commit/40f07b8efe7b6d48da0da5db1ce1372d07a14d3c))
+
 ## [1.119.0](https://github.com/MetaCubeX/metacubexd/compare/v1.118.0...v1.119.0) (2023-09-26)
 
 
