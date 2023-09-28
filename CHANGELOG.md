@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.122.0](https://github.com/MetaCubeX/metacubexd/compare/v1.121.0...v1.122.0) (2023-09-28)
+
+
+### Features
+
+* publish gh-pages with tag name as commit message ([336b954](https://github.com/MetaCubeX/metacubexd/commit/336b9545e662b78f5234d5dfcf926e017857c643))
+
 ## [1.121.0](https://github.com/MetaCubeX/metacubexd/compare/v1.120.0...v1.121.0) (2023-09-27)
 
 
