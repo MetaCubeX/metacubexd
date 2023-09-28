@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.122.1](https://github.com/MetaCubeX/metacubexd/compare/v1.122.0...v1.122.1) (2023-09-28)
+
+
+### Bug Fixes
+
+* **rule:** rule pages filter logic is not stable, fixes [#313](https://github.com/MetaCubeX/metacubexd/issues/313) ([1f22147](https://github.com/MetaCubeX/metacubexd/commit/1f22147cd14462e11b82cd367cbf7b786358d6e5))
+
 ## [1.122.0](https://github.com/MetaCubeX/metacubexd/compare/v1.121.0...v1.122.0) (2023-09-28)
 
 
