@@ -51,8 +51,8 @@ dependencies:
     specifier: ^0.8.3
     version: 0.8.3(solid-js@1.7.12)
   '@tabler/icons-solidjs':
-    specifier: ^2.36.0
-    version: 2.36.0(solid-js@1.7.12)
+    specifier: ^2.37.0
+    version: 2.37.0(solid-js@1.7.12)
   '@tanstack/match-sorter-utils':
     specifier: ^8.8.4
     version: 8.8.4
@@ -2166,17 +2166,17 @@ packages:
       string.prototype.matchall: 4.0.10
     dev: false
 
-  /@tabler/icons-solidjs@2.36.0(solid-js@1.7.12):
-    resolution: {integrity: sha512-2U/5ilgp0sd9Q4ThkGCpAXa0mz8RXVE/+4yNrF5L8boJvL9Uh2JLQucEYcHs3Gbbq3PlFBHdAiMewIQXOruRHw==}
+  /@tabler/icons-solidjs@2.37.0(solid-js@1.7.12):
+    resolution: {integrity: sha512-NdHW3wV0ko2dRT4kC8YLYkIe9klhi35Pf1f/F18OtS0WKdoUSCmZWoKPbzz9GIJQfEZv3s2W/xoUKfSGfMro+w==}
     peerDependencies:
       solid-js: ^1.4.7
     dependencies:
-      '@tabler/icons': 2.36.0
+      '@tabler/icons': 2.37.0
       solid-js: 1.7.12
     dev: false
 
-  /@tabler/icons@2.36.0:
-    resolution: {integrity: sha512-pgUAALzzr3sDQ1m0s240LrwVxeUgkFuP6oZnwd1zTB5V7sgvgVUt0Uf0/qYwUQkoqt0oDgGQngXriCCp7AOvrg==}
+  /@tabler/icons@2.37.0:
+    resolution: {integrity: sha512-Qo/aRhs2xXcD8IDSuePonR/39GSvQUdwv6RXdbcAhMfpJZP+pHRn2TQFPNGJND9B5uUBez694j4Nx71539XHGA==}
     dev: false
 
   /@tanstack/match-sorter-utils@8.8.4:
@@ -2291,10 +2291,6 @@ packages:
     resolution: {integrity: sha512-bUBrPjEry2QUTsnuEjzjbS7voGWCc30W0qzgMf90GPeDGFRakvrz47ju+oqDAKCXLUCe39u57/ORMl/O/04/9g==}
     dev: false
 
-  /@types/node@20.7.0:
-    resolution: {integrity: sha512-zI22/pJW2wUZOVyguFaUL1HABdmSVxpXrzIqkjsHmyUjNhPoWM1CKfvVuXfetHhIok4RY573cqS0mZ1SJEnoTg==}
-    dev: false
-
   /@types/node@20.7.1:
     resolution: {integrity: sha512-LT+OIXpp2kj4E2S/p91BMe+VgGX2+lfO+XTpfXhh+bCk2LkQtHZSub8ewFBMGP5ClysPjTDFa4sMI8Q3n4T0wg==}
     dev: false
@@ -2306,7 +2302,7 @@ packages:
   /@types/resolve@1.17.1:
     resolution: {integrity: sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==}
     dependencies:
-      '@types/node': 20.7.0
+      '@types/node': 20.7.1
     dev: false
 
   /@types/semver@7.5.2:
@@ -4317,7 +4313,7 @@ packages:
     resolution: {integrity: sha512-KWYVV1c4i+jbMpaBC+U++4Va0cp8OisU185o73T1vo99hqi7w8tSJfUXYswwqqrjzwxa6KpRK54WhPvwf5w6PQ==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': 20.7.0
+      '@types/node': 20.7.1
       merge-stream: 2.0.0
       supports-color: 7.2.0
     dev: false
