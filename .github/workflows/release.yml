@@ -49,6 +49,7 @@ jobs:
           publish_dir: ./dist
           force_orphan: true
           cname: d.metacubex.one
+          commit_message: ${{ needs.release-please.outputs.tag_name }}
 
       - name: compress dist
         run: tar czvf compressed-dist.tgz -C dist .
