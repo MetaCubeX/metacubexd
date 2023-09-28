@@ -79,25 +79,36 @@ export default () => {
 
   let scrollElementRef: HTMLDivElement | undefined
 
+  const getRuleItemKey = ({ type, payload, proxy }: Rule) =>
+    `${type}-${payload}-${proxy}`
+
   const ruleVirtualizer = createVirtualizer({
     get count() {
       return filteredRules().length
     },
-    getItemKey: (index) => filteredRules()[index].payload,
+    getItemKey: (index) => getRuleItemKey(filteredRules()[index]),
     getScrollElement: () => scrollElementRef!,
-    estimateSize: () => 74,
+    estimateSize: () => 82,
     overscan: 5,
   })
 
   const ruleVirtualizerItems = ruleVirtualizer.getVirtualItems()
 
+  const getRuleProviderItemKey = ({
+    type,
+    name,
+    vehicleType,
+    behavior,
+  }: RuleProvider) => `${type}-${name}-${vehicleType}-${behavior}`
+
   const ruleProviderVirtualizer = createVirtualizer({
     get count() {
       return filteredRuleProviders().length
     },
-    getItemKey: (index) => filteredRuleProviders()[index].name,
+    getItemKey: (index) =>
+      getRuleProviderItemKey(filteredRuleProviders()[index]),
     getScrollElement: () => scrollElementRef!,
-    estimateSize: () => 74,
+    estimateSize: () => 82,
     overscan: 5,
   })
 
@@ -157,7 +168,7 @@ export default () => {
           >
             {ruleVirtualizerItems.map((virtualizerItem) => {
               const rule = filteredRules().find(
-                (rule) => rule.payload === virtualizerItem.key,
+                (rule) => getRuleItemKey(rule) === virtualizerItem.key,
               )!
 
               return (
@@ -197,7 +208,8 @@ export default () => {
           >
             {ruleProviderVirtualizerItems.map((virtualizerItem) => {
               const ruleProvider = ruleProviders().find(
-                (ruleProvider) => ruleProvider.name === virtualizerItem.key,
+                (ruleProvider) =>
+                  getRuleProviderItemKey(ruleProvider) === virtualizerItem.key,
               )!
 
               return (
