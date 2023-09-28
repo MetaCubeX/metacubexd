@@ -48,7 +48,7 @@ external-ui: /etc/clash-meta/ui
 > Update
 
 ```shell
-git -C /etc/clash-meta/ui pull
+git -C /etc/clash-meta/ui pull -r
 ```
 
 ### Run inside Docker
