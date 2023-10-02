@@ -31,6 +31,7 @@ import { LANG, MODE_OPTIONS, ROUTES, themes } from '~/constants'
 import { locale, setLocale, useI18n } from '~/i18n'
 import {
   autoSwitchTheme,
+  endpoint,
   favDayTheme,
   favNightTheme,
   setAutoSwitchTheme,
@@ -462,19 +463,23 @@ const Versions = () => {
   })
 
   return (
-    <div class="grid grid-cols-2 gap-4">
-      <kbd class="kbd">{import.meta.env.version}</kbd>
+    <div class="flex flex-col gap-2">
+      <div class="grid grid-cols-2 gap-4">
+        <kbd class="kbd">{import.meta.env.version}</kbd>
 
-      <div class="relative">
-        <Show when={isUpdateAvailable()}>
-          <span class="absolute -right-1 -top-1 flex h-3 w-3">
-            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-info opacity-75" />
-            <span class="inline-flex h-3 w-3 rounded-full bg-info" />
-          </span>
-        </Show>
+        <div class="relative">
+          <Show when={isUpdateAvailable()}>
+            <span class="absolute -right-1 -top-1 flex h-3 w-3">
+              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-info opacity-75" />
+              <span class="inline-flex h-3 w-3 rounded-full bg-info" />
+            </span>
+          </Show>
 
-        <kbd class="kbd w-full">{backendVersion()}</kbd>
+          <kbd class="kbd w-full">{backendVersion()}</kbd>
+        </div>
       </div>
+
+      <h1 class="text-center text-lg font-bold">{endpoint()?.url}</h1>
     </div>
   )
 }
