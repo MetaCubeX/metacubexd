@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.123.0](https://github.com/MetaCubeX/metacubexd/compare/v1.122.1...v1.123.0) (2023-10-02)
+
+
+### Features
+
+* **config:** display currently selected endpoint url ([59e0b07](https://github.com/MetaCubeX/metacubexd/commit/59e0b076bf42db40c2ff1bafa2ba126f79997d25))
+
 ## [1.122.1](https://github.com/MetaCubeX/metacubexd/compare/v1.122.0...v1.122.1) (2023-09-28)
 
 
