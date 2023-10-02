@@ -90,8 +90,8 @@ dependencies:
     specifier: ^0.0.10
     version: 0.0.10
   apexcharts:
-    specifier: ^3.42.0
-    version: 3.42.0
+    specifier: ^3.43.0
+    version: 3.43.0
   autoprefixer:
     specifier: ^10.4.16
     version: 10.4.16(postcss@8.4.30)
@@ -145,7 +145,7 @@ dependencies:
     version: 0.5.4(prettier-plugin-organize-imports@3.2.3)(prettier@3.0.3)
   solid-apexcharts:
     specifier: ^0.3.2
-    version: 0.3.2(apexcharts@3.42.0)(solid-js@1.7.12)
+    version: 0.3.2(apexcharts@3.43.0)(solid-js@1.7.12)
   solid-js:
     specifier: ^1.7.12
     version: 1.7.12
@@ -2291,10 +2291,6 @@ packages:
     resolution: {integrity: sha512-4tT2UrL5LBqDwoed9wZ6N3umC4Yhz3W3FloMmiiG4JwmUJWpie0c7lcnUNd4gtMKuDEO4wRVS8B6Xa0uMRsMKg==}
     dev: false
 
-  /@types/node@20.7.1:
-    resolution: {integrity: sha512-LT+OIXpp2kj4E2S/p91BMe+VgGX2+lfO+XTpfXhh+bCk2LkQtHZSub8ewFBMGP5ClysPjTDFa4sMI8Q3n4T0wg==}
-    dev: false
-
   /@types/node@20.7.2:
     resolution: {integrity: sha512-RcdC3hOBOauLP+r/kRt27NrByYtDjsXyAuSbR87O6xpsvi763WI+5fbSIvYJrXnt9w4RuxhV6eAXfIs7aaf/FQ==}
     dev: false
@@ -2306,7 +2302,7 @@ packages:
   /@types/resolve@1.17.1:
     resolution: {integrity: sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==}
     dependencies:
-      '@types/node': 20.7.1
+      '@types/node': 20.7.2
     dev: false
 
   /@types/semver@7.5.2:
@@ -2562,8 +2558,8 @@ packages:
       picomatch: 2.3.1
     dev: false
 
-  /apexcharts@3.42.0:
-    resolution: {integrity: sha512-hYhzZqh2Efny9uiutkGU2M/EarJ4Nn8s6dxZ0C7E7N+SV4d1xjTioXi2NLn4UKVJabZkb3HnpXDoumXgtAymwg==}
+  /apexcharts@3.43.0:
+    resolution: {integrity: sha512-YPw1aLatPQMUqVLMp5d+LDaXFi4QrRQND72/XO7/2NJdg+R5MjE9sifJ0GzOfgoZM7ltBUTjwfSxIvwR/9V8yw==}
     dependencies:
       '@yr/monotone-cubic-spline': 1.0.3
       svg.draggable.js: 2.2.2
@@ -4317,7 +4313,7 @@ packages:
     resolution: {integrity: sha512-KWYVV1c4i+jbMpaBC+U++4Va0cp8OisU185o73T1vo99hqi7w8tSJfUXYswwqqrjzwxa6KpRK54WhPvwf5w6PQ==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': 20.7.1
+      '@types/node': 20.7.2
       merge-stream: 2.0.0
       supports-color: 7.2.0
     dev: false
@@ -5543,13 +5539,13 @@ packages:
       is-fullwidth-code-point: 4.0.0
     dev: false
 
-  /solid-apexcharts@0.3.2(apexcharts@3.42.0)(solid-js@1.7.12):
+  /solid-apexcharts@0.3.2(apexcharts@3.43.0)(solid-js@1.7.12):
     resolution: {integrity: sha512-4U80dk2e/YEghD903aitBrO0l5WjUv/IhRI6Pp8mfJNT6JPkYG4HTMjBrI+XHRU8uJICJl9ZwLtkvFZnKd2Shw==}
     peerDependencies:
       apexcharts: ^3.40.0
       solid-js: ^1.6.0
     dependencies:
-      apexcharts: 3.42.0
+      apexcharts: 3.43.0
       defu: 6.1.2
       solid-js: 1.7.12
     dev: false
