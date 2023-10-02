@@ -15,8 +15,8 @@ dependencies:
     specifier: ^1.0.17
     version: 1.0.17(zod@3.22.2)
   '@fontsource/fira-sans':
-    specifier: ^5.0.12
-    version: 5.0.12
+    specifier: ^5.0.13
+    version: 5.0.13
   '@solid-primitives/clipboard':
     specifier: ^1.5.7
     version: 1.5.7(solid-js@1.7.12)
@@ -1873,8 +1873,8 @@ packages:
       zod: 3.22.2
     dev: false
 
-  /@fontsource/fira-sans@5.0.12:
-    resolution: {integrity: sha512-IQJxlmbye/pTHHPkW/36isA5EnrRP014sAY1ZEGtFmV0TA6CcFoLV91foSKqFwQWrJ/dFs1n1ogfECLIFXWd8Q==}
+  /@fontsource/fira-sans@5.0.13:
+    resolution: {integrity: sha512-3G9lX1NJkvNwkYZrusB6dTKy3cHu67Fv2/Mjp5yjmEwviO2cZiKnxsn8coY5gApd7hCeJDepnLNrrzr1CNaecw==}
     dev: false
 
   /@humanwhocodes/config-array@0.11.11:
@@ -2291,10 +2291,6 @@ packages:
     resolution: {integrity: sha512-4tT2UrL5LBqDwoed9wZ6N3umC4Yhz3W3FloMmiiG4JwmUJWpie0c7lcnUNd4gtMKuDEO4wRVS8B6Xa0uMRsMKg==}
     dev: false
 
-  /@types/node@20.7.1:
-    resolution: {integrity: sha512-LT+OIXpp2kj4E2S/p91BMe+VgGX2+lfO+XTpfXhh+bCk2LkQtHZSub8ewFBMGP5ClysPjTDFa4sMI8Q3n4T0wg==}
-    dev: false
-
   /@types/node@20.7.2:
     resolution: {integrity: sha512-RcdC3hOBOauLP+r/kRt27NrByYtDjsXyAuSbR87O6xpsvi763WI+5fbSIvYJrXnt9w4RuxhV6eAXfIs7aaf/FQ==}
     dev: false
@@ -2306,7 +2302,7 @@ packages:
   /@types/resolve@1.17.1:
     resolution: {integrity: sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==}
     dependencies:
-      '@types/node': 20.7.1
+      '@types/node': 20.7.2
     dev: false
 
   /@types/semver@7.5.2:
@@ -4317,7 +4313,7 @@ packages:
     resolution: {integrity: sha512-KWYVV1c4i+jbMpaBC+U++4Va0cp8OisU185o73T1vo99hqi7w8tSJfUXYswwqqrjzwxa6KpRK54WhPvwf5w6PQ==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': 20.7.1
+      '@types/node': 20.7.2
       merge-stream: 2.0.0
       supports-color: 7.2.0
     dev: false
