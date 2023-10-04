@@ -13,7 +13,7 @@ dependencies:
     version: 1.2.11(solid-js@1.7.12)
   '@felte/validator-zod':
     specifier: ^1.0.17
-    version: 1.0.17(zod@3.22.3)
+    version: 1.0.17(zod@3.22.4)
   '@fontsource/fira-sans':
     specifier: ^5.0.14
     version: 5.0.14
@@ -180,8 +180,8 @@ dependencies:
     specifier: ^2.7.0
     version: 2.7.0(solid-js@1.7.12)(vite@4.4.9)
   zod:
-    specifier: ^3.22.3
-    version: 3.22.3
+    specifier: ^3.22.4
+    version: 3.22.4
 
 packages:
 
@@ -1863,14 +1863,14 @@ packages:
       solid-js: 1.7.12
     dev: false
 
-  /@felte/validator-zod@1.0.17(zod@3.22.3):
+  /@felte/validator-zod@1.0.17(zod@3.22.4):
     resolution: {integrity: sha512-rOX1chLfTcixKMPEdrMSi8zsCM685Dsoy1a5qN1G6Fyh7HYK1vSmI6SfJ7m92DOt6kV+vAP4m5rk94Y8UFIeVw==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     peerDependencies:
       zod: ^3.2.0
     dependencies:
       '@felte/common': 1.1.8
-      zod: 3.22.3
+      zod: 3.22.4
     dev: false
 
   /@fontsource/fira-sans@5.0.14:
@@ -6653,6 +6653,6 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  /zod@3.22.3:
-    resolution: {integrity: sha512-EjIevzuJRiRPbVH4mGc8nApb/lVLKVpmUhAaR5R5doKGfAnGJ6Gr3CViAVjP+4FWSxCsybeWQdcgCtbX+7oZug==}
+  /zod@3.22.4:
+    resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
     dev: false

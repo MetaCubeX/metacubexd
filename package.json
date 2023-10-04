@@ -72,6 +72,6 @@
     "vite": "^4.4.9",
     "vite-plugin-pwa": "^0.16.5",
     "vite-plugin-solid": "^2.7.0",
-    "zod": "^3.22.3"
+    "zod": "^3.22.4"
   }
 }
