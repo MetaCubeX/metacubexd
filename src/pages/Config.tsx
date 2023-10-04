@@ -9,6 +9,7 @@ import {
   createSignal,
   onMount,
 } from 'solid-js'
+import { toast } from 'solid-toast'
 import { z } from 'zod'
 import {
   fetchBackendConfigAPI,
@@ -56,7 +57,7 @@ const DNSQueryForm = () => {
   const { form, isSubmitting } = createForm<z.infer<typeof dnsQueryFormSchema>>(
     {
       extend: validator({ schema: dnsQueryFormSchema }),
-      onSubmit: async (values) => {
+      onSubmit: (values) =>
         request
           .get('dns/query', {
             searchParams: { name: values.name, type: values.type },
@@ -65,7 +66,7 @@ const DNSQueryForm = () => {
           .then(({ Answer }) =>
             setDNSQueryResult(Answer?.map(({ data }) => data) || []),
           )
-      },
+          .catch((err) => toast.error(err.message)),
     },
   )
 
