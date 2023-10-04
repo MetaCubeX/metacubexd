@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.124.0](https://github.com/MetaCubeX/metacubexd/compare/v1.123.0...v1.124.0) (2023-10-04)
+
+
+### Features
+
+* **config:** toast error message when dns query failed for some reason, closes [#321](https://github.com/MetaCubeX/metacubexd/issues/321) ([82c2772](https://github.com/MetaCubeX/metacubexd/commit/82c2772afe913039b0695ef449f9f48b54eb822b))
+
 ## [1.123.0](https://github.com/MetaCubeX/metacubexd/compare/v1.122.1...v1.123.0) (2023-10-02)
 
 
