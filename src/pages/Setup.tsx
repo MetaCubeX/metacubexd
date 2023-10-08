@@ -1,6 +1,6 @@
 import { createForm } from '@felte/solid'
 import { validator } from '@felte/validator-zod'
-import { useNavigate } from '@solidjs/router'
+import { useLocation, useNavigate } from '@solidjs/router'
 import { IconX } from '@tabler/icons-solidjs'
 import ky from 'ky'
 import { For, onMount } from 'solid-js'
@@ -18,12 +18,13 @@ import {
 } from '~/signals'
 
 const schema = z.object({
-  url: z.string().nonempty(),
+  url: z.string().min(1),
   secret: z.string(),
 })
 
 export default () => {
   const [t] = useI18n()
+  const location = useLocation()
   const navigate = useNavigate()
 
   const onSetupSuccess = (id: string) => {
@@ -109,7 +110,7 @@ export default () => {
   }
 
   onMount(() => {
-    const query = new URLSearchParams(window.location.search)
+    const query = new URLSearchParams(location.search)
 
     if (query.has('hostname')) {
       void onSubmit({
