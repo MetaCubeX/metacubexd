@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.124.1](https://github.com/MetaCubeX/metacubexd/compare/v1.124.0...v1.124.1) (2023-10-08)
+
+
+### Bug Fixes
+
+* **setup:** use location info from router instead of browser ([7ecc51c](https://github.com/MetaCubeX/metacubexd/commit/7ecc51c43c581105506f23192f4d7b6938ec944c))
+
 ## [1.124.0](https://github.com/MetaCubeX/metacubexd/compare/v1.123.0...v1.124.0) (2023-10-04)
 
 
