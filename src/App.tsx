@@ -1,6 +1,6 @@
 import { usePrefersDark } from '@solid-primitives/media'
-import { Navigate, Route, Routes, useNavigate } from '@solidjs/router'
-import { Show, createEffect, lazy, onMount } from 'solid-js'
+import { Navigate, Route, Routes } from '@solidjs/router'
+import { Show, createEffect, lazy } from 'solid-js'
 import { Toaster } from 'solid-toast'
 import { twMerge } from 'tailwind-merge'
 import { Header } from '~/components'
@@ -36,20 +36,11 @@ const ProtectedResources = () => {
 }
 
 export const App = () => {
-  const navigate = useNavigate()
-
   const prefersDark = usePrefersDark()
 
   createEffect(() => {
-    if (autoSwitchTheme()) {
+    if (autoSwitchTheme())
       setCurTheme(prefersDark() ? favNightTheme() : favDayTheme())
-    }
-  })
-
-  onMount(() => {
-    if (!endpoint()) {
-      navigate(ROUTES.Setup)
-    }
   })
 
   return (
