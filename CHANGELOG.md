@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.124.2](https://github.com/MetaCubeX/metacubexd/compare/v1.124.1...v1.124.2) (2023-10-09)
+
+
+### Bug Fixes
+
+* **setup:** setup with url search string not working properly ([ce4622b](https://github.com/MetaCubeX/metacubexd/commit/ce4622b9543d14b304bf10bcc2d542ee248a14bc))
+
 ## [1.124.1](https://github.com/MetaCubeX/metacubexd/compare/v1.124.0...v1.124.1) (2023-10-08)
 
 
