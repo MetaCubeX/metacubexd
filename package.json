@@ -71,7 +71,7 @@
     "uuid": "^9.0.1",
     "vite": "^4.4.11",
     "vite-plugin-pwa": "^0.16.5",
-    "vite-plugin-solid": "^2.7.0",
+    "vite-plugin-solid": "^2.7.1",
     "zod": "^3.22.4"
   }
 }
