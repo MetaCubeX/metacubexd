@@ -37,7 +37,7 @@
     "@thisbeyond/solid-dnd": "^0.7.4",
     "@types/byte-size": "^8.1.0",
     "@types/lodash": "^4.14.199",
-    "@types/node": "^20.8.4",
+    "@types/node": "^20.8.5",
     "@types/uuid": "^9.0.5",
     "@typescript-eslint/eslint-plugin": "^6.7.5",
     "@typescript-eslint/parser": "^6.7.5",
