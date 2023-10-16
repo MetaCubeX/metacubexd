@@ -2,6 +2,8 @@ import { createForm } from '@felte/solid'
 import { validator } from '@felte/validator-zod'
 import { useNavigate } from '@solidjs/router'
 import {
+  Accessor,
+  Component,
   For,
   Show,
   createEffect,
@@ -29,6 +31,7 @@ import {
 } from '~/apis'
 import { Button, ConfigTitle } from '~/components'
 import { LANG, MODE_OPTIONS, ROUTES, themes } from '~/constants'
+import { isSingBox } from '~/helpers'
 import { locale, setLocale, useI18n } from '~/i18n'
 import {
   autoSwitchTheme,
@@ -114,7 +117,9 @@ const configFormSchema = z.object({
   'mixed-port': z.number(),
 })
 
-const ConfigForm = () => {
+const ConfigForm: Component<{ backendVersion: Accessor<string> }> = ({
+  backendVersion,
+}) => {
   const [t] = useI18n()
   const navigate = useNavigate()
 
@@ -196,109 +201,111 @@ const ConfigForm = () => {
         <option value={MODE_OPTIONS.Direct}>{t('direct')}</option>
       </select>
 
-      <form class="grid grid-cols-3 gap-2 sm:grid-cols-5" use:form={form}>
-        <For each={portList}>
-          {(item) => (
-            <div class="form-control">
-              <label for={item.key} class="label">
-                <span class="label-text">{item.label()}</span>
-              </label>
+      <Show when={!isSingBox(backendVersion())}>
+        <form class="grid grid-cols-3 gap-2 sm:grid-cols-5" use:form={form}>
+          <For each={portList}>
+            {(item) => (
+              <div class="form-control">
+                <label for={item.key} class="label">
+                  <span class="label-text">{item.label()}</span>
+                </label>
 
-              <input
-                id={item.key}
-                name={item.key}
-                type="number"
-                class="input input-bordered"
-                placeholder={item.label()}
-                onChange={item.onChange}
-              />
-            </div>
-          )}
-        </For>
-      </form>
+                <input
+                  id={item.key}
+                  name={item.key}
+                  type="number"
+                  class="input input-bordered"
+                  placeholder={item.label()}
+                  onChange={item.onChange}
+                />
+              </div>
+            )}
+          </For>
+        </form>
 
-      <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <div class="form-control">
-          <label for="enable-tun-device" class="label gap-2">
-            <span class="label-text">{t('enableTunDevice')}</span>
-          </label>
+        <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <div class="form-control">
+            <label for="enable-tun-device" class="label gap-2">
+              <span class="label-text">{t('enableTunDevice')}</span>
+            </label>
 
-          <input
-            id="enable-tun-device"
-            type="checkbox"
-            class="toggle"
-            checked={configsData()?.tun.enable}
-            onChange={(e) =>
-              void updateBackendConfigAPI(
-                'tun',
-                { enable: e.target.checked },
-                refetch,
-              )
-            }
-          />
+            <input
+              id="enable-tun-device"
+              type="checkbox"
+              class="toggle"
+              checked={configsData()?.tun.enable}
+              onChange={(e) =>
+                void updateBackendConfigAPI(
+                  'tun',
+                  { enable: e.target.checked },
+                  refetch,
+                )
+              }
+            />
+          </div>
+
+          <div class="form-control">
+            <label for="tun-ip-stack" class="label gap-2">
+              <span class="label-text">{t('tunModeStack')}</span>
+            </label>
+
+            <select
+              id="tun-ip-stack"
+              class="select select-bordered flex-1"
+              value={configsData()?.tun.stack}
+              onChange={(e) =>
+                void updateBackendConfigAPI(
+                  'tun',
+                  { stack: e.target.value },
+                  refetch,
+                )
+              }
+            >
+              <option>gVisor</option>
+              <option>System</option>
+              <option>LWIP</option>
+            </select>
+          </div>
+
+          <div class="form-control">
+            <label for="device-name" class="label gap-2">
+              <span class="label-text">{t('tunDeviceName')}</span>
+            </label>
+
+            <input
+              id="device-name"
+              class="input input-bordered min-w-0"
+              value={configsData()?.tun.device}
+              onChange={(e) =>
+                void updateBackendConfigAPI(
+                  'tun',
+                  { device: e.target.value },
+                  refetch,
+                )
+              }
+            />
+          </div>
+
+          <div class="form-control">
+            <label for="interface-name" class="label gap-2">
+              <span class="label-text">{t('interfaceName')}</span>
+            </label>
+
+            <input
+              id="interface-name"
+              class="input input-bordered min-w-0"
+              value={configsData()?.['interface-name']}
+              onChange={(e) =>
+                void updateBackendConfigAPI(
+                  'interface-name',
+                  e.target.value,
+                  refetch,
+                )
+              }
+            />
+          </div>
         </div>
-
-        <div class="form-control">
-          <label for="tun-ip-stack" class="label gap-2">
-            <span class="label-text">{t('tunModeStack')}</span>
-          </label>
-
-          <select
-            id="tun-ip-stack"
-            class="select select-bordered flex-1"
-            value={configsData()?.tun.stack}
-            onChange={(e) =>
-              void updateBackendConfigAPI(
-                'tun',
-                { stack: e.target.value },
-                refetch,
-              )
-            }
-          >
-            <option>gVisor</option>
-            <option>System</option>
-            <option>LWIP</option>
-          </select>
-        </div>
-
-        <div class="form-control">
-          <label for="device-name" class="label gap-2">
-            <span class="label-text">{t('tunDeviceName')}</span>
-          </label>
-
-          <input
-            id="device-name"
-            class="input input-bordered min-w-0"
-            value={configsData()?.tun.device}
-            onChange={(e) =>
-              void updateBackendConfigAPI(
-                'tun',
-                { device: e.target.value },
-                refetch,
-              )
-            }
-          />
-        </div>
-
-        <div class="form-control">
-          <label for="interface-name" class="label gap-2">
-            <span class="label-text">{t('interfaceName')}</span>
-          </label>
-
-          <input
-            id="interface-name"
-            class="input input-bordered min-w-0"
-            value={configsData()?.['interface-name']}
-            onChange={(e) =>
-              void updateBackendConfigAPI(
-                'interface-name',
-                e.target.value,
-                refetch,
-              )
-            }
-          />
-        </div>
-      </div>
+      </Show>
 
       <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <Button
@@ -325,13 +332,15 @@ const ConfigForm = () => {
           {t('flushFakeIP')}
         </Button>
 
-        <Button
-          class="btn-error"
-          loading={upgradingBackend()}
-          onClick={upgradeBackendAPI}
-        >
-          {t('upgradeCore')}
-        </Button>
+        <Show when={!isSingBox(backendVersion())}>
+          <Button
+            class="btn-error"
+            loading={upgradingBackend()}
+            onClick={upgradeBackendAPI}
+          >
+            {t('upgradeCore')}
+          </Button>
+        </Show>
 
         <Button
           class="btn-warning"
@@ -453,14 +462,13 @@ const ConfigForXd = () => {
   )
 }
 
-const Versions = () => {
-  const [backendVersion, setBackendVersion] = createSignal('')
+const Versions: Component<{ backendVersion: Accessor<string> }> = ({
+  backendVersion,
+}) => {
   const [isUpdateAvailable, setIsUpdateAvailable] = createSignal(false)
 
   onMount(async () => {
-    const version = await fetchBackendVersionAPI()
-    setBackendVersion(version)
-    setIsUpdateAvailable(await isUpdateAvailableAPI(version))
+    setIsUpdateAvailable(await isUpdateAvailableAPI(backendVersion()))
   })
 
   return (
@@ -486,17 +494,26 @@ const Versions = () => {
 }
 
 export default () => {
+  const [backendVersion, setBackendVersion] = createSignal('')
+
+  onMount(async () => {
+    const version = await fetchBackendVersionAPI()
+    setBackendVersion(version)
+  })
+
   const [t] = useI18n()
 
   return (
     <div class="mx-auto flex max-w-screen-md flex-col gap-4">
-      <ConfigTitle withDivider>{t('dnsQuery')}</ConfigTitle>
+      <Show when={!isSingBox(backendVersion())}>
+        <ConfigTitle withDivider>{t('dnsQuery')}</ConfigTitle>
 
-      <DNSQueryForm />
+        <DNSQueryForm />
+      </Show>
 
       <ConfigTitle withDivider>{t('coreConfig')}</ConfigTitle>
 
-      <ConfigForm />
+      <ConfigForm backendVersion={backendVersion} />
 
       <ConfigTitle withDivider>{t('xdConfig')}</ConfigTitle>
 
@@ -504,7 +521,7 @@ export default () => {
 
       <ConfigTitle withDivider>{t('version')}</ConfigTitle>
 
-      <Versions />
+      <Versions backendVersion={backendVersion} />
     </div>
   )
 }
