@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.124.3](https://github.com/MetaCubeX/metacubexd/compare/v1.124.2...v1.124.3) (2023-10-16)
+
+
+### Bug Fixes
+
+* **config:** backend version is likely to be undefined when invoking isUpdateAvailableAPI ([398f05d](https://github.com/MetaCubeX/metacubexd/commit/398f05d8a54cf85964024e05e01c56d2fb99714d))
+
 ## [1.124.2](https://github.com/MetaCubeX/metacubexd/compare/v1.124.1...v1.124.2) (2023-10-09)
 
 
