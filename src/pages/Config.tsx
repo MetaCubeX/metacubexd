@@ -467,8 +467,12 @@ const Versions: Component<{ backendVersion: Accessor<string> }> = ({
 }) => {
   const [isUpdateAvailable, setIsUpdateAvailable] = createSignal(false)
 
-  onMount(async () => {
-    setIsUpdateAvailable(await isUpdateAvailableAPI(backendVersion()))
+  createEffect(async () => {
+    const version = backendVersion()
+
+    if (!version) return
+
+    setIsUpdateAvailable(await isUpdateAvailableAPI(version))
   })
 
   return (
@@ -494,14 +498,13 @@ const Versions: Component<{ backendVersion: Accessor<string> }> = ({
 }
 
 export default () => {
+  const [t] = useI18n()
+
   const [backendVersion, setBackendVersion] = createSignal('')
 
   onMount(async () => {
-    const version = await fetchBackendVersionAPI()
-    setBackendVersion(version)
+    setBackendVersion(await fetchBackendVersionAPI())
   })
-
-  const [t] = useI18n()
 
   return (
     <div class="mx-auto flex max-w-screen-md flex-col gap-4">
