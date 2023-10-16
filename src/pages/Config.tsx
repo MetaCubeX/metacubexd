@@ -3,6 +3,7 @@ import { validator } from '@felte/validator-zod'
 import { useNavigate } from '@solidjs/router'
 import {
   Accessor,
+  Component,
   For,
   Show,
   createEffect,
@@ -30,6 +31,7 @@ import {
 } from '~/apis'
 import { Button, ConfigTitle } from '~/components'
 import { LANG, MODE_OPTIONS, ROUTES, themes } from '~/constants'
+import { isSingBox } from '~/helpers'
 import { locale, setLocale, useI18n } from '~/i18n'
 import {
   autoSwitchTheme,
@@ -115,10 +117,8 @@ const configFormSchema = z.object({
   'mixed-port': z.number(),
 })
 
-const ConfigForm = ({
+const ConfigForm: Component<{ backendVersion: Accessor<string> }> = ({
   backendVersion,
-}: {
-  backendVersion: Accessor<string>
 }) => {
   const [t] = useI18n()
   const navigate = useNavigate()
@@ -201,7 +201,7 @@ const ConfigForm = ({
         <option value={MODE_OPTIONS.Direct}>{t('direct')}</option>
       </select>
 
-      <Show when={!IsSingbox(backendVersion())}>
+      <Show when={!isSingBox(backendVersion())}>
         <form class="grid grid-cols-3 gap-2 sm:grid-cols-5" use:form={form}>
           <For each={portList}>
             {(item) => (
@@ -332,7 +332,7 @@ const ConfigForm = ({
           {t('flushFakeIP')}
         </Button>
 
-        <Show when={!IsSingbox(backendVersion())}>
+        <Show when={!isSingBox(backendVersion())}>
           <Button
             class="btn-error"
             loading={upgradingBackend()}
@@ -462,7 +462,9 @@ const ConfigForXd = () => {
   )
 }
 
-const Versions = ({ backendVersion }: { backendVersion: Accessor<string> }) => {
+const Versions: Component<{ backendVersion: Accessor<string> }> = ({
+  backendVersion,
+}) => {
   const [isUpdateAvailable, setIsUpdateAvailable] = createSignal(false)
 
   onMount(async () => {
@@ -491,10 +493,6 @@ const Versions = ({ backendVersion }: { backendVersion: Accessor<string> }) => {
   )
 }
 
-const IsSingbox = (version: string) => {
-  return version.includes('sing-box')
-}
-
 export default () => {
   const [backendVersion, setBackendVersion] = createSignal('')
 
@@ -507,7 +505,7 @@ export default () => {
 
   return (
     <div class="mx-auto flex max-w-screen-md flex-col gap-4">
-      <Show when={!IsSingbox(backendVersion())}>
+      <Show when={!isSingBox(backendVersion())}>
         <ConfigTitle withDivider>{t('dnsQuery')}</ConfigTitle>
 
         <DNSQueryForm />
