@@ -90,8 +90,8 @@ dependencies:
     specifier: ^0.0.10
     version: 0.0.10
   apexcharts:
-    specifier: ^3.43.0
-    version: 3.43.0
+    specifier: ^3.44.0
+    version: 3.44.0
   autoprefixer:
     specifier: ^10.4.16
     version: 10.4.16(postcss@8.4.31)
@@ -145,7 +145,7 @@ dependencies:
     version: 0.5.6(prettier-plugin-organize-imports@3.2.3)(prettier@3.0.3)
   solid-apexcharts:
     specifier: ^0.3.2
-    version: 0.3.2(apexcharts@3.43.0)(solid-js@1.8.1)
+    version: 0.3.2(apexcharts@3.44.0)(solid-js@1.8.1)
   solid-js:
     specifier: ^1.8.1
     version: 1.8.1
@@ -2560,8 +2560,8 @@ packages:
       picomatch: 2.3.1
     dev: false
 
-  /apexcharts@3.43.0:
-    resolution: {integrity: sha512-YPw1aLatPQMUqVLMp5d+LDaXFi4QrRQND72/XO7/2NJdg+R5MjE9sifJ0GzOfgoZM7ltBUTjwfSxIvwR/9V8yw==}
+  /apexcharts@3.44.0:
+    resolution: {integrity: sha512-u7Xzrbcxc2yWznN78Jh5NMCYVAsWDfBjRl5ea++rVzFAqjU2hLz4RgKIFwYOBDRQtW1e/Qz8azJTqIJ1+Vu9Qg==}
     dependencies:
       '@yr/monotone-cubic-spline': 1.0.3
       svg.draggable.js: 2.2.2
@@ -5565,13 +5565,13 @@ packages:
       is-fullwidth-code-point: 4.0.0
     dev: false
 
-  /solid-apexcharts@0.3.2(apexcharts@3.43.0)(solid-js@1.8.1):
+  /solid-apexcharts@0.3.2(apexcharts@3.44.0)(solid-js@1.8.1):
     resolution: {integrity: sha512-4U80dk2e/YEghD903aitBrO0l5WjUv/IhRI6Pp8mfJNT6JPkYG4HTMjBrI+XHRU8uJICJl9ZwLtkvFZnKd2Shw==}
     peerDependencies:
       apexcharts: ^3.40.0
       solid-js: ^1.6.0
     dependencies:
-      apexcharts: 3.43.0
+      apexcharts: 3.44.0
       defu: 6.1.2
       solid-js: 1.8.1
     dev: false
