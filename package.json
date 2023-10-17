@@ -14,7 +14,7 @@
     "serve": "vite preview"
   },
   "dependencies": {
-    "@commitlint/config-conventional": "^17.7.0",
+    "@commitlint/config-conventional": "^17.8.0",
     "@felte/solid": "^1.2.11",
     "@felte/validator-zod": "^1.0.17",
     "@fontsource/fira-sans": "^5.0.15",
