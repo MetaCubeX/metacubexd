@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.125.0](https://github.com/MetaCubeX/metacubexd/compare/v1.124.3...v1.125.0) (2023-10-19)
+
+
+### Features
+
+* **connection:** drag handle, closes [#320](https://github.com/MetaCubeX/metacubexd/issues/320) ([dc8fddb](https://github.com/MetaCubeX/metacubexd/commit/dc8fddb08a2ba8fb9fdfa1629379eec552702b49))
+* **proxy:** do not truncate the proxy node name when not enough width, closes [#351](https://github.com/MetaCubeX/metacubexd/issues/351) ([a648f1e](https://github.com/MetaCubeX/metacubexd/commit/a648f1e41399327341ca2e603b2331f5f42f9ccc))
+
+
+### Bug Fixes
+
+* **config:** the bottom edge of the page gets cutoff, closes [#385](https://github.com/MetaCubeX/metacubexd/issues/385) ([522be60](https://github.com/MetaCubeX/metacubexd/commit/522be608a70d142e0805f14748c073c476d5f713))
+
 ## [1.124.3](https://github.com/MetaCubeX/metacubexd/compare/v1.124.2...v1.124.3) (2023-10-16)
 
 
