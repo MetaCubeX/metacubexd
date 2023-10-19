@@ -1,6 +1,6 @@
 import { createForm } from '@felte/solid'
 import { validator } from '@felte/validator-zod'
-import { IconNetwork, IconX } from '@tabler/icons-solidjs'
+import { IconMenuOrder, IconNetwork, IconX } from '@tabler/icons-solidjs'
 import type {
   DragEventHandler,
   Draggable,
@@ -13,6 +13,7 @@ import {
   SortableProvider,
   closestCenter,
   createSortable,
+  transformStyle,
   useDragDropContext,
 } from '@thisbeyond/solid-dnd'
 import { uniq } from 'lodash'
@@ -152,15 +153,23 @@ export const ConnectionsSettingsModal = (props: {
 
     return (
       <div
-        use:sortable
-        class="sortable"
+        ref={sortable.ref}
         classList={{
           'opacity-25': sortable.isActiveDraggable,
           'transition-transform': !!state.active.draggable,
         }}
+        style={transformStyle(sortable.transform)}
       >
-        <div class="flex cursor-grab justify-between py-2">
-          <span class="select-none">{t(key)}</span>
+        <div class="flex justify-between py-2">
+          <div class="flex items-center gap-2">
+            <Button
+              class="btn-ghost btn-sm cursor-grab"
+              icon={<IconMenuOrder size={24} />}
+              {...sortable.dragActivators}
+            />
+
+            <span>{t(key)}</span>
+          </div>
 
           <input
             type="checkbox"
