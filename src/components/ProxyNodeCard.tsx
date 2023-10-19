@@ -26,7 +26,7 @@ export const ProxyNodeCard = (props: {
   return (
     <div
       class={twMerge(
-        'card card-bordered tooltip-bottom flex flex-col gap-1 border-neutral-focus bg-neutral p-2 text-neutral-content shadow-lg',
+        'card card-bordered tooltip-bottom flex flex-col gap-1 border-neutral-focus bg-neutral p-2 text-neutral-content',
         isSelected && 'border-primary bg-primary-content text-primary',
         onClick && 'cursor-pointer',
       )}

@@ -100,7 +100,7 @@ export const Header = () => {
   const [openedDrawer, setOpenedDrawer] = createSignal(false)
 
   return (
-    <ul class="navbar sticky inset-x-0 top-0 z-50 flex w-auto items-center justify-center bg-base-300 px-4 shadow-lg">
+    <ul class="navbar z-50 flex w-auto items-center justify-center bg-base-300 px-4 shadow-lg">
       <div class="navbar-start gap-4">
         <div class="drawer w-auto lg:hidden">
           <input

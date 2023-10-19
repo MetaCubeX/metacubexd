@@ -47,7 +47,7 @@ export const App = () => {
     <I18nProvider locale={locale()}>
       <div
         class={twMerge(
-          'relative flex h-screen flex-col overscroll-y-none subpixel-antialiased p-safe',
+          'relative flex h-screen flex-col overscroll-y-none subpixel-antialiased',
           useTwemoji() ? 'font-twemoji' : 'font-no-twemoji',
         )}
         data-theme={curTheme()}
@@ -55,23 +55,25 @@ export const App = () => {
         <Header />
 
         <div class="flex-1 overflow-y-auto p-2 sm:p-4">
-          <Routes>
+          <div class="pb-8">
+            <Routes>
+              <Show when={endpoint()}>
+                <Route path={ROUTES.Overview} component={Overview} />
+                <Route path={ROUTES.Proxies} component={Proxies} />
+                <Route path={ROUTES.Rules} component={Rules} />
+                <Route path={ROUTES.Conns} component={Connections} />
+                <Route path={ROUTES.Log} component={Logs} />
+                <Route path={ROUTES.Config} component={Config} />
+                <Route path="*" element={<Navigate href={ROUTES.Overview} />} />
+              </Show>
+
+              <Route path={endpoint() ? ROUTES.Setup : '*'} component={Setup} />
+            </Routes>
+
             <Show when={endpoint()}>
-              <Route path={ROUTES.Overview} component={Overview} />
-              <Route path={ROUTES.Proxies} component={Proxies} />
-              <Route path={ROUTES.Rules} component={Rules} />
-              <Route path={ROUTES.Conns} component={Connections} />
-              <Route path={ROUTES.Log} component={Logs} />
-              <Route path={ROUTES.Config} component={Config} />
-              <Route path="*" element={<Navigate href={ROUTES.Overview} />} />
+              <ProtectedResources />
             </Show>
-
-            <Route path={endpoint() ? ROUTES.Setup : '*'} component={Setup} />
-          </Routes>
-
-          <Show when={endpoint()}>
-            <ProtectedResources />
-          </Show>
+          </div>
         </div>
 
         <Toaster position="bottom-center" />
