@@ -26,7 +26,7 @@ export const ProxyNodeCard = (props: {
   return (
     <div
       class={twMerge(
-        'card card-bordered tooltip-bottom flex flex-col gap-1 border-neutral-focus bg-neutral p-2 text-neutral-content',
+        'card card-bordered tooltip-bottom flex flex-col justify-between gap-1 border-neutral-focus bg-neutral p-2 text-neutral-content',
         isSelected && 'border-primary bg-primary-content text-primary',
         onClick && 'cursor-pointer',
       )}
@@ -34,7 +34,7 @@ export const ProxyNodeCard = (props: {
       title={proxyName}
     >
       <div class="flex items-center justify-between gap-2">
-        <span class="truncate text-left text-sm">{proxyName}</span>
+        <span class="text-left text-sm">{proxyName}</span>
 
         <Button
           class="btn-circle btn-ghost h-auto min-h-0 w-auto"
@@ -58,7 +58,7 @@ export const ProxyNodeCard = (props: {
       <div class="flex items-center justify-between gap-1">
         <div
           class={twMerge(
-            'truncate text-xs text-slate-500',
+            'text-xs text-slate-500',
             isSelected && 'text-primary',
           )}
         >
