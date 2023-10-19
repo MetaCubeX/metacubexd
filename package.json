@@ -54,7 +54,7 @@
     "husky": "^8.0.3",
     "is-ip": "^5.0.1",
     "ky": "^1.1.0",
-    "lint-staged": "^15.0.1",
+    "lint-staged": "^15.0.2",
     "lodash": "^4.17.21",
     "match-sorter": "^6.3.1",
     "prettier": "^3.0.3",
