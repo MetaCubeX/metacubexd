@@ -69,8 +69,8 @@ dependencies:
     specifier: ^0.7.4
     version: 0.7.4(solid-js@1.8.3)
   '@types/byte-size':
-    specifier: ^8.1.0
-    version: 8.1.0
+    specifier: ^8.1.1
+    version: 8.1.1
   '@types/lodash':
     specifier: ^4.14.200
     version: 4.14.200
@@ -2267,8 +2267,8 @@ packages:
       '@babel/types': 7.23.0
     dev: false
 
-  /@types/byte-size@8.1.0:
-    resolution: {integrity: sha512-LCIlZh8vyx+I2fgRycE1D34c33QDppYY6quBYYoaOpQ1nGhJ/avSP2VlrAefVotjJxgSk6WkKo0rTcCJwGG7vA==}
+  /@types/byte-size@8.1.1:
+    resolution: {integrity: sha512-W2wYneHxtHj+NRNgfx3hduTZXRBq7cgFfkvlKytwmROLhUa+hi7XFyWLYecYiCxGsvni1he3ki8cKVNqYNM/Xg==}
     dev: false
 
   /@types/estree@0.0.39:
