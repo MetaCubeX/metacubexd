@@ -16,6 +16,7 @@ import {
   latencyTestTimeoutDuration,
   latestConnectionMsg,
   restructRawMsgToConnection,
+  urlForIPv6SupportTest,
   urlForLatencyTest,
 } from '~/signals'
 import type { Proxy, ProxyNode, ProxyProvider } from '~/types'
@@ -56,6 +57,9 @@ const [proxyProviders, setProxyProviders] = createSignal<
 >([])
 
 const [latencyMap, setLatencyMap] = createSignal<Record<string, number>>({})
+const [proxyIPv6SupportMap, setProxyIPv6SupportMap] = createSignal<
+  Record<string, boolean>
+>({})
 const [proxyNodeMap, setProxyNodeMap] = createSignal<Record<string, ProxyInfo>>(
   {},
 )
@@ -65,20 +69,43 @@ const setProxiesInfo = (
 ) => {
   const newProxyNodeMap = { ...proxyNodeMap() }
   const newLatencyMap = { ...latencyMap() }
+  const newProxyIPv6SupportMap = { ...proxyIPv6SupportMap() }
+
+  const lastDelay = (
+    proxy: Pick<Proxy, 'extra' | 'history'>,
+    url: string,
+    fallbackDefault = true,
+  ) => {
+    const extra = proxy.extra?.[url] as Proxy['history'] | undefined
+
+    if (Array.isArray(extra)) {
+      const delay = extra.at(-1)?.delay
+
+      if (delay || !fallbackDefault) {
+        return delay
+      }
+    }
+
+    return proxy.history?.at(-1)?.delay
+  }
 
   proxies.forEach((proxy) => {
     const { udp, xudp, type, now, name, provider = '' } = proxy
+    newProxyNodeMap[proxy.name] = { udp, xudp, type, now, name, provider }
 
     const latency =
-      proxy.history.at(-1)?.delay || latencyQualityMap().NOT_CONNECTED
-
-    newProxyNodeMap[proxy.name] = { udp, xudp, type, now, name, provider }
+      lastDelay(proxy, urlForLatencyTest()) || latencyQualityMap().NOT_CONNECTED
     newLatencyMap[proxy.name] = latency
+
+    const proxyIPv6Support =
+      (lastDelay(proxy, urlForIPv6SupportTest(), false) ?? 0) > 0
+    newProxyIPv6SupportMap[proxy.name] = proxyIPv6Support
   })
 
   batch(() => {
     setProxyNodeMap(newProxyNodeMap)
     setLatencyMap(newLatencyMap)
+    setProxyIPv6SupportMap(newProxyIPv6SupportMap)
   })
 }
 
@@ -144,7 +171,56 @@ export const useProxies = () => {
     }
   }
 
-  const proxyLatencyTest = (proxyName: string, provider: string) =>
+  const proxyIPv6SupportTest = async (proxyName: string, provider: string) => {
+    const urlForTest = urlForIPv6SupportTest()
+
+    if (!urlForTest || urlForTest.length === 0) {
+      setProxyIPv6SupportMap({})
+
+      return
+    }
+
+    let support = false
+    try {
+      const { delay } = await proxyLatencyTestAPI(
+        proxyName,
+        provider,
+        urlForTest,
+        latencyTestTimeoutDuration(),
+      )
+      support = delay > 0
+    } catch {
+      support = false
+    }
+    setProxyIPv6SupportMap((supportMap) => ({
+      ...supportMap,
+      [proxyName]: support,
+    }))
+  }
+  const proxyGroupIPv6SupportTest = async (proxyGroupName: string) => {
+    const urlForTest = urlForIPv6SupportTest()
+
+    if (!urlForTest || urlForTest.length === 0) {
+      setProxyIPv6SupportMap({})
+
+      return
+    }
+
+    const newLatencyMap = await proxyGroupLatencyTestAPI(
+      proxyGroupName,
+      urlForTest,
+      latencyTestTimeoutDuration(),
+    )
+    const newSupportMap = Object.fromEntries(
+      Object.entries(newLatencyMap).map(([k, v]) => [k, v > 0]),
+    )
+    setProxyIPv6SupportMap((supportMap) => ({
+      ...supportMap,
+      ...newSupportMap,
+    }))
+  }
+
+  const proxyLatencyTest = async (proxyName: string, provider: string) => {
     setProxyLatencyTestingMap(proxyName, async () => {
       const { delay } = await proxyLatencyTestAPI(
         proxyName,
@@ -158,8 +234,10 @@ export const useProxies = () => {
         [proxyName]: delay,
       }))
     })
+    await proxyIPv6SupportTest(proxyName, provider)
+  }
 
-  const proxyGroupLatencyTest = (proxyGroupName: string) =>
+  const proxyGroupLatencyTest = async (proxyGroupName: string) => {
     setProxyGroupLatencyTestingMap(proxyGroupName, async () => {
       const newLatencyMap = await proxyGroupLatencyTestAPI(
         proxyGroupName,
@@ -174,6 +252,8 @@ export const useProxies = () => {
 
       await fetchProxies()
     })
+    await proxyGroupIPv6SupportTest(proxyGroupName)
+  }
 
   const updateProviderByProviderName = (providerName: string) =>
     setUpdatingMap(providerName, async () => {
@@ -206,6 +286,7 @@ export const useProxies = () => {
   return {
     collapsedMap,
     setCollapsedMap,
+    proxyIPv6SupportMap,
     proxyLatencyTestingMap,
     proxyGroupLatencyTestingMap,
     proxyProviderLatencyTestingMap,
