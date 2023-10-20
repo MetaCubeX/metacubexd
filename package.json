@@ -45,7 +45,7 @@
     "apexcharts": "^3.44.0",
     "autoprefixer": "^10.4.16",
     "byte-size": "^8.1.1",
-    "commitlint": "^17.8.0",
+    "commitlint": "^18.0.0",
     "daisyui": "^3.9.3",
     "dayjs": "^1.11.10",
     "eslint": "^8.51.0",
