@@ -48,7 +48,7 @@ export default {
   auto: '自适应',
   off: '关闭',
   proxiesPreviewType: '节点组预览样式',
-  urlForIPv6SupportTest: 'IPv6 支持测试链接',
+  urlForIPv6SupportTest: '测试 IPv6 支持链接',
   urlForLatencyTest: '测速链接',
   autoCloseConns: '自动断开连接',
   useTwemoji: '使用 Twemoji Mozilla 字体',
