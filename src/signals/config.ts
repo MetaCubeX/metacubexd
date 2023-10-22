@@ -36,6 +36,12 @@ export const [urlForLatencyTest, setUrlForLatencyTest] = makePersisted(
   createSignal('https://www.gstatic.com/generate_204'),
   { name: 'urlForLatencyTest', storage: localStorage },
 )
+
+export const [urlForIPv6SupportTest, setUrlIPv6SupportTest] = makePersisted(
+  createSignal('https://api-ipv6.ip.sb/ip'),
+  { name: 'urlForIPv6SupportTest', storage: localStorage },
+)
+
 export const [autoCloseConns, setAutoCloseConns] = makePersisted(
   createSignal(false),
   { name: 'autoCloseConns', storage: localStorage },

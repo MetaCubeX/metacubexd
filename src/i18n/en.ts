@@ -46,6 +46,7 @@ export default {
   auto: 'Auto',
   off: 'Off',
   proxiesPreviewType: 'Proxies preview type',
+  urlForIPv6SupportTest: 'URL for IPv6 support test',
   urlForLatencyTest: 'URL for latency test',
   autoCloseConns: 'Automatically Close connections',
   useTwemoji: 'Use Twemoji Mozilla Font',

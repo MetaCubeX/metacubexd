@@ -1,7 +1,7 @@
 import { IconBrandSpeedtest } from '@tabler/icons-solidjs'
 import { createMemo, Show } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import { Button, Latency } from '~/components'
+import { Button, IPv6Support, Latency } from '~/components'
 import { filterSpecialProxyType, formatProxyType } from '~/helpers'
 import { useProxies } from '~/signals'
 
@@ -36,23 +36,26 @@ export const ProxyNodeCard = (props: {
       <div class="flex items-center justify-between gap-2">
         <span class="text-left text-sm">{proxyName}</span>
 
-        <Button
-          class="btn-circle btn-ghost h-auto min-h-0 w-auto"
-          icon={
-            <IconBrandSpeedtest
-              size={20}
-              class={twMerge(
-                proxyLatencyTestingMap()[proxyName] &&
-                  'animate-pulse text-success',
-              )}
-            />
-          }
-          onClick={(e) => {
-            e.stopPropagation()
+        <span class="flex items-center gap-1">
+          <IPv6Support name={props.proxyName} />
+          <Button
+            class="btn-circle btn-ghost h-auto min-h-0 w-auto"
+            icon={
+              <IconBrandSpeedtest
+                size={20}
+                class={twMerge(
+                  proxyLatencyTestingMap()[proxyName] &&
+                    'animate-pulse text-success',
+                )}
+              />
+            }
+            onClick={(e) => {
+              e.stopPropagation()
 
-            void proxyLatencyTest(proxyName, proxyNode().provider)
-          }}
-        />
+              void proxyLatencyTest(proxyName, proxyNode().provider)
+            }}
+          />
+        </span>
       </div>
 
       <div class="flex items-center justify-between gap-1">
