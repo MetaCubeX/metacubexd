@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.126.0](https://github.com/MetaCubeX/metacubexd/compare/v1.125.0...v1.126.0) (2023-10-22)
+
+
+### Features
+
+* add support for IPv6 check ([#403](https://github.com/MetaCubeX/metacubexd/issues/403)) ([4d5543c](https://github.com/MetaCubeX/metacubexd/commit/4d5543c64b32263ef1288aac19d3d749abddb59b))
+
 ## [1.125.0](https://github.com/MetaCubeX/metacubexd/compare/v1.124.3...v1.125.0) (2023-10-19)
 
 
