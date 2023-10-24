@@ -15,8 +15,8 @@ dependencies:
     specifier: ^1.0.17
     version: 1.0.17(zod@3.22.4)
   '@fontsource/fira-sans':
-    specifier: ^5.0.16
-    version: 5.0.16
+    specifier: ^5.0.17
+    version: 5.0.17
   '@solid-primitives/clipboard':
     specifier: ^1.5.7
     version: 1.5.7(solid-js@1.8.3)
@@ -1870,8 +1870,8 @@ packages:
       zod: 3.22.4
     dev: false
 
-  /@fontsource/fira-sans@5.0.16:
-    resolution: {integrity: sha512-fQQ6rGQDv+gMaNFagge9e7XkcO1XfIbkCF8FrwuRnYc5SeBl7+9dnysbAXPb/fFXksG7XpR2mtBX+UvBPUJE3g==}
+  /@fontsource/fira-sans@5.0.17:
+    resolution: {integrity: sha512-UAXX8YkVhU5OeLPIw3KezI9XgZPSEkf96wpstqWM9U6qFbc3KD+6ANfG1LkPxrsGi+XmbTKZayO5MGnkiiaTyw==}
     dev: false
 
   /@humanwhocodes/config-array@0.11.13:
