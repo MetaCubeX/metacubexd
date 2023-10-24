@@ -39,7 +39,7 @@
     "@types/lodash": "^4.14.200",
     "@types/node": "^20.8.7",
     "@types/uuid": "^9.0.6",
-    "@typescript-eslint/eslint-plugin": "^6.8.0",
+    "@typescript-eslint/eslint-plugin": "^6.9.0",
     "@typescript-eslint/parser": "^6.9.0",
     "@vite-pwa/assets-generator": "^0.0.10",
     "apexcharts": "^3.44.0",
