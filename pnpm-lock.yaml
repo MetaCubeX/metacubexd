@@ -159,8 +159,8 @@ dependencies:
     specifier: ^1.14.0
     version: 1.14.0
   tailwindcss:
-    specifier: ^3.3.4
-    version: 3.3.4(ts-node@10.9.1)
+    specifier: ^3.3.5
+    version: 3.3.5(ts-node@10.9.1)
   typescript:
     specifier: ^5.2.2
     version: 5.2.2
@@ -3126,7 +3126,7 @@ packages:
       css-selector-tokenizer: 0.8.0
       postcss: 8.4.31
       postcss-js: 4.0.1(postcss@8.4.31)
-      tailwindcss: 3.3.4(ts-node@10.9.1)
+      tailwindcss: 3.3.5(ts-node@10.9.1)
     transitivePeerDependencies:
       - ts-node
     dev: false
@@ -5932,8 +5932,8 @@ packages:
     resolution: {integrity: sha512-3mFKyCo/MBcgyOTlrY8T7odzZFx+w+qKSMAmdFzRvqBfLlSigU6TZnlFHK0lkMwj9Bj8OYU+9yW9lmGuS0QEnQ==}
     dev: false
 
-  /tailwindcss@3.3.4(ts-node@10.9.1):
-    resolution: {integrity: sha512-JXZNOkggUAc9T5E7nCrimoXHcSf9h3NWFe5sh36CGD/3M5TRLuQeFnQoDsit2uVTqgoOZHLx5rTykLUu16vsMQ==}
+  /tailwindcss@3.3.5(ts-node@10.9.1):
+    resolution: {integrity: sha512-5SEZU4J7pxZgSkv7FP1zY8i2TIAOooNZ1e/OGtxIEv6GltpoiXUqWvLy89+a10qYTB1N5Ifkuw9lqQkN9sscvA==}
     engines: {node: '>=14.0.0'}
     hasBin: true
     dependencies:
