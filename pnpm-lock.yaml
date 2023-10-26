@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@commitlint/config-conventional':
-    specifier: ^18.0.0
-    version: 18.0.0
+    specifier: ^18.1.0
+    version: 18.1.0
   '@felte/solid':
     specifier: ^1.2.11
     version: 1.2.11(solid-js@1.8.3)
@@ -1448,8 +1448,8 @@ packages:
       - '@swc/wasm'
     dev: false
 
-  /@commitlint/config-conventional@18.0.0:
-    resolution: {integrity: sha512-XZW3MDwhMWwr7pf+jO5F18ohBwrJ8mt+1OPhkVyO8bYrY0dKPE5tPpdXlDt+JCFurl4VnUDPmu6xZ4/cKCH7cA==}
+  /@commitlint/config-conventional@18.1.0:
+    resolution: {integrity: sha512-8vvvtV3GOLEMHeKc8PjRL1lfP1Y4B6BG0WroFd9PJeRiOc3nFX1J0wlJenLURzl9Qus6YXVGWf+a/ZlbCKT3AA==}
     engines: {node: '>=v18'}
     dependencies:
       conventional-changelog-conventionalcommits: 7.0.2
