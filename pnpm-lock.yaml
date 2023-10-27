@@ -45,8 +45,8 @@ dependencies:
     specifier: ^1.3.7
     version: 1.3.7(solid-js@1.8.4)
   '@solid-primitives/websocket':
-    specifier: ^1.1.0
-    version: 1.1.0(solid-js@1.8.4)
+    specifier: ^1.2.0
+    version: 1.2.0(solid-js@1.8.4)
   '@solidjs/router':
     specifier: ^0.8.3
     version: 0.8.3(solid-js@1.8.4)
@@ -2120,8 +2120,8 @@ packages:
       solid-js: 1.8.4
     dev: false
 
-  /@solid-primitives/websocket@1.1.0(solid-js@1.8.4):
-    resolution: {integrity: sha512-4GLsJsusG4qh5TT/SqPLO7fqUoAXMOspaSls4MFtdzpbfNI/QQSOzSnrTl84wgzu/HdNe68Ho2mvCWLdy/mFtA==}
+  /@solid-primitives/websocket@1.2.0(solid-js@1.8.4):
+    resolution: {integrity: sha512-Ft74wlLD/zrOSDUq4zMDDEs4Bf7ywQO52zOMQqijLYZ9ndvepje5Eb1xiFGnfZ2kcbKaLUfnqIQxVZVB7FGnPQ==}
     peerDependencies:
       solid-js: ^1.6.12
     dependencies:
