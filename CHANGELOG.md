@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.127.0](https://github.com/MetaCubeX/metacubexd/compare/v1.126.0...v1.127.0) (2023-10-29)
+
+
+### Features
+
+* **config:** tun mode stack: `Mixed`, closes [#431](https://github.com/MetaCubeX/metacubexd/issues/431) ([59d7b04](https://github.com/MetaCubeX/metacubexd/commit/59d7b04d5ce5431c4b165c1d781be32eaa9cc4ff))
+
+
+### Bug Fixes
+
+* **proxy:** proxy node card layout issue, closes [#429](https://github.com/MetaCubeX/metacubexd/issues/429) ([88bfcf8](https://github.com/MetaCubeX/metacubexd/commit/88bfcf8d731e0d2c57f31d2ba2af2d603c66bf16))
+
 ## [1.126.0](https://github.com/MetaCubeX/metacubexd/compare/v1.125.0...v1.126.0) (2023-10-22)
 
 
