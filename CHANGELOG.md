@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.128.1](https://github.com/MetaCubeX/metacubexd/compare/v1.128.0...v1.128.1) (2023-10-29)
+
+
+### Bug Fixes
+
+* **proxy:** proxy preview bar style issue ([54226bc](https://github.com/MetaCubeX/metacubexd/commit/54226bcdc4b205dffad5d4b9358ebc42525b1f31))
+
 ## [1.128.0](https://github.com/MetaCubeX/metacubexd/compare/v1.127.0...v1.128.0) (2023-10-29)
 
 
