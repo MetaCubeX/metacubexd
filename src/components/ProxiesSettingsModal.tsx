@@ -9,11 +9,13 @@ import {
   latencyTestTimeoutDuration,
   proxiesOrderingType,
   proxiesPreviewType,
+  renderProxiesInTwoColumns,
   setAutoCloseConns,
   setHideUnAvailableProxies,
   setLatencyTestTimeoutDuration,
   setProxiesOrderingType,
   setProxiesPreviewType,
+  setRenderProxiesInTwoColumns,
   setUrlForLatencyTest,
   setUrlIPv6SupportTest,
   urlForIPv6SupportTest,
@@ -109,6 +111,19 @@ export const ProxiesSettingsModal: Component<{
               type="checkbox"
               checked={hideUnAvailableProxies()}
               onChange={(e) => setHideUnAvailableProxies(e.target.checked)}
+            />
+          </div>
+        </div>
+
+        <div>
+          <ConfigTitle withDivider>{t('renderInTwoColumns')}</ConfigTitle>
+
+          <div class="flex w-full justify-center">
+            <input
+              class="toggle"
+              type="checkbox"
+              checked={renderProxiesInTwoColumns()}
+              onChange={(e) => setRenderProxiesInTwoColumns(e.target.checked)}
             />
           </div>
         </div>

@@ -32,6 +32,12 @@ export const [hideUnAvailableProxies, setHideUnAvailableProxies] =
     storage: localStorage,
   })
 
+export const [renderProxiesInTwoColumns, setRenderProxiesInTwoColumns] =
+  makePersisted(createSignal(true), {
+    name: 'renderProxiesInTwoColumns',
+    storage: localStorage,
+  })
+
 export const [urlForLatencyTest, setUrlForLatencyTest] = makePersisted(
   createSignal('https://www.gstatic.com/generate_204'),
   { name: 'urlForLatencyTest', storage: localStorage },
