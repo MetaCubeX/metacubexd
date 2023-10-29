@@ -42,27 +42,27 @@ export const ProxyPreviewBar = (props: {
 
   return (
     <div class="flex items-center gap-2 py-2">
-      <div class="flex h-4 flex-1 items-center justify-center">
+      <div class="my-2 flex flex-1 items-center justify-center overflow-hidden rounded-2xl [&>*]:h-2">
         <div
-          class="h-2 overflow-hidden rounded-2xl bg-success"
+          class="bg-success"
           style={{
             width: `${(good() * 100) / all()}%`, // cant use tw class, otherwise dynamic classname won't be generated
           }}
         />
         <div
-          class="h-2 overflow-hidden rounded-2xl bg-warning"
+          class="bg-warning"
           style={{
             width: `${(middle() * 100) / all()}%`,
           }}
         />
         <div
-          class="h-2 overflow-hidden rounded-2xl bg-error"
+          class="bg-error"
           style={{
             width: `${(slow() * 100) / all()}%`,
           }}
         />
         <div
-          class="h-2 overflow-hidden rounded-2xl bg-neutral"
+          class="bg-neutral"
           style={{
             width: `${(notConnected() * 100) / all()}%`,
           }}
