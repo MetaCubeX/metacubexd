@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.128.0](https://github.com/MetaCubeX/metacubexd/compare/v1.127.0...v1.128.0) (2023-10-29)
+
+
+### Features
+
+* **proxy:** add back the render proxies in two columns option, closes [#360](https://github.com/MetaCubeX/metacubexd/issues/360) ([62c0cd9](https://github.com/MetaCubeX/metacubexd/commit/62c0cd9a634f768a970afc66e15968f5f8821c5a))
+
 ## [1.127.0](https://github.com/MetaCubeX/metacubexd/compare/v1.126.0...v1.127.0) (2023-10-29)
 
 
