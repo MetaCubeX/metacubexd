@@ -34,7 +34,7 @@ export const ProxyNodeCard = (props: {
       title={proxyName}
     >
       <div class="flex items-center justify-between gap-2">
-        <span class="text-left text-sm">{proxyName}</span>
+        <span class="break-all text-left text-sm">{proxyName}</span>
 
         <span class="flex items-center gap-1">
           <IPv6Support name={props.proxyName} />
