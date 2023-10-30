@@ -126,6 +126,7 @@ export enum CONNECTIONS_TABLE_ACCESSOR_KEY {
   SourceIP = 'sourceIP',
   SourcePort = 'sourcePort',
   Destination = 'destination',
+  InboundUser = 'inboundUser',
 }
 
 export const CONNECTIONS_TABLE_MAX_CLOSED_ROWS = 200

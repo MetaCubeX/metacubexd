@@ -38,6 +38,7 @@ export default {
   sourceIP: 'Source IP',
   sourcePort: 'Source Port',
   destination: 'Destination',
+  inboundUser: 'Inbound User',
   close: 'Close',
   reset: 'Reset',
   dnsQuery: 'DNS Query',
