@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.129.0](https://github.com/MetaCubeX/metacubexd/compare/v1.128.1...v1.129.0) (2023-10-30)
+
+
+### Features
+
+* **connection:** 添加入站用户列 ([#437](https://github.com/MetaCubeX/metacubexd/issues/437)) ([1ba7700](https://github.com/MetaCubeX/metacubexd/commit/1ba7700a3f7f72e0b778a1b4af083231e1d6790c))
+
 ## [1.128.1](https://github.com/MetaCubeX/metacubexd/compare/v1.128.0...v1.128.1) (2023-10-29)
 
 
