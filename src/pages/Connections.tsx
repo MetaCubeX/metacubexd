@@ -242,6 +242,14 @@ export default () => {
         original.metadata.destinationIP ||
         original.metadata.host,
     },
+    {
+      header: () => t('inboundUser'),
+      accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.InboundUser,
+      accessorFn: (original) =>
+        original.metadata.inboundUser ||
+        original.metadata.inboundName ||
+        original.metadata.inboundPort,
+    },
   ]
 
   const [grouping, setGrouping] = createSignal<GroupingState>([])

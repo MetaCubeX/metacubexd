@@ -40,6 +40,7 @@ export default {
   sourceIP: '源地址',
   sourcePort: '源端口',
   destination: '目标地址',
+  inboundUser: '入站用户',
   close: '关闭',
   reset: '重置',
   dnsQuery: 'DNS 查询',
