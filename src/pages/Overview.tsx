@@ -14,7 +14,7 @@ import {
 } from 'solid-js'
 import { CHART_MAX_XAXIS, DEFAULT_CHART_OPTIONS } from '~/constants'
 import { useI18n } from '~/i18n'
-import { latestConnectionMsg, useWsRequest } from '~/signals'
+import { endpoint, latestConnectionMsg, useWsRequest } from '~/signals'
 
 const TrafficWidget: ParentComponent<{ label: JSX.Element }> = (props) => (
   <div class="stat flex-1 place-items-center">
@@ -130,6 +130,10 @@ export default () => {
           />
         </div>
       </div>
+
+      <footer class="footer rounded-box mx-auto mt-4 block bg-neutral p-4 text-center text-lg font-bold text-neutral-content">
+        {endpoint()?.url}
+      </footer>
     </div>
   )
 }

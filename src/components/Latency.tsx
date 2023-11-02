@@ -7,9 +7,7 @@ export const Latency = (props: { name?: string }) => {
   const [t] = useI18n()
   const { latencyMap } = useProxies()
   const [textClassName, setTextClassName] = createSignal('')
-  const latency = createMemo(() => {
-    return latencyMap()[props.name!]
-  })
+  const latency = createMemo(() => latencyMap()[props.name!])
 
   createEffect(() => {
     setTextClassName('text-success')

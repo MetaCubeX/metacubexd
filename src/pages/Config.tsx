@@ -35,7 +35,6 @@ import { isSingBox } from '~/helpers'
 import { locale, setLocale, useI18n } from '~/i18n'
 import {
   autoSwitchTheme,
-  endpoint,
   favDayTheme,
   favNightTheme,
   setAutoSwitchTheme,
@@ -383,6 +382,36 @@ const ConfigForXd = () => {
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
       <div class="flex flex-col gap-2">
         <div class="flex flex-col items-center">
+          <ConfigTitle>{t('useTwemoji')}</ConfigTitle>
+
+          <input
+            type="checkbox"
+            class="toggle"
+            checked={useTwemoji()}
+            onChange={(e) => setUseTwemoji(e.target.checked)}
+          />
+        </div>
+
+        <div class="flex flex-col">
+          <ConfigTitle>{t('switchLanguage')}</ConfigTitle>
+
+          <select
+            class="select select-bordered"
+            onChange={(e) => setLocale(e.target.value as LANG)}
+          >
+            <For each={languages}>
+              {(lang) => (
+                <option selected={locale() === lang.value} value={lang.value}>
+                  {lang.label()}
+                </option>
+              )}
+            </For>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <div class="flex flex-col items-center">
           <ConfigTitle>{t('autoSwitchTheme')}</ConfigTitle>
 
           <input
@@ -429,36 +458,6 @@ const ConfigForXd = () => {
           </div>
         </Show>
       </div>
-
-      <div class="flex flex-col gap-2">
-        <div class="flex flex-col items-center">
-          <ConfigTitle>{t('useTwemoji')}</ConfigTitle>
-
-          <input
-            type="checkbox"
-            class="toggle"
-            checked={useTwemoji()}
-            onChange={(e) => setUseTwemoji(e.target.checked)}
-          />
-        </div>
-
-        <div class="flex flex-col">
-          <ConfigTitle>{t('switchLanguage')}</ConfigTitle>
-
-          <select
-            class="select select-bordered"
-            onChange={(e) => setLocale(e.target.value as LANG)}
-          >
-            <For each={languages}>
-              {(lang) => (
-                <option selected={locale() === lang.value} value={lang.value}>
-                  {lang.label()}
-                </option>
-              )}
-            </For>
-          </select>
-        </div>
-      </div>
     </div>
   )
 }
@@ -477,23 +476,19 @@ const Versions: Component<{ backendVersion: Accessor<string> }> = ({
   })
 
   return (
-    <div class="flex flex-col gap-2">
-      <div class="grid grid-cols-2 gap-4">
-        <kbd class="kbd">{import.meta.env.version}</kbd>
+    <div class="grid grid-cols-2 gap-4">
+      <kbd class="kbd">{import.meta.env.version}</kbd>
 
-        <div class="relative">
-          <Show when={isUpdateAvailable()}>
-            <span class="absolute -right-1 -top-1 flex h-3 w-3">
-              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-info opacity-75" />
-              <span class="inline-flex h-3 w-3 rounded-full bg-info" />
-            </span>
-          </Show>
+      <div class="relative">
+        <Show when={isUpdateAvailable()}>
+          <span class="absolute -right-1 -top-1 flex h-3 w-3">
+            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-info opacity-75" />
+            <span class="inline-flex h-3 w-3 rounded-full bg-info" />
+          </span>
+        </Show>
 
-          <kbd class="kbd w-full">{backendVersion()}</kbd>
-        </div>
+        <kbd class="kbd w-full">{backendVersion()}</kbd>
       </div>
-
-      <h1 class="text-center text-lg font-bold">{endpoint()?.url}</h1>
     </div>
   )
 }
