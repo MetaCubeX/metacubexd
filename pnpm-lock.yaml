@@ -66,8 +66,8 @@ dependencies:
     specifier: 3.0.0-beta.68
     version: 3.0.0-beta.68
   '@thisbeyond/solid-dnd':
-    specifier: ^0.7.4
-    version: 0.7.4(solid-js@1.8.5)
+    specifier: ^0.7.5
+    version: 0.7.5(solid-js@1.8.5)
   '@types/byte-size':
     specifier: ^8.1.1
     version: 8.1.1
@@ -2200,8 +2200,9 @@ packages:
     resolution: {integrity: sha512-CnvsEJWK7cugigckt13AeY80FMzH+OMdEP0j0bS3/zjs44NiRe49x8FZC6R9suRXGMVMXtUHet0zbTp/Ec9Wfg==}
     dev: false
 
-  /@thisbeyond/solid-dnd@0.7.4(solid-js@1.8.5):
-    resolution: {integrity: sha512-jgV9EtR3gAtVsILG8p1OAGrhHIgnK4W04YxpyLgJRCDKEFYQWuDrMdUe8F5Kc6pcVXlC4IMXr4cB8fS2Ut3/Ow==}
+  /@thisbeyond/solid-dnd@0.7.5(solid-js@1.8.5):
+    resolution: {integrity: sha512-DfI5ff+yYGpK9M21LhYwIPlbP2msKxN2ARwuu6GF8tT1GgNVDTI8VCQvH4TJFoVApP9d44izmAcTh/iTCH2UUw==}
+    engines: {node: '>=18.0.0', pnpm: '>=8.6.0'}
     peerDependencies:
       solid-js: ^1.5
     dependencies:
