@@ -61,11 +61,11 @@ export const [autoSwitchTheme, setAutoSwitchTheme] = makePersisted(
   { name: 'autoSwitchTheme', storage: localStorage },
 )
 export const [favDayTheme, setFavDayTheme] = makePersisted(
-  createSignal<(typeof themes)[number]>('lofi'),
+  createSignal<(typeof themes)[number]>('nord'),
   { name: 'favDayTheme', storage: localStorage },
 )
 export const [favNightTheme, setFavNightTheme] = makePersisted(
-  createSignal<(typeof themes)[number]>('business'),
+  createSignal<(typeof themes)[number]>('sunset'),
   { name: 'favNightTheme', storage: localStorage },
 )
 export const [connectionsTableSize, setConnectionsTableSize] = makePersisted(
