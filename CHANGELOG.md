@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.132.0](https://github.com/MetaCubeX/metacubexd/compare/v1.131.0...v1.132.0) (2023-12-01)
+
+
+### Features
+
+* new themes ([677d024](https://github.com/MetaCubeX/metacubexd/commit/677d024e988d67076f5a7bd4c716021a83bb3681))
+
 ## [1.131.0](https://github.com/MetaCubeX/metacubexd/compare/v1.130.0...v1.131.0) (2023-12-01)
 
 
