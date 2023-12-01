@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.133.0](https://github.com/MetaCubeX/metacubexd/compare/v1.132.0...v1.133.0) (2023-12-01)
+
+
+### Features
+
+* proxy group is always placed at the forefront when sorting proxies ([#458](https://github.com/MetaCubeX/metacubexd/issues/458)) ([a0f80aa](https://github.com/MetaCubeX/metacubexd/commit/a0f80aa62dc4ed90fed288019fc00ec26b952316))
+
 ## [1.132.0](https://github.com/MetaCubeX/metacubexd/compare/v1.131.0...v1.132.0) (2023-12-01)
 
 
