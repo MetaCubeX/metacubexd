@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.130.0](https://github.com/MetaCubeX/metacubexd/compare/v1.129.0...v1.130.0) (2023-11-02)
+
+
+### Features
+
+* display current selected endpoint at the bottom of the overview page ([3e92373](https://github.com/MetaCubeX/metacubexd/commit/3e92373166620dc52cbd8cdf5bfedc88296edf6e))
+
 ## [1.129.0](https://github.com/MetaCubeX/metacubexd/compare/v1.128.1...v1.129.0) (2023-10-30)
 
 
