@@ -124,14 +124,7 @@ pnpm build
 pnpm serve
 ```
 
-## Contributors
-
-This project is only possible thanks to these amazing people.
-
-![contributors](https://contributors.nn.ci/api?repo=metacubex/metacubexd)
-
 ## Credits
 
-- [Clash.Meta](https://github.com/MetaCubeX/Clash.Meta)
 - [SolidJS](https://github.com/solidjs/solid)
 - [daisyUI](https://github.com/saadeghi/daisyui)
