@@ -38,12 +38,17 @@ export const sortProxiesByOrderingType = (
   proxyNames: string[],
   proxyLatencyMap: Record<string, number>,
   orderingType: PROXIES_ORDERING_TYPE,
+  proxyGroupNames: Set<string> | undefined,
 ) => {
   if (orderingType === PROXIES_ORDERING_TYPE.NATURAL) {
     return proxyNames
   }
 
   return proxyNames.sort((a, b) => {
+    if (proxyGroupNames?.has(a) && !proxyGroupNames?.has(b)) return -1
+
+    if (proxyGroupNames?.has(b) && !proxyGroupNames?.has(a)) return 1
+
     const prevLatency = proxyLatencyMap[a]
     const nextLatency = proxyLatencyMap[b]
 
@@ -77,10 +82,13 @@ export const sortProxiesByOrderingType = (
 export const filterProxiesByAvailability = (
   proxyNames: string[],
   proxyLatencyMap: Record<string, number>,
+  excludes: Set<string>,
   enabled?: boolean,
 ) =>
   enabled
-    ? proxyNames.filter(
-        (name) => proxyLatencyMap[name] !== latencyQualityMap().NOT_CONNECTED,
+    ? proxyNames.filter((name) =>
+        excludes?.has(name)
+          ? true
+          : proxyLatencyMap[name] !== latencyQualityMap().NOT_CONNECTED,
       )
     : proxyNames

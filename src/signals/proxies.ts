@@ -52,6 +52,9 @@ const [isAllProviderUpdating, setIsAllProviderUpdating] = createSignal(false)
 
 // these signals should be global state
 const [proxies, setProxies] = createSignal<ProxyWithProvider[]>([])
+const [proxyGroupNames, setProxyGroupNames] = createSignal<Set<string>>(
+  new Set(),
+)
 const [proxyProviders, setProxyProviders] = createSignal<
   (ProxyProvider & { proxies: ProxyNodeWithProvider[] })[]
 >([])
@@ -89,18 +92,45 @@ const setProxiesInfo = (
     return proxy.history?.at(-1)?.delay
   }
 
+  const dependedLatencyProxies = {} as Record<string, Set<string>>
+
   proxies.forEach((proxy) => {
     const { udp, xudp, type, now, name, provider = '' } = proxy
     newProxyNodeMap[proxy.name] = { udp, xudp, type, now, name, provider }
 
-    const latency =
-      lastDelay(proxy, urlForLatencyTest()) || latencyQualityMap().NOT_CONNECTED
-    newLatencyMap[proxy.name] = latency
+    // to solve the problem of the ProxyGroup cannot obtain the latency of the currently used proxy node
+    // it seems that only clash.core and clash.preminu have issues
+    if (!now) {
+      newLatencyMap[proxy.name] =
+        lastDelay(proxy, urlForLatencyTest()) ||
+        latencyQualityMap().NOT_CONNECTED
+    } else if (newLatencyMap[now] !== undefined) {
+      newLatencyMap[proxy.name] = newLatencyMap[now]
+    } else {
+      const dependencies = dependedLatencyProxies[now] ?? new Set()
+      dependencies.add(proxy.name)
+      dependedLatencyProxies[now] = dependencies
+    }
 
     const proxyIPv6Support =
       (lastDelay(proxy, urlForIPv6SupportTest(), false) ?? 0) > 0
     newProxyIPv6SupportMap[proxy.name] = proxyIPv6Support
   })
+
+  const independencies = Object.keys(dependedLatencyProxies).filter(
+    (now) => newLatencyMap[now] !== undefined,
+  )
+
+  // maybe we should use Union-Find to implement this
+  while (independencies.length > 0) {
+    const now = independencies.shift()!
+    const delay = newLatencyMap[now]!
+
+    for (const name of dependedLatencyProxies[now]?.values() ?? []) {
+      newLatencyMap[name] = delay
+      independencies.push(name)
+    }
+  }
 
   batch(() => {
     setProxyNodeMap(newProxyNodeMap)
@@ -142,6 +172,9 @@ export const useProxies = () => {
 
     batch(() => {
       setProxies(sortedProxies)
+      setProxyGroupNames(
+        new Set(['DIRECT', 'REJECT', ...sortedProxies.map((p) => p.name)]),
+      )
       setProxyProviders(sortedProviders)
       setProxiesInfo(allProxies)
     })
@@ -293,6 +326,7 @@ export const useProxies = () => {
     updatingMap,
     isAllProviderUpdating,
     proxies,
+    proxyGroupNames,
     proxyProviders,
     proxyLatencyTest,
     proxyGroupLatencyTest,
