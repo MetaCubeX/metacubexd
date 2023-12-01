@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.133.1](https://github.com/MetaCubeX/metacubexd/compare/v1.133.0...v1.133.1) (2023-12-01)
+
+
+### Bug Fixes
+
+* virtual scroll ([73fb1a7](https://github.com/MetaCubeX/metacubexd/commit/73fb1a7ed49ef6dfc72198cf271526a04f023247))
+
 ## [1.133.0](https://github.com/MetaCubeX/metacubexd/compare/v1.132.0...v1.133.0) (2023-12-01)
 
 
