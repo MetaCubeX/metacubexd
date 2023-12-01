@@ -41,6 +41,7 @@ export default () => {
     proxies,
     selectProxyInGroup,
     latencyMap,
+    proxyGroupNames,
     proxyProviders,
     updateProviderByProviderName,
     updateAllProvider,
@@ -157,8 +158,10 @@ export default () => {
                       proxyGroup.all ?? [],
                       latencyMap(),
                       proxiesOrderingType(),
+                      proxyGroupNames(),
                     ),
                     latencyMap(),
+                    proxyGroupNames(),
                     hideUnAvailableProxies(),
                   ),
                 )
@@ -244,6 +247,7 @@ export default () => {
                     proxyProvider.proxies.map((i) => i.name) ?? [],
                     latencyMap(),
                     proxiesOrderingType(),
+                    undefined,
                   ),
                 )
 
