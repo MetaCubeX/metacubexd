@@ -11,10 +11,10 @@ services:
   # optional
   meta:
     container_name: meta
-    image: docker.io/metacubex/clash-meta:Alpha
+    image: docker.io/metacubex/mihomo:Alpha
     restart: always
     network_mode: host
     cap_add:
       - NET_ADMIN
     volumes:
-      - ./config.yaml:/root/.config/clash
+      - ./config.yaml:/root/.config/mihomo

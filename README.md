@@ -1,6 +1,6 @@
 # metacubexd
 
-Clash.Meta Dashboard, The Official One, XD
+Mihomo Dashboard, The Official One, XD
 
 ![preview-overview](https://assets.solidjs.com/banner?project=metacubexd)
 
@@ -36,19 +36,19 @@ external-controller: 0.0.0.0:9090
 > First time setup
 
 ```shell
-git clone https://github.com/metacubex/metacubexd.git -b gh-pages /etc/clash-meta/ui
+git clone https://github.com/metacubex/metacubexd.git -b gh-pages /etc/mihomo/ui
 ```
 
 Make sure you have external-ui directory set correctly in your config file
 
 ```yaml
-external-ui: /etc/clash-meta/ui
+external-ui: /etc/mihomo/ui
 ```
 
 > Update
 
 ```shell
-git -C /etc/clash-meta/ui pull -r
+git -C /etc/mihomo/ui pull -r
 ```
 
 ### Run inside Docker
@@ -83,13 +83,13 @@ services:
   # optional
   meta:
     container_name: meta
-    image: docker.io/metacubex/clash-meta:Alpha
+    image: docker.io/metacubex/mihomo:Alpha
     restart: always
     network_mode: host
     cap_add:
       - NET_ADMIN
     volumes:
-      - ./config.yaml:/root/.config/clash
+      - ./config.yaml:/root/.config/mihomo
 ```
 
 Running
