@@ -209,7 +209,12 @@ export const updateRuleProviderAPI = (providerName: string) => {
   return request.put(`providers/rules/${providerName}`)
 }
 
+type ReleaseAPIResponse = {
+  assets: { name: string }[]
+}
+
 export const isUpdateAvailableAPI = async (versionResponse: string) => {
+  const repositoryURL = 'https://api.github.com/repos/MetaCubeX/mihomo'
   const match = /(alpha|beta|meta)-?(\w+)/.exec(versionResponse)
 
   if (!match) {
@@ -221,12 +226,8 @@ export const isUpdateAvailableAPI = async (versionResponse: string) => {
 
   if (channel === 'meta') {
     const { assets } = await ky
-      .get('https://api.github.com/repos/MetaCubeX/Clash.Meta/releases/latest')
-      .json<{
-        assets: {
-          name: string
-        }[]
-      }>()
+      .get(`${repositoryURL}/releases/latest`)
+      .json<ReleaseAPIResponse>()
 
     const alreadyLatest = assets.some(({ name }) => name.includes(version))
 
@@ -235,14 +236,8 @@ export const isUpdateAvailableAPI = async (versionResponse: string) => {
 
   if (channel === 'alpha') {
     const { assets } = await ky
-      .get(
-        'https://api.github.com/repos/MetaCubeX/Clash.Meta/releases/tags/Prerelease-Alpha',
-      )
-      .json<{
-        assets: {
-          name: string
-        }[]
-      }>()
+      .get(`${repositoryURL}/releases/tags/Prerelease-Alpha`)
+      .json<ReleaseAPIResponse>()
 
     const alreadyLatest = assets.some(({ name }) => name.includes(version))
 

@@ -40,10 +40,10 @@ const ThemeSwitcher = () => (
       </label>
     </div>
 
-    <div class="drawer-side">
+    <div class="drawer-side overflow-x-hidden">
       <label for="themes" class="drawer-overlay" />
 
-      <ul class="menu rounded-l-box gap-2 bg-base-300 p-2">
+      <ul class="menu gap-2 rounded-l-box bg-base-300 p-2">
         <For each={themes}>
           {(theme) => (
             <li
@@ -120,7 +120,7 @@ export const Header = () => {
           <div class="drawer-side">
             <label for="navs" class="drawer-overlay" />
 
-            <ul class="menu rounded-r-box min-h-full w-2/5 gap-2 bg-base-300 pt-20">
+            <ul class="menu min-h-full w-2/5 gap-2 rounded-r-box bg-base-300 pt-20">
               <For each={navs()}>
                 {({ href, name }) => (
                   <li onClick={() => setOpenedDrawer(false)}>
