@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.131.0](https://github.com/MetaCubeX/metacubexd/compare/v1.130.0...v1.131.0) (2023-12-01)
+
+
+### Features
+
+* update backend repository url ([43acdac](https://github.com/MetaCubeX/metacubexd/commit/43acdace5dbcf39ea736a9d6f1ee8078a19a1647))
+
 ## [1.130.0](https://github.com/MetaCubeX/metacubexd/compare/v1.129.0...v1.130.0) (2023-11-02)
 
 
