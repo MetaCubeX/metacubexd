@@ -139,7 +139,6 @@ export default () => {
           />
         </div>
       </div>
-
       <footer class="footer mx-auto mt-4 block rounded-box bg-neutral p-4 text-center text-lg font-bold text-neutral-content">
         {endpoint()?.url}
       </footer>

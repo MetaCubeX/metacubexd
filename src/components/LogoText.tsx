@@ -1,8 +1,9 @@
 import { A } from '@solidjs/router'
 import { endpoint } from '~/signals'
+import { EndPointLabel } from './EndpointLabel'
 
 export const LogoText = () => (
-  <div class="text-md flex items-center gap-1 whitespace-nowrap font-bold uppercase sm:text-xl">
+  <div class="text-md group flex items-center gap-1 whitespace-nowrap font-bold uppercase sm:text-xl">
     <A
       class="bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent"
       href={endpoint() ? '/' : '/setup'}
@@ -18,5 +19,7 @@ export const LogoText = () => (
       xd
     </a>
     <span>)</span>
+
+    <EndPointLabel class="ml-2 w-0 transition-all group-hover:w-full" />
   </div>
 )
