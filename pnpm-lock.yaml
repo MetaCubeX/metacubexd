@@ -63,8 +63,8 @@ dependencies:
     specifier: 3.0.0-beta.68
     version: 3.0.0-beta.68(solid-js@1.8.7)
   '@tanstack/virtual-core':
-    specifier: 3.0.0-beta.68
-    version: 3.0.0-beta.68
+    specifier: 3.0.0
+    version: 3.0.0
   '@thisbeyond/solid-dnd':
     specifier: ^0.7.5
     version: 0.7.5(solid-js@1.8.7)
@@ -2294,6 +2294,10 @@ packages:
   /@tanstack/table-core@8.10.7:
     resolution: {integrity: sha512-KQk5OMg5OH6rmbHZxuNROvdI+hKDIUxANaHlV+dPlNN7ED3qYQ/WkpY2qlXww1SIdeMlkIhpN/2L00rof0fXFw==}
     engines: {node: '>=12'}
+    dev: false
+
+  /@tanstack/virtual-core@3.0.0:
+    resolution: {integrity: sha512-SYXOBTjJb05rXa2vl55TTwO40A6wKu0R5i1qQwhJYNDIqaIGF7D0HsLw+pJAyi2OvntlEIVusx3xtbbgSUi6zg==}
     dev: false
 
   /@tanstack/virtual-core@3.0.0-beta.68:
