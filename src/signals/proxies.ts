@@ -270,7 +270,10 @@ export const useProxies = () => {
     await proxyIPv6SupportTest(proxyName, provider)
   }
 
-  const proxyGroupLatencyTest = async (proxyGroupName: string) => {
+  const proxyGroupLatencyTest = async (
+    proxyGroupName: string,
+    disableTestIPv6?: boolean,
+  ) => {
     setProxyGroupLatencyTestingMap(proxyGroupName, async () => {
       const newLatencyMap = await proxyGroupLatencyTestAPI(
         proxyGroupName,
@@ -285,7 +288,15 @@ export const useProxies = () => {
 
       await fetchProxies()
     })
-    await proxyGroupIPv6SupportTest(proxyGroupName)
+
+    if (disableTestIPv6) return
+
+    try {
+      await proxyGroupIPv6SupportTest(proxyGroupName)
+    } catch {
+      // A failed IPv6 test will override the default latency, test again
+      await proxyGroupLatencyTest(proxyGroupName, true)
+    }
   }
 
   const updateProviderByProviderName = (providerName: string) =>
