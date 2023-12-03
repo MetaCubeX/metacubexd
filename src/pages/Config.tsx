@@ -224,6 +224,26 @@ const ConfigForm: Component<{ backendVersion: Accessor<string> }> = ({
 
         <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
           <div class="form-control">
+            <label for="enable-allow-lan" class="label gap-2">
+              <span class="label-text">{t('allowLan')}</span>
+            </label>
+
+            <input
+              id="enable-allow-lan"
+              type="checkbox"
+              class="toggle"
+              checked={configsData()?.['allow-lan']}
+              onChange={(e) =>
+                void updateBackendConfigAPI(
+                  'allow-lan',
+                  e.target.checked,
+                  refetch,
+                )
+              }
+            />
+          </div>
+
+          <div class="form-control">
             <label for="enable-tun-device" class="label gap-2">
               <span class="label-text">{t('enableTunDevice')}</span>
             </label>
