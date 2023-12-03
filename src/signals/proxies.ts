@@ -84,9 +84,13 @@ const setProxiesInfo = (
     if (Array.isArray(extra)) {
       const delay = extra.at(-1)?.delay
 
-      if (delay || !fallbackDefault) {
+      if (delay) {
         return delay
       }
+    }
+
+    if (!fallbackDefault) {
+      return undefined
     }
 
     return proxy.history?.at(-1)?.delay
