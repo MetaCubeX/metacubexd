@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.134.0](https://github.com/MetaCubeX/metacubexd/compare/v1.133.1...v1.134.0) (2023-12-03)
+
+
+### Features
+
+* add allow-lan ([#478](https://github.com/MetaCubeX/metacubexd/issues/478)) ([aa4d1d9](https://github.com/MetaCubeX/metacubexd/commit/aa4d1d9e517ed6f33920f0082fc3ade23236097d))
+
+
+### Bug Fixes
+
+* last delay fallback ([#468](https://github.com/MetaCubeX/metacubexd/issues/468)) ([0e3c465](https://github.com/MetaCubeX/metacubexd/commit/0e3c46569a327451e43542e0cedf83b9087b675b))
+
 ## [1.133.1](https://github.com/MetaCubeX/metacubexd/compare/v1.133.0...v1.133.1) (2023-12-01)
 
 
