@@ -105,6 +105,7 @@ export default {
   version: '版本',
   expire: '到期时间',
   noExpire: '不限时',
+  allowLan: '允许局域网访问',
   enableTunDevice: '开启 TUN 转发',
   tunModeStack: 'TUN 模式堆栈',
   tunDeviceName: 'TUN 设备名称',

@@ -103,6 +103,7 @@ export default {
   version: 'Version',
   expire: 'Expire',
   noExpire: 'Null',
+  allowLan: 'Allow Lan',
   enableTunDevice: 'Enable TUN Device',
   tunModeStack: 'TUN Mode Stack',
   tunDeviceName: 'TUN Device Name',
