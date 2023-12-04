@@ -252,7 +252,8 @@ const ConfigForm: Component<{ backendVersion: Accessor<string> }> = ({
               id="enable-tun-device"
               type="checkbox"
               class="toggle"
-              checked={configsData()?.tun.enable}
+              disabled={!configsData()?.tun}
+              checked={configsData()?.tun?.enable || false}
               onChange={(e) =>
                 void updateBackendConfigAPI(
                   'tun',
@@ -271,7 +272,7 @@ const ConfigForm: Component<{ backendVersion: Accessor<string> }> = ({
             <select
               id="tun-ip-stack"
               class="select select-bordered flex-1"
-              value={configsData()?.tun.stack}
+              value={configsData()?.tun?.stack || 'System'}
               onChange={(e) =>
                 void updateBackendConfigAPI(
                   'tun',
@@ -295,7 +296,7 @@ const ConfigForm: Component<{ backendVersion: Accessor<string> }> = ({
             <input
               id="device-name"
               class="input input-bordered min-w-0"
-              value={configsData()?.tun.device}
+              value={configsData()?.tun?.device || ''}
               onChange={(e) =>
                 void updateBackendConfigAPI(
                   'tun',
