@@ -49,7 +49,7 @@
     "daisyui": "^4.4.17",
     "dayjs": "^1.11.10",
     "eslint": "^8.55.0",
-    "eslint-config-prettier": "^9.0.0",
+    "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.0.1",
     "husky": "^8.0.3",
     "is-ip": "^5.0.1",
