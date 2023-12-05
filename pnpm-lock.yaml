@@ -90,11 +90,11 @@ dependencies:
     specifier: ^0.0.11
     version: 0.0.11
   apexcharts:
-    specifier: ^3.44.1
-    version: 3.44.1
+    specifier: ^3.44.2
+    version: 3.44.2
   autoprefixer:
     specifier: ^10.4.16
-    version: 10.4.16(postcss@8.4.31)
+    version: 10.4.16(postcss@8.4.32)
   byte-size:
     specifier: ^8.1.1
     version: 8.1.1
@@ -103,7 +103,7 @@ dependencies:
     version: 18.4.3(typescript@5.3.2)
   daisyui:
     specifier: ^4.4.17
-    version: 4.4.17(postcss@8.4.31)
+    version: 4.4.17(postcss@8.4.32)
   dayjs:
     specifier: ^1.11.10
     version: 1.11.10
@@ -145,7 +145,7 @@ dependencies:
     version: 0.5.7(prettier-plugin-organize-imports@3.2.4)(prettier@3.1.0)
   solid-apexcharts:
     specifier: ^0.3.2
-    version: 0.3.2(apexcharts@3.44.1)(solid-js@1.8.7)
+    version: 0.3.2(apexcharts@3.44.2)(solid-js@1.8.7)
   solid-js:
     specifier: ^1.8.7
     version: 1.8.7
@@ -2632,8 +2632,8 @@ packages:
       picomatch: 2.3.1
     dev: false
 
-  /apexcharts@3.44.1:
-    resolution: {integrity: sha512-nWd6bWf8E+c3YOsB0j0R4MOebMv1rBRWsK6aA11jF+pbag9IuBl4zrT4L42fxmDdLMcf5t3trWIXiGJmbLi2tA==}
+  /apexcharts@3.44.2:
+    resolution: {integrity: sha512-QWOFS/SC1TDsuI8VudVuIwLhs1qE6kwixRvmABMUgTVeVzizRWgQh8pdEIgwl+Zvr0TlM3vHPz6Dc5NP1hJ7BA==}
     dependencies:
       '@yr/monotone-cubic-spline': 1.0.3
       svg.draggable.js: 2.2.2
@@ -2695,7 +2695,7 @@ packages:
     engines: {node: '>= 4.0.0'}
     dev: false
 
-  /autoprefixer@10.4.16(postcss@8.4.31):
+  /autoprefixer@10.4.16(postcss@8.4.32):
     resolution: {integrity: sha512-7vd3UC6xKp0HLfua5IjZlcXvGAGy7cBAXTg2lyQ/8WpNhd6SiZ8Be+xm3FyBSYJx5GKcpRCzBh7RH4/0dnY+uQ==}
     engines: {node: ^10 || ^12 || >=14}
     hasBin: true
@@ -2707,7 +2707,7 @@ packages:
       fraction.js: 4.3.7
       normalize-range: 0.1.2
       picocolors: 1.0.0
-      postcss: 8.4.31
+      postcss: 8.4.32
       postcss-value-parser: 4.2.0
     dev: false
 
@@ -3175,14 +3175,14 @@ packages:
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     dev: false
 
-  /daisyui@4.4.17(postcss@8.4.31):
+  /daisyui@4.4.17(postcss@8.4.32):
     resolution: {integrity: sha512-vcxLKoWiqPjEtcBkSayi9sDW1kWgWRdy1GjSu3zNtMiCsXwqDpCzNkdijuY9RuJ/2tBCtnwxhBv72Yizfi7KAQ==}
     engines: {node: '>=16.9.0'}
     dependencies:
       css-selector-tokenizer: 0.8.0
       culori: 3.3.0
       picocolors: 1.0.0
-      postcss-js: 4.0.1(postcss@8.4.31)
+      postcss-js: 4.0.1(postcss@8.4.32)
     transitivePeerDependencies:
       - postcss
     dev: false
@@ -5068,6 +5068,16 @@ packages:
       postcss: 8.4.31
     dev: false
 
+  /postcss-js@4.0.1(postcss@8.4.32):
+    resolution: {integrity: sha512-dDLF8pEO191hJMtlHFPRa8xsizHaM82MLfNkUHdUtVEV3tgTp5oj+8qbEqYM57SLfc74KSbw//4SeJma2LRVIw==}
+    engines: {node: ^12 || ^14 || >= 16}
+    peerDependencies:
+      postcss: ^8.4.21
+    dependencies:
+      camelcase-css: 2.0.1
+      postcss: 8.4.32
+    dev: false
+
   /postcss-load-config@4.0.2(postcss@8.4.31):
     resolution: {integrity: sha512-bSVhyJGL00wMVoPUzAVAnbEoWyqRxkjv64tUl427SKnPrENtq6hJwUojroMz2VB+Q1edmi4IfrAPpami5VVgMQ==}
     engines: {node: '>= 14'}
@@ -5660,13 +5670,13 @@ packages:
       is-fullwidth-code-point: 4.0.0
     dev: false
 
-  /solid-apexcharts@0.3.2(apexcharts@3.44.1)(solid-js@1.8.7):
+  /solid-apexcharts@0.3.2(apexcharts@3.44.2)(solid-js@1.8.7):
     resolution: {integrity: sha512-4U80dk2e/YEghD903aitBrO0l5WjUv/IhRI6Pp8mfJNT6JPkYG4HTMjBrI+XHRU8uJICJl9ZwLtkvFZnKd2Shw==}
     peerDependencies:
       apexcharts: ^3.40.0
       solid-js: ^1.6.0
     dependencies:
-      apexcharts: 3.44.1
+      apexcharts: 3.44.2
       defu: 6.1.3
       solid-js: 1.8.7
     dev: false
