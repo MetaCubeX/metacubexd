@@ -66,7 +66,7 @@
     "sort-package-json": "^2.6.0",
     "tailwind-merge": "^2.1.0",
     "tailwindcss": "^3.3.6",
-    "typescript": "^5.3.2",
+    "typescript": "^5.3.3",
     "uuid": "^9.0.1",
     "vite": "^5.0.7",
     "vite-plugin-pwa": "^0.17.4",
