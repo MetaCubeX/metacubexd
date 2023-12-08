@@ -75,8 +75,8 @@ dependencies:
     specifier: ^4.14.202
     version: 4.14.202
   '@types/node':
-    specifier: ^20.10.3
-    version: 20.10.3
+    specifier: ^20.10.4
+    version: 20.10.4
   '@types/uuid':
     specifier: ^9.0.7
     version: 9.0.7
@@ -169,7 +169,7 @@ dependencies:
     version: 9.0.1
   vite:
     specifier: ^5.0.5
-    version: 5.0.5(@types/node@20.10.3)
+    version: 5.0.5(@types/node@20.10.4)
   vite-plugin-pwa:
     specifier: ^0.17.4
     version: 0.17.4(vite@5.0.5)(workbox-build@7.0.0)(workbox-window@7.0.0)
@@ -2366,6 +2366,12 @@ packages:
 
   /@types/node@20.10.3:
     resolution: {integrity: sha512-XJavIpZqiXID5Yxnxv3RUDKTN5b81ddNC3ecsA0SoFXz/QU8OGBwZGMomiq0zw+uuqbL/krztv/DINAQ/EV4gg==}
+    dependencies:
+      undici-types: 5.26.5
+    dev: false
+
+  /@types/node@20.10.4:
+    resolution: {integrity: sha512-D08YG6rr8X90YB56tSIuBaddy/UXAA9RKJoFvrsnogAum/0pmjkgi4+2nx96A330FmioegBWmEYQ+syqCFaveg==}
     dependencies:
       undici-types: 5.26.5
     dev: false
@@ -6426,7 +6432,7 @@ packages:
       debug: 4.3.4
       fast-glob: 3.3.2
       pretty-bytes: 6.1.1
-      vite: 5.0.5(@types/node@20.10.3)
+      vite: 5.0.5(@types/node@20.10.4)
       workbox-build: 7.0.0
       workbox-window: 7.0.0
     transitivePeerDependencies:
@@ -6446,13 +6452,13 @@ packages:
       merge-anything: 5.1.7
       solid-js: 1.8.7
       solid-refresh: 0.5.3(solid-js@1.8.7)
-      vite: 5.0.5(@types/node@20.10.3)
+      vite: 5.0.5(@types/node@20.10.4)
       vitefu: 0.2.5(vite@5.0.5)
     transitivePeerDependencies:
       - supports-color
     dev: false
 
-  /vite@5.0.5(@types/node@20.10.3):
+  /vite@5.0.5(@types/node@20.10.4):
     resolution: {integrity: sha512-OekeWqR9Ls56f3zd4CaxzbbS11gqYkEiBtnWFFgYR2WV8oPJRRKq0mpskYy/XaoCL3L7VINDhqqOMNDiYdGvGg==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
@@ -6480,7 +6486,7 @@ packages:
       terser:
         optional: true
     dependencies:
-      '@types/node': 20.10.3
+      '@types/node': 20.10.4
       esbuild: 0.19.8
       postcss: 8.4.32
       rollup: 4.6.1
@@ -6496,7 +6502,7 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 5.0.5(@types/node@20.10.3)
+      vite: 5.0.5(@types/node@20.10.4)
     dev: false
 
   /webidl-conversions@4.0.2:
