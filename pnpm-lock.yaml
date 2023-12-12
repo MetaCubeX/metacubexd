@@ -87,8 +87,8 @@ dependencies:
     specifier: ^6.13.2
     version: 6.13.2(eslint@8.55.0)(typescript@5.3.3)
   '@vite-pwa/assets-generator':
-    specifier: ^0.0.11
-    version: 0.0.11
+    specifier: ^0.1.0
+    version: 0.1.0
   apexcharts:
     specifier: ^3.44.2
     version: 3.44.2
@@ -2539,8 +2539,8 @@ packages:
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
     dev: false
 
-  /@vite-pwa/assets-generator@0.0.11:
-    resolution: {integrity: sha512-fm2aRHYM3O8wmsOPq04g/xcmlkyvvcI+SaKbAHyrIS+gP4fEESa8/UadxMqV531QW6Xe1ECQNSxFKffmNS7yQg==}
+  /@vite-pwa/assets-generator@0.1.0:
+    resolution: {integrity: sha512-2JZ4BTo/1as0yUZuXyJmUyo7dXaibhVHkvlGKstW3epnSNJCakqVO6v2eps7F/EjzBB3HUZtkWixIR8ncZzo+g==}
     engines: {node: '>=16.14.0'}
     hasBin: true
     dependencies:
