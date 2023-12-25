@@ -50,7 +50,7 @@
     "dayjs": "^1.11.10",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.1.1",
+    "eslint-plugin-prettier": "^5.1.2",
     "husky": "^8.0.3",
     "is-ip": "^5.0.1",
     "ky": "^1.1.3",
