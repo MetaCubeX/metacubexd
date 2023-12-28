@@ -59,7 +59,7 @@
     "match-sorter": "^6.3.1",
     "prettier": "^3.1.1",
     "prettier-plugin-organize-imports": "^3.2.4",
-    "prettier-plugin-tailwindcss": "^0.5.9",
+    "prettier-plugin-tailwindcss": "^0.5.10",
     "solid-apexcharts": "^0.3.2",
     "solid-js": "^1.8.7",
     "solid-toast": "^0.5.0",
