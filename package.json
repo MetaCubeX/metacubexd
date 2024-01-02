@@ -40,7 +40,7 @@
     "@types/node": "^20.10.6",
     "@types/uuid": "^9.0.7",
     "@typescript-eslint/eslint-plugin": "^6.16.0",
-    "@typescript-eslint/parser": "^6.16.0",
+    "@typescript-eslint/parser": "^6.17.0",
     "@vite-pwa/assets-generator": "^0.2.2",
     "apexcharts": "^3.45.1",
     "autoprefixer": "^10.4.16",
