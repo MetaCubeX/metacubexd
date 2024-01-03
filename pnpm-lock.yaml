@@ -54,8 +54,8 @@ dependencies:
     specifier: ^2.45.0
     version: 2.45.0(solid-js@1.8.7)
   '@tanstack/match-sorter-utils':
-    specifier: ^8.8.4
-    version: 8.8.4
+    specifier: ^8.11.3
+    version: 8.11.3
   '@tanstack/solid-table':
     specifier: ^8.11.2
     version: 8.11.2(solid-js@1.8.7)
@@ -2273,8 +2273,8 @@ packages:
     resolution: {integrity: sha512-J10UDghOni9wlrj5CpKAzychDCABCKYq897mGg0wGFsd+tYLaUdz0dt/HZeGnV8gZJo0hIiTPLGwBp5EW42Qsg==}
     dev: false
 
-  /@tanstack/match-sorter-utils@8.8.4:
-    resolution: {integrity: sha512-rKH8LjZiszWEvmi01NR72QWZ8m4xmXre0OOwlRGnjU01Eqz/QnN+cqpty2PJ0efHblq09+KilvyR7lsbzmXVEw==}
+  /@tanstack/match-sorter-utils@8.11.3:
+    resolution: {integrity: sha512-2XVYTN6fLFyeIPywDL/HGKIQce3V6oUch1FHweGwxruPKEXip6Z9qg+zWZwNE26WG6CktqJh6NqTq90a42jeEw==}
     engines: {node: '>=12'}
     dependencies:
       remove-accents: 0.4.2
