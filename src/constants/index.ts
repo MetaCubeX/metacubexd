@@ -1,5 +1,11 @@
 import { ApexOptions } from 'apexcharts'
 import byteSize from 'byte-size'
+import semver from 'semver/preload'
+
+export const BREACKING_CHANGE_VERSIONS = {
+  // https://github.com/MetaCubeX/mihomo/pull/964
+  V1_18_0: semver.parse('1.18.0')!,
+}
 
 export const themes = [
   'acid',
