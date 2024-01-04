@@ -2,7 +2,9 @@ import { createEventSignal } from '@solid-primitives/event-listener'
 import { makePersisted } from '@solid-primitives/storage'
 import { createReconnectingWS } from '@solid-primitives/websocket'
 import ky from 'ky'
-import { createMemo, createSignal } from 'solid-js'
+import semver from 'semver/preload'
+import { createMemo, createResource, createSignal } from 'solid-js'
+import { fetchBackendVersionAPI } from '~/apis'
 
 export const [selectedEndpoint, setSelectedEndpoint] = makePersisted(
   createSignal(''),
@@ -46,6 +48,12 @@ export const endpoint = () =>
   endpointList().find(({ id }) => id === selectedEndpoint())
 
 export const secret = () => endpoint()?.secret
+
+export const [backendVersion] = createResource(async () => {
+  const ver = await fetchBackendVersionAPI()
+
+  return semver.parse(ver)
+})
 
 export const wsEndpointURL = () =>
   new URL(endpoint()?.url ?? '').origin.replace('http', 'ws')
