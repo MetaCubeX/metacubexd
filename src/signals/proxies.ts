@@ -12,6 +12,7 @@ import {
 import { useStringBooleanMap } from '~/helpers'
 import {
   autoCloseConns,
+  backendVersion,
   latencyQualityMap,
   latencyTestTimeoutDuration,
   latestConnectionMsg,
@@ -74,15 +75,29 @@ const setProxiesInfo = (
   const newLatencyMap = { ...latencyMap() }
   const newProxyIPv6SupportMap = { ...proxyIPv6SupportMap() }
 
+  const version = backendVersion()
+
   const lastDelay = (
     proxy: Pick<Proxy, 'extra' | 'history'>,
     url: string,
     fallbackDefault = true,
   ) => {
-    const extra = proxy.extra?.[url] as Proxy['history'] | undefined
+    let history
+    if (version && version.major === 1 && version.minor >= 18) {
+      history = (
+        proxy.extra?.[url] as
+          | {
+              alive: boolean
+              history: Proxy['history']
+            }
+          | undefined
+      )?.history
+    } else {
+      history = proxy.extra?.[url] as Proxy['history'] | undefined
+    }
 
-    if (Array.isArray(extra)) {
-      const delay = extra.at(-1)?.delay
+    if (Array.isArray(history)) {
+      const delay = history.at(-1)?.delay
 
       if (delay) {
         return delay
