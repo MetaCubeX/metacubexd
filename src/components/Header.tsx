@@ -14,6 +14,7 @@ import { LogoText } from '~/components'
 import { ROUTES, themes } from '~/constants'
 import { useI18n } from '~/i18n'
 import { setCurTheme } from '~/signals'
+import { EndPointLabel } from './EndpointLabel'
 
 const Nav: ParentComponent<{ href: string; tooltip: string }> = ({
   href,
@@ -121,6 +122,9 @@ export const Header = () => {
             <label for="navs" class="drawer-overlay" />
 
             <ul class="menu min-h-full w-2/5 gap-2 rounded-r-box bg-base-300 pt-20">
+              <div class="mb-2">
+                <EndPointLabel />
+              </div>
               <For each={navs()}>
                 {({ href, name }) => (
                   <li onClick={() => setOpenedDrawer(false)}>
