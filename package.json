@@ -28,7 +28,7 @@
     "@solid-primitives/storage": "^2.1.1",
     "@solid-primitives/timer": "^1.3.7",
     "@solid-primitives/websocket": "^1.2.0",
-    "@solidjs/router": "^0.9.1",
+    "@solidjs/router": "^0.10.8",
     "@tabler/icons-solidjs": "^2.45.0",
     "@tanstack/match-sorter-utils": "^8.11.3",
     "@tanstack/solid-table": "^8.11.4",

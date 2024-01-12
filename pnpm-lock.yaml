@@ -48,8 +48,8 @@ dependencies:
     specifier: ^1.2.0
     version: 1.2.0(solid-js@1.8.10)
   '@solidjs/router':
-    specifier: ^0.9.1
-    version: 0.9.1(solid-js@1.8.10)
+    specifier: ^0.10.8
+    version: 0.10.8(solid-js@1.8.10)
   '@tabler/icons-solidjs':
     specifier: ^2.45.0
     version: 2.45.0(solid-js@1.8.10)
@@ -2243,10 +2243,10 @@ packages:
       solid-js: 1.8.10
     dev: false
 
-  /@solidjs/router@0.9.1(solid-js@1.8.10):
-    resolution: {integrity: sha512-kRY75piOQsyoH75E/RP6lr7uVGFCjeeCCCJx7Z2D1Vc6+I1yFQjLCvE+6agXGwqDoWi6vbETP1g7gmp/L1mNLg==}
+  /@solidjs/router@0.10.8(solid-js@1.8.10):
+    resolution: {integrity: sha512-C71HFnEHxO2OvgQbQ2auFntxUM3rY5WaYeF45HBivGUVEEI/Pn6M6id+egVcKHqFSF9I6rwc5Q36i7aO+jlGPA==}
     peerDependencies:
-      solid-js: ^1.8.4
+      solid-js: ^1.8.6
     dependencies:
       solid-js: 1.8.10
     dev: false
@@ -2370,12 +2370,6 @@ packages:
     resolution: {integrity: sha512-hov8bUuiLiyFPGyFPE1lwWhmzYbirOXQNNo40+y3zow8aFVTeyn3VWL0VFFfdNddA8S4Vf0Tc062rzyNr7Paag==}
     dev: false
 
-  /@types/node@20.10.8:
-    resolution: {integrity: sha512-f8nQs3cLxbAFc00vEU59yf9UyGUftkPaLGfvbVOIDdx2i1b8epBqj2aNGyP19fiyXWvlmZ7qC1XLjAzw/OKIeA==}
-    dependencies:
-      undici-types: 5.26.5
-    dev: false
-
   /@types/node@20.11.0:
     resolution: {integrity: sha512-o9bjXmDNcF7GbM4CNQpmi+TutCgap/K3w1JyKgxAjqx41zp9qlIAVFi0IhCNsJcXolEqLWhbFbEeL0PvYm4pcQ==}
     dependencies:
@@ -2389,7 +2383,7 @@ packages:
   /@types/resolve@1.17.1:
     resolution: {integrity: sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==}
     dependencies:
-      '@types/node': 20.10.8
+      '@types/node': 20.11.0
     dev: false
 
   /@types/semver@7.5.6:
@@ -4431,7 +4425,7 @@ packages:
     resolution: {integrity: sha512-KWYVV1c4i+jbMpaBC+U++4Va0cp8OisU185o73T1vo99hqi7w8tSJfUXYswwqqrjzwxa6KpRK54WhPvwf5w6PQ==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': 20.10.8
+      '@types/node': 20.11.0
       merge-stream: 2.0.0
       supports-color: 7.2.0
     dev: false
