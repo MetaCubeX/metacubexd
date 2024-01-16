@@ -18,8 +18,8 @@ dependencies:
     specifier: ^5.0.18
     version: 5.0.18
   '@solid-primitives/clipboard':
-    specifier: ^1.5.7
-    version: 1.5.7(solid-js@1.8.11)
+    specifier: ^1.5.8
+    version: 1.5.8(solid-js@1.8.11)
   '@solid-primitives/context':
     specifier: ^0.2.1
     version: 0.2.1(solid-js@1.8.11)
@@ -2122,12 +2122,12 @@ packages:
     dev: false
     optional: true
 
-  /@solid-primitives/clipboard@1.5.7(solid-js@1.8.11):
-    resolution: {integrity: sha512-MGTykW9739tMm2wS3P/Pb9W7BIZvgBLnC+Vhlx3s0DGm9CcEeXJ8lHyUp736UE57HKtCsqzfcCkpmIprbidIbQ==}
+  /@solid-primitives/clipboard@1.5.8(solid-js@1.8.11):
+    resolution: {integrity: sha512-yMwT3nRY1VHWJYtxvO9dUy4+h7GspgPpmvHaPV12jHSBlNWaCN72779MheS/hUYQii5WyE2UkrWwUDIx9JlfNw==}
     peerDependencies:
       solid-js: ^1.6.12
     dependencies:
-      '@solid-primitives/utils': 6.2.1(solid-js@1.8.11)
+      '@solid-primitives/utils': 6.2.2(solid-js@1.8.11)
       solid-js: 1.8.11
     dev: false
 
@@ -2229,6 +2229,14 @@ packages:
 
   /@solid-primitives/utils@6.2.1(solid-js@1.8.11):
     resolution: {integrity: sha512-TsecNzxiO5bLfzqb4OOuzfUmdOROcssuGqgh5rXMMaasoFZ3GoveUgdY1wcf17frMJM7kCNGNuK34EjErneZkg==}
+    peerDependencies:
+      solid-js: ^1.6.12
+    dependencies:
+      solid-js: 1.8.11
+    dev: false
+
+  /@solid-primitives/utils@6.2.2(solid-js@1.8.11):
+    resolution: {integrity: sha512-11ypVbp987XxETeRqY5Y3OmmTpm8/jZqJXRvo6AyqBthzkvvjEdReuUMU2yVb+pwWGxfZpWHZ6EUCcGXUMhfwg==}
     peerDependencies:
       solid-js: ^1.6.12
     dependencies:
@@ -2370,12 +2378,6 @@ packages:
     resolution: {integrity: sha512-hov8bUuiLiyFPGyFPE1lwWhmzYbirOXQNNo40+y3zow8aFVTeyn3VWL0VFFfdNddA8S4Vf0Tc062rzyNr7Paag==}
     dev: false
 
-  /@types/node@20.11.0:
-    resolution: {integrity: sha512-o9bjXmDNcF7GbM4CNQpmi+TutCgap/K3w1JyKgxAjqx41zp9qlIAVFi0IhCNsJcXolEqLWhbFbEeL0PvYm4pcQ==}
-    dependencies:
-      undici-types: 5.26.5
-    dev: false
-
   /@types/node@20.11.3:
     resolution: {integrity: sha512-nrlmbvGPNGaj84IJZXMPhQuCMEVTT/hXZMJJG/aIqVL9fKxqk814sGGtJA4GI6hpJSLQjpi6cn0Qx9eOf9SDVg==}
     dependencies:
@@ -2389,7 +2391,7 @@ packages:
   /@types/resolve@1.17.1:
     resolution: {integrity: sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==}
     dependencies:
-      '@types/node': 20.11.0
+      '@types/node': 20.11.3
     dev: false
 
   /@types/semver@7.5.6:
@@ -4474,7 +4476,7 @@ packages:
     resolution: {integrity: sha512-KWYVV1c4i+jbMpaBC+U++4Va0cp8OisU185o73T1vo99hqi7w8tSJfUXYswwqqrjzwxa6KpRK54WhPvwf5w6PQ==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': 20.11.0
+      '@types/node': 20.11.3
       merge-stream: 2.0.0
       supports-color: 7.2.0
     dev: false
