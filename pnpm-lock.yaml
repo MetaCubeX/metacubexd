@@ -18,8 +18,8 @@ dependencies:
     specifier: ^5.0.18
     version: 5.0.18
   '@solid-primitives/clipboard':
-    specifier: ^1.5.7
-    version: 1.5.7(solid-js@1.8.11)
+    specifier: ^1.5.8
+    version: 1.5.8(solid-js@1.8.11)
   '@solid-primitives/context':
     specifier: ^0.2.1
     version: 0.2.1(solid-js@1.8.11)
@@ -2129,12 +2129,12 @@ packages:
     dev: false
     optional: true
 
-  /@solid-primitives/clipboard@1.5.7(solid-js@1.8.11):
-    resolution: {integrity: sha512-MGTykW9739tMm2wS3P/Pb9W7BIZvgBLnC+Vhlx3s0DGm9CcEeXJ8lHyUp736UE57HKtCsqzfcCkpmIprbidIbQ==}
+  /@solid-primitives/clipboard@1.5.8(solid-js@1.8.11):
+    resolution: {integrity: sha512-yMwT3nRY1VHWJYtxvO9dUy4+h7GspgPpmvHaPV12jHSBlNWaCN72779MheS/hUYQii5WyE2UkrWwUDIx9JlfNw==}
     peerDependencies:
       solid-js: ^1.6.12
     dependencies:
-      '@solid-primitives/utils': 6.2.1(solid-js@1.8.11)
+      '@solid-primitives/utils': 6.2.2(solid-js@1.8.11)
       solid-js: 1.8.11
     dev: false
 
@@ -2236,6 +2236,14 @@ packages:
 
   /@solid-primitives/utils@6.2.1(solid-js@1.8.11):
     resolution: {integrity: sha512-TsecNzxiO5bLfzqb4OOuzfUmdOROcssuGqgh5rXMMaasoFZ3GoveUgdY1wcf17frMJM7kCNGNuK34EjErneZkg==}
+    peerDependencies:
+      solid-js: ^1.6.12
+    dependencies:
+      solid-js: 1.8.11
+    dev: false
+
+  /@solid-primitives/utils@6.2.2(solid-js@1.8.11):
+    resolution: {integrity: sha512-11ypVbp987XxETeRqY5Y3OmmTpm8/jZqJXRvo6AyqBthzkvvjEdReuUMU2yVb+pwWGxfZpWHZ6EUCcGXUMhfwg==}
     peerDependencies:
       solid-js: ^1.6.12
     dependencies:
