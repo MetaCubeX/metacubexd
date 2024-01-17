@@ -30,8 +30,8 @@ dependencies:
     specifier: ^2.0.0
     version: 2.0.0(solid-js@1.8.11)
   '@solid-primitives/keyed':
-    specifier: ^1.2.0
-    version: 1.2.0(solid-js@1.8.11)
+    specifier: ^1.2.1
+    version: 1.2.1(solid-js@1.8.11)
   '@solid-primitives/media':
     specifier: ^2.2.5
     version: 2.2.5(solid-js@1.8.11)
@@ -2163,8 +2163,8 @@ packages:
       solid-js: 1.8.11
     dev: false
 
-  /@solid-primitives/keyed@1.2.0(solid-js@1.8.11):
-    resolution: {integrity: sha512-0DuTeJdxWjCTu73XnDZs24JzfXckBnpvCfQ6Mf/kTPKkMZJh7tjkBnZEk48ckrE9xmwat9stIdfrBmZctsepIw==}
+  /@solid-primitives/keyed@1.2.1(solid-js@1.8.11):
+    resolution: {integrity: sha512-fLZ3CX41IiG2kshCWFMDBq4LeSuuHpZ91UrWqcr6EFq3lGWE5iPswHyHilSiaeLWZLpbhZ/HAwrM/wlh2S1mYQ==}
     peerDependencies:
       solid-js: ^1.6.12
     dependencies:
@@ -5389,7 +5389,7 @@ packages:
   /regenerator-transform@0.15.2:
     resolution: {integrity: sha512-hfMp2BoF0qOk3uc5V20ALGDS2ddjQaLrdl7xrGXvAIow7qeWRM2VA2HuCHkUKk9slq3VwEwLNK3DFBqDfPGYtg==}
     dependencies:
-      '@babel/runtime': 7.23.5
+      '@babel/runtime': 7.23.8
     dev: false
 
   /regexp.prototype.flags@1.5.1:
@@ -6608,7 +6608,7 @@ packages:
       '@apideck/better-ajv-errors': 0.3.6(ajv@8.12.0)
       '@babel/core': 7.23.5
       '@babel/preset-env': 7.23.5(@babel/core@7.23.5)
-      '@babel/runtime': 7.23.5
+      '@babel/runtime': 7.23.8
       '@rollup/plugin-babel': 5.3.1(@babel/core@7.23.5)(rollup@2.79.1)
       '@rollup/plugin-node-resolve': 11.2.1(rollup@2.79.1)
       '@rollup/plugin-replace': 2.4.2(rollup@2.79.1)
