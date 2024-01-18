@@ -30,8 +30,8 @@ dependencies:
     specifier: ^2.0.0
     version: 2.0.0(solid-js@1.8.11)
   '@solid-primitives/keyed':
-    specifier: ^1.2.0
-    version: 1.2.0(solid-js@1.8.11)
+    specifier: ^1.2.1
+    version: 1.2.1(solid-js@1.8.11)
   '@solid-primitives/media':
     specifier: ^2.2.5
     version: 2.2.5(solid-js@1.8.11)
@@ -2163,8 +2163,8 @@ packages:
       solid-js: 1.8.11
     dev: false
 
-  /@solid-primitives/keyed@1.2.0(solid-js@1.8.11):
-    resolution: {integrity: sha512-0DuTeJdxWjCTu73XnDZs24JzfXckBnpvCfQ6Mf/kTPKkMZJh7tjkBnZEk48ckrE9xmwat9stIdfrBmZctsepIw==}
+  /@solid-primitives/keyed@1.2.1(solid-js@1.8.11):
+    resolution: {integrity: sha512-fLZ3CX41IiG2kshCWFMDBq4LeSuuHpZ91UrWqcr6EFq3lGWE5iPswHyHilSiaeLWZLpbhZ/HAwrM/wlh2S1mYQ==}
     peerDependencies:
       solid-js: ^1.6.12
     dependencies:
