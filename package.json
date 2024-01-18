@@ -43,7 +43,7 @@
     "@typescript-eslint/parser": "^6.19.0",
     "@vite-pwa/assets-generator": "^0.2.2",
     "apexcharts": "^3.45.1",
-    "autoprefixer": "^10.4.16",
+    "autoprefixer": "^10.4.17",
     "byte-size": "^8.1.1",
     "commitlint": "^18.4.4",
     "daisyui": "^4.6.0",
