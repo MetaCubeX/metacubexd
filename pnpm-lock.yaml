@@ -21,8 +21,8 @@ dependencies:
     specifier: ^1.5.8
     version: 1.5.8(solid-js@1.8.11)
   '@solid-primitives/context':
-    specifier: ^0.2.1
-    version: 0.2.1(solid-js@1.8.11)
+    specifier: ^0.2.2
+    version: 0.2.2(solid-js@1.8.11)
   '@solid-primitives/event-listener':
     specifier: ^2.3.0
     version: 2.3.0(solid-js@1.8.11)
@@ -2138,8 +2138,8 @@ packages:
       solid-js: 1.8.11
     dev: false
 
-  /@solid-primitives/context@0.2.1(solid-js@1.8.11):
-    resolution: {integrity: sha512-XIIwCOWpRKDersgkR9LNFXaJHIV8QlCFo/tq5bV0cAOZklcwOFcqi2bN+uWgEIQSWGjWXU2kc1H1/TzgYzVDlg==}
+  /@solid-primitives/context@0.2.2(solid-js@1.8.11):
+    resolution: {integrity: sha512-HwI039pxwlB992T/B9YpKACIQTuJQiguV9vLuUBPEVg8Esbxwl8H3je3Ir1jKuxU4Yc5pkgJNojF1Ylw9pLo/A==}
     peerDependencies:
       solid-js: ^1.6.12
     dependencies:
