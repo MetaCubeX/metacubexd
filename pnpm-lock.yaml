@@ -27,8 +27,8 @@ dependencies:
     specifier: ^2.3.0
     version: 2.3.0(solid-js@1.8.11)
   '@solid-primitives/i18n':
-    specifier: ^2.0.0
-    version: 2.0.0(solid-js@1.8.11)
+    specifier: ^2.0.1
+    version: 2.0.1(solid-js@1.8.11)
   '@solid-primitives/keyed':
     specifier: ^1.2.1
     version: 1.2.1(solid-js@1.8.11)
@@ -2155,8 +2155,8 @@ packages:
       solid-js: 1.8.11
     dev: false
 
-  /@solid-primitives/i18n@2.0.0(solid-js@1.8.11):
-    resolution: {integrity: sha512-2sfhiUGl3eCPrDnPpQapbKnZ2iVo1IY6aI5vJTozc2fIf/yEM2+LlCY4PwQTf8vkM5B0Pf3jA+7vC70fR6xbmg==}
+  /@solid-primitives/i18n@2.0.1(solid-js@1.8.11):
+    resolution: {integrity: sha512-oOsZQUqlfPciJLz+iW+L2l0e0pSUZbx2SrFIRIkuhnaXLKfM5q9oXq59ManOYlhFDkQiE0EigWfBHMR4OjkrSQ==}
     peerDependencies:
       solid-js: ^1.6.12
     dependencies:
