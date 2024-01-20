@@ -20,7 +20,7 @@
     "@fontsource/fira-sans": "^5.0.18",
     "@solid-primitives/clipboard": "^1.5.8",
     "@solid-primitives/context": "^0.2.2",
-    "@solid-primitives/event-listener": "^2.3.0",
+    "@solid-primitives/event-listener": "^2.3.1",
     "@solid-primitives/i18n": "^2.0.1",
     "@solid-primitives/keyed": "^1.2.1",
     "@solid-primitives/media": "^2.2.5",
