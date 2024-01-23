@@ -36,8 +36,8 @@ dependencies:
     specifier: ^2.2.5
     version: 2.2.5(solid-js@1.8.11)
   '@solid-primitives/resize-observer':
-    specifier: ^2.0.22
-    version: 2.0.22(solid-js@1.8.11)
+    specifier: ^2.0.23
+    version: 2.0.23(solid-js@1.8.11)
   '@solid-primitives/storage':
     specifier: ^2.1.2
     version: 2.1.2(solid-js@1.8.11)
@@ -2183,15 +2183,15 @@ packages:
       solid-js: 1.8.11
     dev: false
 
-  /@solid-primitives/resize-observer@2.0.22(solid-js@1.8.11):
-    resolution: {integrity: sha512-ps8UIFiGsNxZaWBKSH0Py0Nx5PDd7NtUGHkN/04SNRYgtTvlPF768rk0ksPlDgpIwYmBLIoC9qvQmQPaHF4F5w==}
+  /@solid-primitives/resize-observer@2.0.23(solid-js@1.8.11):
+    resolution: {integrity: sha512-SgKRzRfy1oFbPSapmtF5H9VQcN66foQaQK3QTyzh4cihIG2k/UiVNjbC+el1nEDnSeAP7zTO4Xsf2UW8dc+aBw==}
     peerDependencies:
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/event-listener': 2.3.1(solid-js@1.8.11)
-      '@solid-primitives/rootless': 1.4.2(solid-js@1.8.11)
-      '@solid-primitives/static-store': 0.0.5(solid-js@1.8.11)
-      '@solid-primitives/utils': 6.2.1(solid-js@1.8.11)
+      '@solid-primitives/rootless': 1.4.3(solid-js@1.8.11)
+      '@solid-primitives/static-store': 0.0.6(solid-js@1.8.11)
+      '@solid-primitives/utils': 6.2.2(solid-js@1.8.11)
       solid-js: 1.8.11
     dev: false
 
@@ -2204,12 +2204,30 @@ packages:
       solid-js: 1.8.11
     dev: false
 
+  /@solid-primitives/rootless@1.4.3(solid-js@1.8.11):
+    resolution: {integrity: sha512-IPsfUhKsqQOxLtRMQWK2EZAYbL9RKJMLBelLwpaXl9+oa1tl5aNvA6GHgrNrK+85oUhiYh7/OuogO18AuHepqQ==}
+    peerDependencies:
+      solid-js: ^1.6.12
+    dependencies:
+      '@solid-primitives/utils': 6.2.2(solid-js@1.8.11)
+      solid-js: 1.8.11
+    dev: false
+
   /@solid-primitives/static-store@0.0.5(solid-js@1.8.11):
     resolution: {integrity: sha512-ssQ+s/wrlFAEE4Zw8GV499yBfvWx7SMm+ZVc11wvao4T5xg9VfXCL9Oa+x4h+vPMvSV/Knv5LrsLiUa+wlJUXQ==}
     peerDependencies:
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/utils': 6.2.1(solid-js@1.8.11)
+      solid-js: 1.8.11
+    dev: false
+
+  /@solid-primitives/static-store@0.0.6(solid-js@1.8.11):
+    resolution: {integrity: sha512-PtvkbbucbjT+9p95pksOciG9gOnCtJz4IUyAKX1Ld7YwI+QgtPTo0Wuxs8gNbNtLtoDv5PNv5t4YRzUyl0fwdg==}
+    peerDependencies:
+      solid-js: ^1.6.12
+    dependencies:
+      '@solid-primitives/utils': 6.2.2(solid-js@1.8.11)
       solid-js: 1.8.11
     dev: false
 
