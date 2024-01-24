@@ -115,7 +115,7 @@ dependencies:
     version: 9.1.0(eslint@8.56.0)
   eslint-plugin-prettier:
     specifier: ^5.1.3
-    version: 5.1.3(eslint-config-prettier@9.1.0)(eslint@8.56.0)(prettier@3.2.2)
+    version: 5.1.3(eslint-config-prettier@9.1.0)(eslint@8.56.0)(prettier@3.2.4)
   husky:
     specifier: ^8.0.3
     version: 8.0.3
@@ -135,14 +135,14 @@ dependencies:
     specifier: ^6.3.3
     version: 6.3.3
   prettier:
-    specifier: ^3.2.2
-    version: 3.2.2
+    specifier: ^3.2.4
+    version: 3.2.4
   prettier-plugin-organize-imports:
     specifier: ^3.2.4
-    version: 3.2.4(prettier@3.2.2)(typescript@5.3.3)
+    version: 3.2.4(prettier@3.2.4)(typescript@5.3.3)
   prettier-plugin-tailwindcss:
     specifier: ^0.5.11
-    version: 0.5.11(prettier-plugin-organize-imports@3.2.4)(prettier@3.2.2)
+    version: 0.5.11(prettier-plugin-organize-imports@3.2.4)(prettier@3.2.4)
   solid-apexcharts:
     specifier: ^0.3.3
     version: 0.3.3(apexcharts@3.45.1)(solid-js@1.8.12)
@@ -276,14 +276,14 @@ packages:
     resolution: {integrity: sha512-LvBTxu8bQSQkcyKOU+a1btnNFQ1dMAd0R6PyW3arXes06F6QLWLIrd681bxRPIXlrMGR3XYnW9JyML7dP3qgxg==}
     engines: {node: '>=6.9.0'}
     dependencies:
-      '@babel/types': 7.23.5
+      '@babel/types': 7.23.6
     dev: false
 
   /@babel/helper-builder-binary-assignment-operator-visitor@7.22.15:
     resolution: {integrity: sha512-QkBXwGgaoC2GtGZRoma6kv7Szfv06khvhFav67ZExau2RaXzy8MpHSMO2PNoP2XtmQphJQRHFfg77Bq731Yizw==}
     engines: {node: '>=6.9.0'}
     dependencies:
-      '@babel/types': 7.23.5
+      '@babel/types': 7.23.6
     dev: false
 
   /@babel/helper-compilation-targets@7.22.15:
@@ -366,7 +366,7 @@ packages:
     resolution: {integrity: sha512-6gfrPwh7OuT6gZyJZvd6WbTfrqAo7vm4xCzAXOusKqq/vWdKXphTpj5klHKNmRUU6/QRGlBsyU9mAIPaWHlqJA==}
     engines: {node: '>=6.9.0'}
     dependencies:
-      '@babel/types': 7.23.5
+      '@babel/types': 7.23.6
     dev: false
 
   /@babel/helper-module-imports@7.18.6:
@@ -401,7 +401,7 @@ packages:
     resolution: {integrity: sha512-HBwaojN0xFRx4yIvpwGqxiV2tUfl7401jlok564NgB9EHS1y6QT17FmKWm4ztqjeVdXLuC4fSvHc5ePpQjoTbw==}
     engines: {node: '>=6.9.0'}
     dependencies:
-      '@babel/types': 7.23.5
+      '@babel/types': 7.23.6
     dev: false
 
   /@babel/helper-plugin-utils@7.22.5:
@@ -444,7 +444,7 @@ packages:
     resolution: {integrity: sha512-tK14r66JZKiC43p8Ki33yLBVJKlQDFoA8GYN67lWCDCqoL6EMMSuM9b+Iff2jHaM/RRFYl7K+iiru7hbRqNx8Q==}
     engines: {node: '>=6.9.0'}
     dependencies:
-      '@babel/types': 7.23.5
+      '@babel/types': 7.23.6
     dev: false
 
   /@babel/helper-split-export-declaration@7.22.6:
@@ -475,7 +475,7 @@ packages:
     dependencies:
       '@babel/helper-function-name': 7.23.0
       '@babel/template': 7.22.15
-      '@babel/types': 7.23.5
+      '@babel/types': 7.23.6
     dev: false
 
   /@babel/helpers@7.23.5:
@@ -1357,7 +1357,7 @@ packages:
     dependencies:
       '@babel/core': 7.23.5
       '@babel/helper-plugin-utils': 7.22.5
-      '@babel/types': 7.23.5
+      '@babel/types': 7.23.6
       esutils: 2.0.3
     dev: false
 
@@ -3520,7 +3520,7 @@ packages:
       eslint: 8.56.0
     dev: false
 
-  /eslint-plugin-prettier@5.1.3(eslint-config-prettier@9.1.0)(eslint@8.56.0)(prettier@3.2.2):
+  /eslint-plugin-prettier@5.1.3(eslint-config-prettier@9.1.0)(eslint@8.56.0)(prettier@3.2.4):
     resolution: {integrity: sha512-C9GCVAs4Eq7ZC/XFQHITLiHJxQngdtraXaM+LoUFoFp/lHNl2Zn8f3WQbe9HvTBBQ9YnKFB0/2Ajdqwo5D1EAw==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
@@ -3536,7 +3536,7 @@ packages:
     dependencies:
       eslint: 8.56.0
       eslint-config-prettier: 9.1.0(eslint@8.56.0)
-      prettier: 3.2.2
+      prettier: 3.2.4
       prettier-linter-helpers: 1.0.0
       synckit: 0.8.6
     dev: false
@@ -5176,7 +5176,7 @@ packages:
       fast-diff: 1.3.0
     dev: false
 
-  /prettier-plugin-organize-imports@3.2.4(prettier@3.2.2)(typescript@5.3.3):
+  /prettier-plugin-organize-imports@3.2.4(prettier@3.2.4)(typescript@5.3.3):
     resolution: {integrity: sha512-6m8WBhIp0dfwu0SkgfOxJqh+HpdyfqSSLfKKRZSFbDuEQXDDndb8fTpRWkUrX/uBenkex3MgnVk0J3b3Y5byog==}
     peerDependencies:
       '@volar/vue-language-plugin-pug': ^1.0.4
@@ -5189,11 +5189,11 @@ packages:
       '@volar/vue-typescript':
         optional: true
     dependencies:
-      prettier: 3.2.2
+      prettier: 3.2.4
       typescript: 5.3.3
     dev: false
 
-  /prettier-plugin-tailwindcss@0.5.11(prettier-plugin-organize-imports@3.2.4)(prettier@3.2.2):
+  /prettier-plugin-tailwindcss@0.5.11(prettier-plugin-organize-imports@3.2.4)(prettier@3.2.4):
     resolution: {integrity: sha512-AvI/DNyMctyyxGOjyePgi/gqj5hJYClZ1avtQvLlqMT3uDZkRbi4HhGUpok3DRzv9z7Lti85Kdj3s3/1CeNI0w==}
     engines: {node: '>=14.21.3'}
     peerDependencies:
@@ -5242,12 +5242,12 @@ packages:
       prettier-plugin-twig-melody:
         optional: true
     dependencies:
-      prettier: 3.2.2
-      prettier-plugin-organize-imports: 3.2.4(prettier@3.2.2)(typescript@5.3.3)
+      prettier: 3.2.4
+      prettier-plugin-organize-imports: 3.2.4(prettier@3.2.4)(typescript@5.3.3)
     dev: false
 
-  /prettier@3.2.2:
-    resolution: {integrity: sha512-HTByuKZzw7utPiDO523Tt2pLtEyK7OibUD9suEJQrPUCYQqrHr74GGX6VidMrovbf/I50mPqr8j/II6oBAuc5A==}
+  /prettier@3.2.4:
+    resolution: {integrity: sha512-FWu1oLHKCrtpO1ypU6J0SbK2d9Ckwysq6bHj/uaCP26DxrPpppCLQRGVuqAxSTvhF00AcvDRyYrLNW7ocBhFFQ==}
     engines: {node: '>=14'}
     hasBin: true
     dev: false
