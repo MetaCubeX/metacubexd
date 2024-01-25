@@ -42,7 +42,7 @@
     "@typescript-eslint/eslint-plugin": "^6.19.0",
     "@typescript-eslint/parser": "^6.19.0",
     "@vite-pwa/assets-generator": "^0.2.3",
-    "apexcharts": "^3.45.1",
+    "apexcharts": "^3.45.2",
     "autoprefixer": "^10.4.17",
     "byte-size": "^8.1.1",
     "commitlint": "^18.5.0",
