@@ -9,8 +9,8 @@ dependencies:
     specifier: ^18.5.0
     version: 18.5.0
   '@felte/solid':
-    specifier: ^1.2.11
-    version: 1.2.11(solid-js@1.8.12)
+    specifier: ^1.2.13
+    version: 1.2.13(solid-js@1.8.12)
   '@felte/validator-zod':
     specifier: ^1.0.17
     version: 1.0.17(zod@3.22.4)
@@ -1825,20 +1825,20 @@ packages:
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     dev: false
 
-  /@felte/core@1.4.1:
-    resolution: {integrity: sha512-dUzfzug5cK93kBjG0u9F3zDM781qCJP4QwYPOpJsXbydwVseDM5BXpDqvZUFhqJsd0x1GKftkX69+iWafyASjw==}
+  /@felte/core@1.4.3:
+    resolution: {integrity: sha512-DoXTuHD4atDG0SfTfI4orllcnriHRgM/ijMdRsUbLPL7O/UWGSWNXkxErx7XPbWOXMjX0J79KLfxZzm9abOCxw==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     dependencies:
       '@felte/common': 1.1.8
     dev: false
 
-  /@felte/solid@1.2.11(solid-js@1.8.12):
-    resolution: {integrity: sha512-0NlcDjr+AY6m2B48J4hvHMxbLvx1l7O9/j3izkb35qb+26wki4tk4HpIzmnRIweTT7PXsObq6mnuc20+MGlrMQ==}
+  /@felte/solid@1.2.13(solid-js@1.8.12):
+    resolution: {integrity: sha512-ngJgNRe0Frxl6iypCFbpKxs+xGw3MXucttqbCDAx7rSFe4BL9NqLDr65CZhd28KY4NRjbnYgAqT0mf0HxHz9Vw==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     peerDependencies:
       solid-js: ^1.2.0
     dependencies:
-      '@felte/core': 1.4.1
+      '@felte/core': 1.4.3
       solid-js: 1.8.12
     dev: false
 

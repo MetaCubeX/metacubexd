@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@commitlint/config-conventional": "^18.5.0",
-    "@felte/solid": "^1.2.11",
+    "@felte/solid": "^1.2.13",
     "@felte/validator-zod": "^1.0.17",
     "@fontsource/fira-sans": "^5.0.18",
     "@solid-primitives/clipboard": "^1.5.8",
