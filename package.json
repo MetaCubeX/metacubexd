@@ -63,7 +63,7 @@
     "solid-apexcharts": "^0.3.3",
     "solid-js": "^1.8.12",
     "solid-toast": "^0.5.0",
-    "sort-package-json": "^2.6.0",
+    "sort-package-json": "^2.7.0",
     "tailwind-merge": "^2.2.1",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.3.3",
