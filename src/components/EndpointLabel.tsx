@@ -1,14 +1,15 @@
 import { A } from '@solidjs/router'
+import { twMerge } from 'tailwind-merge'
 import { endpoint } from '~/signals'
 
-export const EndPointLabel = (pros: { class?: string }) => {
+export const EndpointLabel = (props: { class?: string }) => {
   return (
     <A
       href="/setup"
-      class={
-        (pros.class ?? '') +
-        ' bg-gradient-to-br from-primary to-secondary bg-clip-text normal-case text-transparent'
-      }
+      class={twMerge(
+        props.class,
+        ' bg-gradient-to-br from-primary to-secondary bg-clip-text normal-case text-transparent',
+      )}
     >
       {endpoint()?.url}
     </A>
