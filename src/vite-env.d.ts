@@ -1,5 +1,5 @@
 interface ImportMetaEnv {
-  readonly version: string
+  readonly VITE_APP_VERSION: string
 }
 
 interface ImportMeta {

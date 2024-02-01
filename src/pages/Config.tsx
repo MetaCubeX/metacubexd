@@ -497,7 +497,7 @@ const Versions: Component<{ backendVersion: Accessor<string> }> = ({
 
   return (
     <div class="grid grid-cols-2 gap-4">
-      <kbd class="kbd">{import.meta.env.version}</kbd>
+      <kbd class="kbd">{import.meta.env.VITE_APP_VERSION}</kbd>
 
       <div class="relative">
         <Show when={isUpdateAvailable()}>
