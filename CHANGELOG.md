@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.135.0](https://github.com/MetaCubeX/metacubexd/compare/v1.134.0...v1.135.0) (2024-02-01)
+
+
+### Features
+
+* get package.json version from npm builtin environment variable ([0cdf390](https://github.com/MetaCubeX/metacubexd/commit/0cdf390c2801f2b8dc4678898a709143204ccf30))
+
 ## [1.134.0](https://github.com/MetaCubeX/metacubexd/compare/v1.133.1...v1.134.0) (2023-12-03)
 
 
