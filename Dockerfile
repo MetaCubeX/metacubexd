@@ -1,5 +1,6 @@
 FROM docker.io/oven/bun:alpine as builder
 
+ENV HUSKY=0
 WORKDIR /build
 
 COPY . .

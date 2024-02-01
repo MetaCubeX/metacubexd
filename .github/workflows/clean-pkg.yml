@@ -1,4 +1,5 @@
 name: clean old package
+
 on:
   workflow_dispatch:
   schedule:
@@ -9,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/delete-package-versions@v4
-        with: 
+        with:
           package-name: 'metacubexd'
           package-type: 'container'
           min-versions-to-keep: 3
