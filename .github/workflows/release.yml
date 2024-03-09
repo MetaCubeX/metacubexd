@@ -48,7 +48,7 @@ jobs:
         run: tar czvf compressed-dist.tgz -C dist .
 
       - name: attach github release artifacts
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: compressed-dist.tgz
           tag_name: ${{ needs.release-please.outputs.tag_name }}
