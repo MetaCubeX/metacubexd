@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.135.1](https://github.com/MetaCubeX/metacubexd/compare/v1.135.0...v1.135.1) (2024-03-11)
+
+
+### Bug Fixes
+
+* version not showing ([0f0b771](https://github.com/MetaCubeX/metacubexd/commit/0f0b771f218b203bb37bb9d5432d462eb73b6192))
+
 ## [1.135.0](https://github.com/MetaCubeX/metacubexd/compare/v1.134.0...v1.135.0) (2024-02-01)
 
 
