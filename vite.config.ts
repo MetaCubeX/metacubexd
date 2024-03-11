@@ -6,6 +6,11 @@ export default defineConfig({
   base: './',
   build: { chunkSizeWarningLimit: 1000 },
   resolve: { alias: { '~': '/src' } },
+  define: {
+    'import.meta.env.APP_VERSION': JSON.stringify(
+      process.env.npm_package_version,
+    ),
+  },
   plugins: [
     solidPlugin(),
     splitVendorChunkPlugin(),
