@@ -123,7 +123,7 @@ export default () => {
               <button
                 class={twMerge(
                   activeTab() === tab.type && 'tab-active',
-                  'tab tab-sm gap-2 px-2 md:tab-md',
+                  'tab-sm md:tab-md tab gap-2 px-2',
                 )}
                 onClick={() => setActiveTab(tab.type)}
               >

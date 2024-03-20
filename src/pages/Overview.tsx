@@ -114,7 +114,7 @@ export default () => {
         </TrafficWidget>
       </div>
 
-      <div class="rounded-box flex flex-col gap-2 bg-base-300 py-4 lg:flex-row">
+      <div class="flex flex-col gap-2 rounded-box bg-base-300 py-4 lg:flex-row">
         <div class="flex-1">
           <SolidApexCharts
             type="area"
@@ -131,7 +131,7 @@ export default () => {
         </div>
       </div>
 
-      <footer class="footer rounded-box mx-auto mt-4 block bg-neutral p-4 text-center text-lg font-bold text-neutral-content">
+      <footer class="footer mx-auto mt-4 block rounded-box bg-neutral p-4 text-center text-lg font-bold text-neutral-content">
         {endpoint()?.url}
       </footer>
     </div>

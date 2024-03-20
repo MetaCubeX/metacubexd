@@ -69,7 +69,7 @@ const TagClientSourceIPWithNameForm: Component = () => {
   return (
     <form use:form={form}>
       <div class="join flex">
-        <select name="sourceIP" class="select join-item select-bordered">
+        <select name="sourceIP" class="join-item select select-bordered">
           <option />
 
           <Index

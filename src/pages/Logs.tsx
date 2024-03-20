@@ -135,7 +135,7 @@ export default () => {
       <div class="join w-full">
         <input
           type="search"
-          class="input join-item input-primary input-sm flex-1 flex-shrink-0 sm:input-md"
+          class="input input-sm join-item input-primary flex-1 flex-shrink-0 sm:input-md"
           placeholder={t('search')}
           onInput={(e) => setGlobalFilter(e.target.value)}
         />
