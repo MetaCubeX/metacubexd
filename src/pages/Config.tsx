@@ -35,6 +35,7 @@ import { isSingBox } from '~/helpers'
 import { locale, setLocale, useI18n } from '~/i18n'
 import {
   autoSwitchTheme,
+  endpoint,
   favDayTheme,
   favNightTheme,
   setAutoSwitchTheme,
@@ -514,6 +515,14 @@ const Versions: Component<{ backendVersion: Accessor<string> }> = ({
 }
 
 export default () => {
+  const navigate = useNavigate()
+
+  if (!endpoint()) {
+    navigate('/setup', { replace: true })
+
+    return null
+  }
+
   const [t] = useI18n()
 
   const [backendVersion, setBackendVersion] = createSignal('')

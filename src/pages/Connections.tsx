@@ -1,5 +1,6 @@
 import { writeClipboard } from '@solid-primitives/clipboard'
 import { makePersisted } from '@solid-primitives/storage'
+import { useNavigate } from '@solidjs/router'
 import {
   IconInfoSmall,
   IconPlayerPause,
@@ -51,6 +52,7 @@ import {
   connectionsTableColumnOrder,
   connectionsTableColumnVisibility,
   connectionsTableSize,
+  endpoint,
   formatTimeFromNow,
   setConnectionsTableColumnOrder,
   setConnectionsTableColumnVisibility,
@@ -78,6 +80,14 @@ const fuzzyFilter: FilterFn<Connection> = (row, columnId, value, addMeta) => {
 }
 
 export default () => {
+  const navigate = useNavigate()
+
+  if (!endpoint()) {
+    navigate('/setup', { replace: true })
+
+    return null
+  }
+
   let connectionsSettingsModalRef: HTMLDialogElement | undefined
   let connectionsDetailsModalRef: HTMLDialogElement | undefined
 

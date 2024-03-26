@@ -1,4 +1,5 @@
 import { makePersisted } from '@solid-primitives/storage'
+import { useNavigate } from '@solidjs/router'
 import {
   IconSettings,
   IconSortAscending,
@@ -20,7 +21,12 @@ import { twMerge } from 'tailwind-merge'
 import { Button, LogsSettingsModal } from '~/components'
 import { LOG_LEVEL } from '~/constants'
 import { useI18n } from '~/i18n'
-import { logsTableSize, tableSizeClassName, useWsRequest } from '~/signals'
+import {
+  endpoint,
+  logsTableSize,
+  tableSizeClassName,
+  useWsRequest,
+} from '~/signals'
 import { logLevel, logMaxRows } from '~/signals/config'
 import { Log } from '~/types'
 
@@ -40,6 +46,14 @@ const fuzzyFilter: FilterFn<LogWithSeq> = (row, columnId, value, addMeta) => {
 }
 
 export default () => {
+  const navigate = useNavigate()
+
+  if (!endpoint()) {
+    navigate('/setup', { replace: true })
+
+    return null
+  }
+
   let logsSettingsModalRef: HTMLDialogElement | undefined
 
   const [t] = useI18n()

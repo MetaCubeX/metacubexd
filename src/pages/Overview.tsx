@@ -1,4 +1,5 @@
 import { makeTimer } from '@solid-primitives/timer'
+import { useNavigate } from '@solidjs/router'
 import type { ApexOptions } from 'apexcharts'
 import byteSize from 'byte-size'
 import { merge } from 'lodash'
@@ -26,6 +27,14 @@ const TrafficWidget: ParentComponent<{ label: JSX.Element }> = (props) => (
 )
 
 export default () => {
+  const navigate = useNavigate()
+
+  if (!endpoint()) {
+    navigate('/setup', { replace: true })
+
+    return null
+  }
+
   const [t] = useI18n()
 
   const [traffics, setTraffics] = createSignal<{ down: number; up: number }[]>(

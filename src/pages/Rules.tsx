@@ -1,3 +1,4 @@
+import { useNavigate } from '@solidjs/router'
 import { IconReload } from '@tabler/icons-solidjs'
 import { createVirtualizer } from '@tanstack/solid-virtual'
 import { matchSorter } from 'match-sorter'
@@ -6,7 +7,7 @@ import { twMerge } from 'tailwind-merge'
 import { Button } from '~/components'
 import { useStringBooleanMap } from '~/helpers'
 import { useI18n } from '~/i18n'
-import { formatTimeFromNow, useRules } from '~/signals'
+import { endpoint, formatTimeFromNow, useRules } from '~/signals'
 import { Rule, RuleProvider } from '~/types'
 
 enum ActiveTab {
@@ -15,6 +16,14 @@ enum ActiveTab {
 }
 
 export default () => {
+  const navigate = useNavigate()
+
+  if (!endpoint()) {
+    navigate('/setup', { replace: true })
+
+    return null
+  }
+
   const [t] = useI18n()
   const {
     rules,

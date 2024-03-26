@@ -27,7 +27,7 @@ render(
     <I18nProvider locale={locale()}>
       <HashRouter root={App}>
         <Route path={ROUTES.Setup} component={Setup} />
-        <Route path="/" component={Overview} />
+        <Route path="*" component={Overview} />
         <Route path={ROUTES.Overview} component={Overview} />
         <Route path={ROUTES.Proxies} component={Proxies} />
         <Route path={ROUTES.Rules} component={Rules} />
