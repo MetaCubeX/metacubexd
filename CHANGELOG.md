@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.136.1](https://github.com/MetaCubeX/metacubexd/compare/v1.136.0...v1.136.1) (2024-03-26)
+
+
+### Bug Fixes
+
+* protected pages behind selected endpoint, fixes [#647](https://github.com/MetaCubeX/metacubexd/issues/647) ([a387722](https://github.com/MetaCubeX/metacubexd/commit/a3877229b8807f1c9f1b68f31dc348f061f3e24e))
+
 ## [1.136.0](https://github.com/MetaCubeX/metacubexd/compare/v1.135.1...v1.136.0) (2024-03-20)
 
 
