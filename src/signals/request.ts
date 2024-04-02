@@ -48,7 +48,7 @@ export const endpoint = () =>
 export const secret = () => endpoint()?.secret
 
 export const wsEndpointURL = () =>
-  new URL(endpoint()?.url ?? '').origin.replace('http', 'ws')
+  new URL(endpoint()?.url ?? '').href.replace('http', 'ws')
 
 export const useWsRequest = <T>(
   path: string,
