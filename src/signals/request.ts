@@ -2,6 +2,7 @@ import { createEventSignal } from '@solid-primitives/event-listener'
 import { makePersisted } from '@solid-primitives/storage'
 import { createReconnectingWS } from '@solid-primitives/websocket'
 import ky from 'ky'
+import _ from 'lodash'
 import { createMemo, createSignal } from 'solid-js'
 
 export const [selectedEndpoint, setSelectedEndpoint] = makePersisted(
@@ -48,7 +49,7 @@ export const endpoint = () =>
 export const secret = () => endpoint()?.secret
 
 export const wsEndpointURL = () =>
-  new URL(endpoint()?.url ?? '').href.replace('http', 'ws')
+  _.trimEnd(new URL(endpoint()?.url ?? '').href.replace('http', 'ws'), '/')
 
 export const useWsRequest = <T>(
   path: string,
