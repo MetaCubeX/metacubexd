@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.138.0](https://github.com/MetaCubeX/metacubexd/compare/v1.137.0...v1.138.0) (2024-04-08)
+
+
+### Features
+
+* bun -&gt; pnpm ([74ed544](https://github.com/MetaCubeX/metacubexd/commit/74ed5448f4aca701f7e0e5f3013485ba449171b7))
+
 ## [1.137.0](https://github.com/MetaCubeX/metacubexd/compare/v1.136.2...v1.137.0) (2024-04-08)
 
 
