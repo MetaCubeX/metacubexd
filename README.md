@@ -112,19 +112,19 @@ docker compose pull && docker compose up -d
 > Install npm dependencies
 
 ```shell
-bun install
+pnpm install
 ```
 
 > Build artifacts
 
 ```shell
-bun run build
+pnpm build
 ```
 
 > Serve static files
 
 ```shell
-bun run serve
+pnpm serve
 ```
 
 ## Credits

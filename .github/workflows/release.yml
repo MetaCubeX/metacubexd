@@ -27,13 +27,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: oven-sh/setup-bun@v1
+      - uses: pnpm/action-setup@v3
+        with:
+          version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          cache: pnpm
+          node-version: latest
 
       - name: install dependencies
-        run: bun install
+        run: pnpm install
 
       - name: build
-        run: bun run build
+        run: pnpm build
 
       - name: publish gh-pages
         uses: peaceiris/actions-gh-pages@v3

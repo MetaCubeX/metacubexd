@@ -1,12 +1,14 @@
-FROM docker.io/oven/bun:alpine as builder
+FROM docker.io/node:alpine as builder
 
 ENV HUSKY=0
 WORKDIR /build
 
 COPY . .
 
-RUN bun install
-RUN bun run build
+RUN corepack enable
+RUN corepack prepare pnpm@latest --activate
+RUN pnpm install
+RUN pnpm build
 
 FROM docker.io/caddy:alpine
 
