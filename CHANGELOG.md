@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.136.2](https://github.com/MetaCubeX/metacubexd/compare/v1.136.1...v1.136.2) (2024-04-07)
+
+
+### Bug Fixes
+
+* `//` in websocketpath ([#651](https://github.com/MetaCubeX/metacubexd/issues/651)) ([ed70948](https://github.com/MetaCubeX/metacubexd/commit/ed70948a364279f7f9acffb903f6e46a94191da6))
+
 ## [1.136.1](https://github.com/MetaCubeX/metacubexd/compare/v1.136.0...v1.136.1) (2024-03-26)
 
 
