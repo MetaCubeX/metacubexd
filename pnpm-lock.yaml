@@ -33,8 +33,8 @@ dependencies:
     specifier: ^1.2.2
     version: 1.2.2(solid-js@1.8.16)
   '@solid-primitives/media':
-    specifier: ^2.2.8
-    version: 2.2.8(solid-js@1.8.16)
+    specifier: ^2.2.9
+    version: 2.2.9(solid-js@1.8.16)
   '@solid-primitives/resize-observer':
     specifier: ^2.0.25
     version: 2.0.25(solid-js@1.8.16)
@@ -2182,8 +2182,8 @@ packages:
       solid-js: 1.8.16
     dev: false
 
-  /@solid-primitives/media@2.2.8(solid-js@1.8.16):
-    resolution: {integrity: sha512-jcwTxjEn07W5KEeQIc0nR+07xRjvsWTf115PIwScCWgo6aPkfW3x74aq7lH5F3mLfb/9SeTn0ixz8fBVel3cHg==}
+  /@solid-primitives/media@2.2.9(solid-js@1.8.16):
+    resolution: {integrity: sha512-QUmU62D4/d9YWx/4Dvr/UZasIkIpqNXz7wosA5GLmesRW9XlPa3G5M6uOmTw73SByHNTCw0D6x8bSdtvvLgzvQ==}
     peerDependencies:
       solid-js: ^1.6.12
     dependencies:
