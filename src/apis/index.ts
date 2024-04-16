@@ -38,7 +38,9 @@ export const reloadConfigFileAPI = async () => {
       searchParams: { force: true },
       json: { path: '', payload: '' },
     })
-  } catch {}
+  } catch {
+    /* empty */
+  }
   setReloadingConfigFile(false)
 }
 
@@ -47,7 +49,9 @@ export const flushFakeIPDataAPI = async () => {
   setFlushingFakeIPData(true)
   try {
     await request.post('cache/fakeip/flush')
-  } catch {}
+  } catch {
+    /* empty */
+  }
   setFlushingFakeIPData(false)
 }
 
@@ -56,7 +60,9 @@ export const updateGEODatabasesAPI = async () => {
   setUpdatingGEODatabases(true)
   try {
     await request.post('configs/geo')
-  } catch {}
+  } catch {
+    /* empty */
+  }
   setUpdatingGEODatabases(false)
 }
 
@@ -65,7 +71,9 @@ export const upgradeBackendAPI = async () => {
   setUpgradingBackend(true)
   try {
     await request.post('upgrade')
-  } catch {}
+  } catch {
+    /* empty */
+  }
   setUpgradingBackend(false)
 }
 
@@ -74,7 +82,9 @@ export const restartBackendAPI = async () => {
   setRestartingBackend(true)
   try {
     await request.post('restart')
-  } catch {}
+  } catch {
+    /* empty */
+  }
   setRestartingBackend(false)
 }
 

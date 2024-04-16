@@ -23,7 +23,9 @@ export const useStringBooleanMap = () => {
     set(name, true)
     try {
       await callback()
-    } catch {}
+    } catch {
+      /* empty */
+    }
     set(name, false)
   }
 

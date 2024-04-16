@@ -296,7 +296,9 @@ export const useProxies = () => {
     setUpdatingMap(providerName, async () => {
       try {
         await updateProxyProviderAPI(providerName)
-      } catch {}
+      } catch {
+        /* empty */
+      }
       await fetchProxies()
     })
 

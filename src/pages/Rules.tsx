@@ -49,7 +49,9 @@ export default () => {
     setAllProviderIsUpdating(true)
     try {
       await updateAllRuleProvider()
-    } catch {}
+    } catch {
+      /* empty */
+    }
     setAllProviderIsUpdating(false)
   }
 

@@ -1,9 +1,11 @@
 {
+  "eslint.experimental.useFlatConfig": true,
   "tailwindCSS.classAttributes": [
     "class",
     "className",
     "ngClass",
     "classList",
     ".*ClassName*"
-  ]
+  ],
+  "cSpell.words": ["restruct"]
 }
