@@ -1,4 +1,3 @@
-import { Show, createMemo } from 'solid-js'
 import { useProxies } from '~/signals'
 
 export const IPv6Support = (props: { name?: string }) => {

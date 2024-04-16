@@ -1,4 +1,4 @@
-import { children, ParentComponent } from 'solid-js'
+import type { ParentComponent } from 'solid-js'
 
 export const ConfigTitle: ParentComponent<{ withDivider?: boolean }> = (
   props,

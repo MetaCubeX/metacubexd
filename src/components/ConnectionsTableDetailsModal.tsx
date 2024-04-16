@@ -1,5 +1,5 @@
 import { IconNetwork } from '@tabler/icons-solidjs'
-import { Component, Show } from 'solid-js'
+import type { Component } from 'solid-js'
 import { Modal } from '~/components'
 import { useI18n } from '~/i18n'
 import { allConnections } from '~/signals'

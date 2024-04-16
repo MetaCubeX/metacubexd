@@ -1,8 +1,6 @@
-import { useNavigate } from '@solidjs/router'
 import { IconReload } from '@tabler/icons-solidjs'
 import { createVirtualizer } from '@tanstack/solid-virtual'
 import { matchSorter } from 'match-sorter'
-import { For, Show, createMemo, createSignal, onMount } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Button } from '~/components'
 import { useStringBooleanMap } from '~/helpers'

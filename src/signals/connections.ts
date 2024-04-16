@@ -1,5 +1,4 @@
 import { differenceWith, isNumber, unionWith } from 'lodash'
-import { createEffect, createSignal, untrack } from 'solid-js'
 import { CONNECTIONS_TABLE_MAX_CLOSED_ROWS } from '~/constants'
 import { Connection, ConnectionRawMessage } from '~/types'
 

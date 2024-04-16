@@ -1,12 +1,10 @@
 /* @refresh reload */
 import '~/index.css'
 
-import { HashRouter, Route } from '@solidjs/router'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { lazy } from 'solid-js'
-import { render } from 'solid-js/web'
 import { Toaster } from 'solid-toast'
 import { App } from '~/App'
 import { ROUTES } from '~/constants'

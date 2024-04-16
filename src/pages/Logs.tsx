@@ -1,5 +1,4 @@
 import { makePersisted } from '@solid-primitives/storage'
-import { useNavigate } from '@solidjs/router'
 import {
   IconSettings,
   IconSortAscending,
@@ -16,7 +15,6 @@ import {
   getFilteredRowModel,
   getSortedRowModel,
 } from '@tanstack/solid-table'
-import { For, Index, createEffect, createSignal } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Button, LogsSettingsModal } from '~/components'
 import { LOG_LEVEL } from '~/constants'

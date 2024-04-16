@@ -1,4 +1,3 @@
-import { A } from '@solidjs/router'
 import { endpoint } from '~/signals'
 
 export const LogoText = () => (

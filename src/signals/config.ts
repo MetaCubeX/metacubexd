@@ -1,5 +1,4 @@
 import { makePersisted } from '@solid-primitives/storage'
-import { createSignal } from 'solid-js'
 import {
   CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
   CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY,

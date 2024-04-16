@@ -1,16 +1,6 @@
 import { createForm } from '@felte/solid'
 import { validator } from '@felte/validator-zod'
-import { useNavigate } from '@solidjs/router'
-import {
-  Accessor,
-  Component,
-  For,
-  Show,
-  createEffect,
-  createResource,
-  createSignal,
-  onMount,
-} from 'solid-js'
+import type { Accessor, Component } from 'solid-js'
 import { toast } from 'solid-toast'
 import { z } from 'zod'
 import {

@@ -1,7 +1,6 @@
 import { createContextProvider } from '@solid-primitives/context'
 import * as i18n from '@solid-primitives/i18n'
 import { makePersisted } from '@solid-primitives/storage'
-import { createSignal } from 'solid-js'
 import { LANG } from '~/constants'
 import dict, { Dict } from './dict'
 

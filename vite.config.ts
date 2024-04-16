@@ -1,3 +1,4 @@
+import AutoImport from 'unplugin-auto-import/vite'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import solidPlugin from 'vite-plugin-solid'
@@ -13,6 +14,10 @@ export default defineConfig({
   },
   plugins: [
     solidPlugin(),
+
+    AutoImport({
+      packagePresets: ['solid-js', 'solid-js/web', '@solidjs/router'],
+    }),
 
     VitePWA({
       registerType: 'autoUpdate',

@@ -1,18 +1,9 @@
 import { makeTimer } from '@solid-primitives/timer'
-import { useNavigate } from '@solidjs/router'
 import type { ApexOptions } from 'apexcharts'
 import byteSize from 'byte-size'
 import { merge } from 'lodash'
 import { SolidApexCharts } from 'solid-apexcharts'
-import {
-  JSX,
-  ParentComponent,
-  batch,
-  children,
-  createEffect,
-  createMemo,
-  createSignal,
-} from 'solid-js'
+import type { JSX, ParentComponent } from 'solid-js'
 import { CHART_MAX_XAXIS, DEFAULT_CHART_OPTIONS } from '~/constants'
 import { useI18n } from '~/i18n'
 import { endpoint, latestConnectionMsg, useWsRequest } from '~/signals'

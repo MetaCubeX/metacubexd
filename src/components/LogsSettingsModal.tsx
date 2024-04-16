@@ -1,5 +1,5 @@
 import { IconFileStack } from '@tabler/icons-solidjs'
-import { Component, For } from 'solid-js'
+import type { Component } from 'solid-js'
 import { ConfigTitle, Modal } from '~/components'
 import {
   LOGS_TABLE_MAX_ROWS_LIST,

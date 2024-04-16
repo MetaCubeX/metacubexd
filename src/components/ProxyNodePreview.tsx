@@ -1,4 +1,3 @@
-import { createMemo, Match, Show, Switch } from 'solid-js'
 import { ProxyPreviewBar, ProxyPreviewDots } from '~/components'
 import { PROXIES_PREVIEW_TYPE } from '~/constants'
 import { proxiesPreviewType } from '~/signals'

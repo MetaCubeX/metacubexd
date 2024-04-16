@@ -1,4 +1,3 @@
-import { createMemo } from 'solid-js'
 import { Latency } from '~/components'
 import { latencyQualityMap, useProxies } from '~/signals'
 

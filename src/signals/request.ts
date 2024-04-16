@@ -3,7 +3,6 @@ import { makePersisted } from '@solid-primitives/storage'
 import { createReconnectingWS } from '@solid-primitives/websocket'
 import ky from 'ky'
 import _ from 'lodash'
-import { createMemo, createSignal } from 'solid-js'
 
 export const [selectedEndpoint, setSelectedEndpoint] = makePersisted(
   createSignal(''),

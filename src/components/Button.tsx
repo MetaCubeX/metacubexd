@@ -1,4 +1,4 @@
-import { JSX, ParentComponent, Show, splitProps } from 'solid-js'
+import type { JSX, ParentComponent } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 
 interface ButtonBaseProps extends JSX.ButtonHTMLAttributes<HTMLButtonElement> {

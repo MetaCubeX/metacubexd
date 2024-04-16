@@ -1,5 +1,5 @@
 import { IconX } from '@tabler/icons-solidjs'
-import { JSX, ParentComponent, Show, children } from 'solid-js'
+import type { JSX, ParentComponent } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Button } from '~/components'
 

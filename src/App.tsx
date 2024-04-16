@@ -1,5 +1,5 @@
 import { usePrefersDark } from '@solid-primitives/media'
-import { ParentComponent, Show, createEffect } from 'solid-js'
+import type { ParentComponent } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Header } from '~/components'
 import {

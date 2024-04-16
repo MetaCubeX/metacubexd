@@ -1,4 +1,3 @@
-import { For } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Latency } from '~/components'
 import { latencyQualityMap, useProxies } from '~/signals'

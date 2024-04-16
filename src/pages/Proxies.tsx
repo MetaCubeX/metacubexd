@@ -1,10 +1,8 @@
-import { useNavigate } from '@solidjs/router'
 import {
   IconBrandSpeedtest,
   IconReload,
   IconSettings,
 } from '@tabler/icons-solidjs'
-import { For, Show, createMemo, createSignal, onMount } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import {
   Button,

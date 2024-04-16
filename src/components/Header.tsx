@@ -1,4 +1,3 @@
-import { A, useLocation } from '@solidjs/router'
 import {
   IconFileStack,
   IconGlobe,
@@ -9,7 +8,7 @@ import {
   IconRuler,
   IconSettings,
 } from '@tabler/icons-solidjs'
-import { For, ParentComponent, Show, createSignal } from 'solid-js'
+import type { ParentComponent } from 'solid-js'
 import { LogoText } from '~/components'
 import { ROUTES, themes } from '~/constants'
 import { useI18n } from '~/i18n'

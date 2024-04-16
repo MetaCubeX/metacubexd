@@ -1,6 +1,5 @@
 import { writeClipboard } from '@solid-primitives/clipboard'
 import { makePersisted } from '@solid-primitives/storage'
-import { useNavigate } from '@solidjs/router'
 import {
   IconInfoSmall,
   IconPlayerPause,
@@ -29,14 +28,6 @@ import {
 import byteSize from 'byte-size'
 import dayjs from 'dayjs'
 import { uniq } from 'lodash'
-import {
-  For,
-  Index,
-  createEffect,
-  createMemo,
-  createSignal,
-  on,
-} from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { closeAllConnectionsAPI, closeSingleConnectionAPI } from '~/apis'
 import {

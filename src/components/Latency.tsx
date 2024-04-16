@@ -1,4 +1,3 @@
-import { Show, createEffect, createMemo, createSignal } from 'solid-js'
 import { LATENCY_QUALITY_MAP_HTTP } from '~/constants'
 import { useI18n } from '~/i18n'
 import { latencyQualityMap, useProxies } from '~/signals'

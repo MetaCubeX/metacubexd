@@ -1,5 +1,4 @@
 import { IconBrandSpeedtest } from '@tabler/icons-solidjs'
-import { createMemo, Show } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Button, IPv6Support, Latency } from '~/components'
 import { filterSpecialProxyType, formatProxyType } from '~/helpers'

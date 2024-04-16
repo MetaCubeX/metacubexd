@@ -17,7 +17,7 @@ import {
   useDragDropContext,
 } from '@thisbeyond/solid-dnd'
 import { uniq } from 'lodash'
-import { Component, For, Index, Show, createSignal } from 'solid-js'
+import type { Component } from 'solid-js'
 import { z } from 'zod'
 import { Button, ConfigTitle, Modal } from '~/components'
 import {

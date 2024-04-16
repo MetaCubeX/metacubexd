@@ -1,5 +1,3 @@
-import { createSignal } from 'solid-js'
-
 export const isSingBox = (version: string) => {
   return version.includes('sing-box')
 }

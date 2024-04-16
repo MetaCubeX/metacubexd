@@ -1,5 +1,5 @@
 import { IconGlobe } from '@tabler/icons-solidjs'
-import { Component, For } from 'solid-js'
+import type { Component } from 'solid-js'
 import { ConfigTitle, Modal } from '~/components'
 import { PROXIES_ORDERING_TYPE, PROXIES_PREVIEW_TYPE } from '~/constants'
 import { useI18n } from '~/i18n'

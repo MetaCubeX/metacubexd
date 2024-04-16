@@ -1,5 +1,5 @@
 import { createWindowSize } from '@solid-primitives/resize-observer'
-import { ParentComponent, Show, children, createMemo } from 'solid-js'
+import type { ParentComponent } from 'solid-js'
 
 export const RenderInTwoColumns: ParentComponent = (props) => {
   const resolvedChildren = children(() => props.children)

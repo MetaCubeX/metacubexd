@@ -1,4 +1,3 @@
-import { batch, createSignal, untrack } from 'solid-js'
 import {
   closeSingleConnectionAPI,
   fetchProxiesAPI,
@@ -103,7 +102,7 @@ const setProxiesInfo = (
     newProxyNodeMap[proxy.name] = { udp, xudp, type, now, name, provider }
 
     // to solve the problem of the ProxyGroup cannot obtain the latency of the currently used proxy node
-    // it seems that only clash.core and clash.preminu have issues
+    // it seems that only clash.core and clash.premium have issues
     if (!now) {
       newLatencyMap[proxy.name] =
         lastDelay(proxy, urlForLatencyTest()) ||

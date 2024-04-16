@@ -66,6 +66,7 @@
     "tailwindcss": "^3.4.3",
     "typescript": "^5.4.5",
     "typescript-eslint": "^7.7.0",
+    "unplugin-auto-import": "^0.17.5",
     "uuid": "^9.0.1",
     "vite": "^5.2.9",
     "vite-plugin-pwa": "^0.19.8",
