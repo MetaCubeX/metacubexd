@@ -57,8 +57,8 @@ dependencies:
     specifier: ^8.15.1
     version: 8.15.1
   '@tanstack/solid-table':
-    specifier: ^8.16.0
-    version: 8.16.0(solid-js@1.8.16)
+    specifier: ^8.16.1
+    version: 8.16.1(solid-js@1.8.16)
   '@tanstack/solid-virtual':
     specifier: ^3.3.0
     version: 3.3.0(solid-js@1.8.16)
@@ -2313,8 +2313,8 @@ packages:
       remove-accents: 0.5.0
     dev: false
 
-  /@tanstack/solid-table@8.16.0(solid-js@1.8.16):
-    resolution: {integrity: sha512-HrqRpHL699TdXvqQvOulqA9AsaAceFNR+UoAqjXUX/CYMt49AEFdysiSzJ4/Qsls7MS1gnaCuEYWFjocoRzgog==}
+  /@tanstack/solid-table@8.16.1(solid-js@1.8.16):
+    resolution: {integrity: sha512-v63WeHWV/HQyMjVBjcqjl/nzbucS8Ry6B0Nue1F5nlEBNqm1GU/yIYH8yiU3bzsH1dpoZi9NaToP4gvyqWriRQ==}
     engines: {node: '>=12'}
     peerDependencies:
       solid-js: '>=1.3'
