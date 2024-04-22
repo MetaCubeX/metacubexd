@@ -18,8 +18,8 @@ dependencies:
     specifier: ^1.0.17
     version: 1.0.17(zod@3.22.5)
   '@fontsource/fira-sans':
-    specifier: ^5.0.19
-    version: 5.0.19
+    specifier: ^5.0.20
+    version: 5.0.20
   '@solid-primitives/clipboard':
     specifier: ^1.5.10
     version: 1.5.10(solid-js@1.8.16)
@@ -1816,11 +1816,6 @@ packages:
       - supports-color
     dev: false
 
-  /@eslint/js@9.0.0:
-    resolution: {integrity: sha512-RThY/MnKrhubF6+s1JflwUjPEsnCEmYCWwqa/aRISKWNXGZ9epUwft4bUMM35SdKF9xvBrLydAM1RDHd1Z//ZQ==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-    dev: false
-
   /@eslint/js@9.1.1:
     resolution: {integrity: sha512-5WoDz3Y19Bg2BnErkZTp0en+c/i9PvgFS7MBe1+m60HjFr0hrphlAGp4yzI7pxpt4xShln4ZyYp4neJm8hmOkQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
@@ -1858,8 +1853,8 @@ packages:
       zod: 3.22.5
     dev: false
 
-  /@fontsource/fira-sans@5.0.19:
-    resolution: {integrity: sha512-6hTOV2mgGx2OCyuXwjCPSfvQra4aw4t6rDCvembo8VHIVALOwEH6rmHrITDAVhxjP6p+51I0+9j+x6JD155G5w==}
+  /@fontsource/fira-sans@5.0.20:
+    resolution: {integrity: sha512-inmUjoKPrgnO4uUaZTAgP0b6YdhDfA52axHXvdTwgLvwd2kn3ZgK52UZoxD0VnrvTOjLA/iE4oC0tNtz4nyb5g==}
     dev: false
 
   /@humanwhocodes/config-array@0.13.0:
