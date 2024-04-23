@@ -18,7 +18,7 @@
     "@eslint/js": "^9.1.1",
     "@felte/solid": "^1.2.13",
     "@felte/validator-zod": "^1.0.17",
-    "@fontsource/fira-sans": "^5.0.19",
+    "@fontsource/fira-sans": "^5.0.20",
     "@solid-primitives/clipboard": "^1.5.10",
     "@solid-primitives/context": "^0.2.3",
     "@solid-primitives/event-listener": "^2.3.3",
