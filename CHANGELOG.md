@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.138.1](https://github.com/MetaCubeX/metacubexd/compare/v1.138.0...v1.138.1) (2024-04-23)
+
+
+### Bug Fixes
+
+* closes [#685](https://github.com/MetaCubeX/metacubexd/issues/685) ([995388f](https://github.com/MetaCubeX/metacubexd/commit/995388f74fcdb54007a8e595334b6e0a2910a91c))
+
 ## [1.138.0](https://github.com/MetaCubeX/metacubexd/compare/v1.137.0...v1.138.0) (2024-04-08)
 
 
