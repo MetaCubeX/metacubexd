@@ -395,7 +395,9 @@ export default () => {
               if (table.getState().globalFilter) {
                 table
                   .getFilteredRowModel()
-                  .rows.forEach(({ id }) => closeSingleConnectionAPI(id))
+                  .rows.forEach(({ original }) =>
+                    closeSingleConnectionAPI(original.id),
+                  )
               } else {
                 closeAllConnectionsAPI()
               }

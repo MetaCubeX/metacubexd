@@ -16,7 +16,8 @@ export default defineConfig({
     solidPlugin(),
 
     AutoImport({
-      packagePresets: ['solid-js', 'solid-js/web', '@solidjs/router'],
+      imports: ['solid-js'],
+      packagePresets: ['@solidjs/router'],
     }),
 
     VitePWA({
