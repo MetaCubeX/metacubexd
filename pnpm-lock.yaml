@@ -39,8 +39,8 @@ dependencies:
     specifier: ^2.0.25
     version: 2.0.25(solid-js@1.8.16)
   '@solid-primitives/storage':
-    specifier: ^3.3.0
-    version: 3.3.0(solid-js@1.8.16)
+    specifier: ^3.4.0
+    version: 3.4.0(solid-js@1.8.16)
   '@solid-primitives/timer':
     specifier: ^1.3.9
     version: 1.3.9(solid-js@1.8.16)
@@ -2244,12 +2244,15 @@ packages:
       solid-js: 1.8.16
     dev: false
 
-  /@solid-primitives/storage@3.3.0(solid-js@1.8.16):
-    resolution: {integrity: sha512-kHFbKLHg0QJ2DblF9M1hU6wvlennPGWKCsuXj2oAxB7157odhDdcoB0DEOr/C8RWjZsIxBgEle5Q45CNqCQ1fw==}
+  /@solid-primitives/storage@3.4.0(solid-js@1.8.16):
+    resolution: {integrity: sha512-1DUlBBX97qxv1w2Wb0XDidT+yuG43kNAdZvw4R7N8XLlE9XYtyGdplguYgEOBxyhpoR6vK5TvpdT2A5lUv8mPg==}
     peerDependencies:
+      '@tauri-apps/plugin-store': '*'
       solid-js: ^1.6.12
       solid-start: '*'
     peerDependenciesMeta:
+      '@tauri-apps/plugin-store':
+        optional: true
       solid-start:
         optional: true
     dependencies:
