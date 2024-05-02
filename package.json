@@ -68,7 +68,7 @@
     "typescript-eslint": "^7.7.1",
     "unplugin-auto-import": "^0.17.5",
     "uuid": "^9.0.1",
-    "vite": "^5.2.9",
+    "vite": "^5.2.11",
     "vite-plugin-pwa": "^0.19.8",
     "vite-plugin-solid": "^2.10.2",
     "zod": "^3.22.5"
