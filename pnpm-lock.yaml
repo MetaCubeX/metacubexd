@@ -162,8 +162,8 @@ dependencies:
     specifier: ^7.7.1
     version: 7.8.0(eslint@9.2.0)(typescript@5.4.5)
   unplugin-auto-import:
-    specifier: ^0.17.5
-    version: 0.17.5(rollup@2.79.1)
+    specifier: ^0.17.6
+    version: 0.17.6(rollup@2.79.1)
   uuid:
     specifier: ^9.0.1
     version: 9.0.1
@@ -197,6 +197,10 @@ packages:
 
   /@antfu/utils@0.7.7:
     resolution: {integrity: sha512-gFPqTG7otEJ8uP6wrhDv6mqwGWYZKNvAcCq6u9hOj0c+IKCEsY4L1oC9trPq2SaWIzAfHvqfBDxF591JkMf+kg==}
+    dev: false
+
+  /@antfu/utils@0.7.8:
+    resolution: {integrity: sha512-rWQkqXRESdjXtc+7NRfK9lASQjpXJu1ayp7qi1d23zZorY+wBHVLHHoVcMsEnkqEBWTFqbztO7/QdJFzyEcLTg==}
     dev: false
 
   /@apideck/better-ajv-errors@0.3.6(ajv@8.13.0):
@@ -6288,8 +6292,8 @@ packages:
     engines: {node: '>= 10.0.0'}
     dev: false
 
-  /unplugin-auto-import@0.17.5(rollup@2.79.1):
-    resolution: {integrity: sha512-fHNDkDSxv3PGagX1wmKBYBkgaM4AKAgZmdJw/bxjhNljx9KSXSgHpGfX0MwUrq9qw6q1bhHIZVWyOwoY2koo4w==}
+  /unplugin-auto-import@0.17.6(rollup@2.79.1):
+    resolution: {integrity: sha512-dmX0Pex5DzMzVuALkexboOZvh51fL/BD6aoPO7qHoTYGlQp0GRKsREv2KMF1lzYI9SXKQiRxAjwzbQnrFFNydQ==}
     engines: {node: '>=14'}
     peerDependencies:
       '@nuxt/kit': ^3.2.2
@@ -6300,7 +6304,7 @@ packages:
       '@vueuse/core':
         optional: true
     dependencies:
-      '@antfu/utils': 0.7.7
+      '@antfu/utils': 0.7.8
       '@rollup/pluginutils': 5.1.0(rollup@2.79.1)
       fast-glob: 3.3.2
       local-pkg: 0.5.0
