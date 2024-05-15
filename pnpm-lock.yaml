@@ -51,8 +51,8 @@ dependencies:
     specifier: ^0.13.2
     version: 0.13.3(solid-js@1.8.17)
   '@tabler/icons-solidjs':
-    specifier: ^2.47.0
-    version: 2.47.0(solid-js@1.8.17)
+    specifier: ^3.3.0
+    version: 3.3.0(solid-js@1.8.17)
   '@tanstack/match-sorter-utils':
     specifier: ^8.15.1
     version: 8.15.1
@@ -2311,17 +2311,17 @@ packages:
       string.prototype.matchall: 4.0.11
     dev: false
 
-  /@tabler/icons-solidjs@2.47.0(solid-js@1.8.17):
-    resolution: {integrity: sha512-qyQau0ViXrYy0ut8ZkLTTvLlbCZi92P5YIlEV7t6f1a5sAN9CMuTcsjrZM60Vf7+6o7tloUgW+VFgc9kwsIBcg==}
+  /@tabler/icons-solidjs@3.3.0(solid-js@1.8.17):
+    resolution: {integrity: sha512-spOad61pFAE57YGOcPqFN5458TBF0ctZzEfwiVzvLByJbrmuocmgeUmctsmfmdXNQ5yTtyk5NBmelpxQuyFJrA==}
     peerDependencies:
       solid-js: ^1.4.7
     dependencies:
-      '@tabler/icons': 2.47.0
+      '@tabler/icons': 3.3.0
       solid-js: 1.8.17
     dev: false
 
-  /@tabler/icons@2.47.0:
-    resolution: {integrity: sha512-4w5evLh+7FUUiA1GucvGj2ReX2TvOjEr4ejXdwL/bsjoSkof6r1gQmzqI+VHrE2CpJpB3al7bCTulOkFa/RcyA==}
+  /@tabler/icons@3.3.0:
+    resolution: {integrity: sha512-PLVe9d7b59sKytbx00KgeGhQG3N176Ezv8YMmsnSz4s0ifDzMWlp/h2wEfQZ0ZNe8e377GY2OW6kovUe3Rnd0g==}
     dev: false
 
   /@tanstack/match-sorter-utils@8.15.1:
