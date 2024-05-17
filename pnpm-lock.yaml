@@ -9,8 +9,8 @@ dependencies:
     specifier: ^19.2.2
     version: 19.2.2
   '@eslint/js':
-    specifier: ^9.2.0
-    version: 9.2.0
+    specifier: ^9.3.0
+    version: 9.3.0
   '@felte/solid':
     specifier: ^1.2.13
     version: 1.2.13(solid-js@1.8.17)
@@ -1817,6 +1817,11 @@ packages:
 
   /@eslint/js@9.2.0:
     resolution: {integrity: sha512-ESiIudvhoYni+MdsI8oD7skpprZ89qKocwRM2KEvhhBJ9nl5MRh7BXU5GTod7Mdygq+AUl+QzId6iWJKR/wABA==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    dev: false
+
+  /@eslint/js@9.3.0:
+    resolution: {integrity: sha512-niBqk8iwv96+yuTwjM6bWg8ovzAPF9qkICsGtcoa5/dmqcEMfdwNAX7+/OHcJHc7wj7XqPxH98oAHytFYlw6Sw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     dev: false
 
