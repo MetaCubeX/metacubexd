@@ -128,6 +128,7 @@ declare global {
   const useAssets: (typeof import('solid-js/web'))['useAssets']
   const useBeforeLeave: (typeof import('@solidjs/router'))['useBeforeLeave']
   const useContext: (typeof import('solid-js'))['useContext']
+  const useCurrentMatches: (typeof import('@solidjs/router'))['useCurrentMatches']
   const useHref: (typeof import('@solidjs/router'))['useHref']
   const useIsRouting: (typeof import('@solidjs/router'))['useIsRouting']
   const useLocation: (typeof import('@solidjs/router'))['useLocation']
