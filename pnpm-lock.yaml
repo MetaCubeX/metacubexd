@@ -135,8 +135,8 @@ dependencies:
     specifier: ^3.2.4
     version: 3.2.4(prettier@3.2.5)(typescript@5.4.5)
   prettier-plugin-tailwindcss:
-    specifier: ^0.5.14
-    version: 0.5.14(prettier-plugin-organize-imports@3.2.4)(prettier@3.2.5)
+    specifier: ^0.6.0
+    version: 0.6.0(prettier-plugin-organize-imports@3.2.4)(prettier@3.2.5)
   solid-apexcharts:
     specifier: ^0.3.4
     version: 0.3.4(apexcharts@3.49.1)(solid-js@1.8.17)
@@ -5131,8 +5131,8 @@ packages:
       typescript: 5.4.5
     dev: false
 
-  /prettier-plugin-tailwindcss@0.5.14(prettier-plugin-organize-imports@3.2.4)(prettier@3.2.5):
-    resolution: {integrity: sha512-Puaz+wPUAhFp8Lo9HuciYKM2Y2XExESjeT+9NQoVFXZsPPnc9VYss2SpxdQ6vbatmt8/4+SN0oe0I1cPDABg9Q==}
+  /prettier-plugin-tailwindcss@0.6.0(prettier-plugin-organize-imports@3.2.4)(prettier@3.2.5):
+    resolution: {integrity: sha512-l5F3iG54XbOq/2DOPP/YA+c6VE3/qXrcBccntq2v7PSxtEc+J6SwsuTyDHxoFK1+jAlcU/hECBfzn6MON6ENBg==}
     engines: {node: '>=14.21.3'}
     peerDependencies:
       '@ianvs/prettier-plugin-sort-imports': '*'
