@@ -135,14 +135,14 @@ export const fetchProxiesAPI = () => {
 export const updateProxyProviderAPI = (providerName: string) => {
   const request = useRequest()
 
-  return request.put(`providers/proxies/${providerName}`)
+  return request.put(`providers/proxies/${encodeURIComponent(providerName)}`)
 }
 
 export const proxyProviderHealthCheckAPI = (providerName: string) => {
   const request = useRequest()
 
   return request
-    .get(`providers/proxies/${providerName}/healthcheck`, {
+    .get(`providers/proxies/${encodeURIComponent(providerName)}/healthcheck`, {
       timeout: 5 * 1000,
     })
     .json<Record<string, number>>()
@@ -151,7 +151,7 @@ export const proxyProviderHealthCheckAPI = (providerName: string) => {
 export const selectProxyInGroupAPI = (groupName: string, proxyName: string) => {
   const request = useRequest()
 
-  return request.put(`proxies/${groupName}`, {
+  return request.put(`proxies/${encodeURIComponent(groupName)}`, {
     body: JSON.stringify({
       name: proxyName,
     }),
@@ -173,7 +173,7 @@ export const proxyLatencyTestAPI = (
   }
 
   return request
-    .get(`proxies/${proxyName}/delay`, {
+    .get(`proxies/${encodeURIComponent(proxyName)}/delay`, {
       searchParams: {
         url,
         timeout,
@@ -190,7 +190,7 @@ export const proxyGroupLatencyTestAPI = (
   const request = useRequest()
 
   return request
-    .get(`group/${groupName}/delay`, {
+    .get(`group/${encodeURIComponent(groupName)}/delay`, {
       searchParams: {
         url,
         timeout,
@@ -216,7 +216,7 @@ export const fetchRuleProvidersAPI = () => {
 export const updateRuleProviderAPI = (providerName: string) => {
   const request = useRequest()
 
-  return request.put(`providers/rules/${providerName}`)
+  return request.put(`providers/rules/${encodeURIComponent(providerName)}`)
 }
 
 type ReleaseAPIResponse = {
