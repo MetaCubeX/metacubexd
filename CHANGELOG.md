@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.140.0](https://github.com/MetaCubeX/metacubexd/compare/v1.139.0...v1.140.0) (2024-06-02)
+
+
+### Features
+
+* pin packageManager version ([a8cf520](https://github.com/MetaCubeX/metacubexd/commit/a8cf520b5a516198c5552e4442cf2a4ef37b5441))
+
 ## [1.139.0](https://github.com/MetaCubeX/metacubexd/compare/v1.138.2...v1.139.0) (2024-06-02)
 
 
