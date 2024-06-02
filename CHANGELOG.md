@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.139.0](https://github.com/MetaCubeX/metacubexd/compare/v1.138.2...v1.139.0) (2024-06-02)
+
+
+### Features
+
+* upgrade dependencies ([af43c7d](https://github.com/MetaCubeX/metacubexd/commit/af43c7d233df9416871402e20f18e81ffba61cee))
+
 ## [1.138.2](https://github.com/MetaCubeX/metacubexd/compare/v1.138.1...v1.138.2) (2024-06-02)
 
 
