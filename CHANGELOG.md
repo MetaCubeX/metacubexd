@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.138.2](https://github.com/MetaCubeX/metacubexd/compare/v1.138.1...v1.138.2) (2024-06-02)
+
+
+### Bug Fixes
+
+* auto configure ([#726](https://github.com/MetaCubeX/metacubexd/issues/726)) ([ce4f67d](https://github.com/MetaCubeX/metacubexd/commit/ce4f67d6504614502fac781174a75472d50bb312))
+* Encode name to prevent request failure due to '/' in URL ([#734](https://github.com/MetaCubeX/metacubexd/issues/734)) ([c121167](https://github.com/MetaCubeX/metacubexd/commit/c121167407ee212049a643551fca29e83642bcf2))
+
 ## [1.138.1](https://github.com/MetaCubeX/metacubexd/compare/v1.138.0...v1.138.1) (2024-04-23)
 
 
