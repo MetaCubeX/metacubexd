@@ -108,11 +108,21 @@ export default () => {
   }
 
   onMount(() => {
-    const query = new URLSearchParams(location.search)
+    let search = location.search
+
+    if (search.length === 0) {
+      const searchList = location.hash.match(/\?.*$/)
+
+      if (searchList.length > 0 && searchList[0].length > 0) {
+        search = searchList[0].replace('?', '', 1)
+      }
+    }
+
+    const query = new URLSearchParams(search)
 
     if (query.has('hostname')) {
       void onSubmit({
-        url: `${window.location.protocol}//${query.get('hostname')}${
+        url: `${query.get('http') ? 'http:' : query.get('https') ? 'https:' : window.location.protocol}//${query.get('hostname')}${
           query.get('port') ? `:${query.get('port')}` : ''
         }`,
         secret: query.get('secret') ?? '',
