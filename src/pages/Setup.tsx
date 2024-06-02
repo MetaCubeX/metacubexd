@@ -110,11 +110,11 @@ export default () => {
   onMount(() => {
     let search = location.search
 
-    if (search.length === 0) {
+    if (search) {
       const searchList = location.hash.match(/\?.*$/)
 
-      if (searchList.length > 0 && searchList[0].length > 0) {
-        search = searchList[0].replace('?', '', 1)
+      if (Array.isArray(searchList) && searchList[0]) {
+        search = searchList[0].replace('?', '')
       }
     }
 
