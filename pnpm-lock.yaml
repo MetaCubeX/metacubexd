@@ -66,8 +66,8 @@ importers:
         specifier: ^3.5.0
         version: 3.5.0(solid-js@1.8.17)
       '@tanstack/virtual-core':
-        specifier: ^3.5.0
-        version: 3.5.0
+        specifier: ^3.5.1
+        version: 3.5.1
       '@thisbeyond/solid-dnd':
         specifier: ^0.7.5
         version: 0.7.5(solid-js@1.8.17)
@@ -1333,6 +1333,9 @@ packages:
 
   '@tanstack/virtual-core@3.5.0':
     resolution: {integrity: sha512-KnPRCkQTyqhanNC0K63GBG3wA8I+D1fQuVnAvcBF8f13akOKeQp1gSbu6f77zCxhEk727iV5oQnbHLYzHrECLg==}
+
+  '@tanstack/virtual-core@3.5.1':
+    resolution: {integrity: sha512-046+AUSiDru/V9pajE1du8WayvBKeCvJ2NmKPy/mR8/SbKKrqmSbj7LJBfXE+nSq4f5TBXvnCzu0kcYebI9WdQ==}
 
   '@thisbeyond/solid-dnd@0.7.5':
     resolution: {integrity: sha512-DfI5ff+yYGpK9M21LhYwIPlbP2msKxN2ARwuu6GF8tT1GgNVDTI8VCQvH4TJFoVApP9d44izmAcTh/iTCH2UUw==}
@@ -4945,6 +4948,8 @@ snapshots:
   '@tanstack/table-core@8.17.3': {}
 
   '@tanstack/virtual-core@3.5.0': {}
+
+  '@tanstack/virtual-core@3.5.1': {}
 
   '@thisbeyond/solid-dnd@0.7.5(solid-js@1.8.17)':
     dependencies:
