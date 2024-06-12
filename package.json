@@ -55,7 +55,7 @@
     "lint-staged": "^15.2.5",
     "lodash": "^4.17.21",
     "match-sorter": "^6.3.4",
-    "prettier": "^3.3.1",
+    "prettier": "^3.3.2",
     "prettier-plugin-organize-imports": "^3.2.4",
     "prettier-plugin-tailwindcss": "^0.6.2",
     "solid-apexcharts": "^0.3.4",
