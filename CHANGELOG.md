@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.140.1](https://github.com/MetaCubeX/metacubexd/compare/v1.140.0...v1.140.1) (2024-06-16)
+
+
+### Bug Fixes
+
+* don't allow invalid url like 'http:127.0.0.1' ([#766](https://github.com/MetaCubeX/metacubexd/issues/766)) ([68b97a6](https://github.com/MetaCubeX/metacubexd/commit/68b97a6753f322f6e8e95ffb9c92f36ef5c04ca9))
+
 ## [1.140.0](https://github.com/MetaCubeX/metacubexd/compare/v1.139.0...v1.140.0) (2024-06-02)
 
 
