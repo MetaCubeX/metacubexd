@@ -3,7 +3,7 @@ export const isSingBox = (version: string) => {
 }
 
 export const transformEndpointURL = (url: string) =>
-  /^https?/.test(url) ? url : `${window.location.protocol}//${url}`
+  /^https?:\/\//.test(url) ? url : `${window.location.protocol}//${url}`
 
 export const useStringBooleanMap = () => {
   const [map, setMap] = createSignal<Record<string, boolean>>({})
