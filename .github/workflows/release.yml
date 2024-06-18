@@ -80,7 +80,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: build and publish ghcr.io docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           builder: ${{ steps.buildx.outputs.name }}
