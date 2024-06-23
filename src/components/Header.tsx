@@ -121,9 +121,9 @@ export const Header = () => {
 
             <ul class="menu min-h-full w-2/5 gap-2 rounded-r-box bg-base-300 pt-20">
               <For each={navs()}>
-                {({ href, name }) => (
+                {({ href, name, icon }) => (
                   <li onClick={() => setOpenedDrawer(false)}>
-                    <A href={href}>{name}</A>
+                    <A href={href}>{icon} {name}</A>
                   </li>
                 )}
               </For>
