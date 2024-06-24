@@ -18,6 +18,8 @@ import {
   updatingGEODatabases,
   upgradeBackendAPI,
   upgradingBackend,
+  upgradeUIAPI,
+  upgradingUI,
 } from '~/apis'
 import { Button, ConfigTitle } from '~/components'
 import { LANG, MODE_OPTIONS, ROUTES, themes } from '~/constants'
@@ -363,12 +365,10 @@ const ConfigForm: Component<{ backendVersion: Accessor<string> }> = ({
 
         <Button
           class="btn-info"
-          onClick={() => {
-            setSelectedEndpoint('')
-            navigate(ROUTES.Setup)
-          }}
+          loading={upgradingUI()}
+          onClick={upgradeUIAPI}
         >
-          {t('switchEndpoint')}
+          {t('upgradeUI')}
         </Button>
       </div>
     </div>
@@ -377,7 +377,7 @@ const ConfigForm: Component<{ backendVersion: Accessor<string> }> = ({
 
 const ConfigForXd = () => {
   const [t] = useI18n()
-
+  const navigate = useNavigate()
   const languages = [
     {
       label: () => t('en'),
@@ -418,6 +418,19 @@ const ConfigForXd = () => {
               )}
             </For>
           </select>
+        </div>
+
+        <div class="flex flex-col">
+          <div class="py-2 text-center text-lg font-semibold">&nbsp;</div>
+          <Button
+            class="btn-info"
+            onClick={() => {
+              setSelectedEndpoint('')
+              navigate(ROUTES.Setup)
+            }}
+          >
+            {t('switchEndpoint')}
+          </Button>
         </div>
       </div>
 

@@ -58,6 +58,7 @@ export default {
   updateGEODatabases: 'Update GEO Databases',
   restartCore: 'Restart Core',
   upgradeCore: 'Upgrade Core',
+  upgradeUI: 'Upgrade Dashboard',
   proxiesSorting: 'Proxies Sorting',
   orderNatural: 'Original order in config file',
   orderLatency_asc: 'By latency from low to high',

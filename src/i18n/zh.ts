@@ -60,6 +60,7 @@ export default {
   updateGEODatabases: '更新 GEO 数据库',
   restartCore: '重启核心',
   upgradeCore: '更新核心',
+  upgradeUI: '更新控制面板',
   proxiesSorting: '节点排序',
   orderNatural: '原配置文件中的排序',
   orderLatency_asc: '按延迟从低到高',
