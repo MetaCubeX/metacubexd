@@ -117,6 +117,16 @@ const ConfigForm: Component<{ backendVersion: Accessor<string> }> = ({
 
   const portList = [
     {
+      label: () => t('port', { name: 'Mixed' }),
+      key: 'mixed-port',
+      onChange: (e: Event & { target: HTMLInputElement }) =>
+        void updateBackendConfigAPI(
+          'mixed-port',
+          Number(e.target.value),
+          refetch,
+        ),
+    },
+    {
       label: () => t('port', { name: 'HTTP' }),
       key: 'port',
       onChange: (e: Event & { target: HTMLInputElement }) =>
@@ -148,16 +158,6 @@ const ConfigForm: Component<{ backendVersion: Accessor<string> }> = ({
       onChange: (e: Event & { target: HTMLInputElement }) =>
         void updateBackendConfigAPI(
           'tproxy-port',
-          Number(e.target.value),
-          refetch,
-        ),
-    },
-    {
-      label: () => t('port', { name: 'Mixed' }),
-      key: 'mixed-port',
-      onChange: (e: Event & { target: HTMLInputElement }) =>
-        void updateBackendConfigAPI(
-          'mixed-port',
           Number(e.target.value),
           refetch,
         ),
@@ -330,30 +330,12 @@ const ConfigForm: Component<{ backendVersion: Accessor<string> }> = ({
         </Button>
 
         <Button
-          class="btn-secondary"
-          loading={updatingGEODatabases()}
-          onClick={updateGEODatabasesAPI}
-        >
-          {t('updateGEODatabases')}
-        </Button>
-
-        <Button
           class="btn-accent"
           loading={flushingFakeIPData()}
           onClick={flushFakeIPDataAPI}
         >
           {t('flushFakeIP')}
         </Button>
-
-        <Show when={!isSingBox(backendVersion())}>
-          <Button
-            class="btn-error"
-            loading={upgradingBackend()}
-            onClick={upgradeBackendAPI}
-          >
-            {t('upgradeCore')}
-          </Button>
-        </Show>
 
         <Button
           class="btn-warning"
@@ -363,13 +345,31 @@ const ConfigForm: Component<{ backendVersion: Accessor<string> }> = ({
           {t('restartCore')}
         </Button>
 
-        <Button
-          class="btn-info"
-          loading={upgradingUI()}
-          onClick={upgradeUIAPI}
-        >
-          {t('upgradeUI')}
-        </Button>
+        <Show when={!isSingBox(backendVersion())}>
+          <Button
+            class="btn-secondary"
+            loading={updatingGEODatabases()}
+            onClick={updateGEODatabasesAPI}
+          >
+            {t('updateGEODatabases')}
+          </Button>
+
+          <Button
+            class="btn-info"
+            loading={upgradingUI()}
+            onClick={upgradeUIAPI}
+          >
+            {t('upgradeUI')}
+          </Button>
+
+          <Button
+            class="btn-error"
+            loading={upgradingBackend()}
+            onClick={upgradeBackendAPI}
+          >
+            {t('upgradeCore')}
+          </Button>
+        </Show>
       </div>
     </div>
   )
