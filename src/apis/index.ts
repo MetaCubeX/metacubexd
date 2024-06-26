@@ -28,6 +28,7 @@ export const [updatingGEODatabases, setUpdatingGEODatabases] =
   createSignal(false)
 export const [flushingFakeIPData, setFlushingFakeIPData] = createSignal(false)
 export const [upgradingBackend, setUpgradingBackend] = createSignal(false)
+export const [upgradingUI, setUpgradingUI] = createSignal(false)
 export const [restartingBackend, setRestartingBackend] = createSignal(false)
 
 export const reloadConfigFileAPI = async () => {
@@ -75,6 +76,17 @@ export const upgradeBackendAPI = async () => {
     /* empty */
   }
   setUpgradingBackend(false)
+}
+
+export const upgradeUIAPI = async () => {
+  const request = useRequest()
+  setUpgradingUI(true)
+  try {
+    await request.post('upgrade/ui')
+  } catch {
+    /* empty */
+  }
+  setUpgradingUI(false)
 }
 
 export const restartBackendAPI = async () => {
