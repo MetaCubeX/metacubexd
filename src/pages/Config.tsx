@@ -17,8 +17,8 @@ import {
   updateGEODatabasesAPI,
   updatingGEODatabases,
   upgradeBackendAPI,
-  upgradingBackend,
   upgradeUIAPI,
+  upgradingBackend,
   upgradingUI,
 } from '~/apis'
 import { Button, ConfigTitle } from '~/components'
@@ -113,7 +113,6 @@ const ConfigForm: Component<{ backendVersion: Accessor<string> }> = ({
   backendVersion,
 }) => {
   const [t] = useI18n()
-  const navigate = useNavigate()
 
   const portList = [
     {

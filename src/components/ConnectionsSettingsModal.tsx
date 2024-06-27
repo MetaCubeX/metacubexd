@@ -41,8 +41,8 @@ import {
 
 const TagClientSourceIPWithNameForm: Component = () => {
   const schema = z.object({
-    tagName: z.string().nonempty(),
-    sourceIP: z.string().nonempty(),
+    tagName: z.string().min(1),
+    sourceIP: z.string().min(1),
   })
 
   const [t] = useI18n()
