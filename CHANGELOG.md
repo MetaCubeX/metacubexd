@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.141.0](https://github.com/MetaCubeX/metacubexd/compare/v1.140.1...v1.141.0) (2024-06-27)
+
+
+### Features
+
+* Add Upgrade Dashboard Button ([#784](https://github.com/MetaCubeX/metacubexd/issues/784)) ([32704fb](https://github.com/MetaCubeX/metacubexd/commit/32704fbaaf8593bebf7a0050d4278bc314daf7f5))
+
 ## [1.140.1](https://github.com/MetaCubeX/metacubexd/compare/v1.140.0...v1.140.1) (2024-06-16)
 
 
