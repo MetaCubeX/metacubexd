@@ -123,7 +123,9 @@ export const Header = () => {
               <For each={navs()}>
                 {({ href, name, icon }) => (
                   <li onClick={() => setOpenedDrawer(false)}>
-                    <A href={href}>{icon} {name}</A>
+                    <A href={href}>
+                      {icon} {name}
+                    </A>
                   </li>
                 )}
               </For>
