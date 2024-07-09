@@ -41,9 +41,7 @@ export const App: ParentComponent = ({ children }) => {
     >
       <Header />
 
-      <div class="flex-1 overflow-y-auto p-2 sm:p-4">
-        <div class="pb-8">{children}</div>
-      </div>
+      <div class="flex-1 overflow-y-auto p-2 sm:p-4">{children}</div>
 
       <Show when={endpoint()}>
         <ProtectedResources />
