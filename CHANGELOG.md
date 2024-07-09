@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.141.1](https://github.com/MetaCubeX/metacubexd/compare/v1.141.0...v1.141.1) (2024-07-09)
+
+
+### Bug Fixes
+
+* virtual scroll not working on rules page ([#814](https://github.com/MetaCubeX/metacubexd/issues/814)) ([54c18f7](https://github.com/MetaCubeX/metacubexd/commit/54c18f7d3fcd8237f233dd1da875c1853e84bdd3))
+
 ## [1.141.0](https://github.com/MetaCubeX/metacubexd/compare/v1.140.1...v1.141.0) (2024-06-27)
 
 
