@@ -40,7 +40,7 @@
     "@types/node": "^20.14.9",
     "@types/uuid": "^10.0.0",
     "@vite-pwa/assets-generator": "^0.2.4",
-    "apexcharts": "^3.49.2",
+    "apexcharts": "^3.50.0",
     "autoprefixer": "^10.4.19",
     "byte-size": "^8.1.1",
     "commitlint": "^19.3.0",
