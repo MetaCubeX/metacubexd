@@ -166,10 +166,7 @@ export default () => {
         onInput={(e) => setGlobalFilter(e.currentTarget.value)}
       />
 
-      <div
-        ref={(ref) => (scrollElementRef = ref)}
-        class="flex-1 overflow-y-auto"
-      >
+      <div ref={scrollElementRef} class="flex-1 overflow-y-auto">
         <Show when={activeTab() === ActiveTab.rules}>
           <div
             class="relative"

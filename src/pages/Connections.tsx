@@ -25,6 +25,7 @@ import {
   getGroupedRowModel,
   getSortedRowModel,
 } from '@tanstack/solid-table'
+import { createVirtualizer } from '@tanstack/solid-virtual'
 import byteSize from 'byte-size'
 import dayjs from 'dayjs'
 import { uniq } from 'lodash'
@@ -332,6 +333,20 @@ export default () => {
     },
   ])
 
+  const rows = createMemo(() => table.getRowModel().rows)
+
+  let scrollElementRef: HTMLDivElement | undefined
+
+  const { getTotalSize, getVirtualItems, measureElement } = createVirtualizer({
+    get count() {
+      return rows().length
+    },
+    getItemKey: (index) => rows()[index].id,
+    getScrollElement: () => scrollElementRef!,
+    estimateSize: () => 32,
+    overscan: 5,
+  })
+
   return (
     <div class="flex h-full flex-col gap-2">
       <div class="flex w-full flex-wrap items-center gap-2">
@@ -413,125 +428,152 @@ export default () => {
         </div>
       </div>
 
-      <div class="overflow-x-auto whitespace-nowrap rounded-md bg-base-300">
-        <table
-          class={twMerge(
-            tableSizeClassName(connectionsTableSize()),
-            'table table-zebra relative rounded-none',
-          )}
+      <div
+        ref={scrollElementRef}
+        class="flex-1 overflow-auto whitespace-nowrap rounded-md bg-base-300"
+      >
+        <div
+          style={{
+            height: `${getTotalSize()}px`,
+          }}
         >
-          <thead class="sticky top-0 z-10 h-8">
-            <For each={table.getHeaderGroups()}>
-              {(headerGroup) => (
-                <tr>
-                  <For each={headerGroup.headers}>
-                    {(header) => (
-                      <th class="bg-base-200">
-                        <div class={twMerge('flex items-center gap-2')}>
-                          {header.column.getCanGroup() ? (
-                            <button
-                              class="cursor-pointer"
-                              onClick={header.column.getToggleGroupingHandler()}
-                            >
-                              {header.column.getIsGrouped() ? (
-                                <IconZoomOutFilled size={18} />
-                              ) : (
-                                <IconZoomInFilled size={18} />
-                              )}
-                            </button>
-                          ) : null}
-
-                          <div
-                            class={twMerge(
-                              header.column.getCanSort() &&
-                                'cursor-pointer select-none',
-                              'flex-1',
-                            )}
-                            onClick={header.column.getToggleSortingHandler()}
-                          >
-                            {flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                          </div>
-
-                          {{
-                            asc: <IconSortAscending />,
-                            desc: <IconSortDescending />,
-                          }[header.column.getIsSorted() as string] ?? null}
-                        </div>
-                      </th>
-                    )}
-                  </For>
-                </tr>
-              )}
-            </For>
-          </thead>
-
-          <tbody>
-            <For each={table.getRowModel().rows}>
-              {(row) => (
-                <tr class="hover:!bg-primary hover:text-primary-content">
-                  <For each={row.getVisibleCells()}>
-                    {(cell) => {
-                      return (
-                        <td
-                          class="py-2"
-                          onContextMenu={(e) => {
-                            e.preventDefault()
-
-                            const value = cell.renderValue() as null | string
-                            value && writeClipboard(value).catch(() => {})
-                          }}
-                        >
-                          {cell.getIsGrouped() ? (
-                            <button
-                              class={twMerge(
-                                row.getCanExpand()
-                                  ? 'cursor-pointer'
-                                  : 'cursor-normal',
-                                'flex items-center gap-2',
-                              )}
-                              onClick={row.getToggleExpandedHandler()}
-                            >
-                              <div>
-                                {row.getIsExpanded() ? (
+          <table
+            class={twMerge(
+              tableSizeClassName(connectionsTableSize()),
+              'table table-zebra rounded-none',
+            )}
+          >
+            <thead class="bg-base-200">
+              <For each={table.getHeaderGroups()}>
+                {(headerGroup) => (
+                  <tr>
+                    <For each={headerGroup.headers}>
+                      {(header) => (
+                        <th>
+                          <div class={twMerge('flex items-center gap-2')}>
+                            {header.column.getCanGroup() ? (
+                              <button
+                                class="cursor-pointer"
+                                onClick={header.column.getToggleGroupingHandler()}
+                              >
+                                {header.column.getIsGrouped() ? (
                                   <IconZoomOutFilled size={18} />
                                 ) : (
                                   <IconZoomInFilled size={18} />
                                 )}
-                              </div>
+                              </button>
+                            ) : null}
 
-                              <div>
-                                {flexRender(
+                            <div
+                              class={twMerge(
+                                header.column.getCanSort() &&
+                                  'cursor-pointer select-none',
+                                'flex-1',
+                              )}
+                              onClick={header.column.getToggleSortingHandler()}
+                            >
+                              {flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
+                            </div>
+
+                            {{
+                              asc: <IconSortAscending />,
+                              desc: <IconSortDescending />,
+                            }[header.column.getIsSorted() as string] ?? null}
+                          </div>
+                        </th>
+                      )}
+                    </For>
+                  </tr>
+                )}
+              </For>
+            </thead>
+
+            <tbody>
+              <For each={getVirtualItems()}>
+                {(virtualRow, index) => {
+                  let ref!: HTMLTableRowElement
+                  const row = createMemo(() => rows()[index()])
+                  onMount(() => measureElement(ref))
+
+                  return (
+                    <tr
+                      ref={ref}
+                      class="hover:!bg-primary hover:text-primary-content"
+                      data-index={index()}
+                      style={{
+                        height: `${virtualRow.size}px`,
+                        transform: `translateY(${
+                          getVirtualItems()[0]?.start || 0
+                        }px)`,
+                      }}
+                    >
+                      <For each={row().getVisibleCells()}>
+                        {(cell) => {
+                          return (
+                            <td
+                              class="py-2"
+                              onContextMenu={(e) => {
+                                e.preventDefault()
+
+                                const value = cell.renderValue() as
+                                  | null
+                                  | string
+                                value && writeClipboard(value).catch(() => {})
+                              }}
+                            >
+                              {cell.getIsGrouped() ? (
+                                <button
+                                  class={twMerge(
+                                    row().getCanExpand()
+                                      ? 'cursor-pointer'
+                                      : 'cursor-normal',
+                                    'flex items-center gap-2',
+                                  )}
+                                  onClick={row().getToggleExpandedHandler()}
+                                >
+                                  <div>
+                                    {row().getIsExpanded() ? (
+                                      <IconZoomOutFilled size={18} />
+                                    ) : (
+                                      <IconZoomInFilled size={18} />
+                                    )}
+                                  </div>
+
+                                  <div>
+                                    {flexRender(
+                                      cell.column.columnDef.cell,
+                                      cell.getContext(),
+                                    )}
+                                  </div>
+
+                                  <div>({row().subRows.length})</div>
+                                </button>
+                              ) : cell.getIsAggregated() ? (
+                                flexRender(
+                                  cell.column.columnDef.aggregatedCell ??
+                                    cell.column.columnDef.cell,
+                                  cell.getContext(),
+                                )
+                              ) : cell.getIsPlaceholder() ? null : (
+                                flexRender(
                                   cell.column.columnDef.cell,
                                   cell.getContext(),
-                                )}
-                              </div>
-
-                              <div>({row.subRows.length})</div>
-                            </button>
-                          ) : cell.getIsAggregated() ? (
-                            flexRender(
-                              cell.column.columnDef.aggregatedCell ??
-                                cell.column.columnDef.cell,
-                              cell.getContext(),
-                            )
-                          ) : cell.getIsPlaceholder() ? null : (
-                            flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext(),
-                            )
-                          )}
-                        </td>
-                      )
-                    }}
-                  </For>
-                </tr>
-              )}
-            </For>
-          </tbody>
-        </table>
+                                )
+                              )}
+                            </td>
+                          )
+                        }}
+                      </For>
+                    </tr>
+                  )
+                }}
+              </For>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <ConnectionsSettingsModal
