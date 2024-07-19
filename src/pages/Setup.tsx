@@ -108,7 +108,7 @@ export default () => {
   }
 
   onMount(() => {
-    let search = location.search
+    let search = location.search || window.location.search
 
     if (search) {
       const searchList = location.hash.match(/\?.*$/)
