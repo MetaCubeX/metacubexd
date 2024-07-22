@@ -36,7 +36,7 @@
     "@tanstack/virtual-core": "^3.8.1",
     "@thisbeyond/solid-dnd": "^0.7.5",
     "@types/byte-size": "^8.1.2",
-    "@types/lodash": "^4.17.6",
+    "@types/lodash": "^4.17.7",
     "@types/node": "^20.14.10",
     "@types/uuid": "^10.0.0",
     "@vite-pwa/assets-generator": "^0.2.4",
