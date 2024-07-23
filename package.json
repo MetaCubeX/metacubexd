@@ -42,7 +42,7 @@
     "@vite-pwa/assets-generator": "^0.2.4",
     "apexcharts": "^3.51.0",
     "autoprefixer": "^10.4.19",
-    "byte-size": "^8.1.1",
+    "byte-size": "^9.0.0",
     "commitlint": "^19.3.0",
     "daisyui": "^4.12.10",
     "dayjs": "^1.11.11",
