@@ -135,6 +135,7 @@ declare global {
   const useMatch: (typeof import('@solidjs/router'))['useMatch']
   const useNavigate: (typeof import('@solidjs/router'))['useNavigate']
   const useParams: (typeof import('@solidjs/router'))['useParams']
+  const usePreloadRoute: (typeof import('@solidjs/router'))['usePreloadRoute']
   const useResolvedPath: (typeof import('@solidjs/router'))['useResolvedPath']
   const useRouteData: (typeof import('@solidjs/router'))['useRouteData']
   const useRoutes: (typeof import('@solidjs/router'))['useRoutes']

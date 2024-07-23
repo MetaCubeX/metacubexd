@@ -2,7 +2,7 @@ import { LATENCY_QUALITY_MAP_HTTP } from '~/constants'
 import { useI18n } from '~/i18n'
 import { latencyQualityMap, useProxies } from '~/signals'
 
-export const Latency = (props: { name?: string }) => {
+export const Latency = (props: { name?: string; class?: string }) => {
   const [t] = useI18n()
   const { latencyMap } = useProxies()
   const [textClassName, setTextClassName] = createSignal('')
@@ -25,7 +25,9 @@ export const Latency = (props: { name?: string }) => {
         latency() !== LATENCY_QUALITY_MAP_HTTP.NOT_CONNECTED
       }
     >
-      <span class={`whitespace-nowrap text-xs ${textClassName()}`}>
+      <span
+        class={`whitespace-nowrap text-xs ${textClassName()} ${props.class}`}
+      >
         {latency()}
         {t('ms')}
       </span>

@@ -26,7 +26,8 @@ export const ProxyNodeCard = (props: {
     <div
       class={twMerge(
         'border-neutral-focus card card-bordered tooltip-bottom flex flex-col justify-between gap-1 bg-neutral p-2 text-neutral-content',
-        isSelected && 'border-primary bg-primary-content text-primary',
+        isSelected &&
+          'bg-gradient-to-br from-primary to-secondary text-primary-content',
         onClick && 'cursor-pointer',
       )}
       onClick={onClick}
@@ -61,7 +62,7 @@ export const ProxyNodeCard = (props: {
         <div
           class={twMerge(
             'text-xs text-slate-500',
-            isSelected && 'text-primary',
+            isSelected && 'text-primary-content',
           )}
         >
           {formatProxyType(proxyNode()?.type)}
@@ -69,9 +70,10 @@ export const ProxyNodeCard = (props: {
           <Show when={specialType()}>{` :: ${specialType()}`}</Show>
         </div>
 
-        <div class="text-xs">
-          <Latency name={props.proxyName} />
-        </div>
+        <Latency
+          name={props.proxyName}
+          class={twMerge(isSelected && 'badge badge-sm px-1')}
+        />
       </div>
     </div>
   )

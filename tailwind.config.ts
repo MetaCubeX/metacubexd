@@ -7,8 +7,8 @@ export default {
   daisyui: { themes: true },
   theme: {
     fontFamily: {
-      twemoji: ['Fira Sans', 'Twemoji Mozilla', 'system-ui', 'monospace'],
-      'no-twemoji': ['Fira Sans', 'system-ui', 'monospace'],
+      twemoji: ['system-ui', 'Twemoji Mozilla', 'Fira Sans', 'monospace'],
+      'no-twemoji': ['system-ui', 'Fira Sans', 'monospace'],
     },
   },
 } as Config
