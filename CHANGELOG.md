@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.141.2](https://github.com/MetaCubeX/metacubexd/compare/v1.141.1...v1.141.2) (2024-07-23)
+
+
+### Bug Fixes
+
+* location.search not work ([#842](https://github.com/MetaCubeX/metacubexd/issues/842)) ([614430e](https://github.com/MetaCubeX/metacubexd/commit/614430e0060bf3852f73ad3e5aab97ae032a99f0))
+* respect system ui font & better looking (maybe) for proxy card ([#844](https://github.com/MetaCubeX/metacubexd/issues/844)) ([4b669ff](https://github.com/MetaCubeX/metacubexd/commit/4b669ff030c4c3aa713d639e03ceda185f6b9db6))
+
 ## [1.141.1](https://github.com/MetaCubeX/metacubexd/compare/v1.141.0...v1.141.1) (2024-07-09)
 
 
