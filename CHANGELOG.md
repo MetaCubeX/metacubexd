@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.142.0](https://github.com/MetaCubeX/metacubexd/compare/v1.141.2...v1.142.0) (2024-07-24)
+
+
+### Features
+
+* logs pause ([#855](https://github.com/MetaCubeX/metacubexd/issues/855)) ([776d8f8](https://github.com/MetaCubeX/metacubexd/commit/776d8f8daf0b2232a5b25020f14c4062b74761a7))
+
+
+### Bug Fixes
+
+* ipv6 latency test ([#854](https://github.com/MetaCubeX/metacubexd/issues/854)) ([d6ec561](https://github.com/MetaCubeX/metacubexd/commit/d6ec561b81f42d8bf76be62ebedc053c883067a3))
+
 ## [1.141.2](https://github.com/MetaCubeX/metacubexd/compare/v1.141.1...v1.141.2) (2024-07-23)
 
 
