@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.143.0](https://github.com/MetaCubeX/metacubexd/compare/v1.142.0...v1.143.0) (2024-07-24)
+
+
+### Features
+
+* quick filter for connections ([#856](https://github.com/MetaCubeX/metacubexd/issues/856)) ([916a661](https://github.com/MetaCubeX/metacubexd/commit/916a661011a3b559df6b91fd85bb2a17e039f508))
+
 ## [1.142.0](https://github.com/MetaCubeX/metacubexd/compare/v1.141.2...v1.142.0) (2024-07-24)
 
 
