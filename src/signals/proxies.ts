@@ -257,6 +257,7 @@ export const useProxies = () => {
   }
 
   const proxyLatencyTest = async (proxyName: string, provider: string) => {
+    await proxyIPv6SupportTest(proxyName, provider)
     setProxyLatencyTestingMap(proxyName, async () => {
       const { delay } = await proxyLatencyTestAPI(
         proxyName,
@@ -270,10 +271,10 @@ export const useProxies = () => {
         [proxyName]: delay,
       }))
     })
-    await proxyIPv6SupportTest(proxyName, provider)
   }
 
   const proxyGroupLatencyTest = async (proxyGroupName: string) => {
+    await proxyGroupIPv6SupportTest(proxyGroupName)
     setProxyGroupLatencyTestingMap(proxyGroupName, async () => {
       const newLatencyMap = await proxyGroupLatencyTestAPI(
         proxyGroupName,
@@ -288,7 +289,6 @@ export const useProxies = () => {
 
       await fetchProxies()
     })
-    await proxyGroupIPv6SupportTest(proxyGroupName)
   }
 
   const updateProviderByProviderName = (providerName: string) =>
