@@ -112,4 +112,5 @@ export default {
   en: 'English',
   zh: 'Chinese',
   port: '{{ name }} Port',
+  quickFilter: 'Quick Filter',
 }

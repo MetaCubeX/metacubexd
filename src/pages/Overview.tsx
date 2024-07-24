@@ -87,8 +87,8 @@ export default () => {
   ])
 
   return (
-    <div class="flex flex-col gap-2">
-      <div class="stats stats-vertical w-full grid-cols-2 bg-primary shadow lg:stats-horizontal lg:flex">
+    <div class="flex flex-col gap-2 lg:h-full">
+      <div class="stats stats-vertical w-full flex-shrink-0 grid-cols-2 bg-gradient-to-br from-primary to-secondary shadow lg:stats-horizontal lg:flex">
         <TrafficWidget label={t('upload')}>
           {byteSize(traffic()?.up || 0).toString()}/s
         </TrafficWidget>

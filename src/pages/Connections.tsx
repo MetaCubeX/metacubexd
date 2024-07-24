@@ -45,6 +45,7 @@ import {
   connectionsTableSize,
   endpoint,
   formatTimeFromNow,
+  quickFilterRegex,
   setConnectionsTableColumnOrder,
   setConnectionsTableColumnVisibility,
   tableSizeClassName,
@@ -89,7 +90,13 @@ export default () => {
     useConnections()
 
   const [globalFilter, setGlobalFilter] = createSignal('')
-
+  const [enableQuickFilter, setEnableQuickFilter] = makePersisted(
+    createSignal(false),
+    {
+      name: 'enableQuickFilter',
+      storage: localStorage,
+    },
+  )
   const [selectedConnectionID, setSelectedConnectionID] = createSignal<string>()
 
   const columns: ColumnDef<Connection>[] = [
@@ -283,9 +290,24 @@ export default () => {
       },
     },
     get data() {
-      return activeTab() === ActiveTab.activeConnections
-        ? activeConnections()
-        : closedConnections()
+      const connections =
+        activeTab() === ActiveTab.activeConnections
+          ? activeConnections()
+          : closedConnections()
+
+      connections.sort((a, b) => {
+        return a.id.localeCompare(b.id)
+      })
+
+      if (!enableQuickFilter()) {
+        return connections
+      }
+
+      const reg = new RegExp(quickFilterRegex(), 'i')
+
+      return connections.filter(
+        (connection) => !reg.test(connection.chains.join('')),
+      )
     },
     sortDescFirst: true,
     enableHiding: true,
@@ -351,6 +373,16 @@ export default () => {
                 </button>
               )}
             </Index>
+          </div>
+
+          <div class="flex items-center">
+            <span class="mr-2 hidden lg:inline-block">{t('quickFilter')}:</span>
+            <input
+              type="checkbox"
+              class="toggle"
+              checked={enableQuickFilter()}
+              onChange={(e) => setEnableQuickFilter(e.target.checked)}
+            />
           </div>
 
           <select
