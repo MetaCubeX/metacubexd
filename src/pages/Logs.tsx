@@ -1,5 +1,7 @@
 import { makePersisted } from '@solid-primitives/storage'
 import {
+  IconPlayerPause,
+  IconPlayerPlay,
   IconSettings,
   IconSortAscending,
   IconSortDescending,
@@ -19,16 +21,9 @@ import { twMerge } from 'tailwind-merge'
 import { Button, LogsSettingsModal } from '~/components'
 import { LOG_LEVEL } from '~/constants'
 import { useI18n } from '~/i18n'
-import {
-  endpoint,
-  logsTableSize,
-  tableSizeClassName,
-  useWsRequest,
-} from '~/signals'
-import { logLevel, logMaxRows } from '~/signals/config'
-import { Log } from '~/types'
-
-type LogWithSeq = Log & { seq: number }
+import { endpoint, logsTableSize, tableSizeClassName } from '~/signals'
+import { useLogs } from '~/signals/logs'
+import { LogWithSeq } from '~/types'
 
 const fuzzyFilter: FilterFn<LogWithSeq> = (row, columnId, value, addMeta) => {
   // Rank the item
@@ -53,27 +48,9 @@ export default () => {
   }
 
   let logsSettingsModalRef: HTMLDialogElement | undefined
-
   const [t] = useI18n()
-
-  let seq = 1
-  const [logs, setLogs] = createSignal<LogWithSeq[]>([])
-
-  const logsData = useWsRequest<Log>('logs', { level: logLevel() })
-
-  createEffect(() => {
-    const data = logsData()
-
-    if (!data) {
-      return
-    }
-
-    setLogs((logs) => [{ ...data, seq }, ...logs].slice(0, logMaxRows()))
-
-    seq++
-  })
-
   const [globalFilter, setGlobalFilter] = createSignal('')
+  const { logs, paused, setPaused } = useLogs()
 
   const [sorting, setSorting] = makePersisted(createSignal<SortingState>([]), {
     name: 'logsTableSorting',
@@ -152,6 +129,11 @@ export default () => {
           onInput={(e) => setGlobalFilter(e.target.value)}
         />
 
+        <Button
+          class="join-item btn-sm sm:btn-md"
+          onClick={() => setPaused((paused) => !paused)}
+          icon={paused() ? <IconPlayerPlay /> : <IconPlayerPause />}
+        />
         <Button
           class="join-item btn-sm sm:btn-md"
           onClick={() => logsSettingsModalRef?.showModal()}
