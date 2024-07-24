@@ -113,6 +113,8 @@ export type Log = {
   payload: string
 }
 
+export type LogWithSeq = Log & { seq: number }
+
 export type Config = {
   mode: 'global' | 'rule' | 'direct'
   port: number
