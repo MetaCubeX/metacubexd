@@ -114,4 +114,5 @@ export default {
   en: '英文',
   zh: '中文',
   port: '{{ name }} 端口',
+  quickFilter: '快速过滤',
 } satisfies Dict

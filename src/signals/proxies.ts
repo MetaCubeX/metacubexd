@@ -32,7 +32,6 @@ type ProxyInfo = {
 export type ProxyWithProvider = Proxy & { provider?: string }
 export type ProxyNodeWithProvider = ProxyNode & { provider?: string }
 
-const { map: collapsedMap, set: setCollapsedMap } = useStringBooleanMap()
 const {
   map: proxyLatencyTestingMap,
   setWithCallback: setProxyLatencyTestingMap,
@@ -322,8 +321,6 @@ export const useProxies = () => {
     })
 
   return {
-    collapsedMap,
-    setCollapsedMap,
     proxyIPv6SupportMap,
     proxyLatencyTestingMap,
     proxyGroupLatencyTestingMap,

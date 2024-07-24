@@ -1,3 +1,4 @@
+import { makePersisted } from '@solid-primitives/storage'
 import { differenceWith, isNumber, unionWith } from 'lodash'
 import { CONNECTIONS_TABLE_MAX_CLOSED_ROWS } from '~/constants'
 import { Connection, ConnectionRawMessage } from '~/types'
@@ -7,6 +8,14 @@ export type WsMsg = {
   uploadTotal: number
   downloadTotal: number
 } | null
+
+export const [quickFilterRegex, setQuickFilterRegex] = makePersisted(
+  createSignal<string>('Direct|direct|dns-out'),
+  {
+    name: 'quickFilterRegex',
+    storage: localStorage,
+  },
+)
 
 // we make connections global, so we can keep track of connections when user in proxy page
 // when user selects proxy and close some connections they can back and check connections

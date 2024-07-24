@@ -1,3 +1,4 @@
+import { makePersisted } from '@solid-primitives/storage'
 import {
   IconBrandSpeedtest,
   IconReload,
@@ -55,13 +56,23 @@ export default () => {
     updateAllProvider,
     proxyGroupLatencyTest,
     proxyProviderLatencyTest,
-    collapsedMap,
-    setCollapsedMap,
     proxyGroupLatencyTestingMap,
     proxyProviderLatencyTestingMap,
     isAllProviderUpdating,
     updatingMap,
   } = useProxies()
+
+  const [collapsedMap, setCollapsedMap] = makePersisted(
+    createSignal<Record<string, boolean>>({}),
+    {
+      name: 'collapsedMap',
+      storage: localStorage,
+    },
+  )
+
+  const setCollapsedMapByKey = (key: string, value: boolean) => {
+    setCollapsedMap((prev) => ({ ...prev, [key]: value }))
+  }
 
   onMount(fetchProxies)
 
@@ -221,7 +232,9 @@ export default () => {
                   <Collapse
                     isOpen={collapsedMap()[proxyGroup.name]}
                     title={title}
-                    onCollapse={(val) => setCollapsedMap(proxyGroup.name, val)}
+                    onCollapse={(val) =>
+                      setCollapsedMapByKey(proxyGroup.name, val)
+                    }
                   >
                     <For each={sortedProxyNames()}>
                       {(proxyName) => (
@@ -330,7 +343,7 @@ export default () => {
                     isOpen={collapsedMap()[proxyProvider.name]}
                     title={title}
                     onCollapse={(val) =>
-                      setCollapsedMap(proxyProvider.name, val)
+                      setCollapsedMapByKey(proxyProvider.name, val)
                     }
                   >
                     <For each={sortedProxyNames()}>
