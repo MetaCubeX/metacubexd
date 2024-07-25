@@ -93,8 +93,8 @@ importers:
         specifier: ^10.4.19
         version: 10.4.19(postcss@8.4.39)
       byte-size:
-        specifier: ^8.1.1
-        version: 8.2.1
+        specifier: ^9.0.0
+        version: 9.0.0
       commitlint:
         specifier: ^19.3.0
         version: 19.3.0(@types/node@20.14.12)(typescript@5.5.4)
@@ -1627,8 +1627,8 @@ packages:
     resolution: {integrity: sha512-zhaCDicdLuWN5UbN5IMnFqNMhNfo919sH85y2/ea+5Yg9TsTkeZxpL+JLbp6cgYFS4sRLp3YV4S6yDuqVWHYOw==}
     engines: {node: '>=6'}
 
-  byte-size@8.2.1:
-    resolution: {integrity: sha512-pph2jjc3PxRLeB2nWfJy/tMiHnS6j7xhDlkglBp3KlchnJkILdZ2DmUyZ8svDJ5Z+q431vbhuoiuOvuGhY8fjw==}
+  byte-size@9.0.0:
+    resolution: {integrity: sha512-xrJ8Hki7eQ6xew55mM6TG9zHI852OoAHcPfduWWtR6yxk2upTuIZy13VioRBDyHReHDdbeDPifUboeNkK/sXXA==}
     engines: {node: '>=12.17'}
 
   cac@6.7.14:
@@ -5380,7 +5380,7 @@ snapshots:
 
   builtin-modules@3.3.0: {}
 
-  byte-size@8.2.1: {}
+  byte-size@9.0.0: {}
 
   cac@6.7.14: {}
 
@@ -7183,7 +7183,7 @@ snapshots:
   terser@5.31.1:
     dependencies:
       '@jridgewell/source-map': 0.3.6
-      acorn: 8.12.0
+      acorn: 8.12.1
       commander: 2.20.3
       source-map-support: 0.5.21
 
