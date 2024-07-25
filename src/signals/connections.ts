@@ -9,8 +9,10 @@ export type WsMsg = {
   downloadTotal: number
 } | null
 
+// DIRECT is from clash
+// direct and dns-out is from the example of sing-box official site
 export const [quickFilterRegex, setQuickFilterRegex] = makePersisted(
-  createSignal<string>('Direct|direct|dns-out'),
+  createSignal<string>('DIRECT|direct|dns-out'),
   {
     name: 'quickFilterRegex',
     storage: localStorage,
