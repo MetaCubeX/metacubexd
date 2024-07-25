@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.143.1](https://github.com/MetaCubeX/metacubexd/compare/v1.143.0...v1.143.1) (2024-07-25)
+
+
+### Bug Fixes
+
+* latency test for selector and ipv6 test ([#860](https://github.com/MetaCubeX/metacubexd/issues/860)) ([5da350d](https://github.com/MetaCubeX/metacubexd/commit/5da350d08e6bf06846729fe457abf4f8c3bca77e))
+
 ## [1.143.0](https://github.com/MetaCubeX/metacubexd/compare/v1.142.0...v1.143.0) (2024-07-24)
 
 
