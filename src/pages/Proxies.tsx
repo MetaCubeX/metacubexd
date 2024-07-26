@@ -49,8 +49,6 @@ export default () => {
     fetchProxies,
     proxies,
     selectProxyInGroup,
-    latencyMap,
-    proxyGroupNames,
     proxyProviders,
     updateProviderByProviderName,
     updateAllProvider,
@@ -175,12 +173,8 @@ export default () => {
                   filterProxiesByAvailability(
                     sortProxiesByOrderingType(
                       proxyGroup.all ?? [],
-                      latencyMap(),
                       proxiesOrderingType(),
-                      proxyGroupNames(),
                     ),
-                    latencyMap(),
-                    proxyGroupNames(),
                     hideUnAvailableProxies(),
                   ),
                 )
@@ -266,9 +260,7 @@ export default () => {
                 const sortedProxyNames = createMemo(() =>
                   sortProxiesByOrderingType(
                     proxyProvider.proxies.map((i) => i.name) ?? [],
-                    latencyMap(),
                     proxiesOrderingType(),
-                    undefined,
                   ),
                 )
 

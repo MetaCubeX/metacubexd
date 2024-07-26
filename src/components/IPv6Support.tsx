@@ -1,7 +1,7 @@
 import { useProxies } from '~/signals'
 import { proxyIPv6SupportMap } from '~/signals/ipv6'
 
-export const IPv6Support = (props: { name?: string; class?: string }) => {
+export const IPv6Support = (props: { name?: string }) => {
   const { getNowProxyNodeName } = useProxies()
 
   const support = createMemo(() => {
@@ -10,7 +10,7 @@ export const IPv6Support = (props: { name?: string; class?: string }) => {
 
   return (
     <Show when={support()}>
-      <span class={`scale-75 ${props.class}`}>IPv6</span>
+      <span class={`text-xs`}>IPv6</span>
     </Show>
   )
 }

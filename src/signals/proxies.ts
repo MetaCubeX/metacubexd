@@ -56,13 +56,11 @@ const [isAllProviderUpdating, setIsAllProviderUpdating] = createSignal(false)
 
 // these signals should be global state
 const [proxies, setProxies] = createSignal<ProxyWithProvider[]>([])
-const [proxyGroupNames, setProxyGroupNames] = createSignal<Set<string>>(
-  new Set(),
-)
 const [proxyProviders, setProxyProviders] = createSignal<
   (ProxyProvider & { proxies: ProxyNodeWithProvider[] })[]
 >([])
 
+// DO NOT use latency from latency map directly use getLatencyByName instead
 const [latencyMap, setLatencyMap] = createSignal<Record<string, number>>({})
 const [proxyNodeMap, setProxyNodeMap] = createSignal<Record<string, ProxyInfo>>(
   {},
@@ -152,9 +150,6 @@ export const useProxies = () => {
 
     batch(() => {
       setProxies(sortedProxies)
-      setProxyGroupNames(
-        new Set(['DIRECT', 'REJECT', ...sortedProxies.map((p) => p.name)]),
-      )
       setProxyProviders(sortedProviders)
       setProxiesInfo(allProxies)
     })
@@ -185,10 +180,12 @@ export const useProxies = () => {
   }
 
   const proxyLatencyTest = async (proxyName: string, provider: string) => {
-    setProxyLatencyTestingMap(proxyName, async () => {
-      await proxyIPv6SupportTest(proxyName, provider)
+    const nodeName = getNowProxyNodeName(proxyName)
+
+    setProxyLatencyTestingMap(nodeName, async () => {
+      await proxyIPv6SupportTest(nodeName, provider)
       const { delay } = await proxyLatencyTestAPI(
-        proxyName,
+        nodeName,
         provider,
         urlForLatencyTest(),
         latencyTestTimeoutDuration(),
@@ -196,7 +193,7 @@ export const useProxies = () => {
 
       setLatencyMap((latencyMap) => ({
         ...latencyMap,
-        [proxyName]: delay,
+        [nodeName]: delay,
       }))
     })
   }
@@ -257,6 +254,10 @@ export const useProxies = () => {
     return node.name
   }
 
+  const getLatencyByName = (name: string) => {
+    return latencyMap()[getNowProxyNodeName(name)]
+  }
+
   return {
     proxyLatencyTestingMap,
     proxyGroupLatencyTestingMap,
@@ -264,7 +265,6 @@ export const useProxies = () => {
     updatingMap,
     isAllProviderUpdating,
     proxies,
-    proxyGroupNames,
     proxyProviders,
     proxyLatencyTest,
     proxyGroupLatencyTest,
@@ -276,5 +276,6 @@ export const useProxies = () => {
     updateAllProvider,
     proxyProviderLatencyTest,
     getNowProxyNodeName,
+    getLatencyByName,
   }
 }

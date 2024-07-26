@@ -1,5 +1,5 @@
 import { PROXIES_ORDERING_TYPE } from '~/constants'
-import { latencyQualityMap } from '~/signals'
+import { latencyQualityMap, useProxies } from '~/signals'
 
 export const formatProxyType = (type = '') => {
   const t = type.toLowerCase()
@@ -36,21 +36,17 @@ export const filterSpecialProxyType = (type = '') => {
 
 export const sortProxiesByOrderingType = (
   proxyNames: string[],
-  proxyLatencyMap: Record<string, number>,
   orderingType: PROXIES_ORDERING_TYPE,
-  proxyGroupNames: Set<string> | undefined,
 ) => {
+  const { getLatencyByName } = useProxies()
+
   if (orderingType === PROXIES_ORDERING_TYPE.NATURAL) {
     return proxyNames
   }
 
   return proxyNames.sort((a, b) => {
-    if (proxyGroupNames?.has(a) && !proxyGroupNames?.has(b)) return -1
-
-    if (proxyGroupNames?.has(b) && !proxyGroupNames?.has(a)) return 1
-
-    const prevLatency = proxyLatencyMap[a]
-    const nextLatency = proxyLatencyMap[b]
+    const prevLatency = getLatencyByName(a)
+    const nextLatency = getLatencyByName(b)
 
     switch (orderingType) {
       case PROXIES_ORDERING_TYPE.LATENCY_ASC:
@@ -81,14 +77,13 @@ export const sortProxiesByOrderingType = (
 
 export const filterProxiesByAvailability = (
   proxyNames: string[],
-  proxyLatencyMap: Record<string, number>,
-  excludes: Set<string>,
   enabled?: boolean,
-) =>
-  enabled
-    ? proxyNames.filter((name) =>
-        excludes?.has(name)
-          ? true
-          : proxyLatencyMap[name] !== latencyQualityMap().NOT_CONNECTED,
+) => {
+  const { getLatencyByName } = useProxies()
+
+  return enabled
+    ? proxyNames.filter(
+        (name) => getLatencyByName(name) !== latencyQualityMap().NOT_CONNECTED,
       )
     : proxyNames
+}
