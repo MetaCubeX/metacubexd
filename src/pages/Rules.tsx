@@ -126,7 +126,7 @@ export default () => {
   return (
     <div class="flex h-full flex-col gap-2">
       <div class="flex items-center gap-2">
-        <div class="tabs-boxed tabs gap-2">
+        <div class="tabs-boxed tabs gap-2 pl-0">
           <For each={tabs()}>
             {(tab) => (
               <button
@@ -160,7 +160,7 @@ export default () => {
       </div>
 
       <input
-        class="input input-bordered input-primary"
+        class="input input-sm input-bordered input-primary"
         placeholder={t('search')}
         value={globalFilter()}
         onInput={(e) => setGlobalFilter(e.currentTarget.value)}
