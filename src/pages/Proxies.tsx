@@ -49,8 +49,6 @@ export default () => {
     fetchProxies,
     proxies,
     selectProxyInGroup,
-    latencyMap,
-    proxyGroupNames,
     proxyProviders,
     updateProviderByProviderName,
     updateAllProvider,
@@ -120,7 +118,7 @@ export default () => {
   return (
     <div class="flex h-full flex-col gap-2">
       <div class="flex items-center gap-2">
-        <div class="tabs-boxed tabs gap-2">
+        <div class="tabs-boxed tabs gap-2 pl-0">
           <For each={tabs()}>
             {(tab) => (
               <button
@@ -154,7 +152,7 @@ export default () => {
 
         <div class="ml-auto">
           <Button
-            class="btn-circle btn-sm sm:btn-md"
+            class="btn-circle btn-primary btn-sm"
             onClick={() => proxiesSettingsModalRef?.showModal()}
             icon={<IconSettings />}
           />
@@ -175,12 +173,8 @@ export default () => {
                   filterProxiesByAvailability(
                     sortProxiesByOrderingType(
                       proxyGroup.all ?? [],
-                      latencyMap(),
                       proxiesOrderingType(),
-                      proxyGroupNames(),
                     ),
-                    latencyMap(),
-                    proxyGroupNames(),
                     hideUnAvailableProxies(),
                   ),
                 )
@@ -266,9 +260,7 @@ export default () => {
                 const sortedProxyNames = createMemo(() =>
                   sortProxiesByOrderingType(
                     proxyProvider.proxies.map((i) => i.name) ?? [],
-                    latencyMap(),
                     proxiesOrderingType(),
-                    undefined,
                   ),
                 )
 

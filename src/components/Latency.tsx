@@ -4,10 +4,10 @@ import { latencyQualityMap, useProxies } from '~/signals'
 
 export const Latency = (props: { name?: string; class?: string }) => {
   const [t] = useI18n()
-  const { getNowProxyNodeName, latencyMap } = useProxies()
+  const { getLatencyByName } = useProxies()
   const [textClassName, setTextClassName] = createSignal('')
   const latency = createMemo(() => {
-    return latencyMap()[getNowProxyNodeName(props.name || '')]
+    return getLatencyByName(props.name || '')
   })
 
   createEffect(() => {

@@ -19,7 +19,7 @@ createEffect(() => {
   seq++
 })
 
-export function useLogs() {
+export const useLogs = () => {
   return {
     logs,
     paused,

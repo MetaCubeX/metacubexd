@@ -110,7 +110,7 @@ export const Header = () => {
             checked={openedDrawer()}
           />
 
-          <div class="drawer-content flex items-center">
+          <div class="drawer-content flex w-6 items-center">
             <label for="navs" class="btn btn-circle drawer-button btn-sm">
               <IconMenu />
             </label>

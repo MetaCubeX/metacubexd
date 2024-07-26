@@ -124,18 +124,18 @@ export default () => {
       <div class="join w-full">
         <input
           type="search"
-          class="input input-sm join-item input-primary flex-1 flex-shrink-0 sm:input-md"
+          class="input input-sm join-item input-primary flex-1 flex-shrink-0"
           placeholder={t('search')}
           onInput={(e) => setGlobalFilter(e.target.value)}
         />
 
         <Button
-          class="join-item btn-sm sm:btn-md"
+          class="btn-primary join-item btn-sm"
           onClick={() => setPaused((paused) => !paused)}
           icon={paused() ? <IconPlayerPlay /> : <IconPlayerPause />}
         />
         <Button
-          class="join-item btn-sm sm:btn-md"
+          class="btn-primary join-item btn-sm"
           onClick={() => logsSettingsModalRef?.showModal()}
           icon={<IconSettings />}
         />
