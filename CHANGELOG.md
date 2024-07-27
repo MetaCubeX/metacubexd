@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.143.2](https://github.com/MetaCubeX/metacubexd/compare/v1.143.1...v1.143.2) (2024-07-27)
+
+
+### Bug Fixes
+
+* enum of not connect for mihomo ([#868](https://github.com/MetaCubeX/metacubexd/issues/868)) ([f6a4d55](https://github.com/MetaCubeX/metacubexd/commit/f6a4d551bafde805507084bf95045dfd251411f3))
+
 ## [1.143.1](https://github.com/MetaCubeX/metacubexd/compare/v1.143.0...v1.143.1) (2024-07-25)
 
 
