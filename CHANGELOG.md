@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.143.3](https://github.com/MetaCubeX/metacubexd/compare/v1.143.2...v1.143.3) (2024-07-28)
+
+
+### Bug Fixes
+
+* unexpected filtered proxy group ([#875](https://github.com/MetaCubeX/metacubexd/issues/875)) ([9289353](https://github.com/MetaCubeX/metacubexd/commit/928935321bfd9fea4b184423df344354392cfb51))
+
 ## [1.143.2](https://github.com/MetaCubeX/metacubexd/compare/v1.143.1...v1.143.2) (2024-07-27)
 
 
