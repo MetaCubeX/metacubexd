@@ -79,11 +79,17 @@ export const filterProxiesByAvailability = (
   proxyNames: string[],
   enabled?: boolean,
 ) => {
-  const { getLatencyByName } = useProxies()
+  const { getLatencyByName, isProxyGroup } = useProxies()
 
   return enabled
     ? proxyNames.filter(
-        (name) => getLatencyByName(name) !== latencyQualityMap().NOT_CONNECTED,
+        // we need proxy node with connected or the node is a group it self
+        (name) => {
+          return (
+            isProxyGroup(name) ||
+            getLatencyByName(name) !== latencyQualityMap().NOT_CONNECTED
+          )
+        },
       )
     : proxyNames
 }
