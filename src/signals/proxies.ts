@@ -258,6 +258,19 @@ export const useProxies = () => {
     return latencyMap()[getNowProxyNodeName(name)]
   }
 
+  const isProxyGroup = (name: string) => {
+    const proxyNode = proxyNodeMap()[name]
+
+    if (!proxyNode) {
+      return false
+    }
+
+    return (
+      ['direct', 'reject'].includes(proxyNode.type.toLowerCase()) ||
+      !!proxyNode.now
+    )
+  }
+
   return {
     proxyLatencyTestingMap,
     proxyGroupLatencyTestingMap,
@@ -277,5 +290,6 @@ export const useProxies = () => {
     proxyProviderLatencyTest,
     getNowProxyNodeName,
     getLatencyByName,
+    isProxyGroup,
   }
 }
