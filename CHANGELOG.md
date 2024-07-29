@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.143.4](https://github.com/MetaCubeX/metacubexd/compare/v1.143.3...v1.143.4) (2024-07-29)
+
+
+### Bug Fixes
+
+* release failure caused by `pnpm-lock.yaml is not up to date` ([5e4b132](https://github.com/MetaCubeX/metacubexd/commit/5e4b1326bd7987a66ebd45bab1decbb02da19485))
+
 ## [1.143.3](https://github.com/MetaCubeX/metacubexd/compare/v1.143.2...v1.143.3) (2024-07-28)
 
 
