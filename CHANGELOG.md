@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.143.5](https://github.com/MetaCubeX/metacubexd/compare/v1.143.4...v1.143.5) (2024-07-30)
+
+
+### Bug Fixes
+
+* filter for loadbalance ([#881](https://github.com/MetaCubeX/metacubexd/issues/881)) ([faf7a7e](https://github.com/MetaCubeX/metacubexd/commit/faf7a7ebd04872b47ec62e87aac3bff406268d5b))
+
 ## [1.143.4](https://github.com/MetaCubeX/metacubexd/compare/v1.143.3...v1.143.4) (2024-07-29)
 
 
