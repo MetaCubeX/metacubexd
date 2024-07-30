@@ -266,8 +266,9 @@ export const useProxies = () => {
     }
 
     return (
-      ['direct', 'reject'].includes(proxyNode.type.toLowerCase()) ||
-      !!proxyNode.now
+      ['direct', 'reject', 'loadbalance'].includes(
+        proxyNode.type.toLowerCase(),
+      ) || !!proxyNode.now
     )
   }
 
