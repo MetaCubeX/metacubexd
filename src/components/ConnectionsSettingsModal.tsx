@@ -1,6 +1,12 @@
 import { createForm } from '@felte/solid'
 import { validator } from '@felte/validator-zod'
-import { IconMenuOrder, IconNetwork, IconX } from '@tabler/icons-solidjs'
+import {
+  IconArrowDown,
+  IconArrowUp,
+  IconMenuOrder,
+  IconNetwork,
+  IconX,
+} from '@tabler/icons-solidjs'
 import type {
   DragEventHandler,
   Draggable,
@@ -147,6 +153,29 @@ export const ConnectionsSettingsModal = (props: {
     }
   }
 
+  const moveElementInOrder = (
+    key: CONNECTIONS_TABLE_ACCESSOR_KEY,
+    direction: 'forward' | 'backward',
+  ) => {
+    const arr = [...props.order]
+    const length = arr.length
+    const index = arr.indexOf(key)
+
+    if (index < 0 || index >= length) {
+      return
+    }
+
+    const newIndex = direction === 'forward' ? index + 1 : index - 1
+
+    if (newIndex < 0 || newIndex >= length) {
+      return
+    }
+
+    ;[arr[index], arr[newIndex]] = [arr[newIndex], arr[index]]
+
+    props.onOrderChange(arr)
+  }
+
   const FormRow: Component<{
     key: CONNECTIONS_TABLE_ACCESSOR_KEY
   }> = ({ key }) => {
@@ -165,25 +194,36 @@ export const ConnectionsSettingsModal = (props: {
         <div class="flex justify-between py-2">
           <div class="flex items-center gap-2">
             <Button
-              class="btn-ghost btn-sm cursor-grab"
+              class="btn-ghost btn-sm hidden cursor-grab sm:inline-block"
               icon={<IconMenuOrder size={24} />}
               {...sortable.dragActivators}
             />
 
             <span>{t(key)}</span>
           </div>
-
-          <input
-            type="checkbox"
-            class="toggle"
-            checked={props.visible[key]}
-            onChange={(e) => {
-              props.onVisibleChange({
-                ...props.visible,
-                [key]: e.target.checked,
-              })
-            }}
-          />
+          <div>
+            <Button
+              class="btn-circle btn-sm mx-2 inline-block sm:hidden"
+              icon={<IconArrowUp width={30} size={24} />}
+              onClick={() => moveElementInOrder(key, 'backward')}
+            />
+            <Button
+              class="btn-circle btn-sm mx-2 inline-block sm:hidden"
+              icon={<IconArrowDown width={30} size={24} />}
+              onClick={() => moveElementInOrder(key, 'forward')}
+            />
+            <input
+              type="checkbox"
+              class="toggle"
+              checked={props.visible[key]}
+              onChange={(e) => {
+                props.onVisibleChange({
+                  ...props.visible,
+                  [key]: e.target.checked,
+                })
+              }}
+            />
+          </div>
         </div>
       </div>
     )
