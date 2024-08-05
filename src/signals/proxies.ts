@@ -248,7 +248,13 @@ export const useProxies = () => {
     }
 
     while (node.now && node.now !== node.name) {
-      node = proxyNodeMap()[node.now]
+      const nextNode = proxyNodeMap()[node.now]
+
+      if (!nextNode) {
+        return node.name
+      }
+
+      node = nextNode
     }
 
     return node.name
