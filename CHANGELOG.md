@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.144.0](https://github.com/MetaCubeX/metacubexd/compare/v1.143.5...v1.144.0) (2024-08-09)
+
+
+### Features
+
+* custom table columns order for mobile ([#885](https://github.com/MetaCubeX/metacubexd/issues/885)) ([3fd6abb](https://github.com/MetaCubeX/metacubexd/commit/3fd6abb879b6aa4d3fa42b40210f39c2160d00c7))
+
+
+### Bug Fixes
+
+* nil for nextnode ([#892](https://github.com/MetaCubeX/metacubexd/issues/892)) ([a4be392](https://github.com/MetaCubeX/metacubexd/commit/a4be39268a496055b76e0679fe1b2e060ee6c2a7))
+* use google as default ipv6 test url ([#894](https://github.com/MetaCubeX/metacubexd/issues/894)) ([dba6d1a](https://github.com/MetaCubeX/metacubexd/commit/dba6d1a4a953dba0bbaec18a45e9e74bc82d72f9))
+
 ## [1.143.5](https://github.com/MetaCubeX/metacubexd/compare/v1.143.4...v1.143.5) (2024-07-30)
 
 
