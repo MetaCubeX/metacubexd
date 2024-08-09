@@ -31,7 +31,7 @@
     "@solidjs/router": "^0.14.1",
     "@tabler/icons-solidjs": "^3.11.0",
     "@tanstack/match-sorter-utils": "^8.19.4",
-    "@tanstack/solid-table": "^8.19.3",
+    "@tanstack/solid-table": "^8.20.1",
     "@tanstack/solid-virtual": "^3.8.4",
     "@tanstack/virtual-core": "^3.8.4",
     "@thisbeyond/solid-dnd": "^0.7.5",
