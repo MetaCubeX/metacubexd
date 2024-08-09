@@ -43,7 +43,7 @@ export const [urlForLatencyTest, setUrlForLatencyTest] = makePersisted(
 )
 
 export const [urlForIPv6SupportTest, setUrlIPv6SupportTest] = makePersisted(
-  createSignal('https://api-ipv6.ip.sb/ip'),
+  createSignal('https://ipv6.google.com'),
   { name: 'urlForIPv6SupportTest', storage: localStorage },
 )
 
