@@ -1,7 +1,3 @@
-export const isSingBox = (version: string) => {
-  return version.includes('sing-box')
-}
-
 export const transformEndpointURL = (url: string) =>
   /^https?:\/\//.test(url) ? url : `${window.location.protocol}//${url}`
 

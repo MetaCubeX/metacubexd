@@ -41,7 +41,7 @@ export const ProxyPreviewBar = (props: {
 
   return (
     <div class="flex items-center gap-2 py-2">
-      <div class="my-2 flex flex-1 items-center justify-center overflow-hidden rounded-2xl [&>*]:h-2">
+      <div class="my-1 flex flex-1 items-center justify-center overflow-hidden rounded-2xl [&>*]:h-2">
         <div
           class="bg-success"
           style={{

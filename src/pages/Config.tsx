@@ -5,7 +5,6 @@ import { toast } from 'solid-toast'
 import { z } from 'zod'
 import {
   fetchBackendConfigAPI,
-  fetchBackendVersionAPI,
   flushFakeIPDataAPI,
   flushingFakeIPData,
   isUpdateAvailableAPI,
@@ -23,7 +22,6 @@ import {
 } from '~/apis'
 import { Button, ConfigTitle } from '~/components'
 import { LANG, MODE_OPTIONS, ROUTES, themes } from '~/constants'
-import { isSingBox } from '~/helpers'
 import { locale, setLocale, useI18n } from '~/i18n'
 import {
   autoSwitchTheme,
@@ -38,6 +36,11 @@ import {
   useRequest,
   useTwemoji,
 } from '~/signals'
+import {
+  backendVersion,
+  isSingBox,
+  updateBackendVersion,
+} from '~/signals/version'
 import type { DNSQuery } from '~/types'
 
 const dnsQueryFormSchema = z.object({
@@ -109,9 +112,7 @@ const configFormSchema = z.object({
   'mixed-port': z.number(),
 })
 
-const ConfigForm: Component<{ backendVersion: Accessor<string> }> = ({
-  backendVersion,
-}) => {
+const ConfigForm = () => {
   const [t] = useI18n()
 
   const portList = [
@@ -192,7 +193,7 @@ const ConfigForm: Component<{ backendVersion: Accessor<string> }> = ({
         <option value={MODE_OPTIONS.Direct}>{t('direct')}</option>
       </select>
 
-      <Show when={!isSingBox(backendVersion())}>
+      <Show when={!isSingBox()}>
         <form class="grid grid-cols-3 gap-2 sm:grid-cols-5" use:form={form}>
           <For each={portList}>
             {(item) => (
@@ -344,7 +345,7 @@ const ConfigForm: Component<{ backendVersion: Accessor<string> }> = ({
           {t('restartCore')}
         </Button>
 
-        <Show when={!isSingBox(backendVersion())}>
+        <Show when={!isSingBox()}>
           <Button
             class="btn-secondary"
             loading={updatingGEODatabases()}
@@ -527,15 +528,11 @@ export default () => {
 
   const [t] = useI18n()
 
-  const [backendVersion, setBackendVersion] = createSignal('')
-
-  onMount(async () => {
-    setBackendVersion(await fetchBackendVersionAPI())
-  })
+  updateBackendVersion()
 
   return (
     <div class="mx-auto flex max-w-screen-md flex-col gap-4">
-      <Show when={!isSingBox(backendVersion())}>
+      <Show when={!isSingBox()}>
         <ConfigTitle withDivider>{t('dnsQuery')}</ConfigTitle>
 
         <DNSQueryForm />
@@ -543,7 +540,7 @@ export default () => {
 
       <ConfigTitle withDivider>{t('coreConfig')}</ConfigTitle>
 
-      <ConfigForm backendVersion={backendVersion} />
+      <ConfigForm />
 
       <ConfigTitle withDivider>{t('xdConfig')}</ConfigTitle>
 
