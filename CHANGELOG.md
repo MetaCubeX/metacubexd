@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.144.1](https://github.com/MetaCubeX/metacubexd/compare/v1.144.0...v1.144.1) (2024-08-09)
+
+
+### Bug Fixes
+
+* flickering issue of the config page under sing-box ([#900](https://github.com/MetaCubeX/metacubexd/issues/900)) ([b07647c](https://github.com/MetaCubeX/metacubexd/commit/b07647c549a26868af6c27cc6e8c25501c80b3b3))
+
 ## [1.144.0](https://github.com/MetaCubeX/metacubexd/compare/v1.143.5...v1.144.0) (2024-08-09)
 
 
