@@ -11,7 +11,7 @@ import { endpoint, latestConnectionMsg, useWsRequest } from '~/signals'
 const TrafficWidget: ParentComponent<{ label: JSX.Element }> = (props) => (
   <div class="stat flex-1 place-items-center">
     <div class="stat-title text-primary-content">{props.label}</div>
-    <div class="stat-value text-2xl text-primary-content lg:text-3xl">
+    <div class="stat-value w-full truncate text-center text-2xl text-primary-content lg:text-3xl">
       {children(() => props.children)()}
     </div>
   </div>
