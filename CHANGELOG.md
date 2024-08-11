@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.144.2](https://github.com/MetaCubeX/metacubexd/compare/v1.144.1...v1.144.2) (2024-08-11)
+
+
+### Bug Fixes
+
+* **overview:** traffic widget, truncate the texts to fix overflow ([dc9db7c](https://github.com/MetaCubeX/metacubexd/commit/dc9db7c60c5db056418a9af6e2d09184cf482a82))
+
 ## [1.144.1](https://github.com/MetaCubeX/metacubexd/compare/v1.144.0...v1.144.1) (2024-08-09)
 
 
