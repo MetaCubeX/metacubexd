@@ -117,7 +117,7 @@ export type LogWithSeq = Log & { seq: number }
 
 export type Config = {
   mode: string
-  modes: string[]
+  modes?: string[]
   port: number
   'socks-port': number
   'redir-port': number

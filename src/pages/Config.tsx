@@ -204,7 +204,7 @@ const ConfigForm = () => {
           }
         >
           {configsData().modes.map(name => (
-            <option value={name}>{name}</option>
+            <option value={name}>{t(name)}</option>
           ))}
         </select>
       </Show>
