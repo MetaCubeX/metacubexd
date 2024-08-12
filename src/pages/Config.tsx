@@ -181,17 +181,33 @@ const ConfigForm = () => {
 
   return (
     <div class="flex flex-col gap-4">
-      <select
-        class="select select-bordered"
-        value={configsData()?.mode}
-        onChange={(e) =>
-          void updateBackendConfigAPI('mode', e.target.value, refetch)
-        }
-      >
-        <option value={MODE_OPTIONS.Global}>{t('global')}</option>
-        <option value={MODE_OPTIONS.Rule}>{t('rule')}</option>
-        <option value={MODE_OPTIONS.Direct}>{t('direct')}</option>
-      </select>
+      <Show when={configsData() === void 0 || !("modes" in configsData())}>
+        <select
+          class="select select-bordered"
+          value={configsData()?.mode}
+          onChange={(e) =>
+            void updateBackendConfigAPI('mode', e.target.value, refetch)
+          }
+        >
+          <option value={MODE_OPTIONS.Global}>{t('global')}</option>
+          <option value={MODE_OPTIONS.Rule}>{t('rule')}</option>
+          <option value={MODE_OPTIONS.Direct}>{t('direct')}</option>
+        </select>
+      </Show>
+
+      <Show when={configsData() && "modes" in configsData()}>
+        <select
+          class="select select-bordered"
+          value={configsData()?.mode}
+          onChange={(e) =>
+            void updateBackendConfigAPI('mode', e.target.value, refetch)
+          }
+        >
+          {configsData().modes.map(name => (
+            <option value={name}>{name}</option>
+          ))}
+        </select>
+      </Show>
 
       <Show when={!isSingBox()}>
         <form class="grid grid-cols-3 gap-2 sm:grid-cols-5" use:form={form}>
