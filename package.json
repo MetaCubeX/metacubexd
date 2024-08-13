@@ -62,7 +62,7 @@
     "solid-js": "^1.8.20",
     "solid-toast": "^0.5.0",
     "sort-package-json": "^2.10.0",
-    "tailwind-merge": "^2.4.0",
+    "tailwind-merge": "^2.5.2",
     "tailwindcss": "^3.4.9",
     "typescript": "^5.5.4",
     "typescript-eslint": "^8.0.1",
