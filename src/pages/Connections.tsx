@@ -358,7 +358,7 @@ export default () => {
     <div class="flex h-full flex-col gap-2">
       <div class="flex w-full flex-wrap items-center gap-2">
         <div class="flex items-center gap-2">
-          <div class="tabs-boxed tabs gap-2 pl-0">
+          <div class="tabs-boxed tabs gap-2">
             <Index each={tabs()}>
               {(tab) => (
                 <button
