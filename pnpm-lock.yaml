@@ -21,8 +21,8 @@ importers:
         specifier: ^1.0.17
         version: 1.0.17(zod@3.23.8)
       '@fontsource/fira-sans':
-        specifier: ^5.0.20
-        version: 5.0.20
+        specifier: ^5.0.21
+        version: 5.0.21
       '@solid-primitives/clipboard':
         specifier: ^1.5.10
         version: 1.5.10(solid-js@1.8.21)
@@ -1044,8 +1044,8 @@ packages:
     peerDependencies:
       zod: ^3.2.0
 
-  '@fontsource/fira-sans@5.0.20':
-    resolution: {integrity: sha512-inmUjoKPrgnO4uUaZTAgP0b6YdhDfA52axHXvdTwgLvwd2kn3ZgK52UZoxD0VnrvTOjLA/iE4oC0tNtz4nyb5g==}
+  '@fontsource/fira-sans@5.0.21':
+    resolution: {integrity: sha512-R4s5A+WF4rm45Us+3Gqp9Lijm83OflTSVyp7xccQLUAtjzp+Qmp7Y+adQ37vnjxaNfSoicJ6fTNYvlXck6KNUg==}
 
   '@humanwhocodes/module-importer@1.0.1':
     resolution: {integrity: sha512-bxveV4V8v5Yb4ncFTT3rPSgZBOpCkjfK0y4oVVVJwIuDVBRMDXrPyXRL988i5ap9m9bnyEEjWfm5WkBmtffLfA==}
@@ -4823,7 +4823,7 @@ snapshots:
       '@felte/common': 1.1.8
       zod: 3.23.8
 
-  '@fontsource/fira-sans@5.0.20': {}
+  '@fontsource/fira-sans@5.0.21': {}
 
   '@humanwhocodes/module-importer@1.0.1': {}
 
