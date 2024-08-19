@@ -4,6 +4,7 @@ import {
   IconReload,
   IconSettings,
 } from '@tabler/icons-solidjs'
+import byteSize from 'byte-size'
 import { twMerge } from 'tailwind-merge'
 import {
   Button,
@@ -24,6 +25,7 @@ import {
   hideUnAvailableProxies,
   proxiesOrderingType,
   renderProxiesInTwoColumns,
+  useConnections,
   useProxies,
 } from '~/signals'
 
@@ -59,6 +61,8 @@ export default () => {
     isAllProviderUpdating,
     updatingMap,
   } = useProxies()
+
+  const { speedGroupByName } = useConnections()
 
   const [collapsedMap, setCollapsedMap] = makePersisted(
     createSignal<Record<string, boolean>>({}),
@@ -210,7 +214,11 @@ export default () => {
 
                     <div class="text-sm text-slate-500">
                       {proxyGroup.type}{' '}
-                      {proxyGroup.now?.length > 0 && ` :: ${proxyGroup.now}`}
+                      {proxyGroup.now?.length > 0 && ` :: ${proxyGroup.now}`}{' '}
+                      {byteSize(
+                        speedGroupByName()[proxyGroup.name] ?? 0,
+                      ).toString()}
+                      /s
                     </div>
 
                     <Show when={!collapsedMap()[proxyGroup.name]}>
