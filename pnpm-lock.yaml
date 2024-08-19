@@ -63,8 +63,8 @@ importers:
         specifier: ^8.20.1
         version: 8.20.1(solid-js@1.8.21)
       '@tanstack/solid-virtual':
-        specifier: ^3.9.0
-        version: 3.9.0(solid-js@1.8.21)
+        specifier: ^3.10.0
+        version: 3.10.0(solid-js@1.8.21)
       '@tanstack/virtual-core':
         specifier: ^3.9.0
         version: 3.9.0
@@ -1322,8 +1322,8 @@ packages:
     peerDependencies:
       solid-js: '>=1.3'
 
-  '@tanstack/solid-virtual@3.9.0':
-    resolution: {integrity: sha512-dDHeRNJX0tZYNvPa03Wtwi4QZMl299VpwLZ/xqR6wH9Hg2K/0am8DjQnPWEX8I/evo0R32JascLyaGNUuf1ZSQ==}
+  '@tanstack/solid-virtual@3.10.0':
+    resolution: {integrity: sha512-1k0an+MMj+c5hcb8l+MYHR1387x/UQYZLXETHuCDX9pOKHasLA2ujtzXYzXMopHp3Em8l66BGKOYshMJZk/J7g==}
     peerDependencies:
       solid-js: ^1.3.0
 
@@ -5064,7 +5064,7 @@ snapshots:
       '@tanstack/table-core': 8.20.1
       solid-js: 1.8.21
 
-  '@tanstack/solid-virtual@3.9.0(solid-js@1.8.21)':
+  '@tanstack/solid-virtual@3.10.0(solid-js@1.8.21)':
     dependencies:
       '@tanstack/virtual-core': 3.9.0
       solid-js: 1.8.21
