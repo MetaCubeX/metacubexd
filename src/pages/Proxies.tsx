@@ -212,13 +212,17 @@ export default () => {
                       />
                     </div>
 
-                    <div class="text-sm text-slate-500">
-                      {proxyGroup.type}{' '}
-                      {proxyGroup.now?.length > 0 && ` :: ${proxyGroup.now}`}{' '}
-                      {byteSize(
-                        speedGroupByName()[proxyGroup.name] ?? 0,
-                      ).toString()}
-                      /s
+                    <div class="flex items-center justify-between text-sm text-slate-500">
+                      <span>
+                        {proxyGroup.type}{' '}
+                        {proxyGroup.now?.length > 0 && ` :: ${proxyGroup.now}`}
+                      </span>
+                      <span>
+                        {byteSize(
+                          speedGroupByName()[proxyGroup.name] ?? 0,
+                        ).toString()}
+                        /s
+                      </span>
                     </div>
 
                     <Show when={!collapsedMap()[proxyGroup.name]}>
