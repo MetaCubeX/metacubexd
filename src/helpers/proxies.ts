@@ -8,8 +8,8 @@ export const formatProxyType = (type = '') => {
     return t.replace('shadowsocks', 'ss') // for both ss and ssr
   }
 
-  if (t === 'hysteria') {
-    return 'hy'
+  if (t.includes('hysteria')) {
+    return t.replace('hysteria', 'hy')
   }
 
   if (t === 'wireguard') {
