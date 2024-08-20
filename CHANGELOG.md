@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.145.0](https://github.com/MetaCubeX/metacubexd/compare/v1.144.2...v1.145.0) (2024-08-20)
+
+
+### Features
+
+* preview dlspeed in proxies page ([#924](https://github.com/MetaCubeX/metacubexd/issues/924)) ([51a88b5](https://github.com/MetaCubeX/metacubexd/commit/51a88b506c1c4a5c41ff9a5c0e12a630f82a79fe))
+
 ## [1.144.2](https://github.com/MetaCubeX/metacubexd/compare/v1.144.1...v1.144.2) (2024-08-11)
 
 
