@@ -25,6 +25,7 @@ export const [quickFilterRegex, setQuickFilterRegex] = makePersisted(
 export const [allConnections, setAllConnections] = createSignal<Connection[]>(
   [],
 )
+
 export const [latestConnectionMsg, setLatestConnectionMsg] =
   createSignal<WsMsg>(null)
 
@@ -69,9 +70,26 @@ export const useConnections = () => {
     })
   })
 
+  const speedGroupByName = createMemo(() => {
+    const returnMap: Record<string, number> = {}
+
+    activeConnections().forEach((c) => {
+      c.chains.forEach((chain) => {
+        if (!returnMap[chain]) {
+          returnMap[chain] = 0
+        }
+
+        returnMap[chain] += c.downloadSpeed
+      })
+    })
+
+    return returnMap
+  })
+
   return {
     closedConnections,
     activeConnections,
+    speedGroupByName,
     paused,
     setPaused,
   }
