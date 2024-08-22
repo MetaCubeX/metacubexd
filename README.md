@@ -17,8 +17,6 @@ Mihomo Dashboard, The Official One, XD
 
 ## Published Official Links
 
-GH Pages Custom Domain: http://d.metacubex.one
-
 GH Pages: https://metacubex.github.io/metacubexd
 
 Cloudflare Pages: https://metacubexd.pages.dev
