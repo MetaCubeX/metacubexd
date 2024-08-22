@@ -192,9 +192,11 @@ const ConfigForm = () => {
           void updateBackendConfigAPI('mode', e.target.value, refetch)
         }
       >
-        {modes().map(name => (
-          <option value={name}>{t(name) ?? name}</option>
-        ))}
+        <For echo={modes()}>
+          {(name) => (
+            <option value={name}>{t(name) ?? name}</option>
+          )}
+        </For>
       </select>
 
       <Show when={!isSingBox()}>
