@@ -37,7 +37,7 @@
     "@thisbeyond/solid-dnd": "^0.7.5",
     "@types/byte-size": "^8.1.2",
     "@types/lodash": "^4.17.7",
-    "@types/node": "^22.4.1",
+    "@types/node": "^22.5.0",
     "@types/uuid": "^10.0.0",
     "@vite-pwa/assets-generator": "^0.2.4",
     "apexcharts": "^3.52.0",
@@ -51,7 +51,7 @@
     "eslint-plugin-prettier": "^5.2.1",
     "husky": "^9.1.5",
     "is-ip": "^5.0.1",
-    "ky": "^1.7.0",
+    "ky": "^1.7.1",
     "lint-staged": "^15.2.9",
     "lodash": "^4.17.21",
     "match-sorter": "^6.3.4",
@@ -73,5 +73,5 @@
     "vite-plugin-solid": "^2.10.2",
     "zod": "^3.23.8"
   },
-  "packageManager": "pnpm@9.7.0"
+  "packageManager": "pnpm@9.7.1"
 }

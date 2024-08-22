@@ -180,7 +180,7 @@ const ConfigForm = () => {
   })
 
   const modes = () => {
-    return configsData()?.modes || ["rule", "direct", "global"]
+    return configsData()?.modes || ['rule', 'direct', 'global']
   }
 
   return (
@@ -192,9 +192,12 @@ const ConfigForm = () => {
           void updateBackendConfigAPI('mode', e.target.value, refetch)
         }
       >
-        <For echo={modes()}>
+        <For each={modes()}>
           {(name) => (
-            <option value={name}>{t(name) ?? name}</option>
+            <option value={name}>
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              {t(name as any) ?? name}
+            </option>
           )}
         </For>
       </select>
