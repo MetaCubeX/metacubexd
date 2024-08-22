@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.146.1](https://github.com/MetaCubeX/metacubexd/compare/v1.146.0...v1.146.1) (2024-08-22)
+
+
+### Bug Fixes
+
+* **config:** mode select options are missing ([21a3aa1](https://github.com/MetaCubeX/metacubexd/commit/21a3aa169ed3fe53f04a97c806ef20a11120fdea))
+
 ## [1.146.0](https://github.com/MetaCubeX/metacubexd/compare/v1.145.0...v1.146.0) (2024-08-22)
 
 
