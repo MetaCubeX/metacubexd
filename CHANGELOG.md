@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.146.0](https://github.com/MetaCubeX/metacubexd/compare/v1.145.0...v1.146.0) (2024-08-22)
+
+
+### Features
+
+* hidden api & remove domain unmaintained ([#939](https://github.com/MetaCubeX/metacubexd/issues/939)) ([bd65478](https://github.com/MetaCubeX/metacubexd/commit/bd6547873fcc64a500eadda78a1607be59e11a97))
+* Support dynamic acquisition of clash_mode ([#908](https://github.com/MetaCubeX/metacubexd/issues/908)) ([341a14a](https://github.com/MetaCubeX/metacubexd/commit/341a14a7bcdf6054fb3bb8f1d6bb87e78cc38db7))
+
+
+### Bug Fixes
+
+* improve readability for dlspeed preview ([#932](https://github.com/MetaCubeX/metacubexd/issues/932)) ([3727122](https://github.com/MetaCubeX/metacubexd/commit/3727122b95cde32ef15d7383fa8d9eee98dfd5f0))
+
 ## [1.145.0](https://github.com/MetaCubeX/metacubexd/compare/v1.144.2...v1.145.0) (2024-08-20)
 
 
