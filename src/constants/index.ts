@@ -151,12 +151,6 @@ export enum TAILWINDCSS_SIZE {
   LG = 'lg',
 }
 
-export enum MODE_OPTIONS {
-  Global = 'global',
-  Rule = 'rule',
-  Direct = 'direct',
-}
-
 export enum LOG_LEVEL {
   Info = 'info',
   Error = 'error',
