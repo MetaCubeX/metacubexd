@@ -17,6 +17,7 @@ export type Proxy = {
     time: string
     delay: number
   }[]
+  hidden: boolean
   udp: boolean
   xudp: boolean
   tfo: boolean

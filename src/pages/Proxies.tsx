@@ -62,6 +62,9 @@ export default () => {
     updatingMap,
   } = useProxies()
 
+  const renderProxies = createMemo(() =>
+    proxies().filter((proxy) => !proxy.hidden),
+  )
   const { speedGroupByName } = useConnections()
 
   const [collapsedMap, setCollapsedMap] = makePersisted(
@@ -110,7 +113,7 @@ export default () => {
     {
       type: ActiveTab.proxies,
       name: t('proxies'),
-      count: proxies().length,
+      count: renderProxies().length,
     },
     {
       type: ActiveTab.proxyProviders,
@@ -171,7 +174,7 @@ export default () => {
               renderProxiesInTwoColumns() ? 'sm:grid-cols-2' : 'sm:grid-cols-1',
             )}
           >
-            <For each={proxies()}>
+            <For each={renderProxies()}>
               {(proxyGroup) => {
                 const sortedProxyNames = createMemo(() =>
                   filterProxiesByAvailability(
