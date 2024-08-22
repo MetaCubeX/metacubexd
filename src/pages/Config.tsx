@@ -21,7 +21,7 @@ import {
   upgradingUI,
 } from '~/apis'
 import { Button, ConfigTitle } from '~/components'
-import { LANG, MODE_OPTIONS, ROUTES, themes } from '~/constants'
+import { LANG, ROUTES, themes } from '~/constants'
 import { locale, setLocale, useI18n } from '~/i18n'
 import {
   autoSwitchTheme,
