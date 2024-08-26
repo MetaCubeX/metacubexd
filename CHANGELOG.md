@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.146.2](https://github.com/MetaCubeX/metacubexd/compare/v1.146.1...v1.146.2) (2024-08-26)
+
+
+### Bug Fixes
+
+* set latency for test failed ([#948](https://github.com/MetaCubeX/metacubexd/issues/948)) ([9189bf5](https://github.com/MetaCubeX/metacubexd/commit/9189bf5efb0676a053981e0ffd3b3c21f8332dcf))
+
 ## [1.146.1](https://github.com/MetaCubeX/metacubexd/compare/v1.146.0...v1.146.1) (2024-08-22)
 
 
