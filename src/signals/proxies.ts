@@ -184,17 +184,24 @@ export const useProxies = () => {
 
     setProxyLatencyTestingMap(nodeName, async () => {
       await proxyIPv6SupportTest(nodeName, provider)
-      const { delay } = await proxyLatencyTestAPI(
-        nodeName,
-        provider,
-        urlForLatencyTest(),
-        latencyTestTimeoutDuration(),
-      )
+      try {
+        const { delay } = await proxyLatencyTestAPI(
+          nodeName,
+          provider,
+          urlForLatencyTest(),
+          latencyTestTimeoutDuration(),
+        )
 
-      setLatencyMap((latencyMap) => ({
-        ...latencyMap,
-        [nodeName]: delay,
-      }))
+        setLatencyMap((latencyMap) => ({
+          ...latencyMap,
+          [nodeName]: delay,
+        }))
+      } catch {
+        setLatencyMap((latencyMap) => ({
+          ...latencyMap,
+          [nodeName]: latencyQualityMap().NOT_CONNECTED,
+        }))
+      }
     })
   }
 
