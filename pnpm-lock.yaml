@@ -54,8 +54,8 @@ importers:
         specifier: ^0.14.3
         version: 0.14.3(solid-js@1.8.21)
       '@tabler/icons-solidjs':
-        specifier: ^3.12.0
-        version: 3.12.0(solid-js@1.8.21)
+        specifier: ^3.14.0
+        version: 3.14.0(solid-js@1.8.21)
       '@tanstack/match-sorter-utils':
         specifier: ^8.19.4
         version: 8.19.4
@@ -1304,13 +1304,13 @@ packages:
   '@surma/rollup-plugin-off-main-thread@2.2.3':
     resolution: {integrity: sha512-lR8q/9W7hZpMWweNiAKU7NQerBnzQQLvi8qnTDU/fxItPhtZVMbPV3lbCwjhIlNBe9Bbr5V+KHshvWmVSG9cxQ==}
 
-  '@tabler/icons-solidjs@3.12.0':
-    resolution: {integrity: sha512-oAt0zrzP3+1Idm7kkjbgsXC7RxwwIPmQM3iNZspxnd6AQ1OfggqEntXqiVnX1tfz+4mll/4azYB2tcNYN7FcAQ==}
+  '@tabler/icons-solidjs@3.14.0':
+    resolution: {integrity: sha512-pqZ/8402J1EFcl0IneB90Bpsk846PY3oxBPjYDDiGWiFeSTGAaNZnLks/qPM4BoEo/GY3oJrHPr32ehCn7Xhdw==}
     peerDependencies:
       solid-js: ^1.4.7
 
-  '@tabler/icons@3.12.0':
-    resolution: {integrity: sha512-Im37ar/mQkqLb6XUXsU7nOc4/66VB9/3KLuZ+6tUsJKHHNLaDUkYfCTNG3pnGDI03laByxVf5+umSNK2yPTx8A==}
+  '@tabler/icons@3.14.0':
+    resolution: {integrity: sha512-OakKjK1kuDWKoNwdnHHVMt11kTZAC10iZpN/8o/CSYdeBH7S3v5n8IyqAYynFxLI8yBGTyBvljtvWdmWh57zSg==}
 
   '@tanstack/match-sorter-utils@8.19.4':
     resolution: {integrity: sha512-Wo1iKt2b9OT7d+YGhvEPD3DXvPv2etTusIMhMUoG7fbhmxcXCtIjJDEygy91Y2JFlwGyjqiBPRozme7UD8hoqg==}
@@ -5048,12 +5048,12 @@ snapshots:
       magic-string: 0.25.9
       string.prototype.matchall: 4.0.11
 
-  '@tabler/icons-solidjs@3.12.0(solid-js@1.8.21)':
+  '@tabler/icons-solidjs@3.14.0(solid-js@1.8.21)':
     dependencies:
-      '@tabler/icons': 3.12.0
+      '@tabler/icons': 3.14.0
       solid-js: 1.8.21
 
-  '@tabler/icons@3.12.0': {}
+  '@tabler/icons@3.14.0': {}
 
   '@tanstack/match-sorter-utils@8.19.4':
     dependencies:
