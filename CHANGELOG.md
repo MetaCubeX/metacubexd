@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.147.0](https://github.com/MetaCubeX/metacubexd/compare/v1.146.2...v1.147.0) (2024-08-29)
+
+
+### Features
+
+* optimize setup form ([#960](https://github.com/MetaCubeX/metacubexd/issues/960)) ([00ab6d4](https://github.com/MetaCubeX/metacubexd/commit/00ab6d46458c20d41b8b8080a8f57736d600d8d0))
+
 ## [1.146.2](https://github.com/MetaCubeX/metacubexd/compare/v1.146.1...v1.146.2) (2024-08-26)
 
 
