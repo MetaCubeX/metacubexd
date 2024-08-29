@@ -37,7 +37,7 @@
     "@thisbeyond/solid-dnd": "^0.7.5",
     "@types/byte-size": "^8.1.2",
     "@types/lodash": "^4.17.7",
-    "@types/node": "^22.5.0",
+    "@types/node": "^22.5.1",
     "@types/uuid": "^10.0.0",
     "@vite-pwa/assets-generator": "^0.2.4",
     "apexcharts": "^3.52.0",
