@@ -152,12 +152,15 @@ export default () => {
               name="url"
               type="url"
               class="input input-bordered w-full"
-              placeholder="http://127.0.0.1:9090"
+              placeholder="http(s)://{hostname}:{port}"
               list="defaultEndpoints"
             />
 
             <datalist id="defaultEndpoints">
               <option value="http://127.0.0.1:9090" />
+              <Show when={window.location.origin !== 'http://127.0.0.1:9090'}>
+                <option value={window.location.origin} />
+              </Show>
             </datalist>
           </div>
 
