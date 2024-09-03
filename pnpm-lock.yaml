@@ -120,8 +120,8 @@ importers:
         specifier: ^5.0.1
         version: 5.0.1
       ky:
-        specifier: ^1.7.1
-        version: 1.7.1
+        specifier: ^1.7.2
+        version: 1.7.2
       lint-staged:
         specifier: ^15.2.9
         version: 15.2.9
@@ -2556,8 +2556,8 @@ packages:
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
 
-  ky@1.7.1:
-    resolution: {integrity: sha512-KJ/IXXkFhTDqxcN8wKqMXk1/UoOpc0UnOB6H7QcqlPInh/M2B5Mlj+i9exez1w4RSwJhNFmHiUDPriAYFwb5VA==}
+  ky@1.7.2:
+    resolution: {integrity: sha512-OzIvbHKKDpi60TnF9t7UUVAF1B4mcqc02z5PIvrm08Wyb+yOcz63GRvEuVxNT18a9E1SrNouhB4W2NNLeD7Ykg==}
     engines: {node: '>=18'}
 
   leven@3.1.0:
@@ -6342,7 +6342,7 @@ snapshots:
     dependencies:
       json-buffer: 3.0.1
 
-  ky@1.7.1: {}
+  ky@1.7.2: {}
 
   leven@3.1.0: {}
 
