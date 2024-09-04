@@ -32,7 +32,7 @@
     "@tabler/icons-solidjs": "^3.14.0",
     "@tanstack/match-sorter-utils": "^8.19.4",
     "@tanstack/solid-table": "^8.20.5",
-    "@tanstack/solid-virtual": "^3.10.6",
+    "@tanstack/solid-virtual": "^3.10.7",
     "@tanstack/virtual-core": "^3.10.6",
     "@thisbeyond/solid-dnd": "^0.7.5",
     "@types/byte-size": "^8.1.2",
