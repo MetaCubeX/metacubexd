@@ -39,7 +39,7 @@
     "@types/lodash": "^4.17.7",
     "@types/node": "^22.5.2",
     "@types/uuid": "^10.0.0",
-    "@vite-pwa/assets-generator": "^0.2.4",
+    "@vite-pwa/assets-generator": "^0.2.5",
     "apexcharts": "^3.53.0",
     "autoprefixer": "^10.4.20",
     "byte-size": "^9.0.0",
