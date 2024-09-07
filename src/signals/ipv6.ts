@@ -1,3 +1,4 @@
+import { makePersisted } from '@solid-primitives/storage'
 import { proxyGroupLatencyTestAPI, proxyLatencyTestAPI } from '~/apis'
 import {
   latencyQualityMap,
@@ -5,9 +6,13 @@ import {
   urlForIPv6SupportTest,
 } from './config'
 
-export const [proxyIPv6SupportMap, setProxyIPv6SupportMap] = createSignal<
-  Record<string, boolean>
->({})
+export const [proxyIPv6SupportMap, setProxyIPv6SupportMap] = makePersisted(
+  createSignal<Record<string, boolean>>({}),
+  {
+    name: 'proxyIPv6SupportMap',
+    storage: localStorage,
+  },
+)
 
 export const proxyIPv6SupportTest = async (
   proxyName: string,
