@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.148.0](https://github.com/MetaCubeX/metacubexd/compare/v1.147.0...v1.148.0) (2024-09-08)
+
+
+### Features
+
+* make persisted for ipv6 result ([#983](https://github.com/MetaCubeX/metacubexd/issues/983)) ([2078051](https://github.com/MetaCubeX/metacubexd/commit/2078051d7c8433ceda4240d41952cff32308990c))
+
 ## [1.147.0](https://github.com/MetaCubeX/metacubexd/compare/v1.146.2...v1.147.0) (2024-08-29)
 
 
