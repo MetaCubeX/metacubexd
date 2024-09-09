@@ -21,8 +21,8 @@ importers:
         specifier: ^1.0.17
         version: 1.0.17(zod@3.23.8)
       '@fontsource/fira-sans':
-        specifier: ^5.0.21
-        version: 5.0.21
+        specifier: ^5.0.22
+        version: 5.0.22
       '@solid-primitives/clipboard':
         specifier: ^1.5.10
         version: 1.5.10(solid-js@1.8.22)
@@ -1020,10 +1020,6 @@ packages:
     resolution: {integrity: sha512-fuXtbiP5GWIn8Fz+LWoOMVf/Jxm+aajZYkhi6CuEm4SxymFM+eUWzbO9qXT+L0iCkL5+KGYMCSGxo686H19S1g==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@eslint/js@9.9.1':
-    resolution: {integrity: sha512-xIDQRsfg5hNBqHz04H1R3scSVwmI+KUbqjsQKHKQ1DAUSaUjYPReZZmS/5PNiKu1fUvzDd6H7DEDKACSEhu+TQ==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
   '@eslint/object-schema@2.1.4':
     resolution: {integrity: sha512-BsWiH1yFGjXXS2yvrf5LyuoSIIbPrGUWob917o+BTKuZ7qJdxX8aJLRxs1fS9n6r7vESrq1OUqb68dANcFXuQQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
@@ -1052,8 +1048,8 @@ packages:
     peerDependencies:
       zod: ^3.2.0
 
-  '@fontsource/fira-sans@5.0.21':
-    resolution: {integrity: sha512-R4s5A+WF4rm45Us+3Gqp9Lijm83OflTSVyp7xccQLUAtjzp+Qmp7Y+adQ37vnjxaNfSoicJ6fTNYvlXck6KNUg==}
+  '@fontsource/fira-sans@5.0.22':
+    resolution: {integrity: sha512-mx//lXB+nFwSgAwX6rdZFs/KMGt18IyHfmJnbWAsKpxRqgLIz+INgMtfFfXCLAPiB2Mzt7KoyoU9bItdyj+8NQ==}
 
   '@humanwhocodes/module-importer@1.0.1':
     resolution: {integrity: sha512-bxveV4V8v5Yb4ncFTT3rPSgZBOpCkjfK0y4oVVVJwIuDVBRMDXrPyXRL988i5ap9m9bnyEEjWfm5WkBmtffLfA==}
@@ -4809,8 +4805,6 @@ snapshots:
 
   '@eslint/js@9.10.0': {}
 
-  '@eslint/js@9.9.1': {}
-
   '@eslint/object-schema@2.1.4': {}
 
   '@eslint/plugin-kit@0.1.0':
@@ -4833,7 +4827,7 @@ snapshots:
       '@felte/common': 1.1.8
       zod: 3.23.8
 
-  '@fontsource/fira-sans@5.0.21': {}
+  '@fontsource/fira-sans@5.0.22': {}
 
   '@humanwhocodes/module-importer@1.0.1': {}
 
