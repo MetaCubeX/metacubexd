@@ -54,8 +54,8 @@ importers:
         specifier: ^0.14.3
         version: 0.14.3(solid-js@1.8.22)
       '@tabler/icons-solidjs':
-        specifier: ^3.14.0
-        version: 3.14.0(solid-js@1.8.22)
+        specifier: ^3.15.0
+        version: 3.15.0(solid-js@1.8.22)
       '@tanstack/match-sorter-utils':
         specifier: ^8.19.4
         version: 8.19.4
@@ -1020,10 +1020,6 @@ packages:
     resolution: {integrity: sha512-fuXtbiP5GWIn8Fz+LWoOMVf/Jxm+aajZYkhi6CuEm4SxymFM+eUWzbO9qXT+L0iCkL5+KGYMCSGxo686H19S1g==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@eslint/js@9.9.1':
-    resolution: {integrity: sha512-xIDQRsfg5hNBqHz04H1R3scSVwmI+KUbqjsQKHKQ1DAUSaUjYPReZZmS/5PNiKu1fUvzDd6H7DEDKACSEhu+TQ==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
   '@eslint/object-schema@2.1.4':
     resolution: {integrity: sha512-BsWiH1yFGjXXS2yvrf5LyuoSIIbPrGUWob917o+BTKuZ7qJdxX8aJLRxs1fS9n6r7vESrq1OUqb68dANcFXuQQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
@@ -1312,13 +1308,13 @@ packages:
   '@surma/rollup-plugin-off-main-thread@2.2.3':
     resolution: {integrity: sha512-lR8q/9W7hZpMWweNiAKU7NQerBnzQQLvi8qnTDU/fxItPhtZVMbPV3lbCwjhIlNBe9Bbr5V+KHshvWmVSG9cxQ==}
 
-  '@tabler/icons-solidjs@3.14.0':
-    resolution: {integrity: sha512-pqZ/8402J1EFcl0IneB90Bpsk846PY3oxBPjYDDiGWiFeSTGAaNZnLks/qPM4BoEo/GY3oJrHPr32ehCn7Xhdw==}
+  '@tabler/icons-solidjs@3.15.0':
+    resolution: {integrity: sha512-w4okL+aU2Djf6vCNMOsSrlBVMNvrTuSUxrz8IUkiIUTugirSpMXk7z/G33cphpnM+6340HLWteEgeO9sgUswUQ==}
     peerDependencies:
       solid-js: ^1.4.7
 
-  '@tabler/icons@3.14.0':
-    resolution: {integrity: sha512-OakKjK1kuDWKoNwdnHHVMt11kTZAC10iZpN/8o/CSYdeBH7S3v5n8IyqAYynFxLI8yBGTyBvljtvWdmWh57zSg==}
+  '@tabler/icons@3.15.0':
+    resolution: {integrity: sha512-Pzo7g8znsCgCcnSLCfukEV+kcfr0/VjBoCLXJtrOtaY94gtvYjWC2hrKzazf511asUflRuk/+dxztdKYJgpe4g==}
 
   '@tanstack/match-sorter-utils@8.19.4':
     resolution: {integrity: sha512-Wo1iKt2b9OT7d+YGhvEPD3DXvPv2etTusIMhMUoG7fbhmxcXCtIjJDEygy91Y2JFlwGyjqiBPRozme7UD8hoqg==}
@@ -4809,8 +4805,6 @@ snapshots:
 
   '@eslint/js@9.10.0': {}
 
-  '@eslint/js@9.9.1': {}
-
   '@eslint/object-schema@2.1.4': {}
 
   '@eslint/plugin-kit@0.1.0':
@@ -5058,12 +5052,12 @@ snapshots:
       magic-string: 0.25.9
       string.prototype.matchall: 4.0.11
 
-  '@tabler/icons-solidjs@3.14.0(solid-js@1.8.22)':
+  '@tabler/icons-solidjs@3.15.0(solid-js@1.8.22)':
     dependencies:
-      '@tabler/icons': 3.14.0
+      '@tabler/icons': 3.15.0
       solid-js: 1.8.22
 
-  '@tabler/icons@3.14.0': {}
+  '@tabler/icons@3.15.0': {}
 
   '@tanstack/match-sorter-utils@8.19.4':
     dependencies:
