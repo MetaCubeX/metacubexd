@@ -1,3 +1,4 @@
+import { makePersisted } from '@solid-primitives/storage'
 import {
   closeSingleConnectionAPI,
   fetchProxiesAPI,
@@ -19,12 +20,6 @@ import {
   urlForLatencyTest,
 } from '~/signals'
 import type { Proxy, ProxyNode, ProxyProvider } from '~/types'
-import {
-  proxyGroupIPv6SupportTest,
-  proxyIPv6SupportMap,
-  proxyIPv6SupportTest,
-  setProxyIPv6SupportMap,
-} from './ipv6'
 
 type ProxyInfo = {
   name: string
@@ -64,6 +59,14 @@ const [proxyProviders, setProxyProviders] = createSignal<
 const [latencyMap, setLatencyMap] = createSignal<Record<string, number>>({})
 const [proxyNodeMap, setProxyNodeMap] = createSignal<Record<string, ProxyInfo>>(
   {},
+)
+
+const [proxyIPv6SupportMap, setProxyIPv6SupportMap] = makePersisted(
+  createSignal<Record<string, boolean>>({}),
+  {
+    name: 'proxyIPv6SupportMap',
+    storage: localStorage,
+  },
 )
 
 const getLatencyFromProxy = (
@@ -217,6 +220,75 @@ export const useProxies = () => {
     })
   }
 
+  const proxyIPv6SupportTest = async (proxyName: string, provider: string) => {
+    const urlForTest = urlForIPv6SupportTest()
+
+    if (!urlForTest || urlForTest.length === 0) {
+      setProxyIPv6SupportMap({})
+
+      return
+    }
+
+    let support = false
+    try {
+      const { delay } = await proxyLatencyTestAPI(
+        proxyName,
+        provider,
+        urlForTest,
+        latencyTestTimeoutDuration(),
+      )
+      support = delay > latencyQualityMap().NOT_CONNECTED
+    } catch {
+      support = false
+    }
+    setProxyIPv6SupportMap((supportMap) => ({
+      ...supportMap,
+      [proxyName]: support,
+    }))
+  }
+
+  const proxyGroupIPv6SupportTest = async (proxyGroupName: string) => {
+    const urlForTest = urlForIPv6SupportTest()
+
+    if (!urlForTest || urlForTest.length === 0) {
+      setProxyIPv6SupportMap({})
+
+      return
+    }
+
+    try {
+      const newLatencyMap = await proxyGroupLatencyTestAPI(
+        proxyGroupName,
+        urlForTest,
+        latencyTestTimeoutDuration(),
+      )
+
+      const newSupportMap = Object.fromEntries(
+        Object.entries(newLatencyMap).map(([nodeName, latency]) => [
+          getNowProxyNodeName(nodeName),
+          latency > latencyQualityMap().NOT_CONNECTED,
+        ]),
+      )
+      setProxyIPv6SupportMap((supportMap) => ({
+        ...supportMap,
+        ...newSupportMap,
+      }))
+    } catch {
+      const allNodes = proxies().find((p) => p.name === proxyGroupName)?.all
+
+      if (!allNodes) {
+        return
+      }
+
+      setProxyIPv6SupportMap((proxyIPv6SupportMap) => ({
+        ...proxyIPv6SupportMap,
+        ...Object.fromEntries(
+          allNodes.map((name) => [getNowProxyNodeName(name), false]),
+        ),
+      }))
+    }
+  }
+
   const updateProviderByProviderName = (providerName: string) =>
     setUpdatingMap(providerName, async () => {
       try {
@@ -305,5 +377,6 @@ export const useProxies = () => {
     getNowProxyNodeName,
     getLatencyByName,
     isProxyGroup,
+    proxyIPv6SupportMap,
   }
 }
