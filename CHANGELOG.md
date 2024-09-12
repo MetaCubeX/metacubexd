@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.148.1](https://github.com/MetaCubeX/metacubexd/compare/v1.148.0...v1.148.1) (2024-09-12)
+
+
+### Bug Fixes
+
+* proxy group ipv6 test failed ([#996](https://github.com/MetaCubeX/metacubexd/issues/996)) ([c43b84b](https://github.com/MetaCubeX/metacubexd/commit/c43b84b1149939bf604e6798931f221fa191bc6b))
+
 ## [1.148.0](https://github.com/MetaCubeX/metacubexd/compare/v1.147.0...v1.148.0) (2024-09-08)
 
 
