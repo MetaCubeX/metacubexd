@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.149.0](https://github.com/MetaCubeX/metacubexd/compare/v1.148.1...v1.149.0) (2024-09-14)
+
+
+### Features
+
+* reconnect ws when logs level changed ([#1003](https://github.com/MetaCubeX/metacubexd/issues/1003)) ([246a1ac](https://github.com/MetaCubeX/metacubexd/commit/246a1ac053ef56a1930d3ad2ae3bd0784e01c513))
+
 ## [1.148.1](https://github.com/MetaCubeX/metacubexd/compare/v1.148.0...v1.148.1) (2024-09-12)
 
 
