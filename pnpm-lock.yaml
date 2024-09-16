@@ -63,8 +63,8 @@ importers:
         specifier: ^8.20.5
         version: 8.20.5(solid-js@1.8.22)
       '@tanstack/solid-virtual':
-        specifier: ^3.10.7
-        version: 3.10.7(solid-js@1.8.22)
+        specifier: ^3.10.8
+        version: 3.10.8(solid-js@1.8.22)
       '@tanstack/virtual-core':
         specifier: ^3.10.7
         version: 3.10.7
@@ -1329,8 +1329,8 @@ packages:
     peerDependencies:
       solid-js: '>=1.3'
 
-  '@tanstack/solid-virtual@3.10.7':
-    resolution: {integrity: sha512-9z1ifq6UHiiKgCmexTAZKD/vBkwyMYkFnR9ZMDaqzAtj25G92guNmQLgWQ8ihmPl4WeixyzOXkLLwDKva4LW1Q==}
+  '@tanstack/solid-virtual@3.10.8':
+    resolution: {integrity: sha512-4dmUYIjjIVRFmpm7qha1tEDk5L6yzCEh63gTCUlo9ECXz7n3gvY95YQsrFNO020en5gXIUPHIzMBd56qqafyhQ==}
     peerDependencies:
       solid-js: ^1.3.0
 
@@ -1340,6 +1340,9 @@ packages:
 
   '@tanstack/virtual-core@3.10.7':
     resolution: {integrity: sha512-ND5dfsU0n9F4gROzwNNDJmg6y8n9pI8YWxtgbfJ5UcNn7Hx+MxEXtXcQ189tS7sh8pmCObgz2qSiyRKTZxT4dg==}
+
+  '@tanstack/virtual-core@3.10.8':
+    resolution: {integrity: sha512-PBu00mtt95jbKFi6Llk9aik8bnR3tR/oQP1o3TSi+iG//+Q2RTIzCEgKkHG8BB86kxMNW6O8wku+Lmi+QFR6jA==}
 
   '@thisbeyond/solid-dnd@0.7.5':
     resolution: {integrity: sha512-DfI5ff+yYGpK9M21LhYwIPlbP2msKxN2ARwuu6GF8tT1GgNVDTI8VCQvH4TJFoVApP9d44izmAcTh/iTCH2UUw==}
@@ -5075,14 +5078,16 @@ snapshots:
       '@tanstack/table-core': 8.20.5
       solid-js: 1.8.22
 
-  '@tanstack/solid-virtual@3.10.7(solid-js@1.8.22)':
+  '@tanstack/solid-virtual@3.10.8(solid-js@1.8.22)':
     dependencies:
-      '@tanstack/virtual-core': 3.10.7
+      '@tanstack/virtual-core': 3.10.8
       solid-js: 1.8.22
 
   '@tanstack/table-core@8.20.5': {}
 
   '@tanstack/virtual-core@3.10.7': {}
+
+  '@tanstack/virtual-core@3.10.8': {}
 
   '@thisbeyond/solid-dnd@0.7.5(solid-js@1.8.22)':
     dependencies:
