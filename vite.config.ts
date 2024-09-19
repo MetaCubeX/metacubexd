@@ -7,11 +7,13 @@ export default defineConfig({
   base: './',
   build: { chunkSizeWarningLimit: 1000 },
   resolve: { alias: { '~': '/src' } },
+
   define: {
     'import.meta.env.APP_VERSION': JSON.stringify(
       process.env.npm_package_version,
     ),
   },
+
   plugins: [
     solidPlugin(),
 
@@ -23,6 +25,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
+      workbox: { maximumFileSizeToCacheInBytes: 5 * 1024 * 1024 },
       manifest: {
         icons: [
           {
