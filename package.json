@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@commitlint/config-conventional": "^19.5.0",
-    "@eslint/js": "^9.10.0",
+    "@eslint/js": "^9.11.0",
     "@felte/solid": "^1.2.13",
     "@felte/validator-zod": "^1.0.17",
     "@fontsource/fira-sans": "^5.1.0",
