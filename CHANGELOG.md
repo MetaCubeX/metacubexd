@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.150.0](https://github.com/MetaCubeX/metacubexd/compare/v1.149.0...v1.150.0) (2024-09-24)
+
+
+### Features
+
+* proxy group icon ([#1023](https://github.com/MetaCubeX/metacubexd/issues/1023)) ([0b1d472](https://github.com/MetaCubeX/metacubexd/commit/0b1d472d62734cba0bb75efa6acc787957b571c6))
+
 ## [1.149.0](https://github.com/MetaCubeX/metacubexd/compare/v1.148.1...v1.149.0) (2024-09-14)
 
 
