@@ -12,6 +12,7 @@ export type Proxy = {
   name: string
   type: string
   all?: string[]
+  icon?: string
   extra: Record<string, unknown>
   history: {
     time: string
