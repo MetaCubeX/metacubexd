@@ -78,8 +78,8 @@ importers:
         specifier: ^4.17.9
         version: 4.17.9
       '@types/node':
-        specifier: ^22.6.1
-        version: 22.6.1
+        specifier: ^22.7.2
+        version: 22.7.2
       '@types/uuid':
         specifier: ^10.0.0
         version: 10.0.0
@@ -97,7 +97,7 @@ importers:
         version: 9.0.0
       commitlint:
         specifier: ^19.5.0
-        version: 19.5.0(@types/node@22.6.1)(typescript@5.6.2)
+        version: 19.5.0(@types/node@22.7.2)(typescript@5.6.2)
       daisyui:
         specifier: ^4.12.10
         version: 4.12.10(postcss@8.4.44)
@@ -172,13 +172,13 @@ importers:
         version: 10.0.0
       vite:
         specifier: ^5.4.8
-        version: 5.4.8(@types/node@22.6.1)(terser@5.31.1)
+        version: 5.4.8(@types/node@22.7.2)(terser@5.31.1)
       vite-plugin-pwa:
         specifier: ^0.20.5
-        version: 0.20.5(@vite-pwa/assets-generator@0.2.6)(vite@5.4.8(@types/node@22.6.1)(terser@5.31.1))(workbox-build@7.1.1(@types/babel__core@7.20.5))(workbox-window@7.1.0)
+        version: 0.20.5(@vite-pwa/assets-generator@0.2.6)(vite@5.4.8(@types/node@22.7.2)(terser@5.31.1))(workbox-build@7.1.1(@types/babel__core@7.20.5))(workbox-window@7.1.0)
       vite-plugin-solid:
         specifier: ^2.10.2
-        version: 2.10.2(solid-js@1.9.0)(vite@5.4.8(@types/node@22.6.1)(terser@5.31.1))
+        version: 2.10.2(solid-js@1.9.0)(vite@5.4.8(@types/node@22.7.2)(terser@5.31.1))
       zod:
         specifier: ^3.23.8
         version: 3.23.8
@@ -1381,8 +1381,8 @@ packages:
   '@types/lodash@4.17.9':
     resolution: {integrity: sha512-w9iWudx1XWOHW5lQRS9iKpK/XuRhnN+0T7HvdCCd802FYkT1AMTnxndJHGrNJwRoRHkslGr4S29tjm1cT7x/7w==}
 
-  '@types/node@22.6.1':
-    resolution: {integrity: sha512-V48tCfcKb/e6cVUigLAaJDAILdMP0fUW6BidkPK4GpGjXcfbnoHasCZDwz3N3yVt5we2RHm4XTQCpv0KJz9zqw==}
+  '@types/node@22.7.2':
+    resolution: {integrity: sha512-866lXSrpGpgyHBZUa2m9YNWqHDjjM0aBTJlNtYaGEw4rqY/dcD7deRVTbBBAJelfA7oaGDbNftXF/TL/A6RgoA==}
 
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
@@ -4595,11 +4595,11 @@ snapshots:
 
   '@canvas/image-data@1.0.0': {}
 
-  '@commitlint/cli@19.5.0(@types/node@22.6.1)(typescript@5.6.2)':
+  '@commitlint/cli@19.5.0(@types/node@22.7.2)(typescript@5.6.2)':
     dependencies:
       '@commitlint/format': 19.5.0
       '@commitlint/lint': 19.5.0
-      '@commitlint/load': 19.5.0(@types/node@22.6.1)(typescript@5.6.2)
+      '@commitlint/load': 19.5.0(@types/node@22.7.2)(typescript@5.6.2)
       '@commitlint/read': 19.5.0
       '@commitlint/types': 19.5.0
       tinyexec: 0.3.0
@@ -4646,7 +4646,7 @@ snapshots:
       '@commitlint/rules': 19.5.0
       '@commitlint/types': 19.5.0
 
-  '@commitlint/load@19.5.0(@types/node@22.6.1)(typescript@5.6.2)':
+  '@commitlint/load@19.5.0(@types/node@22.7.2)(typescript@5.6.2)':
     dependencies:
       '@commitlint/config-validator': 19.5.0
       '@commitlint/execute-rule': 19.5.0
@@ -4654,7 +4654,7 @@ snapshots:
       '@commitlint/types': 19.5.0
       chalk: 5.3.0
       cosmiconfig: 9.0.0(typescript@5.6.2)
-      cosmiconfig-typescript-loader: 5.0.0(@types/node@22.6.1)(cosmiconfig@9.0.0(typescript@5.6.2))(typescript@5.6.2)
+      cosmiconfig-typescript-loader: 5.0.0(@types/node@22.7.2)(cosmiconfig@9.0.0(typescript@5.6.2))(typescript@5.6.2)
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       lodash.uniq: 4.5.0
@@ -5108,7 +5108,7 @@ snapshots:
 
   '@types/conventional-commits-parser@5.0.0':
     dependencies:
-      '@types/node': 22.6.1
+      '@types/node': 22.7.2
 
   '@types/estree@0.0.39': {}
 
@@ -5120,7 +5120,7 @@ snapshots:
 
   '@types/lodash@4.17.9': {}
 
-  '@types/node@22.6.1':
+  '@types/node@22.7.2':
     dependencies:
       undici-types: 6.19.6
 
@@ -5529,9 +5529,9 @@ snapshots:
 
   commander@4.1.1: {}
 
-  commitlint@19.5.0(@types/node@22.6.1)(typescript@5.6.2):
+  commitlint@19.5.0(@types/node@22.7.2)(typescript@5.6.2):
     dependencies:
-      '@commitlint/cli': 19.5.0(@types/node@22.6.1)(typescript@5.6.2)
+      '@commitlint/cli': 19.5.0(@types/node@22.7.2)(typescript@5.6.2)
       '@commitlint/types': 19.5.0
     transitivePeerDependencies:
       - '@types/node'
@@ -5573,9 +5573,9 @@ snapshots:
     dependencies:
       browserslist: 4.23.3
 
-  cosmiconfig-typescript-loader@5.0.0(@types/node@22.6.1)(cosmiconfig@9.0.0(typescript@5.6.2))(typescript@5.6.2):
+  cosmiconfig-typescript-loader@5.0.0(@types/node@22.7.2)(cosmiconfig@9.0.0(typescript@5.6.2))(typescript@5.6.2):
     dependencies:
-      '@types/node': 22.6.1
+      '@types/node': 22.7.2
       cosmiconfig: 9.0.0(typescript@5.6.2)
       jiti: 1.21.6
       typescript: 5.6.2
@@ -7446,12 +7446,12 @@ snapshots:
 
   validate-html-nesting@1.2.2: {}
 
-  vite-plugin-pwa@0.20.5(@vite-pwa/assets-generator@0.2.6)(vite@5.4.8(@types/node@22.6.1)(terser@5.31.1))(workbox-build@7.1.1(@types/babel__core@7.20.5))(workbox-window@7.1.0):
+  vite-plugin-pwa@0.20.5(@vite-pwa/assets-generator@0.2.6)(vite@5.4.8(@types/node@22.7.2)(terser@5.31.1))(workbox-build@7.1.1(@types/babel__core@7.20.5))(workbox-window@7.1.0):
     dependencies:
       debug: 4.3.6
       pretty-bytes: 6.1.1
       tinyglobby: 0.2.0
-      vite: 5.4.8(@types/node@22.6.1)(terser@5.31.1)
+      vite: 5.4.8(@types/node@22.7.2)(terser@5.31.1)
       workbox-build: 7.1.1(@types/babel__core@7.20.5)
       workbox-window: 7.1.0
     optionalDependencies:
@@ -7459,7 +7459,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-solid@2.10.2(solid-js@1.9.0)(vite@5.4.8(@types/node@22.6.1)(terser@5.31.1)):
+  vite-plugin-solid@2.10.2(solid-js@1.9.0)(vite@5.4.8(@types/node@22.7.2)(terser@5.31.1)):
     dependencies:
       '@babel/core': 7.24.7
       '@types/babel__core': 7.20.5
@@ -7467,24 +7467,24 @@ snapshots:
       merge-anything: 5.1.7
       solid-js: 1.9.0
       solid-refresh: 0.6.3(solid-js@1.9.0)
-      vite: 5.4.8(@types/node@22.6.1)(terser@5.31.1)
-      vitefu: 0.2.5(vite@5.4.8(@types/node@22.6.1)(terser@5.31.1))
+      vite: 5.4.8(@types/node@22.7.2)(terser@5.31.1)
+      vitefu: 0.2.5(vite@5.4.8(@types/node@22.7.2)(terser@5.31.1))
     transitivePeerDependencies:
       - supports-color
 
-  vite@5.4.8(@types/node@22.6.1)(terser@5.31.1):
+  vite@5.4.8(@types/node@22.7.2)(terser@5.31.1):
     dependencies:
       esbuild: 0.21.5
       postcss: 8.4.44
       rollup: 4.21.0
     optionalDependencies:
-      '@types/node': 22.6.1
+      '@types/node': 22.7.2
       fsevents: 2.3.3
       terser: 5.31.1
 
-  vitefu@0.2.5(vite@5.4.8(@types/node@22.6.1)(terser@5.31.1)):
+  vitefu@0.2.5(vite@5.4.8(@types/node@22.7.2)(terser@5.31.1)):
     optionalDependencies:
-      vite: 5.4.8(@types/node@22.6.1)(terser@5.31.1)
+      vite: 5.4.8(@types/node@22.7.2)(terser@5.31.1)
 
   webidl-conversions@4.0.2: {}
 
