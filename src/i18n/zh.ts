@@ -115,4 +115,6 @@ export default {
   zh: '中文',
   port: '{{ name }} 端口',
   quickFilter: '快速过滤',
+  iconHeight: '图标高度',
+  iconMarginRight: '图标右边距',
 } satisfies Dict

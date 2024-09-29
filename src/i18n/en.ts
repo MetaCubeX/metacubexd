@@ -113,4 +113,6 @@ export default {
   zh: 'Chinese',
   port: '{{ name }} Port',
   quickFilter: 'Quick Filter',
+  iconHeight: 'Icon Height',
+  iconMarginRight: 'Icon Margin Right',
 }

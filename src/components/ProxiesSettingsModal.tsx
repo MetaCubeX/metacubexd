@@ -6,12 +6,16 @@ import { useI18n } from '~/i18n'
 import {
   autoCloseConns,
   hideUnAvailableProxies,
+  iconHeight,
+  iconMarginRight,
   latencyTestTimeoutDuration,
   proxiesOrderingType,
   proxiesPreviewType,
   renderProxiesInTwoColumns,
   setAutoCloseConns,
   setHideUnAvailableProxies,
+  setIconHeight,
+  setIconMarginRight,
   setLatencyTestTimeoutDuration,
   setProxiesOrderingType,
   setProxiesPreviewType,
@@ -142,6 +146,26 @@ export const ProxiesSettingsModal: Component<{
               {(value) => <option value={value}>{t(value)}</option>}
             </For>
           </select>
+        </div>
+
+        <div>
+          <ConfigTitle withDivider>{t('iconHeight')}</ConfigTitle>
+
+          <input
+            type="number"
+            class="input input-bordered w-full"
+            value={iconHeight()}
+            onChange={(e) => setIconHeight(Number(e.target.value))}
+          />
+
+          <ConfigTitle withDivider>{t('iconMarginRight')}</ConfigTitle>
+
+          <input
+            type="number"
+            class="input input-bordered w-full"
+            value={iconMarginRight()}
+            onChange={(e) => setIconMarginRight(Number(e.target.value))}
+          />
         </div>
       </div>
     </Modal>

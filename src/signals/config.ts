@@ -148,3 +148,13 @@ export const isLatencyTestByHttps = () =>
 
 export const latencyQualityMap = () =>
   isLatencyTestByHttps() ? LATENCY_QUALITY_MAP_HTTPS : LATENCY_QUALITY_MAP_HTTP
+
+export const [iconHeight, setIconHeight] = makePersisted(createSignal(24), {
+  name: 'iconHeight',
+  storage: localStorage,
+})
+
+export const [iconMarginRight, setIconMarginRight] = makePersisted(
+  createSignal(8),
+  { name: 'iconMarginRight', storage: localStorage },
+)
