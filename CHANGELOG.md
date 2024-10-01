@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.151.0](https://github.com/MetaCubeX/metacubexd/compare/v1.150.0...v1.151.0) (2024-10-01)
+
+
+### Features
+
+* config for icon height and margin-right ([#1041](https://github.com/MetaCubeX/metacubexd/issues/1041)) ([bf26a53](https://github.com/MetaCubeX/metacubexd/commit/bf26a539bce4a995bf254f1653d98c3b5f1c0a22))
+
 ## [1.150.0](https://github.com/MetaCubeX/metacubexd/compare/v1.149.0...v1.150.0) (2024-09-24)
 
 
