@@ -12,8 +12,8 @@ importers:
         specifier: ^19.5.0
         version: 19.5.0
       '@eslint/js':
-        specifier: ^9.11.1
-        version: 9.11.1
+        specifier: ^9.12.0
+        version: 9.12.0
       '@felte/solid':
         specifier: ^1.2.13
         version: 1.2.13(solid-js@1.9.1)
