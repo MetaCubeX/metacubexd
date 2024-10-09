@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.152.0](https://github.com/MetaCubeX/metacubexd/compare/v1.151.0...v1.152.0) (2024-10-09)
+
+
+### Features
+
+* show current page title, closes [#474](https://github.com/MetaCubeX/metacubexd/issues/474) ([9c76d7f](https://github.com/MetaCubeX/metacubexd/commit/9c76d7ff76886495208809d3e0f2efc6e90de2f3))
+
 ## [1.151.0](https://github.com/MetaCubeX/metacubexd/compare/v1.150.0...v1.151.0) (2024-10-01)
 
 
