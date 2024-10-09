@@ -2,6 +2,7 @@ import { Dict } from '~/i18n/dict'
 
 export default {
   add: '添加',
+  setup: '设置',
   overview: '概览',
   proxies: '代理',
   proxiesSettings: '代理设置',

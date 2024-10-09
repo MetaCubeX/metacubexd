@@ -21,6 +21,7 @@ import {
   upgradingUI,
 } from '~/apis'
 import { Button, ConfigTitle } from '~/components'
+import DocumentTitle from '~/components/DocumentTitle'
 import { LANG, ROUTES, themes } from '~/constants'
 import { locale, setLocale, useI18n } from '~/i18n'
 import {
@@ -540,24 +541,28 @@ export default () => {
   updateBackendVersion()
 
   return (
-    <div class="mx-auto flex max-w-screen-md flex-col gap-4">
-      <Show when={!isSingBox()}>
-        <ConfigTitle withDivider>{t('dnsQuery')}</ConfigTitle>
+    <>
+      <DocumentTitle>{t('config')}</DocumentTitle>
 
-        <DNSQueryForm />
-      </Show>
+      <div class="mx-auto flex max-w-screen-md flex-col gap-4">
+        <Show when={!isSingBox()}>
+          <ConfigTitle withDivider>{t('dnsQuery')}</ConfigTitle>
 
-      <ConfigTitle withDivider>{t('coreConfig')}</ConfigTitle>
+          <DNSQueryForm />
+        </Show>
 
-      <ConfigForm />
+        <ConfigTitle withDivider>{t('coreConfig')}</ConfigTitle>
 
-      <ConfigTitle withDivider>{t('xdConfig')}</ConfigTitle>
+        <ConfigForm />
 
-      <ConfigForXd />
+        <ConfigTitle withDivider>{t('xdConfig')}</ConfigTitle>
 
-      <ConfigTitle withDivider>{t('version')}</ConfigTitle>
+        <ConfigForXd />
 
-      <Versions backendVersion={backendVersion} />
-    </div>
+        <ConfigTitle withDivider>{t('version')}</ConfigTitle>
+
+        <Versions backendVersion={backendVersion} />
+      </div>
+    </>
   )
 }

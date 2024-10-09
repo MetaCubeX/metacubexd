@@ -4,6 +4,7 @@ import byteSize from 'byte-size'
 import { merge } from 'lodash'
 import { SolidApexCharts } from 'solid-apexcharts'
 import type { JSX, ParentComponent } from 'solid-js'
+import DocumentTitle from '~/components/DocumentTitle'
 import { CHART_MAX_XAXIS, DEFAULT_CHART_OPTIONS } from '~/constants'
 import { useI18n } from '~/i18n'
 import { endpoint, latestConnectionMsg, useWsRequest } from '~/signals'
@@ -87,53 +88,57 @@ export default () => {
   ])
 
   return (
-    <div class="flex flex-col gap-2 lg:h-full">
-      <div class="stats stats-vertical w-full flex-shrink-0 grid-cols-2 bg-gradient-to-br from-primary to-secondary shadow lg:stats-horizontal lg:flex">
-        <TrafficWidget label={t('upload')}>
-          {byteSize(traffic()?.up || 0).toString()}/s
-        </TrafficWidget>
+    <>
+      <DocumentTitle>{t('overview')}</DocumentTitle>
 
-        <TrafficWidget label={t('download')}>
-          {byteSize(traffic()?.down || 0).toString()}/s
-        </TrafficWidget>
+      <div class="flex flex-col gap-2 lg:h-full">
+        <div class="stats stats-vertical w-full flex-shrink-0 grid-cols-2 bg-gradient-to-br from-primary to-secondary shadow lg:stats-horizontal lg:flex">
+          <TrafficWidget label={t('upload')}>
+            {byteSize(traffic()?.up || 0).toString()}/s
+          </TrafficWidget>
 
-        <TrafficWidget label={t('uploadTotal')}>
-          {byteSize(latestConnectionMsg()?.uploadTotal || 0).toString()}
-        </TrafficWidget>
+          <TrafficWidget label={t('download')}>
+            {byteSize(traffic()?.down || 0).toString()}/s
+          </TrafficWidget>
 
-        <TrafficWidget label={t('downloadTotal')}>
-          {byteSize(latestConnectionMsg()?.downloadTotal || 0).toString()}
-        </TrafficWidget>
+          <TrafficWidget label={t('uploadTotal')}>
+            {byteSize(latestConnectionMsg()?.uploadTotal || 0).toString()}
+          </TrafficWidget>
 
-        <TrafficWidget label={t('activeConnections')}>
-          {latestConnectionMsg()?.connections?.length || 0}
-        </TrafficWidget>
+          <TrafficWidget label={t('downloadTotal')}>
+            {byteSize(latestConnectionMsg()?.downloadTotal || 0).toString()}
+          </TrafficWidget>
 
-        <TrafficWidget label={t('memoryUsage')}>
-          {byteSize(memory()?.inuse || 0).toString()}
-        </TrafficWidget>
-      </div>
+          <TrafficWidget label={t('activeConnections')}>
+            {latestConnectionMsg()?.connections?.length || 0}
+          </TrafficWidget>
 
-      <div class="flex flex-col gap-2 rounded-box bg-base-300 py-4 lg:flex-row">
-        <div class="flex-1">
-          <SolidApexCharts
-            type="area"
-            options={trafficChartOptions()}
-            series={trafficChartSeries()}
-          />
+          <TrafficWidget label={t('memoryUsage')}>
+            {byteSize(memory()?.inuse || 0).toString()}
+          </TrafficWidget>
         </div>
-        <div class="flex-1">
-          <SolidApexCharts
-            type="line"
-            options={memoryChartOptions()}
-            series={memoryChartSeries()}
-          />
-        </div>
-      </div>
 
-      <footer class="footer mx-auto mt-4 block rounded-box bg-neutral p-4 text-center text-lg font-bold text-neutral-content">
-        {endpoint()?.url}
-      </footer>
-    </div>
+        <div class="flex flex-col gap-2 rounded-box bg-base-300 py-4 lg:flex-row">
+          <div class="flex-1">
+            <SolidApexCharts
+              type="area"
+              options={trafficChartOptions()}
+              series={trafficChartSeries()}
+            />
+          </div>
+          <div class="flex-1">
+            <SolidApexCharts
+              type="line"
+              options={memoryChartOptions()}
+              series={memoryChartSeries()}
+            />
+          </div>
+        </div>
+
+        <footer class="footer mx-auto mt-4 block rounded-box bg-neutral p-4 text-center text-lg font-bold text-neutral-content">
+          {endpoint()?.url}
+        </footer>
+      </div>
+    </>
   )
 }

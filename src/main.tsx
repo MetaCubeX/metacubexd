@@ -1,6 +1,7 @@
 /* @refresh reload */
 import '~/index.css'
 
+import { MetaProvider } from '@solidjs/meta'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -24,16 +25,18 @@ dayjs.extend(relativeTime)
 render(
   () => (
     <I18nProvider locale={locale()}>
-      <HashRouter root={App}>
-        <Route path={ROUTES.Setup} component={Setup} />
-        <Route path="*" component={Overview} />
-        <Route path={ROUTES.Overview} component={Overview} />
-        <Route path={ROUTES.Proxies} component={Proxies} />
-        <Route path={ROUTES.Rules} component={Rules} />
-        <Route path={ROUTES.Conns} component={Connections} />
-        <Route path={ROUTES.Log} component={Logs} />
-        <Route path={ROUTES.Config} component={Config} />
-      </HashRouter>
+      <MetaProvider>
+        <HashRouter root={App}>
+          <Route path={ROUTES.Setup} component={Setup} />
+          <Route path="*" component={Overview} />
+          <Route path={ROUTES.Overview} component={Overview} />
+          <Route path={ROUTES.Proxies} component={Proxies} />
+          <Route path={ROUTES.Rules} component={Rules} />
+          <Route path={ROUTES.Conns} component={Connections} />
+          <Route path={ROUTES.Log} component={Logs} />
+          <Route path={ROUTES.Config} component={Config} />
+        </HashRouter>
+      </MetaProvider>
 
       <Toaster position="bottom-center" />
     </I18nProvider>

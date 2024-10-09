@@ -6,6 +6,7 @@ import { toast } from 'solid-toast'
 import { v4 as uuid } from 'uuid'
 import { z } from 'zod'
 import { Button } from '~/components'
+import DocumentTitle from '~/components/DocumentTitle'
 import { transformEndpointURL } from '~/helpers'
 import { useI18n } from '~/i18n'
 import {
@@ -140,71 +141,75 @@ export default () => {
   })
 
   return (
-    <div class="mx-auto flex max-w-screen-sm flex-col items-center gap-4 py-10">
-      <form class="contents" use:form={form}>
-        <div class="flex w-full flex-col gap-4">
-          <div class="flex-1">
-            <label class="label">
-              <span class="label-text">{t('endpointURL')}</span>
-            </label>
+    <>
+      <DocumentTitle>{t('setup')}</DocumentTitle>
 
-            <input
-              name="url"
-              type="url"
-              class="input input-bordered w-full"
-              placeholder="http(s)://{hostname}:{port}"
-              list="defaultEndpoints"
-            />
+      <div class="mx-auto flex max-w-screen-sm flex-col items-center gap-4 py-10">
+        <form class="contents" use:form={form}>
+          <div class="flex w-full flex-col gap-4">
+            <div class="flex-1">
+              <label class="label">
+                <span class="label-text">{t('endpointURL')}</span>
+              </label>
 
-            <datalist id="defaultEndpoints">
-              <option value="http://127.0.0.1:9090" />
-              <Show when={window.location.origin !== 'http://127.0.0.1:9090'}>
-                <option value={window.location.origin} />
-              </Show>
-            </datalist>
-          </div>
+              <input
+                name="url"
+                type="url"
+                class="input input-bordered w-full"
+                placeholder="http(s)://{hostname}:{port}"
+                list="defaultEndpoints"
+              />
 
-          <div class="flex-1">
-            <label class="label">
-              <span class="label-text">{t('secret')}</span>
-            </label>
-
-            <input
-              name="secret"
-              type="password"
-              class="input input-bordered w-full"
-              placeholder="secret"
-            />
-          </div>
-
-          <Button type="submit" class="btn-primary uppercase">
-            {t('add')}
-          </Button>
-        </div>
-      </form>
-
-      <div class="grid w-full grid-cols-2 gap-4">
-        <For each={endpointList()}>
-          {({ id, url }) => (
-            <div
-              class="badge badge-info flex w-full cursor-pointer items-center justify-between gap-4 py-4"
-              onClick={() => onEndpointSelect(id)}
-            >
-              <span class="truncate">{url}</span>
-
-              <Button
-                class="btn-circle btn-ghost btn-xs text-white"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onRemove(id)
-                }}
-              >
-                <IconX />
-              </Button>
+              <datalist id="defaultEndpoints">
+                <option value="http://127.0.0.1:9090" />
+                <Show when={window.location.origin !== 'http://127.0.0.1:9090'}>
+                  <option value={window.location.origin} />
+                </Show>
+              </datalist>
             </div>
-          )}
-        </For>
+
+            <div class="flex-1">
+              <label class="label">
+                <span class="label-text">{t('secret')}</span>
+              </label>
+
+              <input
+                name="secret"
+                type="password"
+                class="input input-bordered w-full"
+                placeholder="secret"
+              />
+            </div>
+
+            <Button type="submit" class="btn-primary uppercase">
+              {t('add')}
+            </Button>
+          </div>
+        </form>
+
+        <div class="grid w-full grid-cols-2 gap-4">
+          <For each={endpointList()}>
+            {({ id, url }) => (
+              <div
+                class="badge badge-info flex w-full cursor-pointer items-center justify-between gap-4 py-4"
+                onClick={() => onEndpointSelect(id)}
+              >
+                <span class="truncate">{url}</span>
+
+                <Button
+                  class="btn-circle btn-ghost btn-xs text-white"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onRemove(id)
+                  }}
+                >
+                  <IconX />
+                </Button>
+              </div>
+            )}
+          </For>
+        </div>
       </div>
-    </div>
+    </>
   )
 }

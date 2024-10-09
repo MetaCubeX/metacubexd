@@ -1,5 +1,6 @@
 export default {
   add: 'Add',
+  setup: 'Setup',
   overview: 'Overview',
   proxies: 'Proxies',
   proxiesSettings: 'Proxies Settings',

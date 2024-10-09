@@ -119,7 +119,7 @@ export const Header = () => {
           <div class="drawer-side">
             <label for="navs" class="drawer-overlay" />
 
-            <ul class="menu min-h-full w-2/5 gap-2 rounded-r-box bg-base-300 pt-20">
+            <ul class="min-w-2/5 menu min-h-full gap-2 rounded-r-box bg-base-300 pt-20">
               <For each={navs()}>
                 {({ href, name, icon }) => (
                   <li onClick={() => setOpenedDrawer(false)}>
