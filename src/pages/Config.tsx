@@ -256,7 +256,7 @@ const ConfigForm: ParentComponent<{ isSingBox: Accessor<boolean> }> = ({
         </div>
 
         <div class="form-control">
-          <Label for="mode">{t('rule')}</Label>
+          <Label for="mode">{t('runningMode')}</Label>
 
           <Select
             id="mode"

@@ -88,6 +88,7 @@ export default {
   details: 'Details',
   endpointURL: 'Endpoint URL',
   secret: 'Secret',
+  runningMode: 'Running Mode',
   global: 'Global',
   rule: 'Rule',
   direct: 'Direct',

@@ -90,6 +90,7 @@ export default {
   details: '详情',
   endpointURL: '后端地址',
   secret: '密钥',
+  runningMode: '运行模式',
   global: '全局',
   rule: '规则',
   direct: '直连',
