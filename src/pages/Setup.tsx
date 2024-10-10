@@ -1,10 +1,10 @@
 import { createForm } from '@felte/solid'
 import { validator } from '@felte/validator-zod'
 import { IconX } from '@tabler/icons-solidjs'
-import ky from 'ky'
 import { toast } from 'solid-toast'
 import { v4 as uuid } from 'uuid'
 import { z } from 'zod'
+import { checkEndpointAPI } from '~/apis'
 import { Button } from '~/components'
 import DocumentTitle from '~/components/DocumentTitle'
 import { transformEndpointURL } from '~/helpers'
@@ -31,28 +31,12 @@ export default () => {
     navigate('/overview', { replace: true })
   }
 
-  const checkEndpoint = (url: string, secret: string) =>
-    ky
-      .get(url, {
-        headers: secret
-          ? {
-              Authorization: `Bearer ${secret}`,
-            }
-          : {},
-      })
-      .then(({ ok }) => ok)
-      .catch((err) => {
-        const { message } = err as Error
-
-        toast.error(message)
-      })
-
   const onEndpointSelect = async (id: string) => {
     const endpoint = endpointList().find((e) => e.id === id)
 
     if (!endpoint) return
 
-    if (!(await checkEndpoint(endpoint.url, endpoint.secret))) return
+    if (!(await checkEndpointAPI(endpoint.url, endpoint.secret))) return
 
     onSetupSuccess(id)
   }
@@ -60,7 +44,7 @@ export default () => {
   const onSubmit = async ({ url, secret }: { url: string; secret: string }) => {
     const transformedURL = transformEndpointURL(url)
 
-    if (!(await checkEndpoint(transformedURL, secret))) return
+    if (!(await checkEndpointAPI(transformedURL, secret))) return
 
     const id = uuid()
     const list = endpointList().slice()
@@ -102,21 +86,18 @@ export default () => {
     setEndpointList(endpointList().filter((e) => e.id !== id))
   }
 
-  onMount(() => {
-    let search = location.search || window.location.search
+  onMount(async () => {
+    const search =
+      location.search ||
+      window.location.search ||
+      location.hash.match(/\?.*$/)?.[0]?.replace('?', '')
 
-    if (search) {
-      const searchList = location.hash.match(/\?.*$/)
-
-      if (Array.isArray(searchList) && searchList[0]) {
-        search = searchList[0].replace('?', '')
-      }
-    }
+    if (!search) return
 
     const query = new URLSearchParams(search)
 
     if (query.has('hostname')) {
-      void onSubmit({
+      await onSubmit({
         url: `${query.get('http') ? 'http:' : query.get('https') ? 'https:' : window.location.protocol}//${query.get('hostname')}${
           query.get('port') ? `:${query.get('port')}` : ''
         }`,
@@ -127,7 +108,7 @@ export default () => {
         we only try auto login when there is nothing in endpoint list
         or user who is using default config won't be able to switch to another endpoint ever
       */
-      void onSubmit({
+      await onSubmit({
         url: 'http://127.0.0.1:9090',
         secret: '',
       })

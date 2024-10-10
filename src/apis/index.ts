@@ -11,6 +11,22 @@ import {
   RuleProvider,
 } from '~/types'
 
+export const checkEndpointAPI = (url: string, secret: string) =>
+  ky
+    .get(url, {
+      headers: secret
+        ? {
+            Authorization: `Bearer ${secret}`,
+          }
+        : {},
+    })
+    .then(({ ok }) => ok)
+    .catch((err) => {
+      const { message } = err as Error
+
+      toast.error(message)
+    })
+
 export const closeAllConnectionsAPI = () => {
   const request = useRequest()
 
@@ -239,9 +255,7 @@ export const isUpdateAvailableAPI = async (versionResponse: string) => {
   const repositoryURL = 'https://api.github.com/repos/MetaCubeX/mihomo'
   const match = /(alpha|beta|meta)-?(\w+)/.exec(versionResponse)
 
-  if (!match) {
-    return false
-  }
+  if (!match) return false
 
   const channel = match[1],
     version = match[2]

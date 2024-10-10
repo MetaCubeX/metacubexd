@@ -17,9 +17,7 @@ export const useLogs = () => {
       createEffect(() => {
         const data = logsData()
 
-        if (!data || paused()) {
-          return
-        }
+        if (!data || paused()) return
 
         setLogs((logs) => [{ ...data, seq }, ...logs].slice(0, logMaxRows()))
         seq++
