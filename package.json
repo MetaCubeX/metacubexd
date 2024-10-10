@@ -29,7 +29,7 @@
     "@solid-primitives/timer": "^1.3.10",
     "@solid-primitives/websocket": "^1.2.2",
     "@solidjs/meta": "^0.29.4",
-    "@solidjs/router": "^0.14.7",
+    "@solidjs/router": "^0.14.8",
     "@tabler/icons-solidjs": "^3.19.0",
     "@tanstack/match-sorter-utils": "^8.19.4",
     "@tanstack/solid-table": "^8.20.5",
