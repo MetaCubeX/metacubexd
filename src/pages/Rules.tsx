@@ -205,7 +205,7 @@ export default () => {
                       </div>
 
                       <div class="text-xs text-slate-500">
-                        {rule.type} :: {rule.proxy}
+                        {`${rule.type} :: ${rule.proxy}`}
                       </div>
                     </div>
                   </div>
@@ -240,15 +240,14 @@ export default () => {
                     <div class="card card-bordered card-compact bg-base-200 p-4">
                       <div class="flex items-center gap-2 pr-8">
                         <span class="break-all">{ruleProvider.name}</span>
+
                         <div class="badge badge-sm">
                           {ruleProvider.ruleCount}
                         </div>
                       </div>
 
                       <div class="text-xs text-slate-500">
-                        {ruleProvider.vehicleType} / {ruleProvider.behavior} /
-                        {t('updated')}{' '}
-                        {formatTimeFromNow(ruleProvider.updatedAt)}
+                        {`${ruleProvider.vehicleType} / ${ruleProvider.behavior} / ${t('updated')} ${formatTimeFromNow(ruleProvider.updatedAt)}`}
                       </div>
 
                       <Button

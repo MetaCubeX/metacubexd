@@ -24,9 +24,13 @@ export default defineConfig({
 
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg'],
+      includeAssets: ['favicon.svg', ''],
       workbox: { maximumFileSizeToCacheInBytes: 5 * 1024 * 1024 },
       manifest: {
+        name: 'MetaCubeXD',
+        short_name: 'MetaCubeXD',
+        description: 'Mihomo Dashboard, The Official One, XD',
+        theme_color: '#000000',
         icons: [
           {
             src: 'pwa-192x192.png',
