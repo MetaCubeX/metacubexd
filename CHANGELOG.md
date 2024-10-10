@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.153.0](https://github.com/MetaCubeX/metacubexd/compare/v1.152.0...v1.153.0) (2024-10-10)
+
+
+### Features
+
+* **proxies:** overhaul the look of proxies page, drop renderInTwoColumns support ([698362f](https://github.com/MetaCubeX/metacubexd/commit/698362f1c7b31837ac60bdfde7aac1deccb2ea35))
+
+
+### Bug Fixes
+
+* **proxies:** double specialType if statement ([0c004be](https://github.com/MetaCubeX/metacubexd/commit/0c004be98f062f79806a4ef95949f380d17571e1))
+* **proxies:** prevent proxyName from overflowing ([4037597](https://github.com/MetaCubeX/metacubexd/commit/40375979b8d1328ba3dde5e0a61d24271dfd4b3e))
+
 ## [1.152.0](https://github.com/MetaCubeX/metacubexd/compare/v1.151.0...v1.152.0) (2024-10-09)
 
 
