@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.154.0](https://github.com/MetaCubeX/metacubexd/compare/v1.153.2...v1.154.0) (2024-10-10)
+
+
+### Features
+
+* **config:** check for frontend version update ([657c180](https://github.com/MetaCubeX/metacubexd/commit/657c180e056e345776ac1a21966c4c3eafdb1d09))
+
 ## [1.153.2](https://github.com/MetaCubeX/metacubexd/compare/v1.153.1...v1.153.2) (2024-10-10)
 
 
