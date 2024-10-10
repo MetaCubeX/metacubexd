@@ -89,6 +89,7 @@ export default () => {
   const [activeTab, setActiveTab] = createSignal(ActiveTab.activeConnections)
   const { activeConnections, closedConnections, paused, setPaused } =
     useConnections()
+  const [isClosingConnections, setIsClosingConnections] = createSignal(false)
 
   const [globalFilter, setGlobalFilter] = createSignal('')
   const [enableQuickFilter, setEnableQuickFilter] = makePersisted(
@@ -429,18 +430,30 @@ export default () => {
 
             <Button
               class="btn btn-primary join-item btn-sm"
-              onClick={() => {
+              onClick={async () => {
+                setIsClosingConnections(true)
+
                 if (table.getState().globalFilter) {
-                  table
-                    .getFilteredRowModel()
-                    .rows.forEach(({ original }) =>
-                      closeSingleConnectionAPI(original.id),
-                    )
+                  await Promise.allSettled(
+                    table
+                      .getFilteredRowModel()
+                      .rows.map(({ original }) =>
+                        closeSingleConnectionAPI(original.id),
+                      ),
+                  )
                 } else {
-                  closeAllConnectionsAPI()
+                  await closeAllConnectionsAPI()
                 }
+
+                setIsClosingConnections(false)
               }}
-              icon={<IconX />}
+              icon={
+                isClosingConnections() ? (
+                  <div class="loading loading-spinner" />
+                ) : (
+                  <IconX />
+                )
+              }
             />
 
             <Button
