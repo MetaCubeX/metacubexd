@@ -16,94 +16,148 @@ import {
   ConnectionsTableColumnVisibility,
 } from '~/types'
 
+export const proxiesPreviewTypeDefault = PROXIES_PREVIEW_TYPE.Auto
+
 export const [proxiesPreviewType, setProxiesPreviewType] = makePersisted(
-  createSignal(PROXIES_PREVIEW_TYPE.Auto),
+  createSignal(proxiesPreviewTypeDefault),
   { name: 'proxiesPreviewType', storage: localStorage },
 )
+
+export const proxiesOrderingTypeDefault = PROXIES_ORDERING_TYPE.NATURAL
+
 export const [proxiesOrderingType, setProxiesOrderingType] = makePersisted(
-  createSignal(PROXIES_ORDERING_TYPE.NATURAL),
+  createSignal(proxiesOrderingTypeDefault),
   { name: 'proxiesOrderingType', storage: localStorage },
 )
 
+export const hideUnAvailableProxiesDefault = false
+
 export const [hideUnAvailableProxies, setHideUnAvailableProxies] =
-  makePersisted(createSignal(false), {
+  makePersisted(createSignal(hideUnAvailableProxiesDefault), {
     name: 'hideUnAvailableProxies',
     storage: localStorage,
   })
 
+export const urlForLatencyTestDefault = 'https://www.gstatic.com/generate_204'
+
 export const [urlForLatencyTest, setUrlForLatencyTest] = makePersisted(
-  createSignal('https://www.gstatic.com/generate_204'),
+  createSignal(urlForLatencyTestDefault),
   { name: 'urlForLatencyTest', storage: localStorage },
 )
 
+export const urlForIPv6SupportTestDefault = 'https://ipv6.google.com'
+
 export const [urlForIPv6SupportTest, setUrlIPv6SupportTest] = makePersisted(
-  createSignal('https://ipv6.google.com'),
+  createSignal(urlForIPv6SupportTestDefault),
   { name: 'urlForIPv6SupportTest', storage: localStorage },
 )
 
+export const autoCloseConnsDefault = false
+
 export const [autoCloseConns, setAutoCloseConns] = makePersisted(
-  createSignal(false),
+  createSignal(autoCloseConnsDefault),
   { name: 'autoCloseConns', storage: localStorage },
 )
-export const [useTwemoji, setUseTwemoji] = makePersisted(createSignal(true), {
-  name: 'useTwemoji',
-  storage: localStorage,
-})
+
+export const useTwemojiDefault = true
+
+export const [useTwemoji, setUseTwemoji] = makePersisted(
+  createSignal(useTwemojiDefault),
+  {
+    name: 'useTwemoji',
+    storage: localStorage,
+  },
+)
+
+export const autoSwitchThemeDefault = false
+
 export const [autoSwitchTheme, setAutoSwitchTheme] = makePersisted(
-  createSignal(false),
+  createSignal(autoSwitchThemeDefault),
   { name: 'autoSwitchTheme', storage: localStorage },
 )
+
+export const favDayThemeDefault: (typeof themes)[number] = 'nord'
+
 export const [favDayTheme, setFavDayTheme] = makePersisted(
-  createSignal<(typeof themes)[number]>('nord'),
+  createSignal<(typeof themes)[number]>(favDayThemeDefault),
   { name: 'favDayTheme', storage: localStorage },
 )
+
+export const favNightThemeDefault: (typeof themes)[number] = 'sunset'
+
 export const [favNightTheme, setFavNightTheme] = makePersisted(
-  createSignal<(typeof themes)[number]>('sunset'),
+  createSignal<(typeof themes)[number]>(favNightThemeDefault),
   { name: 'favNightTheme', storage: localStorage },
 )
+
+export const connectionsTableSizeDefault = TAILWINDCSS_SIZE.XS
+
 export const [connectionsTableSize, setConnectionsTableSize] = makePersisted(
-  createSignal<TAILWINDCSS_SIZE>(TAILWINDCSS_SIZE.XS),
+  createSignal(connectionsTableSizeDefault),
   { name: 'connectionsTableSize', storage: localStorage },
 )
+
+export const connectionsTableColumnVisibilityDefault =
+  CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY
+
 export const [
   connectionsTableColumnVisibility,
   setConnectionsTableColumnVisibility,
 ] = makePersisted(
   createSignal<ConnectionsTableColumnVisibility>(
-    CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY,
+    connectionsTableColumnVisibilityDefault,
   ),
   {
     name: 'connectionsTableColumnVisibility',
     storage: localStorage,
   },
 )
+
+export const connectionsTableColumnOrderDefault =
+  CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER
+
 export const [connectionsTableColumnOrder, setConnectionsTableColumnOrder] =
   makePersisted(
     createSignal<ConnectionsTableColumnOrder>(
-      CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
+      connectionsTableColumnOrderDefault,
     ),
     {
       name: 'connectionsTableColumnOrder',
       storage: localStorage,
     },
   )
+
+export const clientSourceIPTagsDefault: {
+  tagName: string
+  sourceIP: string
+}[] = []
+
 export const [clientSourceIPTags, setClientSourceIPTags] = makePersisted(
-  createSignal<{ tagName: string; sourceIP: string }[]>([]),
+  createSignal(clientSourceIPTagsDefault),
   {
     name: 'clientSourceIPTags',
     storage: localStorage,
   },
 )
+
+export const logsTableSizeDefault = TAILWINDCSS_SIZE.XS
+
 export const [logsTableSize, setLogsTableSize] = makePersisted(
-  createSignal<TAILWINDCSS_SIZE>(TAILWINDCSS_SIZE.XS),
+  createSignal(logsTableSizeDefault),
   { name: 'logsTableSize', storage: localStorage },
 )
+
+export const logLevelDefault = LOG_LEVEL.Info
+
 export const [logLevel, setLogLevel] = makePersisted(
-  createSignal<LOG_LEVEL>(LOG_LEVEL.Info),
+  createSignal(logLevelDefault),
   { name: 'logLevel', storage: localStorage },
 )
+
+export const logMaxRowsDefault = DEFAULT_LOGS_TABLE_MAX_ROWS
+
 export const [logMaxRows, setLogMaxRows] = makePersisted(
-  createSignal(DEFAULT_LOGS_TABLE_MAX_ROWS),
+  createSignal(logMaxRowsDefault),
   {
     name: 'logMaxRows',
     storage: localStorage,
@@ -131,8 +185,10 @@ export const tableSizeClassName = (size: TAILWINDCSS_SIZE) => {
   return className
 }
 
+export const latencyTestTimeoutDurationDefault = 5000
+
 export const [latencyTestTimeoutDuration, setLatencyTestTimeoutDuration] =
-  makePersisted(createSignal(5000), {
+  makePersisted(createSignal(latencyTestTimeoutDurationDefault), {
     name: 'latencyTestTimeoutDuration',
     storage: localStorage,
   })
@@ -143,12 +199,19 @@ export const isLatencyTestByHttps = () =>
 export const latencyQualityMap = () =>
   isLatencyTestByHttps() ? LATENCY_QUALITY_MAP_HTTPS : LATENCY_QUALITY_MAP_HTTP
 
-export const [iconHeight, setIconHeight] = makePersisted(createSignal(24), {
-  name: 'iconHeight',
-  storage: localStorage,
-})
+export const iconHeightDefault = 24
+
+export const [iconHeight, setIconHeight] = makePersisted(
+  createSignal(iconHeightDefault),
+  {
+    name: 'iconHeight',
+    storage: localStorage,
+  },
+)
+
+export const iconMarginRightDefault = 8
 
 export const [iconMarginRight, setIconMarginRight] = makePersisted(
-  createSignal(8),
+  createSignal(iconMarginRightDefault),
   { name: 'iconMarginRight', storage: localStorage },
 )
