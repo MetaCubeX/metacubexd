@@ -76,6 +76,9 @@ const DNSQueryForm = () => {
           name="name"
           class="input input-bordered min-w-0 flex-1"
           placeholder="google.com"
+          onInput={(e) => {
+            if (!e.target.value) setDNSQueryResult([])
+          }}
         />
 
         <div class="flex items-center gap-2">
