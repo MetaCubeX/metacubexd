@@ -18,7 +18,7 @@ export const ProxyNodeCard = (props: {
     proxyLatencyTestingMap,
   } = useProxies()
   const supportIPv6 = createMemo(
-    () => proxyIPv6SupportMap()[getNowProxyNodeName(props.proxyName || '')],
+    () => proxyIPv6SupportMap()[getNowProxyNodeName(proxyName || '')],
   )
   const proxyNode = createMemo(() => proxyNodeMap()[proxyName])
 
@@ -47,16 +47,12 @@ export const ProxyNodeCard = (props: {
 
         <div class="flex items-center justify-between gap-2">
           <div class="flex items-center gap-2">
-            <Show when={specialType()}>
-              <div class="badge badge-primary badge-sm font-bold uppercase">
-                {formatProxyType(proxyNode()?.type)}
-              </div>
+            <div class="badge badge-primary badge-sm font-bold uppercase">
+              {formatProxyType(proxyNode()?.type)}
+            </div>
 
-              <Show when={specialType()}>
-                <div class="badge badge-secondary badge-sm">
-                  {specialType()}
-                </div>
-              </Show>
+            <Show when={specialType()}>
+              <div class="badge badge-secondary badge-sm">{specialType()}</div>
             </Show>
 
             <Show when={supportIPv6()}>
