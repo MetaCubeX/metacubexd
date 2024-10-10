@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.157.0](https://github.com/MetaCubeX/metacubexd/compare/v1.156.0...v1.157.0) (2024-10-10)
+
+
+### Features
+
+* **proxies:** adjust collapsible grid columns ([3d1a234](https://github.com/MetaCubeX/metacubexd/commit/3d1a2349780f780976192ed8cc06ada6b46c069b))
+
 ## [1.156.0](https://github.com/MetaCubeX/metacubexd/compare/v1.155.0...v1.156.0) (2024-10-10)
 
 
