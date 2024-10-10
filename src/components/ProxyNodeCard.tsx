@@ -43,49 +43,47 @@ export const ProxyNodeCard = (props: {
       onClick={onClick}
     >
       <div class="card-body">
-        <span class="card-title line-clamp-1 text-start text-sm">
-          {proxyName}
-        </span>
+        <div class="card-title flex items-center justify-between gap-2">
+          <span class="line-clamp-1 text-start text-sm">{proxyName}</span>
 
-        <div class="flex items-center justify-between gap-2">
-          <div class="flex items-center gap-2">
-            <div class="badge badge-primary badge-sm font-bold uppercase">
-              {formatProxyType(proxyNode()?.type)}
-            </div>
-
-            <Show when={specialType()}>
-              <div class="badge badge-secondary badge-sm">{specialType()}</div>
-            </Show>
-
-            <Show when={supportIPv6()}>
-              <div class="badge badge-accent badge-sm">IPv6</div>
-            </Show>
+          <div class="badge badge-primary badge-sm font-bold uppercase">
+            {formatProxyType(proxyNode()?.type)}
           </div>
+        </div>
 
-          <div class="flex items-center gap-2">
-            <Latency
-              name={props.proxyName}
-              class={twMerge(isSelected && 'badge')}
-            />
+        <div class="flex flex-wrap items-center gap-2">
+          <Show when={specialType()}>
+            <div class="badge badge-secondary badge-sm">{specialType()}</div>
+          </Show>
 
-            <Button
-              class="btn-square btn-sm"
-              icon={
-                <IconBrandSpeedtest
-                  class={twMerge(
-                    'size-6',
-                    proxyLatencyTestingMap()[proxyName] &&
-                      'animate-pulse text-success',
-                  )}
-                />
-              }
-              onClick={(e) => {
-                e.stopPropagation()
+          <Show when={supportIPv6()}>
+            <div class="badge badge-accent badge-sm">IPv6</div>
+          </Show>
+        </div>
 
-                void proxyLatencyTest(proxyName, proxyNode().provider)
-              }}
-            />
-          </div>
+        <div class="card-actions items-center justify-end">
+          <Latency
+            name={props.proxyName}
+            class={twMerge(isSelected && 'badge')}
+          />
+
+          <Button
+            class="btn-square btn-sm"
+            icon={
+              <IconBrandSpeedtest
+                class={twMerge(
+                  'size-6',
+                  proxyLatencyTestingMap()[proxyName] &&
+                    'animate-pulse text-success',
+                )}
+              />
+            }
+            onClick={(e) => {
+              e.stopPropagation()
+
+              void proxyLatencyTest(proxyName, proxyNode().provider)
+            }}
+          />
         </div>
       </div>
     </div>

@@ -173,7 +173,7 @@ export default () => {
 
         <div class="flex-1 overflow-y-auto">
           <Show when={activeTab() === ActiveTab.proxies}>
-            <div class="flex flex-col gap-2">
+            <div class="grid grid-cols-1 place-items-start gap-2 sm:grid-cols-2">
               <For each={renderProxies()}>
                 {(proxyGroup) => {
                   const sortedProxyNames = createMemo(() =>
@@ -278,7 +278,7 @@ export default () => {
           </Show>
 
           <Show when={activeTab() === ActiveTab.proxyProviders}>
-            <div class="flex flex-col gap-2">
+            <div class="grid grid-cols-1 place-items-start gap-2 sm:grid-cols-2">
               <For each={proxyProviders()}>
                 {(proxyProvider) => {
                   const sortedProxyNames = createMemo(() =>

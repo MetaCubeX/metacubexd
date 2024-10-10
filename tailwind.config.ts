@@ -6,9 +6,11 @@ export default {
   plugins: [daisyui],
   daisyui: { themes: true },
   theme: {
-    fontFamily: {
-      twemoji: ['system-ui', 'Twemoji Mozilla', 'Fira Sans', 'monospace'],
-      'no-twemoji': ['system-ui', 'Fira Sans', 'monospace'],
+    extend: {
+      fontFamily: {
+        twemoji: ['system-ui', 'Twemoji Mozilla', 'Fira Sans', 'monospace'],
+        'no-twemoji': ['system-ui', 'Fira Sans', 'monospace'],
+      },
     },
   },
 } as Config
