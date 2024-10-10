@@ -110,7 +110,7 @@ export default {
   enableTunDevice: '开启 TUN 转发',
   tunModeStack: 'TUN 模式堆栈',
   tunDeviceName: 'TUN 设备名称',
-  interfaceName: '接口名称',
+  outboundInterfaceName: '出站接口名称',
   en: '英文',
   zh: '中文',
   port: '{{ name }} 端口',

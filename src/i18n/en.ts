@@ -108,7 +108,7 @@ export default {
   enableTunDevice: 'Enable TUN Device',
   tunModeStack: 'TUN Mode Stack',
   tunDeviceName: 'TUN Device Name',
-  interfaceName: 'Interface Name',
+  outboundInterfaceName: 'Outbound Interface Name',
   en: 'English',
   zh: 'Chinese',
   port: '{{ name }} Port',

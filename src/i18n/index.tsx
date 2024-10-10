@@ -24,3 +24,5 @@ export const [I18nProvider, useMaybeI18n] = createContextProvider<
 ])
 
 export const useI18n = () => useMaybeI18n()!
+
+export { type Dict }

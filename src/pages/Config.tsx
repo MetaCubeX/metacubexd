@@ -1,7 +1,8 @@
 import { createForm } from '@felte/solid'
 import { validator } from '@felte/validator-zod'
-import type { Accessor, Component, ParentComponent } from 'solid-js'
+import type { Accessor, Component, JSX, ParentComponent } from 'solid-js'
 import { toast } from 'solid-toast'
+import { twMerge } from 'tailwind-merge'
 import { z } from 'zod'
 import {
   fetchBackendConfigAPI,
@@ -25,7 +26,7 @@ import {
 import { Button, ConfigTitle } from '~/components'
 import DocumentTitle from '~/components/DocumentTitle'
 import { LANG, ROUTES, themes } from '~/constants'
-import { locale, setLocale, useI18n } from '~/i18n'
+import { Dict, locale, setLocale, useI18n } from '~/i18n'
 import {
   autoSwitchTheme,
   endpoint,
@@ -40,6 +41,55 @@ import {
   useTwemoji,
 } from '~/signals'
 import type { DNSQuery } from '~/types'
+
+const Toggle: ParentComponent<JSX.InputHTMLAttributes<HTMLInputElement>> = (
+  props,
+) => {
+  const [local, others] = splitProps(props, ['class'])
+
+  return (
+    <input type="checkbox" class={twMerge('toggle', local.class)} {...others} />
+  )
+}
+
+const Input: ParentComponent<JSX.InputHTMLAttributes<HTMLInputElement>> = (
+  props,
+) => {
+  const [local, others] = splitProps(props, ['class'])
+
+  return (
+    <input
+      class={twMerge('input input-bordered min-w-0', local.class)}
+      {...others}
+    />
+  )
+}
+
+const Select: ParentComponent<JSX.SelectHTMLAttributes<HTMLSelectElement>> = (
+  props,
+) => {
+  const [local, others] = splitProps(props, ['class'])
+
+  return (
+    <select class={twMerge('select select-bordered', local.class)} {...others}>
+      {children(() => others.children)()}
+    </select>
+  )
+}
+
+const Label: ParentComponent<JSX.LabelHTMLAttributes<HTMLLabelElement>> = (
+  props,
+) => {
+  const [local, others] = splitProps(props, ['class'])
+
+  return (
+    <label class={twMerge('label', local.class)} {...others}>
+      <span class="label-text truncate">
+        {children(() => others.children)()}
+      </span>
+    </label>
+  )
+}
 
 const dnsQueryFormSchema = z.object({
   name: z.string(),
@@ -71,10 +121,10 @@ const DNSQueryForm = () => {
   return (
     <div class="flex flex-col">
       <form use:form={form} class="flex gap-2 sm:flex-row">
-        <input
+        <Input
           type="search"
           name="name"
-          class="input input-bordered min-w-0 flex-1"
+          class="flex-1"
           placeholder="google.com"
           onInput={(e) => {
             if (!e.target.value) setDNSQueryResult([])
@@ -82,11 +132,11 @@ const DNSQueryForm = () => {
         />
 
         <div class="flex items-center gap-2">
-          <select name="type" class="select select-bordered">
+          <Select name="type">
             <option>A</option>
             <option>AAAA</option>
             <option>MX</option>
-          </select>
+          </Select>
 
           <Button type="submit" class="btn-primary" loading={isSubmitting()}>
             {t('dnsQuery')}
@@ -188,75 +238,63 @@ const ConfigForm: ParentComponent<{ isSingBox: Accessor<boolean> }> = ({
 
   return (
     <div class="flex flex-col gap-4">
-      <select
-        class="select select-bordered"
-        value={configsData()?.mode}
-        onChange={(e) =>
-          void updateBackendConfigAPI('mode', e.target.value, refetch)
-        }
-      >
-        <For each={modes()}>
-          {(name) => (
-            <option value={name}>
-              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-              {t(name as any) ?? name}
-            </option>
-          )}
-        </For>
-      </select>
+      <div class="grid grid-cols-3 gap-2">
+        <div class="form-control">
+          <Label for="enable-allow-lan">{t('allowLan')}</Label>
+
+          <Toggle
+            id="enable-allow-lan"
+            checked={configsData()?.['allow-lan']}
+            onChange={(e) =>
+              void updateBackendConfigAPI(
+                'allow-lan',
+                e.target.checked,
+                refetch,
+              )
+            }
+          />
+        </div>
+
+        <div class="form-control">
+          <Label for="mode">{t('rule')}</Label>
+
+          <Select
+            id="mode"
+            value={configsData()?.mode}
+            onChange={(e) =>
+              void updateBackendConfigAPI('mode', e.target.value, refetch)
+            }
+          >
+            <For each={modes()}>
+              {(name) => <option value={name}>{t(name as keyof Dict)}</option>}
+            </For>
+          </Select>
+        </div>
+
+        <div class="form-control">
+          <Label for="interface-name">{t('outboundInterfaceName')}</Label>
+
+          <Input
+            id="interface-name"
+            value={configsData()?.['interface-name']}
+            onChange={(e) =>
+              void updateBackendConfigAPI(
+                'interface-name',
+                e.target.value,
+                refetch,
+              )
+            }
+          />
+        </div>
+      </div>
 
       <Show when={!isSingBox()}>
-        <form class="grid grid-cols-3 gap-2 sm:grid-cols-5" use:form={form}>
-          <For each={portList}>
-            {(item) => (
-              <div class="form-control">
-                <label for={item.key} class="label">
-                  <span class="label-text">{item.label()}</span>
-                </label>
-
-                <input
-                  id={item.key}
-                  name={item.key}
-                  type="number"
-                  class="input input-bordered"
-                  placeholder={item.label()}
-                  onChange={item.onChange}
-                />
-              </div>
-            )}
-          </For>
-        </form>
-
-        <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <div class="grid grid-cols-3 gap-2">
           <div class="form-control">
-            <label for="enable-allow-lan" class="label gap-2">
-              <span class="label-text">{t('allowLan')}</span>
-            </label>
+            <Label for="enable-tun-device">{t('enableTunDevice')}</Label>
 
-            <input
-              id="enable-allow-lan"
-              type="checkbox"
-              class="toggle"
-              checked={configsData()?.['allow-lan']}
-              onChange={(e) =>
-                void updateBackendConfigAPI(
-                  'allow-lan',
-                  e.target.checked,
-                  refetch,
-                )
-              }
-            />
-          </div>
-
-          <div class="form-control">
-            <label for="enable-tun-device" class="label gap-2">
-              <span class="label-text">{t('enableTunDevice')}</span>
-            </label>
-
-            <input
+            <Toggle
               id="enable-tun-device"
-              type="checkbox"
-              class="toggle"
               checked={configsData()?.tun?.enable}
               onChange={(e) =>
                 void updateBackendConfigAPI(
@@ -269,13 +307,10 @@ const ConfigForm: ParentComponent<{ isSingBox: Accessor<boolean> }> = ({
           </div>
 
           <div class="form-control">
-            <label for="tun-ip-stack" class="label gap-2">
-              <span class="label-text">{t('tunModeStack')}</span>
-            </label>
+            <Label for="tun-ip-stack">{t('tunModeStack')}</Label>
 
-            <select
+            <Select
               id="tun-ip-stack"
-              class="select select-bordered flex-1"
               value={configsData()?.tun?.stack}
               onChange={(e) =>
                 void updateBackendConfigAPI(
@@ -289,17 +324,14 @@ const ConfigForm: ParentComponent<{ isSingBox: Accessor<boolean> }> = ({
               <option>gVisor</option>
               <option>System</option>
               <option>LWIP</option>
-            </select>
+            </Select>
           </div>
 
           <div class="form-control">
-            <label for="device-name" class="label gap-2">
-              <span class="label-text">{t('tunDeviceName')}</span>
-            </label>
+            <Label for="device-name">{t('tunDeviceName')}</Label>
 
-            <input
+            <Input
               id="device-name"
-              class="input input-bordered min-w-0"
               value={configsData()?.tun?.device}
               onChange={(e) =>
                 void updateBackendConfigAPI(
@@ -310,29 +342,28 @@ const ConfigForm: ParentComponent<{ isSingBox: Accessor<boolean> }> = ({
               }
             />
           </div>
-
-          <div class="form-control">
-            <label for="interface-name" class="label gap-2">
-              <span class="label-text">{t('interfaceName')}</span>
-            </label>
-
-            <input
-              id="interface-name"
-              class="input input-bordered min-w-0"
-              value={configsData()?.['interface-name']}
-              onChange={(e) =>
-                void updateBackendConfigAPI(
-                  'interface-name',
-                  e.target.value,
-                  refetch,
-                )
-              }
-            />
-          </div>
         </div>
+
+        <form class="grid grid-cols-3 gap-2 sm:grid-cols-5" use:form={form}>
+          <For each={portList}>
+            {(item) => (
+              <div class="form-control">
+                <Label for={item.key}>{item.label()}</Label>
+
+                <Input
+                  id={item.key}
+                  name={item.key}
+                  type="number"
+                  placeholder={item.label()}
+                  onChange={item.onChange}
+                />
+              </div>
+            )}
+          </For>
+        </form>
       </Show>
 
-      <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+      <div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
         <Button
           class="btn-primary"
           loading={reloadingConfigFile()}
@@ -407,9 +438,7 @@ const ConfigForXd = () => {
         <div class="flex flex-col items-center">
           <ConfigTitle>{t('useTwemoji')}</ConfigTitle>
 
-          <input
-            type="checkbox"
-            class="toggle"
+          <Toggle
             checked={useTwemoji()}
             onChange={(e) => setUseTwemoji(e.target.checked)}
           />
@@ -418,10 +447,7 @@ const ConfigForXd = () => {
         <div class="flex flex-col">
           <ConfigTitle>{t('switchLanguage')}</ConfigTitle>
 
-          <select
-            class="select select-bordered"
-            onChange={(e) => setLocale(e.target.value as LANG)}
-          >
+          <Select onChange={(e) => setLocale(e.target.value as LANG)}>
             <For each={languages}>
               {(lang) => (
                 <option selected={locale() === lang.value} value={lang.value}>
@@ -429,7 +455,7 @@ const ConfigForXd = () => {
                 </option>
               )}
             </For>
-          </select>
+          </Select>
         </div>
 
         <div class="flex flex-col">
@@ -450,9 +476,7 @@ const ConfigForXd = () => {
         <div class="flex flex-col items-center">
           <ConfigTitle>{t('autoSwitchTheme')}</ConfigTitle>
 
-          <input
-            type="checkbox"
-            class="toggle"
+          <Toggle
             checked={autoSwitchTheme()}
             onChange={(e) => setAutoSwitchTheme(e.target.checked)}
           />
@@ -463,8 +487,7 @@ const ConfigForXd = () => {
             <div class="flex flex-col">
               <ConfigTitle>{t('favDayTheme')}</ConfigTitle>
 
-              <select
-                class="select select-bordered"
+              <Select
                 value={favDayTheme()}
                 onChange={(e) =>
                   setFavDayTheme(e.target.value as (typeof themes)[number])
@@ -473,14 +496,13 @@ const ConfigForXd = () => {
                 <For each={themes}>
                   {(theme) => <option value={theme}>{theme}</option>}
                 </For>
-              </select>
+              </Select>
             </div>
 
             <div class="flex flex-col">
               <ConfigTitle>{t('favNightTheme')}</ConfigTitle>
 
-              <select
-                class="select select-bordered"
+              <Select
                 value={favNightTheme()}
                 onChange={(e) =>
                   setFavNightTheme(e.target.value as (typeof themes)[number])
@@ -489,7 +511,7 @@ const ConfigForXd = () => {
                 <For each={themes}>
                   {(theme) => <option value={theme}>{theme}</option>}
                 </For>
-              </select>
+              </Select>
             </div>
           </div>
         </Show>
