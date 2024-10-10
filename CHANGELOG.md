@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.153.1](https://github.com/MetaCubeX/metacubexd/compare/v1.153.0...v1.153.1) (2024-10-10)
+
+
+### Bug Fixes
+
+* **rules:** text spacing of `updated at` ([342119e](https://github.com/MetaCubeX/metacubexd/commit/342119e01e5a4fe02ca6cb68902d08d52f36c486))
+
 ## [1.153.0](https://github.com/MetaCubeX/metacubexd/compare/v1.152.0...v1.153.0) (2024-10-10)
 
 
