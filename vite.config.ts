@@ -24,7 +24,7 @@ export default defineConfig({
 
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', ''],
+      includeAssets: ['favicon.svg'],
       workbox: { maximumFileSizeToCacheInBytes: 5 * 1024 * 1024 },
       manifest: {
         name: 'MetaCubeXD',
