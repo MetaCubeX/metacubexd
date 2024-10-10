@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.158.0](https://github.com/MetaCubeX/metacubexd/compare/v1.157.0...v1.158.0) (2024-10-10)
+
+
+### Features
+
+* **connections:** add isClosingConnections spinner ([23193c5](https://github.com/MetaCubeX/metacubexd/commit/23193c5c98e41cc73250c4567f2558ee6f8943fb))
+
 ## [1.157.0](https://github.com/MetaCubeX/metacubexd/compare/v1.156.0...v1.157.0) (2024-10-10)
 
 
