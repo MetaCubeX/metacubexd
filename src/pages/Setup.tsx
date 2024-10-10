@@ -28,7 +28,7 @@ export default () => {
 
   const onSetupSuccess = (id: string) => {
     setSelectedEndpoint(id)
-    navigate('/overview')
+    navigate('/overview', { replace: true })
   }
 
   const checkEndpoint = (url: string, secret: string) =>
@@ -50,13 +50,9 @@ export default () => {
   const onEndpointSelect = async (id: string) => {
     const endpoint = endpointList().find((e) => e.id === id)
 
-    if (!endpoint) {
-      return
-    }
+    if (!endpoint) return
 
-    if (!(await checkEndpoint(endpoint.url, endpoint.secret))) {
-      return
-    }
+    if (!(await checkEndpoint(endpoint.url, endpoint.secret))) return
 
     onSetupSuccess(id)
   }
@@ -64,9 +60,7 @@ export default () => {
   const onSubmit = async ({ url, secret }: { url: string; secret: string }) => {
     const transformedURL = transformEndpointURL(url)
 
-    if (!(await checkEndpoint(transformedURL, secret))) {
-      return
-    }
+    if (!(await checkEndpoint(transformedURL, secret))) return
 
     const id = uuid()
     const list = endpointList().slice()

@@ -1,10 +1,11 @@
 import { createForm } from '@felte/solid'
 import { validator } from '@felte/validator-zod'
-import type { Accessor, Component } from 'solid-js'
+import type { Accessor, Component, ParentComponent } from 'solid-js'
 import { toast } from 'solid-toast'
 import { z } from 'zod'
 import {
   fetchBackendConfigAPI,
+  fetchBackendVersionAPI,
   flushFakeIPDataAPI,
   flushingFakeIPData,
   isUpdateAvailableAPI,
@@ -37,11 +38,6 @@ import {
   useRequest,
   useTwemoji,
 } from '~/signals'
-import {
-  backendVersion,
-  isSingBox,
-  updateBackendVersion,
-} from '~/signals/version'
 import type { DNSQuery } from '~/types'
 
 const dnsQueryFormSchema = z.object({
@@ -113,7 +109,9 @@ const configFormSchema = z.object({
   'mixed-port': z.number(),
 })
 
-const ConfigForm = () => {
+const ConfigForm: ParentComponent<{ isSingBox: Accessor<boolean> }> = ({
+  isSingBox,
+}) => {
   const [t] = useI18n()
 
   const portList = [
@@ -180,9 +178,9 @@ const ConfigForm = () => {
     }
   })
 
-  const modes = () => {
-    return configsData()?.modes || ['rule', 'direct', 'global']
-  }
+  const modes = createMemo(
+    () => configsData()?.modes || ['rule', 'direct', 'global'],
+  )
 
   return (
     <div class="flex flex-col gap-4">
@@ -538,7 +536,12 @@ export default () => {
 
   const [t] = useI18n()
 
-  updateBackendVersion()
+  const [backendVersion, setBackendVersion] = createSignal('')
+  const isSingBox = createMemo(() => backendVersion().includes('sing-box'))
+
+  onMount(() => {
+    fetchBackendVersionAPI().then(setBackendVersion)
+  })
 
   return (
     <>
@@ -553,7 +556,7 @@ export default () => {
 
         <ConfigTitle withDivider>{t('coreConfig')}</ConfigTitle>
 
-        <ConfigForm />
+        <ConfigForm isSingBox={isSingBox} />
 
         <ConfigTitle withDivider>{t('xdConfig')}</ConfigTitle>
 
