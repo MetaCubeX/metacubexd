@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.153.2](https://github.com/MetaCubeX/metacubexd/compare/v1.153.1...v1.153.2) (2024-10-10)
+
+
+### Bug Fixes
+
+* **pwa:** items in includeAssets cannot be empty string ([ab794e7](https://github.com/MetaCubeX/metacubexd/commit/ab794e73e3fce6de51485aa1837344117941fc9f))
+
 ## [1.153.1](https://github.com/MetaCubeX/metacubexd/compare/v1.153.0...v1.153.1) (2024-10-10)
 
 
