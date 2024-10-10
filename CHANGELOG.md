@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.155.0](https://github.com/MetaCubeX/metacubexd/compare/v1.154.0...v1.155.0) (2024-10-10)
+
+
+### Features
+
+* **config:** clear dns query results when input content gets cleared ([04cae65](https://github.com/MetaCubeX/metacubexd/commit/04cae65805fac8102246f57aa438fc054bc68174))
+* **config:** rearrange settings ([90c3d15](https://github.com/MetaCubeX/metacubexd/commit/90c3d15616860c27c80b47e4190414a68ec395c2))
+
+
+### Bug Fixes
+
+* **config:** missing translation for running mode ([705f651](https://github.com/MetaCubeX/metacubexd/commit/705f6513469466ac74c137f396c135b31da31804))
+
 ## [1.154.0](https://github.com/MetaCubeX/metacubexd/compare/v1.153.2...v1.154.0) (2024-10-10)
 
 
