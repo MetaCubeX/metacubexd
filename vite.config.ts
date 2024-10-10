@@ -2,6 +2,7 @@ import AutoImport from 'unplugin-auto-import/vite'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import solidPlugin from 'vite-plugin-solid'
+import { version } from './package.json'
 
 export default defineConfig({
   base: './',
@@ -9,9 +10,7 @@ export default defineConfig({
   resolve: { alias: { '~': '/src' } },
 
   define: {
-    'import.meta.env.APP_VERSION': JSON.stringify(
-      process.env.npm_package_version,
-    ),
+    'import.meta.env.APP_VERSION': JSON.stringify(version),
   },
 
   plugins: [

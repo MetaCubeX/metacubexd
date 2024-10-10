@@ -8,7 +8,8 @@ import {
   fetchBackendVersionAPI,
   flushFakeIPDataAPI,
   flushingFakeIPData,
-  isUpdateAvailableAPI,
+  isBackendUpdateAvailableAPI,
+  isFrontendUpdateAvailableAPI,
   reloadConfigFileAPI,
   reloadingConfigFile,
   restartBackendAPI,
@@ -494,29 +495,37 @@ const ConfigForXd = () => {
   )
 }
 
-const Versions: Component<{ backendVersion: Accessor<string> }> = ({
-  backendVersion,
-}) => {
-  const [isUpdateAvailable, setIsUpdateAvailable] = createSignal(false)
+const Versions: Component<{
+  frontendVersion: string
+  backendVersion: Accessor<string>
+}> = ({ frontendVersion, backendVersion }) => {
+  const [isFrontendUpdateAvailable] = createResource(() =>
+    isFrontendUpdateAvailableAPI(frontendVersion),
+  )
+  const [isBackendUpdateAvailable] = createResource(() =>
+    isBackendUpdateAvailableAPI(backendVersion()),
+  )
 
-  createEffect(async () => {
-    const version = backendVersion()
-
-    if (!version) return
-
-    setIsUpdateAvailable(await isUpdateAvailableAPI(version))
-  })
+  const UpdateAvailableIndicator = () => (
+    <span class="absolute -right-1 -top-1 flex h-3 w-3">
+      <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-info opacity-75" />
+      <span class="inline-flex h-3 w-3 rounded-full bg-info" />
+    </span>
+  )
 
   return (
     <div class="grid grid-cols-2 gap-4">
-      <kbd class="kbd">{import.meta.env.APP_VERSION}</kbd>
+      <div class="relative">
+        <Show when={isFrontendUpdateAvailable()}>
+          <UpdateAvailableIndicator />
+        </Show>
+
+        <kbd class="kbd w-full">{import.meta.env.APP_VERSION}</kbd>
+      </div>
 
       <div class="relative">
-        <Show when={isUpdateAvailable()}>
-          <span class="absolute -right-1 -top-1 flex h-3 w-3">
-            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-info opacity-75" />
-            <span class="inline-flex h-3 w-3 rounded-full bg-info" />
-          </span>
+        <Show when={isBackendUpdateAvailable()}>
+          <UpdateAvailableIndicator />
         </Show>
 
         <kbd class="kbd w-full">{backendVersion()}</kbd>
@@ -536,12 +545,14 @@ export default () => {
 
   const [t] = useI18n()
 
-  const [backendVersion, setBackendVersion] = createSignal('')
-  const isSingBox = createMemo(() => backendVersion().includes('sing-box'))
-
-  onMount(() => {
-    fetchBackendVersionAPI().then(setBackendVersion)
+  const frontendVersion = `v${import.meta.env.APP_VERSION}`
+  const [backendVersion] = createResource(fetchBackendVersionAPI, {
+    initialValue: '',
   })
+
+  const isSingBox = createMemo(
+    () => backendVersion()?.includes('sing-box') || false,
+  )
 
   return (
     <>
@@ -564,7 +575,12 @@ export default () => {
 
         <ConfigTitle withDivider>{t('version')}</ConfigTitle>
 
-        <Versions backendVersion={backendVersion} />
+        <Show when={!backendVersion.loading}>
+          <Versions
+            frontendVersion={frontendVersion}
+            backendVersion={backendVersion}
+          />
+        </Show>
       </div>
     </>
   )
