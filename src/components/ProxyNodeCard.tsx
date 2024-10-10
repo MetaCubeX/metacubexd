@@ -35,8 +35,7 @@ export const ProxyNodeCard = (props: {
     <div
       class={twMerge(
         'card tooltip card-compact tooltip-accent bg-neutral text-neutral-content',
-        isSelected &&
-          'bg-gradient-to-l from-primary to-secondary text-primary-content',
+        isSelected && 'bg-primary text-primary-content',
         onClick && 'cursor-pointer',
       )}
       data-tip={proxyName}
