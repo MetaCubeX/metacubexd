@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.156.0](https://github.com/MetaCubeX/metacubexd/compare/v1.155.0...v1.156.0) (2024-10-10)
+
+
+### Features
+
+* **proxies:** add multi-column render back ([9f7f8d0](https://github.com/MetaCubeX/metacubexd/commit/9f7f8d0161103c222747b4d65f330057edd87d81))
+* **proxies:** replace gradient with pure background color ([e273439](https://github.com/MetaCubeX/metacubexd/commit/e273439f688790f5ced9f0fac9f2ac5d7064650e))
+
 ## [1.155.0](https://github.com/MetaCubeX/metacubexd/compare/v1.154.0...v1.155.0) (2024-10-10)
 
 
