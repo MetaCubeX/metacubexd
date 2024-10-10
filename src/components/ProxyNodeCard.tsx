@@ -43,7 +43,9 @@ export const ProxyNodeCard = (props: {
       onClick={onClick}
     >
       <div class="card-body">
-        <span class="card-title truncate text-sm">{proxyName}</span>
+        <span class="card-title line-clamp-1 text-start text-sm">
+          {proxyName}
+        </span>
 
         <div class="flex items-center justify-between gap-2">
           <div class="flex items-center gap-2">
