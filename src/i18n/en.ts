@@ -55,6 +55,7 @@ export default {
   autoSwitchTheme: 'Automatically switch theme',
   favDayTheme: 'Favorite light theme',
   favNightTheme: 'Favorite dark theme',
+  renderInTwoColumns: 'Render In Two Columns',
   updateGEODatabases: 'Update GEO Databases',
   restartCore: 'Restart Core',
   upgradeCore: 'Upgrade Core',

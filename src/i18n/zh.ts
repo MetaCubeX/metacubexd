@@ -57,6 +57,7 @@ export default {
   autoSwitchTheme: '自动切换主题',
   favDayTheme: '浅色主题偏好',
   favNightTheme: '深色主题偏好',
+  renderInTwoColumns: '双列渲染',
   updateGEODatabases: '更新 GEO 数据库',
   restartCore: '重启核心',
   upgradeCore: '更新核心',

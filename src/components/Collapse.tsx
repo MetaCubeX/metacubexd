@@ -1,5 +1,6 @@
 import type { JSX, ParentComponent } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
+import { renderProxiesInTwoColumns } from '~/signals'
 
 type Props = {
   title: JSX.Element
@@ -24,6 +25,14 @@ export const Collapse: ParentComponent<Props> = (props) => {
     return props.isOpen ? openedClassName : closedClassName
   }
 
+  const gridStyle = createMemo(() => {
+    if (renderProxiesInTwoColumns()) {
+      return 'lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'
+    }
+
+    return 'sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10'
+  })
+
   return (
     <div
       class={twMerge(
@@ -41,7 +50,8 @@ export const Collapse: ParentComponent<Props> = (props) => {
       <div
         class={twMerge(
           getCollapseContentClassName(),
-          'collapse-content grid grid-cols-1 gap-2 transition-opacity duration-1000 xl:grid-cols-2 2xl:grid-cols-3',
+          gridStyle(),
+          'collapse-content grid grid-cols-2 gap-2 transition-opacity duration-1000',
         )}
       >
         <Show when={props.isOpen}>{children(() => props.children)()}</Show>
