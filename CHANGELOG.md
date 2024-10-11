@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.160.0](https://github.com/MetaCubeX/metacubexd/compare/v1.159.0...v1.160.0) (2024-10-11)
+
+
+### Features
+
+* **proxies:** update layout, disable twemoji font by default ([3d8fa08](https://github.com/MetaCubeX/metacubexd/commit/3d8fa080c351fa155c8c0edc7e4f6fee06438693))
+
 ## [1.159.0](https://github.com/MetaCubeX/metacubexd/compare/v1.158.0...v1.159.0) (2024-10-11)
 
 
