@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.160.1](https://github.com/MetaCubeX/metacubexd/compare/v1.160.0...v1.160.1) (2024-10-11)
+
+
+### Bug Fixes
+
+* **proxies:** proxy type should be positioned relative to the card ([78ec9e5](https://github.com/MetaCubeX/metacubexd/commit/78ec9e5d6c574e85405f7138782f39cce3a8a345))
+
 ## [1.160.0](https://github.com/MetaCubeX/metacubexd/compare/v1.159.0...v1.160.0) (2024-10-11)
 
 
