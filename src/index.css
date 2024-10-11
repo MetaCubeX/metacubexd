@@ -6,6 +6,11 @@
 @tailwind variants;
 
 @font-face {
+  font-family: 'Fira Sans';
+  src: url('assets/FiraSans-Regular.ttf') format('truetype');
+}
+
+@font-face {
   font-family: 'Twemoji Mozilla';
   src: url('assets/Twemoji.Mozilla.ttf') format('truetype');
 }
