@@ -41,24 +41,23 @@ export const ProxyNodeCard = (props: {
       data-tip={proxyName}
       onClick={onClick}
     >
-      <div class="card-body">
+      <div class="card-body relative">
+        <div class="badge badge-secondary badge-sm absolute bottom-0 left-1/2 -translate-x-1/2 font-bold uppercase">
+          {formatProxyType(proxyNode()?.type)}
+        </div>
+
         <div class="card-title flex items-center justify-between gap-2">
           <span class="line-clamp-1 text-start text-sm">{proxyName}</span>
-
-          <div class="badge badge-primary badge-sm font-bold uppercase">
-            {formatProxyType(proxyNode()?.type)}
-          </div>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2">
-          <Show when={specialType()}>
-            <div class="badge badge-secondary badge-sm">{specialType()}</div>
-          </Show>
-
-          <Show when={supportIPv6()}>
-            <div class="badge badge-accent badge-sm">IPv6</div>
-          </Show>
-        </div>
+        <span
+          class={twMerge(
+            'text-start text-xs',
+            isSelected ? 'text-info-content' : 'text-neutral-content',
+          )}
+        >
+          {[specialType(), supportIPv6() && 'IPv6'].filter(Boolean).join(' / ')}
+        </span>
 
         <div class="card-actions items-center justify-end">
           <Latency

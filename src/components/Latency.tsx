@@ -6,17 +6,15 @@ export const Latency = (props: { name?: string; class?: string }) => {
   const [t] = useI18n()
   const { getLatencyByName } = useProxies()
   const [textClassName, setTextClassName] = createSignal('')
-  const latency = createMemo(() => {
-    return getLatencyByName(props.name || '')
-  })
+  const latency = createMemo(() => getLatencyByName(props.name || ''))
 
   createEffect(() => {
-    setTextClassName('text-success')
-
     if (latency() > latencyQualityMap().HIGH) {
       setTextClassName('text-error')
     } else if (latency() > latencyQualityMap().MEDIUM) {
       setTextClassName('text-warning')
+    } else {
+      setTextClassName('text-success')
     }
   })
 
