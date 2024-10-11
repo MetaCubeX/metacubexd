@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.161.0](https://github.com/MetaCubeX/metacubexd/compare/v1.160.1...v1.161.0) (2024-10-11)
+
+
+### Features
+
+* embed fira sans web font ([b3ed3b5](https://github.com/MetaCubeX/metacubexd/commit/b3ed3b50a5a074a7a30b754c8fa235bb63ca09cc))
+
 ## [1.160.1](https://github.com/MetaCubeX/metacubexd/compare/v1.160.0...v1.160.1) (2024-10-11)
 
 
