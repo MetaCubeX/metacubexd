@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.159.0](https://github.com/MetaCubeX/metacubexd/compare/v1.158.0...v1.159.0) (2024-10-11)
+
+
+### Features
+
+* **proxies:** add render in two columns option back ([1fd22d3](https://github.com/MetaCubeX/metacubexd/commit/1fd22d3ece0905f1f22acb94d7d6a7a86a7a31e9))
+
 ## [1.158.0](https://github.com/MetaCubeX/metacubexd/compare/v1.157.0...v1.158.0) (2024-10-10)
 
 
