@@ -34,21 +34,19 @@ export const ProxyNodeCard = (props: {
   return (
     <div
       class={twMerge(
-        'card tooltip card-compact tooltip-accent bg-neutral text-neutral-content',
+        'card tooltip card-compact tooltip-accent relative bg-neutral text-neutral-content',
         isSelected && 'bg-primary text-primary-content',
         onClick && 'cursor-pointer',
       )}
       data-tip={proxyName}
       onClick={onClick}
     >
-      <div class="card-body relative">
-        <div class="badge badge-secondary badge-sm absolute bottom-0 left-1/2 -translate-x-1/2 font-bold uppercase">
-          {formatProxyType(proxyNode()?.type)}
-        </div>
+      <div class="badge badge-secondary badge-sm absolute bottom-0 left-1/2 -translate-x-1/2 font-bold uppercase">
+        {formatProxyType(proxyNode()?.type)}
+      </div>
 
-        <div class="card-title flex items-center justify-between gap-2">
-          <span class="line-clamp-1 text-start text-sm">{proxyName}</span>
-        </div>
+      <div class="card-body">
+        <h2 class="card-title line-clamp-1 text-start text-sm">{proxyName}</h2>
 
         <span
           class={twMerge(
