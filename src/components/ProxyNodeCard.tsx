@@ -48,7 +48,8 @@ export const ProxyNodeCard = (props: {
       <Tooltip.Anchor
         class={twMerge(
           'card bg-neutral text-neutral-content',
-          isSelected && 'bg-primary text-primary-content',
+          isSelected &&
+            'bg-gradient-to-b from-primary to-secondary text-primary-content',
           onClick && 'cursor-pointer',
         )}
         title={title()}
@@ -67,6 +68,7 @@ export const ProxyNodeCard = (props: {
               <Latency
                 proxyName={props.proxyName}
                 class={twMerge(
+                  isSelected && 'badge-primary',
                   proxyLatencyTestingMap()[proxyName] && 'animate-pulse',
                 )}
                 onClick={(e) => {
