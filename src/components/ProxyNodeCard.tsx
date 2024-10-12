@@ -56,7 +56,7 @@ export const ProxyNodeCard = (props: {
       >
         <Tooltip.Trigger>
           <div class="card-body space-y-1 p-2.5" onClick={onClick}>
-            <h2 class="card-title line-clamp-1 text-start text-sm">
+            <h2 class="card-title line-clamp-1 break-all text-start text-sm">
               {proxyName}
             </h2>
 
