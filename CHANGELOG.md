@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.162.1](https://github.com/MetaCubeX/metacubexd/compare/v1.162.0...v1.162.1) (2024-10-12)
+
+
+### Bug Fixes
+
+* **config:** options are not getting reflected in fav light/dark theme select, closes [#1079](https://github.com/MetaCubeX/metacubexd/issues/1079) ([ae1158d](https://github.com/MetaCubeX/metacubexd/commit/ae1158d9577f3e4c9bf6efe5fb2737065559f777))
+
 ## [1.162.0](https://github.com/MetaCubeX/metacubexd/compare/v1.161.0...v1.162.0) (2024-10-12)
 
 
