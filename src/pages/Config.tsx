@@ -163,9 +163,10 @@ const configFormSchema = z.object({
   'mixed-port': z.number(),
 })
 
-const ConfigForm: ParentComponent<{ isSingBox: Accessor<boolean> }> = ({
-  isSingBox,
-}) => {
+const ConfigForm: ParentComponent<{
+  isSingBox: Accessor<boolean>
+  fetchBackendVersion: () => Promise<void>
+}> = ({ isSingBox, fetchBackendVersion }) => {
   const [t] = useI18n()
 
   const portList = [
@@ -408,7 +409,10 @@ const ConfigForm: ParentComponent<{ isSingBox: Accessor<boolean> }> = ({
           <Button
             class="btn-error"
             loading={upgradingBackend()}
-            onClick={upgradeBackendAPI}
+            onClick={async () => {
+              await upgradeBackendAPI()
+              await fetchBackendVersion()
+            }}
           >
             {t('upgradeCore')}
           </Button>
@@ -527,9 +531,12 @@ const Versions: Component<{
   const [isFrontendUpdateAvailable] = createResource(() =>
     isFrontendUpdateAvailableAPI(frontendVersion),
   )
-  const [isBackendUpdateAvailable] = createResource(() =>
-    isBackendUpdateAvailableAPI(backendVersion()),
-  )
+  const [isBackendUpdateAvailable, { refetch: fetchIsBackendUpdateAvailable }] =
+    createResource(() => isBackendUpdateAvailableAPI(backendVersion()))
+
+  createEffect(() => {
+    fetchIsBackendUpdateAvailable()
+  }, backendVersion())
 
   const UpdateAvailableIndicator = () => (
     <span class="absolute -right-1 -top-1 flex h-3 w-3">
@@ -571,9 +578,10 @@ export default () => {
   const [t] = useI18n()
 
   const frontendVersion = `v${import.meta.env.APP_VERSION}`
-  const [backendVersion] = createResource(fetchBackendVersionAPI, {
-    initialValue: '',
-  })
+  const [backendVersion, { refetch: fetchBackendVersion }] = createResource(
+    fetchBackendVersionAPI,
+    { initialValue: '' },
+  )
 
   const isSingBox = createMemo(
     () => backendVersion()?.includes('sing-box') || false,
@@ -592,7 +600,12 @@ export default () => {
 
         <ConfigTitle withDivider>{t('coreConfig')}</ConfigTitle>
 
-        <ConfigForm isSingBox={isSingBox} />
+        <ConfigForm
+          isSingBox={isSingBox}
+          fetchBackendVersion={() =>
+            fetchBackendVersion() as unknown as Promise<void>
+          }
+        />
 
         <ConfigTitle withDivider>{t('xdConfig')}</ConfigTitle>
 
