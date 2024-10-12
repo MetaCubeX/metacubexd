@@ -2,7 +2,7 @@ import { twMerge } from 'tailwind-merge'
 import { Latency } from '~/components'
 import { latencyQualityMap, useProxies } from '~/signals'
 
-const LatencyDots = (props: {
+const LatencyDot = (props: {
   name: string
   latency?: number
   selected: boolean
@@ -51,21 +51,19 @@ export const ProxyPreviewDots = (props: {
             getLatencyByName(name),
           ])}
         >
-          {([name, latency]) => {
-            const isSelected = props.now === name
-
-            return (
-              <LatencyDots
-                name={name}
-                latency={latency}
-                selected={isSelected}
-              />
-            )
-          }}
+          {([name, latency]) => (
+            <LatencyDot
+              name={name}
+              latency={latency}
+              selected={props.now === name}
+            />
+          )}
         </For>
       </div>
 
-      <Latency proxyName={props.now} />
+      <Show when={props.now}>
+        <Latency proxyName={props.now!} />
+      </Show>
     </div>
   )
 }
