@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.167.0](https://github.com/MetaCubeX/metacubexd/compare/v1.166.0...v1.167.0) (2024-10-12)
+
+
+### Features
+
+* **connections:** reduce default visible columns ([ca9e3ba](https://github.com/MetaCubeX/metacubexd/commit/ca9e3ba57e4849c7349c8ff4fab018989b057d10))
+
 ## [1.166.0](https://github.com/MetaCubeX/metacubexd/compare/v1.165.0...v1.166.0) (2024-10-12)
 
 
