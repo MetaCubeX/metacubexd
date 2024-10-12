@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.162.0](https://github.com/MetaCubeX/metacubexd/compare/v1.161.0...v1.162.0) (2024-10-12)
+
+
+### Features
+
+* **config:** refresh backend version after core gets updated ([73b7e3e](https://github.com/MetaCubeX/metacubexd/commit/73b7e3e40a4a8ad18f5fece8260217ddb4bcfddb))
+* **proxies:** add proxy latency test history timeline ([1e7dcb1](https://github.com/MetaCubeX/metacubexd/commit/1e7dcb13bc212c1b2e717bbaa72e9583edce41f4))
+
 ## [1.161.0](https://github.com/MetaCubeX/metacubexd/compare/v1.160.1...v1.161.0) (2024-10-11)
 
 
