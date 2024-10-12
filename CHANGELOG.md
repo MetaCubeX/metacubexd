@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.166.0](https://github.com/MetaCubeX/metacubexd/compare/v1.165.0...v1.166.0) (2024-10-12)
+
+
+### Features
+
+* **proxies:** gradient gradient gradient ([ca13549](https://github.com/MetaCubeX/metacubexd/commit/ca1354943450bc927b508df9fac935047cb30d42))
+
 ## [1.165.0](https://github.com/MetaCubeX/metacubexd/compare/v1.164.0...v1.165.0) (2024-10-12)
 
 
