@@ -414,7 +414,7 @@ export default () => {
             </select>
           </div>
 
-          <div class="join flex flex-1 items-center md:flex-1">
+          <div class="join flex flex-1 items-center">
             <input
               type="search"
               class="input input-sm join-item input-primary min-w-0 flex-1"

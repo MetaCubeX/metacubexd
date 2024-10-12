@@ -128,7 +128,7 @@ export default () => {
       <DocumentTitle>{t('rules')}</DocumentTitle>
 
       <div class="flex h-full flex-col gap-2">
-        <div class="flex items-center gap-2">
+        <div class="flex w-full flex-wrap items-center gap-2">
           <div class="tabs-boxed tabs gap-2">
             <For each={tabs()}>
               {(tab) => (
@@ -146,28 +146,31 @@ export default () => {
             </For>
           </div>
 
-          <Show when={activeTab() === ActiveTab.ruleProviders}>
-            <Button
-              class="btn btn-circle btn-sm"
-              disabled={allProviderIsUpdating()}
-              onClick={(e) => onUpdateAllProviderClick(e)}
-              icon={
-                <IconReload
-                  class={twMerge(
-                    allProviderIsUpdating() && 'animate-spin text-success',
-                  )}
-                />
-              }
+          <div class="join flex flex-1 items-center">
+            <input
+              class="input input-sm join-item input-primary min-w-0 flex-1"
+              type="search"
+              placeholder={t('search')}
+              value={globalFilter()}
+              onInput={(e) => setGlobalFilter(e.currentTarget.value)}
             />
-          </Show>
-        </div>
 
-        <input
-          class="input input-sm input-bordered input-primary"
-          placeholder={t('search')}
-          value={globalFilter()}
-          onInput={(e) => setGlobalFilter(e.currentTarget.value)}
-        />
+            <Show when={activeTab() === ActiveTab.ruleProviders}>
+              <Button
+                class="btn btn-primary join-item btn-sm"
+                disabled={allProviderIsUpdating()}
+                onClick={(e) => onUpdateAllProviderClick(e)}
+                icon={
+                  <IconReload
+                    class={twMerge(
+                      allProviderIsUpdating() && 'animate-spin text-success',
+                    )}
+                  />
+                }
+              />
+            </Show>
+          </div>
+        </div>
 
         <div
           ref={(ref) => (scrollElementRef = ref)}
