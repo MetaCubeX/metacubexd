@@ -492,13 +492,16 @@ const ConfigForXd = () => {
               <ConfigTitle>{t('favDayTheme')}</ConfigTitle>
 
               <Select
-                value={favDayTheme()}
                 onChange={(e) =>
                   setFavDayTheme(e.target.value as (typeof themes)[number])
                 }
               >
                 <For each={themes}>
-                  {(theme) => <option value={theme}>{theme}</option>}
+                  {(theme) => (
+                    <option selected={favDayTheme() === theme} value={theme}>
+                      {theme}
+                    </option>
+                  )}
                 </For>
               </Select>
             </div>
@@ -507,13 +510,16 @@ const ConfigForXd = () => {
               <ConfigTitle>{t('favNightTheme')}</ConfigTitle>
 
               <Select
-                value={favNightTheme()}
                 onChange={(e) =>
                   setFavNightTheme(e.target.value as (typeof themes)[number])
                 }
               >
                 <For each={themes}>
-                  {(theme) => <option value={theme}>{theme}</option>}
+                  {(theme) => (
+                    <option selected={favNightTheme() === theme} value={theme}>
+                      {theme}
+                    </option>
+                  )}
                 </For>
               </Select>
             </div>
