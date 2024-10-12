@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.167.1](https://github.com/MetaCubeX/metacubexd/compare/v1.167.0...v1.167.1) (2024-10-12)
+
+
+### Bug Fixes
+
+* **proxies:** set break all on proxy name ([a31d2e8](https://github.com/MetaCubeX/metacubexd/commit/a31d2e8d148c81f93b82d6bce55b0fff7410f61d))
+
 ## [1.167.0](https://github.com/MetaCubeX/metacubexd/compare/v1.166.0...v1.167.0) (2024-10-12)
 
 
