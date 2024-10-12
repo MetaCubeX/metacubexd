@@ -109,6 +109,7 @@ export const ProxiesSettingsModal: Component<{
 
         <div>
           <ConfigTitle withDivider>{t('renderInTwoColumns')}</ConfigTitle>
+
           <div class="flex w-full justify-center">
             <input
               class="toggle"
