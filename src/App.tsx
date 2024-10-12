@@ -27,13 +27,6 @@ export const App: ParentComponent = ({ children }) => {
   const prefersDark = usePrefersDark()
 
   createEffect(() => {
-    console.log(
-      autoSwitchTheme(),
-      prefersDark(),
-      favNightTheme(),
-      favDayTheme(),
-    )
-
     if (autoSwitchTheme())
       setCurTheme(prefersDark() ? favNightTheme() : favDayTheme())
   })
