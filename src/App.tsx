@@ -11,6 +11,7 @@ import {
   favNightTheme,
   setCurTheme,
   setLatestConnectionMsg,
+  setRootElement,
   useTwemoji,
   useWsRequest,
 } from '~/signals'
@@ -33,6 +34,7 @@ export const App: ParentComponent = ({ children }) => {
 
   return (
     <div
+      ref={(el) => setRootElement(el)}
       class={twMerge(
         'relative flex h-screen flex-col overscroll-y-none subpixel-antialiased',
         useTwemoji() ? 'font-twemoji' : 'font-no-twemoji',

@@ -8,7 +8,7 @@ import {
   formatProxyType,
   getLatencyClassName,
 } from '~/helpers'
-import { curTheme, useProxies } from '~/signals'
+import { rootElement, useProxies } from '~/signals'
 
 export const ProxyNodeCard = (props: {
   proxyName: string
@@ -79,8 +79,8 @@ export const ProxyNodeCard = (props: {
           </div>
         </Tooltip.Trigger>
 
-        <Tooltip.Portal>
-          <Tooltip.Content data-theme={curTheme()} class="z-50 bg-transparent">
+        <Tooltip.Portal mount={rootElement()}>
+          <Tooltip.Content class="z-50">
             <Tooltip.Arrow class="text-neutral" />
 
             <div class="flex flex-col items-center gap-2 rounded-box bg-neutral p-2.5 text-neutral-content">
