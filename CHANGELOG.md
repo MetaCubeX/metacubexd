@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.165.0](https://github.com/MetaCubeX/metacubexd/compare/v1.164.0...v1.165.0) (2024-10-12)
+
+
+### Features
+
+* **connections:** enable autoCloseConns by default ([dfcc750](https://github.com/MetaCubeX/metacubexd/commit/dfcc750a1231d2614b5db92619bd71b89661cacc))
+* **proxies:** mount tooltip portal within rootElement ([554b361](https://github.com/MetaCubeX/metacubexd/commit/554b3611844f355347ee99466c879fba035610cc))
+* **proxies:** show latency result only when possible ([4314e64](https://github.com/MetaCubeX/metacubexd/commit/4314e64785a2caa5f1dbdb2896f2b28af8716f41))
+* **rules:** search input align with tabs ([ab018c5](https://github.com/MetaCubeX/metacubexd/commit/ab018c529dea2f5af14cdd8b6724c01cecbbf59c))
+
 ## [1.164.0](https://github.com/MetaCubeX/metacubexd/compare/v1.163.0...v1.164.0) (2024-10-12)
 
 
