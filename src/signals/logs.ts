@@ -1,5 +1,4 @@
-import { useWsRequest } from '~/signals'
-import { logLevel, logMaxRows } from '~/signals/config'
+import { logLevel, logMaxRows, useWsRequest } from '~/signals'
 import { Log, LogWithSeq } from '~/types'
 
 let seq = 1

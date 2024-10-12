@@ -23,8 +23,7 @@ import {
   upgradingBackend,
   upgradingUI,
 } from '~/apis'
-import { Button, ConfigTitle } from '~/components'
-import DocumentTitle from '~/components/DocumentTitle'
+import { Button, ConfigTitle, DocumentTitle } from '~/components'
 import { LANG, ROUTES, themes } from '~/constants'
 import { Dict, locale, setLocale, useI18n } from '~/i18n'
 import {

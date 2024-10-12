@@ -18,12 +18,10 @@ import {
   getSortedRowModel,
 } from '@tanstack/solid-table'
 import { twMerge } from 'tailwind-merge'
-import { Button, LogsSettingsModal } from '~/components'
-import DocumentTitle from '~/components/DocumentTitle'
+import { Button, DocumentTitle, LogsSettingsModal } from '~/components'
 import { LOG_LEVEL } from '~/constants'
 import { useI18n } from '~/i18n'
-import { endpoint, logsTableSize, tableSizeClassName } from '~/signals'
-import { useLogs } from '~/signals/logs'
+import { endpoint, logsTableSize, tableSizeClassName, useLogs } from '~/signals'
 import { LogWithSeq } from '~/types'
 
 const fuzzyFilter: FilterFn<LogWithSeq> = (row, columnId, value, addMeta) => {

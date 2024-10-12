@@ -9,12 +9,12 @@ import { twMerge } from 'tailwind-merge'
 import {
   Button,
   Collapse,
+  DocumentTitle,
   ProxiesSettingsModal,
   ProxyNodeCard,
   ProxyNodePreview,
   SubscriptionInfo,
 } from '~/components'
-import DocumentTitle from '~/components/DocumentTitle'
 import {
   filterProxiesByAvailability,
   formatTimeFromNow,

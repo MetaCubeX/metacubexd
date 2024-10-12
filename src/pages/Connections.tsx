@@ -34,8 +34,8 @@ import {
   Button,
   ConnectionsSettingsModal,
   ConnectionsTableDetailsModal,
+  DocumentTitle,
 } from '~/components'
-import DocumentTitle from '~/components/DocumentTitle'
 import { CONNECTIONS_TABLE_ACCESSOR_KEY } from '~/constants'
 import { formatTimeFromNow } from '~/helpers'
 import { useI18n } from '~/i18n'
