@@ -4,9 +4,9 @@ import { matchSorter } from 'match-sorter'
 import { twMerge } from 'tailwind-merge'
 import { Button } from '~/components'
 import DocumentTitle from '~/components/DocumentTitle'
-import { useStringBooleanMap } from '~/helpers'
+import { formatTimeFromNow, useStringBooleanMap } from '~/helpers'
 import { useI18n } from '~/i18n'
-import { endpoint, formatTimeFromNow, useRules } from '~/signals'
+import { endpoint, useRules } from '~/signals'
 import { Rule, RuleProvider } from '~/types'
 
 enum ActiveTab {

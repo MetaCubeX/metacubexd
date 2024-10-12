@@ -17,12 +17,12 @@ import {
 import DocumentTitle from '~/components/DocumentTitle'
 import {
   filterProxiesByAvailability,
+  formatTimeFromNow,
   sortProxiesByOrderingType,
 } from '~/helpers'
 import { useI18n } from '~/i18n'
 import {
   endpoint,
-  formatTimeFromNow,
   hideUnAvailableProxies,
   iconHeight,
   iconMarginRight,
