@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.163.0](https://github.com/MetaCubeX/metacubexd/compare/v1.162.1...v1.163.0) (2024-10-12)
+
+
+### Features
+
+* **proxies:** drop ipv6 latency test & display ([cdd60cf](https://github.com/MetaCubeX/metacubexd/commit/cdd60cfc37999da0f04bb7d286d8edd55f841dcb))
+
 ## [1.162.1](https://github.com/MetaCubeX/metacubexd/compare/v1.162.0...v1.162.1) (2024-10-12)
 
 
