@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.164.0](https://github.com/MetaCubeX/metacubexd/compare/v1.163.0...v1.164.0) (2024-10-12)
+
+
+### Features
+
+* **proxies:** add subtle padding between title and footer ([e7ef8b3](https://github.com/MetaCubeX/metacubexd/commit/e7ef8b373587c791283e6aaf8c11c3d0bb19367b))
+* **proxies:** display specialTypes on mobile in title ([0973686](https://github.com/MetaCubeX/metacubexd/commit/09736863dfb7ca8738e70a0460ea401630182dab))
+
 ## [1.163.0](https://github.com/MetaCubeX/metacubexd/compare/v1.162.1...v1.163.0) (2024-10-12)
 
 
