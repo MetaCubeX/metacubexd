@@ -53,7 +53,7 @@ export const [urlForLatencyTest, setUrlForLatencyTest] = makePersisted(
   { name: 'urlForLatencyTest', storage: localStorage },
 )
 
-export const autoCloseConnsDefault = false
+export const autoCloseConnsDefault = true
 
 export const [autoCloseConns, setAutoCloseConns] = makePersisted(
   createSignal(autoCloseConnsDefault),
