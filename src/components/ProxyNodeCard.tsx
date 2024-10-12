@@ -16,16 +16,8 @@ export const ProxyNodeCard = (props: {
   onClick?: () => void
 }) => {
   const { proxyName, isSelected, onClick } = props
-  const {
-    getNowProxyNodeName,
-    proxyIPv6SupportMap,
-    proxyNodeMap,
-    proxyLatencyTest,
-    proxyLatencyTestingMap,
-  } = useProxies()
-  const supportIPv6 = createMemo(
-    () => proxyIPv6SupportMap()[getNowProxyNodeName(proxyName || '')],
-  )
+  const { proxyNodeMap, proxyLatencyTest, proxyLatencyTestingMap } =
+    useProxies()
   const proxyNode = createMemo(() => proxyNodeMap()[proxyName])
 
   const specialType = () =>
@@ -60,21 +52,6 @@ export const ProxyNodeCard = (props: {
               {proxyName}
             </h2>
 
-            <span
-              class={twMerge(
-                'text-start text-xs',
-                isSelected ? 'text-info-content' : 'text-neutral-content',
-              )}
-            >
-              {[
-                specialType(),
-                supportIPv6() && 'IPv6',
-                proxyNode().tfo && 'TFO',
-              ]
-                .filter(Boolean)
-                .join(' / ')}
-            </span>
-
             <div class="card-actions items-center justify-between">
               <div class="badge badge-secondary badge-sm font-bold uppercase">
                 {formatProxyType(proxyNode()?.type)}
@@ -101,6 +78,17 @@ export const ProxyNodeCard = (props: {
 
             <div class="flex flex-col items-center gap-2 rounded-box bg-neutral p-2.5 text-neutral-content">
               <h2 class="text-lg font-bold">{proxyName}</h2>
+
+              <div
+                class={twMerge(
+                  'w-full text-start text-xs',
+                  isSelected ? 'text-info-content' : 'text-neutral-content',
+                )}
+              >
+                {[specialType(), proxyNode().tfo && 'TFO']
+                  .filter(Boolean)
+                  .join(' / ')}
+              </div>
 
               <ul class="timeline timeline-vertical timeline-compact timeline-snap-icon">
                 <For each={proxyNode().latencyTestHistory}>

@@ -53,13 +53,6 @@ export const [urlForLatencyTest, setUrlForLatencyTest] = makePersisted(
   { name: 'urlForLatencyTest', storage: localStorage },
 )
 
-export const urlForIPv6SupportTestDefault = 'https://ipv6.google.com'
-
-export const [urlForIPv6SupportTest, setUrlIPv6SupportTest] = makePersisted(
-  createSignal(urlForIPv6SupportTestDefault),
-  { name: 'urlForIPv6SupportTest', storage: localStorage },
-)
-
 export const autoCloseConnsDefault = false
 
 export const [autoCloseConns, setAutoCloseConns] = makePersisted(
