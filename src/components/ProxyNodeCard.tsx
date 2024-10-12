@@ -20,14 +20,21 @@ export const ProxyNodeCard = (props: {
     useProxies()
   const proxyNode = createMemo(() => proxyNodeMap()[proxyName])
 
-  const specialType = () =>
-    filterSpecialProxyType(proxyNode()?.type)
-      ? proxyNode()?.xudp
-        ? 'xudp'
-        : proxyNode()?.udp
-          ? 'udp'
-          : null
-      : null
+  const specialTypes = createMemo(() => {
+    if (!filterSpecialProxyType(proxyNode()?.type)) return null
+
+    return `(${[
+      proxyNode().xudp && 'xudp',
+      proxyNode().udp && 'udp',
+      proxyNode().tfo && 'TFO',
+    ]
+      .filter(Boolean)
+      .join(' / ')})`
+  })
+
+  const title = createMemo(() =>
+    [proxyName, specialTypes()].filter(Boolean).join(' - '),
+  )
 
   return (
     <Tooltip
@@ -44,7 +51,7 @@ export const ProxyNodeCard = (props: {
           isSelected && 'bg-primary text-primary-content',
           onClick && 'cursor-pointer',
         )}
-        title={proxyName}
+        title={title()}
       >
         <Tooltip.Trigger>
           <div class="card-body space-y-1 p-2.5" onClick={onClick}>
@@ -79,15 +86,8 @@ export const ProxyNodeCard = (props: {
             <div class="flex flex-col items-center gap-2 rounded-box bg-neutral p-2.5 text-neutral-content">
               <h2 class="text-lg font-bold">{proxyName}</h2>
 
-              <div
-                class={twMerge(
-                  'w-full text-start text-xs',
-                  isSelected ? 'text-info-content' : 'text-neutral-content',
-                )}
-              >
-                {[specialType(), proxyNode().tfo && 'TFO']
-                  .filter(Boolean)
-                  .join(' / ')}
+              <div class="w-full text-xs text-neutral-content">
+                {specialTypes()}
               </div>
 
               <ul class="timeline timeline-vertical timeline-compact timeline-snap-icon">

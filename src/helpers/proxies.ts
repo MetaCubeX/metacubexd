@@ -32,7 +32,6 @@ export const getLatencyClassName = (latency: LATENCY_QUALITY_MAP_HTTP) => {
 }
 
 export const filterSpecialProxyType = (type = '') => {
-  const t = type.toLowerCase()
   const conditions = [
     'selector',
     'direct',
@@ -43,7 +42,7 @@ export const filterSpecialProxyType = (type = '') => {
     'relay',
   ]
 
-  return !conditions.includes(t)
+  return !conditions.includes(type.toLowerCase())
 }
 
 export const sortProxiesByOrderingType = (
