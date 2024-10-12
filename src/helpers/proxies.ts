@@ -1,4 +1,4 @@
-import { PROXIES_ORDERING_TYPE } from '~/constants'
+import { LATENCY_QUALITY_MAP_HTTP, PROXIES_ORDERING_TYPE } from '~/constants'
 import { latencyQualityMap, useProxies } from '~/signals'
 
 export const formatProxyType = (type = '') => {
@@ -17,6 +17,18 @@ export const formatProxyType = (type = '') => {
   }
 
   return t
+}
+
+export const getLatencyClassName = (latency: LATENCY_QUALITY_MAP_HTTP) => {
+  if (latency > latencyQualityMap().HIGH) {
+    return 'text-error'
+  } else if (latency > latencyQualityMap().MEDIUM) {
+    return 'text-warning'
+  } else if (latency === LATENCY_QUALITY_MAP_HTTP.NOT_CONNECTED) {
+    return 'text-neutral-content'
+  } else {
+    return 'text-success'
+  }
 }
 
 export const filterSpecialProxyType = (type = '') => {

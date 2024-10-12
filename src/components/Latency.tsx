@@ -1,36 +1,28 @@
-import { LATENCY_QUALITY_MAP_HTTP } from '~/constants'
-import { useI18n } from '~/i18n'
-import { latencyQualityMap, useProxies } from '~/signals'
+import { JSX, ParentComponent } from 'solid-js'
+import { twMerge } from 'tailwind-merge'
+import { getLatencyClassName } from '~/helpers'
+import { useProxies } from '~/signals'
 
-export const Latency = (props: { name?: string; class?: string }) => {
-  const [t] = useI18n()
+interface Props extends JSX.HTMLAttributes<HTMLSpanElement> {
+  proxyName: string
+}
+
+export const Latency: ParentComponent<Props> = (props) => {
+  const [local, others] = splitProps(props, ['class'])
   const { getLatencyByName } = useProxies()
   const [textClassName, setTextClassName] = createSignal('')
-  const latency = createMemo(() => getLatencyByName(props.name || ''))
+  const latency = createMemo(() => getLatencyByName(others.proxyName || ''))
 
   createEffect(() => {
-    if (latency() > latencyQualityMap().HIGH) {
-      setTextClassName('text-error')
-    } else if (latency() > latencyQualityMap().MEDIUM) {
-      setTextClassName('text-warning')
-    } else {
-      setTextClassName('text-success')
-    }
+    setTextClassName(getLatencyClassName(latency()))
   })
 
   return (
-    <Show
-      when={
-        typeof latency() === 'number' &&
-        latency() !== LATENCY_QUALITY_MAP_HTTP.NOT_CONNECTED
-      }
+    <span
+      class={twMerge('badge whitespace-nowrap', textClassName(), local.class)}
+      {...others}
     >
-      <span
-        class={`whitespace-nowrap text-xs ${textClassName()} ${props.class}`}
-      >
-        {latency()}
-        {t('ms')}
-      </span>
-    </Show>
+      {latency() || '-'}
+    </span>
   )
 }

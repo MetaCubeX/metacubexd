@@ -65,7 +65,7 @@ export const ProxyPreviewDots = (props: {
         </For>
       </div>
 
-      <Latency name={props.now} />
+      <Latency proxyName={props.now} />
     </div>
   )
 }

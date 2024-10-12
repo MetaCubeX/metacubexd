@@ -24,7 +24,12 @@ import type { Proxy, ProxyNode, ProxyProvider } from '~/types'
 type ProxyInfo = {
   name: string
   udp: boolean
-  now: string
+  tfo: boolean
+  latencyTestHistory: {
+    time: string
+    delay: number
+  }[]
+  latency: string
   xudp: boolean
   type: string
   provider: string
@@ -99,9 +104,19 @@ const setProxiesInfo = (
   const newProxyIPv6SupportMap = { ...proxyIPv6SupportMap() }
 
   proxies.forEach((proxy) => {
-    const { udp, xudp, type, now, name, provider = '' } = proxy
+    const { udp, xudp, type, now, history, name, tfo, provider = '' } = proxy
 
-    newProxyNodeMap[proxy.name] = { udp, xudp, type, now, name, provider }
+    newProxyNodeMap[proxy.name] = {
+      udp,
+      xudp,
+      type,
+      latency: now,
+      latencyTestHistory: history,
+      name,
+      tfo,
+      provider,
+    }
+
     newLatencyMap[proxy.name] = getLatencyFromProxy(proxy, urlForLatencyTest())
 
     // we don't set it when false because sing-box didn't have "extra" so it will always be false
@@ -326,8 +341,8 @@ export const useProxies = () => {
       return name
     }
 
-    while (node.now && node.now !== node.name) {
-      const nextNode = proxyNodeMap()[node.now]
+    while (node.latency && node.latency !== node.name) {
+      const nextNode = proxyNodeMap()[node.latency]
 
       if (!nextNode) {
         return node.name
@@ -353,7 +368,7 @@ export const useProxies = () => {
     return (
       ['direct', 'reject', 'loadbalance'].includes(
         proxyNode.type.toLowerCase(),
-      ) || !!proxyNode.now
+      ) || !!proxyNode.latency
     )
   }
 

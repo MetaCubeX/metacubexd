@@ -1,8 +1,14 @@
-import { IconBrandSpeedtest } from '@tabler/icons-solidjs'
+import Tooltip from '@corvu/tooltip'
+import { IconCircleCheckFilled } from '@tabler/icons-solidjs'
+import dayjs from 'dayjs'
 import { twMerge } from 'tailwind-merge'
-import { Button, Latency } from '~/components'
-import { filterSpecialProxyType, formatProxyType } from '~/helpers'
-import { useProxies } from '~/signals'
+import { Latency } from '~/components'
+import {
+  filterSpecialProxyType,
+  formatProxyType,
+  getLatencyClassName,
+} from '~/helpers'
+import { curTheme, useProxies } from '~/signals'
 
 export const ProxyNodeCard = (props: {
   proxyName: string
@@ -32,56 +38,114 @@ export const ProxyNodeCard = (props: {
       : null
 
   return (
-    <div
-      class={twMerge(
-        'card tooltip card-compact tooltip-accent relative bg-neutral text-neutral-content',
-        isSelected && 'bg-primary text-primary-content',
-        onClick && 'cursor-pointer',
-      )}
-      data-tip={proxyName}
-      onClick={onClick}
+    <Tooltip
+      placement="top"
+      floatingOptions={{
+        autoPlacement: true,
+        shift: true,
+        offset: 10,
+      }}
     >
-      <div class="badge badge-secondary badge-sm absolute bottom-0 left-1/2 -translate-x-1/2 font-bold uppercase">
-        {formatProxyType(proxyNode()?.type)}
-      </div>
+      <Tooltip.Anchor
+        class={twMerge(
+          'card bg-neutral text-neutral-content',
+          isSelected && 'bg-primary text-primary-content',
+          onClick && 'cursor-pointer',
+        )}
+        title={proxyName}
+      >
+        <Tooltip.Trigger>
+          <div class="card-body p-2.5" onClick={onClick}>
+            <h2 class="card-title line-clamp-1 text-start text-sm">
+              {proxyName}
+            </h2>
 
-      <div class="card-body">
-        <h2 class="card-title line-clamp-1 text-start text-sm">{proxyName}</h2>
+            <span
+              class={twMerge(
+                'text-start text-xs',
+                isSelected ? 'text-info-content' : 'text-neutral-content',
+              )}
+            >
+              {[
+                specialType(),
+                supportIPv6() && 'IPv6',
+                proxyNode().tfo && 'TFO',
+              ]
+                .filter(Boolean)
+                .join(' / ')}
+            </span>
 
-        <span
-          class={twMerge(
-            'text-start text-xs',
-            isSelected ? 'text-info-content' : 'text-neutral-content',
-          )}
-        >
-          {[specialType(), supportIPv6() && 'IPv6'].filter(Boolean).join(' / ')}
-        </span>
+            <div class="card-actions items-center justify-between">
+              <div class="badge badge-secondary badge-sm font-bold uppercase">
+                {formatProxyType(proxyNode()?.type)}
+              </div>
 
-        <div class="card-actions items-center justify-end">
-          <Latency
-            name={props.proxyName}
-            class={twMerge(isSelected && 'badge')}
-          />
-
-          <Button
-            class="btn-square btn-sm"
-            icon={
-              <IconBrandSpeedtest
+              <Latency
+                proxyName={props.proxyName}
                 class={twMerge(
-                  'size-6',
-                  proxyLatencyTestingMap()[proxyName] &&
-                    'animate-pulse text-success',
+                  proxyLatencyTestingMap()[proxyName] && 'animate-pulse',
                 )}
-              />
-            }
-            onClick={(e) => {
-              e.stopPropagation()
+                onClick={(e) => {
+                  e.stopPropagation()
 
-              void proxyLatencyTest(proxyName, proxyNode().provider)
-            }}
-          />
-        </div>
-      </div>
-    </div>
+                  void proxyLatencyTest(proxyName, proxyNode().provider)
+                }}
+              />
+            </div>
+          </div>
+        </Tooltip.Trigger>
+
+        <Tooltip.Portal>
+          <Tooltip.Content data-theme={curTheme()} class="z-50 bg-transparent">
+            <Tooltip.Arrow class="text-neutral" />
+
+            <div class="flex flex-col items-center gap-2 rounded-box bg-neutral p-2.5 text-neutral-content">
+              <h2 class="text-lg font-bold">{proxyName}</h2>
+
+              <ul class="timeline timeline-vertical timeline-compact timeline-snap-icon">
+                <For each={proxyNode().latencyTestHistory}>
+                  {(latencyTestResult, index) => (
+                    <li>
+                      <Show when={index() > 0}>
+                        <hr />
+                      </Show>
+
+                      <div class="timeline-start space-y-2">
+                        <time class="text-sm italic">
+                          {dayjs(latencyTestResult.time).format(
+                            'YYYY-MM-DD HH:mm:ss',
+                          )}
+                        </time>
+
+                        <div
+                          class={twMerge(
+                            'badge block',
+                            getLatencyClassName(latencyTestResult.delay),
+                          )}
+                        >
+                          {latencyTestResult.delay || '-'}
+                        </div>
+                      </div>
+
+                      <div class="timeline-middle">
+                        <IconCircleCheckFilled class="size-4" />
+                      </div>
+
+                      <Show
+                        when={
+                          index() !== proxyNode().latencyTestHistory.length - 1
+                        }
+                      >
+                        <hr />
+                      </Show>
+                    </li>
+                  )}
+                </For>
+              </ul>
+            </div>
+          </Tooltip.Content>
+        </Tooltip.Portal>
+      </Tooltip.Anchor>
+    </Tooltip>
   )
 }
