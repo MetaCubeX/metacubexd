@@ -249,12 +249,13 @@ export const ConnectionsSettingsModal = (props: {
       <div class="flex flex-col gap-4">
         <div>
           <ConfigTitle withDivider>{t('quickFilter')}</ConfigTitle>
+
           <input
             type="text"
             class="input input-bordered w-full"
             onInput={(e) => setQuickFilterRegex(e.target.value)}
             value={quickFilterRegex()}
-          ></input>
+          />
         </div>
 
         <div>

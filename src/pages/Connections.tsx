@@ -176,7 +176,7 @@ export default () => {
       accessorFn: (original) => original.metadata.sniffHost || '-',
     },
     {
-      header: () => t('rules'),
+      header: () => t('rule'),
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Rule,
       accessorFn: (original) =>
         !original.rulePayload
@@ -208,7 +208,7 @@ export default () => {
     {
       header: () => t('ulSpeed'),
       enableGrouping: false,
-      accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.ULSpeed,
+      accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.UlSpeed,
       accessorFn: (original) => `${byteSize(original.uploadSpeed)}/s`,
       sortingFn: (prev, next) =>
         prev.original.uploadSpeed - next.original.uploadSpeed,

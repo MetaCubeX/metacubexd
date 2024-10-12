@@ -10,6 +10,12 @@ importers:
       '@commitlint/config-conventional':
         specifier: ^19.5.0
         version: 19.5.0
+      '@corvu/accordion':
+        specifier: ^0.2.3
+        version: 0.2.3(solid-js@1.9.2)
+      '@corvu/tailwind':
+        specifier: ^0.1.5
+        version: 0.1.5(tailwindcss@3.4.13)
       '@corvu/tooltip':
         specifier: ^0.2.1
         version: 0.2.1(solid-js@1.9.2)
@@ -1260,10 +1266,42 @@ packages:
       }
     engines: { node: '>=v18' }
 
+  '@corvu/accordion@0.2.3':
+    resolution:
+      {
+        integrity: sha512-M+qDysE1bKXeCmVsaHVs4FbrIWzQfffOrQ2H2yYYuGQfZINi5783rBcLTn7eNhUknOfdwVcjs2rnODeIomVC3A==,
+      }
+    peerDependencies:
+      solid-js: ^1.8
+
+  '@corvu/disclosure@0.2.0':
+    resolution:
+      {
+        integrity: sha512-+SkGXXcah8CiXQeM1qrYgikEEX6CFGZ8AOAEDHHkxFkQHC8ll0wAdGAkqT11quPvE9O6/f1ulfWNWdrX4Lqmnw==,
+      }
+    peerDependencies:
+      solid-js: ^1.8
+
+  '@corvu/tailwind@0.1.5':
+    resolution:
+      {
+        integrity: sha512-+rTTveZVTfUM6z6w83A2IWCSob33EFxAuazn1bzd8/T1t1FhpzV1Jt/Sn3awH4muDAuDaZujzebueB/t3u03hw==,
+      }
+    peerDependencies:
+      tailwindcss: ^3
+
   '@corvu/tooltip@0.2.1':
     resolution:
       {
         integrity: sha512-y2CQ2/6DH/gJJZPo1fV3O7l4Jfgu5ZW58bpqPmKS+l8Pa6gIKV6zkrMoyBg8Hsn6z9RmdZFqkGFs/9C5fvwKpg==,
+      }
+    peerDependencies:
+      solid-js: ^1.8
+
+  '@corvu/utils@0.3.2':
+    resolution:
+      {
+        integrity: sha512-ZWlyWEE8qV9+CB9OAyo2bTrZGXQN9ZeM+JfYv89zoR+lRACKTDuoOZEdiyL8Uc7U5dUSH1uTqKhTTnaHWb+wZA==,
       }
     peerDependencies:
       solid-js: ^1.8
@@ -5382,6 +5420,14 @@ packages:
         integrity: sha512-fe/K03nV+kMFJYhAOE8AIQHcGxB4rMIEoEyrulbtmf217NffbbwBqJnJI4ovt16e+kaIt0czE2WA7mP/pYN9yg==,
       }
 
+  solid-list@0.3.0:
+    resolution:
+      {
+        integrity: sha512-t4hx/F/l8Vmq+ib9HtZYl7Z9F1eKxq3eKJTXlvcm7P7yI4Z8O7QSOOEVHb/K6DD7M0RxzVRobK/BS5aSfLRwKg==,
+      }
+    peerDependencies:
+      solid-js: ^1.8
+
   solid-presence@0.1.8:
     resolution:
       {
@@ -7281,6 +7327,23 @@ snapshots:
       '@types/conventional-commits-parser': 5.0.0
       chalk: 5.3.0
 
+  '@corvu/accordion@0.2.3(solid-js@1.9.2)':
+    dependencies:
+      '@corvu/disclosure': 0.2.0(solid-js@1.9.2)
+      '@corvu/utils': 0.4.2(solid-js@1.9.2)
+      solid-js: 1.9.2
+      solid-list: 0.3.0(solid-js@1.9.2)
+
+  '@corvu/disclosure@0.2.0(solid-js@1.9.2)':
+    dependencies:
+      '@corvu/utils': 0.3.2(solid-js@1.9.2)
+      solid-js: 1.9.2
+      solid-presence: 0.1.8(solid-js@1.9.2)
+
+  '@corvu/tailwind@0.1.5(tailwindcss@3.4.13)':
+    dependencies:
+      tailwindcss: 3.4.13
+
   '@corvu/tooltip@0.2.1(solid-js@1.9.2)':
     dependencies:
       '@corvu/utils': 0.4.2(solid-js@1.9.2)
@@ -7288,6 +7351,11 @@ snapshots:
       solid-dismissible: 0.1.1(solid-js@1.9.2)
       solid-js: 1.9.2
       solid-presence: 0.1.8(solid-js@1.9.2)
+
+  '@corvu/utils@0.3.2(solid-js@1.9.2)':
+    dependencies:
+      '@floating-ui/dom': 1.6.11
+      solid-js: 1.9.2
 
   '@corvu/utils@0.4.2(solid-js@1.9.2)':
     dependencies:
@@ -9582,6 +9650,11 @@ snapshots:
       csstype: 3.1.3
       seroval: 1.1.0
       seroval-plugins: 1.1.0(seroval@1.1.0)
+
+  solid-list@0.3.0(solid-js@1.9.2):
+    dependencies:
+      '@corvu/utils': 0.4.2(solid-js@1.9.2)
+      solid-js: 1.9.2
 
   solid-presence@0.1.8(solid-js@1.9.2):
     dependencies:

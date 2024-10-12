@@ -119,10 +119,10 @@ export enum CONNECTIONS_TABLE_ACCESSOR_KEY {
   Process = 'process',
   Host = 'host',
   SniffHost = 'sniffHost',
-  Rule = 'rules',
+  Rule = 'rule',
   Chains = 'chains',
   DlSpeed = 'dlSpeed',
-  ULSpeed = 'ulSpeed',
+  UlSpeed = 'ulSpeed',
   Download = 'dl',
   Upload = 'ul',
   ConnectTime = 'connectTime',
@@ -140,9 +140,16 @@ export const CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER = Object.values(
 
 export const CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY = {
   ...Object.fromEntries(
-    CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER.map((i) => [i, true]),
+    CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER.map((i) => [i, false]),
   ),
-  [CONNECTIONS_TABLE_ACCESSOR_KEY.ID]: false,
+  [CONNECTIONS_TABLE_ACCESSOR_KEY.Details]: true,
+  [CONNECTIONS_TABLE_ACCESSOR_KEY.Close]: true,
+  [CONNECTIONS_TABLE_ACCESSOR_KEY.Host]: true,
+  [CONNECTIONS_TABLE_ACCESSOR_KEY.Rule]: true,
+  [CONNECTIONS_TABLE_ACCESSOR_KEY.Chains]: true,
+  [CONNECTIONS_TABLE_ACCESSOR_KEY.DlSpeed]: true,
+  [CONNECTIONS_TABLE_ACCESSOR_KEY.UlSpeed]: true,
+  [CONNECTIONS_TABLE_ACCESSOR_KEY.SourceIP]: true,
 }
 
 export enum TAILWINDCSS_SIZE {
