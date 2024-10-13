@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.167.3](https://github.com/MetaCubeX/metacubexd/compare/v1.167.2...v1.167.3) (2024-10-13)
+
+
+### Bug Fixes
+
+* **i18n:** time locale not working ([e6fa749](https://github.com/MetaCubeX/metacubexd/commit/e6fa749a28e55b9ea85a5ccae71346823fd2567c))
+
 ## [1.167.2](https://github.com/MetaCubeX/metacubexd/compare/v1.167.1...v1.167.2) (2024-10-13)
 
 
