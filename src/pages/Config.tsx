@@ -260,13 +260,16 @@ const ConfigForm: ParentComponent<{
 
           <Select
             id="mode"
-            value={configsData()?.mode}
             onChange={(e) =>
               void updateBackendConfigAPI('mode', e.target.value, refetch)
             }
           >
             <For each={modes()}>
-              {(name) => <option value={name}>{t(name as keyof Dict)}</option>}
+              {(name) => (
+                <option selected={name === configsData()?.mode} value={name}>
+                  {t(name as keyof Dict)}
+                </option>
+              )}
             </For>
           </Select>
         </div>
@@ -311,7 +314,6 @@ const ConfigForm: ParentComponent<{
 
             <Select
               id="tun-ip-stack"
-              value={configsData()?.tun?.stack}
               onChange={(e) =>
                 void updateBackendConfigAPI(
                   'tun',
@@ -320,10 +322,16 @@ const ConfigForm: ParentComponent<{
                 )
               }
             >
-              <option>Mixed</option>
-              <option>gVisor</option>
-              <option>System</option>
-              <option>LWIP</option>
+              <For each={['Mixed', 'gVisor', 'System', 'LWIP']}>
+                {(name) => (
+                  <option
+                    selected={configsData()?.tun?.stack === name}
+                    value={name}
+                  >
+                    {name}
+                  </option>
+                )}
+              </For>
             </Select>
           </div>
 
