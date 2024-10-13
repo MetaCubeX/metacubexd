@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.167.2](https://github.com/MetaCubeX/metacubexd/compare/v1.167.1...v1.167.2) (2024-10-13)
+
+
+### Bug Fixes
+
+* **rules:** restore name display ([cdef0e8](https://github.com/MetaCubeX/metacubexd/commit/cdef0e8355fe0c25ee35d1345d54fda050f1fece))
+
 ## [1.167.1](https://github.com/MetaCubeX/metacubexd/compare/v1.167.0...v1.167.1) (2024-10-12)
 
 
