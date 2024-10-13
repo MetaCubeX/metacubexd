@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.167.4](https://github.com/MetaCubeX/metacubexd/compare/v1.167.3...v1.167.4) (2024-10-13)
+
+
+### Bug Fixes
+
+* **config:** selected option ([d6ce137](https://github.com/MetaCubeX/metacubexd/commit/d6ce1376a67bdd8b439730505563084cb1ba082e))
+
 ## [1.167.3](https://github.com/MetaCubeX/metacubexd/compare/v1.167.2...v1.167.3) (2024-10-13)
 
 
