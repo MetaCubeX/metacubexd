@@ -6,6 +6,7 @@ export default {
   overview: '概览',
   proxies: '代理',
   proxiesSettings: '代理设置',
+  rules: '规则',
   connections: '连接',
   connectionsSettings: '连接设置',
   connectionsDetails: '连接详情',

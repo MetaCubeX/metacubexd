@@ -4,6 +4,7 @@ export default {
   overview: 'Overview',
   proxies: 'Proxies',
   proxiesSettings: 'Proxies Settings',
+  rules: 'Rules',
   connections: 'Connections',
   connectionsSettings: 'Connections Settings',
   connectionsDetails: 'Connections Details',
