@@ -269,7 +269,7 @@ const ConfigForm: ParentComponent<{
             <For each={modes()}>
               {(name) => (
                 <option selected={name === configsData()?.mode} value={name}>
-                  {t(name as keyof Dict)}
+                  {t(name as keyof Dict) ?? name}
                 </option>
               )}
             </For>
