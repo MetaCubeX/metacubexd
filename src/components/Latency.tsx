@@ -19,10 +19,10 @@ export const Latency: ParentComponent<Props> = (props) => {
 
   return (
     <span
-      class={twMerge('badge whitespace-nowrap', textClassName(), local.class)}
+      class={twMerge('badge w-11 whitespace-nowrap', textClassName(), local.class)}
       {...others}
     >
-      {latency() || '-'}
+      {latency() || '---'}
     </span>
   )
 }

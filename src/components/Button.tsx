@@ -25,7 +25,7 @@ export const Button: ParentComponent<
   return (
     <button
       class={twMerge(
-        'btn flex items-center',
+        'btn flex items-center leading-8',
         local.loading ? 'btn-disabled' : local.class,
       )}
       {...others}

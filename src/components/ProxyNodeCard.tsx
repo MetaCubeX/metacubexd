@@ -49,26 +49,25 @@ export const ProxyNodeCard = (props: {
         class={twMerge(
           'card bg-neutral text-neutral-content',
           isSelected &&
-            'bg-gradient-to-b from-primary to-secondary text-primary-content',
+            'bg-gradient-to-br from-primary to-secondary text-primary-content',
           onClick && 'cursor-pointer',
         )}
         title={title()}
       >
         <Tooltip.Trigger>
-          <div class="card-body space-y-1 p-2.5" onClick={onClick}>
+          <div class="card-body gap-1 space-y-1 p-2.5" onClick={onClick}>
             <h2 class="card-title line-clamp-1 break-all text-start text-sm">
               {proxyName}
             </h2>
 
-            <div class="card-actions items-center justify-between">
-              <div class="badge badge-secondary badge-sm font-bold uppercase">
+            <div class="card-actions items-center justify-between gap-1">
+              <div class="badge badge-secondary px-1 text-xs font-bold capitalize">
                 {formatProxyType(proxyNode()?.type)}
               </div>
 
               <Latency
                 proxyName={props.proxyName}
                 class={twMerge(
-                  isSelected && 'badge-primary',
                   proxyLatencyTestingMap()[proxyName] && 'animate-pulse',
                 )}
                 onClick={(e) => {
@@ -85,10 +84,10 @@ export const ProxyNodeCard = (props: {
           <Tooltip.Content class="z-50">
             <Tooltip.Arrow class="text-neutral" />
 
-            <div class="flex flex-col items-center gap-2 rounded-box bg-neutral p-2.5 text-neutral-content">
+            <div class="flex flex-col items-center gap-2 rounded-box bg-neutral bg-gradient-to-br from-primary to-secondary p-2.5 text-primary-content shadow-lg">
               <h2 class="text-lg font-bold">{proxyName}</h2>
 
-              <div class="w-full text-xs text-neutral-content">
+              <div class="w-full text-xs uppercase">
                 {specialTypes()}
               </div>
 
@@ -113,7 +112,7 @@ export const ProxyNodeCard = (props: {
                             getLatencyClassName(latencyTestResult.delay),
                           )}
                         >
-                          {latencyTestResult.delay || '-'}
+                          {latencyTestResult.delay || '---'}
                         </div>
                       </div>
 
