@@ -63,8 +63,8 @@ importers:
         specifier: ^0.29.4
         version: 0.29.4(solid-js@1.9.2)
       '@solidjs/router':
-        specifier: ^0.14.9
-        version: 0.14.9(solid-js@1.9.2)
+        specifier: ^0.14.10
+        version: 0.14.10(solid-js@1.9.2)
       '@tabler/icons-solidjs':
         specifier: ^3.19.0
         version: 3.19.0(solid-js@1.9.2)
@@ -1368,8 +1368,8 @@ packages:
     peerDependencies:
       solid-js: '>=1.8.4'
 
-  '@solidjs/router@0.14.9':
-    resolution: {integrity: sha512-CnCi+oSGhTMAhk3Dtg6E29uRf9FoMIu9/awvrx6czbHcyXvGLxkyHsKm6CWErKUmKJBRSwdn8siRuV3qDrZOEg==}
+  '@solidjs/router@0.14.10':
+    resolution: {integrity: sha512-5B8LVgvvXijfXyXWPVLUm7RQ05BhjIpAyRkYVDZtrR3OaSvftXobWc6qSEwk4ICLoGi/IE9CUp2LUdCBIs9AXg==}
     peerDependencies:
       solid-js: ^1.8.6
 
@@ -5175,7 +5175,7 @@ snapshots:
     dependencies:
       solid-js: 1.9.2
 
-  '@solidjs/router@0.14.9(solid-js@1.9.2)':
+  '@solidjs/router@0.14.10(solid-js@1.9.2)':
     dependencies:
       solid-js: 1.9.2
 
