@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.168.0](https://github.com/MetaCubeX/metacubexd/compare/v1.167.4...v1.168.0) (2024-10-19)
+
+
+### Features
+
+* bump version ([64a2005](https://github.com/MetaCubeX/metacubexd/commit/64a20050d9f07943a6671002fe7c8cc22092fe5f))
+
 ## [1.167.4](https://github.com/MetaCubeX/metacubexd/compare/v1.167.3...v1.167.4) (2024-10-13)
 
 
