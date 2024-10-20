@@ -4,8 +4,12 @@ import { latencyQualityMap, useProxies } from '~/signals'
 export const formatProxyType = (type = '') => {
   const t = type.toLowerCase()
 
+  if (t.includes('shadowsocksr')) {
+    return t.replace('shadowsocksr', 'SSR') // for ssr
+  }
+
   if (t.includes('shadowsocks')) {
-    return t.replace('shadowsocks', 'SS') // for both ss and ssr
+    return t.replace('shadowsocks', 'SS') // for ss
   }
 
   if (t.includes('hysteria')) {
