@@ -1,22 +1,32 @@
 import { LATENCY_QUALITY_MAP_HTTP, PROXIES_ORDERING_TYPE } from '~/constants'
+import { useI18n } from '~/i18n'
 import { latencyQualityMap, useProxies } from '~/signals'
 
 export const formatProxyType = (type = '') => {
-  const t = type.toLowerCase()
+  const [t] = useI18n()
+  const lt = type.toLowerCase()
+  const formatMap = new Map([
+    ['shadowsocks', 'SS'],
+    ['shadowsocksr', 'SSR'],
+    ['hysteria', 'HY'],
+    ['hysteria2', 'HY2'],
+    ['wireguard', 'WG'],
+    ['selector', t('selector')],
+    ['urltest', t('urltest')],
+    ['fallback', t('fallback')],
+    ['loadbalance', t('loadbalance')],
+    ['direct', t('direct')],
+    ['reject', t('reject')],
+    ['rejectdrop', t('rejectdrop')],
+    ['relay', t('relay')],
+    ['pass', t('pass')],
+  ])
 
-  if (t.includes('shadowsocks')) {
-    return t.replace('shadowsocks', 'SS') // for both ss and ssr
+  if (formatMap.has(lt)) {
+    return formatMap.get(lt)
+  } else {
+    return lt
   }
-
-  if (t.includes('hysteria')) {
-    return t.replace('hysteria', 'HY')
-  }
-
-  if (t === 'wireguard') {
-    return 'WG'
-  }
-
-  return t
 }
 
 export const getLatencyClassName = (latency: LATENCY_QUALITY_MAP_HTTP) => {
