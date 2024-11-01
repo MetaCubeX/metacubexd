@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.169.0](https://github.com/MetaCubeX/metacubexd/compare/v1.168.0...v1.169.0) (2024-11-01)
+
+
+### Features
+
+* proxy type support i18n ([#1135](https://github.com/MetaCubeX/metacubexd/issues/1135)) ([b0f32b5](https://github.com/MetaCubeX/metacubexd/commit/b0f32b5e5583ca673ade44bbbe058900b4630a74))
+
 ## [1.168.0](https://github.com/MetaCubeX/metacubexd/compare/v1.167.4...v1.168.0) (2024-10-19)
 
 
