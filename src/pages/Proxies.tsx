@@ -17,6 +17,7 @@ import {
 } from '~/components'
 import {
   filterProxiesByAvailability,
+  formatProxyType,
   formatTimeFromNow,
   sortProxiesByOrderingType,
 } from '~/helpers'
@@ -235,7 +236,7 @@ export default () => {
 
                       <div class="flex flex-wrap items-center justify-between gap-2">
                         <div class="badge badge-primary badge-sm">
-                          <span class="font-bold">{proxyGroup.type}</span>
+                          <span class="font-bold">{formatProxyType(proxyGroup.type)}</span>
                           <Show when={proxyGroup.now?.length > 0}>
                             <span class="whitespace-nowrap">
                               &nbsp;::&nbsp;
