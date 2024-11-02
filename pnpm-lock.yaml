@@ -24,8 +24,8 @@ importers:
         specifier: ^9.14.0
         version: 9.14.0
       '@felte/solid':
-        specifier: ^1.2.13
-        version: 1.2.13(solid-js@1.9.3)
+        specifier: ^1.2.14
+        version: 1.2.14(solid-js@1.9.3)
       '@felte/validator-zod':
         specifier: ^1.0.17
         version: 1.0.17(zod@3.23.8)
@@ -1066,10 +1066,6 @@ packages:
     resolution: {integrity: sha512-4Bfj15dVJdoy3RfZmmo86RK1Fwzn6SstsvK9JS+BaVKqC6QQQQyXekNaC+g+LKNgkQ+2VhGAzm6hO40AhMR3zQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@eslint/js@9.13.0':
-    resolution: {integrity: sha512-IFLyoY4d72Z5y/6o/BazFBezupzI/taV8sGumxTAVw3lXG9A6md1Dc34T9s1FoD/an9pJH8RHbAxsaEbBed9lA==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
   '@eslint/js@9.14.0':
     resolution: {integrity: sha512-pFoEtFWCPyDOl+C6Ift+wC7Ro89otjigCf5vcuWqWgqNSQbRrpjSvdeE6ofLz4dHmyxD5f7gIdGT4+p36L6Twg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
@@ -1086,12 +1082,16 @@ packages:
     resolution: {integrity: sha512-VbEOfNLWfDx0SpCfeE+fNWDpvcntND4MFs7Lxd18RIjrZYH82D0wWe9th2oVF9QT5XzgBEdMF5NGIttcwU4sjg==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
-  '@felte/core@1.4.3':
-    resolution: {integrity: sha512-DoXTuHD4atDG0SfTfI4orllcnriHRgM/ijMdRsUbLPL7O/UWGSWNXkxErx7XPbWOXMjX0J79KLfxZzm9abOCxw==}
+  '@felte/common@1.1.9':
+    resolution: {integrity: sha512-d9e9M5FWc7AyaX/fb2I78AvwIAAA6S8ncKoTd3vYdPGQfgryl18oMU+ScM1WgFnbOBSoItdt61oaZAuRqfE4AA==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
-  '@felte/solid@1.2.13':
-    resolution: {integrity: sha512-ngJgNRe0Frxl6iypCFbpKxs+xGw3MXucttqbCDAx7rSFe4BL9NqLDr65CZhd28KY4NRjbnYgAqT0mf0HxHz9Vw==}
+  '@felte/core@1.4.4':
+    resolution: {integrity: sha512-qXEofmfc0tKvd1MOP9T1ixoI4+u0ZcUtC7JpBfb2A/lr/mhc8HrkvVWGatrGBnNovTc4lgIKWOySVVFswa4BYg==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
+
+  '@felte/solid@1.2.14':
+    resolution: {integrity: sha512-7MzN3sa8HVik3nZKe6UIBCWnlYVBfcGN3KxXPefREpIBphFhK1OFeCz/qaDApXomhI9as8L1XGXwR1aRGoUwfw==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     peerDependencies:
       solid-js: ^1.2.0
@@ -4934,8 +4934,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@eslint/js@9.13.0': {}
-
   '@eslint/js@9.14.0': {}
 
   '@eslint/object-schema@2.1.4': {}
@@ -4946,13 +4944,15 @@ snapshots:
 
   '@felte/common@1.1.8': {}
 
-  '@felte/core@1.4.3':
-    dependencies:
-      '@felte/common': 1.1.8
+  '@felte/common@1.1.9': {}
 
-  '@felte/solid@1.2.13(solid-js@1.9.3)':
+  '@felte/core@1.4.4':
     dependencies:
-      '@felte/core': 1.4.3
+      '@felte/common': 1.1.9
+
+  '@felte/solid@1.2.14(solid-js@1.9.3)':
+    dependencies:
+      '@felte/core': 1.4.4
       solid-js: 1.9.3
 
   '@felte/validator-zod@1.0.17(zod@3.23.8)':
@@ -7406,7 +7406,7 @@ snapshots:
   terser@5.31.1:
     dependencies:
       '@jridgewell/source-map': 0.3.6
-      acorn: 8.12.1
+      acorn: 8.14.0
       commander: 2.20.3
       source-map-support: 0.5.21
 
