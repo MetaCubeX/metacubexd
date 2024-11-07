@@ -15,6 +15,7 @@ import {
   ProxyNodePreview,
   SubscriptionInfo,
 } from '~/components'
+import { ProxiesRenderWarpper } from '~/components/ProxiesRenderWrapper'
 import {
   filterProxiesByAvailability,
   formatProxyType,
@@ -28,7 +29,6 @@ import {
   iconHeight,
   iconMarginRight,
   proxiesOrderingType,
-  renderProxiesInTwoColumns,
   useConnections,
   useProxies,
 } from '~/signals'
@@ -175,14 +175,7 @@ export default () => {
 
         <div class="flex-1 overflow-y-auto">
           <Show when={activeTab() === ActiveTab.proxies}>
-            <div
-              class={twMerge(
-                'grid grid-cols-1 place-items-start gap-2',
-                renderProxiesInTwoColumns()
-                  ? 'sm:grid-cols-2'
-                  : 'sm:grid-cols-1',
-              )}
-            >
+            <ProxiesRenderWarpper>
               <For each={renderProxies()}>
                 {(proxyGroup) => {
                   const sortedProxyNames = createMemo(() =>
@@ -236,7 +229,9 @@ export default () => {
 
                       <div class="flex flex-wrap items-center justify-between gap-2">
                         <div class="badge badge-primary badge-sm">
-                          <span class="font-bold">{formatProxyType(proxyGroup.type)}</span>
+                          <span class="font-bold">
+                            {formatProxyType(proxyGroup.type)}
+                          </span>
                           <Show when={proxyGroup.now?.length > 0}>
                             <span class="whitespace-nowrap">
                               &nbsp;::&nbsp;
@@ -285,18 +280,11 @@ export default () => {
                   )
                 }}
               </For>
-            </div>
+            </ProxiesRenderWarpper>
           </Show>
 
           <Show when={activeTab() === ActiveTab.proxyProviders}>
-            <div
-              class={twMerge(
-                'grid grid-cols-1 place-items-start gap-2',
-                renderProxiesInTwoColumns()
-                  ? 'sm:grid-cols-2'
-                  : 'sm:grid-cols-1',
-              )}
-            >
+            <ProxiesRenderWarpper>
               <For each={proxyProviders()}>
                 {(proxyProvider) => {
                   const sortedProxyNames = createMemo(() =>
@@ -390,7 +378,7 @@ export default () => {
                   )
                 }}
               </For>
-            </div>
+            </ProxiesRenderWarpper>
           </Show>
         </div>
 
