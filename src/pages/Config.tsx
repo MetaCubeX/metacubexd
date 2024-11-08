@@ -559,7 +559,7 @@ const Versions: Component<{
   )
 
   return (
-    <div class="grid grid-cols-2 gap-4">
+    <div class="grid grid-cols-2 gap-4 mx-2 md:mx-0">
       <div class="relative">
         <Show when={isFrontendUpdateAvailable()}>
           <UpdateAvailableIndicator />
