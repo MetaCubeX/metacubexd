@@ -27,8 +27,8 @@ importers:
         specifier: ^1.2.14
         version: 1.2.14(solid-js@1.9.3)
       '@felte/validator-zod':
-        specifier: ^1.0.17
-        version: 1.0.17(zod@3.23.8)
+        specifier: ^1.0.18
+        version: 1.0.18(zod@3.23.8)
       '@fontsource/fira-sans':
         specifier: ^5.1.0
         version: 5.1.0
@@ -1074,10 +1074,6 @@ packages:
     resolution: {integrity: sha512-vH9PiIMMwvhCx31Af3HiGzsVNULDbyVkHXwlemn/B0TFj/00ho3y55efXrUZTfQipxoHC5u4xq6zblww1zm1Ig==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@felte/common@1.1.8':
-    resolution: {integrity: sha512-VbEOfNLWfDx0SpCfeE+fNWDpvcntND4MFs7Lxd18RIjrZYH82D0wWe9th2oVF9QT5XzgBEdMF5NGIttcwU4sjg==}
-    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
-
   '@felte/common@1.1.9':
     resolution: {integrity: sha512-d9e9M5FWc7AyaX/fb2I78AvwIAAA6S8ncKoTd3vYdPGQfgryl18oMU+ScM1WgFnbOBSoItdt61oaZAuRqfE4AA==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
@@ -1092,8 +1088,8 @@ packages:
     peerDependencies:
       solid-js: ^1.2.0
 
-  '@felte/validator-zod@1.0.17':
-    resolution: {integrity: sha512-rOX1chLfTcixKMPEdrMSi8zsCM685Dsoy1a5qN1G6Fyh7HYK1vSmI6SfJ7m92DOt6kV+vAP4m5rk94Y8UFIeVw==}
+  '@felte/validator-zod@1.0.18':
+    resolution: {integrity: sha512-nLhy3qhCrL14iMxIHXtIH0MckZr/dmpqRd/KcqQ6HJoT2tjvv8gPpgOGJdOR15Wfzd25n/UUr3tyX7ydgXA5xQ==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     peerDependencies:
       zod: ^3.2.0
@@ -4939,8 +4935,6 @@ snapshots:
     dependencies:
       levn: 0.4.1
 
-  '@felte/common@1.1.8': {}
-
   '@felte/common@1.1.9': {}
 
   '@felte/core@1.4.4':
@@ -4952,9 +4946,9 @@ snapshots:
       '@felte/core': 1.4.4
       solid-js: 1.9.3
 
-  '@felte/validator-zod@1.0.17(zod@3.23.8)':
+  '@felte/validator-zod@1.0.18(zod@3.23.8)':
     dependencies:
-      '@felte/common': 1.1.8
+      '@felte/common': 1.1.9
       zod: 3.23.8
 
   '@floating-ui/core@1.6.8':
