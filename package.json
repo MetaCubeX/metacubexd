@@ -1,6 +1,6 @@
 {
   "name": "metacubexd",
-  "version": "1.169.0",
+  "version": "1.171.0",
   "description": "Mihomo Dashboard, The Official One, XD",
   "license": "MIT",
   "type": "module",
@@ -44,7 +44,7 @@
     "@types/node": "^22.9.0",
     "@types/uuid": "^10.0.0",
     "@vite-pwa/assets-generator": "^0.2.6",
-    "apexcharts": "^3.54.1",
+    "apexcharts": "^4.0.0",
     "autoprefixer": "^10.4.20",
     "byte-size": "^9.0.0",
     "commitlint": "^19.5.0",
@@ -72,10 +72,10 @@
     "typescript-eslint": "^8.14.0",
     "unplugin-auto-import": "^0.18.3",
     "uuid": "^11.0.3",
-    "vite": "^5.4.10",
-    "vite-plugin-pwa": "^0.20.5",
+    "vite": "^5.4.11",
+    "vite-plugin-pwa": "^0.21.0",
     "vite-plugin-solid": "^2.10.2",
     "zod": "^3.23.8"
   },
-  "packageManager": "pnpm@9.12.1"
+  "packageManager": "pnpm@9.12.3"
 }
