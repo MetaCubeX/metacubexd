@@ -92,7 +92,22 @@ export default () => {
     e.stopPropagation()
     void proxyGroupLatencyTest(groupName)
   }
-
+  const encodeSvg = (svg: string) => {
+    return svg
+      .replace(
+        '<svg',
+        ~svg.indexOf('xmlns')
+          ? '<svg'
+          : '<svg xmlns="http://www.w3.org/2000/svg"',
+      )
+      .replace(/"/g, "'")
+      .replace(/%/g, '%25')
+      .replace(/#/g, '%23')
+      .replace(/\{/g, '%7B')
+      .replace(/\}/g, '%7D')
+      .replace(/</g, '%3C')
+      .replace(/>/g, '%3E')
+  }
   const onProxyProviderLatencyTestClick = (
     e: MouseEvent,
     providerName: string,
@@ -192,12 +207,37 @@ export default () => {
                     <div class="space-y-2">
                       <div class="flex items-center justify-between pr-8">
                         <div class="flex items-center">
-                          <Show when={proxyGroup.icon}>
+                          <Show
+                            when={
+                              proxyGroup.icon &&
+                              !proxyGroup.icon.startsWith('data:image/svg+xml')
+                            }
+                          >
                             <img
                               src={proxyGroup.icon}
                               style={{
                                 height: `${iconHeight()}px`,
                                 'margin-right': `${iconMarginRight()}px`,
+                              }}
+                            />
+                          </Show>
+                          <Show
+                            when={
+                              proxyGroup.icon &&
+                              proxyGroup.icon.startsWith('data:image/svg+xml')
+                            }
+                          >
+                            <div
+                              style={{
+                                'mask-image': `url("${encodeSvg(proxyGroup.icon!)}")`,
+                                '-webkitmask-image': `url("${encodeSvg(proxyGroup.icon!)}")`,
+                                height: `${iconHeight()}px`,
+                                width: `${iconHeight()}px`,
+                                'margin-right': `${iconMarginRight()}px`,
+                                'mask-size': '100% 100%',
+                                'background-color': 'currentColor',
+                                color:
+                                  'var(--icon-p, oklch(var(--p) / var(--tw-bg-opacity)))',
                               }}
                             />
                           </Show>
