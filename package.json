@@ -33,7 +33,7 @@
     "@solid-primitives/websocket": "^1.2.2",
     "@solidjs/meta": "^0.29.4",
     "@solidjs/router": "^0.15.1",
-    "@tabler/icons-solidjs": "^3.21.0",
+    "@tabler/icons-solidjs": "^3.22.0",
     "@tanstack/match-sorter-utils": "^8.19.4",
     "@tanstack/solid-table": "^8.20.5",
     "@tanstack/solid-virtual": "^3.10.9",
@@ -44,7 +44,7 @@
     "@types/node": "^22.9.0",
     "@types/uuid": "^10.0.0",
     "@vite-pwa/assets-generator": "^0.2.6",
-    "apexcharts": "^3.54.1",
+    "apexcharts": "^4.0.0",
     "autoprefixer": "^10.4.20",
     "byte-size": "^9.0.0",
     "commitlint": "^19.5.0",
@@ -73,9 +73,9 @@
     "unplugin-auto-import": "^0.18.3",
     "uuid": "^11.0.3",
     "vite": "^5.4.11",
-    "vite-plugin-pwa": "^0.20.5",
+    "vite-plugin-pwa": "^0.21.0",
     "vite-plugin-solid": "^2.10.2",
     "zod": "^3.23.8"
   },
-  "packageManager": "pnpm@9.12.1"
+  "packageManager": "pnpm@9.12.3"
 }
