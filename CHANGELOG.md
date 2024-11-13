@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.171.0](https://github.com/MetaCubeX/metacubexd/compare/v1.170.0...v1.171.0) (2024-11-13)
+
+
+### Features
+
+* trigger release ([2df7158](https://github.com/MetaCubeX/metacubexd/commit/2df7158f8a1a5b3e81e0ffd68eb1918582002d62))
+
 ## [1.170.0](https://github.com/MetaCubeX/metacubexd/compare/v1.169.0...v1.170.0) (2024-11-13)
 
 
