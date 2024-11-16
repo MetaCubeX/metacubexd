@@ -18,7 +18,7 @@
     "@corvu/accordion": "^0.2.3",
     "@corvu/tailwind": "^0.1.5",
     "@corvu/tooltip": "^0.2.1",
-    "@eslint/js": "^9.14.0",
+    "@eslint/js": "^9.15.0",
     "@felte/solid": "^1.2.14",
     "@felte/validator-zod": "^1.0.18",
     "@fontsource/fira-sans": "^5.1.0",
