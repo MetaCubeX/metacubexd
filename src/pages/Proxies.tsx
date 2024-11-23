@@ -213,7 +213,7 @@ export default () => {
                         <div class="flex items-center">
                           <Show when={proxyGroup.icon}>
                             <Show
-                              when={proxyGroup.icon?.startsWith(
+                              when={proxyGroup.icon!.startsWith(
                                 'data:image/svg+xml',
                               )}
                               fallback={
