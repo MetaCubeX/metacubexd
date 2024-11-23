@@ -92,7 +92,26 @@ export default () => {
     e.stopPropagation()
     void proxyGroupLatencyTest(groupName)
   }
-
+  /**
+   * transform an SVG into a data URI
+   * @see https://gist.github.com/jennyknuth/222825e315d45a738ed9d6e04c7a88d0
+   */
+  const encodeSvg = (svg: string) => {
+    return svg
+      .replace(
+        '<svg',
+        ~svg.indexOf('xmlns')
+          ? '<svg'
+          : '<svg xmlns="http://www.w3.org/2000/svg"',
+      )
+      .replace(/"/g, "'")
+      .replace(/%/g, '%25')
+      .replace(/#/g, '%23')
+      .replace(/\{/g, '%7B')
+      .replace(/\}/g, '%7D')
+      .replace(/</g, '%3C')
+      .replace(/>/g, '%3E')
+  }
   const onProxyProviderLatencyTestClick = (
     e: MouseEvent,
     providerName: string,
@@ -193,13 +212,33 @@ export default () => {
                       <div class="flex items-center justify-between pr-8">
                         <div class="flex items-center">
                           <Show when={proxyGroup.icon}>
-                            <img
-                              src={proxyGroup.icon}
-                              style={{
-                                height: `${iconHeight()}px`,
-                                'margin-right': `${iconMarginRight()}px`,
-                              }}
-                            />
+                            <Show
+                              when={proxyGroup.icon!.startsWith(
+                                'data:image/svg+xml',
+                              )}
+                              fallback={
+                                <img
+                                  src={proxyGroup.icon}
+                                  style={{
+                                    height: `${iconHeight()}px`,
+                                    'margin-right': `${iconMarginRight()}px`,
+                                  }}
+                                />
+                              }
+                            >
+                              <div
+                                style={{
+                                  height: `${iconHeight()}px`,
+                                  width: `${iconHeight()}px`,
+                                  color:
+                                    'oklch(var(--p) / var(--tw-bg-opacity))',
+                                  'background-color': 'currentColor',
+                                  'margin-right': `${iconMarginRight()}px`,
+                                  'mask-image': `url("${encodeSvg(proxyGroup.icon!)}")`,
+                                  'mask-size': '100% 100%',
+                                }}
+                              />
+                            </Show>
                           </Show>
                           <span>{proxyGroup.name}</span>
                           <div class="badge badge-sm ml-2">
