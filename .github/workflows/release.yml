@@ -89,5 +89,6 @@ jobs:
           push: true
           tags: |
             ghcr.io/metacubex/metacubexd:latest
+            ghcr.io/metacubex/metacubexd:${{ needs.release-please.outputs.tag_name }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
