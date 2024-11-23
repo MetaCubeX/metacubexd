@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.172.0](https://github.com/MetaCubeX/metacubexd/compare/v1.171.0...v1.172.0) (2024-11-23)
+
+
+### Features
+
+* support to set icon color to the theme color when proxy icon starts with `data:image/svg+xml` ([#1166](https://github.com/MetaCubeX/metacubexd/issues/1166)) ([29ed55c](https://github.com/MetaCubeX/metacubexd/commit/29ed55cf50298578a9fa92a209a1c9f70882ea43))
+
 ## [1.171.0](https://github.com/MetaCubeX/metacubexd/compare/v1.170.0...v1.171.0) (2024-11-13)
 
 
