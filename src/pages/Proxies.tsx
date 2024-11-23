@@ -92,6 +92,10 @@ export default () => {
     e.stopPropagation()
     void proxyGroupLatencyTest(groupName)
   }
+  /**
+   * transform an SVG into a data URI
+   * @see https://gist.github.com/jennyknuth/222825e315d45a738ed9d6e04c7a88d0
+   */
   const encodeSvg = (svg: string) => {
     return svg
       .replace(
@@ -207,39 +211,34 @@ export default () => {
                     <div class="space-y-2">
                       <div class="flex items-center justify-between pr-8">
                         <div class="flex items-center">
-                          <Show
-                            when={
-                              proxyGroup.icon &&
-                              !proxyGroup.icon.startsWith('data:image/svg+xml')
-                            }
-                          >
-                            <img
-                              src={proxyGroup.icon}
-                              style={{
-                                height: `${iconHeight()}px`,
-                                'margin-right': `${iconMarginRight()}px`,
-                              }}
-                            />
-                          </Show>
-                          <Show
-                            when={
-                              proxyGroup.icon &&
-                              proxyGroup.icon.startsWith('data:image/svg+xml')
-                            }
-                          >
-                            <div
-                              style={{
-                                'mask-image': `url("${encodeSvg(proxyGroup.icon!)}")`,
-                                '-webkitmask-image': `url("${encodeSvg(proxyGroup.icon!)}")`,
-                                height: `${iconHeight()}px`,
-                                width: `${iconHeight()}px`,
-                                'margin-right': `${iconMarginRight()}px`,
-                                'mask-size': '100% 100%',
-                                'background-color': 'currentColor',
-                                color:
-                                  'var(--icon-p, oklch(var(--p) / var(--tw-bg-opacity)))',
-                              }}
-                            />
+                          <Show when={proxyGroup.icon}>
+                            <Show
+                              when={proxyGroup.icon?.startsWith(
+                                'data:image/svg+xml',
+                              )}
+                              fallback={
+                                <img
+                                  src={proxyGroup.icon}
+                                  style={{
+                                    height: `${iconHeight()}px`,
+                                    'margin-right': `${iconMarginRight()}px`,
+                                  }}
+                                />
+                              }
+                            >
+                              <div
+                                style={{
+                                  height: `${iconHeight()}px`,
+                                  width: `${iconHeight()}px`,
+                                  color:
+                                    'oklch(var(--p) / var(--tw-bg-opacity))',
+                                  'background-color': 'currentColor',
+                                  'margin-right': `${iconMarginRight()}px`,
+                                  'mask-image': `url("${encodeSvg(proxyGroup.icon!)}")`,
+                                  'mask-size': '100% 100%',
+                                }}
+                              />
+                            </Show>
                           </Show>
                           <span>{proxyGroup.name}</span>
                           <div class="badge badge-sm ml-2">
