@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.173.0](https://github.com/MetaCubeX/metacubexd/compare/v1.172.0...v1.173.0) (2024-11-24)
+
+
+### Features
+
+* modes list for sing-box offical ([#1182](https://github.com/MetaCubeX/metacubexd/issues/1182)) ([1ca89fb](https://github.com/MetaCubeX/metacubexd/commit/1ca89fb6c736bcdb4d4b84552828fc7df3fa131d))
+
 ## [1.172.0](https://github.com/MetaCubeX/metacubexd/compare/v1.171.0...v1.172.0) (2024-11-23)
 
 
