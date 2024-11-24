@@ -232,9 +232,11 @@ const ConfigForm: ParentComponent<{
     }
   })
 
-  const modes = createMemo(
-    () => configsData()?.modes || ['rule', 'direct', 'global'],
-  )
+  const modes = createMemo(() => {
+    const cfg = configsData()
+
+    return cfg?.['mode-list'] || cfg?.modes || ['rule', 'direct', 'global']
+  })
 
   return (
     <div class="flex flex-col gap-4">
