@@ -23,10 +23,7 @@ type ProxyInfo = {
   name: string
   udp: boolean
   tfo: boolean
-  latencyTestHistory: {
-    time: string
-    delay: number
-  }[]
+  latencyTestHistory: Record<string, Proxy['history'] | undefined>
   latency: string
   xudp: boolean
   type: string
@@ -59,31 +56,61 @@ const [proxyProviders, setProxyProviders] = createSignal<
 >([])
 
 // DO NOT use latency from latency map directly use getLatencyByName instead
-const [latencyMap, setLatencyMap] = createSignal<Record<string, number>>({})
+const [latencyMap, setLatencyMap] = createSignal<
+  Record<string, Record<string, number> | undefined>
+>({})
+
 const [proxyNodeMap, setProxyNodeMap] = createSignal<Record<string, ProxyInfo>>(
   {},
 )
 
+type AllTestUrlLatencyInfo = {
+  allTestUrlLatency: Record<string, number>
+  allTestUrlLatencyHistory: Record<string, Proxy['history'] | undefined>
+}
+
 const getLatencyFromProxy = (
   proxy: Pick<Proxy, 'extra' | 'history'>,
-  url: string,
   fallbackDefault = true,
-) => {
-  const extra = proxy.extra?.[url] as Proxy['history'] | undefined
-
-  if (Array.isArray(extra)) {
-    const delay = extra.at(-1)?.delay
-
-    if (delay) {
-      return delay
+): AllTestUrlLatencyInfo => {
+  const extra = (proxy.extra || {}) as Record<
+    string,
+    {
+      history?: Proxy['history']
     }
+  >
+
+  if (!Object.keys(extra).length && fallbackDefault) {
+    const testUrl = urlForLatencyTest()
+
+    const delay =
+      proxy.history?.at(-1)?.delay ?? latencyQualityMap().NOT_CONNECTED
+
+    const allTestUrlLatency = { [testUrl]: delay }
+    const allTestUrlLatencyHistory = { [testUrl]: proxy.history }
+
+    return {
+      allTestUrlLatency,
+      allTestUrlLatencyHistory,
+    } as AllTestUrlLatencyInfo
   }
 
-  if (!fallbackDefault) {
-    return latencyQualityMap().NOT_CONNECTED
-  }
+  return Object.keys(extra).reduce(
+    (acc, testUrl) => {
+      const data = extra[testUrl]
+      const delay =
+        data?.history?.at(-1)?.delay ?? latencyQualityMap().NOT_CONNECTED
 
-  return proxy.history?.at(-1)?.delay ?? latencyQualityMap().NOT_CONNECTED
+      acc.allTestUrlLatency[testUrl] = delay
+      acc.allTestUrlLatencyHistory[testUrl] = data.history
+
+      return acc
+    },
+    {
+      allTestUrlLatency: {},
+      allTestUrlLatencyHistory: {},
+    } as AllTestUrlLatencyInfo,
+  )
 }
 
 const setProxiesInfo = (
@@ -93,20 +120,23 @@ const setProxiesInfo = (
   const newLatencyMap = { ...latencyMap() }
 
   proxies.forEach((proxy) => {
-    const { udp, xudp, type, now, history, name, tfo, provider = '' } = proxy
+    const { allTestUrlLatency, allTestUrlLatencyHistory } =
+      getLatencyFromProxy(proxy)
+
+    const { udp, xudp, type, now, name, tfo, provider = '' } = proxy
 
     newProxyNodeMap[proxy.name] = {
       udp,
       xudp,
       type,
       latency: now,
-      latencyTestHistory: history,
+      latencyTestHistory: allTestUrlLatencyHistory,
       name,
       tfo,
       provider,
     }
 
-    newLatencyMap[proxy.name] = getLatencyFromProxy(proxy, urlForLatencyTest())
+    newLatencyMap[proxy.name] = allTestUrlLatency
   })
 
   batch(() => {
@@ -122,8 +152,18 @@ export const useProxies = () => {
       fetchProxiesAPI(),
     ])
 
+    const proxiesWithTestUrl = Object.values(proxies).map((proxy) => {
+      if (proxy.all?.length) {
+        const { testUrl, timeout } = providers?.[proxy.name] || {}
+
+        return { ...proxy, testUrl, timeout }
+      } else {
+        return proxy
+      }
+    })
+
     const sortIndex = [...(proxies['GLOBAL'].all ?? []), 'GLOBAL']
-    const sortedProxies = Object.values(proxies)
+    const sortedProxies = Object.values(proxiesWithTestUrl)
       .filter((proxy) => proxy.all?.length)
       .sort(
         (prev, next) =>
@@ -135,7 +175,7 @@ export const useProxies = () => {
     )
 
     const allProxies = [
-      ...Object.values(proxies),
+      ...proxiesWithTestUrl,
       ...sortedProviders.flatMap((provider) =>
         provider.proxies
           .filter((proxy) => !(proxy.name in proxies))
@@ -177,37 +217,53 @@ export const useProxies = () => {
     }
   }
 
-  const proxyLatencyTest = async (proxyName: string, provider: string) => {
+  const proxyLatencyTest = async (
+    proxyName: string,
+    provider: string,
+    testUrl: string | null,
+    timmeout: number | null,
+  ) => {
     const nodeName = getNowProxyNodeName(proxyName)
 
     setProxyLatencyTestingMap(nodeName, async () => {
+      const finalTestUrl = testUrl || urlForLatencyTest()
+      const currentNodeLatency = latencyMap()?.[nodeName] || {}
       try {
         const { delay } = await proxyLatencyTestAPI(
           nodeName,
           provider,
-          urlForLatencyTest(),
-          latencyTestTimeoutDuration(),
+          finalTestUrl,
+          timmeout ?? latencyTestTimeoutDuration(),
         )
 
-        setLatencyMap((latencyMap) => ({
-          ...latencyMap,
-          [nodeName]: delay,
-        }))
+        currentNodeLatency[finalTestUrl] = delay
+
+        setLatencyMap((latencyMap) => {
+          return {
+            ...latencyMap,
+            [nodeName]: currentNodeLatency,
+          }
+        })
       } catch {
+        currentNodeLatency[finalTestUrl] = latencyQualityMap().NOT_CONNECTED
         setLatencyMap((latencyMap) => ({
           ...latencyMap,
-          [nodeName]: latencyQualityMap().NOT_CONNECTED,
+          [nodeName]: currentNodeLatency,
         }))
       }
     })
   }
 
   const proxyGroupLatencyTest = async (proxyGroupName: string) => {
+    const currentProxyGroups = proxies()
     setProxyGroupLatencyTestingMap(proxyGroupName, async () => {
+      const currentProxyGroup = currentProxyGroups.find(
+        (item) => item.name === proxyGroupName,
+      )
       await proxyGroupLatencyTestAPI(
         proxyGroupName,
-        urlForLatencyTest(),
-        latencyTestTimeoutDuration(),
+        currentProxyGroup?.testUrl || urlForLatencyTest(),
+        currentProxyGroup?.timeout ?? latencyTestTimeoutDuration(),
       )
       await fetchProxies()
     })
@@ -263,8 +319,10 @@ export const useProxies = () => {
     return node.name
   }
 
-  const getLatencyByName = (name: string) => {
-    return latencyMap()[getNowProxyNodeName(name)]
+  const getLatencyByName = (name: string, testUrl: string | null) => {
+    const finalTestUrl = testUrl || urlForLatencyTest()
+
+    return latencyMap()[getNowProxyNodeName(name)]?.[finalTestUrl] || 0
   }
 
   const isProxyGroup = (name: string) => {

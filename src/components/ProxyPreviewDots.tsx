@@ -38,6 +38,7 @@ const LatencyDot = (props: {
 
 export const ProxyPreviewDots = (props: {
   proxyNameList: string[]
+  testUrl: string | null
   now?: string
 }) => {
   const { getLatencyByName } = useProxies()
@@ -48,7 +49,7 @@ export const ProxyPreviewDots = (props: {
         <For
           each={props.proxyNameList.map((name): [string, number] => [
             name,
-            getLatencyByName(name),
+            getLatencyByName(name, props.testUrl),
           ])}
         >
           {([name, latency]) => (
@@ -62,7 +63,7 @@ export const ProxyPreviewDots = (props: {
       </div>
 
       <Show when={props.now}>
-        <Latency proxyName={props.now!} />
+        <Latency proxyName={props.now!} testUrl={props.testUrl} />
       </Show>
     </div>
   )

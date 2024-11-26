@@ -8,10 +8,12 @@ import {
   formatProxyType,
   getLatencyClassName,
 } from '~/helpers'
-import { rootElement, useProxies } from '~/signals'
+import { rootElement, urlForLatencyTest, useProxies } from '~/signals'
 
 export const ProxyNodeCard = (props: {
   proxyName: string
+  testUrl: string | null
+  timeout: number | null
   isSelected?: boolean
   onClick?: () => void
 }) => {
@@ -35,6 +37,9 @@ export const ProxyNodeCard = (props: {
   const title = createMemo(() =>
     [proxyName, specialTypes()].filter(Boolean).join(' - '),
   )
+
+  const latencyTestHistory =
+    proxyNode().latencyTestHistory[props.testUrl || urlForLatencyTest()] || []
 
   return (
     <Tooltip
@@ -67,13 +72,19 @@ export const ProxyNodeCard = (props: {
 
               <Latency
                 proxyName={props.proxyName}
+                testUrl={props.testUrl || null}
                 class={twMerge(
                   proxyLatencyTestingMap()[proxyName] && 'animate-pulse',
                 )}
                 onClick={(e) => {
                   e.stopPropagation()
 
-                  void proxyLatencyTest(proxyName, proxyNode().provider)
+                  void proxyLatencyTest(
+                    proxyName,
+                    proxyNode().provider,
+                    props.testUrl,
+                    props.timeout,
+                  )
                 }}
               />
             </div>
@@ -87,12 +98,10 @@ export const ProxyNodeCard = (props: {
             <div class="flex flex-col items-center gap-2 rounded-box bg-neutral bg-gradient-to-br from-primary to-secondary p-2.5 text-primary-content shadow-lg">
               <h2 class="text-lg font-bold">{proxyName}</h2>
 
-              <div class="w-full text-xs uppercase">
-                {specialTypes()}
-              </div>
+              <div class="w-full text-xs uppercase">{specialTypes()}</div>
 
               <ul class="timeline timeline-vertical timeline-compact timeline-snap-icon">
-                <For each={proxyNode().latencyTestHistory}>
+                <For each={latencyTestHistory}>
                   {(latencyTestResult, index) => (
                     <li>
                       <Show when={index() > 0}>
@@ -120,11 +129,7 @@ export const ProxyNodeCard = (props: {
                         <IconCircleCheckFilled class="size-4" />
                       </div>
 
-                      <Show
-                        when={
-                          index() !== proxyNode().latencyTestHistory.length - 1
-                        }
-                      >
+                      <Show when={index() !== latencyTestHistory.length - 1}>
                         <hr />
                       </Show>
                     </li>

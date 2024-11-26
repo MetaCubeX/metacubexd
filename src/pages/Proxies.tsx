@@ -198,13 +198,15 @@ export default () => {
               <For each={renderProxies()}>
                 {(proxyGroup) => {
                   const sortedProxyNames = createMemo(() =>
-                    filterProxiesByAvailability(
-                      sortProxiesByOrderingType(
-                        proxyGroup.all ?? [],
-                        proxiesOrderingType(),
-                      ),
-                      hideUnAvailableProxies(),
-                    ),
+                    filterProxiesByAvailability({
+                      proxyNames: sortProxiesByOrderingType({
+                        proxyNames: proxyGroup.all ?? [],
+                        orderingType: proxiesOrderingType(),
+                        testUrl: proxyGroup.testUrl || null,
+                      }),
+                      enabled: hideUnAvailableProxies(),
+                      testUrl: proxyGroup.testUrl || null,
+                    }),
                   )
 
                   const title = (
@@ -291,6 +293,7 @@ export default () => {
                         <ProxyNodePreview
                           proxyNameList={sortedProxyNames()}
                           now={proxyGroup.now}
+                          testUrl={proxyGroup.testUrl || null}
                         />
                       </Show>
                     </div>
@@ -308,6 +311,8 @@ export default () => {
                         {(proxyName) => (
                           <ProxyNodeCard
                             proxyName={proxyName}
+                            testUrl={proxyGroup.testUrl || null}
+                            timeout={proxyGroup.timeout ?? null}
                             isSelected={proxyGroup.now === proxyName}
                             onClick={() =>
                               void selectProxyInGroup(proxyGroup, proxyName)
@@ -327,10 +332,12 @@ export default () => {
               <For each={proxyProviders()}>
                 {(proxyProvider) => {
                   const sortedProxyNames = createMemo(() =>
-                    sortProxiesByOrderingType(
-                      proxyProvider.proxies.map((i) => i.name) ?? [],
-                      proxiesOrderingType(),
-                    ),
+                    sortProxiesByOrderingType({
+                      orderingType: proxiesOrderingType(),
+                      proxyNames:
+                        proxyProvider.proxies.map((i) => i.name) ?? [],
+                      testUrl: proxyProvider.testUrl,
+                    }),
                   )
 
                   const title = (
@@ -397,7 +404,10 @@ export default () => {
                       </div>
 
                       <Show when={!collapsedMap()[proxyProvider.name]}>
-                        <ProxyNodePreview proxyNameList={sortedProxyNames()} />
+                        <ProxyNodePreview
+                          proxyNameList={sortedProxyNames()}
+                          testUrl={proxyProvider.testUrl}
+                        />
                       </Show>
                     </>
                   )
@@ -411,7 +421,13 @@ export default () => {
                       }
                     >
                       <For each={sortedProxyNames()}>
-                        {(proxyName) => <ProxyNodeCard proxyName={proxyName} />}
+                        {(proxyName) => (
+                          <ProxyNodeCard
+                            proxyName={proxyName}
+                            testUrl={proxyProvider.testUrl}
+                            timeout={proxyProvider.timeout ?? null}
+                          />
+                        )}
                       </For>
                     </Collapse>
                   )
