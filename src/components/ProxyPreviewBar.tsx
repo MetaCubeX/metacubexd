@@ -3,11 +3,12 @@ import { latencyQualityMap, useProxies } from '~/signals'
 
 export const ProxyPreviewBar = (props: {
   proxyNameList: string[]
+  testUrl: string | null
   now?: string
 }) => {
   const { getLatencyByName } = useProxies()
   const latencyList = createMemo(() =>
-    props.proxyNameList.map((name) => getLatencyByName(name)),
+    props.proxyNameList.map((name) => getLatencyByName(name, props.testUrl)),
   )
 
   const all = createMemo(() => latencyList().length)
@@ -69,7 +70,7 @@ export const ProxyPreviewBar = (props: {
       </div>
 
       <Show when={props.now}>
-        <Latency proxyName={props.now!} />
+        <Latency proxyName={props.now!} testUrl={props.testUrl} />
       </Show>
     </div>
   )
