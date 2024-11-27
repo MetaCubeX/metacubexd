@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.173.1](https://github.com/MetaCubeX/metacubexd/compare/v1.173.0...v1.173.1) (2024-11-27)
+
+
+### Bug Fixes
+
+* latency not correct when set custom url in config ([#1189](https://github.com/MetaCubeX/metacubexd/issues/1189)) ([af30813](https://github.com/MetaCubeX/metacubexd/commit/af3081371d3c6fb7a748b8c9a11cb5dcd5b31dca))
+
 ## [1.173.0](https://github.com/MetaCubeX/metacubexd/compare/v1.172.0...v1.173.0) (2024-11-24)
 
 
