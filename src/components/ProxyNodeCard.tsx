@@ -8,7 +8,7 @@ import {
   formatProxyType,
   getLatencyClassName,
 } from '~/helpers'
-import { rootElement, urlForLatencyTest, useProxies } from '~/signals'
+import { rootElement, useProxies } from '~/signals'
 
 export const ProxyNodeCard = (props: {
   proxyName: string
@@ -18,8 +18,12 @@ export const ProxyNodeCard = (props: {
   onClick?: () => void
 }) => {
   const { proxyName, isSelected, onClick } = props
-  const { proxyNodeMap, proxyLatencyTest, proxyLatencyTestingMap } =
-    useProxies()
+  const {
+    proxyNodeMap,
+    proxyLatencyTest,
+    proxyLatencyTestingMap,
+    getLatencyHistoryByName,
+  } = useProxies()
   const proxyNode = createMemo(() => proxyNodeMap()[proxyName])
 
   const specialTypes = createMemo(() => {
@@ -38,8 +42,10 @@ export const ProxyNodeCard = (props: {
     [proxyName, specialTypes()].filter(Boolean).join(' - '),
   )
 
-  const latencyTestHistory =
-    proxyNode().latencyTestHistory[props.testUrl || urlForLatencyTest()] || []
+  const latencyTestHistory = getLatencyHistoryByName(
+    props.proxyName,
+    props.testUrl,
+  )
 
   return (
     <Tooltip
