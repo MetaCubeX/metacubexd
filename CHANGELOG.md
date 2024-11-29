@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.173.2](https://github.com/MetaCubeX/metacubexd/compare/v1.173.1...v1.173.2) (2024-11-29)
+
+
+### Bug Fixes
+
+* latency not correct when proxy group has custom test url ([#1199](https://github.com/MetaCubeX/metacubexd/issues/1199)) ([23e56cf](https://github.com/MetaCubeX/metacubexd/commit/23e56cfde81fcd0453106e477cdf9e17f98019ae))
+
 ## [1.173.1](https://github.com/MetaCubeX/metacubexd/compare/v1.173.0...v1.173.1) (2024-11-27)
 
 
