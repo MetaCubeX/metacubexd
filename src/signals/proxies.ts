@@ -70,7 +70,7 @@ type AllTestUrlLatencyInfo = {
 }
 
 const getLatencyFromProxy = (
-  proxy: Pick<Proxy, 'extra' | 'history'>,
+  proxy: Pick<Proxy, 'extra' | 'history' | 'testUrl'>,
   fallbackDefault = true,
 ): AllTestUrlLatencyInfo => {
   const extra = (proxy.extra || {}) as Record<
@@ -80,22 +80,9 @@ const getLatencyFromProxy = (
     }
   >
 
-  if (!Object.keys(extra).length && fallbackDefault) {
-    const testUrl = urlForLatencyTest()
-
-    const delay =
-      proxy.history?.at(-1)?.delay ?? latencyQualityMap().NOT_CONNECTED
-
-    const allTestUrlLatency = { [testUrl]: delay }
-    const allTestUrlLatencyHistory = { [testUrl]: proxy.history }
-
-    return {
-      allTestUrlLatency,
-      allTestUrlLatencyHistory,
-    } as AllTestUrlLatencyInfo
-  }
-
-  return Object.keys(extra).reduce(
+  const { allTestUrlLatency, allTestUrlLatencyHistory } = Object.keys(
+    extra,
+  ).reduce(
     (acc, testUrl) => {
       const data = extra[testUrl]
       const delay =
@@ -111,6 +98,23 @@ const getLatencyFromProxy = (
       allTestUrlLatencyHistory: {},
     } as AllTestUrlLatencyInfo,
   )
+
+  if (fallbackDefault) {
+    // Since the proxy here could be a proxy group, prioritize using the group's own testUrl
+    const defaultTestUrl = proxy.testUrl || urlForLatencyTest()
+    const isDefaultTestUrlLatencyExists = defaultTestUrl in allTestUrlLatency
+
+    // If the defaultTtestUrlLatency is not exist, use the fault latency history
+    // If the current proxy is a proxy group with its own testUrl, then this history refers to the current proxy group's history
+    if (!isDefaultTestUrlLatencyExists) {
+      const delay =
+        proxy.history?.at(-1)?.delay ?? latencyQualityMap().NOT_CONNECTED
+      allTestUrlLatency[defaultTestUrl] = delay
+      allTestUrlLatencyHistory[defaultTestUrl] = proxy.history
+    }
+  }
+
+  return { allTestUrlLatency, allTestUrlLatencyHistory }
 }
 
 const setProxiesInfo = (
@@ -153,7 +157,7 @@ export const useProxies = () => {
     ])
 
     const proxiesWithTestUrl = Object.values(proxies).map((proxy) => {
-      if (proxy.all?.length) {
+      if (proxy.all?.length && !proxy.testUrl) {
         const { testUrl, timeout } = providers?.[proxy.name] || {}
 
         return { ...proxy, testUrl, timeout }
@@ -321,8 +325,30 @@ export const useProxies = () => {
 
   const getLatencyByName = (name: string, testUrl: string | null) => {
     const finalTestUrl = testUrl || urlForLatencyTest()
+    const latencyMapValue = latencyMap()
 
-    return latencyMap()[getNowProxyNodeName(name)]?.[finalTestUrl] || 0
+    // First recursively search for proxy node latency by name for the current testUrl.
+    // If not found, the current name may be a proxy group - in that case, use that proxy group's latency
+    return (
+      latencyMapValue[getNowProxyNodeName(name)]?.[finalTestUrl] ||
+      latencyMapValue[name]?.[finalTestUrl] ||
+      latencyQualityMap().NOT_CONNECTED
+    )
+  }
+
+  const getLatencyHistoryByName = (name: string, testUrl: string | null) => {
+    const proxyNode = proxyNodeMap()[name]
+
+    const nowProxyNodeName = getNowProxyNodeName(name)
+    const nowProxyNode = proxyNodeMap()[nowProxyNodeName]
+
+    const finalTestUrl = testUrl || urlForLatencyTest()
+
+    return (
+      nowProxyNode.latencyTestHistory[finalTestUrl] ||
+      proxyNode.latencyTestHistory[finalTestUrl] ||
+      []
+    )
   }
 
   const isProxyGroup = (name: string) => {
@@ -358,6 +384,7 @@ export const useProxies = () => {
     proxyProviderLatencyTest,
     getNowProxyNodeName,
     getLatencyByName,
+    getLatencyHistoryByName,
     isProxyGroup,
   }
 }
