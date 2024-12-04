@@ -66,8 +66,8 @@ importers:
         specifier: ^0.15.1
         version: 0.15.1(solid-js@1.9.3)
       '@tabler/icons-solidjs':
-        specifier: ^3.23.0
-        version: 3.23.0(solid-js@1.9.3)
+        specifier: ^3.24.0
+        version: 3.24.0(solid-js@1.9.3)
       '@tanstack/match-sorter-utils':
         specifier: ^8.19.4
         version: 8.19.4
@@ -1421,13 +1421,13 @@ packages:
     peerDependencies:
       '@svgdotjs/svg.js': ^3.2.4
 
-  '@tabler/icons-solidjs@3.23.0':
-    resolution: {integrity: sha512-9CgN3Yllqa52MyF5DCnjLBmArzbC0zEhoF5bt0E/Oq1JHAAjwXXPpGqFD5XRBUIn+2Wbeh0sMvjyQAd3mtlbVg==}
+  '@tabler/icons-solidjs@3.24.0':
+    resolution: {integrity: sha512-2RnSdD4YYsGCUIWuP/FEroQZjc5Pa6KOAV96mnnkdsJkoPwsLv0BLC1kJ4USwR0ri7II5SyTOq/p/c8Fw26jtg==}
     peerDependencies:
       solid-js: ^1.4.7
 
-  '@tabler/icons@3.23.0':
-    resolution: {integrity: sha512-Cz+X58jfRm0g/KcupXXuPw5knj671lNR054AnmLXvCjudiQBWI0wZulDDSsqDoGezvBzMTNPQtNcjLkZs82ZxQ==}
+  '@tabler/icons@3.24.0':
+    resolution: {integrity: sha512-qNis9e90QcdxAGV3wNIeX0Ba2R7ktm0cnqOToKHJfC2kj3fvJwEVLsw63K0/fm7NW8rSZjDSTQRmMnSg8g/wrg==}
 
   '@tanstack/match-sorter-utils@8.19.4':
     resolution: {integrity: sha512-Wo1iKt2b9OT7d+YGhvEPD3DXvPv2etTusIMhMUoG7fbhmxcXCtIjJDEygy91Y2JFlwGyjqiBPRozme7UD8hoqg==}
@@ -5194,12 +5194,12 @@ snapshots:
     dependencies:
       '@svgdotjs/svg.js': 3.2.4
 
-  '@tabler/icons-solidjs@3.23.0(solid-js@1.9.3)':
+  '@tabler/icons-solidjs@3.24.0(solid-js@1.9.3)':
     dependencies:
-      '@tabler/icons': 3.23.0
+      '@tabler/icons': 3.24.0
       solid-js: 1.9.3
 
-  '@tabler/icons@3.23.0': {}
+  '@tabler/icons@3.24.0': {}
 
   '@tanstack/match-sorter-utils@8.19.4':
     dependencies:
