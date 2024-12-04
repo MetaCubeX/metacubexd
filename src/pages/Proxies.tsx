@@ -1,6 +1,7 @@
 import { makePersisted } from '@solid-primitives/storage'
 import {
   IconBrandSpeedtest,
+  IconChevronRight,
   IconReload,
   IconSettings,
 } from '@tabler/icons-solidjs'
@@ -274,8 +275,8 @@ export default () => {
                             {formatProxyType(proxyGroup.type)}
                           </span>
                           <Show when={proxyGroup.now?.length > 0}>
+                            <IconChevronRight size={18}/>
                             <span class="whitespace-nowrap">
-                              &nbsp;::&nbsp;
                               {proxyGroup.now}
                             </span>
                           </Show>
@@ -343,11 +344,15 @@ export default () => {
                   const title = (
                     <>
                       <div class="flex items-center justify-between pr-8">
-                        <div class="flex items-center gap-2">
-                          <span>{proxyProvider.name}</span>
+                        <div class="flex flex-wrap items-center gap-1">
+                          <span class="line-clamp-1 break-all">{proxyProvider.name}</span>
 
                           <div class="badge badge-sm">
                             {proxyProvider.proxies.length}
+                          </div>
+
+                          <div class="badge badge-sm">
+                            {proxyProvider.vehicleType}
                           </div>
                         </div>
 
@@ -399,7 +404,7 @@ export default () => {
                       />
 
                       <div class="text-sm text-slate-500">
-                        {proxyProvider.vehicleType} :: {t('updated')}{' '}
+                        {t('updated')}{' '}
                         {formatTimeFromNow(proxyProvider.updatedAt)}
                       </div>
 
