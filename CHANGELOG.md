@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.173.3](https://github.com/MetaCubeX/metacubexd/compare/v1.173.2...v1.173.3) (2024-12-04)
+
+
+### Bug Fixes
+
+* I18n unable to get value for name ([#1206](https://github.com/MetaCubeX/metacubexd/issues/1206)) ([92a2e39](https://github.com/MetaCubeX/metacubexd/commit/92a2e3985d3596b9048dd49fd69987fcadf0e515))
+
 ## [1.173.2](https://github.com/MetaCubeX/metacubexd/compare/v1.173.1...v1.173.2) (2024-11-29)
 
 
