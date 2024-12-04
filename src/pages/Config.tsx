@@ -472,7 +472,8 @@ const ConfigForXd = () => {
         </div>
 
         <div class="flex flex-col">
-          <div class="py-2 text-center text-lg font-semibold">&nbsp;</div>
+          <ConfigTitle>{endpoint()?.url}</ConfigTitle>
+          
           <Button
             class="btn-info"
             onClick={() => {
