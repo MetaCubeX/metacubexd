@@ -44,7 +44,7 @@ export const ProxyPreviewDots = (props: {
   const { getLatencyByName } = useProxies()
 
   return (
-    <div class="flex items-center gap-2 py-2">
+    <div class="flex items-center gap-2">
       <div class="flex flex-1 flex-wrap items-center gap-1">
         <For
           each={props.proxyNameList.map((name): [string, number] => [

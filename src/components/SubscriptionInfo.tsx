@@ -11,7 +11,7 @@ const getSubscriptionsInfo = (subscriptionInfo: ISubscriptionInfo) => {
   const used = byteSize(Download + Upload, {
     units: 'iec',
   })
-  const percentage = toFinite((((Download + Upload) / Total) * 100).toFixed(2))
+  const percentage = Math.min(toFinite((((Download + Upload) / Total) * 100).toFixed(1)),999)
 
   const expirePrefix = () => {
     const [t] = useI18n()
@@ -49,14 +49,22 @@ export const SubscriptionInfo = (props: {
 
   return (
     <>
-      <progress class="progress" value={info.percentage} max="100" />
+      <div class="flex items-center gap-2 pt-1">
+        <progress class="progress" value={info.percentage} max="100" />
 
-      <div class="text-sm text-slate-500">
-        {`${info.used}`} / {`${info.total}`} ( {info.percentage}% )
+        <div class="badge badge-secondary badge-sm">
+          {info.percentage}%
+        </div>
       </div>
 
-      <div class="text-sm text-slate-500">
-        {info.expirePrefix()}: {info.expireStr()}
+      <div class="flex flex-wrap items-center justify-between">
+        <div class="text-sm text-slate-500">
+          {`${info.used}`} / {`${info.total}`}
+        </div>
+
+        <div class="text-sm text-slate-500">
+          {info.expirePrefix()}: {info.expireStr()}
+        </div>
       </div>
     </>
   )
