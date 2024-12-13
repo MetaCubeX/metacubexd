@@ -120,6 +120,7 @@ export default {
   outboundInterfaceName: 'Outbound Interface Name',
   en: 'English',
   zh: 'Chinese',
+  ru: 'Russian',
   port: '{{ name }} Port',
   quickFilter: 'Quick Filter',
   iconHeight: 'Icon Height',

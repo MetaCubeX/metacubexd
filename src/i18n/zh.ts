@@ -122,6 +122,7 @@ export default {
   outboundInterfaceName: '出站接口名称',
   en: '英文',
   zh: '中文',
+  ru: '俄文',
   port: '{{ name }} 端口',
   quickFilter: '快速过滤',
   iconHeight: '图标高度',

@@ -443,6 +443,10 @@ const ConfigForXd = () => {
       label: () => t('zh'),
       value: LANG.ZH,
     },
+    {
+      label: () => t('ru'),
+      value: LANG.RU,
+    },
   ]
 
   return (
@@ -473,7 +477,7 @@ const ConfigForXd = () => {
 
         <div class="flex flex-col">
           <ConfigTitle>{endpoint()?.url}</ConfigTitle>
-          
+
           <Button
             class="btn-info"
             onClick={() => {
@@ -562,7 +566,7 @@ const Versions: Component<{
   )
 
   return (
-    <div class="grid grid-cols-2 gap-4 mx-2 md:mx-0">
+    <div class="mx-2 grid grid-cols-2 gap-4 md:mx-0">
       <div class="relative">
         <Show when={isFrontendUpdateAvailable()}>
           <UpdateAvailableIndicator />

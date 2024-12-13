@@ -99,6 +99,7 @@ declare global {
   const pipeToNodeWritable: (typeof import('solid-js/web'))['pipeToNodeWritable']
   const pipeToWritable: (typeof import('solid-js/web'))['pipeToWritable']
   const produce: typeof import('solid-js/store')['produce']
+  const query: typeof import('@solidjs/router')['query']
   const reconcile: typeof import('solid-js/store')['reconcile']
   const redirect: typeof import('@solidjs/router')['redirect']
   const reload: typeof import('@solidjs/router')['reload']
