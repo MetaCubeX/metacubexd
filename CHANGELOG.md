@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.174.0](https://github.com/MetaCubeX/metacubexd/compare/v1.173.3...v1.174.0) (2024-12-14)
+
+
+### Features
+
+* **i18n:** added support for Russian language ([#1234](https://github.com/MetaCubeX/metacubexd/issues/1234)) ([5e033d9](https://github.com/MetaCubeX/metacubexd/commit/5e033d9f76c95ba7e3d9e7528a43f783736858fa))
+
 ## [1.173.3](https://github.com/MetaCubeX/metacubexd/compare/v1.173.2...v1.173.3) (2024-12-04)
 
 
