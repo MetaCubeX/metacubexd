@@ -111,8 +111,8 @@ importers:
         specifier: ^19.6.0
         version: 19.6.0(@types/node@22.10.2)(typescript@5.7.2)
       daisyui:
-        specifier: ^4.12.20
-        version: 4.12.20(postcss@8.4.49)
+        specifier: ^4.12.22
+        version: 4.12.22(postcss@8.4.49)
       dayjs:
         specifier: ^1.11.13
         version: 1.11.13
@@ -1906,8 +1906,8 @@ packages:
     resolution: {integrity: sha512-pHJg+jbuFsCjz9iclQBqyL3B2HLCBF71BwVNujUYEvCeQMvV97R59MNK3R2+jgJ3a1fcZgI9B3vYgz8lzr/BFQ==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
-  daisyui@4.12.20:
-    resolution: {integrity: sha512-uHr3SQsd2yTjRdVuswTiqGFvZTxX0sGSBRa8JJdbKgmZCk/kRFh4B7Z2jg9vLIdwsHTHPyPgCkZadQo1ce0tAw==}
+  daisyui@4.12.22:
+    resolution: {integrity: sha512-HDLWbmTnXxhE1MrMgSWjVgdRt+bVYHvfNbW3GTsyIokRSqTHonUTrxV3RhpPDjGIWaHt+ELtDCTYCtUFgL2/Nw==}
     engines: {node: '>=16.9.0'}
 
   dargs@8.1.0:
@@ -3949,7 +3949,7 @@ snapshots:
       '@babel/core': 7.24.7
       '@babel/helper-compilation-targets': 7.24.7
       '@babel/helper-plugin-utils': 7.24.7
-      debug: 4.3.6
+      debug: 4.4.0
       lodash.debounce: 4.0.8
       resolve: 1.22.8
     transitivePeerDependencies:
@@ -5732,7 +5732,7 @@ snapshots:
 
   culori@3.3.0: {}
 
-  daisyui@4.12.20(postcss@8.4.49):
+  daisyui@4.12.22(postcss@8.4.49):
     dependencies:
       css-selector-tokenizer: 0.8.0
       culori: 3.3.0
