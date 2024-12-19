@@ -8,8 +8,8 @@ const LatencyDot = (props: {
   selected: boolean
 }) => {
   let dotClassName = props.selected
-    ? 'bg-white border-4 border-success'
-    : 'bg-success'
+    ? 'bg-white border-4 border-green-600'
+    : 'bg-green-600'
 
   if (
     typeof props.latency !== 'number' ||
@@ -20,12 +20,12 @@ const LatencyDot = (props: {
       : 'bg-neutral'
   } else if (props.latency > latencyQualityMap().HIGH) {
     dotClassName = props.selected
-      ? 'bg-white border-4 border-error'
-      : 'bg-error'
+      ? 'bg-white border-4 border-red-500'
+      : 'bg-red-500'
   } else if (props.latency > latencyQualityMap().MEDIUM) {
     dotClassName = props.selected
-      ? 'bg-white border-4 border-warning'
-      : 'bg-warning'
+      ? 'bg-white border-4 border-yellow-500'
+      : 'bg-yellow-500'
   }
 
   return (

@@ -44,19 +44,19 @@ export const ProxyPreviewBar = (props: {
     <div class="flex items-center gap-2">
       <div class="my-1 flex flex-1 items-center justify-center overflow-hidden rounded-2xl [&>*]:h-2">
         <div
-          class="bg-success"
+          class="bg-green-600"
           style={{
             width: `${(good() * 100) / all()}%`, // cant use tw class, otherwise dynamic classname won't be generated
           }}
         />
         <div
-          class="bg-warning"
+          class="bg-yellow-500"
           style={{
             width: `${(middle() * 100) / all()}%`,
           }}
         />
         <div
-          class="bg-error"
+          class="bg-red-500"
           style={{
             width: `${(slow() * 100) / all()}%`,
           }}
