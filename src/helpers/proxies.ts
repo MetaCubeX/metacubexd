@@ -31,13 +31,13 @@ export const formatProxyType = (type = '') => {
 
 export const getLatencyClassName = (latency: LATENCY_QUALITY_MAP_HTTP) => {
   if (latency > latencyQualityMap().HIGH) {
-    return 'text-error'
+    return 'text-red-500'
   } else if (latency > latencyQualityMap().MEDIUM) {
-    return 'text-warning'
+    return 'text-yellow-500'
   } else if (latency === LATENCY_QUALITY_MAP_HTTP.NOT_CONNECTED) {
     return 'text-gray'
   } else {
-    return 'text-success'
+    return 'text-green-600'
   }
 }
 
