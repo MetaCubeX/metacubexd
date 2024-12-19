@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.174.1](https://github.com/MetaCubeX/metacubexd/compare/v1.174.0...v1.174.1) (2024-12-19)
+
+
+### Bug Fixes
+
+* fixed latency color ([#1251](https://github.com/MetaCubeX/metacubexd/issues/1251)) ([1a66ee6](https://github.com/MetaCubeX/metacubexd/commit/1a66ee684789b2cee8a69f9229e9d2f3f002af78))
+
 ## [1.174.0](https://github.com/MetaCubeX/metacubexd/compare/v1.173.3...v1.174.0) (2024-12-14)
 
 
