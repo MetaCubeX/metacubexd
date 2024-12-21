@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.174.2](https://github.com/MetaCubeX/metacubexd/compare/v1.174.1...v1.174.2) (2024-12-21)
+
+
+### Bug Fixes
+
+* the health check for the proxy provider sometimes do not respond ([#1255](https://github.com/MetaCubeX/metacubexd/issues/1255)) ([96bc233](https://github.com/MetaCubeX/metacubexd/commit/96bc233f89003072d066332ce7b0c97adb107064))
+
 ## [1.174.1](https://github.com/MetaCubeX/metacubexd/compare/v1.174.0...v1.174.1) (2024-12-19)
 
 
