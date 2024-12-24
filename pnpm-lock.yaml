@@ -43,9 +43,6 @@ importers:
       '@solid-primitives/i18n':
         specifier: ^2.1.1
         version: 2.1.1(solid-js@1.9.3)
-      '@solid-primitives/keyed':
-        specifier: ^1.2.3
-        version: 1.2.3(solid-js@1.9.3)
       '@solid-primitives/media':
         specifier: ^2.2.9
         version: 2.2.9(solid-js@1.9.3)
@@ -2011,14 +2008,6 @@ packages:
     resolution:
       {
         integrity: sha512-1p9B8hveu+gzFRWfXcRtdzzEdr7gw3c8uLXm+2bU33JHgiI8kYJsWvG128sE6vU1ZtYGPrGq980Jd6hxYupyZQ==,
-      }
-    peerDependencies:
-      solid-js: ^1.6.12
-
-  '@solid-primitives/keyed@1.2.3':
-    resolution:
-      {
-        integrity: sha512-Tlm2wCKcXEVxqd1speWjPhGvDhuuo/VeWSvNF6r2h77BUOHRKmNwz9uVKKMQmYSaLwiptJTp+fPZY2dOVPWQRQ==,
       }
     peerDependencies:
       solid-js: ^1.6.12
@@ -7658,10 +7647,6 @@ snapshots:
       solid-js: 1.9.3
 
   '@solid-primitives/i18n@2.1.1(solid-js@1.9.3)':
-    dependencies:
-      solid-js: 1.9.3
-
-  '@solid-primitives/keyed@1.2.3(solid-js@1.9.3)':
     dependencies:
       solid-js: 1.9.3
 
