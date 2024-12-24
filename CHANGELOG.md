@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.174.3](https://github.com/MetaCubeX/metacubexd/compare/v1.174.2...v1.174.3) (2024-12-24)
+
+
+### Bug Fixes
+
+* table tr keyed ([#1261](https://github.com/MetaCubeX/metacubexd/issues/1261)) ([cd27359](https://github.com/MetaCubeX/metacubexd/commit/cd273598a9fc7b25f023621e2cfc99b41353262d))
+
 ## [1.174.2](https://github.com/MetaCubeX/metacubexd/compare/v1.174.1...v1.174.2) (2024-12-21)
 
 
