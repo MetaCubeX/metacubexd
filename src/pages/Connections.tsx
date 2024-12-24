@@ -1,4 +1,5 @@
 import { writeClipboard } from '@solid-primitives/clipboard'
+import { Key } from '@solid-primitives/keyed'
 import { makePersisted } from '@solid-primitives/storage'
 import {
   IconInfoSmall,
@@ -323,6 +324,7 @@ export default () => {
     getExpandedRowModel: getExpandedRowModel(),
     getGroupedRowModel: getGroupedRowModel(),
     getCoreRowModel: getCoreRowModel(),
+    getRowId: (row) => row.id,
   })
 
   const sourceIPHeader = table
@@ -520,68 +522,74 @@ export default () => {
             </thead>
 
             <tbody>
-              <For each={table.getRowModel().rows}>
-                {(row) => (
-                  <tr class="hover:!bg-primary hover:text-primary-content">
-                    <For each={row.getVisibleCells()}>
-                      {(cell) => {
-                        return (
-                          <td
-                            class="py-2"
-                            onContextMenu={(e) => {
-                              e.preventDefault()
+              <Key each={table.getRowModel().rows} by={(item) => item.id}>
+                {(item) => {
+                  const row = item()
 
-                              const value = cell.renderValue() as null | string
+                  return (
+                    <tr class="hover:!bg-primary hover:text-primary-content">
+                      <For each={row.getVisibleCells()}>
+                        {(cell) => {
+                          return (
+                            <td
+                              class="py-2"
+                              onContextMenu={(e) => {
+                                e.preventDefault()
 
-                              if (value) writeClipboard(value).catch(() => {})
-                            }}
-                          >
-                            {cell.getIsGrouped() ? (
-                              <button
-                                class={twMerge(
-                                  row.getCanExpand()
-                                    ? 'cursor-pointer'
-                                    : 'cursor-normal',
-                                  'flex items-center gap-2',
-                                )}
-                                onClick={row.getToggleExpandedHandler()}
-                              >
-                                <div>
-                                  {row.getIsExpanded() ? (
-                                    <IconZoomOutFilled size={18} />
-                                  ) : (
-                                    <IconZoomInFilled size={18} />
+                                const value = cell.renderValue() as
+                                  | null
+                                  | string
+
+                                if (value) writeClipboard(value).catch(() => {})
+                              }}
+                            >
+                              {cell.getIsGrouped() ? (
+                                <button
+                                  class={twMerge(
+                                    row.getCanExpand()
+                                      ? 'cursor-pointer'
+                                      : 'cursor-normal',
+                                    'flex items-center gap-2',
                                   )}
-                                </div>
+                                  onClick={row.getToggleExpandedHandler()}
+                                >
+                                  <div>
+                                    {row.getIsExpanded() ? (
+                                      <IconZoomOutFilled size={18} />
+                                    ) : (
+                                      <IconZoomInFilled size={18} />
+                                    )}
+                                  </div>
 
-                                <div>
-                                  {flexRender(
+                                  <div>
+                                    {flexRender(
+                                      cell.column.columnDef.cell,
+                                      cell.getContext(),
+                                    )}
+                                  </div>
+
+                                  <div>({row.subRows.length})</div>
+                                </button>
+                              ) : cell.getIsAggregated() ? (
+                                flexRender(
+                                  cell.column.columnDef.aggregatedCell ??
                                     cell.column.columnDef.cell,
-                                    cell.getContext(),
-                                  )}
-                                </div>
-
-                                <div>({row.subRows.length})</div>
-                              </button>
-                            ) : cell.getIsAggregated() ? (
-                              flexRender(
-                                cell.column.columnDef.aggregatedCell ??
+                                  cell.getContext(),
+                                )
+                              ) : cell.getIsPlaceholder() ? null : (
+                                flexRender(
                                   cell.column.columnDef.cell,
-                                cell.getContext(),
-                              )
-                            ) : cell.getIsPlaceholder() ? null : (
-                              flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext(),
-                              )
-                            )}
-                          </td>
-                        )
-                      }}
-                    </For>
-                  </tr>
-                )}
-              </For>
+                                  cell.getContext(),
+                                )
+                              )}
+                            </td>
+                          )
+                        }}
+                      </For>
+                    </tr>
+                  )
+                }}
+              </Key>
             </tbody>
           </table>
         </div>
