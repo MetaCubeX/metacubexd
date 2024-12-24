@@ -26,6 +26,7 @@
     "@solid-primitives/context": "^0.2.3",
     "@solid-primitives/event-listener": "^2.3.3",
     "@solid-primitives/i18n": "^2.1.1",
+    "@solid-primitives/keyed": "^1.2.3",
     "@solid-primitives/media": "^2.2.9",
     "@solid-primitives/resize-observer": "^2.0.26",
     "@solid-primitives/storage": "^4.2.1",
