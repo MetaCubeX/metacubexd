@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.176.1](https://github.com/MetaCubeX/metacubexd/compare/v1.176.0...v1.176.1) (2024-12-28)
+
+
+### Bug Fixes
+
+* **rules:** fix rules search ([#1267](https://github.com/MetaCubeX/metacubexd/issues/1267)) ([#1272](https://github.com/MetaCubeX/metacubexd/issues/1272)) ([30f9bb4](https://github.com/MetaCubeX/metacubexd/commit/30f9bb4854c9318c135468502ce1bc0586bdee81))
+
 ## [1.176.0](https://github.com/MetaCubeX/metacubexd/compare/v1.175.0...v1.176.0) (2024-12-24)
 
 
