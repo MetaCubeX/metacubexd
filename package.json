@@ -62,7 +62,7 @@
     "prettier": "^3.4.2",
     "prettier-plugin-organize-imports": "^4.1.0",
     "prettier-plugin-tailwindcss": "^0.6.9",
-    "solid-apexcharts": "^0.3.4",
+    "solid-apexcharts": "^0.4.0",
     "solid-js": "^1.9.3",
     "solid-toast": "^0.5.0",
     "sort-package-json": "^2.12.0",
