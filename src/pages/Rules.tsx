@@ -73,7 +73,7 @@ export default () => {
   const filteredRules = createMemo(() =>
     globalFilter()
       ? matchSorter(rules(), globalFilter(), {
-          keys: ['type', 'payload', 'type'] as (keyof Rule)[],
+          keys: ['type', 'payload', 'proxy'] as (keyof Rule)[],
         })
       : rules(),
   )
