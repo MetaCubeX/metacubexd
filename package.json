@@ -69,7 +69,7 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.2",
-    "typescript-eslint": "^8.18.2",
+    "typescript-eslint": "^8.19.1",
     "unplugin-auto-import": "^0.19.0",
     "uuid": "^11.0.3",
     "vite": "^6.0.5",
