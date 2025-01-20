@@ -78,8 +78,6 @@ const TagClientSourceIPWithNameForm: Component = () => {
     <form use:form={form}>
       <div class="join flex">
         <select name="sourceIP" class="join-item select select-bordered">
-          <option />
-
           <Index
             each={uniq(
               allConnections().map(({ metadata: { sourceIP } }) => sourceIP),
@@ -93,8 +91,8 @@ const TagClientSourceIPWithNameForm: Component = () => {
               )}
           >
             {(sourceIP) => (
-              <option class="badge" value={sourceIP()}>
-                {sourceIP()}
+              <option class="badge" value={sourceIP() || 'Inner'}>
+                {sourceIP() || 'Inner'}
               </option>
             )}
           </Index>

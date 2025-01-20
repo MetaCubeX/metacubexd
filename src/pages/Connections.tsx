@@ -232,11 +232,12 @@ export default () => {
       header: () => t('sourceIP'),
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.SourceIP,
       accessorFn: (original) => {
+        const sourceIP = original.metadata.sourceIP || 'Inner'
         const tag = clientSourceIPTags().find(
-          (tag) => tag.sourceIP === original.metadata.sourceIP,
+          (tag) => tag.sourceIP === sourceIP,
         )
 
-        return tag ? tag.tagName : original.metadata.sourceIP
+        return tag?.tagName || sourceIP
       },
     },
     {
@@ -405,7 +406,7 @@ export default () => {
                       (tag) => tag.sourceIP === sourceIP,
                     )
 
-                    return tagged ? tagged.tagName : sourceIP
+                    return tagged?.tagName || sourceIP || 'Inner'
                   }),
                 ).sort()}
               >
