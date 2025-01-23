@@ -26,6 +26,7 @@ export default {
   proxyProviders: 'Поставщики прокси',
   ruleProviders: 'Поставщики правил',
   search: 'Поиск',
+  inner: 'Внутренний',
   ID: 'ID',
   type: 'Тип',
   name: 'Название',
