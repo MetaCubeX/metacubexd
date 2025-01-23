@@ -232,12 +232,10 @@ export default () => {
       header: () => t('sourceIP'),
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.SourceIP,
       accessorFn: (original) => {
-        const sourceIP = original.metadata.sourceIP || 'Inner'
-        const tag = clientSourceIPTags().find(
-          (tag) => tag.sourceIP === sourceIP,
-        )
+        const src = original.metadata.sourceIP || t('inner')
+        const tag = clientSourceIPTags().find((tag) => tag.sourceIP === src)
 
-        return tag?.tagName || sourceIP
+        return tag?.tagName || src
       },
     },
     {
@@ -402,11 +400,12 @@ export default () => {
               <Index
                 each={uniq(
                   allConnections().map(({ metadata: { sourceIP } }) => {
+                    const src = sourceIP || t('inner')
                     const tagged = clientSourceIPTags().find(
-                      (tag) => tag.sourceIP === sourceIP,
+                      (tag) => tag.sourceIP === src,
                     )
 
-                    return tagged?.tagName || sourceIP || 'Inner'
+                    return tagged?.tagName || src
                   }),
                 ).sort()}
               >

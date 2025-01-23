@@ -24,6 +24,7 @@ export default {
   proxyProviders: 'Proxy Providers',
   ruleProviders: 'Rule Providers',
   search: 'Search',
+  inner: 'Inner',
   ID: 'ID',
   type: 'Type',
   name: 'Name',

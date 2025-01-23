@@ -26,6 +26,7 @@ export default {
   proxyProviders: '代理提供者',
   ruleProviders: '规则提供者',
   search: '搜索',
+  inner: '内部',
   ID: 'ID',
   type: '类型',
   name: '名字',
