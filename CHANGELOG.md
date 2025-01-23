@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.176.2](https://github.com/MetaCubeX/metacubexd/compare/v1.176.1...v1.176.2) (2025-01-23)
+
+
+### Bug Fixes
+
+* **Connections:** SourceIP filter and tagging ([#1286](https://github.com/MetaCubeX/metacubexd/issues/1286)) ([a1c9d2f](https://github.com/MetaCubeX/metacubexd/commit/a1c9d2f03282f976ee20a78ecf405de5952c1207))
+
 ## [1.176.1](https://github.com/MetaCubeX/metacubexd/compare/v1.176.0...v1.176.1) (2024-12-28)
 
 
