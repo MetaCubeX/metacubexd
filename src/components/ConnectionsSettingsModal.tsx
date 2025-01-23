@@ -94,7 +94,7 @@ const TagClientSourceIPWithNameForm: Component = () => {
           >
             {(sourceIP) => (
               <option class="badge" value={sourceIP() || t('inner')}>
-              {sourceIP() || t('inner')}
+                {sourceIP() || t('inner')}
               </option>
             )}
           </Index>
