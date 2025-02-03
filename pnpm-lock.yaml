@@ -153,8 +153,8 @@ importers:
         specifier: ^0.6.9
         version: 0.6.9(prettier-plugin-organize-imports@4.1.0(prettier@3.4.2)(typescript@5.7.2))(prettier@3.4.2)
       solid-apexcharts:
-        specifier: ^0.3.4
-        version: 0.3.4(apexcharts@4.3.0)(solid-js@1.9.3)
+        specifier: ^0.4.0
+        version: 0.4.0(apexcharts@4.3.0)(solid-js@1.9.3)
       solid-js:
         specifier: ^1.9.3
         version: 1.9.3
@@ -3463,11 +3463,11 @@ packages:
   smob@1.5.0:
     resolution: {integrity: sha512-g6T+p7QO8npa+/hNx9ohv1E5pVCmWrVCUzUXJyLdMmftX6ER0oiWY/w9knEonLpnOp6b6FenKnMfR8gqwWdwig==}
 
-  solid-apexcharts@0.3.4:
-    resolution: {integrity: sha512-XtsQLOYhckjGXBr2bj//ai6+Ld1cjeINRVEHtrGFWI8KgtB8KuRZII+ywRWQCWvezqgAISpRrbR6NW23+V82dg==}
+  solid-apexcharts@0.4.0:
+    resolution: {integrity: sha512-b3tjFaYNF2ggvFq+VSaxxj2ocxfKKkB7jnWL60uDaokv2A3RwFXXzmPYZMkN80FQaLnxeNzkUdre/S9HgshLnA==}
     engines: {node: '>=18', pnpm: '>=8.6.0'}
     peerDependencies:
-      apexcharts: ^3.40.0
+      apexcharts: ^4.0.0
       solid-js: ^1.6.0
 
   solid-dismissible@0.1.1:
@@ -7467,7 +7467,7 @@ snapshots:
 
   smob@1.5.0: {}
 
-  solid-apexcharts@0.3.4(apexcharts@4.3.0)(solid-js@1.9.3):
+  solid-apexcharts@0.4.0(apexcharts@4.3.0)(solid-js@1.9.3):
     dependencies:
       apexcharts: 4.3.0
       defu: 6.1.4
