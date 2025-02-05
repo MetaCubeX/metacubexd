@@ -120,11 +120,11 @@ importers:
         specifier: ^9.17.0
         version: 9.17.0(jiti@2.4.2)
       eslint-config-prettier:
-        specifier: ^9.1.0
-        version: 9.1.0(eslint@9.17.0(jiti@2.4.2))
+        specifier: ^10.0.1
+        version: 10.0.1(eslint@9.17.0(jiti@2.4.2))
       eslint-plugin-prettier:
         specifier: ^5.2.1
-        version: 5.2.1(eslint-config-prettier@9.1.0(eslint@9.17.0(jiti@2.4.2)))(eslint@9.17.0(jiti@2.4.2))(prettier@3.4.2)
+        version: 5.2.1(eslint-config-prettier@10.0.1(eslint@9.17.0(jiti@2.4.2)))(eslint@9.17.0(jiti@2.4.2))(prettier@3.4.2)
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -184,13 +184,13 @@ importers:
         version: 11.0.5
       vite:
         specifier: ^6.0.11
-        version: 6.0.11(@types/node@22.10.2)(jiti@2.4.2)(terser@5.37.0)(yaml@2.7.0)
+        version: 6.0.11(@types/node@22.10.2)(jiti@2.4.2)(terser@5.38.0)(yaml@2.7.0)
       vite-plugin-pwa:
         specifier: ^0.21.1
-        version: 0.21.1(@vite-pwa/assets-generator@0.2.6)(vite@6.0.11(@types/node@22.10.2)(jiti@2.4.2)(terser@5.37.0)(yaml@2.7.0))(workbox-build@7.1.1(@types/babel__core@7.20.5))(workbox-window@7.1.0)
+        version: 0.21.1(@vite-pwa/assets-generator@0.2.6)(vite@6.0.11(@types/node@22.10.2)(jiti@2.4.2)(terser@5.38.0)(yaml@2.7.0))(workbox-build@7.1.1(@types/babel__core@7.20.5))(workbox-window@7.1.0)
       vite-plugin-solid:
         specifier: ^2.11.0
-        version: 2.11.0(solid-js@1.9.3)(vite@6.0.11(@types/node@22.10.2)(jiti@2.4.2)(terser@5.37.0)(yaml@2.7.0))
+        version: 2.11.0(solid-js@1.9.3)(vite@6.0.11(@types/node@22.10.2)(jiti@2.4.2)(terser@5.38.0)(yaml@2.7.0))
       zod:
         specifier: ^3.24.1
         version: 3.24.1
@@ -2151,8 +2151,8 @@ packages:
     resolution: {integrity: sha512-/veY75JbMK4j1yjvuUxuVsiS/hr/4iHs9FTT6cgTexxdE0Ly/glccBAkloH/DofkjRbZU3bnoj38mOmhkZ0lHw==}
     engines: {node: '>=12'}
 
-  eslint-config-prettier@9.1.0:
-    resolution: {integrity: sha512-NSWl5BFQWEPi1j4TjVNItzYV7dZXZ+wP6I6ZhrBGpChQhZRUaElihE9uRRkcbRnNb76UMKDF3r+WTmNcGPKsqw==}
+  eslint-config-prettier@10.0.1:
+    resolution: {integrity: sha512-lZBts941cyJyeaooiKxAtzoPHTN+GbQTJFAIdQbRhA4/8whaAraEh47Whw/ZFfrjNSnlAxqfm9i0XVAEkULjCw==}
     hasBin: true
     peerDependencies:
       eslint: '>=7.0.0'
@@ -3656,8 +3656,8 @@ packages:
     resolution: {integrity: sha512-G13vtMYPT/J8A4X2SjdtBTphZlrp1gKv6hZiOjw14RCWg6GbHuQBGtjlx75xLbYV/wEc0D7G5K4rxKP/cXk8Bw==}
     engines: {node: '>=10'}
 
-  terser@5.37.0:
-    resolution: {integrity: sha512-B8wRRkmre4ERucLM/uXx4MOV5cbnOlVAqUst+1+iLKPI0dOgFO28f84ptoQt9HEI537PMzfYa/d+GEPKTRXmYA==}
+  terser@5.38.0:
+    resolution: {integrity: sha512-a4GD5R1TjEeuCT6ZRiYMHmIf7okbCPEuhQET8bczV6FrQMMlFXA1n+G0KKjdlFCm3TEHV77GxfZB3vZSUQGFpg==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -5246,7 +5246,7 @@ snapshots:
     dependencies:
       serialize-javascript: 6.0.2
       smob: 1.5.0
-      terser: 5.37.0
+      terser: 5.38.0
     optionalDependencies:
       rollup: 2.79.2
 
@@ -6217,18 +6217,18 @@ snapshots:
 
   escape-string-regexp@5.0.0: {}
 
-  eslint-config-prettier@9.1.0(eslint@9.17.0(jiti@2.4.2)):
+  eslint-config-prettier@10.0.1(eslint@9.17.0(jiti@2.4.2)):
     dependencies:
       eslint: 9.17.0(jiti@2.4.2)
 
-  eslint-plugin-prettier@5.2.1(eslint-config-prettier@9.1.0(eslint@9.17.0(jiti@2.4.2)))(eslint@9.17.0(jiti@2.4.2))(prettier@3.4.2):
+  eslint-plugin-prettier@5.2.1(eslint-config-prettier@10.0.1(eslint@9.17.0(jiti@2.4.2)))(eslint@9.17.0(jiti@2.4.2))(prettier@3.4.2):
     dependencies:
       eslint: 9.17.0(jiti@2.4.2)
       prettier: 3.4.2
       prettier-linter-helpers: 1.0.0
       synckit: 0.9.1
     optionalDependencies:
-      eslint-config-prettier: 9.1.0(eslint@9.17.0(jiti@2.4.2))
+      eslint-config-prettier: 10.0.1(eslint@9.17.0(jiti@2.4.2))
 
   eslint-scope@8.2.0:
     dependencies:
@@ -7737,7 +7737,7 @@ snapshots:
       type-fest: 0.16.0
       unique-string: 2.0.0
 
-  terser@5.37.0:
+  terser@5.38.0:
     dependencies:
       '@jridgewell/source-map': 0.3.6
       acorn: 8.14.0
@@ -7947,12 +7947,12 @@ snapshots:
 
   validate-html-nesting@1.2.2: {}
 
-  vite-plugin-pwa@0.21.1(@vite-pwa/assets-generator@0.2.6)(vite@6.0.11(@types/node@22.10.2)(jiti@2.4.2)(terser@5.37.0)(yaml@2.7.0))(workbox-build@7.1.1(@types/babel__core@7.20.5))(workbox-window@7.1.0):
+  vite-plugin-pwa@0.21.1(@vite-pwa/assets-generator@0.2.6)(vite@6.0.11(@types/node@22.10.2)(jiti@2.4.2)(terser@5.38.0)(yaml@2.7.0))(workbox-build@7.1.1(@types/babel__core@7.20.5))(workbox-window@7.1.0):
     dependencies:
       debug: 4.3.6
       pretty-bytes: 6.1.1
       tinyglobby: 0.2.10
-      vite: 6.0.11(@types/node@22.10.2)(jiti@2.4.2)(terser@5.37.0)(yaml@2.7.0)
+      vite: 6.0.11(@types/node@22.10.2)(jiti@2.4.2)(terser@5.38.0)(yaml@2.7.0)
       workbox-build: 7.1.1(@types/babel__core@7.20.5)
       workbox-window: 7.1.0
     optionalDependencies:
@@ -7960,7 +7960,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-solid@2.11.0(solid-js@1.9.3)(vite@6.0.11(@types/node@22.10.2)(jiti@2.4.2)(terser@5.37.0)(yaml@2.7.0)):
+  vite-plugin-solid@2.11.0(solid-js@1.9.3)(vite@6.0.11(@types/node@22.10.2)(jiti@2.4.2)(terser@5.38.0)(yaml@2.7.0)):
     dependencies:
       '@babel/core': 7.24.7
       '@types/babel__core': 7.20.5
@@ -7968,12 +7968,12 @@ snapshots:
       merge-anything: 5.1.7
       solid-js: 1.9.3
       solid-refresh: 0.6.3(solid-js@1.9.3)
-      vite: 6.0.11(@types/node@22.10.2)(jiti@2.4.2)(terser@5.37.0)(yaml@2.7.0)
-      vitefu: 1.0.4(vite@6.0.11(@types/node@22.10.2)(jiti@2.4.2)(terser@5.37.0)(yaml@2.7.0))
+      vite: 6.0.11(@types/node@22.10.2)(jiti@2.4.2)(terser@5.38.0)(yaml@2.7.0)
+      vitefu: 1.0.4(vite@6.0.11(@types/node@22.10.2)(jiti@2.4.2)(terser@5.38.0)(yaml@2.7.0))
     transitivePeerDependencies:
       - supports-color
 
-  vite@6.0.11(@types/node@22.10.2)(jiti@2.4.2)(terser@5.37.0)(yaml@2.7.0):
+  vite@6.0.11(@types/node@22.10.2)(jiti@2.4.2)(terser@5.38.0)(yaml@2.7.0):
     dependencies:
       esbuild: 0.24.2
       postcss: 8.5.1
@@ -7982,12 +7982,12 @@ snapshots:
       '@types/node': 22.10.2
       fsevents: 2.3.3
       jiti: 2.4.2
-      terser: 5.37.0
+      terser: 5.38.0
       yaml: 2.7.0
 
-  vitefu@1.0.4(vite@6.0.11(@types/node@22.10.2)(jiti@2.4.2)(terser@5.37.0)(yaml@2.7.0)):
+  vitefu@1.0.4(vite@6.0.11(@types/node@22.10.2)(jiti@2.4.2)(terser@5.38.0)(yaml@2.7.0)):
     optionalDependencies:
-      vite: 6.0.11(@types/node@22.10.2)(jiti@2.4.2)(terser@5.37.0)(yaml@2.7.0)
+      vite: 6.0.11(@types/node@22.10.2)(jiti@2.4.2)(terser@5.38.0)(yaml@2.7.0)
 
   webidl-conversions@4.0.2: {}
 
