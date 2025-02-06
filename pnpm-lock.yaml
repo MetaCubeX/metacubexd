@@ -57,8 +57,8 @@ importers:
         specifier: ^1.3.10
         version: 1.3.10(solid-js@1.9.3)
       '@solid-primitives/websocket':
-        specifier: ^1.2.2
-        version: 1.2.2(solid-js@1.9.3)
+        specifier: ^1.3.0
+        version: 1.3.0(solid-js@1.9.3)
       '@solidjs/meta':
         specifier: ^0.29.4
         version: 0.29.4(solid-js@1.9.3)
@@ -1421,8 +1421,8 @@ packages:
     peerDependencies:
       solid-js: ^1.6.12
 
-  '@solid-primitives/websocket@1.2.2':
-    resolution: {integrity: sha512-kKiDAOy9eGyWgeNI/gF0L5ZDT9Wf0DYJlsqcq/n6DFSIOfEykvoFW8oRGoRN0KprE42MO9/Kkn/v1mj+iHow7w==}
+  '@solid-primitives/websocket@1.3.0':
+    resolution: {integrity: sha512-+yzaneoVUEqiYuX79BDvvWCP6FJ4bkEdV9w3GezJfXM0+W4KC4aRKPDjs7MQbJZoDR5JxS3eO7/w5wujFItF3Q==}
     peerDependencies:
       solid-js: ^1.6.12
 
@@ -2081,8 +2081,8 @@ packages:
   electron-to-chromium@1.5.4:
     resolution: {integrity: sha512-orzA81VqLyIGUEA77YkVA1D+N+nNfl2isJVjjmOyrlxuooZ19ynb+dOlaDTqd/idKRS9lDCSBmtzM+kyCsMnkA==}
 
-  electron-to-chromium@1.5.92:
-    resolution: {integrity: sha512-BeHgmNobs05N1HMmMZ7YIuHfYBGlq/UmvlsTgg+fsbFs9xVMj+xJHFg19GN04+9Q+r8Xnh9LXqaYIyEWElnNgQ==}
+  electron-to-chromium@1.5.93:
+    resolution: {integrity: sha512-M+29jTcfNNoR9NV7la4SwUqzWAxEwnc7ThA5e1m6LRSotmpfpCpLcIfgtSCVL+MllNLgAyM/5ru86iMRemPzDQ==}
 
   emoji-regex@10.4.0:
     resolution: {integrity: sha512-EC+0oUMY1Rqm4O6LLrgjtYDvcVYTy7chDnM4Q7030tP4Kwj3u/pR6gP9ygnp2CJMK5Gq+9Q2oqmrFJAz01DXjw==}
@@ -5396,7 +5396,7 @@ snapshots:
     dependencies:
       solid-js: 1.9.3
 
-  '@solid-primitives/websocket@1.2.2(solid-js@1.9.3)':
+  '@solid-primitives/websocket@1.3.0(solid-js@1.9.3)':
     dependencies:
       solid-js: 1.9.3
 
@@ -5794,7 +5794,7 @@ snapshots:
   browserslist@4.24.4:
     dependencies:
       caniuse-lite: 1.0.30001697
-      electron-to-chromium: 1.5.92
+      electron-to-chromium: 1.5.93
       node-releases: 2.0.19
       update-browserslist-db: 1.1.2(browserslist@4.24.4)
 
@@ -6093,7 +6093,7 @@ snapshots:
 
   electron-to-chromium@1.5.4: {}
 
-  electron-to-chromium@1.5.92: {}
+  electron-to-chromium@1.5.93: {}
 
   emoji-regex@10.4.0: {}
 
