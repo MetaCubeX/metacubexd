@@ -37,7 +37,7 @@
     "@tanstack/match-sorter-utils": "^8.19.4",
     "@tanstack/solid-table": "^8.20.5",
     "@tanstack/solid-virtual": "^3.11.2",
-    "@tanstack/virtual-core": "^3.11.2",
+    "@tanstack/virtual-core": "^3.13.0",
     "@thisbeyond/solid-dnd": "^0.7.5",
     "@types/byte-size": "^8.1.2",
     "@types/lodash": "^4.17.13",
