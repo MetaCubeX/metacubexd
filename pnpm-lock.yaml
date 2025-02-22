@@ -18,8 +18,8 @@ importers:
         specifier: ^0.1.5
         version: 0.1.5(tailwindcss@3.4.17)
       '@corvu/tooltip':
-        specifier: ^0.2.1
-        version: 0.2.1(solid-js@1.9.3)
+        specifier: ^0.2.2
+        version: 0.2.2(solid-js@1.9.3)
       '@eslint/js':
         specifier: ^9.21.0
         version: 9.21.0
@@ -891,8 +891,8 @@ packages:
     peerDependencies:
       tailwindcss: ^3
 
-  '@corvu/tooltip@0.2.1':
-    resolution: {integrity: sha512-y2CQ2/6DH/gJJZPo1fV3O7l4Jfgu5ZW58bpqPmKS+l8Pa6gIKV6zkrMoyBg8Hsn6z9RmdZFqkGFs/9C5fvwKpg==}
+  '@corvu/tooltip@0.2.2':
+    resolution: {integrity: sha512-gyOBJ43GNAecDtmWc68A5YJvifXWwK0VZZdTOcFbX0rVQUA2ihBMltRE4oj7/lKidg2gXALjmFr71Blt5s3YuQ==}
     peerDependencies:
       solid-js: ^1.8
 
@@ -1123,11 +1123,20 @@ packages:
   '@floating-ui/core@1.6.8':
     resolution: {integrity: sha512-7XJ9cPU+yI2QeLS+FCSlqNFZJq8arvswefkZrYI1yQBbftw6FyrZOxYSh+9S7z7TpeWlRt9zJ5IhM1WIL334jA==}
 
+  '@floating-ui/core@1.6.9':
+    resolution: {integrity: sha512-uMXCuQ3BItDUbAMhIXw7UPXRfAlOAvZzdK9BWpE60MCn+Svt3aLn9jsPTi/WNGlRUu2uI0v5S7JiIUsbsvh3fw==}
+
   '@floating-ui/dom@1.6.11':
     resolution: {integrity: sha512-qkMCxSR24v2vGkhYDo/UzxfJN3D4syqSjyuTFz6C7XcpU1pASPRieNI0Kj5VP3/503mOfYiGY891ugBX1GlABQ==}
 
+  '@floating-ui/dom@1.6.13':
+    resolution: {integrity: sha512-umqzocjDgNRGTuO7Q8CU32dkHkECqI8ZdMZ5Swb6QAM0t5rnlrN3lGo1hdpscRd3WS8T6DKYK4ephgIH9iRh3w==}
+
   '@floating-ui/utils@0.2.8':
     resolution: {integrity: sha512-kym7SodPp8/wloecOpcmSnWJsK7M0E5Wg8UcFA+uO4B9s5d0ywXOEro/8HM9x0rW+TljRzul/14UYz3TleT3ig==}
+
+  '@floating-ui/utils@0.2.9':
+    resolution: {integrity: sha512-MDWhGtE+eHw5JW7lq4qhc5yRLS11ERl1c7Z6Xd0a58DozHES6EnNNwUWbMiG4J9Cgj053Bhk8zvlhFYKVhULwg==}
 
   '@fontsource/fira-sans@5.1.0':
     resolution: {integrity: sha512-qfAjF5WcrL6qQh9eIWLK7lOh9wbCgCnVWh2Nu2gozrTgsUgYBLR8sbCGYwlK1K0yZoQsR2i9VSiQ16wwPCBkSw==}
@@ -3513,6 +3522,11 @@ packages:
     peerDependencies:
       solid-js: ^1.8
 
+  solid-presence@0.2.0:
+    resolution: {integrity: sha512-YM92o+jvpzX3XGaD4rLYmq/Kc2ZVh47GSCLEufHBFQQIurvZTs8SoGJxO8BJGNDxBKdcS8F3dYhW1SDXp4BNjA==}
+    peerDependencies:
+      solid-js: ^1.8
+
   solid-refresh@0.6.3:
     resolution: {integrity: sha512-F3aPsX6hVw9ttm5LYlth8Q15x6MlI/J3Dn+o3EQyRTtTxidepSTwAYdozt01/YA+7ObcciagGEyXIopGZzQtbA==}
     peerDependencies:
@@ -5000,17 +5014,17 @@ snapshots:
     dependencies:
       tailwindcss: 3.4.17
 
-  '@corvu/tooltip@0.2.1(solid-js@1.9.3)':
+  '@corvu/tooltip@0.2.2(solid-js@1.9.3)':
     dependencies:
       '@corvu/utils': 0.4.2(solid-js@1.9.3)
-      '@floating-ui/dom': 1.6.11
+      '@floating-ui/dom': 1.6.13
       solid-dismissible: 0.1.1(solid-js@1.9.3)
       solid-js: 1.9.3
-      solid-presence: 0.1.8(solid-js@1.9.3)
+      solid-presence: 0.2.0(solid-js@1.9.3)
 
   '@corvu/utils@0.3.2(solid-js@1.9.3)':
     dependencies:
-      '@floating-ui/dom': 1.6.11
+      '@floating-ui/dom': 1.6.13
       solid-js: 1.9.3
 
   '@corvu/utils@0.4.2(solid-js@1.9.3)':
@@ -5157,14 +5171,25 @@ snapshots:
 
   '@floating-ui/core@1.6.8':
     dependencies:
-      '@floating-ui/utils': 0.2.8
+      '@floating-ui/utils': 0.2.9
+
+  '@floating-ui/core@1.6.9':
+    dependencies:
+      '@floating-ui/utils': 0.2.9
 
   '@floating-ui/dom@1.6.11':
     dependencies:
       '@floating-ui/core': 1.6.8
       '@floating-ui/utils': 0.2.8
 
+  '@floating-ui/dom@1.6.13':
+    dependencies:
+      '@floating-ui/core': 1.6.9
+      '@floating-ui/utils': 0.2.9
+
   '@floating-ui/utils@0.2.8': {}
+
+  '@floating-ui/utils@0.2.9': {}
 
   '@fontsource/fira-sans@5.1.0': {}
 
@@ -7534,6 +7559,11 @@ snapshots:
       solid-js: 1.9.3
 
   solid-presence@0.1.8(solid-js@1.9.3):
+    dependencies:
+      '@corvu/utils': 0.4.2(solid-js@1.9.3)
+      solid-js: 1.9.3
+
+  solid-presence@0.2.0(solid-js@1.9.3):
     dependencies:
       '@corvu/utils': 0.4.2(solid-js@1.9.3)
       solid-js: 1.9.3
