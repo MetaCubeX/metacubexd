@@ -17,7 +17,7 @@
     "@commitlint/config-conventional": "^19.6.0",
     "@corvu/accordion": "^0.2.3",
     "@corvu/tailwind": "^0.1.5",
-    "@corvu/tooltip": "^0.2.1",
+    "@corvu/tooltip": "^0.2.2",
     "@eslint/js": "^9.21.0",
     "@felte/solid": "^1.2.14",
     "@felte/validator-zod": "^1.0.18",
