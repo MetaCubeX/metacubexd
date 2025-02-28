@@ -162,8 +162,8 @@ importers:
         specifier: ^0.5.0
         version: 0.5.0(solid-js@1.9.5)
       sort-package-json:
-        specifier: ^2.12.0
-        version: 2.12.0
+        specifier: ^2.15.0
+        version: 2.15.0
       tailwind-merge:
         specifier: ^2.6.0
         version: 2.6.0
@@ -2197,6 +2197,14 @@ packages:
       picomatch:
         optional: true
 
+  fdir@6.4.3:
+    resolution: {integrity: sha512-PMXmW2y1hDDfTSRc9gaXIuCCRpuoz3Kaz8cUelp3smouvfT632ozg2vrT6lJsHKKOF59YLbOGfAWGUcKEfRMQw==}
+    peerDependencies:
+      picomatch: ^3 || ^4
+    peerDependenciesMeta:
+      picomatch:
+        optional: true
+
   file-entry-cache@8.0.0:
     resolution: {integrity: sha512-XXTUwCvisa5oacNGRP9SfNtYBNAMi+RPwBFmblZEF7N7swHYQS6/Zfk7SRwx4D5j3CH211YNRco1DEMNVfZCnQ==}
     engines: {node: '>=16.0.0'}
@@ -2298,8 +2306,8 @@ packages:
     resolution: {integrity: sha512-w9UMqWwJxHNOvoNzSJ2oPF5wvYcvP7jUvYzhp67yEhTi17ZDBBC1z9pTdGuzjD+EFIqLSYRweZjqfiPzQ06Ebg==}
     engines: {node: '>= 0.4'}
 
-  git-hooks-list@3.1.0:
-    resolution: {integrity: sha512-LF8VeHeR7v+wAbXqfgRlTSX/1BJR9Q1vEMR8JAz1cEg6GX07+zyj3sAdDvYjj/xnlIfVuGgj4qBei1K3hKH+PA==}
+  git-hooks-list@3.2.0:
+    resolution: {integrity: sha512-ZHG9a1gEhUMX1TvGrLdyWb9kDopCBbTnI8z4JgRMYxsijWipgjSEYoPWqBuIB0DnRnvqlQSEeVmzpeuPm7NdFQ==}
 
   git-raw-commits@4.0.0:
     resolution: {integrity: sha512-ICsMM1Wk8xSGMowkOmPrzo2Fgmfo4bMHLNX6ytHjajRJUqvHOw/TFapQ+QG75c3X/tTDDhOSRPGC52dDbNM8FQ==}
@@ -3295,11 +3303,6 @@ packages:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
     hasBin: true
 
-  semver@7.6.2:
-    resolution: {integrity: sha512-FNAIBWCx9qcRhoHcgcJ0gvU7SN1lYU2ZXuSfl04bSC5OpvDHFyJCjdNHomPXxjQlCBU67YW64PzY7/VIEH7F2w==}
-    engines: {node: '>=10'}
-    hasBin: true
-
   semver@7.7.1:
     resolution: {integrity: sha512-hlq8tAfn0m/61p4BVRcPzIGr6LKiMwo4VM6dGi6pt4qcRkmNzTcWq6eCEjEh+qXjkMDvPlOFFSGwQjoEa6gyMA==}
     engines: {node: '>=10'}
@@ -3428,8 +3431,8 @@ packages:
   sort-object-keys@1.1.3:
     resolution: {integrity: sha512-855pvK+VkU7PaKYPc+Jjnmt4EzejQHyhhF33q31qG8x7maDzkeFhAAThdCYay11CISO+qAMwjOBP+fPZe0IPyg==}
 
-  sort-package-json@2.12.0:
-    resolution: {integrity: sha512-/HrPQAeeLaa+vbAH/znjuhwUluuiM/zL5XX9kop8UpDgjtyWKt43hGDk2vd/TBdDpzIyzIHVUgmYofzYrAQjew==}
+  sort-package-json@2.15.0:
+    resolution: {integrity: sha512-wpKu3DvFuymcRvPqJR7VN5J6wnqR+SYZ4SZmnJa9ckpV+BuoE0XYHZYsoWaJbt6oz8OwOXb4eoMjlEBM6hwhBw==}
     hasBin: true
 
   source-map-js@1.2.1:
@@ -3605,6 +3608,10 @@ packages:
 
   tinyglobby@0.2.10:
     resolution: {integrity: sha512-Zc+8eJlFMvgatPZTl6A9L/yht8QqdmUNtURHaKZLmKBE12hNPSrqNkUp2cs3M/UKmNVVAMFQYSjYIVHDjW5zew==}
+    engines: {node: '>=12.0.0'}
+
+  tinyglobby@0.2.12:
+    resolution: {integrity: sha512-qkf4trmKSIiMTs/E63cxH+ojC2unam7rJ0WrauAzpT3ECNTxGRMlaXxVbfxMUC/w0LaYk6jQ4y/nGR9uBO3tww==}
     engines: {node: '>=12.0.0'}
 
   to-data-view@1.1.0:
@@ -6154,6 +6161,10 @@ snapshots:
     optionalDependencies:
       picomatch: 4.0.2
 
+  fdir@6.4.3(picomatch@4.0.2):
+    optionalDependencies:
+      picomatch: 4.0.2
+
   file-entry-cache@8.0.0:
     dependencies:
       flat-cache: 4.0.1
@@ -6260,7 +6271,7 @@ snapshots:
       es-errors: 1.3.0
       get-intrinsic: 1.3.0
 
-  git-hooks-list@3.1.0: {}
+  git-hooks-list@3.2.0: {}
 
   git-raw-commits@4.0.0:
     dependencies:
@@ -7153,8 +7164,6 @@ snapshots:
 
   semver@6.3.1: {}
 
-  semver@7.6.2: {}
-
   semver@7.7.1: {}
 
   serialize-javascript@6.0.2:
@@ -7201,7 +7210,7 @@ snapshots:
       detect-libc: 2.0.3
       node-addon-api: 6.1.0
       prebuild-install: 7.1.2
-      semver: 7.6.2
+      semver: 7.7.1
       simple-get: 4.0.1
       tar-fs: 3.0.6
       tunnel-agent: 0.6.0
@@ -7313,16 +7322,16 @@ snapshots:
 
   sort-object-keys@1.1.3: {}
 
-  sort-package-json@2.12.0:
+  sort-package-json@2.15.0:
     dependencies:
       detect-indent: 7.0.1
       detect-newline: 4.0.1
       get-stdin: 9.0.0
-      git-hooks-list: 3.1.0
+      git-hooks-list: 3.2.0
       is-plain-obj: 4.1.0
-      semver: 7.6.2
+      semver: 7.7.1
       sort-object-keys: 1.1.3
-      tinyglobby: 0.2.10
+      tinyglobby: 0.2.12
 
   source-map-js@1.2.1: {}
 
@@ -7564,6 +7573,11 @@ snapshots:
   tinyglobby@0.2.10:
     dependencies:
       fdir: 6.4.2(picomatch@4.0.2)
+      picomatch: 4.0.2
+
+  tinyglobby@0.2.12:
+    dependencies:
+      fdir: 6.4.3(picomatch@4.0.2)
       picomatch: 4.0.2
 
   to-data-view@1.1.0: {}
