@@ -24,7 +24,7 @@
     "@fontsource/fira-sans": "^5.1.0",
     "@solid-primitives/clipboard": "^1.6.0",
     "@solid-primitives/context": "^0.2.3",
-    "@solid-primitives/event-listener": "^2.3.3",
+    "@solid-primitives/event-listener": "^2.4.0",
     "@solid-primitives/i18n": "^2.1.1",
     "@solid-primitives/media": "^2.3.0",
     "@solid-primitives/resize-observer": "^2.0.26",

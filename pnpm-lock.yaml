@@ -39,8 +39,8 @@ importers:
         specifier: ^0.2.3
         version: 0.2.3(solid-js@1.9.5)
       '@solid-primitives/event-listener':
-        specifier: ^2.3.3
-        version: 2.3.3(solid-js@1.9.5)
+        specifier: ^2.4.0
+        version: 2.4.0(solid-js@1.9.5)
       '@solid-primitives/i18n':
         specifier: ^2.1.1
         version: 2.1.1(solid-js@1.9.5)
@@ -1279,11 +1279,6 @@ packages:
 
   '@solid-primitives/context@0.2.3':
     resolution: {integrity: sha512-6/e8qu9qJf48FJ+sxc/B782NdgFw5TvI8+r6U0gHizumfZcWZg8FAJqvRZAiwlygkUNiTQOGTeO10LVbMm0kvg==}
-    peerDependencies:
-      solid-js: ^1.6.12
-
-  '@solid-primitives/event-listener@2.3.3':
-    resolution: {integrity: sha512-DAJbl+F0wrFW2xmcV8dKMBhk9QLVLuBSW+TR4JmIfTaObxd13PuL7nqaXnaYKDWOYa6otB00qcCUIGbuIhSUgQ==}
     peerDependencies:
       solid-js: ^1.6.12
 
@@ -5129,11 +5124,6 @@ snapshots:
     dependencies:
       solid-js: 1.9.5
 
-  '@solid-primitives/event-listener@2.3.3(solid-js@1.9.5)':
-    dependencies:
-      '@solid-primitives/utils': 6.2.3(solid-js@1.9.5)
-      solid-js: 1.9.5
-
   '@solid-primitives/event-listener@2.4.0(solid-js@1.9.5)':
     dependencies:
       '@solid-primitives/utils': 6.3.0(solid-js@1.9.5)
@@ -5153,7 +5143,7 @@ snapshots:
 
   '@solid-primitives/resize-observer@2.0.26(solid-js@1.9.5)':
     dependencies:
-      '@solid-primitives/event-listener': 2.3.3(solid-js@1.9.5)
+      '@solid-primitives/event-listener': 2.4.0(solid-js@1.9.5)
       '@solid-primitives/rootless': 1.4.5(solid-js@1.9.5)
       '@solid-primitives/static-store': 0.0.8(solid-js@1.9.5)
       '@solid-primitives/utils': 6.2.3(solid-js@1.9.5)
@@ -5161,7 +5151,7 @@ snapshots:
 
   '@solid-primitives/rootless@1.4.5(solid-js@1.9.5)':
     dependencies:
-      '@solid-primitives/utils': 6.2.3(solid-js@1.9.5)
+      '@solid-primitives/utils': 6.3.0(solid-js@1.9.5)
       solid-js: 1.9.5
 
   '@solid-primitives/rootless@1.5.0(solid-js@1.9.5)':
@@ -5171,7 +5161,7 @@ snapshots:
 
   '@solid-primitives/static-store@0.0.8(solid-js@1.9.5)':
     dependencies:
-      '@solid-primitives/utils': 6.2.3(solid-js@1.9.5)
+      '@solid-primitives/utils': 6.3.0(solid-js@1.9.5)
       solid-js: 1.9.5
 
   '@solid-primitives/static-store@0.1.0(solid-js@1.9.5)':
