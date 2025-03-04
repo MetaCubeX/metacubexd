@@ -92,7 +92,7 @@ export default () => {
       <DocumentTitle>{t('overview')}</DocumentTitle>
 
       <div class="flex flex-col gap-2 lg:h-full">
-        <div class="stats stats-vertical w-full flex-shrink-0 grid-cols-2 bg-gradient-to-br from-primary to-secondary shadow lg:stats-horizontal lg:flex">
+        <div class="stats w-full flex-shrink-0 stats-vertical grid-cols-2 bg-gradient-to-br from-primary to-secondary shadow lg:flex lg:stats-horizontal">
           <TrafficWidget label={t('upload')}>
             {byteSize(traffic()?.up || 0).toString()}/s
           </TrafficWidget>
@@ -135,7 +135,7 @@ export default () => {
           </div>
         </div>
 
-        <footer class="footer mx-auto mt-4 block rounded-box bg-neutral p-4 text-center text-lg font-bold text-neutral-content">
+        <footer class="mx-auto mt-4 footer block footer-horizontal rounded-box bg-neutral p-4 text-center text-lg font-bold text-neutral-content">
           {endpoint()?.url}
         </footer>
       </div>

@@ -67,12 +67,12 @@ export const ProxyNodeCard = (props: {
       >
         <Tooltip.Trigger>
           <div class="card-body gap-1 space-y-1 p-2.5" onClick={onClick}>
-            <h2 class="card-title line-clamp-1 break-all text-start text-sm">
+            <h2 class="card-title line-clamp-1 text-start text-sm break-all">
               {proxyName}
             </h2>
 
             <div class="card-actions items-center justify-between gap-1">
-              <div class="badge badge-secondary px-1 text-xs font-bold capitalize">
+              <div class="badge px-1 text-xs font-bold badge-secondary capitalize">
                 {formatProxyType(proxyNode()?.type)}
               </div>
 

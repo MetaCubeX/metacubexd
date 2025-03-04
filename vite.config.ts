@@ -1,3 +1,4 @@
+import tailwindcss from '@tailwindcss/vite'
 import AutoImport from 'unplugin-auto-import/vite'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -15,6 +16,8 @@ export default defineConfig({
 
   plugins: [
     solidPlugin(),
+
+    tailwindcss(),
 
     AutoImport({
       imports: ['solid-js'],

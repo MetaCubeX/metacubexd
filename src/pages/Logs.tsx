@@ -126,24 +126,24 @@ export default () => {
         <div class="join w-full">
           <input
             type="search"
-            class="input input-sm join-item input-primary flex-1 flex-shrink-0"
+            class="input input-sm join-item flex-1 flex-shrink-0 input-primary"
             placeholder={t('search')}
             onInput={(e) => setGlobalFilter(e.target.value)}
           />
 
           <Button
-            class="btn-primary join-item btn-sm"
+            class="join-item btn-sm btn-primary"
             onClick={() => setPaused((paused) => !paused)}
             icon={paused() ? <IconPlayerPlay /> : <IconPlayerPause />}
           />
           <Button
-            class="btn-primary join-item btn-sm"
+            class="join-item btn-sm btn-primary"
             onClick={() => logsSettingsModalRef?.showModal()}
             icon={<IconSettings />}
           />
         </div>
 
-        <div class="overflow-x-auto whitespace-nowrap rounded-md bg-base-300">
+        <div class="overflow-x-auto rounded-md bg-base-300 whitespace-nowrap">
           <table
             class={twMerge(
               tableSizeClassName(logsTableSize()),

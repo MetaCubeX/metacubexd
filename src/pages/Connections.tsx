@@ -362,13 +362,13 @@ export default () => {
       <div class="flex h-full flex-col gap-2">
         <div class="flex w-full flex-wrap items-center gap-2">
           <div class="flex items-center gap-2">
-            <div class="tabs-boxed tabs gap-2">
+            <div class="tabs tabs-sm gap-2 tabs-box">
               <Index each={tabs()}>
                 {(tab) => (
                   <button
                     class={twMerge(
-                      activeTab() === tab().type && 'tab-active',
-                      'tab-sm sm:tab-md tab gap-2 px-2',
+                      activeTab() === tab().type && 'bg-primary !text-neutral',
+                      'tab gap-2 px-2',
                     )}
                     onClick={() => setActiveTab(tab().type)}
                   >
@@ -392,7 +392,7 @@ export default () => {
             </div>
 
             <select
-              class="select select-bordered select-primary select-sm w-full max-w-full flex-1"
+              class="select flex-1 select-sm select-primary"
               onChange={(e) => setSourceIPFilter(e.target.value)}
             >
               <option value="">{t('all')}</option>
@@ -417,19 +417,19 @@ export default () => {
           <div class="join flex flex-1 items-center">
             <input
               type="search"
-              class="input input-sm join-item input-primary min-w-0 flex-1"
+              class="input input-sm join-item flex-1 input-primary"
               placeholder={t('search')}
               onInput={(e) => setGlobalFilter(e.target.value)}
             />
 
             <Button
-              class="btn btn-primary join-item btn-sm"
+              class="btn join-item btn-sm btn-primary"
               onClick={() => setPaused((paused) => !paused)}
               icon={paused() ? <IconPlayerPlay /> : <IconPlayerPause />}
             />
 
             <Button
-              class="btn btn-primary join-item btn-sm"
+              class="btn join-item btn-sm btn-primary"
               onClick={async () => {
                 setIsClosingConnections(true)
 
@@ -457,18 +457,18 @@ export default () => {
             />
 
             <Button
-              class="btn btn-primary join-item btn-sm"
+              class="btn join-item btn-sm btn-primary"
               onClick={() => connectionsSettingsModalRef?.showModal()}
               icon={<IconSettings />}
             />
           </div>
         </div>
 
-        <div class="overflow-x-auto whitespace-nowrap rounded-md bg-base-300">
+        <div class="overflow-x-auto rounded-md bg-base-300 whitespace-nowrap">
           <table
             class={twMerge(
               tableSizeClassName(connectionsTableSize()),
-              'table table-zebra relative rounded-none',
+              'table relative rounded-none table-zebra',
             )}
           >
             <thead class="sticky top-0 z-10 h-8">

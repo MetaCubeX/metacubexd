@@ -53,7 +53,6 @@ export const DEFAULT_CHART_OPTIONS: ApexOptions = {
   chart: {
     toolbar: { show: false },
     zoom: { enabled: false },
-    animations: { easing: 'linear' },
   },
   noData: { text: 'Loading...' },
   legend: {

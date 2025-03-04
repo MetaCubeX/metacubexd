@@ -53,7 +53,7 @@ export const ProxiesSettingsModal: Component<{
           <ConfigTitle withDivider>{t('urlForLatencyTest')}</ConfigTitle>
 
           <input
-            class="input input-bordered w-full"
+            class="input"
             value={urlForLatencyTest()}
             onChange={(e) => setUrlForLatencyTest(e.target.value)}
           />
@@ -66,7 +66,7 @@ export const ProxiesSettingsModal: Component<{
 
           <input
             type="number"
-            class="input input-bordered w-full"
+            class="input"
             value={latencyTestTimeoutDuration()}
             onChange={(e) =>
               setLatencyTestTimeoutDuration(Number(e.target.value))
@@ -78,7 +78,7 @@ export const ProxiesSettingsModal: Component<{
           <ConfigTitle withDivider>{t('proxiesSorting')}</ConfigTitle>
 
           <select
-            class="select select-bordered w-full"
+            class="select"
             value={proxiesOrderingType()}
             onChange={(e) =>
               setProxiesOrderingType(e.target.value as PROXIES_ORDERING_TYPE)
@@ -124,7 +124,7 @@ export const ProxiesSettingsModal: Component<{
           <ConfigTitle withDivider>{t('proxiesPreviewType')}</ConfigTitle>
 
           <select
-            class="select select-bordered w-full"
+            class="select"
             value={proxiesPreviewType()}
             onChange={(e) =>
               setProxiesPreviewType(e.target.value as PROXIES_PREVIEW_TYPE)
@@ -141,7 +141,7 @@ export const ProxiesSettingsModal: Component<{
 
           <input
             type="number"
-            class="input input-bordered w-full"
+            class="input"
             value={iconHeight()}
             onChange={(e) => setIconHeight(Number(e.target.value))}
           />
@@ -150,7 +150,7 @@ export const ProxiesSettingsModal: Component<{
 
           <input
             type="number"
-            class="input input-bordered w-full"
+            class="input"
             value={iconMarginRight()}
             onChange={(e) => setIconMarginRight(Number(e.target.value))}
           />

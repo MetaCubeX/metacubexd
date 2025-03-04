@@ -56,12 +56,7 @@ const Input: ParentComponent<JSX.InputHTMLAttributes<HTMLInputElement>> = (
 ) => {
   const [local, others] = splitProps(props, ['class'])
 
-  return (
-    <input
-      class={twMerge('input input-bordered min-w-0', local.class)}
-      {...others}
-    />
-  )
+  return <input class={twMerge('input min-w-0', local.class)} {...others} />
 }
 
 const Select: ParentComponent<JSX.SelectHTMLAttributes<HTMLSelectElement>> = (
@@ -70,7 +65,7 @@ const Select: ParentComponent<JSX.SelectHTMLAttributes<HTMLSelectElement>> = (
   const [local, others] = splitProps(props, ['class'])
 
   return (
-    <select class={twMerge('select select-bordered', local.class)} {...others}>
+    <select class={twMerge('select', local.class)} {...others}>
       {children(() => others.children)()}
     </select>
   )
@@ -82,10 +77,8 @@ const Label: ParentComponent<JSX.LabelHTMLAttributes<HTMLLabelElement>> = (
   const [local, others] = splitProps(props, ['class'])
 
   return (
-    <label class={twMerge('label', local.class)} {...others}>
-      <span class="label-text truncate">
-        {children(() => others.children)()}
-      </span>
+    <label class={twMerge('label truncate', local.class)} {...others}>
+      {children(() => others.children)()}
     </label>
   )
 }
@@ -241,7 +234,7 @@ const ConfigForm: ParentComponent<{
   return (
     <div class="flex flex-col gap-4">
       <div class="grid grid-cols-3 gap-2">
-        <div class="form-control">
+        <fieldset class="fieldset">
           <Label for="enable-allow-lan">{t('allowLan')}</Label>
 
           <Toggle
@@ -255,9 +248,9 @@ const ConfigForm: ParentComponent<{
               )
             }
           />
-        </div>
+        </fieldset>
 
-        <div class="form-control">
+        <fieldset class="fieldset">
           <Label for="mode">{t('runningMode')}</Label>
 
           <Select
@@ -274,9 +267,9 @@ const ConfigForm: ParentComponent<{
               )}
             </For>
           </Select>
-        </div>
+        </fieldset>
 
-        <div class="form-control">
+        <fieldset class="fieldset">
           <Label for="interface-name">{t('outboundInterfaceName')}</Label>
 
           <Input
@@ -290,12 +283,12 @@ const ConfigForm: ParentComponent<{
               )
             }
           />
-        </div>
+        </fieldset>
       </div>
 
       <Show when={!isSingBox()}>
         <div class="grid grid-cols-3 gap-2">
-          <div class="form-control">
+          <fieldset class="fieldset">
             <Label for="enable-tun-device">{t('enableTunDevice')}</Label>
 
             <Toggle
@@ -309,9 +302,9 @@ const ConfigForm: ParentComponent<{
                 )
               }
             />
-          </div>
+          </fieldset>
 
-          <div class="form-control">
+          <fieldset class="fieldset">
             <Label for="tun-ip-stack">{t('tunModeStack')}</Label>
 
             <Select
@@ -335,9 +328,9 @@ const ConfigForm: ParentComponent<{
                 )}
               </For>
             </Select>
-          </div>
+          </fieldset>
 
-          <div class="form-control">
+          <fieldset class="fieldset">
             <Label for="device-name">{t('tunDeviceName')}</Label>
 
             <Input
@@ -351,13 +344,13 @@ const ConfigForm: ParentComponent<{
                 )
               }
             />
-          </div>
+          </fieldset>
         </div>
 
         <form class="grid grid-cols-3 gap-2 sm:grid-cols-5" use:form={form}>
           <For each={portList}>
             {(item) => (
-              <div class="form-control">
+              <fieldset class="fieldset">
                 <Label for={item.key}>{item.label()}</Label>
 
                 <Input
@@ -367,7 +360,7 @@ const ConfigForm: ParentComponent<{
                   placeholder={item.label()}
                   onChange={item.onChange}
                 />
-              </div>
+              </fieldset>
             )}
           </For>
         </form>
@@ -559,7 +552,7 @@ const Versions: Component<{
   }, backendVersion())
 
   const UpdateAvailableIndicator = () => (
-    <span class="absolute -right-1 -top-1 flex h-3 w-3">
+    <span class="absolute -top-1 -right-1 flex h-3 w-3">
       <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-info opacity-75" />
       <span class="inline-flex h-3 w-3 rounded-full bg-info" />
     </span>

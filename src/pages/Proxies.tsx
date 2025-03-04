@@ -152,13 +152,13 @@ export default () => {
 
       <div class="flex h-full flex-col gap-2">
         <div class="flex items-center gap-2">
-          <div class="tabs-boxed tabs gap-2">
+          <div class="tabs tabs-sm gap-2 tabs-box">
             <For each={tabs()}>
               {(tab) => (
                 <button
                   class={twMerge(
-                    activeTab() === tab.type && 'tab-active',
-                    'tab-sm sm:tab-md tab gap-2 px-2',
+                    activeTab() === tab.type && 'bg-primary !text-neutral',
+                    'sm:tab-md tab gap-2 px-2',
                   )}
                   onClick={() => setActiveTab(tab.type)}
                 >
@@ -186,7 +186,7 @@ export default () => {
 
           <div class="ml-auto">
             <Button
-              class="btn-circle btn-primary btn-sm"
+              class="btn-circle btn-sm btn-primary"
               onClick={() => proxiesSettingsModalRef?.showModal()}
               icon={<IconSettings />}
             />
@@ -244,7 +244,7 @@ export default () => {
                             </Show>
                           </Show>
                           <span>{proxyGroup.name}</span>
-                          <div class="badge badge-sm ml-2">
+                          <div class="ml-2 badge badge-sm">
                             {proxyGroup.all?.length}
                           </div>
                         </div>
@@ -270,19 +270,19 @@ export default () => {
                       </div>
 
                       <div class="flex flex-wrap items-center justify-between gap-2">
-                        <div class="badge badge-primary badge-sm">
+                        <div class="badge badge-sm badge-primary">
                           <span class="font-bold">
                             {formatProxyType(proxyGroup.type)}
                           </span>
                           <Show when={proxyGroup.now?.length > 0}>
-                            <IconChevronRight size={18}/>
+                            <IconChevronRight size={18} />
                             <span class="whitespace-nowrap">
                               {proxyGroup.now}
                             </span>
                           </Show>
                         </div>
 
-                        <div class="badge badge-secondary badge-sm">
+                        <div class="badge badge-sm badge-secondary">
                           {byteSize(
                             speedGroupByName()[proxyGroup.name] ?? 0,
                           ).toString()}
@@ -345,7 +345,9 @@ export default () => {
                     <>
                       <div class="flex items-center justify-between pr-8">
                         <div class="flex flex-wrap items-center gap-1">
-                          <span class="line-clamp-1 break-all">{proxyProvider.name}</span>
+                          <span class="line-clamp-1 break-all">
+                            {proxyProvider.name}
+                          </span>
 
                           <div class="badge badge-sm">
                             {proxyProvider.proxies.length}

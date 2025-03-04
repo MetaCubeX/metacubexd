@@ -121,41 +121,44 @@ export default () => {
       <div class="mx-auto flex max-w-screen-sm flex-col items-center gap-4 py-10">
         <form class="contents" use:form={form}>
           <div class="flex w-full flex-col gap-4">
-            <div class="flex-1">
-              <label class="label">
-                <span class="label-text">{t('endpointURL')}</span>
+            <fieldset class="fieldset">
+              <label class="label" for="url">
+                <span>{t('endpointURL')}</span>
               </label>
 
               <input
+                id="url"
                 name="url"
                 type="url"
-                class="input input-bordered w-full"
+                class="input w-full"
                 placeholder="http(s)://{hostname}:{port}"
                 list="defaultEndpoints"
               />
 
               <datalist id="defaultEndpoints">
                 <option value="http://127.0.0.1:9090" />
+
                 <Show when={window.location.origin !== 'http://127.0.0.1:9090'}>
                   <option value={window.location.origin} />
                 </Show>
               </datalist>
-            </div>
+            </fieldset>
 
-            <div class="flex-1">
-              <label class="label">
-                <span class="label-text">{t('secret')}</span>
+            <fieldset class="fieldset">
+              <label class="label" for="secret">
+                <span>{t('secret')}</span>
               </label>
 
               <input
+                id="secret"
                 name="secret"
                 type="password"
-                class="input input-bordered w-full"
+                class="input w-full"
                 placeholder="secret"
               />
-            </div>
+            </fieldset>
 
-            <Button type="submit" class="btn-primary uppercase">
+            <Button type="submit" class="uppercase btn-primary">
               {t('add')}
             </Button>
           </div>
@@ -165,13 +168,13 @@ export default () => {
           <For each={endpointList()}>
             {({ id, url }) => (
               <div
-                class="badge badge-info flex w-full cursor-pointer items-center justify-between gap-4 py-4"
+                class="badge flex w-full cursor-pointer items-center justify-between gap-4 py-4 badge-info"
                 onClick={() => onEndpointSelect(id)}
               >
                 <span class="truncate">{url}</span>
 
                 <Button
-                  class="btn-circle btn-ghost btn-xs text-white"
+                  class="btn-circle btn-xs text-white btn-ghost"
                   onClick={(e) => {
                     e.stopPropagation()
                     onRemove(id)

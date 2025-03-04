@@ -129,13 +129,13 @@ export default () => {
 
       <div class="flex h-full flex-col gap-2">
         <div class="flex w-full flex-wrap items-center gap-2">
-          <div class="tabs-boxed tabs gap-2">
+          <div class="tabs tabs-sm gap-2 tabs-box">
             <For each={tabs()}>
               {(tab) => (
                 <button
                   class={twMerge(
-                    activeTab() === tab.type && 'tab-active',
-                    'tab-sm md:tab-md tab gap-2 px-2',
+                    activeTab() === tab.type && 'bg-primary !text-neutral',
+                    'tab gap-2 px-2',
                   )}
                   onClick={() => setActiveTab(tab.type)}
                 >
@@ -148,7 +148,7 @@ export default () => {
 
           <div class="join flex flex-1 items-center">
             <input
-              class="input input-sm join-item input-primary min-w-0 flex-1"
+              class="input input-sm join-item flex-1 input-primary"
               type="search"
               placeholder={t('search')}
               value={globalFilter()}
@@ -157,7 +157,7 @@ export default () => {
 
             <Show when={activeTab() === ActiveTab.ruleProviders}>
               <Button
-                class="btn btn-primary join-item btn-sm"
+                class="btn join-item btn-sm btn-primary"
                 disabled={allProviderIsUpdating()}
                 onClick={(e) => onUpdateAllProviderClick(e)}
                 icon={
@@ -197,7 +197,7 @@ export default () => {
                       transform: `translateY(${virtualizerItem.start}px)`,
                     }}
                   >
-                    <div class="card card-bordered card-compact bg-base-200 p-4">
+                    <div class="card-border card bg-base-200 p-4 card-sm">
                       <div class="flex items-center gap-2">
                         <span class="break-all">{rule.payload}</span>
 
@@ -239,7 +239,7 @@ export default () => {
                       transform: `translateY(${virtualizerItem.start}px)`,
                     }}
                   >
-                    <div class="card card-bordered card-compact bg-base-200 p-4">
+                    <div class="card-border card bg-base-200 p-4 card-sm">
                       <div class="flex items-center gap-2 pr-8">
                         <span class="break-all">{ruleProvider.name}</span>
 
@@ -253,7 +253,7 @@ export default () => {
                       </div>
 
                       <Button
-                        class="btn-circle btn-sm absolute right-2 top-2 mr-2 h-4"
+                        class="absolute top-2 right-2 mr-2 btn-circle h-4 btn-sm"
                         disabled={updatingMap()[ruleProvider.name]}
                         onClick={(e) =>
                           onUpdateProviderClick(e, ruleProvider.name)

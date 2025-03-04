@@ -1,9 +1,8 @@
 @import '@fontsource/fira-sans';
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-@tailwind variants;
+@import 'tailwindcss';
+@plugin "daisyui" {
+  themes: all;
+}
 
 @font-face {
   font-family: 'Fira Sans';

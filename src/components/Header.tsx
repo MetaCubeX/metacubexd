@@ -33,7 +33,7 @@ const ThemeSwitcher = () => (
     <div class="drawer-content flex items-center">
       <label
         for="themes"
-        class="btn btn-circle btn-primary drawer-button btn-sm"
+        class="drawer-button btn btn-circle btn-sm btn-primary"
       >
         <IconPalette />
       </label>
@@ -99,7 +99,7 @@ export const Header = () => {
   const [openedDrawer, setOpenedDrawer] = createSignal(false)
 
   return (
-    <ul class="navbar z-50 flex w-auto items-center justify-center bg-base-300 px-4 shadow-lg">
+    <ul class="z-50 navbar flex w-auto items-center justify-center bg-base-300 px-4 shadow-lg">
       <div class="navbar-start gap-4">
         <div class="drawer w-auto lg:hidden">
           <input
@@ -111,7 +111,7 @@ export const Header = () => {
           />
 
           <div class="drawer-content flex w-6 items-center">
-            <label for="navs" class="btn btn-circle drawer-button btn-sm">
+            <label for="navs" class="drawer-button btn btn-circle btn-sm">
               <IconMenu />
             </label>
           </div>
@@ -119,7 +119,7 @@ export const Header = () => {
           <div class="drawer-side">
             <label for="navs" class="drawer-overlay" />
 
-            <ul class="min-w-2/5 menu min-h-full gap-2 rounded-r-box bg-base-300 pt-20">
+            <ul class="menu min-h-full min-w-2/5 gap-2 rounded-r-box bg-base-300 pt-20">
               <For each={navs()}>
                 {({ href, name, icon }) => (
                   <li onClick={() => setOpenedDrawer(false)}>
@@ -138,7 +138,7 @@ export const Header = () => {
 
       <Show when={location.pathname !== ROUTES.Setup}>
         <div class="navbar-center hidden lg:flex">
-          <ul class="menu menu-horizontal menu-lg gap-2 p-0">
+          <ul class="menu menu-horizontal gap-2 menu-lg p-0">
             <For each={navs()}>
               {({ href, name, icon }) => (
                 <Nav href={href} tooltip={name}>

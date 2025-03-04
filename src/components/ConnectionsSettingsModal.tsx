@@ -77,7 +77,7 @@ const TagClientSourceIPWithNameForm: Component = () => {
   return (
     <form use:form={form}>
       <div class="join flex">
-        <select name="sourceIP" class="join-item select select-bordered">
+        <select name="sourceIP" class="select join-item">
           <option />
 
           <Index
@@ -102,7 +102,7 @@ const TagClientSourceIPWithNameForm: Component = () => {
 
         <input
           name="tagName"
-          class="input join-item input-bordered min-w-0 flex-1"
+          class="input join-item flex-1"
           placeholder="name"
         />
 
@@ -194,7 +194,7 @@ export const ConnectionsSettingsModal = (props: {
         <div class="flex justify-between py-2">
           <div class="flex items-center gap-2">
             <Button
-              class="btn-ghost btn-sm hidden cursor-grab sm:inline-block"
+              class="hidden cursor-grab btn-sm btn-ghost sm:inline-block"
               icon={<IconMenuOrder size={24} />}
               {...sortable.dragActivators}
             />
@@ -203,12 +203,12 @@ export const ConnectionsSettingsModal = (props: {
           </div>
           <div>
             <Button
-              class="btn-circle btn-sm mx-2 inline-block sm:hidden"
+              class="mx-2 inline-block btn-circle btn-sm sm:hidden"
               icon={<IconArrowUp width={30} size={24} />}
               onClick={() => moveElementInOrder(key, 'backward')}
             />
             <Button
-              class="btn-circle btn-sm mx-2 inline-block sm:hidden"
+              class="mx-2 inline-block btn-circle btn-sm sm:hidden"
               icon={<IconArrowDown width={30} size={24} />}
               onClick={() => moveElementInOrder(key, 'forward')}
             />
@@ -236,7 +236,7 @@ export const ConnectionsSettingsModal = (props: {
       title={t('connectionsSettings')}
       action={
         <Button
-          class="btn-neutral btn-sm"
+          class="btn-sm btn-neutral"
           onClick={() => {
             props.onOrderChange(CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER)
             props.onVisibleChange(CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY)
@@ -252,7 +252,7 @@ export const ConnectionsSettingsModal = (props: {
 
           <input
             type="text"
-            class="input input-bordered w-full"
+            class="input"
             onInput={(e) => setQuickFilterRegex(e.target.value)}
             value={quickFilterRegex()}
           />
@@ -262,7 +262,7 @@ export const ConnectionsSettingsModal = (props: {
           <ConfigTitle withDivider>{t('tableSize')}</ConfigTitle>
 
           <select
-            class="select select-bordered w-full"
+            class="select"
             value={connectionsTableSize()}
             onChange={(e) =>
               setConnectionsTableSize(e.target.value as TAILWINDCSS_SIZE)
@@ -285,13 +285,13 @@ export const ConnectionsSettingsModal = (props: {
             <div class="flex flex-col gap-2">
               <For each={clientSourceIPTags()}>
                 {({ tagName, sourceIP }) => (
-                  <div class="badge badge-primary w-full items-center justify-between gap-2 py-4">
+                  <div class="badge w-full items-center justify-between gap-2 py-4 badge-primary">
                     <span class="truncate">
                       {tagName} ({sourceIP})
                     </span>
 
                     <Button
-                      class="btn-circle btn-ghost btn-xs"
+                      class="btn-circle btn-xs btn-ghost"
                       onClick={() =>
                         setClientSourceIPTags((tags) =>
                           tags.filter((tag) => tag.tagName !== tagName),
