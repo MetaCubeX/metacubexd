@@ -48,7 +48,7 @@
     "autoprefixer": "^10.4.20",
     "byte-size": "^9.0.1",
     "commitlint": "^19.7.1",
-    "daisyui": "^4.12.24",
+    "daisyui": "^5.0.0",
     "dayjs": "^1.11.13",
     "eslint": "^9.21.0",
     "eslint-config-prettier": "^10.0.2",
