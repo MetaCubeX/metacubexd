@@ -30,8 +30,8 @@ importers:
         specifier: ^1.0.18
         version: 1.0.18(zod@3.24.2)
       '@fontsource/fira-sans':
-        specifier: ^5.1.1
-        version: 5.1.1
+        specifier: ^5.2.5
+        version: 5.2.5
       '@solid-primitives/clipboard':
         specifier: ^1.6.0
         version: 1.6.0(solid-js@1.9.5)
@@ -1015,8 +1015,8 @@ packages:
   '@floating-ui/utils@0.2.9':
     resolution: {integrity: sha512-MDWhGtE+eHw5JW7lq4qhc5yRLS11ERl1c7Z6Xd0a58DozHES6EnNNwUWbMiG4J9Cgj053Bhk8zvlhFYKVhULwg==}
 
-  '@fontsource/fira-sans@5.1.1':
-    resolution: {integrity: sha512-LdbPwcMEADFjbcMx5sdPcyLi0NnEzP34YO+4d2eOeIKjCu1SyJiG/bBz5K07qm4pyhh2cQveifhFrG7gQDG9wQ==}
+  '@fontsource/fira-sans@5.2.5':
+    resolution: {integrity: sha512-N+GrTGOTIeYE/Wi5tY0RAnc1Tl3ddCdwfZQncvA1zH/lOpKerj9ZS5nfniSXDZ9wrXFRdWTH7anyrRDc+cMpCg==}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -4623,7 +4623,7 @@ snapshots:
 
   '@floating-ui/utils@0.2.9': {}
 
-  '@fontsource/fira-sans@5.1.1': {}
+  '@fontsource/fira-sans@5.2.5': {}
 
   '@humanfs/core@0.19.1': {}
 
