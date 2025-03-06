@@ -66,8 +66,8 @@ importers:
         specifier: ^0.15.3
         version: 0.15.3(solid-js@1.9.5)
       '@tabler/icons-solidjs':
-        specifier: ^3.30.0
-        version: 3.30.0(solid-js@1.9.5)
+        specifier: ^3.31.0
+        version: 3.31.0(solid-js@1.9.5)
       '@tailwindcss/vite':
         specifier: ^4.0.10
         version: 4.0.10(vite@6.2.0(@types/node@22.13.9)(jiti@2.4.2)(lightningcss@1.29.1)(terser@5.39.0)(yaml@2.7.0))
@@ -1324,13 +1324,13 @@ packages:
     peerDependencies:
       '@svgdotjs/svg.js': ^3.2.4
 
-  '@tabler/icons-solidjs@3.30.0':
-    resolution: {integrity: sha512-tBtwAVw5Hc/3ESC7Zyr2sUPPU1JOvqlGrt8PuEATcjb5u2hogEm0aFwDvjUtYxKerswJA6ICckohDGYuJM9o/Q==}
+  '@tabler/icons-solidjs@3.31.0':
+    resolution: {integrity: sha512-NB0Tk8++ibD7L7qtabzqBs//G5U9mhq3UkTvEjCWnHg/W4TROeUZqksSXZ9venU9iRZ5rPIqkV20DEsIi8z9vw==}
     peerDependencies:
       solid-js: ^1.4.7
 
-  '@tabler/icons@3.30.0':
-    resolution: {integrity: sha512-c8OKLM48l00u9TFbh2qhSODMONIzML8ajtCyq95rW8vzkWcBrKRPM61tdkThz2j4kd5u17srPGIjqdeRUZdfdw==}
+  '@tabler/icons@3.31.0':
+    resolution: {integrity: sha512-dblAdeKY3+GA1U+Q9eziZ0ooVlZMHsE8dqP0RkwvRtEsAULoKOYaCUOcJ4oW1DjWegdxk++UAt2SlQVnmeHv+g==}
 
   '@tailwindcss/node@4.0.10':
     resolution: {integrity: sha512-5YuI8pXfNkg5Ng12wgMic6jrFe4K8+eVmaC1kLsbA6g7iMgrj5fyl4hoLqHjmBDGpJXKxUAjwMSuJmc4oetnrg==}
@@ -3398,9 +3398,6 @@ packages:
   tailwindcss@4.0.10:
     resolution: {integrity: sha512-Z8U/6E2BWSdDkt3IWPiphoV+8V6aNzRmu2SriSbuhm6i3QIcY3TdUJzUP5NX8M8MZuIl+v4/77Rer8u4YSrSsg==}
 
-  tailwindcss@4.0.9:
-    resolution: {integrity: sha512-12laZu+fv1ONDRoNR9ipTOpUD7RN9essRVkX36sjxuRUInpN7hIiHN4lBd/SIFjbISvnXzp8h/hXzmU8SQQYhw==}
-
   tapable@2.2.1:
     resolution: {integrity: sha512-GNzQvQTOIP6RyTfE2Qxb8ZVlNmw0n88vp1szwWRimP02mnTsx3Wtn5qRdqY9w2XduFNUgvOwhNnQsjwCp+kqaQ==}
     engines: {node: '>=6'}
@@ -4996,12 +4993,12 @@ snapshots:
     dependencies:
       '@svgdotjs/svg.js': 3.2.4
 
-  '@tabler/icons-solidjs@3.30.0(solid-js@1.9.5)':
+  '@tabler/icons-solidjs@3.31.0(solid-js@1.9.5)':
     dependencies:
-      '@tabler/icons': 3.30.0
+      '@tabler/icons': 3.31.0
       solid-js: 1.9.5
 
-  '@tabler/icons@3.30.0': {}
+  '@tabler/icons@3.31.0': {}
 
   '@tailwindcss/node@4.0.10':
     dependencies:
@@ -7119,8 +7116,6 @@ snapshots:
   tailwind-merge@3.0.2: {}
 
   tailwindcss@4.0.10: {}
-
-  tailwindcss@4.0.9: {}
 
   tapable@2.2.1: {}
 
