@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.177.0](https://github.com/MetaCubeX/metacubexd/compare/v1.176.2...v1.177.0) (2025-03-07)
+
+
+### Features
+
+* set default DNS query target same as the placeholder ([#1346](https://github.com/MetaCubeX/metacubexd/issues/1346)) ([9874c74](https://github.com/MetaCubeX/metacubexd/commit/9874c7429a01cf0701a8894bc15c22d97bebb549))
+
 ## [1.176.2](https://github.com/MetaCubeX/metacubexd/compare/v1.176.1...v1.176.2) (2025-01-23)
 
 
