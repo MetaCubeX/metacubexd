@@ -16,7 +16,7 @@ importers:
         version: 0.2.3(solid-js@1.9.5)
       '@corvu/tailwind':
         specifier: ^0.1.6
-        version: 0.1.6(tailwindcss@4.0.10)
+        version: 0.1.6(tailwindcss@4.0.11)
       '@corvu/tooltip':
         specifier: ^0.2.2
         version: 0.2.2(solid-js@1.9.5)
@@ -168,8 +168,8 @@ importers:
         specifier: ^3.0.2
         version: 3.0.2
       tailwindcss:
-        specifier: ^4.0.10
-        version: 4.0.10
+        specifier: ^4.0.11
+        version: 4.0.11
       typescript:
         specifier: ^5.8.2
         version: 5.8.2
@@ -4577,9 +4577,9 @@ snapshots:
       solid-js: 1.9.5
       solid-presence: 0.2.0(solid-js@1.9.5)
 
-  '@corvu/tailwind@0.1.6(tailwindcss@4.0.10)':
+  '@corvu/tailwind@0.1.6(tailwindcss@4.0.11)':
     dependencies:
-      tailwindcss: 4.0.10
+      tailwindcss: 4.0.11
 
   '@corvu/tooltip@0.2.2(solid-js@1.9.5)':
     dependencies:
