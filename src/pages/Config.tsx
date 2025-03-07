@@ -91,6 +91,7 @@ const dnsQueryFormSchema = z.object({
 const DNSQueryForm = () => {
   const [t] = useI18n()
   const request = useRequest()
+  const defaultDNSQueryTarget = 'google.com'
 
   const { form, isSubmitting } = createForm<z.infer<typeof dnsQueryFormSchema>>(
     {
@@ -98,7 +99,10 @@ const DNSQueryForm = () => {
       onSubmit: (values) =>
         request
           .get('dns/query', {
-            searchParams: { name: values.name, type: values.type },
+            searchParams: {
+              name: values.name || defaultDNSQueryTarget,
+              type: values.type,
+            },
           })
           .json<DNSQuery>()
           .then(({ Answer }) =>
@@ -117,7 +121,7 @@ const DNSQueryForm = () => {
           type="search"
           name="name"
           class="flex-1"
-          placeholder="google.com"
+          placeholder={defaultDNSQueryTarget}
           onInput={(e) => {
             if (!e.target.value) setDNSQueryResult([])
           }}
