@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.177.1](https://github.com/MetaCubeX/metacubexd/compare/v1.177.0...v1.177.1) (2025-03-10)
+
+
+### Bug Fixes
+
+* bg color ([#1355](https://github.com/MetaCubeX/metacubexd/issues/1355)) ([6c84d16](https://github.com/MetaCubeX/metacubexd/commit/6c84d16966ae265b4410b7117dab867062da5ffa))
+
 ## [1.177.0](https://github.com/MetaCubeX/metacubexd/compare/v1.176.2...v1.177.0) (2025-03-07)
 
 
