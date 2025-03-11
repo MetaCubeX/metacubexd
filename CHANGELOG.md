@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.179.0](https://github.com/MetaCubeX/metacubexd/compare/v1.178.0...v1.179.0) (2025-03-11)
+
+
+### Features
+
+* enhance ProxyNodeCard badge opacity and font weight ([3fdf74d](https://github.com/MetaCubeX/metacubexd/commit/3fdf74d57a6259237ad482b1c4b5ca85a9762ac1)), closes [#1361](https://github.com/MetaCubeX/metacubexd/issues/1361)
+
 ## [1.178.0](https://github.com/MetaCubeX/metacubexd/compare/v1.177.1...v1.178.0) (2025-03-11)
 
 
