@@ -72,7 +72,7 @@ export const ProxyNodeCard = (props: {
             </h2>
 
             <div class="card-actions items-center justify-between gap-1">
-              <div class="badge px-1 text-xs font-bold badge-secondary capitalize">
+              <div class={twMerge('text-xs font-medium uppercase')}>
                 {formatProxyType(proxyNode()?.type)}
               </div>
 
