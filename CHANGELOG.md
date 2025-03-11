@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.178.0](https://github.com/MetaCubeX/metacubexd/compare/v1.177.1...v1.178.0) (2025-03-11)
+
+
+### Features
+
+* update ProxyNodeCard badge styling ([e44e190](https://github.com/MetaCubeX/metacubexd/commit/e44e190aaf77d6247289285600b04860ed7d72b3))
+
 ## [1.177.1](https://github.com/MetaCubeX/metacubexd/compare/v1.177.0...v1.177.1) (2025-03-10)
 
 
