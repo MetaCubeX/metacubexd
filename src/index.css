@@ -4,6 +4,11 @@
   themes: all;
 }
 
+@theme {
+  --font-twemoji: 'system-ui', 'Twemoji Mozilla', 'Fira Sans', monospace;
+  --font-no-twemoji: 'system-ui', 'Fira Sans', 'monospace';
+}
+
 @font-face {
   font-family: 'Fira Sans';
   src: url('assets/FiraSans-Regular.ttf') format('truetype');
