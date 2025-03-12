@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.180.0](https://github.com/MetaCubeX/metacubexd/compare/v1.179.0...v1.180.0) (2025-03-12)
+
+
+### Features
+
+* add custom font theme variables for Twemoji and system fonts ([af8b3e2](https://github.com/MetaCubeX/metacubexd/commit/af8b3e2f7003e9831aa3c8a941f5bd5bb8fefc41))
+
 ## [1.179.0](https://github.com/MetaCubeX/metacubexd/compare/v1.178.0...v1.179.0) (2025-03-11)
 
 
