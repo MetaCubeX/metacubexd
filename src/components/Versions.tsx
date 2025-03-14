@@ -87,7 +87,10 @@ export const Versions: Component<{
             <UpgradeButton
               isUpdateAvailable={frontendRelease()?.isUpdateAvailable}
               isUpdating={upgradingUI}
-              onUpdate={upgradeUIAPI}
+              onUpdate={async () => {
+                await upgradeUIAPI()
+                window.location.reload()
+              }}
             >
               {import.meta.env.APP_VERSION}
             </UpgradeButton>
@@ -118,7 +121,10 @@ export const Versions: Component<{
             <UpgradeButton
               isUpdateAvailable={backendRelease()?.isUpdateAvailable}
               isUpdating={upgradingBackend}
-              onUpdate={upgradeBackendAPI}
+              onUpdate={async () => {
+                await upgradeBackendAPI()
+                window.location.reload()
+              }}
             >
               {backendVersion()}
             </UpgradeButton>
