@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.181.1](https://github.com/MetaCubeX/metacubexd/compare/v1.181.0...v1.181.1) (2025-03-14)
+
+
+### Bug Fixes
+
+* **versions:** disable update when none available or during update process ([e050d07](https://github.com/MetaCubeX/metacubexd/commit/e050d07de4fac94a6c695f660f9edeb7fc043a3c))
+
 ## [1.181.0](https://github.com/MetaCubeX/metacubexd/compare/v1.180.0...v1.181.0) (2025-03-14)
 
 
