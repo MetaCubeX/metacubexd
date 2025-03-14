@@ -24,15 +24,16 @@ const UpgradeButton: ParentComponent<{
 }> = (props) => {
   const [local, others] = splitProps(props, ['isUpdateAvailable', 'children'])
   const { isUpdating, onUpdate } = others
+  const disabled = createMemo(() => !local.isUpdateAvailable || isUpdating())
 
   return (
     <div
       class={twMerge(
         'flex w-full items-center justify-center gap-2',
-        local.isUpdateAvailable && 'cursor-pointer',
+        !disabled() && 'cursor-pointer',
       )}
       onClick={() => {
-        if (!local.isUpdateAvailable || isUpdating()) return
+        if (disabled()) return
 
         onUpdate()
       }}
