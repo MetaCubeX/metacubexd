@@ -45,6 +45,19 @@ export const useRequest = () => {
   })
 }
 
+export const useGithubAPI = () => {
+  const headers = new Headers()
+
+  if (import.meta.env.VITE_APP_GH_TOKEN) {
+    headers.set('Authorization', `Bearer ${import.meta.env.VITE_APP_GH_TOKEN}`)
+  }
+
+  return ky.create({
+    prefixUrl: 'https://api.github.com',
+    headers,
+  })
+}
+
 export const endpoint = () =>
   endpointList().find(({ id }) => id === selectedEndpoint())
 

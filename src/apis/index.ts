@@ -1,7 +1,7 @@
 import ky from 'ky'
 import { ResourceActions, createSignal } from 'solid-js'
 import { toast } from 'solid-toast'
-import { useRequest } from '~/signals'
+import { useGithubAPI, useRequest } from '~/signals'
 import {
   BackendVersion,
   Config,
@@ -249,41 +249,65 @@ export const updateRuleProviderAPI = (providerName: string) => {
 
 type ReleaseAPIResponse = {
   tag_name: string
+  body: string
   assets: { name: string }[]
 }
 
-export const isFrontendUpdateAvailableAPI = async (currentVersion: string) => {
-  const repositoryURL = 'https://api.github.com/repos/MetaCubeX/metacubexd'
-
-  const { tag_name } = await ky
-    .get(`${repositoryURL}/releases/latest`)
-    .json<ReleaseAPIResponse>()
-
-  return tag_name !== currentVersion
+type ReleaseReturn = {
+  isUpdateAvailable: boolean
+  changelog?: string
 }
 
-export const isBackendUpdateAvailableAPI = async (currentVersion: string) => {
-  const repositoryURL = 'https://api.github.com/repos/MetaCubeX/mihomo'
+export const frontendReleaseAPI = async (
+  currentVersion: string,
+): Promise<ReleaseReturn> => {
+  const githubAPI = useGithubAPI()
+
+  const { tag_name, body } = await githubAPI
+    .get(`repos/MetaCubeX/metacubexd/releases/latest`)
+    .json<ReleaseAPIResponse>()
+
+  return {
+    isUpdateAvailable: tag_name !== currentVersion,
+    changelog: body,
+  }
+}
+
+export const backendReleaseAPI = async (
+  currentVersion: string,
+): Promise<ReleaseReturn> => {
+  const githubAPI = useGithubAPI()
+
+  const repositoryURL = 'repos/MetaCubeX/mihomo'
   const match = /(alpha|beta|meta)-?(\w+)/.exec(currentVersion)
 
-  if (!match) return false
+  if (!match)
+    return {
+      isUpdateAvailable: false,
+    }
 
-  const check = async (url: string) => {
-    const { assets } = await ky
-      .get(`${repositoryURL}${url}`)
+  const release = async (url: string) => {
+    const { assets, body } = await githubAPI
+      .get(`${repositoryURL}/${url}`)
       .json<ReleaseAPIResponse>()
 
     const alreadyLatest = assets.some(({ name }) => name.includes(version))
 
-    return !alreadyLatest
+    return {
+      isUpdateAvailable: !alreadyLatest,
+      changelog: body,
+    }
   }
 
   const channel = match[1],
     version = match[2]
 
-  if (channel === 'meta') return await check('/releases/latest')
+  if (channel === 'meta') return await release('releases/latest')
 
-  if (channel === 'alpha') return await check('/releases/tags/Prerelease-Alpha')
+  if (channel === 'alpha')
+    return await release('releases/tags/Prerelease-Alpha')
 
-  return false
+  return {
+    isUpdateAvailable: false,
+  }
 }

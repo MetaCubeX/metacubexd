@@ -1,4 +1,5 @@
 .idea
+.history
 node_modules
 dist
-.history
+.env.local
