@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.181.2](https://github.com/MetaCubeX/metacubexd/compare/v1.181.1...v1.181.2) (2025-03-14)
+
+
+### Bug Fixes
+
+* **versions:** reload page after successful update for frontend and backend ([edf0d47](https://github.com/MetaCubeX/metacubexd/commit/edf0d47eb55f34df4dfe2979f28a5d1c1b421e4c))
+
 ## [1.181.1](https://github.com/MetaCubeX/metacubexd/compare/v1.181.0...v1.181.1) (2025-03-14)
 
 
