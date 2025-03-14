@@ -16,7 +16,7 @@ importers:
         version: 0.2.3(solid-js@1.9.5)
       '@corvu/tailwind':
         specifier: ^0.1.6
-        version: 0.1.6(tailwindcss@4.0.13)
+        version: 0.1.6(tailwindcss@4.0.14)
       '@corvu/tooltip':
         specifier: ^0.2.2
         version: 0.2.2(solid-js@1.9.5)
@@ -168,8 +168,8 @@ importers:
         specifier: ^3.0.2
         version: 3.0.2
       tailwindcss:
-        specifier: ^4.0.13
-        version: 4.0.13
+        specifier: ^4.0.14
+        version: 4.0.14
       typescript:
         specifier: ^5.8.2
         version: 5.8.2
@@ -3432,6 +3432,9 @@ packages:
   tailwindcss@4.0.13:
     resolution: {integrity: sha512-gbvFrB0fOsTv/OugXWi2PtflJ4S6/ctu6Mmn3bCftmLY/6xRsQVEJPgIIpABwpZ52DpONkCA3bEj5b54MHxF2Q==}
 
+  tailwindcss@4.0.14:
+    resolution: {integrity: sha512-92YT2dpt671tFiHH/e1ok9D987N9fHD5VWoly1CdPD/Cd1HMglvZwP3nx2yTj2lbXDAHt8QssZkxTLCCTNL+xw==}
+
   tapable@2.2.1:
     resolution: {integrity: sha512-GNzQvQTOIP6RyTfE2Qxb8ZVlNmw0n88vp1szwWRimP02mnTsx3Wtn5qRdqY9w2XduFNUgvOwhNnQsjwCp+kqaQ==}
     engines: {node: '>=6'}
@@ -4680,9 +4683,9 @@ snapshots:
       solid-js: 1.9.5
       solid-presence: 0.2.0(solid-js@1.9.5)
 
-  '@corvu/tailwind@0.1.6(tailwindcss@4.0.13)':
+  '@corvu/tailwind@0.1.6(tailwindcss@4.0.14)':
     dependencies:
-      tailwindcss: 4.0.13
+      tailwindcss: 4.0.14
 
   '@corvu/tooltip@0.2.2(solid-js@1.9.5)':
     dependencies:
@@ -7223,6 +7226,8 @@ snapshots:
   tailwind-merge@3.0.2: {}
 
   tailwindcss@4.0.13: {}
+
+  tailwindcss@4.0.14: {}
 
   tapable@2.2.1: {}
 
