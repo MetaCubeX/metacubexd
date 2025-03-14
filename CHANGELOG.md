@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.181.0](https://github.com/MetaCubeX/metacubexd/compare/v1.180.0...v1.181.0) (2025-03-14)
+
+
+### Features
+
+* add changelog component and update version handling ([bf7c535](https://github.com/MetaCubeX/metacubexd/commit/bf7c53550e5e305f104b92d542b3755c33da8c4f))
+
 ## [1.180.0](https://github.com/MetaCubeX/metacubexd/compare/v1.179.0...v1.180.0) (2025-03-12)
 
 
