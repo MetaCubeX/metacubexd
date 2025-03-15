@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.183.0](https://github.com/MetaCubeX/metacubexd/compare/v1.182.0...v1.183.0) (2025-03-15)
+
+
+### Features
+
+* **versions:** update Tooltip.Trigger classes for better styling consistency ([9ad414c](https://github.com/MetaCubeX/metacubexd/commit/9ad414c46baf5755aa26bbe36000b61266945879))
+
 ## [1.182.0](https://github.com/MetaCubeX/metacubexd/compare/v1.181.2...v1.182.0) (2025-03-15)
 
 
