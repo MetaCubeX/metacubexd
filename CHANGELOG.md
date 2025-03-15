@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.184.0](https://github.com/MetaCubeX/metacubexd/compare/v1.183.0...v1.184.0) (2025-03-15)
+
+
+### Features
+
+* **latency:** enhance loading state with proxy latency updates ([69015f1](https://github.com/MetaCubeX/metacubexd/commit/69015f1187fc63fc28a550569eb9f3746a4d846c))
+* **proxy-node:** add UDP indicator and improve special types display ([cae651f](https://github.com/MetaCubeX/metacubexd/commit/cae651fa1cb15a0d620503741039b7a9f49f486b))
+
 ## [1.183.0](https://github.com/MetaCubeX/metacubexd/compare/v1.182.0...v1.183.0) (2025-03-15)
 
 
