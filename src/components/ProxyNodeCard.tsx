@@ -38,6 +38,8 @@ export const ProxyNodeCard = (props: {
       .join(' / ')})`
   })
 
+  const isUDP = createMemo(() => proxyNode().xudp || proxyNode().udp)
+
   const title = createMemo(() =>
     [proxyName, specialTypes()].filter(Boolean).join(' - '),
   )
@@ -72,10 +74,14 @@ export const ProxyNodeCard = (props: {
             </h2>
 
             <div class="card-actions items-center justify-between gap-1">
-              <div
-                class={twMerge('text-xs font-semibold uppercase opacity-75')}
-              >
-                {formatProxyType(proxyNode()?.type)}
+              <div class="flex items-center gap-1">
+                <div class="text-xs font-semibold uppercase opacity-75">
+                  {formatProxyType(proxyNode()?.type)}
+                </div>
+
+                <Show when={isUDP()}>
+                  <div class="badge badge-ghost badge-xs">U</div>
+                </Show>
               </div>
 
               <Latency
@@ -106,7 +112,9 @@ export const ProxyNodeCard = (props: {
             <div class="flex flex-col items-center gap-2 rounded-box bg-neutral bg-gradient-to-br from-primary to-secondary p-2.5 text-primary-content shadow-lg">
               <h2 class="text-lg font-bold">{proxyName}</h2>
 
-              <div class="w-full text-xs uppercase">{specialTypes()}</div>
+              <Show when={specialTypes()}>
+                <div class="w-full text-xs uppercase">{specialTypes()}</div>
+              </Show>
 
               <ul class="timeline timeline-vertical timeline-compact timeline-snap-icon">
                 <For each={latencyTestHistory}>

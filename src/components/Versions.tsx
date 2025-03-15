@@ -43,9 +43,9 @@ const UpgradeButton: ParentComponent<{
 }
 
 const UpdateAvailableIndicator = () => (
-  <span class="absolute -top-1 -right-1 flex h-3 w-3">
-    <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-info opacity-75" />
-    <span class="inline-flex h-3 w-3 rounded-full bg-info" />
+  <span class="absolute -top-1 -right-1 inline-grid *:[grid-area:1/1]">
+    <span class="status animate-ping status-info" />
+    <div class="status status-info" />
   </span>
 )
 
