@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.186.0](https://github.com/MetaCubeX/metacubexd/compare/v1.185.0...v1.186.0) (2025-03-15)
+
+
+### Features
+
+* **proxies:** restructure layout of ProxyNode display for improved readability ([9c0da7a](https://github.com/MetaCubeX/metacubexd/commit/9c0da7a3897723d4de9d05867cf2d07a81481115))
+
 ## [1.185.0](https://github.com/MetaCubeX/metacubexd/compare/v1.184.0...v1.185.0) (2025-03-15)
 
 
