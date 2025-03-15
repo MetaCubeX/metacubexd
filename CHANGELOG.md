@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.186.1](https://github.com/MetaCubeX/metacubexd/compare/v1.186.0...v1.186.1) (2025-03-15)
+
+
+### Bug Fixes
+
+* **overview:** update stats component background and change chart type for better visual clarity ([dc1df6c](https://github.com/MetaCubeX/metacubexd/commit/dc1df6c382346e90d3657dfc1e953a5caa40aa41))
+
 ## [1.186.0](https://github.com/MetaCubeX/metacubexd/compare/v1.185.0...v1.186.0) (2025-03-15)
 
 
