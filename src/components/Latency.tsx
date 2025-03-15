@@ -10,7 +10,8 @@ interface Props extends JSX.HTMLAttributes<HTMLSpanElement> {
 
 export const Latency: ParentComponent<Props> = (props) => {
   const [local, others] = splitProps(props, ['class'])
-  const { getLatencyByName } = useProxies()
+  const { getLatencyByName, proxyLatencyTestingMap } = useProxies()
+  const updating = createMemo(() => proxyLatencyTestingMap()[others.proxyName])
   const [textClassName, setTextClassName] = createSignal('')
   const latency = createMemo(() =>
     getLatencyByName(
@@ -26,13 +27,15 @@ export const Latency: ParentComponent<Props> = (props) => {
   return (
     <span
       class={twMerge(
-        'badge w-11 whitespace-nowrap',
+        'badge flex w-11 items-center justify-center whitespace-nowrap',
         textClassName(),
         local.class,
       )}
       {...others}
     >
-      {latency() || '---'}
+      <Show when={updating()} fallback={latency() || '---'}>
+        <span class="loading loading-sm loading-infinity" />
+      </Show>
     </span>
   )
 }
