@@ -26,7 +26,7 @@ const UpgradeButton: ParentComponent<{
 
   return (
     <div
-      class="flex w-full cursor-pointer items-center justify-center gap-2"
+      class="flex w-full items-center justify-center gap-2"
       onClick={() => {
         if (isUpdating()) return
 
@@ -73,7 +73,7 @@ export const Versions: Component<{
             <UpdateAvailableIndicator />
           </Show>
 
-          <Tooltip.Trigger class="contents">
+          <Tooltip.Trigger class="w-full cursor-pointer">
             <UpgradeButton
               isUpdateAvailable={frontendRelease()?.isUpdateAvailable}
               isUpdating={upgradingUI}
@@ -107,7 +107,7 @@ export const Versions: Component<{
             <UpdateAvailableIndicator />
           </Show>
 
-          <Tooltip.Trigger class="contents">
+          <Tooltip.Trigger class="w-full cursor-pointer">
             <UpgradeButton
               isUpdateAvailable={backendRelease()?.isUpdateAvailable}
               isUpdating={upgradingBackend}
