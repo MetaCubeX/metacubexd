@@ -92,7 +92,7 @@ export default () => {
       <DocumentTitle>{t('overview')}</DocumentTitle>
 
       <div class="flex flex-col gap-2 lg:h-full">
-        <div class="stats w-full flex-shrink-0 stats-vertical grid-cols-2 bg-gradient-to-br from-primary to-secondary shadow lg:flex lg:stats-horizontal">
+        <div class="stats w-full flex-shrink-0 stats-vertical grid-cols-2 bg-primary shadow lg:flex lg:stats-horizontal">
           <TrafficWidget label={t('upload')}>
             {byteSize(traffic()?.up || 0).toString()}/s
           </TrafficWidget>
@@ -121,7 +121,7 @@ export default () => {
         <div class="flex flex-col gap-2 rounded-box bg-base-300 py-4 lg:flex-row">
           <div class="flex-1">
             <SolidApexCharts
-              type="area"
+              type="line"
               options={trafficChartOptions()}
               series={trafficChartSeries()}
             />
