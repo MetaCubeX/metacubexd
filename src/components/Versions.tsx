@@ -27,7 +27,11 @@ const UpgradeButton: ParentComponent<{
   return (
     <div
       class="flex w-full cursor-pointer items-center justify-center gap-2"
-      onClick={() => onUpdate()}
+      onClick={() => {
+        if (isUpdating()) return
+
+        onUpdate()
+      }}
     >
       {local.children}
 
