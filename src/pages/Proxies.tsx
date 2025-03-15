@@ -405,17 +405,19 @@ export default () => {
                         subscriptionInfo={proxyProvider.subscriptionInfo}
                       />
 
-                      <div class="text-sm text-slate-500">
-                        {t('updated')}{' '}
-                        {formatTimeFromNow(proxyProvider.updatedAt)}
-                      </div>
+                      <div class="flex flex-col gap-2">
+                        <div class="text-sm text-slate-500">
+                          {t('updated')}{' '}
+                          {formatTimeFromNow(proxyProvider.updatedAt)}
+                        </div>
 
-                      <Show when={!collapsedMap()[proxyProvider.name]}>
-                        <ProxyNodePreview
-                          proxyNameList={sortedProxyNames()}
-                          testUrl={proxyProvider.testUrl}
-                        />
-                      </Show>
+                        <Show when={!collapsedMap()[proxyProvider.name]}>
+                          <ProxyNodePreview
+                            proxyNameList={sortedProxyNames()}
+                            testUrl={proxyProvider.testUrl}
+                          />
+                        </Show>
+                      </div>
                     </>
                   )
 
