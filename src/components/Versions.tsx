@@ -6,7 +6,6 @@ import {
   ParentComponent,
   Show,
 } from 'solid-js'
-import { twMerge } from 'tailwind-merge'
 import {
   backendReleaseAPI,
   frontendReleaseAPI,
@@ -24,19 +23,11 @@ const UpgradeButton: ParentComponent<{
 }> = (props) => {
   const [local, others] = splitProps(props, ['isUpdateAvailable', 'children'])
   const { isUpdating, onUpdate } = others
-  const disabled = createMemo(() => !local.isUpdateAvailable || isUpdating())
 
   return (
     <div
-      class={twMerge(
-        'flex w-full items-center justify-center gap-2',
-        !disabled() && 'cursor-pointer',
-      )}
-      onClick={() => {
-        if (disabled()) return
-
-        onUpdate()
-      }}
+      class="flex w-full cursor-pointer items-center justify-center gap-2"
+      onClick={() => onUpdate()}
     >
       {local.children}
 
@@ -47,6 +38,13 @@ const UpgradeButton: ParentComponent<{
   )
 }
 
+const UpdateAvailableIndicator = () => (
+  <span class="absolute -top-1 -right-1 flex h-3 w-3">
+    <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-info opacity-75" />
+    <span class="inline-flex h-3 w-3 rounded-full bg-info" />
+  </span>
+)
+
 export const Versions: Component<{
   frontendVersion: string
   backendVersion: Accessor<string>
@@ -56,13 +54,6 @@ export const Versions: Component<{
   )
   const [backendRelease] = createResource(backendVersion, () =>
     backendReleaseAPI(backendVersion()),
-  )
-
-  const UpdateAvailableIndicator = () => (
-    <span class="absolute -top-1 -right-1 flex h-3 w-3">
-      <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-info opacity-75" />
-      <span class="inline-flex h-3 w-3 rounded-full bg-info" />
-    </span>
   )
 
   return (
@@ -78,12 +69,7 @@ export const Versions: Component<{
             <UpdateAvailableIndicator />
           </Show>
 
-          <Tooltip.Trigger
-            class={twMerge([
-              'flex w-full items-center justify-center gap-2',
-              frontendRelease()?.isUpdateAvailable && 'cursor-pointer',
-            ])}
-          >
+          <Tooltip.Trigger class="contents">
             <UpgradeButton
               isUpdateAvailable={frontendRelease()?.isUpdateAvailable}
               isUpdating={upgradingUI}
@@ -117,7 +103,7 @@ export const Versions: Component<{
             <UpdateAvailableIndicator />
           </Show>
 
-          <Tooltip.Trigger>
+          <Tooltip.Trigger class="contents">
             <UpgradeButton
               isUpdateAvailable={backendRelease()?.isUpdateAvailable}
               isUpdating={upgradingBackend}
