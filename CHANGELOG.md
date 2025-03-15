@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.185.0](https://github.com/MetaCubeX/metacubexd/compare/v1.184.0...v1.185.0) (2025-03-15)
+
+
+### Features
+
+* **proxy-node:** update ProxyNodeCard styling and structure for improved layout and clarity ([8c5d184](https://github.com/MetaCubeX/metacubexd/commit/8c5d1845a7f5e780014f2f8288f6e5602687225a))
+
 ## [1.184.0](https://github.com/MetaCubeX/metacubexd/compare/v1.183.0...v1.184.0) (2025-03-15)
 
 
