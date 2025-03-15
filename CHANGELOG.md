@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.182.0](https://github.com/MetaCubeX/metacubexd/compare/v1.181.2...v1.182.0) (2025-03-15)
+
+
+### Features
+
+* **versions:** enable force update by default, closes [#1376](https://github.com/MetaCubeX/metacubexd/issues/1376) ([fd11412](https://github.com/MetaCubeX/metacubexd/commit/fd114127d62556278825d6837585c49ef6e07f80))
+
+
+### Bug Fixes
+
+* **versions:** prevent update trigger during ongoing update process ([ed55418](https://github.com/MetaCubeX/metacubexd/commit/ed554188bd75eb86baf2e6f22c5d4c66097946f7))
+
 ## [1.181.2](https://github.com/MetaCubeX/metacubexd/compare/v1.181.1...v1.181.2) (2025-03-14)
 
 
