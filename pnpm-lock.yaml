@@ -117,8 +117,8 @@ importers:
         specifier: ^19.8.0
         version: 19.8.0(@types/node@22.13.10)(typescript@5.8.2)
       daisyui:
-        specifier: ^5.0.6
-        version: 5.0.6
+        specifier: ^5.0.9
+        version: 5.0.9
       dayjs:
         specifier: ^1.11.13
         version: 1.11.13
@@ -1916,8 +1916,8 @@ packages:
   csstype@3.1.3:
     resolution: {integrity: sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==}
 
-  daisyui@5.0.6:
-    resolution: {integrity: sha512-/e/9Gw/2y9oawBJlWkJMSEhRXdmfOLvcPl+6q/x2rPEdIVOtebs1t3ex2vwySl9vCRs1GGNBKCiL+P60Ps/wUw==}
+  daisyui@5.0.9:
+    resolution: {integrity: sha512-RsaehHh45f+0shWgZZaOY09/8eOae2voRsqJCD71j9yrnYgcke0Nj5ys0ZxrW4SPcc4+q96kWyJu0Z8P1zZdoA==}
 
   dargs@8.1.0:
     resolution: {integrity: sha512-wAV9QHOsNbwnWdNW2FYvE1P56wtgSbM+3SZcdGiWQILwVjACCXDCI3Ai8QlCjMDB8YK5zySiXZYBiwGmNY3lnw==}
@@ -5721,7 +5721,7 @@ snapshots:
 
   csstype@3.1.3: {}
 
-  daisyui@5.0.6: {}
+  daisyui@5.0.9: {}
 
   dargs@8.1.0: {}
 
