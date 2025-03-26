@@ -12,8 +12,8 @@ importers:
         specifier: ^19.8.0
         version: 19.8.0
       '@corvu/accordion':
-        specifier: ^0.2.3
-        version: 0.2.3(solid-js@1.9.5)
+        specifier: ^0.2.5
+        version: 0.2.5(solid-js@1.9.5)
       '@corvu/tailwind':
         specifier: ^0.1.6
         version: 0.1.6(tailwindcss@4.0.15)
@@ -823,13 +823,13 @@ packages:
     resolution: {integrity: sha512-LRjP623jPyf3Poyfb0ohMj8I3ORyBDOwXAgxxVPbSD0unJuW2mJWeiRfaQinjtccMqC5Wy1HOMfa4btKjbNxbg==}
     engines: {node: '>=v18'}
 
-  '@corvu/accordion@0.2.3':
-    resolution: {integrity: sha512-M+qDysE1bKXeCmVsaHVs4FbrIWzQfffOrQ2H2yYYuGQfZINi5783rBcLTn7eNhUknOfdwVcjs2rnODeIomVC3A==}
+  '@corvu/accordion@0.2.5':
+    resolution: {integrity: sha512-oBZKDZZNN5mirmilSzWSrY+7PQGHQbXAlWm1SOvG1AAsIeX5osUdQnKjH0XzlkkAxCLKHb41178W4YNNPqH0PA==}
     peerDependencies:
       solid-js: ^1.8
 
-  '@corvu/disclosure@0.2.1':
-    resolution: {integrity: sha512-pHpYvAocbSxmuS62dl4i9DE0nY50J5ay/ThrjvL4Tj18eWRoLQQD2aIZk7u4Y80yjwL8tHjBAOPdpWOUItZMwQ==}
+  '@corvu/disclosure@0.2.2':
+    resolution: {integrity: sha512-d2E9zS0w9peeOiBDc8/ZcqS56ZeOIiKJcwMFpLjuhlfrtVAepwyhbwFHNQTb48VeRHW8amfrGliymT//VQFF9g==}
     peerDependencies:
       solid-js: ^1.8
 
@@ -4743,14 +4743,14 @@ snapshots:
       '@types/conventional-commits-parser': 5.0.1
       chalk: 5.4.1
 
-  '@corvu/accordion@0.2.3(solid-js@1.9.5)':
+  '@corvu/accordion@0.2.5(solid-js@1.9.5)':
     dependencies:
-      '@corvu/disclosure': 0.2.1(solid-js@1.9.5)
+      '@corvu/disclosure': 0.2.2(solid-js@1.9.5)
       '@corvu/utils': 0.4.2(solid-js@1.9.5)
       solid-js: 1.9.5
       solid-list: 0.3.0(solid-js@1.9.5)
 
-  '@corvu/disclosure@0.2.1(solid-js@1.9.5)':
+  '@corvu/disclosure@0.2.2(solid-js@1.9.5)':
     dependencies:
       '@corvu/utils': 0.4.2(solid-js@1.9.5)
       solid-js: 1.9.5

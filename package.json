@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@commitlint/config-conventional": "^19.8.0",
-    "@corvu/accordion": "^0.2.3",
+    "@corvu/accordion": "^0.2.5",
     "@corvu/tailwind": "^0.1.6",
     "@corvu/tooltip": "^0.2.2",
     "@eslint/js": "^9.23.0",
