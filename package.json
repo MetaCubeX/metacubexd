@@ -38,7 +38,7 @@
     "@tailwindcss/vite": "^4.0.17",
     "@tanstack/match-sorter-utils": "^8.19.4",
     "@tanstack/solid-table": "^8.21.2",
-    "@tanstack/solid-virtual": "^3.13.5",
+    "@tanstack/solid-virtual": "^3.13.6",
     "@tanstack/virtual-core": "^3.13.5",
     "@thisbeyond/solid-dnd": "^0.7.5",
     "@types/byte-size": "^8.1.2",
