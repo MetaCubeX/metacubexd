@@ -129,8 +129,8 @@ importers:
         specifier: ^10.1.1
         version: 10.1.1(eslint@9.23.0(jiti@2.4.2))
       eslint-plugin-prettier:
-        specifier: ^5.2.5
-        version: 5.2.5(eslint-config-prettier@10.1.1(eslint@9.23.0(jiti@2.4.2)))(eslint@9.23.0(jiti@2.4.2))(prettier@3.5.3)
+        specifier: ^5.2.6
+        version: 5.2.6(eslint-config-prettier@10.1.1(eslint@9.23.0(jiti@2.4.2)))(eslint@9.23.0(jiti@2.4.2))(prettier@3.5.3)
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -1121,8 +1121,8 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
-  '@pkgr/core@0.2.0':
-    resolution: {integrity: sha512-vsJDAkYR6qCPu+ioGScGiMYR7LvZYIXh/dlQeviqoTWNCVfKTLYD/LkNWH4Mxsv2a5vpIRc77FN5DnmK1eBggQ==}
+  '@pkgr/core@0.2.1':
+    resolution: {integrity: sha512-VzgHzGblFmUeBmmrk55zPyrQIArQN4vujc9shWytaPdB3P7qhi0cpaiKIr7tlCmFv2lYUwnLospIqjL9ZSAhhg==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
 
   '@rollup/plugin-babel@5.3.1':
@@ -2097,8 +2097,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-prettier@5.2.5:
-    resolution: {integrity: sha512-IKKP8R87pJyMl7WWamLgPkloB16dagPIdd2FjBDbyRYPKo93wS/NbCOPh6gH+ieNLC+XZrhJt/kWj0PS/DFdmg==}
+  eslint-plugin-prettier@5.2.6:
+    resolution: {integrity: sha512-mUcf7QG2Tjk7H055Jk0lGBjbgDnfrvqjhXh9t2xLMSCjZVcw9Rb1V6sVNXO0th3jgeO7zllWPTNRil3JW94TnQ==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
       '@types/eslint': '>=8.0.0'
@@ -3488,8 +3488,8 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
-  synckit@0.10.3:
-    resolution: {integrity: sha512-R1urvuyiTaWfeCggqEvpDJwAlDVdsT9NM+IP//Tk2x7qHCkSvBk/fwFgw/TLAHzZlrAnnazMcRw0ZD8HlYFTEQ==}
+  synckit@0.11.3:
+    resolution: {integrity: sha512-szhWDqNNI9etJUvbZ1/cx1StnZx8yMmFxme48SwR4dty4ioSY50KEZlpv0qAfgc1fpRzuh9hBXEzoCpJ779dLg==}
     engines: {node: ^14.18.0 || >=16.0.0}
 
   tailwind-merge@3.1.0:
@@ -4975,7 +4975,7 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.19.1
 
-  '@pkgr/core@0.2.0': {}
+  '@pkgr/core@0.2.1': {}
 
   '@rollup/plugin-babel@5.3.1(@babel/core@7.26.10)(@types/babel__core@7.20.5)(rollup@2.79.2)':
     dependencies:
@@ -5980,12 +5980,12 @@ snapshots:
     dependencies:
       eslint: 9.23.0(jiti@2.4.2)
 
-  eslint-plugin-prettier@5.2.5(eslint-config-prettier@10.1.1(eslint@9.23.0(jiti@2.4.2)))(eslint@9.23.0(jiti@2.4.2))(prettier@3.5.3):
+  eslint-plugin-prettier@5.2.6(eslint-config-prettier@10.1.1(eslint@9.23.0(jiti@2.4.2)))(eslint@9.23.0(jiti@2.4.2))(prettier@3.5.3):
     dependencies:
       eslint: 9.23.0(jiti@2.4.2)
       prettier: 3.5.3
       prettier-linter-helpers: 1.0.0
-      synckit: 0.10.3
+      synckit: 0.11.3
     optionalDependencies:
       eslint-config-prettier: 10.1.1(eslint@9.23.0(jiti@2.4.2))
 
@@ -7352,9 +7352,9 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
-  synckit@0.10.3:
+  synckit@0.11.3:
     dependencies:
-      '@pkgr/core': 0.2.0
+      '@pkgr/core': 0.2.1
       tslib: 2.8.1
 
   tailwind-merge@3.1.0: {}
