@@ -47,7 +47,7 @@
     "@types/node": "^22.14.1",
     "@types/uuid": "^10.0.0",
     "@vite-pwa/assets-generator": "^1.0.0",
-    "apexcharts": "^4.5.0",
+    "apexcharts": "^4.6.0",
     "byte-size": "^9.0.1",
     "commitlint": "^19.8.0",
     "daisyui": "^5.0.27",
