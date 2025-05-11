@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.187.0](https://github.com/MetaCubeX/metacubexd/compare/v1.186.1...v1.187.0) (2025-05-11)
+
+
+### Features
+
+* add new flow chart to overview page ([080560e](https://github.com/MetaCubeX/metacubexd/commit/080560e2a54121b27d66986413a9b0a66d33f1a8))
+
 ## [1.186.1](https://github.com/MetaCubeX/metacubexd/compare/v1.186.0...v1.186.1) (2025-03-15)
 
 
