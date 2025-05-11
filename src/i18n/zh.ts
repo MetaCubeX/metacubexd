@@ -19,6 +19,7 @@ export default {
   downloadTotal: '下载总量',
   activeConnections: '活动连接',
   memoryUsage: '内存使用情况',
+  flow: '流量',
   traffic: '流量',
   memory: '内存',
   down: '下载',

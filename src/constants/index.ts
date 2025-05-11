@@ -61,7 +61,6 @@ export const DEFAULT_CHART_OPTIONS: ApexOptions = {
     labels: { colors: 'gray' },
     itemMargin: { horizontal: 32 },
   },
-  dataLabels: { enabled: false },
   grid: { yaxis: { lines: { show: false } } },
   stroke: { curve: 'smooth' },
   tooltip: { enabled: false },

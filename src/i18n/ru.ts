@@ -19,6 +19,7 @@ export default {
   downloadTotal: 'Всего скачано',
   activeConnections: 'Активные подключения',
   memoryUsage: 'Использование памяти',
+  flow: 'Поток',
   traffic: 'Трафик',
   memory: 'Память',
   down: 'Скачано',

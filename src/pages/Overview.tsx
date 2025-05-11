@@ -1,7 +1,7 @@
 import { makeTimer } from '@solid-primitives/timer'
 import type { ApexOptions } from 'apexcharts'
 import byteSize from 'byte-size'
-import { merge } from 'lodash'
+import { defaultsDeep } from 'lodash'
 import { SolidApexCharts } from 'solid-apexcharts'
 import type { JSX, ParentComponent } from 'solid-js'
 import { DocumentTitle } from '~/components'
@@ -57,7 +57,7 @@ export default () => {
   })
 
   const trafficChartOptions = createMemo<ApexOptions>(() =>
-    merge({ title: { text: t('traffic') } }, DEFAULT_CHART_OPTIONS),
+    defaultsDeep({ title: { text: t('traffic') } }, DEFAULT_CHART_OPTIONS),
   )
 
   const trafficChartSeries = createMemo(() => [
@@ -71,6 +71,25 @@ export default () => {
     },
   ])
 
+  const flowChartOptions = createMemo<ApexOptions>(() => {
+    return defaultsDeep(
+      {
+        title: { text: t('flow') },
+        labels: [t('uploadTotal'), t('downloadTotal')],
+        tooltip: { enabled: true },
+        chart: {
+          animations: { enabled: false },
+        },
+      },
+      DEFAULT_CHART_OPTIONS,
+    )
+  })
+
+  const flowChartSeries = createMemo(() => [
+    latestConnectionMsg()?.uploadTotal || 0,
+    latestConnectionMsg()?.downloadTotal || 0,
+  ])
+
   const memory = useWsRequest<{ inuse: number }>('memory')
 
   createEffect(() => {
@@ -80,7 +99,7 @@ export default () => {
   })
 
   const memoryChartOptions = createMemo<ApexOptions>(() =>
-    merge({ title: { text: t('memory') } }, DEFAULT_CHART_OPTIONS),
+    defaultsDeep({ title: { text: t('memory') } }, DEFAULT_CHART_OPTIONS),
   )
 
   const memoryChartSeries = createMemo(() => [
@@ -124,6 +143,13 @@ export default () => {
               type="line"
               options={trafficChartOptions()}
               series={trafficChartSeries()}
+            />
+          </div>
+          <div class="flex-1">
+            <SolidApexCharts
+              type="pie"
+              options={flowChartOptions()}
+              series={flowChartSeries()}
             />
           </div>
           <div class="flex-1">

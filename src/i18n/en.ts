@@ -17,6 +17,7 @@ export default {
   downloadTotal: 'Download Total',
   activeConnections: 'Active Connections',
   memoryUsage: 'Memory Usage',
+  flow: 'Flow',
   traffic: 'Traffic',
   memory: 'Memory',
   down: 'Down',
