@@ -194,7 +194,7 @@ export const ConnectionsSettingsModal = (props: {
         <div class="flex justify-between py-2">
           <div class="flex items-center gap-2">
             <Button
-              class="hidden cursor-grab btn-sm btn-ghost sm:inline-block"
+              class="hidden cursor-grab btn-ghost btn-sm sm:inline-block"
               icon={<IconMenuOrder size={24} />}
               {...sortable.dragActivators}
             />
@@ -291,7 +291,7 @@ export const ConnectionsSettingsModal = (props: {
                     </span>
 
                     <Button
-                      class="btn-circle btn-xs btn-ghost"
+                      class="btn-circle btn-ghost btn-xs"
                       onClick={() =>
                         setClientSourceIPTags((tags) =>
                           tags.filter((tag) => tag.tagName !== tagName),

@@ -174,7 +174,7 @@ export default () => {
                 <span class="truncate">{url}</span>
 
                 <Button
-                  class="btn-circle btn-xs text-white btn-ghost"
+                  class="btn-circle text-white btn-ghost btn-xs"
                   onClick={(e) => {
                     e.stopPropagation()
                     onRemove(id)
