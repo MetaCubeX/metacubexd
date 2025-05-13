@@ -75,7 +75,7 @@ export default () => {
     return defaultsDeep(
       {
         title: { text: t('flow') },
-        labels: [t('uploadTotal'), t('downloadTotal')],
+        labels: [t('downloadTotal'), t('uploadTotal')],
         tooltip: { enabled: true },
         chart: {
           animations: { enabled: false },
@@ -86,8 +86,8 @@ export default () => {
   })
 
   const flowChartSeries = createMemo(() => [
-    latestConnectionMsg()?.uploadTotal || 0,
     latestConnectionMsg()?.downloadTotal || 0,
+    latestConnectionMsg()?.uploadTotal || 0,
   ])
 
   const memory = useWsRequest<{ inuse: number }>('memory')
