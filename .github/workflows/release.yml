@@ -5,8 +5,13 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   release-please:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
@@ -21,6 +26,9 @@ jobs:
           release-type: node
 
   release-assets:
+    permissions:
+      contents: read
+      packages: write
     needs: release-please
     runs-on: ubuntu-latest
     if: ${{ needs.release-please.outputs.release_created }}
@@ -59,6 +67,9 @@ jobs:
           tag_name: ${{ needs.release-please.outputs.tag_name }}
 
   release-image:
+    permissions:
+      contents: read
+      packages: write
     needs: release-please
     runs-on: ubuntu-latest
     if: ${{ needs.release-please.outputs.release_created }}
