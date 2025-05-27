@@ -44,7 +44,7 @@
     "@types/byte-size": "^8.1.2",
     "@types/lodash": "^4.17.17",
     "@types/markdown-it": "^14.1.2",
-    "@types/node": "^22.15.21",
+    "@types/node": "^22.15.23",
     "@types/uuid": "^10.0.0",
     "@vite-pwa/assets-generator": "^1.0.0",
     "apexcharts": "^4.7.0",
