@@ -78,7 +78,7 @@
     "vite": "^6.3.5",
     "vite-plugin-pwa": "^1.0.0",
     "vite-plugin-solid": "^2.11.6",
-    "zod": "^3.25.30"
+    "zod": "^3.25.63"
   },
   "packageManager": "pnpm@10.11.0",
   "pnpm": {
