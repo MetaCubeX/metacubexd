@@ -20,7 +20,7 @@ const Nav: ParentComponent<{ href: string; tooltip: string }> = ({
   children,
 }) => (
   <li class="tooltip tooltip-bottom" data-tip={tooltip}>
-    <A class="rounded-box" href={href}>
+    <A class="rounded-box" activeClass="menu-active" href={href}>
       {children}
     </A>
   </li>
@@ -123,7 +123,7 @@ export const Header = () => {
               <For each={navs()}>
                 {({ href, name, icon }) => (
                   <li onClick={() => setOpenedDrawer(false)}>
-                    <A href={href}>
+                    <A href={href} activeClass="menu-active">
                       {icon} {name}
                     </A>
                   </li>
