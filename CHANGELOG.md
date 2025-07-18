@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.188.1](https://github.com/MetaCubeX/metacubexd/compare/v1.188.0...v1.188.1) (2025-07-18)
+
+
+### Bug Fixes
+
+* add missing token for attaching GitHub release artifacts ([f1525f6](https://github.com/MetaCubeX/metacubexd/commit/f1525f67a565fd00202d8baae351abe67b36d085))
+
 ## [1.188.0](https://github.com/MetaCubeX/metacubexd/compare/v1.187.1...v1.188.0) (2025-07-18)
 
 
