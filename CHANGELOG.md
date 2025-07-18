@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.188.0](https://github.com/MetaCubeX/metacubexd/compare/v1.187.1...v1.188.0) (2025-07-18)
+
+
+### Features
+
+* update CI token, trigger new release ([7c35df9](https://github.com/MetaCubeX/metacubexd/commit/7c35df9bb8ec2baf1fb41c5f16c74528b748048c))
+
+
+### Bug Fixes
+
+* active menu item ([#1523](https://github.com/MetaCubeX/metacubexd/issues/1523)) ([d4398f1](https://github.com/MetaCubeX/metacubexd/commit/d4398f16a54854c4e6169eec10357546208e9d16))
+
 ## [1.187.1](https://github.com/MetaCubeX/metacubexd/compare/v1.187.0...v1.187.1) (2025-05-13)
 
 
