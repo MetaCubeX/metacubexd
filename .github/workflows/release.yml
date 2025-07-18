@@ -63,6 +63,7 @@ jobs:
       - name: attach github release artifacts
         uses: softprops/action-gh-release@v2
         with:
+          token: ${{ secrets.CI_TOKEN }}
           files: compressed-dist.tgz
           tag_name: ${{ needs.release-please.outputs.tag_name }}
 
