@@ -22,7 +22,7 @@ jobs:
         id: release
         uses: googleapis/release-please-action@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.CI_TOKEN }}
           release-type: node
 
   release-assets:
@@ -51,7 +51,7 @@ jobs:
       - name: publish gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.CI_TOKEN }}
           publish_dir: ./dist
           force_orphan: true
           cname: d.metacubex.one
@@ -88,7 +88,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.CI_TOKEN }}
 
       - name: build and publish ghcr.io docker image
         uses: docker/build-push-action@v6
