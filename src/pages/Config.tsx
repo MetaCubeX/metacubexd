@@ -125,7 +125,18 @@ const DNSQueryForm = () => {
           <Select name="type">
             <option>A</option>
             <option>AAAA</option>
+            <option>CNAME</option>
+            <option>TXT</option>
             <option>MX</option>
+            <option>SRV</option>
+            <option>HTTPS</option>
+            <option>NS</option>
+            <option>DNSKEY</option>
+            <option>DS</option>
+            <option>SIG</option>
+            <option>SOA</option>
+            <option>RRSIG</option>
+            <option>RP</option>
           </Select>
 
           <Button type="submit" class="btn-primary" loading={isSubmitting()}>
@@ -135,7 +146,7 @@ const DNSQueryForm = () => {
       </form>
 
       <Show when={DNSQueryResult().length > 0}>
-        <div class="flex flex-col p-4">
+        <div class="flex flex-col overflow-auto p-4">
           <For each={DNSQueryResult()}>
             {(item) => <div class="py-2">{item}</div>}
           </For>
