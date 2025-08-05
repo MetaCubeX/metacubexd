@@ -52,7 +52,7 @@
     "commitlint": "^19.8.1",
     "daisyui": "^5.0.46",
     "dayjs": "^1.11.13",
-    "eslint": "^9.31.0",
+    "eslint": "^9.32.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.5.1",
     "husky": "^9.1.7",
