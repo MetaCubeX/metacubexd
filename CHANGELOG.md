@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.189.0](https://github.com/MetaCubeX/metacubexd/compare/v1.188.1...v1.189.0) (2025-08-05)
+
+
+### Features
+
+* dns query supports more record types ([#1532](https://github.com/MetaCubeX/metacubexd/issues/1532)) ([4ec76c7](https://github.com/MetaCubeX/metacubexd/commit/4ec76c7be214d4f90a32af5e8af93ef73fe774d0))
+
 ## [1.188.1](https://github.com/MetaCubeX/metacubexd/compare/v1.188.0...v1.188.1) (2025-07-18)
 
 
