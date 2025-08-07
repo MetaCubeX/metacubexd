@@ -70,7 +70,7 @@ export const ProxyNodeCard = (props: {
           <div class="indicator-item badge badge-xs badge-info">U</div>
         </Show>
 
-        <Tooltip.Trigger>
+        <Tooltip.Trigger as="div">
           <div
             class={twMerge(
               'card-body gap-1 space-y-1 p-2.5',
