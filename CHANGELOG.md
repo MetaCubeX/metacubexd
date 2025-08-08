@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.189.1](https://github.com/MetaCubeX/metacubexd/compare/v1.189.0...v1.189.1) (2025-08-08)
+
+
+### Bug Fixes
+
+* [#1504](https://github.com/MetaCubeX/metacubexd/issues/1504) [#1381](https://github.com/MetaCubeX/metacubexd/issues/1381) [#1428](https://github.com/MetaCubeX/metacubexd/issues/1428) ([#1540](https://github.com/MetaCubeX/metacubexd/issues/1540)) ([c40b139](https://github.com/MetaCubeX/metacubexd/commit/c40b139cda0ca546ddaa8509101c519377bf9529))
+
 ## [1.189.0](https://github.com/MetaCubeX/metacubexd/compare/v1.188.1...v1.189.0) (2025-08-05)
 
 
