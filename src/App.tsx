@@ -9,10 +9,10 @@ import {
   endpoint,
   favDayTheme,
   favNightTheme,
+  fontFamily,
   setCurTheme,
   setLatestConnectionMsg,
   setRootElement,
-  useTwemoji,
   useWsRequest,
 } from '~/signals'
 
@@ -37,7 +37,7 @@ export const App: ParentComponent = ({ children }) => {
       ref={(el) => setRootElement(el)}
       class={twMerge(
         'relative flex h-screen flex-col overscroll-y-none bg-base-100 subpixel-antialiased',
-        useTwemoji() ? 'font-twemoji' : 'font-no-twemoji',
+        fontFamily(),
       )}
       data-theme={curTheme()}
     >
