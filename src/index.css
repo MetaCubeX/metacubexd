@@ -6,18 +6,18 @@
 }
 
 @theme {
-  --font-twemoji: 'system-ui', 'Twemoji Mozilla', 'Fira Sans', monospace;
-  --font-no-twemoji: 'system-ui', 'Fira Sans', 'monospace';
+  --font-fira-sans: FiraSans, system-ui, 'Twemoji Mozilla', monospace;
+  --font-system-ui: system-ui, 'Twemoji Mozilla', monospace;
 }
 
 @font-face {
-  font-family: 'Fira Sans';
+  font-family: 'FiraSans';
   src: url('assets/FiraSans-Regular.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'Twemoji Mozilla';
-  src: url('assets/Twemoji.Mozilla.ttf') format('truetype');
+  src: url('assets/TwemojiMozilla-flags.woff2') format('woff2');
 }
 
 :root {

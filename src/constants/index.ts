@@ -166,5 +166,10 @@ export enum LOG_LEVEL {
   Silent = 'silent',
 }
 
+export enum FONT_FAMILY {
+  FiraSans = 'font-fira-sans',
+  SystemUI = 'font-system-ui',
+}
+
 export const LOGS_TABLE_MAX_ROWS_LIST = [200, 300, 500, 800, 1000]
 export const DEFAULT_LOGS_TABLE_MAX_ROWS = LOGS_TABLE_MAX_ROWS_LIST[0]

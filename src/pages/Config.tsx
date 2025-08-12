@@ -18,20 +18,20 @@ import {
   updatingGEODatabases,
 } from '~/apis'
 import { Button, ConfigTitle, DocumentTitle, Versions } from '~/components'
-import { LANG, ROUTES, themes } from '~/constants'
+import { FONT_FAMILY, LANG, ROUTES, themes } from '~/constants'
 import { Dict, locale, setLocale, useI18n } from '~/i18n'
 import {
   autoSwitchTheme,
   endpoint,
   favDayTheme,
   favNightTheme,
+  fontFamily,
   setAutoSwitchTheme,
   setFavDayTheme,
   setFavNightTheme,
+  setFontFamily,
   setSelectedEndpoint,
-  setUseTwemoji,
   useRequest,
-  useTwemoji,
 } from '~/signals'
 import type { DNSQuery } from '~/types'
 
@@ -430,23 +430,47 @@ const ConfigForXd = () => {
       value: LANG.RU,
     },
   ]
+  const fonts = [
+    {
+      label: 'SystemUI',
+      value: FONT_FAMILY.SystemUI,
+    },
+    {
+      label: 'FiraSans',
+      value: FONT_FAMILY.FiraSans,
+    },
+  ]
 
   return (
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
       <div class="flex flex-col gap-2">
-        <div class="flex flex-col items-center">
-          <ConfigTitle>{t('useTwemoji')}</ConfigTitle>
+        <div class="flex flex-col">
+          <ConfigTitle>{t('switchFont')}</ConfigTitle>
 
-          <Toggle
-            checked={useTwemoji()}
-            onChange={(e) => setUseTwemoji(e.target.checked)}
-          />
+          <Select
+            class="w-full"
+            onChange={(e) => setFontFamily(e.target.value as FONT_FAMILY)}
+          >
+            <For each={fonts}>
+              {(font) => (
+                <option
+                  selected={fontFamily() === font.value}
+                  value={font.value}
+                >
+                  {font.label}
+                </option>
+              )}
+            </For>
+          </Select>
         </div>
 
         <div class="flex flex-col">
           <ConfigTitle>{t('switchLanguage')}</ConfigTitle>
 
-          <Select onChange={(e) => setLocale(e.target.value as LANG)}>
+          <Select
+            class="w-full"
+            onChange={(e) => setLocale(e.target.value as LANG)}
+          >
             <For each={languages}>
               {(lang) => (
                 <option selected={locale() === lang.value} value={lang.value}>
@@ -476,10 +500,12 @@ const ConfigForXd = () => {
         <div class="flex flex-col items-center">
           <ConfigTitle>{t('autoSwitchTheme')}</ConfigTitle>
 
-          <Toggle
-            checked={autoSwitchTheme()}
-            onChange={(e) => setAutoSwitchTheme(e.target.checked)}
-          />
+          <div class="h-[2.5rem]">
+            <Toggle
+              checked={autoSwitchTheme()}
+              onChange={(e) => setAutoSwitchTheme(e.target.checked)}
+            />
+          </div>
         </div>
 
         <Show when={autoSwitchTheme()}>
@@ -488,6 +514,7 @@ const ConfigForXd = () => {
               <ConfigTitle>{t('favDayTheme')}</ConfigTitle>
 
               <Select
+                class="w-full"
                 onChange={(e) =>
                   setFavDayTheme(e.target.value as (typeof themes)[number])
                 }
@@ -506,6 +533,7 @@ const ConfigForXd = () => {
               <ConfigTitle>{t('favNightTheme')}</ConfigTitle>
 
               <Select
+                class="w-full"
                 onChange={(e) =>
                   setFavNightTheme(e.target.value as (typeof themes)[number])
                 }

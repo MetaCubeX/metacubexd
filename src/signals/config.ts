@@ -3,6 +3,7 @@ import {
   CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
   CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY,
   DEFAULT_LOGS_TABLE_MAX_ROWS,
+  FONT_FAMILY,
   LATENCY_QUALITY_MAP_HTTP,
   LATENCY_QUALITY_MAP_HTTPS,
   LOG_LEVEL,
@@ -60,14 +61,11 @@ export const [autoCloseConns, setAutoCloseConns] = makePersisted(
   { name: 'autoCloseConns', storage: localStorage },
 )
 
-export const useTwemojiDefault = false
+export const fontFamilyDefault = FONT_FAMILY.SystemUI
 
-export const [useTwemoji, setUseTwemoji] = makePersisted(
-  createSignal(useTwemojiDefault),
-  {
-    name: 'useTwemoji',
-    storage: localStorage,
-  },
+export const [fontFamily, setFontFamily] = makePersisted(
+  createSignal(fontFamilyDefault),
+  { name: 'fontFamily', storage: localStorage },
 )
 
 export const autoSwitchThemeDefault = false
