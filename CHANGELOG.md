@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.190.0](https://github.com/MetaCubeX/metacubexd/compare/v1.189.1...v1.190.0) (2025-08-12)
+
+
+### Features
+
+* font switching feature and use the Twemoji font that only includes flags ([#1547](https://github.com/MetaCubeX/metacubexd/issues/1547)) ([aab2d5e](https://github.com/MetaCubeX/metacubexd/commit/aab2d5e620e36db5236b93544ae5be32b9cefbae))
+
 ## [1.189.1](https://github.com/MetaCubeX/metacubexd/compare/v1.189.0...v1.189.1) (2025-08-08)
 
 
