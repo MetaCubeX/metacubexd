@@ -51,3 +51,7 @@
     @apply rounded-box bg-primary;
   }
 }
+
+option {
+  font-family: system-ui;
+}
