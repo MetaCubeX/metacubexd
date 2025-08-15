@@ -6,8 +6,8 @@
 }
 
 @theme {
-  --font-fira-sans: FiraSans, system-ui, 'Twemoji Mozilla', monospace;
-  --font-system-ui: system-ui, 'Twemoji Mozilla', monospace;
+  --font-fira-sans: FiraSans, 'Twemoji Mozilla', system-ui, monospace;
+  --font-system-ui: 'Twemoji Mozilla', system-ui, monospace;
 }
 
 @font-face {
@@ -50,4 +50,8 @@
   ::-webkit-scrollbar-thumb {
     @apply rounded-box bg-primary;
   }
+}
+
+option {
+  font-family: system-ui;
 }
