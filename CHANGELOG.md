@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.190.1](https://github.com/MetaCubeX/metacubexd/compare/v1.190.0...v1.190.1) (2025-08-15)
+
+
+### Bug Fixes
+
+* Twemoji does not work on iOS ([#1552](https://github.com/MetaCubeX/metacubexd/issues/1552)) ([c5eb4c0](https://github.com/MetaCubeX/metacubexd/commit/c5eb4c046f58cc81867af5cb0b56b82c80ab9543))
+
 ## [1.190.0](https://github.com/MetaCubeX/metacubexd/compare/v1.189.1...v1.190.0) (2025-08-12)
 
 
