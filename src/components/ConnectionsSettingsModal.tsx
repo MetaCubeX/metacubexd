@@ -252,7 +252,7 @@ export const ConnectionsSettingsModal = (props: {
 
           <input
             type="text"
-            class="input"
+            class="input w-full"
             onInput={(e) => setQuickFilterRegex(e.target.value)}
             value={quickFilterRegex()}
           />
@@ -262,7 +262,7 @@ export const ConnectionsSettingsModal = (props: {
           <ConfigTitle withDivider>{t('tableSize')}</ConfigTitle>
 
           <select
-            class="select"
+            class="select w-full"
             value={connectionsTableSize()}
             onChange={(e) =>
               setConnectionsTableSize(e.target.value as TAILWINDCSS_SIZE)
