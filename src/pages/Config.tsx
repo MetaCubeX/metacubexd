@@ -110,39 +110,41 @@ const DNSQueryForm = () => {
 
   return (
     <div class="flex flex-col">
-      <form use:form={form} class="flex gap-2 sm:flex-row">
+      <form use:form={form} class="join">
         <Input
           type="search"
           name="name"
-          class="flex-1"
+          class="join-item w-full"
           placeholder={defaultDNSQueryTarget}
           onInput={(e) => {
             if (!e.target.value) setDNSQueryResult([])
           }}
         />
 
-        <div class="flex items-center gap-2">
-          <Select name="type">
-            <option>A</option>
-            <option>AAAA</option>
-            <option>CNAME</option>
-            <option>TXT</option>
-            <option>MX</option>
-            <option>SRV</option>
-            <option>HTTPS</option>
-            <option>NS</option>
-            <option>DNSKEY</option>
-            <option>DS</option>
-            <option>SIG</option>
-            <option>SOA</option>
-            <option>RRSIG</option>
-            <option>RP</option>
-          </Select>
+        <Select name="type" class="join-item max-w-max">
+          <option>A</option>
+          <option>AAAA</option>
+          <option>CNAME</option>
+          <option>TXT</option>
+          <option>MX</option>
+          <option>SRV</option>
+          <option>HTTPS</option>
+          <option>NS</option>
+          <option>DNSKEY</option>
+          <option>DS</option>
+          <option>SIG</option>
+          <option>SOA</option>
+          <option>RRSIG</option>
+          <option>RP</option>
+        </Select>
 
-          <Button type="submit" class="btn-primary" loading={isSubmitting()}>
-            {t('dnsQuery')}
-          </Button>
-        </div>
+        <Button
+          type="submit"
+          class="join-item max-w-max btn-primary"
+          loading={isSubmitting()}
+        >
+          {t('dnsQuery')}
+        </Button>
       </form>
 
       <Show when={DNSQueryResult().length > 0}>
@@ -418,15 +420,15 @@ const ConfigForXd = () => {
   const navigate = useNavigate()
   const languages = [
     {
-      label: () => t('en'),
+      label: 'English',
       value: LANG.EN,
     },
     {
-      label: () => t('zh'),
+      label: '简体中文',
       value: LANG.ZH,
     },
     {
-      label: () => t('ru'),
+      label: 'Русский',
       value: LANG.RU,
     },
   ]
@@ -474,7 +476,7 @@ const ConfigForXd = () => {
             <For each={languages}>
               {(lang) => (
                 <option selected={locale() === lang.value} value={lang.value}>
-                  {lang.label()}
+                  {lang.label}
                 </option>
               )}
             </For>
