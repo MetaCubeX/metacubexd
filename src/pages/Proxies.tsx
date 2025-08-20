@@ -152,7 +152,7 @@ export default () => {
 
       <div class="flex h-full flex-col gap-2">
         <div class="flex items-center gap-2">
-          <div class="tabs tabs-sm gap-2 tabs-box">
+          <div class="tabs gap-2 tabs-box tabs-sm">
             <For each={tabs()}>
               {(tab) => (
                 <button
