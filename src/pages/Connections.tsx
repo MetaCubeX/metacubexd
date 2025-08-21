@@ -194,7 +194,7 @@ export default () => {
               <Show when={index()}>
                 <IconChevronRight class="inline-block" size={18} />
               </Show>
-              {name}
+              <span class="align-middle">{name}</span>
             </>
           )}
         </For>
