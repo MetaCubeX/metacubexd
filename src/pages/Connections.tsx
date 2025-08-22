@@ -1,6 +1,7 @@
 import { writeClipboard } from '@solid-primitives/clipboard'
 import { makePersisted } from '@solid-primitives/storage'
 import {
+  IconChevronRight,
   IconInfoSmall,
   IconPlayerPause,
   IconPlayerPlay,
@@ -37,7 +38,7 @@ import {
   DocumentTitle,
 } from '~/components'
 import { CONNECTIONS_TABLE_ACCESSOR_KEY } from '~/constants'
-import { formatTimeFromNow } from '~/helpers'
+import { formatIPv6, formatTimeFromNow } from '~/helpers'
 import { useI18n } from '~/i18n'
 import {
   allConnections,
@@ -167,7 +168,7 @@ export default () => {
         `${
           original.metadata.host
             ? original.metadata.host
-            : original.metadata.destinationIP
+            : formatIPv6(original.metadata.destinationIP)
         }:${original.metadata.destinationPort}`,
     },
     {
@@ -181,12 +182,23 @@ export default () => {
       accessorFn: (original) =>
         !original.rulePayload
           ? original.rule
-          : `${original.rule} :: ${original.rulePayload}`,
+          : `${original.rule} : ${original.rulePayload}`,
     },
     {
       header: () => t('chains'),
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Chains,
-      accessorFn: (original) => original.chains.slice().reverse().join(' :: '),
+      cell: ({ row }) => (
+        <For each={row.original.chains.slice().reverse()}>
+          {(name, index) => (
+            <>
+              <Show when={index()}>
+                <IconChevronRight class="inline-block" size={18} />
+              </Show>
+              <span class="align-middle">{name}</span>
+            </>
+          )}
+        </For>
+      ),
     },
     {
       header: () => t('connectTime'),
