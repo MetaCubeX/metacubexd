@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.191.0](https://github.com/MetaCubeX/metacubexd/compare/v1.190.1...v1.191.0) (2025-08-22)
+
+
+### Features
+
+* format IPv6 and adjust style ([#1562](https://github.com/MetaCubeX/metacubexd/issues/1562)) ([0c52c30](https://github.com/MetaCubeX/metacubexd/commit/0c52c30efdd7240a86267592c5e691fa23484671))
+
 ## [1.190.1](https://github.com/MetaCubeX/metacubexd/compare/v1.190.0...v1.190.1) (2025-08-15)
 
 
