@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.192.0](https://github.com/MetaCubeX/metacubexd/compare/v1.191.0...v1.192.0) (2025-08-24)
+
+
+### Features
+
+* verify API endpoint with `/version` ([#1568](https://github.com/MetaCubeX/metacubexd/issues/1568)) ([#1569](https://github.com/MetaCubeX/metacubexd/issues/1569)) ([01e130b](https://github.com/MetaCubeX/metacubexd/commit/01e130bf2ac5708c28a0c01a9287bd53addb9a08))
+
 ## [1.191.0](https://github.com/MetaCubeX/metacubexd/compare/v1.190.1...v1.191.0) (2025-08-22)
 
 
