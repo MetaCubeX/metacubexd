@@ -13,7 +13,7 @@ import {
 
 export const checkEndpointAPI = (url: string, secret: string) =>
   ky
-    .get(url, {
+    .get(url.endsWith('/') ? `${url}version` : `${url}/version`, {
       headers: secret
         ? {
             Authorization: `Bearer ${secret}`,
