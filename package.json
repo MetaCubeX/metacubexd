@@ -57,7 +57,7 @@
     "eslint-plugin-prettier": "^5.5.1",
     "husky": "^9.1.7",
     "is-ip": "^5.0.1",
-    "ky": "^1.8.2",
+    "ky": "^1.9.1",
     "lint-staged": "^16.1.2",
     "lodash": "^4.17.21",
     "markdown-it": "^14.1.0",
