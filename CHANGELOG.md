@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.194.0](https://github.com/MetaCubeX/metacubexd/compare/v1.193.0...v1.194.0) (2025-09-22)
+
+
+### Features
+
+* connections table virtual scroll ([fa3d024](https://github.com/MetaCubeX/metacubexd/commit/fa3d024b16b9c0cbeb84d1f0b9117d6be8cb096d))
+
 ## [1.193.0](https://github.com/MetaCubeX/metacubexd/compare/v1.192.0...v1.193.0) (2025-09-22)
 
 
