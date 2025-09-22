@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.193.0](https://github.com/MetaCubeX/metacubexd/compare/v1.192.0...v1.193.0) (2025-09-22)
+
+
+### Features
+
+* change mobile navbar to bottom nav ([#1610](https://github.com/MetaCubeX/metacubexd/issues/1610)) ([e111091](https://github.com/MetaCubeX/metacubexd/commit/e111091d37fae12a6c2d0f832d27016cbd29d085))
+
 ## [1.192.0](https://github.com/MetaCubeX/metacubexd/compare/v1.191.0...v1.192.0) (2025-08-24)
 
 
