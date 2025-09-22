@@ -15,21 +15,22 @@ import {
 import { rankItem } from '@tanstack/match-sorter-utils'
 import {
   ColumnDef,
-  FilterFn,
-  GroupingState,
-  SortingState,
   createSolidTable,
+  FilterFn,
   flexRender,
   getCoreRowModel,
   getExpandedRowModel,
   getFilteredRowModel,
   getGroupedRowModel,
   getSortedRowModel,
+  GroupingState,
+  SortingState,
 } from '@tanstack/solid-table'
 import byteSize from 'byte-size'
 import dayjs from 'dayjs'
 import { uniq } from 'lodash'
 import { twMerge } from 'tailwind-merge'
+import { Virtualizer } from 'virtua/solid'
 import { closeAllConnectionsAPI, closeSingleConnectionAPI } from '~/apis'
 import {
   Button,
@@ -367,6 +368,8 @@ export default () => {
     },
   ])
 
+  let scrollRef: HTMLDivElement | undefined
+
   return (
     <>
       <DocumentTitle>{t('connections')}</DocumentTitle>
@@ -476,20 +479,23 @@ export default () => {
           </div>
         </div>
 
-        <div class="overflow-x-auto rounded-md bg-base-300 whitespace-nowrap">
+        <div
+          class="h-full overflow-x-auto rounded-md bg-base-300"
+          ref={scrollRef}
+        >
           <table
             class={twMerge(
               tableSizeClassName(connectionsTableSize()),
-              'table relative rounded-none table-zebra',
+              'table-pin-rows table h-full table-zebra',
             )}
           >
-            <thead class="sticky top-0 z-10 h-8">
+            <thead>
               <For each={table.getHeaderGroups()}>
                 {(headerGroup) => (
-                  <tr>
+                  <tr class="flex">
                     <For each={headerGroup.headers}>
                       {(header) => (
-                        <th class="bg-base-200">
+                        <th class="bg-base-200" style={{ width: '150px' }}>
                           <div class={twMerge('flex items-center gap-2')}>
                             {header.column.getCanGroup() ? (
                               <button
@@ -531,70 +537,74 @@ export default () => {
               </For>
             </thead>
 
-            <tbody>
-              <For each={table.getRowModel().rows}>
-                {(row) => (
-                  <tr class="hover:!bg-primary hover:text-primary-content">
-                    <For each={row.getVisibleCells()}>
-                      {(cell) => {
-                        return (
-                          <td
-                            class="py-2"
-                            onContextMenu={(e) => {
-                              e.preventDefault()
+            <Virtualizer
+              scrollRef={scrollRef}
+              data={table.getRowModel().rows}
+              as="tbody"
+              item="tr"
+            >
+              {(row) => (
+                <For each={row.getVisibleCells()}>
+                  {(cell) => {
+                    return (
+                      <td
+                        class="inline-block py-2 break-words"
+                        style={{
+                          width: '150px',
+                        }}
+                        onContextMenu={(e) => {
+                          e.preventDefault()
 
-                              const value = cell.renderValue() as null | string
+                          const value = cell.renderValue() as null | string
 
-                              if (value) writeClipboard(value).catch(() => {})
-                            }}
+                          if (value) writeClipboard(value).catch(() => {})
+                        }}
+                      >
+                        {cell.getIsGrouped() ? (
+                          <button
+                            class={twMerge(
+                              row.getCanExpand()
+                                ? 'cursor-pointer'
+                                : 'cursor-normal',
+                              'flex items-center gap-2',
+                            )}
+                            onClick={row.getToggleExpandedHandler()}
                           >
-                            {cell.getIsGrouped() ? (
-                              <button
-                                class={twMerge(
-                                  row.getCanExpand()
-                                    ? 'cursor-pointer'
-                                    : 'cursor-normal',
-                                  'flex items-center gap-2',
-                                )}
-                                onClick={row.getToggleExpandedHandler()}
-                              >
-                                <div>
-                                  {row.getIsExpanded() ? (
-                                    <IconZoomOutFilled size={18} />
-                                  ) : (
-                                    <IconZoomInFilled size={18} />
-                                  )}
-                                </div>
+                            <div>
+                              {row.getIsExpanded() ? (
+                                <IconZoomOutFilled size={18} />
+                              ) : (
+                                <IconZoomInFilled size={18} />
+                              )}
+                            </div>
 
-                                <div>
-                                  {flexRender(
-                                    cell.column.columnDef.cell,
-                                    cell.getContext(),
-                                  )}
-                                </div>
-
-                                <div>({row.subRows.length})</div>
-                              </button>
-                            ) : cell.getIsAggregated() ? (
-                              flexRender(
-                                cell.column.columnDef.aggregatedCell ??
-                                  cell.column.columnDef.cell,
-                                cell.getContext(),
-                              )
-                            ) : cell.getIsPlaceholder() ? null : (
-                              flexRender(
+                            <div>
+                              {flexRender(
                                 cell.column.columnDef.cell,
                                 cell.getContext(),
-                              )
-                            )}
-                          </td>
-                        )
-                      }}
-                    </For>
-                  </tr>
-                )}
-              </For>
-            </tbody>
+                              )}
+                            </div>
+
+                            <div>({row.subRows.length})</div>
+                          </button>
+                        ) : cell.getIsAggregated() ? (
+                          flexRender(
+                            cell.column.columnDef.aggregatedCell ??
+                              cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )
+                        ) : cell.getIsPlaceholder() ? null : (
+                          flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )
+                        )}
+                      </td>
+                    )
+                  }}
+                </For>
+              )}
+            </Virtualizer>
           </table>
         </div>
 

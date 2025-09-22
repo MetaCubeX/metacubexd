@@ -193,6 +193,9 @@ importers:
       uuid:
         specifier: ^13.0.0
         version: 13.0.0
+      virtua:
+        specifier: ^0.43.2
+        version: 0.43.2(solid-js@1.9.9)
       vite:
         specifier: npm:rolldown-vite@latest
         version: rolldown-vite@7.1.11(@types/node@24.5.2)(esbuild@0.25.6)(jiti@2.5.1)(terser@5.44.0)(yaml@2.8.1)
@@ -6051,6 +6054,29 @@ packages:
         integrity: sha512-kdkWdCl6eCeLlRShJKbjVOU2kFKxMF8Ghu50n+crEoyx+VKm3FxAxF9z4DCy6+bbTOqNW0+jcIYRnjoIRzigRw==,
       }
 
+  virtua@0.43.2:
+    resolution:
+      {
+        integrity: sha512-4Tv2qThKZ767PCkFbS5fz8Cy9JmqRV9hq24nGabFl+ddvw+iVdIx11tuWxKvWRhvOZOK5TUosNRUDjIkS6f3FA==,
+      }
+    peerDependencies:
+      react: '>=16.14.0'
+      react-dom: '>=16.14.0'
+      solid-js: '>=1.0'
+      svelte: '>=5.0'
+      vue: '>=3.2'
+    peerDependenciesMeta:
+      react:
+        optional: true
+      react-dom:
+        optional: true
+      solid-js:
+        optional: true
+      svelte:
+        optional: true
+      vue:
+        optional: true
+
   vite-plugin-pwa@1.0.3:
     resolution:
       {
@@ -9944,6 +9970,10 @@ snapshots:
   uuid@13.0.0: {}
 
   validate-html-nesting@1.2.3: {}
+
+  virtua@0.43.2(solid-js@1.9.9):
+    optionalDependencies:
+      solid-js: 1.9.9
 
   vite-plugin-pwa@1.0.3(@vite-pwa/assets-generator@1.0.1)(rolldown-vite@7.1.11(@types/node@24.5.2)(esbuild@0.25.6)(jiti@2.5.1)(terser@5.44.0)(yaml@2.8.1))(workbox-build@7.3.0(@types/babel__core@7.20.5))(workbox-window@7.3.0):
     dependencies:
