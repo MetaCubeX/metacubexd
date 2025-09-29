@@ -51,7 +51,7 @@
     "apexcharts": "^5.3.5",
     "byte-size": "^9.0.1",
     "commitlint": "^19.8.1",
-    "daisyui": "^5.1.18",
+    "daisyui": "^5.1.24",
     "dayjs": "^1.11.18",
     "eslint": "^9.36.0",
     "eslint-config-prettier": "^10.1.8",
