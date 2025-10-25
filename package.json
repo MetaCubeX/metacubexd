@@ -14,7 +14,7 @@
     "serve": "vite preview"
   },
   "dependencies": {
-    "@commitlint/config-conventional": "^19.8.1",
+    "@commitlint/config-conventional": "^20.0.0",
     "@corvu/accordion": "^0.2.5",
     "@corvu/tailwind": "^0.1.7",
     "@corvu/tooltip": "^0.2.2",
