@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.194.1](https://github.com/MetaCubeX/metacubexd/compare/v1.194.0...v1.194.1) (2025-10-28)
+
+
+### Bug Fixes
+
+* virtual table render at bottom in Gecko engine based browser ([#1645](https://github.com/MetaCubeX/metacubexd/issues/1645)) ([62c9439](https://github.com/MetaCubeX/metacubexd/commit/62c9439a7b095a568f07d52707eef8cf002b0654))
+
 ## [1.194.0](https://github.com/MetaCubeX/metacubexd/compare/v1.193.0...v1.194.0) (2025-09-22)
 
 
