@@ -377,7 +377,7 @@ export default () => {
       <div class="flex h-full flex-col gap-2">
         <div class="flex w-full flex-wrap items-center gap-2">
           <div class="flex items-center gap-2">
-            <div class="tabs gap-2 tabs-box tabs-sm">
+            <div class="tabs-box tabs gap-2 tabs-sm">
               <Index each={tabs()}>
                 {(tab) => (
                   <button
@@ -486,7 +486,7 @@ export default () => {
           <table
             class={twMerge(
               tableSizeClassName(connectionsTableSize()),
-              'table-pin-rows table h-full table-zebra',
+              'table-pin-rows table table-zebra',
             )}
           >
             <thead>
