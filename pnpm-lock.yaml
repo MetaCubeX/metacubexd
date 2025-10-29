@@ -79,7 +79,7 @@ importers:
         version: 0.5.19(tailwindcss@4.1.16)
       '@tailwindcss/vite':
         specifier: ^4.1.16
-        version: 4.1.16(rolldown-vite@7.1.20(@types/node@24.5.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1))
+        version: 4.1.16(rolldown-vite@7.1.20(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1))
       '@tanstack/match-sorter-utils':
         specifier: ^8.19.4
         version: 8.19.4
@@ -105,8 +105,8 @@ importers:
         specifier: ^14.1.2
         version: 14.1.2
       '@types/node':
-        specifier: ^24.5.2
-        version: 24.5.2
+        specifier: ^24.9.2
+        version: 24.9.2
       '@types/uuid':
         specifier: ^11.0.0
         version: 11.0.0
@@ -121,7 +121,7 @@ importers:
         version: 9.0.1
       commitlint:
         specifier: ^20.1.0
-        version: 20.1.0(@types/node@24.5.2)(typescript@5.9.2)
+        version: 20.1.0(@types/node@24.9.2)(typescript@5.9.2)
       daisyui:
         specifier: ^5.3.10
         version: 5.3.10
@@ -202,13 +202,13 @@ importers:
         version: 0.43.4(solid-js@1.9.9)
       vite:
         specifier: npm:rolldown-vite@latest
-        version: rolldown-vite@7.1.20(@types/node@24.5.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1)
+        version: rolldown-vite@7.1.20(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1)
       vite-plugin-pwa:
         specifier: ^1.1.0
-        version: 1.1.0(@vite-pwa/assets-generator@1.0.1)(rolldown-vite@7.1.20(@types/node@24.5.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1))(workbox-build@7.3.0(@types/babel__core@7.20.5))(workbox-window@7.3.0)
+        version: 1.1.0(@vite-pwa/assets-generator@1.0.1)(rolldown-vite@7.1.20(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1))(workbox-build@7.3.0(@types/babel__core@7.20.5))(workbox-window@7.3.0)
       vite-plugin-solid:
         specifier: ^2.11.8
-        version: 2.11.8(rolldown-vite@7.1.20(@types/node@24.5.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1))(solid-js@1.9.9)
+        version: 2.11.8(rolldown-vite@7.1.20(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1))(solid-js@1.9.9)
       zod:
         specifier: ^4.1.11
         version: 4.1.11
@@ -1782,8 +1782,8 @@ packages:
   '@types/mdurl@2.0.0':
     resolution: {integrity: sha512-RGdgjQUZba5p6QEFAVx2OGb8rQDL/cPRG7GiedRzMcJ1tYnUANBncjbSB1NRGwbvjcPeikRABz2nshyPk1bhWg==}
 
-  '@types/node@24.5.2':
-    resolution: {integrity: sha512-FYxk1I7wPv3K2XBaoyH2cTnocQEu8AOZ60hPbsyukMPLv5/5qr7V1i8PLHdl6Zf87I+xZXFvPCXYjiTFq+YSDQ==}
+  '@types/node@24.9.2':
+    resolution: {integrity: sha512-uWN8YqxXxqFMX2RqGOrumsKeti4LlmIMIyV0lgut4jx7KQBcBiW6vkDtIBvHnHIquwNfJhk8v2OtmO8zXWHfPA==}
 
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
@@ -3794,8 +3794,8 @@ packages:
   unconfig@7.3.2:
     resolution: {integrity: sha512-nqG5NNL2wFVGZ0NA/aCFw0oJ2pxSf1lwg4Z5ill8wd7K4KX/rQbHlwbh+bjctXL5Ly1xtzHenHGOK0b+lG6JVg==}
 
-  undici-types@7.12.0:
-    resolution: {integrity: sha512-goOacqME2GYyOZZfb5Lgtu+1IDmAlAEu5xnD3+xTzS10hT0vzpf0SPjkXwAw9Jm+4n/mQGDP3LO8CPbYROeBfQ==}
+  undici-types@7.16.0:
+    resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
 
   unicode-canonical-property-names-ecmascript@2.0.1:
     resolution: {integrity: sha512-dA8WbNeb2a6oQzAQ55YlT5vQAWGV9WXOsi3SskE3bcCdM0P4SDd+24zS/OCacdRq5BkdsRj9q3Pg6YyQoxIGqg==}
@@ -4789,11 +4789,11 @@ snapshots:
 
   '@canvas/image-data@1.0.0': {}
 
-  '@commitlint/cli@20.1.0(@types/node@24.5.2)(typescript@5.9.2)':
+  '@commitlint/cli@20.1.0(@types/node@24.9.2)(typescript@5.9.2)':
     dependencies:
       '@commitlint/format': 20.0.0
       '@commitlint/lint': 20.0.0
-      '@commitlint/load': 20.1.0(@types/node@24.5.2)(typescript@5.9.2)
+      '@commitlint/load': 20.1.0(@types/node@24.9.2)(typescript@5.9.2)
       '@commitlint/read': 20.0.0
       '@commitlint/types': 20.0.0
       tinyexec: 1.0.1
@@ -4840,7 +4840,7 @@ snapshots:
       '@commitlint/rules': 20.0.0
       '@commitlint/types': 20.0.0
 
-  '@commitlint/load@20.1.0(@types/node@24.5.2)(typescript@5.9.2)':
+  '@commitlint/load@20.1.0(@types/node@24.9.2)(typescript@5.9.2)':
     dependencies:
       '@commitlint/config-validator': 20.0.0
       '@commitlint/execute-rule': 20.0.0
@@ -4848,7 +4848,7 @@ snapshots:
       '@commitlint/types': 20.0.0
       chalk: 5.6.2
       cosmiconfig: 9.0.0(typescript@5.9.2)
-      cosmiconfig-typescript-loader: 6.2.0(@types/node@24.5.2)(cosmiconfig@9.0.0(typescript@5.9.2))(typescript@5.9.2)
+      cosmiconfig-typescript-loader: 6.2.0(@types/node@24.9.2)(cosmiconfig@9.0.0(typescript@5.9.2))(typescript@5.9.2)
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       lodash.uniq: 4.5.0
@@ -5577,12 +5577,12 @@ snapshots:
       postcss-selector-parser: 6.0.10
       tailwindcss: 4.1.16
 
-  '@tailwindcss/vite@4.1.16(rolldown-vite@7.1.20(@types/node@24.5.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1))':
+  '@tailwindcss/vite@4.1.16(rolldown-vite@7.1.20(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1))':
     dependencies:
       '@tailwindcss/node': 4.1.16
       '@tailwindcss/oxide': 4.1.16
       tailwindcss: 4.1.16
-      vite: rolldown-vite@7.1.20(@types/node@24.5.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1)
+      vite: rolldown-vite@7.1.20(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1)
 
   '@tanstack/match-sorter-utils@8.19.4':
     dependencies:
@@ -5636,7 +5636,7 @@ snapshots:
 
   '@types/conventional-commits-parser@5.0.2':
     dependencies:
-      '@types/node': 24.5.2
+      '@types/node': 24.9.2
 
   '@types/estree@0.0.39': {}
 
@@ -5655,9 +5655,9 @@ snapshots:
 
   '@types/mdurl@2.0.0': {}
 
-  '@types/node@24.5.2':
+  '@types/node@24.9.2':
     dependencies:
-      undici-types: 7.12.0
+      undici-types: 7.16.0
 
   '@types/resolve@1.20.2': {}
 
@@ -5999,9 +5999,9 @@ snapshots:
 
   commander@2.20.3: {}
 
-  commitlint@20.1.0(@types/node@24.5.2)(typescript@5.9.2):
+  commitlint@20.1.0(@types/node@24.9.2)(typescript@5.9.2):
     dependencies:
-      '@commitlint/cli': 20.1.0(@types/node@24.5.2)(typescript@5.9.2)
+      '@commitlint/cli': 20.1.0(@types/node@24.9.2)(typescript@5.9.2)
       '@commitlint/types': 20.0.0
     transitivePeerDependencies:
       - '@types/node'
@@ -6045,9 +6045,9 @@ snapshots:
     dependencies:
       browserslist: 4.27.0
 
-  cosmiconfig-typescript-loader@6.2.0(@types/node@24.5.2)(cosmiconfig@9.0.0(typescript@5.9.2))(typescript@5.9.2):
+  cosmiconfig-typescript-loader@6.2.0(@types/node@24.9.2)(cosmiconfig@9.0.0(typescript@5.9.2))(typescript@5.9.2):
     dependencies:
-      '@types/node': 24.5.2
+      '@types/node': 24.9.2
       cosmiconfig: 9.0.0(typescript@5.9.2)
       jiti: 2.6.1
       typescript: 5.9.2
@@ -7252,7 +7252,7 @@ snapshots:
 
   rfdc@1.4.1: {}
 
-  rolldown-vite@7.1.20(@types/node@24.5.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1):
+  rolldown-vite@7.1.20(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1):
     dependencies:
       '@oxc-project/runtime': 0.95.0
       fdir: 6.5.0(picomatch@4.0.3)
@@ -7262,7 +7262,7 @@ snapshots:
       rolldown: 1.0.0-beta.45
       tinyglobby: 0.2.15
     optionalDependencies:
-      '@types/node': 24.5.2
+      '@types/node': 24.9.2
       esbuild: 0.25.6
       fsevents: 2.3.3
       jiti: 2.6.1
@@ -7736,7 +7736,7 @@ snapshots:
       jiti: 2.5.1
       quansync: 0.2.11
 
-  undici-types@7.12.0: {}
+  undici-types@7.16.0: {}
 
   unicode-canonical-property-names-ecmascript@2.0.1: {}
 
@@ -7823,12 +7823,12 @@ snapshots:
     optionalDependencies:
       solid-js: 1.9.9
 
-  vite-plugin-pwa@1.1.0(@vite-pwa/assets-generator@1.0.1)(rolldown-vite@7.1.20(@types/node@24.5.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1))(workbox-build@7.3.0(@types/babel__core@7.20.5))(workbox-window@7.3.0):
+  vite-plugin-pwa@1.1.0(@vite-pwa/assets-generator@1.0.1)(rolldown-vite@7.1.20(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1))(workbox-build@7.3.0(@types/babel__core@7.20.5))(workbox-window@7.3.0):
     dependencies:
       debug: 4.4.3
       pretty-bytes: 6.1.1
       tinyglobby: 0.2.15
-      vite: rolldown-vite@7.1.20(@types/node@24.5.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1)
+      vite: rolldown-vite@7.1.20(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1)
       workbox-build: 7.3.0(@types/babel__core@7.20.5)
       workbox-window: 7.3.0
     optionalDependencies:
@@ -7836,7 +7836,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-solid@2.11.8(rolldown-vite@7.1.20(@types/node@24.5.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1))(solid-js@1.9.9):
+  vite-plugin-solid@2.11.8(rolldown-vite@7.1.20(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1))(solid-js@1.9.9):
     dependencies:
       '@babel/core': 7.28.4
       '@types/babel__core': 7.20.5
@@ -7844,14 +7844,14 @@ snapshots:
       merge-anything: 5.1.7
       solid-js: 1.9.9
       solid-refresh: 0.6.3(solid-js@1.9.9)
-      vite: rolldown-vite@7.1.20(@types/node@24.5.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1)
-      vitefu: 1.1.1(rolldown-vite@7.1.20(@types/node@24.5.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1))
+      vite: rolldown-vite@7.1.20(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1)
+      vitefu: 1.1.1(rolldown-vite@7.1.20(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1))
     transitivePeerDependencies:
       - supports-color
 
-  vitefu@1.1.1(rolldown-vite@7.1.20(@types/node@24.5.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1)):
+  vitefu@1.1.1(rolldown-vite@7.1.20(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1)):
     optionalDependencies:
-      vite: rolldown-vite@7.1.20(@types/node@24.5.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1)
+      vite: rolldown-vite@7.1.20(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1)
 
   webidl-conversions@4.0.2: {}
 
