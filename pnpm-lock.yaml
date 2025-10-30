@@ -198,8 +198,8 @@ importers:
         specifier: ^13.0.0
         version: 13.0.0
       virtua:
-        specifier: ^0.43.4
-        version: 0.43.4(solid-js@1.9.10)
+        specifier: ^0.46.4
+        version: 0.46.4(solid-js@1.9.10)
       vite:
         specifier: npm:rolldown-vite@latest
         version: rolldown-vite@7.1.20(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1)
@@ -3868,8 +3868,8 @@ packages:
   validate-html-nesting@1.2.3:
     resolution: {integrity: sha512-kdkWdCl6eCeLlRShJKbjVOU2kFKxMF8Ghu50n+crEoyx+VKm3FxAxF9z4DCy6+bbTOqNW0+jcIYRnjoIRzigRw==}
 
-  virtua@0.43.4:
-    resolution: {integrity: sha512-zS9A2EC3KY9hRjG5NM7t0gPGqkcdOc7HWhuc9KDvKq3yz10sRup5L09axFyWHePr1ppWljpAHtr0BCCsM6tS5Q==}
+  virtua@0.46.4:
+    resolution: {integrity: sha512-2adGT8c3N2BrFUIUnLp5jYWgIPSgTC4AbHDwgVQA8IAK1lDWC79KcF/WEhfgfV8vbGJjMGtMPhkTCZGxzd0Jaw==}
     peerDependencies:
       react: '>=16.14.0'
       react-dom: '>=16.14.0'
@@ -7804,7 +7804,7 @@ snapshots:
 
   validate-html-nesting@1.2.3: {}
 
-  virtua@0.43.4(solid-js@1.9.10):
+  virtua@0.46.4(solid-js@1.9.10):
     optionalDependencies:
       solid-js: 1.9.10
 
