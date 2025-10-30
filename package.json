@@ -79,7 +79,7 @@
     "virtua": "^0.46.4",
     "vite": "^7.1.7",
     "vite-plugin-pwa": "^1.1.0",
-    "vite-plugin-solid": "^2.11.8",
+    "vite-plugin-solid": "^2.11.10",
     "zod": "^4.1.11"
   },
   "packageManager": "pnpm@10.17.1",
