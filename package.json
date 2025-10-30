@@ -47,7 +47,7 @@
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^24.9.2",
     "@types/uuid": "^11.0.0",
-    "@vite-pwa/assets-generator": "^1.0.1",
+    "@vite-pwa/assets-generator": "^1.0.2",
     "apexcharts": "^5.3.5",
     "byte-size": "^9.0.1",
     "commitlint": "^20.1.0",
