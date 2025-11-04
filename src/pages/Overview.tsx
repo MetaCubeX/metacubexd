@@ -7,14 +7,7 @@ import type { JSX, ParentComponent } from 'solid-js'
 import { DataUsageTable, DocumentTitle } from '~/components'
 import { CHART_MAX_XAXIS, DEFAULT_CHART_OPTIONS } from '~/constants'
 import { useI18n } from '~/i18n'
-import {
-  endpoint,
-  latestConnectionMsg,
-  restructRawMsgToConnection,
-  updateDataUsage,
-  useWsRequest,
-} from '~/signals'
-import type { Connection } from '~/types'
+import { endpoint, latestConnectionMsg, useWsRequest } from '~/signals'
 
 const TrafficWidget: ParentComponent<{ label: JSX.Element }> = (props) => (
   <div class="stat flex-1 place-items-center">
@@ -61,28 +54,6 @@ export default () => {
     const t = traffic()
 
     if (t) setTraffics((traffics) => [...traffics, t])
-  })
-
-  // Auto-update data usage from connection messages
-  const [prevConnectionsForUsage, setPrevConnectionsForUsage] = createSignal<
-    Connection[]
-  >([])
-
-  createEffect(() => {
-    const msg = latestConnectionMsg()
-    const rawConns = msg?.connections
-
-    if (rawConns && rawConns.length > 0) {
-      untrack(() => {
-        const connections = restructRawMsgToConnection(
-          rawConns,
-          prevConnectionsForUsage(),
-        )
-
-        setPrevConnectionsForUsage(connections)
-        updateDataUsage(connections)
-      })
-    }
   })
 
   const trafficChartOptions = createMemo<ApexOptions>(() =>

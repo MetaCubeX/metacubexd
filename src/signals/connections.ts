@@ -29,6 +29,48 @@ export const [allConnections, setAllConnections] = createSignal<Connection[]>(
 export const [latestConnectionMsg, setLatestConnectionMsg] =
   createSignal<WsMsg>(null)
 
+// Track last known totals to detect service restart
+let lastUploadTotal = 0
+let lastDownloadTotal = 0
+
+// Global effect to monitor data usage - runs always, independent of page
+createEffect(() => {
+  const msg = latestConnectionMsg()
+  const rawConns = msg?.connections
+
+  // Detect service restart: totals reset to 0 or decreased significantly
+  const currentUploadTotal = msg?.uploadTotal || 0
+  const currentDownloadTotal = msg?.downloadTotal || 0
+
+  // If totals decreased, service was restarted - reset tracking
+  if (
+    currentUploadTotal < lastUploadTotal ||
+    currentDownloadTotal < lastDownloadTotal
+  ) {
+    // Service restarted, clear connection tracking data
+    resetConnectionTracking()
+  }
+
+  lastUploadTotal = currentUploadTotal
+  lastDownloadTotal = currentDownloadTotal
+
+  if (!rawConns || rawConns.length === 0) {
+    return
+  }
+
+  untrack(() => {
+    // Get previous connections for speed calculation
+    const prevConns = allConnections()
+    const activeConns = restructRawMsgToConnection(rawConns, prevConns)
+
+    // Update data usage tracking
+    updateDataUsage(activeConns)
+
+    // Cleanup inactive connection tracking data periodically
+    cleanupInactiveConnections()
+  })
+})
+
 export const useConnections = () => {
   const [closedConnections, setClosedConnections] = createSignal<Connection[]>(
     [],
@@ -67,12 +109,6 @@ export const useConnections = () => {
           -(activeConns.length + CONNECTIONS_TABLE_MAX_CLOSED_ROWS),
         ),
       )
-
-      // Update data usage with active connections
-      updateDataUsage(activeConns)
-
-      // Cleanup inactive connection tracking data periodically
-      cleanupInactiveConnections()
     })
   })
 
@@ -177,6 +213,12 @@ const connectionLastData = new Map<
   string,
   { upload: number; download: number }
 >()
+
+// Reset connection tracking data when service restarts
+export const resetConnectionTracking = () => {
+  connectionLastData.clear()
+  console.log('[Data Usage] Connection tracking reset due to service restart')
+}
 
 export const updateDataUsage = (connections: Connection[]) => {
   const updates: Record<string, DataUsageEntry> = { ...dataUsageMap() }
