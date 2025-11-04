@@ -140,6 +140,28 @@ export const DataUsageTable = () => {
                 {totalStats().count}
               </div>
             </div>
+            <Show when={totalStats().firstSeen && totalStats().lastSeen}>
+              <div class="stat py-2">
+                <div class="stat-title text-xs">Time Range</div>
+                <div
+                  class="stat-value text-sm"
+                  title={formatDateRange(
+                    totalStats().firstSeen!,
+                    totalStats().lastSeen!,
+                  )}
+                >
+                  <div class="flex items-center gap-1">
+                    <IconClock size={16} />
+                    <span>
+                      {formatDuration(
+                        totalStats().firstSeen!,
+                        totalStats().lastSeen!,
+                      )}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </Show>
             <div class="stat py-2">
               <div class="stat-title text-xs">Total Upload</div>
               <div class="stat-value text-lg">
@@ -157,23 +179,6 @@ export const DataUsageTable = () => {
               <div class="stat-value text-lg text-secondary">
                 {byteSize(totalStats().total).toString()}
               </div>
-              <Show when={totalStats().firstSeen && totalStats().lastSeen}>
-                <div
-                  class="stat-desc mt-1 flex items-center gap-1"
-                  title={formatDateRange(
-                    totalStats().firstSeen!,
-                    totalStats().lastSeen!,
-                  )}
-                >
-                  <IconClock size={12} />
-                  <span class="text-xs">
-                    {formatDuration(
-                      totalStats().firstSeen!,
-                      totalStats().lastSeen!,
-                    )}
-                  </span>
-                </div>
-              </Show>
             </div>
           </div>
         </Show>
