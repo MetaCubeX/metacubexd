@@ -198,8 +198,8 @@ importers:
         specifier: ^13.0.0
         version: 13.0.0
       virtua:
-        specifier: ^0.46.4
-        version: 0.46.4(solid-js@1.9.10)
+        specifier: ^0.46.6
+        version: 0.46.6(solid-js@1.9.10)
       vite:
         specifier: npm:rolldown-vite@latest
         version: rolldown-vite@7.2.1(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1)
@@ -3802,8 +3802,8 @@ packages:
     resolution: {integrity: sha512-XQegIaBTVUjSHliKqcnFqYypAd4S+WCYt5NIeRs6w/UAry7z8Y9j5ZwRRL4kzq9U3sD6v+85er9FvkEaBpji2w==}
     hasBin: true
 
-  virtua@0.46.4:
-    resolution: {integrity: sha512-2adGT8c3N2BrFUIUnLp5jYWgIPSgTC4AbHDwgVQA8IAK1lDWC79KcF/WEhfgfV8vbGJjMGtMPhkTCZGxzd0Jaw==}
+  virtua@0.46.6:
+    resolution: {integrity: sha512-yoUV8DHLj3GL7GPJ9gBGDY17JiMr5bt9wBj1giISpJBA2IwYmkexH+5lBExyOc+g9OZ7wpMKOjK8lQUWJh0G3A==}
     peerDependencies:
       react: '>=16.14.0'
       react-dom: '>=16.14.0'
@@ -7651,7 +7651,7 @@ snapshots:
 
   uuid@13.0.0: {}
 
-  virtua@0.46.4(solid-js@1.9.10):
+  virtua@0.46.6(solid-js@1.9.10):
     optionalDependencies:
       solid-js: 1.9.10
 

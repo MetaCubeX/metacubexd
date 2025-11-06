@@ -76,7 +76,7 @@
     "typescript-eslint": "^8.46.2",
     "unplugin-auto-import": "^20.2.0",
     "uuid": "^13.0.0",
-    "virtua": "^0.46.4",
+    "virtua": "^0.46.6",
     "vite": "^7.1.7",
     "vite-plugin-pwa": "^1.1.0",
     "vite-plugin-solid": "^2.11.10",
