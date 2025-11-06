@@ -80,7 +80,7 @@
     "vite": "^7.1.7",
     "vite-plugin-pwa": "^1.1.0",
     "vite-plugin-solid": "^2.11.10",
-    "zod": "^4.1.11"
+    "zod": "^4.1.12"
   },
   "packageManager": "pnpm@10.17.1",
   "pnpm": {
