@@ -79,7 +79,7 @@ importers:
         version: 0.5.19(tailwindcss@4.1.16)
       '@tailwindcss/vite':
         specifier: ^4.1.16
-        version: 4.1.16(rolldown-vite@7.2.1(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1))
+        version: 4.1.16(rolldown-vite@7.2.2(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1))
       '@tanstack/match-sorter-utils':
         specifier: ^8.19.4
         version: 8.19.4
@@ -144,8 +144,8 @@ importers:
         specifier: ^5.0.1
         version: 5.0.1
       ky:
-        specifier: ^1.13.0
-        version: 1.13.0
+        specifier: ^1.14.0
+        version: 1.14.0
       lint-staged:
         specifier: ^16.2.6
         version: 16.2.6
@@ -202,13 +202,13 @@ importers:
         version: 0.46.6(solid-js@1.9.10)
       vite:
         specifier: npm:rolldown-vite@latest
-        version: rolldown-vite@7.2.1(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1)
+        version: rolldown-vite@7.2.2(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1)
       vite-plugin-pwa:
         specifier: ^1.1.0
-        version: 1.1.0(@vite-pwa/assets-generator@1.0.2)(rolldown-vite@7.2.1(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1))(workbox-build@7.3.0(@types/babel__core@7.20.5))(workbox-window@7.3.0)
+        version: 1.1.0(@vite-pwa/assets-generator@1.0.2)(rolldown-vite@7.2.2(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1))(workbox-build@7.3.0(@types/babel__core@7.20.5))(workbox-window@7.3.0)
       vite-plugin-solid:
         specifier: ^2.11.10
-        version: 2.11.10(rolldown-vite@7.2.1(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1))(solid-js@1.9.10)
+        version: 2.11.10(rolldown-vite@7.2.2(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1))(solid-js@1.9.10)
       zod:
         specifier: ^4.1.12
         version: 4.1.12
@@ -2806,8 +2806,8 @@ packages:
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
 
-  ky@1.13.0:
-    resolution: {integrity: sha512-JeNNGs44hVUp2XxO3FY9WV28ymG7LgO4wju4HL/dCq1A8eKDcFgVrdCn1ssn+3Q/5OQilv5aYsL0DMt5mmAV9w==}
+  ky@1.14.0:
+    resolution: {integrity: sha512-Rczb6FMM6JT0lvrOlP5WUOCB7s9XKxzwgErzhKlKde1bEV90FXplV1o87fpt4PU/asJFiqjYJxAJyzJhcrxOsQ==}
     engines: {node: '>=18'}
 
   leven@3.1.0:
@@ -3314,8 +3314,8 @@ packages:
   rfdc@1.4.1:
     resolution: {integrity: sha512-q1b3N5QkRUWUl7iyylaaj3kOpIT0N2i9MqIEQXP73GVsN9cw3fdx8X63cEmWhJGi2PPCF23Ijp7ktmd39rawIA==}
 
-  rolldown-vite@7.2.1:
-    resolution: {integrity: sha512-J1QRxf8zlYNvjAY1fB6zW+FLr0K26/IpKFrGM+Za0Ko6meJUMlHBk+LV19gAb8sfSluH4/6dyWKVS2dvNU4RLQ==}
+  rolldown-vite@7.2.2:
+    resolution: {integrity: sha512-Fl3ZdmJhDMJGcqrr342pPVrhugXdOcuNBRBauz4S7QGSRXbQy7y8q5QYJtgkcrG8XjY0EENSZeTk58c3m20FxA==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
@@ -5435,12 +5435,12 @@ snapshots:
       postcss-selector-parser: 6.0.10
       tailwindcss: 4.1.16
 
-  '@tailwindcss/vite@4.1.16(rolldown-vite@7.2.1(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1))':
+  '@tailwindcss/vite@4.1.16(rolldown-vite@7.2.2(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1))':
     dependencies:
       '@tailwindcss/node': 4.1.16
       '@tailwindcss/oxide': 4.1.16
       tailwindcss: 4.1.16
-      vite: rolldown-vite@7.2.1(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1)
+      vite: rolldown-vite@7.2.2(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1)
 
   '@tanstack/match-sorter-utils@8.19.4':
     dependencies:
@@ -6643,7 +6643,7 @@ snapshots:
     dependencies:
       json-buffer: 3.0.1
 
-  ky@1.13.0: {}
+  ky@1.14.0: {}
 
   leven@3.1.0: {}
 
@@ -7086,7 +7086,7 @@ snapshots:
 
   rfdc@1.4.1: {}
 
-  rolldown-vite@7.2.1(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1):
+  rolldown-vite@7.2.2(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1):
     dependencies:
       '@oxc-project/runtime': 0.96.0
       fdir: 6.5.0(picomatch@4.0.3)
@@ -7649,12 +7649,12 @@ snapshots:
     optionalDependencies:
       solid-js: 1.9.10
 
-  vite-plugin-pwa@1.1.0(@vite-pwa/assets-generator@1.0.2)(rolldown-vite@7.2.1(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1))(workbox-build@7.3.0(@types/babel__core@7.20.5))(workbox-window@7.3.0):
+  vite-plugin-pwa@1.1.0(@vite-pwa/assets-generator@1.0.2)(rolldown-vite@7.2.2(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1))(workbox-build@7.3.0(@types/babel__core@7.20.5))(workbox-window@7.3.0):
     dependencies:
       debug: 4.4.3
       pretty-bytes: 6.1.1
       tinyglobby: 0.2.15
-      vite: rolldown-vite@7.2.1(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1)
+      vite: rolldown-vite@7.2.2(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1)
       workbox-build: 7.3.0(@types/babel__core@7.20.5)
       workbox-window: 7.3.0
     optionalDependencies:
@@ -7662,7 +7662,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-solid@2.11.10(rolldown-vite@7.2.1(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1))(solid-js@1.9.10):
+  vite-plugin-solid@2.11.10(rolldown-vite@7.2.2(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1))(solid-js@1.9.10):
     dependencies:
       '@babel/core': 7.28.5
       '@types/babel__core': 7.20.5
@@ -7670,14 +7670,14 @@ snapshots:
       merge-anything: 5.1.7
       solid-js: 1.9.10
       solid-refresh: 0.6.3(solid-js@1.9.10)
-      vite: rolldown-vite@7.2.1(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1)
-      vitefu: 1.1.1(rolldown-vite@7.2.1(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1))
+      vite: rolldown-vite@7.2.2(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1)
+      vitefu: 1.1.1(rolldown-vite@7.2.2(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1))
     transitivePeerDependencies:
       - supports-color
 
-  vitefu@1.1.1(rolldown-vite@7.2.1(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1)):
+  vitefu@1.1.1(rolldown-vite@7.2.2(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1)):
     optionalDependencies:
-      vite: rolldown-vite@7.2.1(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1)
+      vite: rolldown-vite@7.2.2(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1)
 
   webidl-conversions@4.0.2: {}
 
