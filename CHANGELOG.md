@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.196.0](https://github.com/MetaCubeX/metacubexd/compare/v1.195.0...v1.196.0) (2025-11-08)
+
+
+### Features
+
+* add Data Usage tracking table with real-time monitoring ([#1671](https://github.com/MetaCubeX/metacubexd/issues/1671)) ([0762d93](https://github.com/MetaCubeX/metacubexd/commit/0762d93d7d5551ac2851dbbc9807de8ba701f848))
+
 ## [1.195.0](https://github.com/MetaCubeX/metacubexd/compare/v1.194.1...v1.195.0) (2025-10-28)
 
 
