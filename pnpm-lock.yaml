@@ -19,7 +19,7 @@ importers:
         version: 0.2.5(solid-js@1.9.10)
       '@corvu/tailwind':
         specifier: ^0.1.7
-        version: 0.1.7(tailwindcss@4.1.16)
+        version: 0.1.7(tailwindcss@4.1.17)
       '@corvu/tooltip':
         specifier: ^0.2.2
         version: 0.2.2(solid-js@1.9.10)
@@ -76,7 +76,7 @@ importers:
         version: 3.35.0(solid-js@1.9.10)
       '@tailwindcss/typography':
         specifier: ^0.5.19
-        version: 0.5.19(tailwindcss@4.1.16)
+        version: 0.5.19(tailwindcss@4.1.17)
       '@tailwindcss/vite':
         specifier: ^4.1.16
         version: 4.1.16(rolldown-vite@7.2.2(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1))
@@ -183,8 +183,8 @@ importers:
         specifier: ^3.3.1
         version: 3.3.1
       tailwindcss:
-        specifier: ^4.1.16
-        version: 4.1.16
+        specifier: ^4.1.17
+        version: 4.1.17
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -3616,6 +3616,9 @@ packages:
   tailwindcss@4.1.16:
     resolution: {integrity: sha512-pONL5awpaQX4LN5eiv7moSiSPd/DLDzKVRJz8Q9PgzmAdd1R4307GQS2ZpfiN7ZmekdQrfhZZiSE5jkLR4WNaA==}
 
+  tailwindcss@4.1.17:
+    resolution: {integrity: sha512-j9Ee2YjuQqYT9bbRTfTZht9W/ytp5H+jJpZKiYdP/bpnXARAuELt9ofP0lPnmHjbga7SNQIxdTAXCmtKVYjN+Q==}
+
   tapable@2.3.0:
     resolution: {integrity: sha512-g9ljZiwki/LfxmQADO3dEY1CbpmXT5Hm2fJ+QaGKwSXUylMybePR7/67YW7jOrrvjEgL1Fmz5kzyAjWVWLlucg==}
     engines: {node: '>=6'}
@@ -4770,9 +4773,9 @@ snapshots:
       solid-js: 1.9.10
       solid-presence: 0.2.0(solid-js@1.9.10)
 
-  '@corvu/tailwind@0.1.7(tailwindcss@4.1.16)':
+  '@corvu/tailwind@0.1.7(tailwindcss@4.1.17)':
     dependencies:
-      tailwindcss: 4.1.16
+      tailwindcss: 4.1.17
 
   '@corvu/tooltip@0.2.2(solid-js@1.9.10)':
     dependencies:
@@ -5430,10 +5433,10 @@ snapshots:
       '@tailwindcss/oxide-win32-arm64-msvc': 4.1.16
       '@tailwindcss/oxide-win32-x64-msvc': 4.1.16
 
-  '@tailwindcss/typography@0.5.19(tailwindcss@4.1.16)':
+  '@tailwindcss/typography@0.5.19(tailwindcss@4.1.17)':
     dependencies:
       postcss-selector-parser: 6.0.10
-      tailwindcss: 4.1.16
+      tailwindcss: 4.1.17
 
   '@tailwindcss/vite@4.1.16(rolldown-vite@7.2.2(@types/node@24.9.2)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.1))':
     dependencies:
@@ -7444,6 +7447,8 @@ snapshots:
   tailwind-merge@3.3.1: {}
 
   tailwindcss@4.1.16: {}
+
+  tailwindcss@4.1.17: {}
 
   tapable@2.3.0: {}
 

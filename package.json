@@ -71,7 +71,7 @@
     "solid-toast": "^0.5.0",
     "sort-package-json": "^3.4.0",
     "tailwind-merge": "^3.3.1",
-    "tailwindcss": "^4.1.16",
+    "tailwindcss": "^4.1.17",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.3",
     "unplugin-auto-import": "^20.2.0",
