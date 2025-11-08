@@ -1,7 +1,7 @@
 @import '@fontsource/fira-sans';
 @import 'tailwindcss';
-@plugin "@tailwindcss/typography";
-@plugin "daisyui" {
+@plugin '@tailwindcss/typography';
+@plugin 'daisyui' {
   themes: all;
 }
 
@@ -40,7 +40,7 @@
 
 @media (width >= 640px) {
   :root {
-    scrollbar-color: hsl(var(--p)) transparent;
+    scrollbar-color: hsl(var(--color-primary)) transparent;
   }
 
   ::-webkit-scrollbar {

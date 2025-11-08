@@ -1,7 +1,7 @@
 import { makePersisted } from '@solid-primitives/storage'
-import { differenceWith, isNumber, unionWith } from 'lodash'
+import { isNumber } from 'lodash'
 import { CONNECTIONS_TABLE_MAX_CLOSED_ROWS } from '~/constants'
-import { Connection, ConnectionRawMessage } from '~/types'
+import { Connection, ConnectionRawMessage, DataUsageEntry } from '~/types'
 
 export type WsMsg = {
   connections?: ConnectionRawMessage[]
@@ -29,6 +29,48 @@ export const [allConnections, setAllConnections] = createSignal<Connection[]>(
 export const [latestConnectionMsg, setLatestConnectionMsg] =
   createSignal<WsMsg>(null)
 
+// Track last known totals to detect service restart
+let lastUploadTotal = 0
+let lastDownloadTotal = 0
+
+// Global effect to monitor data usage - runs always, independent of page
+createEffect(() => {
+  const msg = latestConnectionMsg()
+  const rawConns = msg?.connections
+
+  // Detect service restart: totals reset to 0 or decreased significantly
+  const currentUploadTotal = msg?.uploadTotal || 0
+  const currentDownloadTotal = msg?.downloadTotal || 0
+
+  // If totals decreased, service was restarted - reset tracking
+  if (
+    currentUploadTotal < lastUploadTotal ||
+    currentDownloadTotal < lastDownloadTotal
+  ) {
+    // Service restarted, clear connection tracking data
+    resetConnectionTracking()
+  }
+
+  lastUploadTotal = currentUploadTotal
+  lastDownloadTotal = currentDownloadTotal
+
+  if (!rawConns || rawConns.length === 0) {
+    return
+  }
+
+  untrack(() => {
+    // Get previous connections for speed calculation
+    const prevConns = allConnections()
+    const activeConns = restructRawMsgToConnection(rawConns, prevConns)
+
+    // Update data usage tracking
+    updateDataUsage(activeConns)
+
+    // Cleanup inactive connection tracking data periodically
+    cleanupInactiveConnections(activeConns)
+  })
+})
+
 export const useConnections = () => {
   const [closedConnections, setClosedConnections] = createSignal<Connection[]>(
     [],
@@ -51,7 +93,8 @@ export const useConnections = () => {
         activeConnections(),
       )
 
-      mergeAllConnections(activeConnections())
+      // Merge using freshly computed activeConns (previous code mistakenly used stale activeConnections())
+      mergeAllConnections(activeConns)
 
       if (!paused()) {
         const closedConns = diffClosedConnections(activeConns, allConnections())
@@ -62,11 +105,7 @@ export const useConnections = () => {
         )
       }
 
-      setAllConnections((allConnections) =>
-        allConnections.slice(
-          -(activeConns.length + CONNECTIONS_TABLE_MAX_CLOSED_ROWS),
-        ),
-      )
+      // Trimming now handled inside mergeAllConnections; removed redundant slice
     })
   })
 
@@ -122,12 +161,195 @@ export const restructRawMsgToConnection = (
 }
 
 export const mergeAllConnections = (activeConns: Connection[]) => {
-  setAllConnections((allConnections) =>
-    unionWith(allConnections, activeConns, (a, b) => a.id === b.id),
-  )
+  // O(n) merge using Set to avoid repeated unionWith comparator per item
+  setAllConnections((prevAll) => {
+    const seen = new Set<string>()
+    const merged: Connection[] = []
+
+    // Keep existing order from previous list first
+    for (const c of prevAll) {
+      if (!seen.has(c.id)) {
+        seen.add(c.id)
+        merged.push(c)
+      }
+    }
+
+    // Append new active connections not yet seen
+    for (const c of activeConns) {
+      if (!seen.has(c.id)) {
+        seen.add(c.id)
+        merged.push(c)
+      }
+    }
+
+    // Trim to latest window: active + max closed
+    const limit = activeConns.length + CONNECTIONS_TABLE_MAX_CLOSED_ROWS
+
+    return limit > 0 && merged.length > limit ? merged.slice(-limit) : merged
+  })
 }
 
 const diffClosedConnections = (
   activeConns: Connection[],
   allConns: Connection[],
-) => differenceWith(allConns, activeConns, (a, b) => a.id === b.id)
+) => {
+  // O(n) difference using Set of active IDs
+  const activeIds = new Set(activeConns.map((c) => c.id))
+
+  return allConns.filter((c) => !activeIds.has(c.id))
+}
+
+// Data Usage tracking
+const migrateDataUsageMap = (
+  data: Record<string, DataUsageEntry>,
+): Record<string, DataUsageEntry> => {
+  const migrated: Record<string, DataUsageEntry> = {}
+
+  Object.entries(data).forEach(([key, entry]) => {
+    // Migrate old entries without firstSeen
+    if (!entry.firstSeen) {
+      migrated[key] = {
+        ...entry,
+        firstSeen: entry.lastSeen || Date.now(),
+      }
+    } else {
+      migrated[key] = entry
+    }
+  })
+
+  return migrated
+}
+
+export const [dataUsageMap, setDataUsageMap] = makePersisted(
+  createSignal<Record<string, DataUsageEntry>>({}),
+  {
+    name: 'dataUsageMap',
+    storage: localStorage,
+    deserialize: (value: string) => {
+      const parsed = JSON.parse(value)
+
+      return migrateDataUsageMap(parsed)
+    },
+  },
+)
+
+// Track last known data for each connection to calculate incremental changes
+const connectionLastData = new Map<
+  string,
+  { upload: number; download: number }
+>()
+
+// Reset connection tracking data when service restarts
+export const resetConnectionTracking = () => {
+  connectionLastData.clear()
+  console.log('[Data Usage] Connection tracking reset due to service restart')
+}
+
+export const updateDataUsage = (connections: Connection[]) => {
+  const updates: Record<string, DataUsageEntry> = { ...dataUsageMap() }
+
+  // Group connections by source IP and sum their current data
+  const ipDataMap = new Map<string, { upload: number; download: number }>()
+
+  connections.forEach((conn) => {
+    const sourceIP = conn.metadata.sourceIP
+
+    if (!sourceIP) return
+
+    const currentUpload = conn.upload || 0
+    const currentDownload = conn.download || 0
+
+    // Get last known data for this connection
+    const lastData = connectionLastData.get(conn.id)
+
+    // Calculate incremental change
+    let uploadDelta = 0
+    let downloadDelta = 0
+
+    if (lastData) {
+      uploadDelta = currentUpload - lastData.upload
+      downloadDelta = currentDownload - lastData.download
+    } else {
+      // First time seeing this connection, use full amount
+      uploadDelta = currentUpload
+      downloadDelta = currentDownload
+    }
+
+    // Update last known data
+    connectionLastData.set(conn.id, {
+      upload: currentUpload,
+      download: currentDownload,
+    })
+
+    // Accumulate data per IP
+    if (!ipDataMap.has(sourceIP)) {
+      ipDataMap.set(sourceIP, {
+        upload: 0,
+        download: 0,
+      })
+    }
+
+    const ipData = ipDataMap.get(sourceIP)!
+
+    ipData.upload += uploadDelta
+    ipData.download += downloadDelta
+  })
+
+  // Update data usage map with accumulated changes
+  ipDataMap.forEach((data, sourceIP) => {
+    const existing = updates[sourceIP]
+    const now = Date.now()
+
+    if (existing) {
+      updates[sourceIP] = {
+        ...existing,
+        upload: existing.upload + data.upload,
+        download: existing.download + data.download,
+        total:
+          existing.upload + data.upload + existing.download + data.download,
+        firstSeen: existing.firstSeen || now, // Ensure firstSeen exists
+        lastSeen: now,
+      }
+    } else {
+      updates[sourceIP] = {
+        sourceIP,
+        macAddress: '',
+        upload: data.upload,
+        download: data.download,
+        total: data.upload + data.download,
+        firstSeen: now,
+        lastSeen: now,
+      }
+    }
+  })
+
+  setDataUsageMap(updates)
+}
+
+export const clearDataUsage = () => {
+  setDataUsageMap({})
+  connectionLastData.clear()
+}
+
+export const removeDataUsageEntry = (sourceIP: string) => {
+  setDataUsageMap((prev) => {
+    const updates = { ...prev }
+
+    delete updates[sourceIP]
+
+    return updates
+  })
+}
+
+export const cleanupInactiveConnections = (activeConns?: Connection[]) => {
+  const activeConnectionIds = activeConns
+    ? new Set(activeConns.map((conn) => conn.id))
+    : new Set(allConnections().map((conn) => conn.id))
+
+  // Remove tracking data for connections that no longer exist
+  connectionLastData.forEach((_, connId) => {
+    if (!activeConnectionIds.has(connId)) {
+      connectionLastData.delete(connId)
+    }
+  })
+}

@@ -4,7 +4,7 @@ import byteSize from 'byte-size'
 import { defaultsDeep } from 'lodash'
 import { SolidApexCharts } from 'solid-apexcharts'
 import type { JSX, ParentComponent } from 'solid-js'
-import { DocumentTitle } from '~/components'
+import { DataUsageTable, DocumentTitle } from '~/components'
 import { CHART_MAX_XAXIS, DEFAULT_CHART_OPTIONS } from '~/constants'
 import { useI18n } from '~/i18n'
 import { endpoint, latestConnectionMsg, useWsRequest } from '~/signals'
@@ -111,7 +111,7 @@ export default () => {
       <DocumentTitle>{t('overview')}</DocumentTitle>
 
       <div class="flex flex-col gap-2 lg:h-full">
-        <div class="stats w-full flex-shrink-0 stats-vertical grid-cols-2 bg-primary shadow lg:flex lg:stats-horizontal">
+        <div class="stats w-full shrink-0 stats-vertical grid-cols-2 bg-primary shadow lg:flex lg:stats-horizontal">
           <TrafficWidget label={t('upload')}>
             {byteSize(traffic()?.up || 0).toString()}/s
           </TrafficWidget>
@@ -160,6 +160,8 @@ export default () => {
             />
           </div>
         </div>
+
+        <DataUsageTable />
 
         <footer class="mx-auto mt-4 footer block footer-horizontal rounded-box bg-neutral p-4 text-center text-lg font-bold text-neutral-content">
           {endpoint()?.url}
