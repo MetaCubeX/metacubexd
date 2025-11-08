@@ -36,7 +36,7 @@
     "@solidjs/router": "^0.15.3",
     "@tabler/icons-solidjs": "^3.35.0",
     "@tailwindcss/typography": "^0.5.19",
-    "@tailwindcss/vite": "^4.1.16",
+    "@tailwindcss/vite": "^4.1.17",
     "@tanstack/match-sorter-utils": "^8.19.4",
     "@tanstack/solid-table": "^8.21.3",
     "@tanstack/solid-virtual": "^3.13.12",
@@ -45,10 +45,10 @@
     "@types/byte-size": "^8.1.2",
     "@types/lodash": "^4.17.20",
     "@types/markdown-it": "^14.1.2",
-    "@types/node": "^24.9.2",
+    "@types/node": "^24.10.0",
     "@types/uuid": "^11.0.0",
     "@vite-pwa/assets-generator": "^1.0.2",
-    "apexcharts": "^5.3.5",
+    "apexcharts": "^5.3.6",
     "byte-size": "^9.0.1",
     "commitlint": "^20.1.0",
     "daisyui": "^5.4.7",
@@ -77,12 +77,12 @@
     "unplugin-auto-import": "^20.2.0",
     "uuid": "^13.0.0",
     "virtua": "^0.46.6",
-    "vite": "^7.1.7",
+    "vite": "^7.2.2",
     "vite-plugin-pwa": "^1.1.0",
     "vite-plugin-solid": "^2.11.10",
     "zod": "^4.1.12"
   },
-  "packageManager": "pnpm@10.17.1",
+  "packageManager": "pnpm@10.20.0",
   "pnpm": {
     "overrides": {
       "vite": "npm:rolldown-vite@latest"

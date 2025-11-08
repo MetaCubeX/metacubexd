@@ -1,5 +1,5 @@
 import { makePersisted } from '@solid-primitives/storage'
-import { differenceWith, isNumber, unionWith } from 'lodash'
+import { isNumber } from 'lodash'
 import { CONNECTIONS_TABLE_MAX_CLOSED_ROWS } from '~/constants'
 import { Connection, ConnectionRawMessage, DataUsageEntry } from '~/types'
 
@@ -67,7 +67,7 @@ createEffect(() => {
     updateDataUsage(activeConns)
 
     // Cleanup inactive connection tracking data periodically
-    cleanupInactiveConnections()
+    cleanupInactiveConnections(activeConns)
   })
 })
 
@@ -93,7 +93,8 @@ export const useConnections = () => {
         activeConnections(),
       )
 
-      mergeAllConnections(activeConnections())
+      // Merge using freshly computed activeConns (previous code mistakenly used stale activeConnections())
+      mergeAllConnections(activeConns)
 
       if (!paused()) {
         const closedConns = diffClosedConnections(activeConns, allConnections())
@@ -104,11 +105,7 @@ export const useConnections = () => {
         )
       }
 
-      setAllConnections((allConnections) =>
-        allConnections.slice(
-          -(activeConns.length + CONNECTIONS_TABLE_MAX_CLOSED_ROWS),
-        ),
-      )
+      // Trimming now handled inside mergeAllConnections; removed redundant slice
     })
   })
 
@@ -164,15 +161,43 @@ export const restructRawMsgToConnection = (
 }
 
 export const mergeAllConnections = (activeConns: Connection[]) => {
-  setAllConnections((allConnections) =>
-    unionWith(allConnections, activeConns, (a, b) => a.id === b.id),
-  )
+  // O(n) merge using Set to avoid repeated unionWith comparator per item
+  setAllConnections((prevAll) => {
+    const seen = new Set<string>()
+    const merged: Connection[] = []
+
+    // Keep existing order from previous list first
+    for (const c of prevAll) {
+      if (!seen.has(c.id)) {
+        seen.add(c.id)
+        merged.push(c)
+      }
+    }
+
+    // Append new active connections not yet seen
+    for (const c of activeConns) {
+      if (!seen.has(c.id)) {
+        seen.add(c.id)
+        merged.push(c)
+      }
+    }
+
+    // Trim to latest window: active + max closed
+    const limit = activeConns.length + CONNECTIONS_TABLE_MAX_CLOSED_ROWS
+
+    return limit > 0 && merged.length > limit ? merged.slice(-limit) : merged
+  })
 }
 
 const diffClosedConnections = (
   activeConns: Connection[],
   allConns: Connection[],
-) => differenceWith(allConns, activeConns, (a, b) => a.id === b.id)
+) => {
+  // O(n) difference using Set of active IDs
+  const activeIds = new Set(activeConns.map((c) => c.id))
+
+  return allConns.filter((c) => !activeIds.has(c.id))
+}
 
 // Data Usage tracking
 const migrateDataUsageMap = (
@@ -316,8 +341,10 @@ export const removeDataUsageEntry = (sourceIP: string) => {
   })
 }
 
-export const cleanupInactiveConnections = () => {
-  const activeConnectionIds = new Set(allConnections().map((conn) => conn.id))
+export const cleanupInactiveConnections = (activeConns?: Connection[]) => {
+  const activeConnectionIds = activeConns
+    ? new Set(activeConns.map((conn) => conn.id))
+    : new Set(allConnections().map((conn) => conn.id))
 
   // Remove tracking data for connections that no longer exist
   connectionLastData.forEach((_, connId) => {

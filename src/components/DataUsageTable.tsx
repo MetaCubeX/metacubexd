@@ -9,11 +9,13 @@ import { For } from 'solid-js'
 import { formatDateRange, formatDuration } from '~/helpers'
 import { clearDataUsage, dataUsageMap, removeDataUsageEntry } from '~/signals'
 import { DataUsageEntry } from '~/types'
+import { useI18n } from '~/i18n'
 
 type SortField = 'ip' | 'duration' | 'total'
 type SortOrder = 'asc' | 'desc'
 
 export const DataUsageTable = () => {
+  const [t] = useI18n()
   const [sortField, setSortField] = createSignal<SortField>('total')
   const [sortOrder, setSortOrder] = createSignal<SortOrder>('desc')
 
@@ -92,7 +94,7 @@ export const DataUsageTable = () => {
   })
 
   const handleClearAll = () => {
-    if (confirm('Clear all data usage?')) {
+    if (confirm(t('confirmClearAll'))) {
       clearDataUsage()
     }
   }
@@ -126,23 +128,23 @@ export const DataUsageTable = () => {
     <div class="rounded-box bg-base-300 p-4">
       <div class="mb-4 flex flex-col gap-2">
         <div class="flex items-center justify-between">
-          <h2 class="text-xl font-bold text-base-content">Data Usage</h2>
+          <h2 class="text-xl font-bold text-base-content">{t('dataUsage')}</h2>
           <button class="btn btn-sm btn-error" onClick={handleClearAll}>
             <IconTrash size={16} />
-            <span class="hidden sm:inline">Clear All</span>
+            <span class="hidden sm:inline">{t('clearAll')}</span>
           </button>
         </div>
         <Show when={totalStats().count > 0}>
           <div class="stats stats-vertical bg-base-200 shadow sm:stats-horizontal">
             <div class="stat py-2">
-              <div class="stat-title text-xs">Devices</div>
+              <div class="stat-title text-xs">{t('devices')}</div>
               <div class="stat-value text-lg text-primary">
                 {totalStats().count}
               </div>
             </div>
             <Show when={totalStats().firstSeen && totalStats().lastSeen}>
               <div class="stat py-2">
-                <div class="stat-title text-xs">Time Range</div>
+                <div class="stat-title text-xs">{t('timeRange')}</div>
                 <div
                   class="stat-value text-sm"
                   title={formatDateRange(
@@ -163,19 +165,19 @@ export const DataUsageTable = () => {
               </div>
             </Show>
             <div class="stat py-2">
-              <div class="stat-title text-xs">Total Upload</div>
+              <div class="stat-title text-xs">{t('uploadTotal')}</div>
               <div class="stat-value text-lg">
                 {byteSize(totalStats().upload).toString()}
               </div>
             </div>
             <div class="stat py-2">
-              <div class="stat-title text-xs">Total Download</div>
+              <div class="stat-title text-xs">{t('downloadTotal')}</div>
               <div class="stat-value text-lg">
                 {byteSize(totalStats().download).toString()}
               </div>
             </div>
             <div class="stat py-2">
-              <div class="stat-title text-xs">Grand Total</div>
+              <div class="stat-title text-xs">{t('grandTotal')}</div>
               <div class="stat-value text-lg text-secondary">
                 {byteSize(totalStats().total).toString()}
               </div>
@@ -189,19 +191,19 @@ export const DataUsageTable = () => {
         <table class="table w-full table-zebra">
           <thead>
             <tr class="bg-base-200">
-              <th class="text-base-content">MAC Address</th>
+              <th class="text-base-content">{t('macAddress')}</th>
               <th class="text-base-content">
-                <SortButton field="ip" label="IP Address" />
+                <SortButton field="ip" label={t('ipAddress')} />
               </th>
               <th class="text-base-content">
-                <SortButton field="duration" label="Duration" />
+                <SortButton field="duration" label={t('duration')} />
               </th>
-              <th class="text-base-content">Upload</th>
-              <th class="text-base-content">Download</th>
+              <th class="text-base-content">{t('upload')}</th>
+              <th class="text-base-content">{t('download')}</th>
               <th class="text-base-content">
-                <SortButton field="total" label="Total" />
+                <SortButton field="total" label={t('total')} />
               </th>
-              <th class="text-base-content">Actions</th>
+              <th class="text-base-content">{t('actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -210,7 +212,7 @@ export const DataUsageTable = () => {
               fallback={
                 <tr>
                   <td colSpan={7} class="text-center text-base-content/70">
-                    No data usage recorded yet
+                    {t('noDataUsageYet')}
                   </td>
                 </tr>
               }
@@ -227,7 +229,7 @@ export const DataUsageTable = () => {
                   return (
                     <tr class="hover">
                       <td class="text-base-content">
-                        {entry.macAddress || 'N/A'}
+                        {entry.macAddress || t('na')}
                       </td>
                       <td class="font-mono text-base-content">
                         {entry.sourceIP}
@@ -251,7 +253,7 @@ export const DataUsageTable = () => {
                         <button
                           class="btn text-error btn-ghost btn-xs hover:bg-error/20"
                           onClick={() => handleRemoveEntry(entry.sourceIP)}
-                          title="Remove"
+                          title={t('remove')}
                         >
                           <IconTrash size={14} />
                         </button>
@@ -271,14 +273,14 @@ export const DataUsageTable = () => {
           {/* Mobile Sort Buttons */}
           <div class="flex gap-2 rounded-lg bg-base-200 p-3">
             <div class="text-xs font-semibold text-base-content/60">
-              Sort by:
+              {t('sortBy')}
             </div>
             <div class="flex flex-1 gap-2">
               <button
                 class={`btn flex-1 btn-xs ${sortField() === 'ip' ? 'btn-primary' : 'btn-ghost'}`}
                 onClick={() => handleSort('ip')}
               >
-                IP
+                {t('ipShort')}
                 <Show when={sortField() === 'ip'}>
                   {sortOrder() === 'asc' ? (
                     <IconArrowUp size={12} />
@@ -291,7 +293,7 @@ export const DataUsageTable = () => {
                 class={`btn flex-1 btn-xs ${sortField() === 'duration' ? 'btn-primary' : 'btn-ghost'}`}
                 onClick={() => handleSort('duration')}
               >
-                Duration
+                {t('duration')}
                 <Show when={sortField() === 'duration'}>
                   {sortOrder() === 'asc' ? (
                     <IconArrowUp size={12} />
@@ -304,7 +306,7 @@ export const DataUsageTable = () => {
                 class={`btn flex-1 btn-xs ${sortField() === 'total' ? 'btn-primary' : 'btn-ghost'}`}
                 onClick={() => handleSort('total')}
               >
-                Total
+                {t('total')}
                 <Show when={sortField() === 'total'}>
                   {sortOrder() === 'asc' ? (
                     <IconArrowUp size={12} />
@@ -321,7 +323,7 @@ export const DataUsageTable = () => {
           when={dataUsageEntries().length > 0}
           fallback={
             <div class="rounded-lg bg-base-200 p-4 text-center text-base-content/70">
-              No data usage recorded yet
+              {t('noDataUsageYet')}
             </div>
           }
         >
@@ -340,7 +342,7 @@ export const DataUsageTable = () => {
                     <div class="mb-2 flex items-start justify-between">
                       <div class="flex-1">
                         <div class="text-xs font-semibold text-base-content/60 uppercase">
-                          IP Address
+                          {t('ipAddress')}
                         </div>
                         <div class="font-mono text-sm font-bold text-base-content">
                           {entry.sourceIP}
@@ -349,7 +351,7 @@ export const DataUsageTable = () => {
                       <button
                         class="btn btn-circle text-error btn-ghost btn-xs"
                         onClick={() => handleRemoveEntry(entry.sourceIP)}
-                        title="Remove"
+                        title={t('remove')}
                       >
                         <IconTrash size={16} />
                       </button>
@@ -358,7 +360,7 @@ export const DataUsageTable = () => {
                     <Show when={entry.macAddress}>
                       <div class="mb-2">
                         <div class="text-xs font-semibold text-base-content/60 uppercase">
-                          MAC Address
+                          {t('macAddress')}
                         </div>
                         <div class="text-sm text-base-content">
                           {entry.macAddress}
@@ -369,7 +371,7 @@ export const DataUsageTable = () => {
                     <Show when={entry.firstSeen}>
                       <div class="mb-2">
                         <div class="text-xs font-semibold text-base-content/60 uppercase">
-                          Time Range
+                          {t('timeRange')}
                         </div>
                         <div class="flex items-center gap-1 text-sm text-base-content">
                           <IconClock size={14} class="text-base-content/60" />
@@ -386,7 +388,7 @@ export const DataUsageTable = () => {
                     <div class="grid grid-cols-3 gap-2">
                       <div>
                         <div class="text-xs font-semibold text-base-content/60 uppercase">
-                          Upload
+                          {t('upload')}
                         </div>
                         <div class="text-sm font-medium text-base-content">
                           {byteSize(entry.upload).toString()}
@@ -394,7 +396,7 @@ export const DataUsageTable = () => {
                       </div>
                       <div>
                         <div class="text-xs font-semibold text-base-content/60 uppercase">
-                          Download
+                          {t('download')}
                         </div>
                         <div class="text-sm font-medium text-base-content">
                           {byteSize(entry.download).toString()}
@@ -402,7 +404,7 @@ export const DataUsageTable = () => {
                       </div>
                       <div>
                         <div class="text-xs font-semibold text-base-content/60 uppercase">
-                          Total
+                          {t('total')}
                         </div>
                         <div class="text-sm font-bold text-primary">
                           {byteSize(entry.total).toString()}
