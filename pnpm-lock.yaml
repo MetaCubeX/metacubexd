@@ -78,7 +78,7 @@ importers:
         specifier: ^0.5.19
         version: 0.5.19(tailwindcss@4.1.17)
       '@tailwindcss/vite':
-        specifier: ^4.1.16
+        specifier: ^4.1.17
         version: 4.1.17(rolldown-vite@7.1.13(@types/node@24.10.0)(esbuild@0.25.6)(jiti@2.6.1)(terser@5.44.0)(yaml@2.8.1))
       '@tanstack/match-sorter-utils':
         specifier: ^8.19.4
@@ -105,7 +105,7 @@ importers:
         specifier: ^14.1.2
         version: 14.1.2
       '@types/node':
-        specifier: ^24.9.2
+        specifier: ^24.10.0
         version: 24.10.0
       '@types/uuid':
         specifier: ^11.0.0
@@ -114,7 +114,7 @@ importers:
         specifier: ^1.0.2
         version: 1.0.2
       apexcharts:
-        specifier: ^5.3.5
+        specifier: ^5.3.6
         version: 5.3.6
       byte-size:
         specifier: ^9.0.1
@@ -123,7 +123,7 @@ importers:
         specifier: ^20.1.0
         version: 20.1.0(@types/node@24.10.0)(typescript@5.9.3)
       daisyui:
-        specifier: ^5.3.10
+        specifier: ^5.4.7
         version: 5.4.7
       dayjs:
         specifier: ^1.11.19
@@ -144,7 +144,7 @@ importers:
         specifier: ^5.0.1
         version: 5.0.1
       ky:
-        specifier: ^1.13.0
+        specifier: ^1.14.0
         version: 1.14.0
       lint-staged:
         specifier: ^16.2.6
@@ -183,7 +183,7 @@ importers:
         specifier: ^3.3.1
         version: 3.3.1
       tailwindcss:
-        specifier: ^4.1.16
+        specifier: ^4.1.17
         version: 4.1.17
       typescript:
         specifier: ^5.9.3
