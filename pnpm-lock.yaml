@@ -169,9 +169,6 @@ importers:
       prettier-plugin-tailwindcss:
         specifier: ^0.7.1
         version: 0.7.1(@prettier/plugin-oxc@0.0.4)(prettier-plugin-organize-imports@4.3.0(prettier@3.6.2)(typescript@5.9.3))(prettier@3.6.2)
-      solid-echarts:
-        specifier: ^0.0.4
-        version: 0.0.4(echarts@6.0.0)(solid-js@1.9.10)
       solid-js:
         specifier: ^1.9.10
         version: 1.9.10
@@ -2244,14 +2241,6 @@ packages:
     resolution:
       {
         integrity: sha512-9HULb0QAzL2r47CCad0M+NKFtQ+LrGGNHZfteX/ThdGvKIg2o2GYhBooZubTCd/RTu2l2+Nw4s+dEfiDGvdrrQ==,
-      }
-    peerDependencies:
-      solid-js: ^1.6.12
-
-  '@solid-primitives/scheduled@1.5.2':
-    resolution:
-      {
-        integrity: sha512-/j2igE0xyNaHhj6kMfcUQn5rAVSTLbAX+CDEBm25hSNBmNiHLu2lM7Usj2kJJ5j36D67bE8wR1hBNA8hjtvsQA==,
       }
     peerDependencies:
       solid-js: ^1.6.12
@@ -5661,15 +5650,6 @@ packages:
     peerDependencies:
       solid-js: ^1.8
 
-  solid-echarts@0.0.4:
-    resolution:
-      {
-        integrity: sha512-NPoRyhoawv83bsBXWq7BHHSXunTKL3Q2x5KHLLPAlvVkzoR9LVvGI3vyxDUyQ1iRkxGiXNYD1Ok97daeKvqfyg==,
-      }
-    peerDependencies:
-      echarts: ^5.0.0
-      solid-js: '*'
-
   solid-js@1.9.10:
     resolution:
       {
@@ -7858,10 +7838,6 @@ snapshots:
       '@solid-primitives/utils': 6.3.2(solid-js@1.9.10)
       solid-js: 1.9.10
 
-  '@solid-primitives/scheduled@1.5.2(solid-js@1.9.10)':
-    dependencies:
-      solid-js: 1.9.10
-
   '@solid-primitives/static-store@0.1.2(solid-js@1.9.10)':
     dependencies:
       '@solid-primitives/utils': 6.3.2(solid-js@1.9.10)
@@ -9856,13 +9832,6 @@ snapshots:
   solid-dismissible@0.1.1(solid-js@1.9.10):
     dependencies:
       '@corvu/utils': 0.4.2(solid-js@1.9.10)
-      solid-js: 1.9.10
-
-  solid-echarts@0.0.4(echarts@6.0.0)(solid-js@1.9.10):
-    dependencies:
-      '@solid-primitives/resize-observer': 2.1.3(solid-js@1.9.10)
-      '@solid-primitives/scheduled': 1.5.2(solid-js@1.9.10)
-      echarts: 6.0.0
       solid-js: 1.9.10
 
   solid-js@1.9.10:
