@@ -134,7 +134,7 @@ export default () => {
               {(tab) => (
                 <button
                   class={twMerge(
-                    activeTab() === tab.type && 'bg-primary !text-neutral',
+                    activeTab() === tab.type && 'bg-primary text-neutral!',
                     'tab gap-2 px-2',
                   )}
                   onClick={() => setActiveTab(tab.type)}

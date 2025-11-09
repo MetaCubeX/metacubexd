@@ -502,7 +502,7 @@ const ConfigForXd = () => {
         <div class="flex flex-col items-center">
           <ConfigTitle>{t('autoSwitchTheme')}</ConfigTitle>
 
-          <div class="h-[2.5rem]">
+          <div class="h-10">
             <Toggle
               checked={autoSwitchTheme()}
               onChange={(e) => setAutoSwitchTheme(e.target.checked)}
@@ -580,7 +580,7 @@ export default () => {
     <>
       <DocumentTitle>{t('config')}</DocumentTitle>
 
-      <div class="mx-auto flex max-w-screen-md flex-col gap-4">
+      <div class="mx-auto flex max-w-3xl flex-col gap-4">
         <Show when={!isSingBox()}>
           <ConfigTitle withDivider>{t('dnsQuery')}</ConfigTitle>
 
