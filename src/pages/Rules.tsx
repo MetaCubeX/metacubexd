@@ -129,7 +129,7 @@ export default () => {
 
       <div class="flex h-full flex-col gap-2">
         <div class="flex w-full flex-wrap items-center gap-2">
-          <div class="tabs gap-2 tabs-box tabs-sm">
+          <div class="tabs-box tabs gap-2 tabs-sm">
             <For each={tabs()}>
               {(tab) => (
                 <button
@@ -197,7 +197,7 @@ export default () => {
                       transform: `translateY(${virtualizerItem.start}px)`,
                     }}
                   >
-                    <div class="card-border card bg-base-200 p-4 card-sm">
+                    <div class="card bg-base-200 p-4 card-sm card-border">
                       <div class="flex items-center gap-2">
                         <span class="break-all">{rule.payload}</span>
 
@@ -239,7 +239,7 @@ export default () => {
                       transform: `translateY(${virtualizerItem.start}px)`,
                     }}
                   >
-                    <div class="card-border card bg-base-200 p-4 card-sm">
+                    <div class="card bg-base-200 p-4 card-sm card-border">
                       <div class="flex items-center gap-2 pr-8">
                         <span class="break-all">{ruleProvider.name}</span>
 
