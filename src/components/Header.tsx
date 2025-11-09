@@ -137,7 +137,7 @@ export const Header = () => {
 
   return (
     <>
-      <header class="z-50 navbar flex w-auto items-center justify-center bg-base-300 px-4 shadow-lg">
+      <header class="navbar z-50 flex w-auto items-center justify-center bg-base-300 px-4 shadow-lg">
         <div class="navbar-start">
           <LogoText />
         </div>
