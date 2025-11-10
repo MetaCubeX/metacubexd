@@ -152,12 +152,12 @@ export default () => {
 
       <div class="flex h-full flex-col gap-2">
         <div class="flex items-center gap-2">
-          <div class="tabs gap-2 tabs-box tabs-sm">
+          <div class="tabs-box tabs gap-2 tabs-sm">
             <For each={tabs()}>
               {(tab) => (
                 <button
                   class={twMerge(
-                    activeTab() === tab.type && 'bg-primary !text-neutral',
+                    activeTab() === tab.type && 'bg-primary text-neutral!',
                     'sm:tab-md tab gap-2 px-2',
                   )}
                   onClick={() => setActiveTab(tab.type)}

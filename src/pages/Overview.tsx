@@ -1,13 +1,21 @@
-import { makeTimer } from '@solid-primitives/timer'
-import type { ApexOptions } from 'apexcharts'
 import byteSize from 'byte-size'
+import type { EChartsOption } from 'echarts'
+import { EChartsAutoSize } from 'echarts-solid'
 import { defaultsDeep } from 'lodash'
-import { SolidApexCharts } from 'solid-apexcharts'
 import type { JSX, ParentComponent } from 'solid-js'
 import { DataUsageTable, DocumentTitle } from '~/components'
 import { CHART_MAX_XAXIS, DEFAULT_CHART_OPTIONS } from '~/constants'
 import { useI18n } from '~/i18n'
 import { endpoint, latestConnectionMsg, useWsRequest } from '~/signals'
+
+const formatDate = (value: number) => {
+  const date = new Date(value)
+
+  return `${date.getMinutes().toString().padStart(2, '0')}:${date
+    .getSeconds()
+    .toString()
+    .padStart(2, '0')}`
+}
 
 const TrafficWidget: ParentComponent<{ label: JSX.Element }> = (props) => (
   <div class="stat flex-1 place-items-center">
@@ -29,82 +37,152 @@ export default () => {
 
   const [t] = useI18n()
 
-  const [traffics, setTraffics] = createSignal<{ down: number; up: number }[]>(
-    [],
-  )
-  const [memories, setMemories] = createSignal<number[]>([])
-
-  // https://github.com/apexcharts/apexcharts.js/blob/main/samples/source/line/realtime.xml
-  // TODO: needs a better way
-  makeTimer(
-    () => {
-      batch(() => {
-        setTraffics((traffics) => traffics.slice(-CHART_MAX_XAXIS))
-        setMemories((memo) => memo.slice(-CHART_MAX_XAXIS))
-      })
-    },
-    // we shrink the chart data array size down every minute to prevent memory leaks
-    60 * 1000,
-    setInterval,
-  )
+  const [traffics, setTraffics] = createSignal<
+    { down: number; up: number; time: Date }[]
+  >([])
+  const [memories, setMemories] = createSignal<
+    { value: number; time: number }[]
+  >([])
 
   const traffic = useWsRequest<{ down: number; up: number }>('traffic')
 
   createEffect(() => {
-    const t = traffic()
+    const newTraffic = traffic()
 
-    if (t) setTraffics((traffics) => [...traffics, t])
+    if (newTraffic) {
+      setTraffics((traffics) => {
+        const newTraffics = [...traffics, { ...newTraffic, time: new Date() }]
+
+        if (newTraffics.length > CHART_MAX_XAXIS) {
+          newTraffics.shift()
+        }
+
+        return newTraffics
+      })
+    }
   })
-
-  const trafficChartOptions = createMemo<ApexOptions>(() =>
-    defaultsDeep({ title: { text: t('traffic') } }, DEFAULT_CHART_OPTIONS),
-  )
-
-  const trafficChartSeries = createMemo(() => [
-    {
-      name: t('down'),
-      data: traffics().map((t) => t.down),
-    },
-    {
-      name: t('up'),
-      data: traffics().map((t) => t.up),
-    },
-  ])
-
-  const flowChartOptions = createMemo<ApexOptions>(() => {
-    return defaultsDeep(
-      {
-        title: { text: t('flow') },
-        labels: [t('downloadTotal'), t('uploadTotal')],
-        tooltip: { enabled: true },
-        chart: {
-          animations: { enabled: false },
-        },
-      },
-      DEFAULT_CHART_OPTIONS,
-    )
-  })
-
-  const flowChartSeries = createMemo(() => [
-    latestConnectionMsg()?.downloadTotal || 0,
-    latestConnectionMsg()?.uploadTotal || 0,
-  ])
 
   const memory = useWsRequest<{ inuse: number }>('memory')
 
   createEffect(() => {
-    const m = memory()?.inuse
+    const newMemory = memory()?.inuse
 
-    if (m) setMemories((memories) => [...memories, m])
+    if (newMemory) {
+      setMemories((memories) => {
+        const newMemories = [
+          ...memories,
+          { value: newMemory, time: Date.now() },
+        ]
+
+        if (newMemories.length > CHART_MAX_XAXIS) {
+          newMemories.shift()
+        }
+
+        return newMemories
+      })
+    }
   })
 
-  const memoryChartOptions = createMemo<ApexOptions>(() =>
-    defaultsDeep({ title: { text: t('memory') } }, DEFAULT_CHART_OPTIONS),
-  )
+  const trafficChartOptions = createMemo<EChartsOption>(() => {
+    const data = traffics()
 
-  const memoryChartSeries = createMemo(() => [
-    { name: t('memory'), data: memories() },
-  ])
+    return defaultsDeep(
+      {
+        title: { text: t('traffic') },
+        xAxis: {
+          axisLabel: {
+            show: true,
+            formatter: formatDate,
+          },
+        },
+        series: [
+          {
+            name: t('down'),
+            type: 'line',
+            stack: 'traffic',
+            smooth: true,
+            showSymbol: false,
+            data: data.map((t) => [t.time, t.down]),
+          },
+          {
+            name: t('up'),
+            type: 'line',
+            stack: 'traffic',
+            smooth: true,
+            showSymbol: false,
+            data: data.map((t) => [t.time, t.up]),
+          },
+        ],
+      } satisfies EChartsOption,
+      DEFAULT_CHART_OPTIONS,
+    )
+  })
+
+  const flowChartOptions = createMemo<EChartsOption>(() => {
+    return {
+      title: { text: t('flow') },
+      tooltip: {
+        trigger: 'item',
+        formatter: (params) => {
+          if (typeof params !== 'object' || Array.isArray(params)) return ''
+
+          const name = params.name || ''
+          const value = Number(params.value) || 0
+          const percent = Number(params.percent) || 0
+
+          return `${name}<br/>${byteSize(value).toString()} (${percent.toFixed(1)}%)`
+        },
+      },
+      series: [
+        {
+          type: 'pie',
+          labelLine: {
+            show: false,
+          },
+          label: {
+            show: false,
+            position: 'center',
+          },
+          data: [
+            {
+              name: t('downloadTotal'),
+              value: latestConnectionMsg()?.downloadTotal || 0,
+            },
+            {
+              name: t('uploadTotal'),
+              value: latestConnectionMsg()?.uploadTotal || 0,
+            },
+          ],
+        },
+      ],
+    }
+  })
+
+  const memoryChartOptions = createMemo<EChartsOption>(() => {
+    const data = memories()
+
+    return defaultsDeep(
+      {
+        title: { text: t('memory') },
+        xAxis: {
+          axisLabel: {
+            show: true,
+            formatter: formatDate,
+          },
+        },
+        series: [
+          {
+            name: t('memory'),
+            type: 'line',
+            smooth: true,
+            showSymbol: false,
+            data: data.map((m) => [m.time, m.value]),
+          },
+        ],
+      } satisfies EChartsOption,
+      DEFAULT_CHART_OPTIONS,
+    )
+  })
 
   return (
     <>
@@ -137,26 +215,23 @@ export default () => {
           </TrafficWidget>
         </div>
 
-        <div class="flex flex-col gap-2 rounded-box bg-base-300 py-4 lg:flex-row">
-          <div class="flex-1">
-            <SolidApexCharts
-              type="line"
-              options={trafficChartOptions()}
-              series={trafficChartSeries()}
+        <div class="grid grid-cols-1 gap-2 rounded-box bg-base-300 py-4 lg:grid-cols-3">
+          <div class="h-80">
+            <EChartsAutoSize
+              isLoading={traffics().length === 0}
+              option={trafficChartOptions()}
             />
           </div>
-          <div class="flex-1">
-            <SolidApexCharts
-              type="pie"
-              options={flowChartOptions()}
-              series={flowChartSeries()}
+          <div class="h-80">
+            <EChartsAutoSize
+              isLoading={latestConnectionMsg()?.connections?.length === 0}
+              option={flowChartOptions()}
             />
           </div>
-          <div class="flex-1">
-            <SolidApexCharts
-              type="line"
-              options={memoryChartOptions()}
-              series={memoryChartSeries()}
+          <div class="h-80">
+            <EChartsAutoSize
+              isLoading={memories().length === 0}
+              option={memoryChartOptions()}
             />
           </div>
         </div>

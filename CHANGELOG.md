@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.197.0](https://github.com/MetaCubeX/metacubexd/compare/v1.196.0...v1.197.0) (2025-11-09)
+
+
+### Features
+
+* update chart options and components to use ECharts ([#1681](https://github.com/MetaCubeX/metacubexd/issues/1681)) ([52fe0ed](https://github.com/MetaCubeX/metacubexd/commit/52fe0ed4d86aa1b8f6cd1a6e55d04a8868bc172c))
+
 ## [1.196.0](https://github.com/MetaCubeX/metacubexd/compare/v1.195.0...v1.196.0) (2025-11-08)
 
 
