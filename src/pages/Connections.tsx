@@ -41,6 +41,7 @@ import {
 import { CONNECTIONS_TABLE_ACCESSOR_KEY } from '~/constants'
 import { formatIPv6, formatTimeFromNow } from '~/helpers'
 import { useI18n } from '~/i18n'
+import type { Dict } from '~/i18n/dict'
 import {
   allConnections,
   clientSourceIPTags,
@@ -60,6 +61,8 @@ enum ActiveTab {
   activeConnections,
   closedConnections,
 }
+
+type ColMeta = { headerKey: keyof Dict }
 
 const fuzzyFilter: FilterFn<Connection> = (row, columnId, value, addMeta) => {
   // Rank the item
@@ -105,6 +108,7 @@ export default () => {
 
   const columns: ColumnDef<Connection>[] = [
     {
+      meta: { headerKey: 'details' },
       header: () => t('details'),
       enableGrouping: false,
       enableSorting: false,
@@ -126,6 +130,7 @@ export default () => {
       ),
     },
     {
+      meta: { headerKey: 'close' },
       header: () => t('close'),
       enableGrouping: false,
       enableSorting: false,
@@ -143,18 +148,21 @@ export default () => {
       ),
     },
     {
+      meta: { headerKey: 'ID' },
       header: () => t('ID'),
       enableGrouping: false,
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.ID,
       accessorFn: (original) => original.id,
     },
     {
+      meta: { headerKey: 'type' },
       header: () => t('type'),
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Type,
       accessorFn: (original) =>
         `${original.metadata.type}(${original.metadata.network})`,
     },
     {
+      meta: { headerKey: 'process' },
       header: () => t('process'),
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Process,
       accessorFn: (original) =>
@@ -163,6 +171,7 @@ export default () => {
         '-',
     },
     {
+      meta: { headerKey: 'host' },
       header: () => t('host'),
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Host,
       accessorFn: (original) =>
@@ -173,11 +182,13 @@ export default () => {
         }:${original.metadata.destinationPort}`,
     },
     {
+      meta: { headerKey: 'sniffHost' },
       header: () => t('sniffHost'),
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.SniffHost,
       accessorFn: (original) => original.metadata.sniffHost || '-',
     },
     {
+      meta: { headerKey: 'rule' },
       header: () => t('rule'),
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Rule,
       accessorFn: (original) =>
@@ -186,6 +197,7 @@ export default () => {
           : `${original.rule} : ${original.rulePayload}`,
     },
     {
+      meta: { headerKey: 'chains' },
       header: () => t('chains'),
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Chains,
       cell: ({ row }) => (
@@ -202,6 +214,7 @@ export default () => {
       ),
     },
     {
+      meta: { headerKey: 'connectTime' },
       header: () => t('connectTime'),
       enableGrouping: false,
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.ConnectTime,
@@ -211,6 +224,7 @@ export default () => {
         dayjs(next.original.start).valueOf(),
     },
     {
+      meta: { headerKey: 'dlSpeed' },
       header: () => t('dlSpeed'),
       enableGrouping: false,
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.DlSpeed,
@@ -219,6 +233,7 @@ export default () => {
         prev.original.downloadSpeed - next.original.downloadSpeed,
     },
     {
+      meta: { headerKey: 'ulSpeed' },
       header: () => t('ulSpeed'),
       enableGrouping: false,
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.UlSpeed,
@@ -227,6 +242,7 @@ export default () => {
         prev.original.uploadSpeed - next.original.uploadSpeed,
     },
     {
+      meta: { headerKey: 'dl' },
       header: () => t('dl'),
       enableGrouping: false,
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Download,
@@ -235,6 +251,7 @@ export default () => {
         prev.original.download - next.original.download,
     },
     {
+      meta: { headerKey: 'ul' },
       header: () => t('ul'),
       enableGrouping: false,
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Upload,
@@ -242,6 +259,7 @@ export default () => {
       sortingFn: (prev, next) => prev.original.upload - next.original.upload,
     },
     {
+      meta: { headerKey: 'sourceIP' },
       header: () => t('sourceIP'),
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.SourceIP,
       accessorFn: (original) => {
@@ -252,11 +270,13 @@ export default () => {
       },
     },
     {
+      meta: { headerKey: 'sourcePort' },
       header: () => t('sourcePort'),
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.SourcePort,
       accessorFn: (original) => original.metadata.sourcePort,
     },
     {
+      meta: { headerKey: 'destination' },
       header: () => t('destination'),
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.Destination,
       accessorFn: (original) =>
@@ -265,6 +285,7 @@ export default () => {
         original.metadata.host,
     },
     {
+      meta: { headerKey: 'inboundUser' },
       header: () => t('inboundUser'),
       accessorKey: CONNECTIONS_TABLE_ACCESSOR_KEY.InboundUser,
       accessorFn: (original) =>
@@ -337,6 +358,39 @@ export default () => {
     getCoreRowModel: getCoreRowModel(),
   })
 
+  // Sort controls state synced with table sorting
+  const [sortColumn, setSortColumn] = createSignal<string>(
+    sorting()[0]?.id || CONNECTIONS_TABLE_ACCESSOR_KEY.ConnectTime,
+  )
+  const [sortDesc, setSortDesc] = createSignal<boolean>(
+    sorting()[0]?.desc ?? true,
+  )
+
+  createEffect(
+    on(sorting, () => {
+      const s = sorting()
+
+      if (s.length) {
+        setSortColumn(s[0].id)
+        setSortDesc(!!s[0].desc)
+      }
+    }),
+  )
+
+  const sortables = createMemo(
+    () =>
+      table
+        .getAllLeafColumns()
+        .filter((c) => c.getCanSort())
+        .map((c) => ({
+          id: c.id,
+          key: (c.columnDef.meta as ColMeta | undefined)?.headerKey as
+            | keyof Dict
+            | undefined,
+        }))
+        .filter((x) => !!x.key) as { id: string; key: keyof Dict }[],
+  )
+
   const sourceIPHeader = table
     .getFlatHeaders()
     .find(({ id }) => id === CONNECTIONS_TABLE_ACCESSOR_KEY.SourceIP)
@@ -382,7 +436,7 @@ export default () => {
                 {(tab) => (
                   <button
                     class={twMerge(
-                      activeTab() === tab().type && 'bg-primary !text-neutral',
+                      activeTab() === tab().type && 'bg-primary text-neutral!',
                       'tab gap-2 px-2',
                     )}
                     onClick={() => setActiveTab(tab().type)}
@@ -427,6 +481,33 @@ export default () => {
                 {(sourceIP) => <option value={sourceIP()}>{sourceIP()}</option>}
               </Index>
             </select>
+          </div>
+
+          {/* Sort controls */}
+          <div class="flex items-center gap-2">
+            <span class="w-32 text-sm sm:inline-block">{t('sortBy')}</span>
+            <select
+              class="select select-sm select-primary"
+              value={sortColumn()}
+              onChange={(e) => {
+                const id = e.target.value
+                setSortColumn(id)
+                setSorting([{ id, desc: sortDesc() }])
+              }}
+            >
+              <Index each={sortables()}>
+                {(opt) => <option value={opt().id}>{t(opt().key)}</option>}
+              </Index>
+            </select>
+            <Button
+              class="btn btn-sm btn-primary"
+              onClick={() => {
+                const next = !sortDesc()
+                setSortDesc(next)
+                setSorting([{ id: sortColumn(), desc: next }])
+              }}
+              icon={sortDesc() ? <IconSortDescending /> : <IconSortAscending />}
+            />
           </div>
 
           <div class="join flex flex-1 items-center">
@@ -489,14 +570,18 @@ export default () => {
               'table-pin-rows table table-zebra',
             )}
           >
-            <thead>
+            <thead class="hidden md:table-header-group">
               <For each={table.getHeaderGroups()}>
                 {(headerGroup) => (
                   <tr class="flex">
                     <For each={headerGroup.headers}>
                       {(header) => (
-                        <th class="bg-base-200" style={{ width: '150px' }}>
-                          <div class={twMerge('flex items-center gap-2')}>
+                        <th class="w-36 min-w-36 bg-base-200 sm:w-40 sm:min-w-40 md:w-44 md:min-w-44 lg:w-48 lg:min-w-48">
+                          <div
+                            class={twMerge(
+                              'flex items-center gap-2 text-justify',
+                            )}
+                          >
                             {header.column.getCanGroup() ? (
                               <button
                                 class="cursor-pointer"
@@ -514,7 +599,7 @@ export default () => {
                               class={twMerge(
                                 header.column.getCanSort() &&
                                   'cursor-pointer select-none',
-                                'flex-1',
+                                'justify flex-1 text-xs wrap-break-word whitespace-normal',
                               )}
                               onClick={header.column.getToggleSortingHandler()}
                             >
@@ -541,17 +626,16 @@ export default () => {
               scrollRef={scrollRef}
               data={table.getRowModel().rows}
               as="tbody"
-              item="tr"
+              item={(props) => (
+                <tr {...props} class="flex flex-wrap md:table-row" />
+              )}
             >
               {(row) => (
                 <For each={row.getVisibleCells()}>
                   {(cell) => {
                     return (
                       <td
-                        class="inline-block py-2 break-words"
-                        style={{
-                          width: '150px',
-                        }}
+                        class="w-1/2 min-w-[50%] py-2 text-justify align-top wrap-break-word nth-[2n]:text-right sm:w-1/3 sm:min-w-[33.333%] sm:nth-[2n]:text-justify sm:nth-[3n]:text-right md:inline-block md:w-44 md:min-w-44 md:text-start lg:w-48 lg:min-w-48"
                         onContextMenu={(e) => {
                           e.preventDefault()
 
@@ -560,6 +644,16 @@ export default () => {
                           if (value) writeClipboard(value).catch(() => {})
                         }}
                       >
+                        {/* Mobile label */}
+                        <div class="justify mb-1 text-[10px] text-base-content/60 uppercase md:hidden">
+                          {(() => {
+                            const key = (
+                              cell.column.columnDef.meta as ColMeta | undefined
+                            )?.headerKey
+
+                            return key ? t(key) : ''
+                          })()}
+                        </div>
                         {cell.getIsGrouped() ? (
                           <button
                             class={twMerge(
