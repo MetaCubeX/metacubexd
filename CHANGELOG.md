@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.198.0](https://github.com/MetaCubeX/metacubexd/compare/v1.197.0...v1.198.0) (2025-11-10)
+
+
+### Features
+
+* Responsive connections table for mobile with sort controls ([#1684](https://github.com/MetaCubeX/metacubexd/issues/1684)) ([8d97c5a](https://github.com/MetaCubeX/metacubexd/commit/8d97c5ad39362fddb5ec2f2153111a2e7eba998d))
+
 ## [1.197.0](https://github.com/MetaCubeX/metacubexd/compare/v1.196.0...v1.197.0) (2025-11-09)
 
 
