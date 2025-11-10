@@ -485,7 +485,7 @@ export default () => {
 
           {/* Sort controls */}
           <div class="flex items-center gap-2">
-            <span class="text-xs sm:inline-block">{t('sortBy')}</span>
+            <span class="w-32 text-sm sm:inline-block">{t('sortBy')}</span>
             <select
               class="select select-sm select-primary"
               value={sortColumn()}
