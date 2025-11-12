@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.199.0](https://github.com/MetaCubeX/metacubexd/compare/v1.198.0...v1.199.0) (2025-11-12)
+
+
+### Features
+
+* release ([ed4a1da](https://github.com/MetaCubeX/metacubexd/commit/ed4a1da1afc5d4e00a7186c5271326313b8036e0))
+
 ## [1.198.0](https://github.com/MetaCubeX/metacubexd/compare/v1.197.0...v1.198.0) (2025-11-10)
 
 
