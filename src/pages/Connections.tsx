@@ -627,7 +627,10 @@ export default () => {
               data={table.getRowModel().rows}
               as="tbody"
               item={(props) => (
-                <tr {...props} class="flex flex-wrap md:table-row" />
+                <tr
+                  {...props}
+                  class="border-base-400 even:bg-base-400 flex flex-wrap border-t border-b-2 odd:bg-base-100 md:table-row md:border-t-0"
+                />
               )}
             >
               {(row) => (
@@ -635,7 +638,7 @@ export default () => {
                   {(cell) => {
                     return (
                       <td
-                        class="w-1/2 min-w-[50%] py-2 text-justify align-top wrap-break-word nth-[2n]:text-right sm:w-1/3 sm:min-w-[33.333%] sm:nth-[2n]:text-justify sm:nth-[3n]:text-right md:inline-block md:w-44 md:min-w-44 md:text-start lg:w-48 lg:min-w-48"
+                        class="w-1/2 min-w-[50%] py-4 text-justify align-top wrap-break-word nth-[2n]:text-right sm:w-1/3 sm:min-w-[33.333%] sm:nth-[2n]:text-justify sm:nth-[3n]:text-right md:inline-block md:w-44 md:min-w-44 md:py-3 md:text-start md:nth-[2n]:text-start md:nth-[3n]:text-start lg:w-68 lg:min-w-48"
                         onContextMenu={(e) => {
                           e.preventDefault()
 

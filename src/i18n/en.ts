@@ -140,4 +140,7 @@ export default {
   sortBy: 'Sort by:',
   ipShort: 'IP',
   na: 'N/A',
+  show: 'Show',
+  dataUsageInfo:
+    'Data usage monitoring is performed on the client-side (browser). When the browser is closed, monitoring will likely not run.',
 }
