@@ -20,7 +20,7 @@ export const DataUsageTable = () => {
   const [t] = useI18n()
   const [sortField, setSortField] = createSignal<SortField>('total')
   const [sortOrder, setSortOrder] = createSignal<SortOrder>('desc')
-  const [showTable, setShowTable] = makePersisted(createSignal(true), {
+  const [showTable, setShowTable] = makePersisted(createSignal(false), {
     name: 'showDataUsageTable',
     storage: localStorage,
   })
