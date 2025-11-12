@@ -3,7 +3,7 @@ import { endpoint } from '~/signals'
 export const LogoText = () => (
   <div class="text-md flex items-center gap-1 font-bold whitespace-nowrap uppercase sm:text-xl">
     <A
-      class="bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent"
+      class="bg-linear-to-br from-primary to-secondary bg-clip-text text-transparent"
       href={endpoint() ? '/' : '/setup'}
     >
       metacube

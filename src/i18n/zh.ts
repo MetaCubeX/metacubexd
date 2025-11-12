@@ -142,4 +142,7 @@ export default {
   sortBy: '排序：',
   ipShort: 'IP',
   na: '无',
+  show: '显示',
+  dataUsageInfo:
+    '数据用量监控在客户端（浏览器）执行。当浏览器关闭时，监控可能不会运行。',
 } satisfies Dict
