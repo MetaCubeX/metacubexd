@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.200.1](https://github.com/MetaCubeX/metacubexd/compare/v1.200.0...v1.200.1) (2025-11-13)
+
+
+### Bug Fixes
+
+* specify platforms directly in docker build step ([ab86845](https://github.com/MetaCubeX/metacubexd/commit/ab8684536cf84b4663eeefe09e8f50837dfc175f))
+
 ## [1.200.0](https://github.com/MetaCubeX/metacubexd/compare/v1.199.2...v1.200.0) (2025-11-13)
 
 
