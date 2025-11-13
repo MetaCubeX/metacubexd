@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.202.0](https://github.com/MetaCubeX/metacubexd/compare/v1.201.0...v1.202.0) (2025-11-13)
+
+
+### Features
+
+* add docker setup action to release workflow ([1d8c1f1](https://github.com/MetaCubeX/metacubexd/commit/1d8c1f10c9e183dfc051ea14debe6ccd7d356270))
+
 ## [1.201.0](https://github.com/MetaCubeX/metacubexd/compare/v1.200.2...v1.201.0) (2025-11-13)
 
 
