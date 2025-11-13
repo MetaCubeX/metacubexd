@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.201.0](https://github.com/MetaCubeX/metacubexd/compare/v1.200.2...v1.201.0) (2025-11-13)
+
+
+### Features
+
+* enable docker feature containerd-snapshotter ([d30e625](https://github.com/MetaCubeX/metacubexd/commit/d30e62570f5664707964fce9fe7eecab9fa72a79))
+
 ## [1.200.2](https://github.com/MetaCubeX/metacubexd/compare/v1.200.1...v1.200.2) (2025-11-13)
 
 
