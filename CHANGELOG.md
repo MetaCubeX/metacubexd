@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.199.2](https://github.com/MetaCubeX/metacubexd/compare/v1.199.1...v1.199.2) (2025-11-13)
+
+
+### Bug Fixes
+
+* **deps:** downgrade @types/node from 24.10.1 to 24.10.0 ([e13b318](https://github.com/MetaCubeX/metacubexd/commit/e13b318a6636479e9a6890dd9f6665afbec77880))
+
 ## [1.199.1](https://github.com/MetaCubeX/metacubexd/compare/v1.199.0...v1.199.1) (2025-11-13)
 
 
