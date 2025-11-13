@@ -1,6 +1,6 @@
 {
   "name": "metacubexd",
-  "version": "1.199.0",
+  "version": "1.199.1",
   "description": "Mihomo Dashboard, The Official One, XD",
   "license": "MIT",
   "type": "module",
@@ -45,7 +45,7 @@
     "@types/byte-size": "^8.1.2",
     "@types/lodash": "^4.17.20",
     "@types/markdown-it": "^14.1.2",
-    "@types/node": "^24.10.1",
+    "@types/node": "^24.10.0",
     "@types/uuid": "^11.0.0",
     "@vite-pwa/assets-generator": "^1.0.2",
     "byte-size": "^9.0.1",

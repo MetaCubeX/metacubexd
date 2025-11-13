@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.199.1](https://github.com/MetaCubeX/metacubexd/compare/v1.199.0...v1.199.1) (2025-11-13)
+
+
+### Bug Fixes
+
+* update tooltip position and adjust column width in Connections table ([#1694](https://github.com/MetaCubeX/metacubexd/issues/1694)) ([f565e7d](https://github.com/MetaCubeX/metacubexd/commit/f565e7d3d65e0b043b92033e1705ea5f9b1e1b91))
+
 ## [1.199.0](https://github.com/MetaCubeX/metacubexd/compare/v1.198.0...v1.199.0) (2025-11-12)
 
 
