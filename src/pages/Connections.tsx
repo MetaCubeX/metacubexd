@@ -576,7 +576,7 @@ export default () => {
                   <tr class="flex">
                     <For each={headerGroup.headers}>
                       {(header) => (
-                        <th class="w-36 min-w-36 bg-base-200 sm:w-40 sm:min-w-40 md:w-44 md:min-w-44 lg:w-48 lg:min-w-48">
+                        <th class="w-36 min-w-36 bg-base-200 sm:w-40 sm:min-w-40 md:w-44 md:min-w-44 lg:w-68 lg:min-w-48">
                           <div
                             class={twMerge(
                               'flex items-center gap-2 text-justify',
@@ -629,7 +629,7 @@ export default () => {
               item={(props) => (
                 <tr
                   {...props}
-                  class="border-base-400 even:bg-base-400 flex flex-wrap border-t border-b-2 odd:bg-base-100 md:table-row md:border-t-0"
+                  class="border-base-400 even:bg-base-400 flex flex-wrap border-t odd:bg-base-100 md:table-row md:border-t-0"
                 />
               )}
             >

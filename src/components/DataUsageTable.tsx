@@ -138,7 +138,10 @@ export const DataUsageTable = () => {
             <h2 class="text-xl font-bold text-base-content">
               {t('dataUsage')}
             </h2>
-            <div class="tooltip tooltip-right" data-tip={t('dataUsageInfo')}>
+            <div
+              class="tooltip tooltip-top before:ml-4 before:max-w-xs before:rounded-lg before:p-2 before:text-xs before:content-[attr(data-tip)] md:tooltip-right md:before:ml-0 md:before:text-sm lg:before:text-base"
+              data-tip={t('dataUsageInfo')}
+            >
               <button class="btn btn-circle text-info btn-ghost btn-xs">
                 <IconInfoCircle size={18} />
               </button>
