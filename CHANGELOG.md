@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.200.0](https://github.com/MetaCubeX/metacubexd/compare/v1.199.2...v1.200.0) (2025-11-13)
+
+
+### Features
+
+* update release workflow to support multi-platform builds ([a377cf2](https://github.com/MetaCubeX/metacubexd/commit/a377cf29b4ba05ae25a98803a0721201ca38b40c))
+
 ## [1.199.2](https://github.com/MetaCubeX/metacubexd/compare/v1.199.1...v1.199.2) (2025-11-13)
 
 
