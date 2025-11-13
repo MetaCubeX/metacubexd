@@ -82,10 +82,6 @@ jobs:
 
     if: ${{ needs.release-please.outputs.release_created }}
 
-    strategy:
-      matrix:
-        platform: [linux/amd64, linux/arm64]
-
     steps:
       - uses: actions/checkout@v5
 
@@ -109,7 +105,7 @@ jobs:
           context: .
           builder: ${{ steps.buildx.outputs.name }}
           file: Dockerfile
-          platforms: ${{ matrix.platform }}
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: |
             ghcr.io/metacubex/metacubexd:latest
