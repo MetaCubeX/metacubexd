@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.200.2](https://github.com/MetaCubeX/metacubexd/compare/v1.200.1...v1.200.2) (2025-11-13)
+
+
+### Bug Fixes
+
+* update docker build step to load cache and specify platforms ([c18e6d4](https://github.com/MetaCubeX/metacubexd/commit/c18e6d43e572e7bf75d0a210484f8037f3d71bac))
+
 ## [1.200.1](https://github.com/MetaCubeX/metacubexd/compare/v1.200.0...v1.200.1) (2025-11-13)
 
 
