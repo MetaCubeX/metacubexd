@@ -29,9 +29,13 @@ jobs:
     permissions:
       contents: read
       packages: write
+
     needs: release-please
+
     runs-on: ubuntu-latest
+
     if: ${{ needs.release-please.outputs.release_created }}
+
     steps:
       - uses: actions/checkout@v5
 
@@ -71,9 +75,17 @@ jobs:
     permissions:
       contents: read
       packages: write
+
     needs: release-please
+
     runs-on: ubuntu-latest
+
     if: ${{ needs.release-please.outputs.release_created }}
+
+    strategy:
+      matrix:
+        platform: [linux/amd64, linux/arm64]
+
     steps:
       - uses: actions/checkout@v5
 
@@ -97,7 +109,7 @@ jobs:
           context: .
           builder: ${{ steps.buildx.outputs.name }}
           file: Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ matrix.platform }}
           push: true
           tags: |
             ghcr.io/metacubex/metacubexd:latest
