@@ -576,30 +576,31 @@ export default () => {
                   <tr class="flex">
                     <For each={headerGroup.headers}>
                       {(header) => (
-                        <th class="w-36 min-w-36 bg-base-200 sm:w-40 sm:min-w-40 md:w-44 md:min-w-44 lg:w-68 lg:min-w-48">
-                          <div
-                            class={twMerge(
-                              'flex items-center gap-2 text-justify',
-                            )}
-                          >
-                            {header.column.getCanGroup() ? (
-                              <button
-                                class="cursor-pointer"
-                                onClick={header.column.getToggleGroupingHandler()}
-                              >
-                                {header.column.getIsGrouped() ? (
-                                  <IconZoomOutFilled size={18} />
-                                ) : (
-                                  <IconZoomInFilled size={18} />
-                                )}
-                              </button>
-                            ) : null}
-
+                        <th
+                          class={twMerge(
+                            'w-36 min-w-36 bg-base-200 sm:w-40 sm:min-w-40 md:w-44 md:min-w-44 lg:w-24',
+                            (header.id ===
+                              CONNECTIONS_TABLE_ACCESSOR_KEY.Details ||
+                              header.id ===
+                                CONNECTIONS_TABLE_ACCESSOR_KEY.Close) &&
+                              'md:w-16 md:min-w-16 lg:w-14 lg:min-w-14',
+                            (header.id === CONNECTIONS_TABLE_ACCESSOR_KEY.ID ||
+                              header.id ===
+                                CONNECTIONS_TABLE_ACCESSOR_KEY.Host ||
+                              header.id ===
+                                CONNECTIONS_TABLE_ACCESSOR_KEY.SniffHost) &&
+                              'md:w-64 md:min-w-64',
+                            header.id ===
+                              CONNECTIONS_TABLE_ACCESSOR_KEY.Chains &&
+                              'md:w-80 md:min-w-80',
+                          )}
+                        >
+                          <div class="flex items-center gap-2">
                             <div
                               class={twMerge(
                                 header.column.getCanSort() &&
                                   'cursor-pointer select-none',
-                                'justify flex-1 text-xs wrap-break-word whitespace-normal',
+                                'text-xs wrap-break-word whitespace-normal',
                               )}
                               onClick={header.column.getToggleSortingHandler()}
                             >
@@ -613,6 +614,19 @@ export default () => {
                               asc: <IconSortAscending />,
                               desc: <IconSortDescending />,
                             }[header.column.getIsSorted() as string] ?? null}
+
+                            {header.column.getCanGroup() ? (
+                              <button
+                                class="cursor-pointer"
+                                onClick={header.column.getToggleGroupingHandler()}
+                              >
+                                {header.column.getIsGrouped() ? (
+                                  <IconZoomOutFilled size={18} />
+                                ) : (
+                                  <IconZoomInFilled size={18} />
+                                )}
+                              </button>
+                            ) : null}
                           </div>
                         </th>
                       )}
@@ -629,7 +643,7 @@ export default () => {
               item={(props) => (
                 <tr
                   {...props}
-                  class="border-base-400 even:bg-base-400 flex flex-wrap border-t odd:bg-base-100 md:table-row md:border-t-0"
+                  class="even:bg-base-500 flex flex-wrap rounded-xl border-4 border-base-300 px-2 odd:bg-base-100 md:table-row md:rounded-none md:border-0 md:px-0"
                 />
               )}
             >
@@ -638,7 +652,24 @@ export default () => {
                   {(cell) => {
                     return (
                       <td
-                        class="w-1/2 min-w-[50%] py-4 text-justify align-top wrap-break-word nth-[2n]:text-right sm:w-1/3 sm:min-w-[33.333%] sm:nth-[2n]:text-justify sm:nth-[3n]:text-right md:inline-block md:w-44 md:min-w-44 md:py-3 md:text-start md:nth-[2n]:text-start md:nth-[3n]:text-start lg:w-68 lg:min-w-48"
+                        class={twMerge(
+                          'md:-1.5 w-1/2 min-w-[50%] pb-1.5 text-justify align-top wrap-break-word nth-[2n]:text-right nth-last-[2]:mb-3 sm:w-1/3 sm:min-w-[33.333%] sm:nth-[2n]:text-justify sm:nth-[3n]:text-right md:inline-block md:w-44 md:min-w-44 md:py-3 md:text-start md:nth-[2n]:text-start md:nth-[3n]:text-start md:nth-last-[2]:mb-3 lg:w-24',
+                          (cell.column.id ===
+                            CONNECTIONS_TABLE_ACCESSOR_KEY.Details ||
+                            cell.column.id ===
+                              CONNECTIONS_TABLE_ACCESSOR_KEY.Close) &&
+                            'md:w-16 md:min-w-16 lg:w-14 lg:min-w-14',
+                          (cell.column.id ===
+                            CONNECTIONS_TABLE_ACCESSOR_KEY.ID ||
+                            cell.column.id ===
+                              CONNECTIONS_TABLE_ACCESSOR_KEY.Host ||
+                            cell.column.id ===
+                              CONNECTIONS_TABLE_ACCESSOR_KEY.SniffHost) &&
+                            'md:w-64 md:min-w-64',
+                          cell.column.id ===
+                            CONNECTIONS_TABLE_ACCESSOR_KEY.Chains &&
+                            'md:w-80 md:min-w-80',
+                        )}
                         onContextMenu={(e) => {
                           e.preventDefault()
 
@@ -648,7 +679,7 @@ export default () => {
                         }}
                       >
                         {/* Mobile label */}
-                        <div class="justify mb-1 text-[10px] text-base-content/60 uppercase md:hidden">
+                        <div class="justify mb-0.5 text-[10px] text-base-content/60 uppercase md:hidden">
                           {(() => {
                             const key = (
                               cell.column.columnDef.meta as ColMeta | undefined
