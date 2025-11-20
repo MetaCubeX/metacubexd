@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.202.1](https://github.com/MetaCubeX/metacubexd/compare/v1.202.0...v1.202.1) (2025-11-20)
+
+
+### Bug Fixes
+
+* improve connections table layout and styling ([#1712](https://github.com/MetaCubeX/metacubexd/issues/1712)) ([d36ac5f](https://github.com/MetaCubeX/metacubexd/commit/d36ac5f6fdc94f4bab3e8fad54b0cdaeb36e49c7))
+
 ## [1.202.0](https://github.com/MetaCubeX/metacubexd/compare/v1.201.0...v1.202.0) (2025-11-13)
 
 
