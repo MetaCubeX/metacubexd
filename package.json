@@ -60,7 +60,7 @@
     "husky": "^9.1.7",
     "is-ip": "^5.0.1",
     "ky": "^1.14.0",
-    "lint-staged": "^16.2.6",
+    "lint-staged": "^16.2.7",
     "lodash": "^4.17.21",
     "markdown-it": "^14.1.0",
     "match-sorter": "^8.1.0",
