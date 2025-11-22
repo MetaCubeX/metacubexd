@@ -50,7 +50,7 @@
     "@vite-pwa/assets-generator": "^1.0.2",
     "byte-size": "^9.0.1",
     "commitlint": "^20.1.0",
-    "daisyui": "^5.5.4",
+    "daisyui": "^5.5.5",
     "dayjs": "^1.11.19",
     "echarts": "^6.0.0",
     "echarts-solid": "^0.2.0",
