@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.206.0](https://github.com/MetaCubeX/metacubexd/compare/v1.205.0...v1.206.0) (2025-11-25)
+
+
+### Features
+
+* **ConnectionsToolbar:** improve layout and accessibility of controls ([1b8b78b](https://github.com/MetaCubeX/metacubexd/commit/1b8b78bc186670e8f388d412898952a8a2ba9320))
+* refactor components to use solid-query for data fetching and state management ([8df4960](https://github.com/MetaCubeX/metacubexd/commit/8df49608f654a5698fdda34b3b4e61c237152fd4))
+
 ## [1.205.0](https://github.com/MetaCubeX/metacubexd/compare/v1.204.0...v1.205.0) (2025-11-25)
 
 
