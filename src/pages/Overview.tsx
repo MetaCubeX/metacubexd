@@ -7,6 +7,7 @@ import {
   type RealtimeChartRef,
   RealtimeLineChartWithRef,
 } from '~/components/RealtimeLineChart'
+import { getChartThemeColors } from '~/helpers'
 import { useI18n } from '~/i18n'
 import { endpoint, latestConnectionMsg, useWsRequest } from '~/signals'
 
@@ -67,10 +68,12 @@ export default () => {
 
   // Flow chart (pie chart) options using Highcharts
   const flowChartOptions = createMemo<Highcharts.Options>(() => {
+    const themeColors = getChartThemeColors()
+
     return {
       chart: {
         type: 'pie',
-        backgroundColor: 'transparent',
+        backgroundColor: themeColors.backgroundColor,
         animation: false,
       },
       credits: {
@@ -79,7 +82,7 @@ export default () => {
       title: {
         text: t('flow'),
         style: {
-          color: 'oklch(0.746477 0 0)',
+          color: themeColors.textColor,
         },
       },
       tooltip: {
@@ -104,10 +107,10 @@ export default () => {
       },
       legend: {
         itemStyle: {
-          color: 'oklch(0.746477 0 0)',
+          color: themeColors.textColor,
         },
         itemHoverStyle: {
-          color: 'oklch(0.9 0 0)',
+          color: themeColors.textColorHover,
         },
       },
       series: [
@@ -118,12 +121,12 @@ export default () => {
             {
               name: t('downloadTotal'),
               y: latestConnectionMsg()?.downloadTotal || 0,
-              color: Highcharts.getOptions().colors?.[0],
+              color: themeColors.seriesColors[0],
             },
             {
               name: t('uploadTotal'),
               y: latestConnectionMsg()?.uploadTotal || 0,
-              color: Highcharts.getOptions().colors?.[1],
+              color: themeColors.seriesColors[1],
             },
           ],
         },

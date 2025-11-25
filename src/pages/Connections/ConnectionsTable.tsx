@@ -87,7 +87,7 @@ export const ConnectionsTable = (props: ConnectionsTableProps) => {
                 <For each={row.getVisibleCells()}>
                   {(cell) => (
                     <td
-                      class="w-1/2 min-w-[50%] pb-1.5 text-justify align-top wrap-break-word nth-[2n]:text-right nth-last-[2]:mb-3 sm:w-1/3 sm:min-w-[33.333%] sm:nth-[2n]:text-justify sm:nth-[3n]:text-right md:w-auto md:min-w-0 md:py-3 md:text-start md:whitespace-nowrap md:nth-[2n]:text-start md:nth-[3n]:text-start md:nth-last-[2]:mb-0"
+                      class="w-1/2 min-w-[50%] pb-1.5 text-justify align-top wrap-break-word nth-[2n]:text-right nth-last-[2]:mb-3 sm:w-1/3 sm:min-w-[33.333%] sm:nth-[2n]:text-justify sm:nth-[3n]:text-right md:w-auto md:min-w-0 md:text-start md:align-middle md:whitespace-nowrap md:nth-[2n]:text-start md:nth-[3n]:text-start md:nth-last-[2]:mb-0"
                       onContextMenu={(e) => {
                         e.preventDefault()
 

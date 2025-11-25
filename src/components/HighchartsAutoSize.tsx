@@ -1,5 +1,7 @@
 import Highcharts from 'highcharts'
 import type { Component } from 'solid-js'
+import { getChartThemeColors } from '~/helpers'
+import { curTheme } from '~/signals'
 
 export type HighchartsAutoSizeProps = {
   options: Highcharts.Options
@@ -12,34 +14,39 @@ export const HighchartsAutoSize: Component<HighchartsAutoSizeProps> = (
   let containerRef: HTMLDivElement | undefined
   let chart: Highcharts.Chart | undefined
 
-  const defaultOptions: Highcharts.Options = {
-    chart: {
-      animation: {
-        duration: 300,
+  const getDefaultOptions = (): Highcharts.Options => {
+    const themeColors = getChartThemeColors()
+
+    return {
+      chart: {
+        animation: {
+          duration: 300,
+        },
+        backgroundColor: themeColors.backgroundColor,
       },
-      backgroundColor: 'transparent',
-    },
-    credits: {
-      enabled: false,
-    },
-    legend: {
-      itemStyle: {
-        color: 'oklch(0.746477 0 0)',
+      credits: {
+        enabled: false,
       },
-      itemHoverStyle: {
-        color: 'oklch(0.9 0 0)',
+      legend: {
+        itemStyle: {
+          color: themeColors.textColor,
+        },
+        itemHoverStyle: {
+          color: themeColors.textColorHover,
+        },
       },
-    },
-    title: {
-      style: {
-        color: 'oklch(0.746477 0 0)',
+      title: {
+        style: {
+          color: themeColors.textColor,
+        },
       },
-    },
+    }
   }
 
   onMount(() => {
     if (!containerRef) return
 
+    const defaultOptions = getDefaultOptions()
     const mergedOptions = {
       ...defaultOptions,
       ...props.options,
@@ -84,6 +91,31 @@ export const HighchartsAutoSize: Component<HighchartsAutoSizeProps> = (
       // Only update series data, don't recreate the entire chart
       chart.update(options, true, false, false)
     }
+  })
+
+  // Update theme colors when theme changes
+  createEffect(() => {
+    curTheme() // Track theme changes
+
+    // Wait for DOM to update with new theme before getting CSS variables
+    requestAnimationFrame(() => {
+      if (chart) {
+        const themeColors = getChartThemeColors()
+
+        chart.update(
+          {
+            title: { style: { color: themeColors.textColor } },
+            legend: {
+              itemStyle: { color: themeColors.textColor },
+              itemHoverStyle: { color: themeColors.textColorHover },
+            },
+          },
+          true,
+          false,
+          false,
+        )
+      }
+    })
   })
 
   return (

@@ -32,6 +32,11 @@ export const App: ParentComponent = ({ children }) => {
       setCurTheme(prefersDark() ? favNightTheme() : favDayTheme())
   })
 
+  // Sync theme to document.documentElement for CSS variables to work
+  createEffect(() => {
+    document.documentElement.setAttribute('data-theme', curTheme())
+  })
+
   return (
     <div
       ref={(el) => setRootElement(el)}
@@ -39,7 +44,6 @@ export const App: ParentComponent = ({ children }) => {
         'relative flex h-screen flex-col overscroll-y-none bg-base-100 subpixel-antialiased',
         fontFamily(),
       )}
-      data-theme={curTheme()}
     >
       <Header />
 

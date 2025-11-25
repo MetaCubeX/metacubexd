@@ -2,6 +2,8 @@ import byteSize from 'byte-size'
 import Highcharts from 'highcharts'
 import type { Component } from 'solid-js'
 import { CHART_MAX_XAXIS } from '~/constants'
+import { getChartThemeColors } from '~/helpers'
+import { curTheme } from '~/signals'
 
 export type RealtimeLineChartProps = {
   title: string
@@ -16,103 +18,108 @@ export const RealtimeLineChart: Component<RealtimeLineChartProps> = (props) => {
   let containerRef: HTMLDivElement | undefined
   let chart: Highcharts.Chart | undefined
 
-  const createChartOptions = (): Highcharts.Options => ({
-    chart: {
-      type: 'areaspline',
-      animation: {
-        duration: 800,
-        easing: 'linear',
-      },
-      backgroundColor: 'transparent',
-    },
-    credits: {
-      enabled: false,
-    },
-    title: {
-      text: props.title,
-      style: {
-        color: 'oklch(0.746477 0 0)',
-      },
-    },
-    legend: {
-      enabled: true,
-      itemStyle: {
-        color: 'oklch(0.746477 0 0)',
-      },
-      itemHoverStyle: {
-        color: 'oklch(0.9 0 0)',
-      },
-    },
-    xAxis: {
-      type: 'datetime',
-      tickPixelInterval: 100,
-      labels: {
-        style: {
-          color: 'oklch(0.746477 0 0)',
-        },
-        formatter: function () {
-          const date = new Date(this.value as number)
+  const createChartOptions = (): Highcharts.Options => {
+    const themeColors = getChartThemeColors()
 
-          return `${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`
+    return {
+      chart: {
+        type: 'areaspline',
+        animation: {
+          duration: 800,
+          easing: 'linear',
         },
+        backgroundColor: themeColors.backgroundColor,
       },
-      lineColor: 'oklch(0.3 0 0)',
-      tickColor: 'oklch(0.3 0 0)',
-    },
-    yAxis: {
+      credits: {
+        enabled: false,
+      },
       title: {
-        text: undefined,
-      },
-      labels: {
+        text: props.title,
         style: {
-          color: 'oklch(0.746477 0 0)',
-        },
-        formatter: function () {
-          return byteSize(this.value as number).toString()
+          color: themeColors.textColor,
         },
       },
-      gridLineColor: 'oklch(0.3 0 0)',
-      min: 0,
-    },
-    tooltip: {
-      shared: true,
-      formatter: function () {
-        const date = new Date(this.x as number)
-        const timeStr = `${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`
-        let html = `<b>${timeStr}</b><br/>`
-
-        this.points?.forEach((point) => {
-          html += `<span style="color:${point.color}">\u25CF</span> ${point.series.name}: <b>${byteSize(point.y as number).toString()}/s</b><br/>`
-        })
-
-        return html
-      },
-    },
-    plotOptions: {
-      areaspline: {
-        fillOpacity: 0.3,
-        marker: {
-          enabled: false,
+      legend: {
+        enabled: true,
+        itemStyle: {
+          color: themeColors.textColor,
         },
-        lineWidth: 2,
-        states: {
-          hover: {
-            lineWidth: 3,
+        itemHoverStyle: {
+          color: themeColors.textColorHover,
+        },
+      },
+      xAxis: {
+        type: 'datetime',
+        tickPixelInterval: 100,
+        labels: {
+          style: {
+            color: themeColors.textColor,
+          },
+          formatter: function () {
+            const date = new Date(this.value as number)
+
+            return `${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`
           },
         },
-        threshold: null,
+        lineColor: themeColors.lineColor,
+        tickColor: themeColors.tickColor,
       },
-    },
-    series: props.seriesConfig.map((config, index) => ({
-      type: 'areaspline' as const,
-      name: config.name,
-      color:
-        config.color ||
-        Highcharts.getOptions().colors?.[index] ||
-        `hsl(${index * 120}, 70%, 50%)`,
-      data: [] as [number, number][],
-    })),
-  })
+      yAxis: {
+        title: {
+          text: undefined,
+        },
+        labels: {
+          style: {
+            color: themeColors.textColor,
+          },
+          formatter: function () {
+            return byteSize(this.value as number).toString()
+          },
+        },
+        gridLineColor: themeColors.gridLineColor,
+        min: 0,
+      },
+      tooltip: {
+        shared: true,
+        formatter: function () {
+          const date = new Date(this.x as number)
+          const timeStr = `${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`
+          let html = `<b>${timeStr}</b><br/>`
+
+          this.points?.forEach((point) => {
+            html += `<span style="color:${point.color}">\u25CF</span> ${point.series.name}: <b>${byteSize(point.y as number).toString()}/s</b><br/>`
+          })
+
+          return html
+        },
+      },
+      plotOptions: {
+        areaspline: {
+          fillOpacity: 0.3,
+          marker: {
+            enabled: false,
+          },
+          lineWidth: 2,
+          states: {
+            hover: {
+              lineWidth: 3,
+            },
+          },
+          threshold: null,
+        },
+      },
+      series: props.seriesConfig.map((config, index) => ({
+        type: 'areaspline' as const,
+        name: config.name,
+        color:
+          config.color ||
+          themeColors.seriesColors[index] ||
+          Highcharts.getOptions().colors?.[index] ||
+          `hsl(${index * 120}, 70%, 50%)`,
+        data: [] as [number, number][],
+      })),
+    }
+  }
 
   onMount(() => {
     if (!containerRef) return
@@ -161,6 +168,40 @@ export const RealtimeLineChart: Component<RealtimeLineChartProps> = (props) => {
     }
   })
 
+  // Update theme colors when theme changes
+  createEffect(() => {
+    curTheme() // Track theme changes
+
+    // Wait for DOM to update with new theme before getting CSS variables
+    requestAnimationFrame(() => {
+      if (chart) {
+        const themeColors = getChartThemeColors()
+
+        chart.update(
+          {
+            title: { style: { color: themeColors.textColor } },
+            legend: {
+              itemStyle: { color: themeColors.textColor },
+              itemHoverStyle: { color: themeColors.textColorHover },
+            },
+            xAxis: {
+              labels: { style: { color: themeColors.textColor } },
+              lineColor: themeColors.lineColor,
+              tickColor: themeColors.tickColor,
+            },
+            yAxis: {
+              labels: { style: { color: themeColors.textColor } },
+              gridLineColor: themeColors.gridLineColor,
+            },
+          },
+          true,
+          false,
+          false,
+        )
+      }
+    })
+  })
+
   return (
     <div class="relative h-full w-full">
       <Show when={props.isLoading}>
@@ -195,103 +236,108 @@ export const RealtimeLineChartWithRef: Component<
   let containerRef: HTMLDivElement | undefined
   let chart: Highcharts.Chart | undefined
 
-  const createChartOptions = (): Highcharts.Options => ({
-    chart: {
-      type: 'areaspline',
-      animation: {
-        duration: 800,
-        easing: 'linear',
-      },
-      backgroundColor: 'transparent',
-    },
-    credits: {
-      enabled: false,
-    },
-    title: {
-      text: props.title,
-      style: {
-        color: 'oklch(0.746477 0 0)',
-      },
-    },
-    legend: {
-      enabled: true,
-      itemStyle: {
-        color: 'oklch(0.746477 0 0)',
-      },
-      itemHoverStyle: {
-        color: 'oklch(0.9 0 0)',
-      },
-    },
-    xAxis: {
-      type: 'datetime',
-      tickPixelInterval: 100,
-      labels: {
-        style: {
-          color: 'oklch(0.746477 0 0)',
-        },
-        formatter: function () {
-          const date = new Date(this.value as number)
+  const createChartOptions = (): Highcharts.Options => {
+    const themeColors = getChartThemeColors()
 
-          return `${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`
+    return {
+      chart: {
+        type: 'areaspline',
+        animation: {
+          duration: 800,
+          easing: 'linear',
         },
+        backgroundColor: themeColors.backgroundColor,
       },
-      lineColor: 'oklch(0.3 0 0)',
-      tickColor: 'oklch(0.3 0 0)',
-    },
-    yAxis: {
+      credits: {
+        enabled: false,
+      },
       title: {
-        text: undefined,
-      },
-      labels: {
+        text: props.title,
         style: {
-          color: 'oklch(0.746477 0 0)',
-        },
-        formatter: function () {
-          return byteSize(this.value as number).toString()
+          color: themeColors.textColor,
         },
       },
-      gridLineColor: 'oklch(0.3 0 0)',
-      min: 0,
-    },
-    tooltip: {
-      shared: true,
-      formatter: function () {
-        const date = new Date(this.x as number)
-        const timeStr = `${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`
-        let html = `<b>${timeStr}</b><br/>`
-
-        this.points?.forEach((point) => {
-          html += `<span style="color:${point.color}">\u25CF</span> ${point.series.name}: <b>${byteSize(point.y as number).toString()}/s</b><br/>`
-        })
-
-        return html
-      },
-    },
-    plotOptions: {
-      areaspline: {
-        fillOpacity: 0.3,
-        marker: {
-          enabled: false,
+      legend: {
+        enabled: true,
+        itemStyle: {
+          color: themeColors.textColor,
         },
-        lineWidth: 2,
-        states: {
-          hover: {
-            lineWidth: 3,
+        itemHoverStyle: {
+          color: themeColors.textColorHover,
+        },
+      },
+      xAxis: {
+        type: 'datetime',
+        tickPixelInterval: 100,
+        labels: {
+          style: {
+            color: themeColors.textColor,
+          },
+          formatter: function () {
+            const date = new Date(this.value as number)
+
+            return `${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`
           },
         },
-        threshold: null,
+        lineColor: themeColors.lineColor,
+        tickColor: themeColors.tickColor,
       },
-    },
-    series: props.seriesConfig.map((config, index) => ({
-      type: 'areaspline' as const,
-      name: config.name,
-      color:
-        config.color ||
-        Highcharts.getOptions().colors?.[index] ||
-        `hsl(${index * 120}, 70%, 50%)`,
-      data: [] as [number, number][],
-    })),
-  })
+      yAxis: {
+        title: {
+          text: undefined,
+        },
+        labels: {
+          style: {
+            color: themeColors.textColor,
+          },
+          formatter: function () {
+            return byteSize(this.value as number).toString()
+          },
+        },
+        gridLineColor: themeColors.gridLineColor,
+        min: 0,
+      },
+      tooltip: {
+        shared: true,
+        formatter: function () {
+          const date = new Date(this.x as number)
+          const timeStr = `${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`
+          let html = `<b>${timeStr}</b><br/>`
+
+          this.points?.forEach((point) => {
+            html += `<span style="color:${point.color}">\u25CF</span> ${point.series.name}: <b>${byteSize(point.y as number).toString()}/s</b><br/>`
+          })
+
+          return html
+        },
+      },
+      plotOptions: {
+        areaspline: {
+          fillOpacity: 0.3,
+          marker: {
+            enabled: false,
+          },
+          lineWidth: 2,
+          states: {
+            hover: {
+              lineWidth: 3,
+            },
+          },
+          threshold: null,
+        },
+      },
+      series: props.seriesConfig.map((config, index) => ({
+        type: 'areaspline' as const,
+        name: config.name,
+        color:
+          config.color ||
+          themeColors.seriesColors[index] ||
+          Highcharts.getOptions().colors?.[index] ||
+          `hsl(${index * 120}, 70%, 50%)`,
+        data: [] as [number, number][],
+      })),
+    }
+  }
 
   onMount(() => {
     if (!containerRef) return
@@ -395,6 +441,40 @@ export const RealtimeLineChartWithRef: Component<
 
       chart.redraw()
     }
+  })
+
+  // Update theme colors when theme changes
+  createEffect(() => {
+    curTheme() // Track theme changes
+
+    // Wait for DOM to update with new theme before getting CSS variables
+    requestAnimationFrame(() => {
+      if (chart) {
+        const themeColors = getChartThemeColors()
+
+        chart.update(
+          {
+            title: { style: { color: themeColors.textColor } },
+            legend: {
+              itemStyle: { color: themeColors.textColor },
+              itemHoverStyle: { color: themeColors.textColorHover },
+            },
+            xAxis: {
+              labels: { style: { color: themeColors.textColor } },
+              lineColor: themeColors.lineColor,
+              tickColor: themeColors.tickColor,
+            },
+            yAxis: {
+              labels: { style: { color: themeColors.textColor } },
+              gridLineColor: themeColors.gridLineColor,
+            },
+          },
+          true,
+          false,
+          false,
+        )
+      }
+    })
   })
 
   return (
