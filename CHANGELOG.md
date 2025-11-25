@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.203.0](https://github.com/MetaCubeX/metacubexd/compare/v1.202.1...v1.203.0) (2025-11-25)
+
+
+### Features
+
+* add Connections page with table, pagination, and toolbar components ([07f4bf4](https://github.com/MetaCubeX/metacubexd/commit/07f4bf4e09e259d702a63afe3765c3c36a4baf17))
+* enhance real-time data handling for traffic and memory metrics with chart history management ([501f95c](https://github.com/MetaCubeX/metacubexd/commit/501f95c4b67cad4449968633dd36e944fdbdf636))
+* implement theme support for Highcharts and update related components ([7e7c1ce](https://github.com/MetaCubeX/metacubexd/commit/7e7c1ced46ce61f37524946e82e5884ca304764f))
+
 ## [1.202.1](https://github.com/MetaCubeX/metacubexd/compare/v1.202.0...v1.202.1) (2025-11-20)
 
 
