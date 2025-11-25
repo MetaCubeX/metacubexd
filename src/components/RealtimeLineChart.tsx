@@ -224,10 +224,13 @@ export type RealtimeChartRef = {
   addPoints: (
     points: { seriesIndex: number; time: number; value: number }[],
   ) => void
+  setSeriesData: (seriesIndex: number, data: [number, number][]) => void
 }
 
 export type RealtimeLineChartWithRefProps = RealtimeLineChartProps & {
   ref?: (ref: RealtimeChartRef) => void
+  // Initial data for each series, used to restore chart state on remount
+  initialData?: [number, number][][]
 }
 
 export const RealtimeLineChartWithRef: Component<
@@ -334,7 +337,8 @@ export const RealtimeLineChartWithRef: Component<
           themeColors.seriesColors[index] ||
           Highcharts.getOptions().colors?.[index] ||
           `hsl(${index * 120}, 70%, 50%)`,
-        data: [] as [number, number][],
+        // Use initial data if provided, otherwise start with empty array
+        data: (props.initialData?.[index] || []) as [number, number][],
       })),
     }
   }
@@ -399,6 +403,11 @@ export const RealtimeLineChartWithRef: Component<
           duration: 800,
           easing: 'linear',
         })
+      },
+      setSeriesData: (seriesIndex: number, data: [number, number][]) => {
+        if (chart?.series[seriesIndex]) {
+          chart.series[seriesIndex].setData(data, true, false, false)
+        }
       },
     })
 

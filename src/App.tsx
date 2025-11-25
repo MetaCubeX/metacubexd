@@ -3,6 +3,8 @@ import type { ParentComponent } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Header } from '~/components'
 import {
+  MemoryData,
+  TrafficData,
   WsMsg,
   autoSwitchTheme,
   curTheme,
@@ -12,14 +14,20 @@ import {
   fontFamily,
   setCurTheme,
   setLatestConnectionMsg,
+  setLatestMemory,
+  setLatestTraffic,
   setRootElement,
   useWsRequest,
 } from '~/signals'
 
 const ProtectedResources = () => {
   const latestConnectionMsg = useWsRequest<WsMsg>('connections')
+  const traffic = useWsRequest<TrafficData>('traffic')
+  const memory = useWsRequest<MemoryData>('memory')
 
   createEffect(() => setLatestConnectionMsg(latestConnectionMsg()))
+  createEffect(() => setLatestTraffic(traffic()))
+  createEffect(() => setLatestMemory(memory()))
 
   return null
 }

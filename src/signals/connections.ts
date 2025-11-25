@@ -1,6 +1,7 @@
 import { makePersisted } from '@solid-primitives/storage'
 import { isNumber } from 'lodash'
 import { CONNECTIONS_TABLE_MAX_CLOSED_ROWS } from '~/constants'
+import { clearChartHistory } from '~/signals/global'
 import { Connection, ConnectionRawMessage, DataUsageEntry } from '~/types'
 
 export type WsMsg = {
@@ -53,6 +54,7 @@ createEffect(() => {
     // Service restarted, clear connection tracking data and data usage
     resetConnectionTracking()
     clearDataUsage()
+    clearChartHistory()
   }
 
   lastUploadTotal = currentUploadTotal

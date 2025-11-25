@@ -9,7 +9,16 @@ import {
 } from '~/components/RealtimeLineChart'
 import { getChartThemeColors } from '~/helpers'
 import { useI18n } from '~/i18n'
-import { endpoint, latestConnectionMsg, useWsRequest } from '~/signals'
+import {
+  addMemoryDataPoint,
+  addTrafficDataPoint,
+  endpoint,
+  latestConnectionMsg,
+  latestMemory,
+  latestTraffic,
+  memoryChartHistory,
+  trafficChartHistory,
+} from '~/signals'
 
 const TrafficWidget: ParentComponent<{ label: JSX.Element }> = (props) => (
   <div class="stat flex-1 place-items-center">
@@ -31,38 +40,52 @@ export default () => {
 
   const [t] = useI18n()
 
-  // Track data point count to determine whether to show loading
-  const [trafficDataCount, setTrafficDataCount] = createSignal(0)
-  const [memoryDataCount, setMemoryDataCount] = createSignal(0)
-
   // Chart refs for real-time updates
   let trafficChartRef: RealtimeChartRef | undefined
   let memoryChartRef: RealtimeChartRef | undefined
 
-  const traffic = useWsRequest<{ down: number; up: number }>('traffic')
+  // Initialize prevTime from history to prevent duplicate points on remount
+  let prevTrafficTime =
+    trafficChartHistory.download.length > 0
+      ? trafficChartHistory.download[trafficChartHistory.download.length - 1][0]
+      : 0
+  let prevMemoryTime =
+    memoryChartHistory.length > 0
+      ? memoryChartHistory[memoryChartHistory.length - 1][0]
+      : 0
 
   createEffect(() => {
-    const newTraffic = traffic()
+    const newTraffic = latestTraffic()
 
     if (newTraffic && trafficChartRef) {
       const time = Date.now()
-      trafficChartRef.addPoints([
-        { seriesIndex: 0, time, value: newTraffic.down },
-        { seriesIndex: 1, time, value: newTraffic.up },
-      ])
-      setTrafficDataCount((c) => c + 1)
+
+      // Only add points if time has advanced (prevents duplicate points on remount)
+      if (time > prevTrafficTime) {
+        trafficChartRef.addPoints([
+          { seriesIndex: 0, time, value: newTraffic.down },
+          { seriesIndex: 1, time, value: newTraffic.up },
+        ])
+        // Store in global history
+        addTrafficDataPoint(time, newTraffic.down, newTraffic.up)
+        prevTrafficTime = time
+      }
     }
   })
 
-  const memory = useWsRequest<{ inuse: number }>('memory')
-
   createEffect(() => {
-    const newMemory = memory()?.inuse
+    const newMemory = latestMemory()?.inuse
 
     if (newMemory && memoryChartRef) {
       const time = Date.now()
-      memoryChartRef.addPoint(0, time, newMemory)
-      setMemoryDataCount((c) => c + 1)
+
+      // Only add points if time has advanced (prevents duplicate points on remount)
+      if (time > prevMemoryTime) {
+        memoryChartRef.addPoint(0, time, newMemory)
+        // Store in global history
+        addMemoryDataPoint(time, newMemory)
+        prevMemoryTime = time
+      }
     }
   })
 
@@ -141,11 +164,11 @@ export default () => {
       <div class="flex flex-col gap-2 lg:h-full">
         <div class="stats w-full shrink-0 stats-vertical grid-cols-2 bg-primary shadow lg:flex lg:stats-horizontal">
           <TrafficWidget label={t('upload')}>
-            {byteSize(traffic()?.up || 0).toString()}/s
+            {byteSize(latestTraffic()?.up || 0).toString()}/s
           </TrafficWidget>
 
           <TrafficWidget label={t('download')}>
-            {byteSize(traffic()?.down || 0).toString()}/s
+            {byteSize(latestTraffic()?.down || 0).toString()}/s
           </TrafficWidget>
 
           <TrafficWidget label={t('uploadTotal')}>
@@ -161,7 +184,7 @@ export default () => {
           </TrafficWidget>
 
           <TrafficWidget label={t('memoryUsage')}>
-            {byteSize(memory()?.inuse || 0).toString()}
+            {byteSize(latestMemory()?.inuse || 0).toString()}
           </TrafficWidget>
         </div>
 
@@ -174,7 +197,11 @@ export default () => {
                 { name: t('down'), color: '#7cb5ec' },
                 { name: t('up'), color: '#90ed7d' },
               ]}
-              isLoading={trafficDataCount() === 0}
+              initialData={[
+                [...trafficChartHistory.download],
+                [...trafficChartHistory.upload],
+              ]}
+              isLoading={!latestTraffic()}
             />
           </div>
           <div class="h-80">
@@ -188,7 +215,8 @@ export default () => {
               ref={(ref: RealtimeChartRef) => (memoryChartRef = ref)}
               title={t('memory')}
               seriesConfig={[{ name: t('memory'), color: '#f7a35c' }]}
-              isLoading={memoryDataCount() === 0}
+              initialData={[[...memoryChartHistory]]}
+              isLoading={!latestMemory()}
             />
           </div>
         </div>
