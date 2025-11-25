@@ -24,6 +24,7 @@ import {
   sortProxiesByOrderingType,
 } from '~/helpers'
 import { useI18n } from '~/i18n'
+import { useWindowFocusRefetch } from '~/query/sync'
 import {
   hideUnAvailableProxies,
   iconHeight,
@@ -76,6 +77,9 @@ export default () => {
   }
 
   onMount(fetchProxies)
+
+  // Enable window focus refetch for proxies data
+  useWindowFocusRefetch(fetchProxies, { staleTime: 30000 })
 
   const onProxyGroupLatencyTestClick = async (
     e: MouseEvent,

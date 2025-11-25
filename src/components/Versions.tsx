@@ -1,20 +1,13 @@
 import Tooltip from '@corvu/tooltip'
+import { type Accessor, type Component, ParentComponent, Show } from 'solid-js'
 import {
-  type Accessor,
-  type Component,
-  createResource,
-  ParentComponent,
-  Show,
-} from 'solid-js'
-import {
-  backendReleaseAPI,
-  frontendReleaseAPI,
   upgradeBackendAPI,
   upgradeUIAPI,
   upgradingBackend,
   upgradingUI,
 } from '~/apis'
 import { Changelog } from '~/components'
+import { useBackendRelease, useFrontendRelease } from '~/query/hooks'
 
 const UpgradeButton: ParentComponent<{
   isUpdateAvailable?: boolean
@@ -53,12 +46,8 @@ export const Versions: Component<{
   frontendVersion: string
   backendVersion: Accessor<string>
 }> = ({ frontendVersion, backendVersion }) => {
-  const [frontendRelease] = createResource(() =>
-    frontendReleaseAPI(frontendVersion),
-  )
-  const [backendRelease] = createResource(backendVersion, () =>
-    backendReleaseAPI(backendVersion()),
-  )
+  const frontendRelease = useFrontendRelease(frontendVersion)
+  const backendRelease = useBackendRelease(backendVersion)
 
   return (
     <div class="mx-2 grid grid-cols-1 gap-4 sm:grid-cols-2 md:mx-0">
@@ -69,13 +58,13 @@ export const Versions: Component<{
         }}
       >
         <Tooltip.Anchor as="kbd" class="relative kbd w-full py-4">
-          <Show when={frontendRelease()?.isUpdateAvailable}>
+          <Show when={frontendRelease.data?.isUpdateAvailable}>
             <UpdateAvailableIndicator />
           </Show>
 
           <Tooltip.Trigger class="w-full cursor-pointer">
             <UpgradeButton
-              isUpdateAvailable={frontendRelease()?.isUpdateAvailable}
+              isUpdateAvailable={frontendRelease.data?.isUpdateAvailable}
               isUpdating={upgradingUI}
               onUpdate={async () => {
                 await upgradeUIAPI()
@@ -86,11 +75,11 @@ export const Versions: Component<{
             </UpgradeButton>
           </Tooltip.Trigger>
 
-          <Show when={frontendRelease()?.changelog}>
+          <Show when={frontendRelease.data?.changelog}>
             <Tooltip.Content class="z-50">
               <Tooltip.Arrow class="text-neutral" />
 
-              <Changelog body={frontendRelease()!.changelog!} />
+              <Changelog body={frontendRelease.data!.changelog!} />
             </Tooltip.Content>
           </Show>
         </Tooltip.Anchor>
@@ -103,13 +92,13 @@ export const Versions: Component<{
         }}
       >
         <Tooltip.Anchor as="kbd" class="relative kbd w-full py-4">
-          <Show when={backendRelease()?.isUpdateAvailable}>
+          <Show when={backendRelease.data?.isUpdateAvailable}>
             <UpdateAvailableIndicator />
           </Show>
 
           <Tooltip.Trigger class="w-full cursor-pointer">
             <UpgradeButton
-              isUpdateAvailable={backendRelease()?.isUpdateAvailable}
+              isUpdateAvailable={backendRelease.data?.isUpdateAvailable}
               isUpdating={upgradingBackend}
               onUpdate={async () => {
                 await upgradeBackendAPI()
@@ -120,11 +109,11 @@ export const Versions: Component<{
             </UpgradeButton>
           </Tooltip.Trigger>
 
-          <Show when={backendRelease()?.changelog}>
+          <Show when={backendRelease.data?.changelog}>
             <Tooltip.Content class="z-50">
               <Tooltip.Arrow class="text-neutral" />
 
-              <Changelog body={backendRelease()!.changelog!} />
+              <Changelog body={backendRelease.data!.changelog!} />
             </Tooltip.Content>
           </Show>
         </Tooltip.Anchor>

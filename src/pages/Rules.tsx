@@ -5,6 +5,7 @@ import { twMerge } from 'tailwind-merge'
 import { Button, DocumentTitle } from '~/components'
 import { formatTimeFromNow, useStringBooleanMap } from '~/helpers'
 import { useI18n } from '~/i18n'
+import { useWindowFocusRefetch } from '~/query/sync'
 import { useRules } from '~/signals'
 import { Rule, RuleProvider } from '~/types'
 
@@ -22,6 +23,11 @@ export default () => {
     updateAllRuleProvider,
     updateRuleProviderByName,
   } = useRules()
+
+  onMount(updateRules)
+
+  // Enable window focus refetch for rules data
+  useWindowFocusRefetch(updateRules, { staleTime: 30000 })
 
   onMount(updateRules)
 

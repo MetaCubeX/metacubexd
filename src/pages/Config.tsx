@@ -5,21 +5,23 @@ import { toast } from 'solid-toast'
 import { twMerge } from 'tailwind-merge'
 import { z } from 'zod'
 import {
-  fetchBackendConfigAPI,
-  fetchBackendVersionAPI,
   flushFakeIPDataAPI,
   flushingFakeIPData,
   reloadConfigFileAPI,
   reloadingConfigFile,
   restartBackendAPI,
   restartingBackend,
-  updateBackendConfigAPI,
   updateGEODatabasesAPI,
   updatingGEODatabases,
 } from '~/apis'
 import { Button, ConfigTitle, DocumentTitle, Versions } from '~/components'
 import { FONT_FAMILY, LANG, ROUTES, themes } from '~/constants'
 import { Dict, locale, setLocale, useI18n } from '~/i18n'
+import {
+  useBackendConfig,
+  useBackendVersion,
+  useUpdateBackendConfig,
+} from '~/query/hooks'
 import {
   autoSwitchTheme,
   endpoint,
@@ -170,53 +172,46 @@ const ConfigForm: ParentComponent<{
   isSingBox: Accessor<boolean>
 }> = ({ isSingBox }) => {
   const [t] = useI18n()
+  const configQuery = useBackendConfig()
+  const updateConfigMutation = useUpdateBackendConfig()
+
+  const updateConfig = (
+    key: Parameters<typeof updateConfigMutation.mutate>[0]['key'],
+    value: Parameters<typeof updateConfigMutation.mutate>[0]['value'],
+  ) => {
+    updateConfigMutation.mutate({ key, value })
+  }
 
   const portList = [
     {
       label: () => t('port', { name: 'Mixed' }),
-      key: 'mixed-port',
+      key: 'mixed-port' as const,
       onChange: (e: Event & { target: HTMLInputElement }) =>
-        void updateBackendConfigAPI(
-          'mixed-port',
-          Number(e.target.value),
-          refetch,
-        ),
+        updateConfig('mixed-port', Number(e.target.value)),
     },
     {
       label: () => t('port', { name: 'HTTP' }),
-      key: 'port',
+      key: 'port' as const,
       onChange: (e: Event & { target: HTMLInputElement }) =>
-        void updateBackendConfigAPI('port', Number(e.target.value), refetch),
+        updateConfig('port', Number(e.target.value)),
     },
     {
       label: () => t('port', { name: 'Socks' }),
-      key: 'socks-port',
+      key: 'socks-port' as const,
       onChange: (e: Event & { target: HTMLInputElement }) =>
-        void updateBackendConfigAPI(
-          'socks-port',
-          Number(e.target.value),
-          refetch,
-        ),
+        updateConfig('socks-port', Number(e.target.value)),
     },
     {
       label: () => t('port', { name: 'Redir' }),
-      key: 'redir-port',
+      key: 'redir-port' as const,
       onChange: (e: Event & { target: HTMLInputElement }) =>
-        void updateBackendConfigAPI(
-          'redir-port',
-          Number(e.target.value),
-          refetch,
-        ),
+        updateConfig('redir-port', Number(e.target.value)),
     },
     {
       label: () => t('port', { name: 'TProxy' }),
-      key: 'tproxy-port',
+      key: 'tproxy-port' as const,
       onChange: (e: Event & { target: HTMLInputElement }) =>
-        void updateBackendConfigAPI(
-          'tproxy-port',
-          Number(e.target.value),
-          refetch,
-        ),
+        updateConfig('tproxy-port', Number(e.target.value)),
     },
   ]
 
@@ -224,10 +219,8 @@ const ConfigForm: ParentComponent<{
     z.infer<typeof configFormSchema>
   >({ extend: validator({ schema: configFormSchema }) })
 
-  const [configsData, { refetch }] = createResource(fetchBackendConfigAPI)
-
   createEffect(() => {
-    const configs = configsData()
+    const configs = configQuery.data
 
     if (configs) {
       setInitialValues(configs)
@@ -236,7 +229,7 @@ const ConfigForm: ParentComponent<{
   })
 
   const modes = createMemo(() => {
-    const cfg = configsData()
+    const cfg = configQuery.data
 
     return cfg?.['mode-list'] || cfg?.modes || ['rule', 'direct', 'global']
   })
@@ -249,14 +242,8 @@ const ConfigForm: ParentComponent<{
 
           <Toggle
             id="enable-allow-lan"
-            checked={configsData()?.['allow-lan']}
-            onChange={(e) =>
-              void updateBackendConfigAPI(
-                'allow-lan',
-                e.target.checked,
-                refetch,
-              )
-            }
+            checked={configQuery.data?.['allow-lan']}
+            onChange={(e) => updateConfig('allow-lan', e.target.checked)}
           />
         </fieldset>
 
@@ -265,13 +252,11 @@ const ConfigForm: ParentComponent<{
 
           <Select
             id="mode"
-            onChange={(e) =>
-              void updateBackendConfigAPI('mode', e.target.value, refetch)
-            }
+            onChange={(e) => updateConfig('mode', e.target.value)}
           >
             <For each={modes()}>
               {(name) => (
-                <option selected={name === configsData()?.mode} value={name}>
+                <option selected={name === configQuery.data?.mode} value={name}>
                   {t(name as keyof Dict) ?? name}
                 </option>
               )}
@@ -284,14 +269,8 @@ const ConfigForm: ParentComponent<{
 
           <Input
             id="interface-name"
-            value={configsData()?.['interface-name']}
-            onChange={(e) =>
-              void updateBackendConfigAPI(
-                'interface-name',
-                e.target.value,
-                refetch,
-              )
-            }
+            value={configQuery.data?.['interface-name']}
+            onChange={(e) => updateConfig('interface-name', e.target.value)}
           />
         </fieldset>
       </div>
@@ -303,13 +282,9 @@ const ConfigForm: ParentComponent<{
 
             <Toggle
               id="enable-tun-device"
-              checked={configsData()?.tun?.enable}
+              checked={configQuery.data?.tun?.enable}
               onChange={(e) =>
-                void updateBackendConfigAPI(
-                  'tun',
-                  { enable: e.target.checked },
-                  refetch,
-                )
+                updateConfig('tun', { enable: e.target.checked })
               }
             />
           </fieldset>
@@ -319,18 +294,12 @@ const ConfigForm: ParentComponent<{
 
             <Select
               id="tun-ip-stack"
-              onChange={(e) =>
-                void updateBackendConfigAPI(
-                  'tun',
-                  { stack: e.target.value },
-                  refetch,
-                )
-              }
+              onChange={(e) => updateConfig('tun', { stack: e.target.value })}
             >
               <For each={['Mixed', 'gVisor', 'System', 'LWIP']}>
                 {(name) => (
                   <option
-                    selected={configsData()?.tun?.stack === name}
+                    selected={configQuery.data?.tun?.stack === name}
                     value={name}
                   >
                     {name}
@@ -345,14 +314,8 @@ const ConfigForm: ParentComponent<{
 
             <Input
               id="device-name"
-              value={configsData()?.tun?.device}
-              onChange={(e) =>
-                void updateBackendConfigAPI(
-                  'tun',
-                  { device: e.target.value },
-                  refetch,
-                )
-              }
+              value={configQuery.data?.tun?.device}
+              onChange={(e) => updateConfig('tun', { device: e.target.value })}
             />
           </fieldset>
         </div>
@@ -560,9 +523,9 @@ export default () => {
   const [t] = useI18n()
 
   const frontendVersion = `v${import.meta.env.APP_VERSION}`
-  const [backendVersion] = createResource(fetchBackendVersionAPI, {
-    initialValue: '',
-  })
+  const backendVersionQuery = useBackendVersion()
+
+  const backendVersion = () => backendVersionQuery.data ?? ''
 
   const isSingBox = createMemo(
     () => backendVersion()?.includes('sing-box') || false,
@@ -589,7 +552,7 @@ export default () => {
 
         <ConfigTitle withDivider>{t('version')}</ConfigTitle>
 
-        <Show when={!backendVersion.loading}>
+        <Show when={!backendVersionQuery.isLoading}>
           <Versions
             frontendVersion={frontendVersion}
             backendVersion={backendVersion}
