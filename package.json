@@ -43,7 +43,7 @@
     "@tanstack/virtual-core": "^3.13.12",
     "@thisbeyond/solid-dnd": "^0.7.5",
     "@types/byte-size": "^8.1.2",
-    "@types/lodash": "^4.17.20",
+    "@types/lodash": "^4.17.21",
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^24.10.1",
     "@types/uuid": "^11.0.0",
