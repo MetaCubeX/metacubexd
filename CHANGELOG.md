@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.204.0](https://github.com/MetaCubeX/metacubexd/compare/v1.203.0...v1.204.0) (2025-11-25)
+
+
+### Features
+
+* **proxy-node-card:** add localization for latency history message and improve tooltip design ([9aabdb2](https://github.com/MetaCubeX/metacubexd/commit/9aabdb27dc096ae2880388d7dbdbfa4558dc1929))
+
 ## [1.203.0](https://github.com/MetaCubeX/metacubexd/compare/v1.202.1...v1.203.0) (2025-11-25)
 
 
