@@ -77,9 +77,9 @@ export const ConnectionsToolbar = (props: ConnectionsToolbarProps) => {
   }
 
   return (
-    <div class="flex w-full flex-wrap items-center gap-2">
-      {/* Tabs and filters */}
-      <div class="flex items-center gap-2">
+    <div class="flex w-full flex-col gap-2">
+      {/* Row 1: Tabs + Quick filter + Source IP filter */}
+      <div class="flex flex-wrap items-center gap-2">
         <div class="tabs-box tabs gap-2 tabs-sm">
           <Index each={props.tabs()}>
             {(tab) => (
@@ -98,18 +98,18 @@ export const ConnectionsToolbar = (props: ConnectionsToolbarProps) => {
           </Index>
         </div>
 
-        <div class="flex items-center">
-          <span class="mr-2 hidden lg:inline-block">{t('quickFilter')}:</span>
+        <div class="flex items-center gap-2">
+          <span class="hidden text-sm sm:inline-block">{t('quickFilter')}</span>
           <input
             type="checkbox"
-            class="toggle"
+            class="toggle toggle-sm"
             checked={props.enableQuickFilter()}
             onChange={(e) => props.setEnableQuickFilter(e.target.checked)}
           />
         </div>
 
         <select
-          class="select flex-1 select-sm select-primary"
+          class="select max-w-40 flex-1 select-sm select-primary"
           onChange={(e) => props.setSourceIPFilter(e.target.value)}
         >
           <option value="">{t('all')}</option>
@@ -131,67 +131,70 @@ export const ConnectionsToolbar = (props: ConnectionsToolbarProps) => {
         </select>
       </div>
 
-      {/* Sort controls */}
-      <div class="flex items-center gap-2">
-        <span class="w-32 text-sm sm:inline-block">{t('sortBy')}</span>
-        <select
-          class="select select-sm select-primary"
-          value={props.sortColumn()}
-          onChange={(e) => {
-            const id = e.target.value
-            props.setSortColumn(id)
-            props.setSorting([{ id, desc: props.sortDesc() }])
-          }}
-        >
-          <Index each={props.sortables()}>
-            {(opt) => <option value={opt().id}>{t(opt().key)}</option>}
-          </Index>
-        </select>
-        <Button
-          class="btn btn-sm btn-primary"
-          onClick={() => {
-            const next = !props.sortDesc()
-            props.setSortDesc(next)
-            props.setSorting([{ id: props.sortColumn(), desc: next }])
-          }}
-          icon={
-            props.sortDesc() ? <IconSortDescending /> : <IconSortAscending />
-          }
-        />
-      </div>
+      {/* Row 2: Sort + Search + Actions */}
+      <div class="flex flex-wrap items-center gap-2">
+        <div class="flex shrink-0 items-center gap-1">
+          <span class="hidden text-sm whitespace-nowrap sm:inline-block">
+            {t('sortBy')}
+          </span>
+          <select
+            class="select select-sm select-primary"
+            value={props.sortColumn()}
+            onChange={(e) => {
+              const id = e.target.value
+              props.setSortColumn(id)
+              props.setSorting([{ id, desc: props.sortDesc() }])
+            }}
+          >
+            <Index each={props.sortables()}>
+              {(opt) => <option value={opt().id}>{t(opt().key)}</option>}
+            </Index>
+          </select>
+          <Button
+            class="btn btn-sm btn-primary"
+            onClick={() => {
+              const next = !props.sortDesc()
+              props.setSortDesc(next)
+              props.setSorting([{ id: props.sortColumn(), desc: next }])
+            }}
+            icon={
+              props.sortDesc() ? <IconSortDescending /> : <IconSortAscending />
+            }
+          />
+        </div>
 
-      {/* Search and actions */}
-      <div class="join flex flex-1 items-center">
-        <input
-          type="search"
-          class="input input-sm join-item flex-1 input-primary"
-          placeholder={t('search')}
-          onInput={(e) => props.setGlobalFilter(e.target.value)}
-        />
+        <div class="join flex min-w-0 flex-1 items-center">
+          <input
+            type="search"
+            class="input input-sm join-item min-w-0 flex-1 input-primary"
+            placeholder={t('search')}
+            onInput={(e) => props.setGlobalFilter(e.target.value)}
+          />
 
-        <Button
-          class="btn join-item btn-sm btn-primary"
-          onClick={() => props.setPaused((paused) => !paused)}
-          icon={props.paused() ? <IconPlayerPlay /> : <IconPlayerPause />}
-        />
+          <Button
+            class="btn join-item btn-sm btn-primary"
+            onClick={() => props.setPaused((paused) => !paused)}
+            icon={props.paused() ? <IconPlayerPlay /> : <IconPlayerPause />}
+          />
 
-        <Button
-          class="btn join-item btn-sm btn-primary"
-          onClick={handleCloseConnections}
-          icon={
-            isClosingConnections() ? (
-              <div class="loading loading-spinner" />
-            ) : (
-              <IconX />
-            )
-          }
-        />
+          <Button
+            class="btn join-item btn-sm btn-primary"
+            onClick={handleCloseConnections}
+            icon={
+              isClosingConnections() ? (
+                <div class="loading loading-spinner" />
+              ) : (
+                <IconX />
+              )
+            }
+          />
 
-        <Button
-          class="btn join-item btn-sm btn-primary"
-          onClick={props.onOpenSettings}
-          icon={<IconSettings />}
-        />
+          <Button
+            class="btn join-item btn-sm btn-primary"
+            onClick={props.onOpenSettings}
+            icon={<IconSettings />}
+          />
+        </div>
       </div>
     </div>
   )

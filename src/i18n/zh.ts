@@ -139,7 +139,7 @@ export default {
   actions: '操作',
   remove: '移除',
   noDataUsageYet: '暂无数据用量记录',
-  sortBy: '排序:',
+  sortBy: '排序',
   rowsPerPage: '每页行数',
   ipShort: 'IP',
   na: '无',

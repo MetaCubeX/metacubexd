@@ -137,7 +137,7 @@ export default {
   actions: 'Actions',
   remove: 'Remove',
   noDataUsageYet: 'No data usage recorded yet',
-  sortBy: 'Sort by:',
+  sortBy: 'Sort by',
   rowsPerPage: 'Rows per page',
   ipShort: 'IP',
   na: 'N/A',
