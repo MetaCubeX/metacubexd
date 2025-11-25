@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.205.0](https://github.com/MetaCubeX/metacubexd/compare/v1.204.0...v1.205.0) (2025-11-25)
+
+
+### Features
+
+* refactor routing and endpoint checks across multiple pages ([e9faa08](https://github.com/MetaCubeX/metacubexd/commit/e9faa08b92d2414bb03c30e02517a7c222e88a36))
+
 ## [1.204.0](https://github.com/MetaCubeX/metacubexd/compare/v1.203.0...v1.204.0) (2025-11-25)
 
 
