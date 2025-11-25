@@ -8,6 +8,7 @@ import {
   formatProxyType,
   getLatencyClassName,
 } from '~/helpers'
+import { useI18n } from '~/i18n'
 import { rootElement, useProxies } from '~/signals'
 
 export const ProxyNodeCard = (props: {
@@ -18,6 +19,7 @@ export const ProxyNodeCard = (props: {
   onClick?: () => void
 }) => {
   const { proxyName, isSelected, onClick } = props
+  const [t] = useI18n()
   const {
     proxyNodeMap,
     proxyLatencyTest,
@@ -52,10 +54,14 @@ export const ProxyNodeCard = (props: {
   return (
     <Tooltip
       placement="top"
+      group="proxy-node"
+      openDelay={300}
       floatingOptions={{
-        autoPlacement: true,
-        shift: true,
-        offset: 10,
+        flip: true,
+        shift: { padding: 8 },
+        offset: 8,
+        arrow: 8,
+        size: { fitViewPort: true },
       }}
     >
       <Tooltip.Anchor
@@ -112,51 +118,58 @@ export const ProxyNodeCard = (props: {
 
         <Tooltip.Portal mount={rootElement()}>
           <Tooltip.Content class="z-50">
-            <Tooltip.Arrow class="text-neutral" />
+            <Tooltip.Arrow class="text-primary [&>svg]:-translate-y-px [&>svg]:fill-current" />
 
-            <div class="flex flex-col items-center gap-2 rounded-box bg-primary p-2.5 text-primary-content shadow-lg">
+            <div class="flex max-h-[70vh] flex-col items-center gap-2 overflow-y-auto rounded-box bg-primary p-2.5 text-primary-content shadow-lg [clip-path:inset(0_round_var(--radius-box))]">
               <h2 class="text-lg font-bold">{proxyName}</h2>
 
               <Show when={specialTypes()}>
                 <div class="w-full text-xs uppercase">{specialTypes()}</div>
               </Show>
 
-              <ul class="timeline timeline-vertical timeline-compact timeline-snap-icon">
-                <For each={latencyTestHistory}>
-                  {(latencyTestResult, index) => (
-                    <li>
-                      <Show when={index() > 0}>
-                        <hr />
-                      </Show>
+              <Show
+                when={latencyTestHistory.length > 0}
+                fallback={
+                  <div class="text-sm opacity-75">{t('noLatencyHistory')}</div>
+                }
+              >
+                <ul class="timeline timeline-vertical timeline-compact timeline-snap-icon">
+                  <For each={latencyTestHistory}>
+                    {(latencyTestResult, index) => (
+                      <li>
+                        <Show when={index() > 0}>
+                          <hr />
+                        </Show>
 
-                      <div class="timeline-start space-y-2">
-                        <time class="text-sm italic">
-                          {dayjs(latencyTestResult.time).format(
-                            'YYYY-MM-DD HH:mm:ss',
-                          )}
-                        </time>
+                        <div class="timeline-start space-y-2">
+                          <time class="text-sm italic">
+                            {dayjs(latencyTestResult.time).format(
+                              'YYYY-MM-DD HH:mm:ss',
+                            )}
+                          </time>
 
-                        <div
-                          class={twMerge(
-                            'badge block',
-                            getLatencyClassName(latencyTestResult.delay),
-                          )}
-                        >
-                          {latencyTestResult.delay || '---'}
+                          <div
+                            class={twMerge(
+                              'badge block',
+                              getLatencyClassName(latencyTestResult.delay),
+                            )}
+                          >
+                            {latencyTestResult.delay || '---'}
+                          </div>
                         </div>
-                      </div>
 
-                      <div class="timeline-middle">
-                        <IconCircleCheckFilled class="size-4" />
-                      </div>
+                        <div class="timeline-middle">
+                          <IconCircleCheckFilled class="size-4" />
+                        </div>
 
-                      <Show when={index() !== latencyTestHistory.length - 1}>
-                        <hr />
-                      </Show>
-                    </li>
-                  )}
-                </For>
-              </ul>
+                        <Show when={index() !== latencyTestHistory.length - 1}>
+                          <hr />
+                        </Show>
+                      </li>
+                    )}
+                  </For>
+                </ul>
+              </Show>
             </div>
           </Tooltip.Content>
         </Tooltip.Portal>

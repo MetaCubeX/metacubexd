@@ -142,6 +142,7 @@ export default {
   ipShort: 'IP',
   na: 'N/A',
   show: 'Show',
+  noLatencyHistory: 'No latency history',
   dataUsageInfo:
     'Data usage monitoring is performed on the client-side (browser). When the browser is closed, monitoring will likely not run.',
 }
