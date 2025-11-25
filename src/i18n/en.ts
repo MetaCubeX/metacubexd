@@ -138,6 +138,7 @@ export default {
   remove: 'Remove',
   noDataUsageYet: 'No data usage recorded yet',
   sortBy: 'Sort by:',
+  rowsPerPage: 'Rows per page',
   ipShort: 'IP',
   na: 'N/A',
   show: 'Show',

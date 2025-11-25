@@ -1,21 +1,14 @@
 import byteSize from 'byte-size'
-import type { EChartsOption } from 'echarts'
-import { EChartsAutoSize } from 'echarts-solid'
-import { defaultsDeep } from 'lodash'
+import Highcharts from 'highcharts'
 import type { JSX, ParentComponent } from 'solid-js'
 import { DataUsageTable, DocumentTitle } from '~/components'
-import { CHART_MAX_XAXIS, DEFAULT_CHART_OPTIONS } from '~/constants'
+import { HighchartsAutoSize } from '~/components/HighchartsAutoSize'
+import {
+  type RealtimeChartRef,
+  RealtimeLineChartWithRef,
+} from '~/components/RealtimeLineChart'
 import { useI18n } from '~/i18n'
 import { endpoint, latestConnectionMsg, useWsRequest } from '~/signals'
-
-const formatDate = (value: number) => {
-  const date = new Date(value)
-
-  return `${date.getMinutes().toString().padStart(2, '0')}:${date
-    .getSeconds()
-    .toString()
-    .padStart(2, '0')}`
-}
 
 const TrafficWidget: ParentComponent<{ label: JSX.Element }> = (props) => (
   <div class="stat flex-1 place-items-center">
@@ -37,28 +30,26 @@ export default () => {
 
   const [t] = useI18n()
 
-  const [traffics, setTraffics] = createSignal<
-    { down: number; up: number; time: Date }[]
-  >([])
-  const [memories, setMemories] = createSignal<
-    { value: number; time: number }[]
-  >([])
+  // Track data point count to determine whether to show loading
+  const [trafficDataCount, setTrafficDataCount] = createSignal(0)
+  const [memoryDataCount, setMemoryDataCount] = createSignal(0)
+
+  // Chart refs for real-time updates
+  let trafficChartRef: RealtimeChartRef | undefined
+  let memoryChartRef: RealtimeChartRef | undefined
 
   const traffic = useWsRequest<{ down: number; up: number }>('traffic')
 
   createEffect(() => {
     const newTraffic = traffic()
 
-    if (newTraffic) {
-      setTraffics((traffics) => {
-        const newTraffics = [...traffics, { ...newTraffic, time: new Date() }]
-
-        if (newTraffics.length > CHART_MAX_XAXIS) {
-          newTraffics.shift()
-        }
-
-        return newTraffics
-      })
+    if (newTraffic && trafficChartRef) {
+      const time = Date.now()
+      trafficChartRef.addPoints([
+        { seriesIndex: 0, time, value: newTraffic.down },
+        { seriesIndex: 1, time, value: newTraffic.up },
+      ])
+      setTrafficDataCount((c) => c + 1)
     }
   })
 
@@ -67,121 +58,77 @@ export default () => {
   createEffect(() => {
     const newMemory = memory()?.inuse
 
-    if (newMemory) {
-      setMemories((memories) => {
-        const newMemories = [
-          ...memories,
-          { value: newMemory, time: Date.now() },
-        ]
-
-        if (newMemories.length > CHART_MAX_XAXIS) {
-          newMemories.shift()
-        }
-
-        return newMemories
-      })
+    if (newMemory && memoryChartRef) {
+      const time = Date.now()
+      memoryChartRef.addPoint(0, time, newMemory)
+      setMemoryDataCount((c) => c + 1)
     }
   })
 
-  const trafficChartOptions = createMemo<EChartsOption>(() => {
-    const data = traffics()
-
-    return defaultsDeep(
-      {
-        title: { text: t('traffic') },
-        xAxis: {
-          axisLabel: {
-            show: true,
-            formatter: formatDate,
-          },
-        },
-        series: [
-          {
-            name: t('down'),
-            type: 'line',
-            stack: 'traffic',
-            smooth: true,
-            showSymbol: false,
-            data: data.map((t) => [t.time, t.down]),
-          },
-          {
-            name: t('up'),
-            type: 'line',
-            stack: 'traffic',
-            smooth: true,
-            showSymbol: false,
-            data: data.map((t) => [t.time, t.up]),
-          },
-        ],
-      } satisfies EChartsOption,
-      DEFAULT_CHART_OPTIONS,
-    )
-  })
-
-  const flowChartOptions = createMemo<EChartsOption>(() => {
+  // Flow chart (pie chart) options using Highcharts
+  const flowChartOptions = createMemo<Highcharts.Options>(() => {
     return {
-      title: { text: t('flow') },
+      chart: {
+        type: 'pie',
+        backgroundColor: 'transparent',
+        animation: false,
+      },
+      credits: {
+        enabled: false,
+      },
+      title: {
+        text: t('flow'),
+        style: {
+          color: 'oklch(0.746477 0 0)',
+        },
+      },
       tooltip: {
-        trigger: 'item',
-        formatter: (params) => {
-          if (typeof params !== 'object' || Array.isArray(params)) return ''
+        pointFormatter: function () {
+          const value = this.y || 0
+          const percent =
+            (this as Highcharts.Point & { percentage?: number }).percentage || 0
 
-          const name = params.name || ''
-          const value = Number(params.value) || 0
-          const percent = Number(params.percent) || 0
-
-          return `${name}<br/>${byteSize(value).toString()} (${percent.toFixed(1)}%)`
+          return `${this.name}<br/>${byteSize(value).toString()} (${percent.toFixed(1)}%)`
+        },
+      },
+      plotOptions: {
+        pie: {
+          allowPointSelect: true,
+          cursor: 'pointer',
+          dataLabels: {
+            enabled: false,
+          },
+          showInLegend: true,
+          animation: false,
+        },
+      },
+      legend: {
+        itemStyle: {
+          color: 'oklch(0.746477 0 0)',
+        },
+        itemHoverStyle: {
+          color: 'oklch(0.9 0 0)',
         },
       },
       series: [
         {
           type: 'pie',
-          labelLine: {
-            show: false,
-          },
-          label: {
-            show: false,
-            position: 'center',
-          },
+          name: t('flow'),
           data: [
             {
               name: t('downloadTotal'),
-              value: latestConnectionMsg()?.downloadTotal || 0,
+              y: latestConnectionMsg()?.downloadTotal || 0,
+              color: Highcharts.getOptions().colors?.[0],
             },
             {
               name: t('uploadTotal'),
-              value: latestConnectionMsg()?.uploadTotal || 0,
+              y: latestConnectionMsg()?.uploadTotal || 0,
+              color: Highcharts.getOptions().colors?.[1],
             },
           ],
         },
       ],
     }
-  })
-
-  const memoryChartOptions = createMemo<EChartsOption>(() => {
-    const data = memories()
-
-    return defaultsDeep(
-      {
-        title: { text: t('memory') },
-        xAxis: {
-          axisLabel: {
-            show: true,
-            formatter: formatDate,
-          },
-        },
-        series: [
-          {
-            name: t('memory'),
-            type: 'line',
-            smooth: true,
-            showSymbol: false,
-            data: data.map((m) => [m.time, m.value]),
-          },
-        ],
-      } satisfies EChartsOption,
-      DEFAULT_CHART_OPTIONS,
-    )
   })
 
   return (
@@ -217,21 +164,28 @@ export default () => {
 
         <div class="grid grid-cols-1 gap-2 rounded-box bg-base-300 py-4 lg:grid-cols-3">
           <div class="h-80">
-            <EChartsAutoSize
-              isLoading={traffics().length === 0}
-              option={trafficChartOptions()}
+            <RealtimeLineChartWithRef
+              ref={(ref: RealtimeChartRef) => (trafficChartRef = ref)}
+              title={t('traffic')}
+              seriesConfig={[
+                { name: t('down'), color: '#7cb5ec' },
+                { name: t('up'), color: '#90ed7d' },
+              ]}
+              isLoading={trafficDataCount() === 0}
             />
           </div>
           <div class="h-80">
-            <EChartsAutoSize
+            <HighchartsAutoSize
               isLoading={latestConnectionMsg()?.connections?.length === 0}
-              option={flowChartOptions()}
+              options={flowChartOptions()}
             />
           </div>
           <div class="h-80">
-            <EChartsAutoSize
-              isLoading={memories().length === 0}
-              option={memoryChartOptions()}
+            <RealtimeLineChartWithRef
+              ref={(ref: RealtimeChartRef) => (memoryChartRef = ref)}
+              title={t('memory')}
+              seriesConfig={[{ name: t('memory'), color: '#f7a35c' }]}
+              isLoading={memoryDataCount() === 0}
             />
           </div>
         </div>

@@ -1,6 +1,3 @@
-import type { EChartsOption } from 'echarts'
-import byteSize from 'byte-size'
-
 export const themes = [
   'acid',
   'aqua',
@@ -47,29 +44,6 @@ export enum ROUTES {
 }
 
 export const CHART_MAX_XAXIS = 10
-
-export const DEFAULT_CHART_OPTIONS: EChartsOption = {
-  title: {
-    textAlign: 'center',
-    left: 'center',
-  },
-  xAxis: {
-    type: 'time',
-  },
-  yAxis: {
-    type: 'value',
-    splitLine: { show: false },
-    axisLabel: {
-      formatter: (val: number) => byteSize(val).toString(),
-    },
-  },
-  series: [],
-  legend: { show: true },
-  tooltip: {
-    show: true,
-    trigger: 'axis',
-  },
-}
 
 export enum LATENCY_QUALITY_MAP_HTTP {
   NOT_CONNECTED = 0,
