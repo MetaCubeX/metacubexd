@@ -6,7 +6,6 @@ import {
 import {
   connectionsTableColumnOrder,
   connectionsTableColumnVisibility,
-  endpoint,
   setConnectionsTableColumnOrder,
   setConnectionsTableColumnVisibility,
 } from '~/signals'
@@ -17,14 +16,6 @@ import { MobilePagination, DesktopPagination } from './ConnectionsPagination'
 import { useConnectionsTable } from './useConnectionsTable'
 
 export default () => {
-  const navigate = useNavigate()
-
-  if (!endpoint()) {
-    navigate('/setup', { replace: true })
-
-    return null
-  }
-
   const [t] = useI18n()
 
   let connectionsSettingsModalRef: HTMLDialogElement | undefined

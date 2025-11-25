@@ -4,7 +4,9 @@ import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
   {
-    ignores: ['dist'],
+    ignores: ['dist/**', 'node_modules/**'],
+  },
+  {
     settings: {
       'import/resolver': {
         typescript: {},

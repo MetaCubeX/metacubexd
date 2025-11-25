@@ -557,14 +557,6 @@ const ConfigForXd = () => {
 }
 
 export default () => {
-  const navigate = useNavigate()
-
-  if (!endpoint()) {
-    navigate('/setup', { replace: true })
-
-    return null
-  }
-
   const [t] = useI18n()
 
   const frontendVersion = `v${import.meta.env.APP_VERSION}`

@@ -25,7 +25,6 @@ import {
 } from '~/helpers'
 import { useI18n } from '~/i18n'
 import {
-  endpoint,
   hideUnAvailableProxies,
   iconHeight,
   iconMarginRight,
@@ -40,14 +39,6 @@ enum ActiveTab {
 }
 
 export default () => {
-  const navigate = useNavigate()
-
-  if (!endpoint()) {
-    navigate('/setup', { replace: true })
-
-    return null
-  }
-
   let proxiesSettingsModalRef: HTMLDialogElement | undefined
 
   const [t] = useI18n()

@@ -5,7 +5,7 @@ import { twMerge } from 'tailwind-merge'
 import { Button, DocumentTitle } from '~/components'
 import { formatTimeFromNow, useStringBooleanMap } from '~/helpers'
 import { useI18n } from '~/i18n'
-import { endpoint, useRules } from '~/signals'
+import { useRules } from '~/signals'
 import { Rule, RuleProvider } from '~/types'
 
 enum ActiveTab {
@@ -14,14 +14,6 @@ enum ActiveTab {
 }
 
 export default () => {
-  const navigate = useNavigate()
-
-  if (!endpoint()) {
-    navigate('/setup', { replace: true })
-
-    return null
-  }
-
   const [t] = useI18n()
   const {
     rules,

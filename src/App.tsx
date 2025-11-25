@@ -2,6 +2,7 @@ import { usePrefersDark } from '@solid-primitives/media'
 import type { ParentComponent } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
 import { Header } from '~/components'
+import { ROUTES } from '~/constants'
 import {
   MemoryData,
   TrafficData,
@@ -33,6 +34,7 @@ const ProtectedResources = () => {
 }
 
 export const App: ParentComponent = ({ children }) => {
+  const location = useLocation()
   const prefersDark = usePrefersDark()
 
   createEffect(() => {
@@ -45,6 +47,10 @@ export const App: ParentComponent = ({ children }) => {
     document.documentElement.setAttribute('data-theme', curTheme())
   })
 
+  // Route guard: redirect to setup if no endpoint configured
+  const isSetupPage = () => location.pathname === ROUTES.Setup
+  const needsRedirect = () => !endpoint() && !isSetupPage()
+
   return (
     <div
       ref={(el) => setRootElement(el)}
@@ -55,7 +61,14 @@ export const App: ParentComponent = ({ children }) => {
     >
       <Header />
 
-      <div class="flex-1 overflow-y-auto p-2 sm:p-4">{children}</div>
+      <div class="flex-1 overflow-y-auto p-2 sm:p-4">
+        <Show
+          when={!needsRedirect()}
+          fallback={<Navigate href={ROUTES.Setup} />}
+        >
+          {children}
+        </Show>
+      </div>
 
       <Show when={!!endpoint()}>
         <ProtectedResources />

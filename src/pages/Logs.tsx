@@ -21,7 +21,7 @@ import { twMerge } from 'tailwind-merge'
 import { Button, DocumentTitle, LogsSettingsModal } from '~/components'
 import { LOG_LEVEL } from '~/constants'
 import { useI18n } from '~/i18n'
-import { endpoint, logsTableSize, tableSizeClassName, useLogs } from '~/signals'
+import { logsTableSize, tableSizeClassName, useLogs } from '~/signals'
 import { LogWithSeq } from '~/types'
 
 const fuzzyFilter: FilterFn<LogWithSeq> = (row, columnId, value, addMeta) => {
@@ -38,14 +38,6 @@ const fuzzyFilter: FilterFn<LogWithSeq> = (row, columnId, value, addMeta) => {
 }
 
 export default () => {
-  const navigate = useNavigate()
-
-  if (!endpoint()) {
-    navigate('/setup', { replace: true })
-
-    return null
-  }
-
   let logsSettingsModalRef: HTMLDialogElement | undefined
   const [t] = useI18n()
   const [globalFilter, setGlobalFilter] = createSignal('')
@@ -126,7 +118,7 @@ export default () => {
         <div class="join w-full">
           <input
             type="search"
-            class="input input-sm join-item flex-1 flex-shrink-0 input-primary"
+            class="input input-sm join-item flex-1 shrink-0 input-primary"
             placeholder={t('search')}
             onInput={(e) => setGlobalFilter(e.target.value)}
           />
@@ -197,7 +189,7 @@ export default () => {
             <tbody>
               <For each={table.getRowModel().rows}>
                 {(row) => (
-                  <tr class="hover:!bg-primary hover:text-primary-content">
+                  <tr class="hover:bg-primary! hover:text-primary-content">
                     <For each={row.getVisibleCells()}>
                       {(cell) => (
                         <td class="py-2">

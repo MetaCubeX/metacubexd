@@ -30,14 +30,6 @@ const TrafficWidget: ParentComponent<{ label: JSX.Element }> = (props) => (
 )
 
 export default () => {
-  const navigate = useNavigate()
-
-  if (!endpoint()) {
-    navigate('/setup', { replace: true })
-
-    return null
-  }
-
   const [t] = useI18n()
 
   // Chart refs for real-time updates
