@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.208.0](https://github.com/MetaCubeX/metacubexd/compare/v1.207.0...v1.208.0) (2025-11-26)
+
+
+### Features
+
+* **Logs:** add log type extraction and update column headers for improved clarity ([a2d8081](https://github.com/MetaCubeX/metacubexd/commit/a2d80815ecb5183cc31c335472a8f5abd9be9355))
+
 ## [1.207.0](https://github.com/MetaCubeX/metacubexd/compare/v1.206.0...v1.207.0) (2025-11-26)
 
 
