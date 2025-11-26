@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.210.0](https://github.com/MetaCubeX/metacubexd/compare/v1.209.0...v1.210.0) (2025-11-26)
+
+
+### Features
+
+* **Changelog:** implement frontend and backend release fetching for changelog timeline ([0f261a6](https://github.com/MetaCubeX/metacubexd/commit/0f261a62b26c1ab8c43d59a7ca7808d5f48ae601))
+
 ## [1.209.0](https://github.com/MetaCubeX/metacubexd/compare/v1.208.0...v1.209.0) (2025-11-26)
 
 
