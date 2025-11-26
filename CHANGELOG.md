@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.207.0](https://github.com/MetaCubeX/metacubexd/compare/v1.206.0...v1.207.0) (2025-11-26)
+
+
+### Features
+
+* **Proxies:** implement display mode toggle for proxy nodes and add ProxyNodeListItem component ([b83f7b9](https://github.com/MetaCubeX/metacubexd/commit/b83f7b9fb67e92777ea33ad57f418df246efa4bd))
+* **useConnectionsTable:** optimize data filtering and memoization for improved performance ([9ee4aec](https://github.com/MetaCubeX/metacubexd/commit/9ee4aeca8d53e875fc3bd96484b4c902f34a8cfa))
+
 ## [1.206.0](https://github.com/MetaCubeX/metacubexd/compare/v1.205.0...v1.206.0) (2025-11-25)
 
 
