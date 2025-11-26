@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.209.0](https://github.com/MetaCubeX/metacubexd/compare/v1.208.0...v1.209.0) (2025-11-26)
+
+
+### Features
+
+* add onSelect prop to ProxyNodePreview and ProxyPreviewDots for improved interactivity ([f2a5b92](https://github.com/MetaCubeX/metacubexd/commit/f2a5b929dacb4c846785ce0321756f84b7cf8513))
+
 ## [1.208.0](https://github.com/MetaCubeX/metacubexd/compare/v1.207.0...v1.208.0) (2025-11-26)
 
 
