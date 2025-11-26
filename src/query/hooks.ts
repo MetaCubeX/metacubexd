@@ -3,7 +3,9 @@ import { toast } from 'solid-toast'
 import {
   backendReleaseAPI,
   fetchBackendConfigAPI,
+  fetchBackendReleasesAPI,
   fetchBackendVersionAPI,
+  fetchFrontendReleasesAPI,
   fetchProxiesAPI,
   fetchProxyProvidersAPI,
   fetchRuleProvidersAPI,
@@ -83,6 +85,30 @@ export const useBackendRelease = (version: () => string) => {
   return useQuery(() => ({
     queryKey: queryKeys.backendRelease(version()),
     queryFn: () => backendReleaseAPI(version()),
+    enabled: !!version(),
+    staleTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  }))
+}
+
+// Frontend releases list query (for changelog timeline)
+export const useFrontendReleases = (version: string, count: number = 10) => {
+  return useQuery(() => ({
+    queryKey: queryKeys.frontendReleases(version),
+    queryFn: () => fetchFrontendReleasesAPI(version, count),
+    staleTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  }))
+}
+
+// Backend releases list query (for changelog timeline)
+export const useBackendReleases = (
+  version: () => string,
+  count: number = 10,
+) => {
+  return useQuery(() => ({
+    queryKey: queryKeys.backendReleases(version()),
+    queryFn: () => fetchBackendReleasesAPI(version(), count),
     enabled: !!version(),
     staleTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,

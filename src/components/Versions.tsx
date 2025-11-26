@@ -1,5 +1,11 @@
 import Tooltip from '@corvu/tooltip'
-import { type Accessor, type Component, ParentComponent, Show } from 'solid-js'
+import {
+  type Accessor,
+  type Component,
+  ParentComponent,
+  Show,
+  splitProps,
+} from 'solid-js'
 import {
   upgradeBackendAPI,
   upgradeUIAPI,
@@ -7,7 +13,12 @@ import {
   upgradingUI,
 } from '~/apis'
 import { Changelog } from '~/components'
-import { useBackendRelease, useFrontendRelease } from '~/query/hooks'
+import {
+  useBackendRelease,
+  useBackendReleases,
+  useFrontendRelease,
+  useFrontendReleases,
+} from '~/query/hooks'
 
 const UpgradeButton: ParentComponent<{
   isUpdateAvailable?: boolean
@@ -48,6 +59,8 @@ export const Versions: Component<{
 }> = ({ frontendVersion, backendVersion }) => {
   const frontendRelease = useFrontendRelease(frontendVersion)
   const backendRelease = useBackendRelease(backendVersion)
+  const frontendReleases = useFrontendReleases(frontendVersion, 10)
+  const backendReleases = useBackendReleases(backendVersion, 10)
 
   return (
     <div class="mx-2 grid grid-cols-1 gap-4 sm:grid-cols-2 md:mx-0">
@@ -75,13 +88,14 @@ export const Versions: Component<{
             </UpgradeButton>
           </Tooltip.Trigger>
 
-          <Show when={frontendRelease.data?.changelog}>
-            <Tooltip.Content class="z-50">
-              <Tooltip.Arrow class="text-neutral" />
+          <Tooltip.Content class="z-50 max-h-96 overflow-y-auto rounded-box bg-neutral p-4 shadow-xl">
+            <Tooltip.Arrow class="text-neutral" />
 
-              <Changelog body={frontendRelease.data!.changelog!} />
-            </Tooltip.Content>
-          </Show>
+            <Changelog
+              releases={frontendReleases.data ?? []}
+              isLoading={frontendReleases.isLoading}
+            />
+          </Tooltip.Content>
         </Tooltip.Anchor>
       </Tooltip>
 
@@ -109,13 +123,14 @@ export const Versions: Component<{
             </UpgradeButton>
           </Tooltip.Trigger>
 
-          <Show when={backendRelease.data?.changelog}>
-            <Tooltip.Content class="z-50">
-              <Tooltip.Arrow class="text-neutral" />
+          <Tooltip.Content class="z-50 max-h-96 overflow-y-auto rounded-box bg-neutral p-4 shadow-xl">
+            <Tooltip.Arrow class="text-neutral" />
 
-              <Changelog body={backendRelease.data!.changelog!} />
-            </Tooltip.Content>
-          </Show>
+            <Changelog
+              releases={backendReleases.data ?? []}
+              isLoading={backendReleases.isLoading}
+            />
+          </Tooltip.Content>
         </Tooltip.Anchor>
       </Tooltip>
     </div>

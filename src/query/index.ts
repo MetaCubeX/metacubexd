@@ -55,6 +55,8 @@ export const queryKeys = {
   // Releases
   frontendRelease: (version: string) => ['frontendRelease', version] as const,
   backendRelease: (version: string) => ['backendRelease', version] as const,
+  frontendReleases: (version: string) => ['frontendReleases', version] as const,
+  backendReleases: (version: string) => ['backendReleases', version] as const,
 } as const
 
 export { QueryClientProvider, useQueryClient } from '@tanstack/solid-query'

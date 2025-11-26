@@ -251,11 +251,19 @@ type ReleaseAPIResponse = {
   tag_name: string
   body: string
   assets: { name: string }[]
+  published_at: string
 }
 
 type ReleaseReturn = {
   isUpdateAvailable: boolean
   changelog?: string
+}
+
+export type ReleaseInfo = {
+  version: string
+  changelog: string
+  publishedAt: string
+  isCurrent: boolean
 }
 
 export const frontendReleaseAPI = async (
@@ -310,4 +318,76 @@ export const backendReleaseAPI = async (
   return {
     isUpdateAvailable: false,
   }
+}
+
+// Fetch recent frontend releases for changelog timeline
+export const fetchFrontendReleasesAPI = async (
+  currentVersion: string,
+  count: number = 10,
+): Promise<ReleaseInfo[]> => {
+  const githubAPI = useGithubAPI()
+
+  const releases = await githubAPI
+    .get(`repos/MetaCubeX/metacubexd/releases`, {
+      searchParams: { per_page: count },
+    })
+    .json<ReleaseAPIResponse[]>()
+
+  return releases.map((release) => ({
+    version: release.tag_name,
+    changelog: release.body,
+    publishedAt: release.published_at,
+    isCurrent: release.tag_name === currentVersion,
+  }))
+}
+
+// Fetch recent backend releases for changelog timeline
+export const fetchBackendReleasesAPI = async (
+  currentVersion: string,
+  count: number = 10,
+): Promise<ReleaseInfo[]> => {
+  const githubAPI = useGithubAPI()
+
+  const repositoryURL = 'repos/MetaCubeX/mihomo'
+  const match = /(alpha|beta|meta)-?(\w+)/.exec(currentVersion)
+
+  if (!match) return []
+
+  const channel = match[1]
+
+  let releases: ReleaseAPIResponse[] = []
+
+  if (channel === 'meta') {
+    releases = await githubAPI
+      .get(`${repositoryURL}/releases`, {
+        searchParams: { per_page: count },
+      })
+      .json<ReleaseAPIResponse[]>()
+    // Filter out pre-releases for stable channel
+    releases = releases.filter(
+      (r) =>
+        !r.tag_name.includes('Alpha') && !r.tag_name.includes('Prerelease'),
+    )
+  } else if (channel === 'alpha') {
+    releases = await githubAPI
+      .get(`${repositoryURL}/releases`, {
+        searchParams: { per_page: count * 2 },
+      })
+      .json<ReleaseAPIResponse[]>()
+    // Filter for alpha releases only
+    releases = releases
+      .filter(
+        (r) =>
+          r.tag_name.includes('Alpha') || r.tag_name.includes('Prerelease'),
+      )
+      .slice(0, count)
+  }
+
+  return releases.map((release) => ({
+    version: release.tag_name,
+    changelog: release.body,
+    publishedAt: release.published_at,
+    isCurrent:
+      release.assets?.some(({ name }) => name.includes(match[2])) ?? false,
+  }))
 }
