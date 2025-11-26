@@ -91,6 +91,7 @@ export default {
   latencyTestTimeoutDuration: 'Тайм-аут теста задержки',
   all: 'Все',
   sequence: '№',
+  level: 'Уровень',
   payload: 'Нагрузка',
   details: 'Детали',
   endpointURL: 'URL-адрес подключения',

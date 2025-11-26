@@ -91,6 +91,7 @@ export default {
   latencyTestTimeoutDuration: '测速超时时间',
   all: '全部',
   sequence: '序列号',
+  level: '等级',
   payload: '内容',
   details: '详情',
   endpointURL: '后端地址',

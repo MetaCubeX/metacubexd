@@ -48,13 +48,20 @@ export default () => {
     storage: localStorage,
   })
 
+  // Extract type from payload, e.g. "[dns] xxx" -> "dns"
+  const extractType = (payload: string) => {
+    const match = payload.match(/^\[([^\]]+)\]/)
+
+    return match ? match[1] : ''
+  }
+
   const columns: ColumnDef<LogWithSeq>[] = [
     {
       header: t('sequence'),
       accessorFn: (row) => row.seq,
     },
     {
-      header: t('type'),
+      header: t('level'),
       accessorFn: (row) => row.type,
       cell: ({ row }) => {
         const type = row.original.type as LOG_LEVEL
@@ -77,6 +84,15 @@ export default () => {
         }
 
         return <span class={className}>{`[${row.original.type}]`}</span>
+      },
+    },
+    {
+      header: t('type'),
+      accessorFn: (row) => extractType(row.payload),
+      cell: ({ row }) => {
+        const logType = extractType(row.original.payload)
+
+        return logType ? <span class="opacity-70">{logType}</span> : null
       },
     },
     {

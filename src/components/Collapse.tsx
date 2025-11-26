@@ -36,7 +36,7 @@ export const Collapse: ParentComponent<Props> = (props) => {
       )}
     >
       <div
-        class="collapse-title pr-4 text-xl font-medium after:!top-8"
+        class="collapse-title pr-4 text-xl font-medium after:top-8!"
         onClick={() => onCollapse(!props.isOpen)}
       >
         {title}

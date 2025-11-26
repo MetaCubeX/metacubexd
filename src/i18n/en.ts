@@ -89,6 +89,7 @@ export default {
   latencyTestTimeoutDuration: 'Latency Test Timeout Duration',
   all: 'All',
   sequence: 'Sequence',
+  level: 'Level',
   payload: 'Payload',
   details: 'Details',
   endpointURL: 'Endpoint URL',
