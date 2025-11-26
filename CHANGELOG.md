@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.211.0](https://github.com/MetaCubeX/metacubexd/compare/v1.210.0...v1.211.0) (2025-11-26)
+
+
+### Features
+
+* enhance latency retrieval logic and improve history fetching in useProxies ([33573e3](https://github.com/MetaCubeX/metacubexd/commit/33573e310fc4c90de2baa7a8fe82ad6f3f5bdbcb))
+
 ## [1.210.0](https://github.com/MetaCubeX/metacubexd/compare/v1.209.0...v1.210.0) (2025-11-26)
 
 
