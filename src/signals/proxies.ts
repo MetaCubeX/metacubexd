@@ -326,14 +326,45 @@ export const useProxies = () => {
   const getLatencyByName = (name: string, testUrl: string | null) => {
     const finalTestUrl = testUrl || urlForLatencyTest()
     const latencyMapValue = latencyMap()
+    const nowName = getNowProxyNodeName(name)
 
     // First recursively search for proxy node latency by name for the current testUrl.
     // If not found, the current name may be a proxy group - in that case, use that proxy group's latency
-    return (
-      latencyMapValue[getNowProxyNodeName(name)]?.[finalTestUrl] ||
-      latencyMapValue[name]?.[finalTestUrl] ||
-      latencyQualityMap().NOT_CONNECTED
-    )
+    const direct = latencyMapValue[nowName]?.[finalTestUrl]
+    const groupDirect = latencyMapValue[name]?.[finalTestUrl]
+
+    if (direct != null) return direct
+
+    if (groupDirect != null) return groupDirect
+
+    // Fallback: when a select group references url-test groups with different testUrls,
+    // show the child's own latency even if the parent's testUrl doesn't match.
+    const nodeLatencies = latencyMapValue[nowName]
+
+    if (nodeLatencies && Object.keys(nodeLatencies).length > 0) {
+      // Prefer latency of the node's own default testUrl if present,
+      // otherwise pick the latest available one.
+      const preferredTestUrl = proxyNodeMap()[nowName]?.type
+        ? finalTestUrl
+        : urlForLatencyTest()
+      const keys = Object.keys(nodeLatencies)
+      const pickUrl =
+        nodeLatencies[preferredTestUrl] != null ? preferredTestUrl : keys[0]
+
+      if (pickUrl) return nodeLatencies[pickUrl] as number
+    }
+
+    // As a last resort, try the group's own latency map
+    const groupLatencies = latencyMapValue[name]
+
+    if (groupLatencies && Object.keys(groupLatencies).length > 0) {
+      const keys = Object.keys(groupLatencies)
+      const pickUrl = keys[0]
+
+      if (pickUrl) return groupLatencies[pickUrl] as number
+    }
+
+    return latencyQualityMap().NOT_CONNECTED
   }
 
   const getLatencyHistoryByName = (name: string, testUrl: string | null) => {
@@ -344,11 +375,36 @@ export const useProxies = () => {
 
     const finalTestUrl = testUrl || urlForLatencyTest()
 
-    return (
+    // Try exact match first
+    const exact =
       nowProxyNode.latencyTestHistory[finalTestUrl] ||
-      proxyNode.latencyTestHistory[finalTestUrl] ||
-      []
-    )
+      proxyNode.latencyTestHistory[finalTestUrl]
+
+    if (exact && exact.length) return exact
+
+    // Fallback: use any available history from the child node
+    const childHistories = nowProxyNode.latencyTestHistory
+    const childKeys = Object.keys(childHistories)
+
+    if (childKeys.length > 0) {
+      const key = childKeys[0]
+      const hist = childHistories[key]
+
+      if (hist && hist.length) return hist
+    }
+
+    // Then try group history
+    const groupHistories = proxyNode.latencyTestHistory
+    const groupKeys = Object.keys(groupHistories)
+
+    if (groupKeys.length > 0) {
+      const key = groupKeys[0]
+      const hist = groupHistories[key]
+
+      if (hist && hist.length) return hist
+    }
+
+    return []
   }
 
   const isProxyGroup = (name: string) => {

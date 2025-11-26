@@ -45,7 +45,7 @@ export const ProxyNodeListItem = (props: {
   const latencyTestHistory = getLatencyHistoryByName(
     props.proxyName,
     props.testUrl,
-  )
+  ).toReversed()
 
   return (
     <Tooltip

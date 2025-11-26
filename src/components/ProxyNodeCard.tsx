@@ -42,14 +42,10 @@ export const ProxyNodeCard = (props: {
 
   const isUDP = createMemo(() => proxyNode().xudp || proxyNode().udp)
 
-  const title = createMemo(() =>
-    [proxyName, specialTypes()].filter(Boolean).join(' - '),
-  )
-
   const latencyTestHistory = getLatencyHistoryByName(
     props.proxyName,
     props.testUrl,
-  )
+  ).toReversed()
 
   return (
     <Tooltip
@@ -70,7 +66,6 @@ export const ProxyNodeCard = (props: {
           'indicator card w-full bg-neutral text-neutral-content',
           isSelected && 'bg-primary text-primary-content',
         )}
-        title={title()}
       >
         <Show when={isUDP()}>
           <div class="indicator-item badge badge-xs badge-info">U</div>
