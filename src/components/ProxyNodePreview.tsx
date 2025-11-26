@@ -6,6 +6,7 @@ export const ProxyNodePreview = (props: {
   proxyNameList: string[]
   testUrl: string | null
   now?: string
+  onSelect?: (name: string) => void
 }) => {
   const off = () => proxiesPreviewType() === PROXIES_PREVIEW_TYPE.OFF
 
@@ -45,6 +46,7 @@ export const ProxyNodePreview = (props: {
             proxyNameList={props.proxyNameList}
             testUrl={props.testUrl}
             now={props.now}
+            onSelect={props.onSelect}
           />
         </Match>
       </Switch>

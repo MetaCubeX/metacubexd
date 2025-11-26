@@ -293,6 +293,9 @@ export default () => {
                           proxyNameList={sortedProxyNames()}
                           now={proxyGroup.now}
                           testUrl={proxyGroup.testUrl || null}
+                          onSelect={(name) =>
+                            void selectProxyInGroup(proxyGroup, name)
+                          }
                         />
                       </Show>
                     </div>

@@ -6,6 +6,8 @@ const LatencyDot = (props: {
   name: string
   latency?: number
   selected: boolean
+  clickable?: boolean
+  onClick?: () => void
 }) => {
   let dotClassName = props.selected
     ? 'bg-white border-4 border-green-600'
@@ -30,8 +32,19 @@ const LatencyDot = (props: {
 
   return (
     <div
-      class={twMerge('h-4 w-4 rounded-full', dotClassName)}
+      class={twMerge(
+        'h-4 w-4 rounded-full',
+        dotClassName,
+        props.clickable &&
+          'cursor-pointer transition-transform hover:scale-125',
+      )}
       title={props.name}
+      onClick={(e) => {
+        if (props.clickable && props.onClick) {
+          e.stopPropagation()
+          props.onClick()
+        }
+      }}
     />
   )
 }
@@ -40,6 +53,7 @@ export const ProxyPreviewDots = (props: {
   proxyNameList: string[]
   testUrl: string | null
   now?: string
+  onSelect?: (name: string) => void
 }) => {
   const { getLatencyByName } = useProxies()
 
@@ -57,6 +71,8 @@ export const ProxyPreviewDots = (props: {
               name={name}
               latency={latency}
               selected={props.now === name}
+              clickable={!!props.onSelect}
+              onClick={() => props.onSelect?.(name)}
             />
           )}
         </For>
