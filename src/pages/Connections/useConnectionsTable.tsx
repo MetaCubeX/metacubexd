@@ -71,6 +71,34 @@ export const useConnectionsTable = (options: UseConnectionsTableOptions) => {
     storage: localStorage,
   })
 
+  // Memoize filtered data to avoid unnecessary recalculations
+  const filteredData = createMemo(() => {
+    const rawConnections =
+      activeTab() === ActiveTab.activeConnections
+        ? activeConnections()
+        : closedConnections()
+
+    // Create a copy to avoid mutating the original signal array
+    const connections = rawConnections
+      .slice()
+      .sort((a, b) => a.id.localeCompare(b.id))
+
+    if (!enableQuickFilter()) {
+      return connections
+    }
+
+    try {
+      const reg = new RegExp(quickFilterRegex(), 'i')
+
+      return connections.filter(
+        (connection) => !reg.test(connection.chains.join('')),
+      )
+    } catch {
+      // Invalid regex, return all connections
+      return connections
+    }
+  })
+
   // Column definitions
   const columns: ColumnDef<Connection>[] = [
     {
@@ -278,22 +306,7 @@ export const useConnectionsTable = (options: UseConnectionsTableOptions) => {
       },
     },
     get data() {
-      const connections =
-        activeTab() === ActiveTab.activeConnections
-          ? activeConnections()
-          : closedConnections()
-
-      connections.sort((a, b) => a.id.localeCompare(b.id))
-
-      if (!enableQuickFilter()) {
-        return connections
-      }
-
-      const reg = new RegExp(quickFilterRegex(), 'i')
-
-      return connections.filter(
-        (connection) => !reg.test(connection.chains.join('')),
-      )
+      return filteredData()
     },
     sortDescFirst: true,
     enableHiding: true,
