@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.212.0](https://github.com/MetaCubeX/metacubexd/compare/v1.211.0...v1.212.0) (2025-11-26)
+
+
+### Features
+
+* rename url field to 'metacubexd-endpoint-url' and enhance form accessibility ([70598d7](https://github.com/MetaCubeX/metacubexd/commit/70598d7ba9a9c088232837facbde44c5b4deb9bb))
+
 ## [1.211.0](https://github.com/MetaCubeX/metacubexd/compare/v1.210.0...v1.211.0) (2025-11-26)
 
 
