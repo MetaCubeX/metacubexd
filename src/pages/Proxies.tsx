@@ -13,9 +13,11 @@ import {
   DocumentTitle,
   ProxiesSettingsModal,
   ProxyNodeCard,
+  ProxyNodeListItem,
   ProxyNodePreview,
   SubscriptionInfo,
 } from '~/components'
+import { PROXIES_DISPLAY_MODE } from '~/constants'
 import { ProxiesRenderWarpper } from '~/components/ProxiesRenderWrapper'
 import {
   filterProxiesByAvailability,
@@ -29,6 +31,7 @@ import {
   hideUnAvailableProxies,
   iconHeight,
   iconMarginRight,
+  proxiesDisplayMode,
   proxiesOrderingType,
   useConnections,
   useProxies,
@@ -305,15 +308,32 @@ export default () => {
                     >
                       <For each={sortedProxyNames()}>
                         {(proxyName) => (
-                          <ProxyNodeCard
-                            proxyName={proxyName}
-                            testUrl={proxyGroup.testUrl || null}
-                            timeout={proxyGroup.timeout ?? null}
-                            isSelected={proxyGroup.now === proxyName}
-                            onClick={() =>
-                              void selectProxyInGroup(proxyGroup, proxyName)
+                          <Show
+                            when={
+                              proxiesDisplayMode() === PROXIES_DISPLAY_MODE.LIST
                             }
-                          />
+                            fallback={
+                              <ProxyNodeCard
+                                proxyName={proxyName}
+                                testUrl={proxyGroup.testUrl || null}
+                                timeout={proxyGroup.timeout ?? null}
+                                isSelected={proxyGroup.now === proxyName}
+                                onClick={() =>
+                                  void selectProxyInGroup(proxyGroup, proxyName)
+                                }
+                              />
+                            }
+                          >
+                            <ProxyNodeListItem
+                              proxyName={proxyName}
+                              testUrl={proxyGroup.testUrl || null}
+                              timeout={proxyGroup.timeout ?? null}
+                              isSelected={proxyGroup.now === proxyName}
+                              onClick={() =>
+                                void selectProxyInGroup(proxyGroup, proxyName)
+                              }
+                            />
+                          </Show>
                         )}
                       </For>
                     </Collapse>
@@ -426,11 +446,24 @@ export default () => {
                     >
                       <For each={sortedProxyNames()}>
                         {(proxyName) => (
-                          <ProxyNodeCard
-                            proxyName={proxyName}
-                            testUrl={proxyProvider.testUrl}
-                            timeout={proxyProvider.timeout ?? null}
-                          />
+                          <Show
+                            when={
+                              proxiesDisplayMode() === PROXIES_DISPLAY_MODE.LIST
+                            }
+                            fallback={
+                              <ProxyNodeCard
+                                proxyName={proxyName}
+                                testUrl={proxyProvider.testUrl}
+                                timeout={proxyProvider.timeout ?? null}
+                              />
+                            }
+                          >
+                            <ProxyNodeListItem
+                              proxyName={proxyName}
+                              testUrl={proxyProvider.testUrl}
+                              timeout={proxyProvider.timeout ?? null}
+                            />
+                          </Show>
                         )}
                       </For>
                     </Collapse>

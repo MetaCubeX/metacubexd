@@ -72,6 +72,11 @@ export enum PROXIES_ORDERING_TYPE {
   NAME_DESC = 'orderName_desc',
 }
 
+export enum PROXIES_DISPLAY_MODE {
+  CARD = 'cardMode',
+  LIST = 'listMode',
+}
+
 export enum LANG {
   EN = 'en-US',
   ZH = 'zh-CN',

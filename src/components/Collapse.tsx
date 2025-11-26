@@ -1,5 +1,7 @@
 import type { JSX, ParentComponent } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
+import { PROXIES_DISPLAY_MODE } from '~/constants'
+import { proxiesDisplayMode } from '~/signals'
 
 type Props = {
   title: JSX.Element
@@ -24,6 +26,8 @@ export const Collapse: ParentComponent<Props> = (props) => {
     return props.isOpen ? openedClassName : closedClassName
   }
 
+  const isListMode = () => proxiesDisplayMode() === PROXIES_DISPLAY_MODE.LIST
+
   return (
     <div
       class={twMerge(
@@ -41,9 +45,14 @@ export const Collapse: ParentComponent<Props> = (props) => {
       <div
         class={twMerge(
           getCollapseContentClassName(),
-          'collapse-content grid gap-2 transition-opacity duration-1000',
+          'collapse-content transition-opacity duration-1000',
+          isListMode() ? 'flex flex-col gap-1' : 'grid gap-2',
         )}
-        style="grid-template-columns: repeat(auto-fill, minmax(150px, 1fr))"
+        style={
+          isListMode()
+            ? undefined
+            : 'grid-template-columns: repeat(auto-fill, minmax(200px, 1fr))'
+        }
       >
         <Show when={props.isOpen}>{children(() => props.children)()}</Show>
       </div>

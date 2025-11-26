@@ -7,6 +7,7 @@ import {
   LATENCY_QUALITY_MAP_HTTP,
   LATENCY_QUALITY_MAP_HTTPS,
   LOG_LEVEL,
+  PROXIES_DISPLAY_MODE,
   PROXIES_ORDERING_TYPE,
   PROXIES_PREVIEW_TYPE,
   TAILWINDCSS_SIZE,
@@ -29,6 +30,13 @@ export const proxiesOrderingTypeDefault = PROXIES_ORDERING_TYPE.NATURAL
 export const [proxiesOrderingType, setProxiesOrderingType] = makePersisted(
   createSignal(proxiesOrderingTypeDefault),
   { name: 'proxiesOrderingType', storage: localStorage },
+)
+
+export const proxiesDisplayModeDefault = PROXIES_DISPLAY_MODE.CARD
+
+export const [proxiesDisplayMode, setProxiesDisplayMode] = makePersisted(
+  createSignal(proxiesDisplayModeDefault),
+  { name: 'proxiesDisplayMode', storage: localStorage },
 )
 
 export const renderProxiesInTwoColumnsDefault = true

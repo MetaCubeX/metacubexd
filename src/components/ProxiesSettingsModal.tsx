@@ -1,7 +1,11 @@
 import { IconGlobe } from '@tabler/icons-solidjs'
 import type { Component } from 'solid-js'
 import { ConfigTitle, Modal } from '~/components'
-import { PROXIES_ORDERING_TYPE, PROXIES_PREVIEW_TYPE } from '~/constants'
+import {
+  PROXIES_DISPLAY_MODE,
+  PROXIES_ORDERING_TYPE,
+  PROXIES_PREVIEW_TYPE,
+} from '~/constants'
 import { useI18n } from '~/i18n'
 import {
   autoCloseConns,
@@ -9,6 +13,7 @@ import {
   iconHeight,
   iconMarginRight,
   latencyTestTimeoutDuration,
+  proxiesDisplayMode,
   proxiesOrderingType,
   proxiesPreviewType,
   renderProxiesInTwoColumns,
@@ -17,6 +22,7 @@ import {
   setIconHeight,
   setIconMarginRight,
   setLatencyTestTimeoutDuration,
+  setProxiesDisplayMode,
   setProxiesOrderingType,
   setProxiesPreviewType,
   setRenderProxiesInTwoColumns,
@@ -118,6 +124,22 @@ export const ProxiesSettingsModal: Component<{
               onChange={(e) => setRenderProxiesInTwoColumns(e.target.checked)}
             />
           </div>
+        </div>
+
+        <div>
+          <ConfigTitle withDivider>{t('proxiesDisplayMode')}</ConfigTitle>
+
+          <select
+            class="select w-full"
+            value={proxiesDisplayMode()}
+            onChange={(e) =>
+              setProxiesDisplayMode(e.target.value as PROXIES_DISPLAY_MODE)
+            }
+          >
+            <For each={Object.values(PROXIES_DISPLAY_MODE)}>
+              {(value) => <option value={value}>{t(value)}</option>}
+            </For>
+          </select>
         </div>
 
         <div>
