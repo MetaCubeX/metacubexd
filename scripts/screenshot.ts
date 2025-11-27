@@ -53,55 +53,46 @@ const PAGES: PageConfig[] = [
 const DESKTOP_VIEWPORT = { width: 1920, height: 1080 }
 const MOBILE_VIEWPORT = { width: 390, height: 844 } // iPhone 14 Pro size
 
-// Start vite preview server
-function startServer(): Promise<ChildProcess> {
-  return new Promise((resolve, reject) => {
-    console.log(`Starting preview server on port ${PORT}...`)
+// Check if server is ready by making HTTP request
+async function waitForServer(maxAttempts = 30): Promise<void> {
+  for (let i = 0; i < maxAttempts; i++) {
+    try {
+      const response = await fetch(BASE_URL)
 
-    const server = spawn(
-      'npx',
-      ['vite', 'preview', '--port', PORT, '--strictPort'],
-      {
-        stdio: ['ignore', 'pipe', 'pipe'],
-        shell: true,
-      },
-    )
+      if (response.ok) {
+        console.log(`Server is ready at ${BASE_URL}`)
 
-    let started = false
-
-    const onData = (data: Buffer) => {
-      const output = data.toString()
-
-      if (!started && output.includes('Local:')) {
-        started = true
-        console.log(`Server started at ${BASE_URL}`)
-        resolve(server)
+        return
       }
+    } catch {
+      // Server not ready yet, wait and retry
     }
 
-    server.stdout?.on('data', onData)
-    server.stderr?.on('data', onData)
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+  }
 
-    server.on('error', (err) => {
-      if (!started) {
-        reject(err)
-      }
-    })
+  throw new Error('Server failed to start within timeout')
+}
 
-    server.on('close', (code) => {
-      if (!started) {
-        reject(new Error(`Server exited with code ${code} before starting`))
-      }
-    })
+// Start vite preview server
+function startServer(): ChildProcess {
+  console.log(`Starting preview server on port ${PORT}...`)
 
-    // Timeout after 30 seconds
-    setTimeout(() => {
-      if (!started) {
-        server.kill()
-        reject(new Error('Server startup timeout'))
-      }
-    }, 30000)
+  const server = spawn(
+    'npx',
+    ['vite', 'preview', '--port', PORT, '--strictPort'],
+    {
+      stdio: 'inherit',
+      shell: true,
+      detached: false,
+    },
+  )
+
+  server.on('error', (err) => {
+    console.error('Server error:', err)
   })
+
+  return server
 }
 
 // Stop the server gracefully
@@ -271,10 +262,10 @@ async function main() {
 
   try {
     // Start the preview server
-    server = await startServer()
+    server = startServer()
 
-    // Wait a bit for the server to be fully ready
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    // Wait for server to be ready
+    await waitForServer()
 
     // Take screenshots
     await takeScreenshots()
