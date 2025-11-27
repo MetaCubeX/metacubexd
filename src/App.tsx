@@ -27,6 +27,44 @@ import {
 // Connection health check timeout in milliseconds
 const AUTO_SWITCH_TIMEOUT_MS = 10000
 const AUTO_SWITCH_CHECK_INTERVAL_MS = 5000
+// Minimum time between auto-switch reloads to prevent loops (in milliseconds)
+const AUTO_SWITCH_RELOAD_COOLDOWN_MS = 30000
+const AUTO_SWITCH_RELOAD_KEY = 'metacubexd_last_auto_switch_reload'
+
+// Check if we can safely reload (prevent rapid reload loops)
+const canAutoSwitchReload = (): boolean => {
+  try {
+    const lastReload = sessionStorage.getItem(AUTO_SWITCH_RELOAD_KEY)
+
+    if (lastReload) {
+      const timeSinceLastReload = Date.now() - parseInt(lastReload, 10)
+
+      if (timeSinceLastReload < AUTO_SWITCH_RELOAD_COOLDOWN_MS) {
+        console.log(
+          `[Auto Switch] Reload blocked: only ${timeSinceLastReload}ms since last reload (cooldown: ${AUTO_SWITCH_RELOAD_COOLDOWN_MS}ms)`,
+        )
+
+        return false
+      }
+    }
+
+    return true
+  } catch {
+    // If sessionStorage is not available, allow reload but log warning
+    console.warn('[Auto Switch] sessionStorage not available, allowing reload')
+
+    return true
+  }
+}
+
+// Record reload timestamp to prevent loops
+const recordAutoSwitchReload = () => {
+  try {
+    sessionStorage.setItem(AUTO_SWITCH_RELOAD_KEY, Date.now().toString())
+  } catch {
+    // Ignore storage errors
+  }
+}
 
 const ProtectedResources = () => {
   const latestConnectionMsg = useWsRequest<WsMsg>('connections')
@@ -56,9 +94,11 @@ const ProtectedResources = () => {
       )
       const switched = await tryAutoSwitchEndpoint()
 
-      if (switched) {
+      if (switched && canAutoSwitchReload()) {
         // Reset timer after switching
         lastDataReceivedTime.current = Date.now()
+        // Record reload timestamp to prevent loops
+        recordAutoSwitchReload()
         // Reload page to reconnect with new endpoint
         window.location.reload()
       }
