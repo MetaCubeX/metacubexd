@@ -6,6 +6,7 @@ import {
 } from '@solid-primitives/websocket'
 import ky from 'ky'
 import _ from 'lodash'
+import { autoSwitchEndpoint } from '~/signals/config'
 
 export const [selectedEndpoint, setSelectedEndpoint] = makePersisted(
   createSignal(''),
@@ -25,6 +26,71 @@ export const [endpointList, setEndpointList] = makePersisted(
   >([]),
   { name: 'endpointList', storage: localStorage },
 )
+
+// Track if we're currently attempting to auto-switch to prevent concurrent switches
+let isAutoSwitching = false
+
+// Test if an endpoint is reachable
+const testEndpointConnectivity = async (
+  url: string,
+  secret: string,
+): Promise<boolean> => {
+  try {
+    const response = await ky.get(
+      url.endsWith('/') ? `${url}version` : `${url}/version`,
+      {
+        headers: secret ? { Authorization: `Bearer ${secret}` } : {},
+        timeout: 5000,
+      },
+    )
+
+    return response.ok
+  } catch {
+    return false
+  }
+}
+
+// Attempt to switch to the next available endpoint
+export const tryAutoSwitchEndpoint = async (): Promise<boolean> => {
+  if (!autoSwitchEndpoint() || isAutoSwitching) {
+    return false
+  }
+
+  const endpoints = endpointList()
+
+  if (endpoints.length < 2) {
+    return false
+  }
+
+  isAutoSwitching = true
+
+  try {
+    const currentEndpointId = selectedEndpoint()
+    const currentIndex = endpoints.findIndex((e) => e.id === currentEndpointId)
+
+    // Try each endpoint starting from the one after current
+    for (let i = 1; i < endpoints.length; i++) {
+      const nextIndex = (currentIndex + i) % endpoints.length
+      const nextEndpoint = endpoints[nextIndex]
+
+      const isAvailable = await testEndpointConnectivity(
+        nextEndpoint.url,
+        nextEndpoint.secret,
+      )
+
+      if (isAvailable) {
+        setSelectedEndpoint(nextEndpoint.id)
+        console.log(`[Auto Switch] Switched to endpoint: ${nextEndpoint.url}`)
+
+        return true
+      }
+    }
+
+    return false
+  } finally {
+    isAutoSwitching = false
+  }
+}
 
 export const useRequest = () => {
   const e = endpoint()

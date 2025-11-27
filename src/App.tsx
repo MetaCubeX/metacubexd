@@ -4,6 +4,7 @@ import { twMerge } from 'tailwind-merge'
 import { Header } from '~/components'
 import { ROUTES } from '~/constants'
 import {
+  autoSwitchEndpoint,
   MemoryData,
   TrafficData,
   WsMsg,
@@ -18,6 +19,7 @@ import {
   setLatestMemory,
   setLatestTraffic,
   setRootElement,
+  tryAutoSwitchEndpoint,
   useWsRequest,
 } from '~/signals'
 
@@ -26,9 +28,76 @@ const ProtectedResources = () => {
   const traffic = useWsRequest<TrafficData>('traffic')
   const memory = useWsRequest<MemoryData>('memory')
 
+  // Track when we last received data
+  let lastDataReceivedTime = Date.now()
+  let autoSwitchCheckInterval: ReturnType<typeof setInterval> | null = null
+
+  // Reset the timer when we receive data
+  const resetDataTimer = () => {
+    lastDataReceivedTime = Date.now()
+  }
+
+  // Check connection health and trigger auto-switch if needed
+  const checkConnectionHealth = async () => {
+    if (!autoSwitchEndpoint()) return
+
+    const timeSinceLastData = Date.now() - lastDataReceivedTime
+    // If no data received for 10 seconds, try to switch endpoint
+    const timeout = 10000
+
+    if (timeSinceLastData > timeout) {
+      console.log(
+        '[Auto Switch] Connection timeout detected, attempting to switch endpoint...',
+      )
+      const switched = await tryAutoSwitchEndpoint()
+
+      if (switched) {
+        // Reset timer after switching
+        lastDataReceivedTime = Date.now()
+        // Reload page to reconnect with new endpoint
+        window.location.reload()
+      }
+    }
+  }
+
+  createEffect(() => {
+    const msg = latestConnectionMsg()
+
+    if (msg) {
+      resetDataTimer()
+    }
+  })
+
+  createEffect(() => {
+    const t = traffic()
+
+    if (t) {
+      resetDataTimer()
+    }
+  })
+
+  createEffect(() => {
+    const m = memory()
+
+    if (m) {
+      resetDataTimer()
+    }
+  })
+
   createEffect(() => setLatestConnectionMsg(latestConnectionMsg()))
   createEffect(() => setLatestTraffic(traffic()))
   createEffect(() => setLatestMemory(memory()))
+
+  // Set up periodic health check
+  onMount(() => {
+    autoSwitchCheckInterval = setInterval(checkConnectionHealth, 5000)
+  })
+
+  onCleanup(() => {
+    if (autoSwitchCheckInterval) {
+      clearInterval(autoSwitchCheckInterval)
+    }
+  })
 
   return null
 }

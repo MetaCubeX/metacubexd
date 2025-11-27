@@ -69,6 +69,13 @@ export const [autoCloseConns, setAutoCloseConns] = makePersisted(
   { name: 'autoCloseConns', storage: localStorage },
 )
 
+export const autoSwitchEndpointDefault = false
+
+export const [autoSwitchEndpoint, setAutoSwitchEndpoint] = makePersisted(
+  createSignal(autoSwitchEndpointDefault),
+  { name: 'autoSwitchEndpoint', storage: localStorage },
+)
+
 export const fontFamilyDefault = FONT_FAMILY.SystemUI
 
 export const [fontFamily, setFontFamily] = makePersisted(
