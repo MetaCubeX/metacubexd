@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.214.0](https://github.com/MetaCubeX/metacubexd/compare/v1.213.0...v1.214.0) (2025-11-27)
+
+
+### Features
+
+* add screenshot generation script for CI ([#1736](https://github.com/MetaCubeX/metacubexd/issues/1736)) ([0ded7f0](https://github.com/MetaCubeX/metacubexd/commit/0ded7f072abdaa1c99722427d931932f3c5064fd))
+
 ## [1.213.0](https://github.com/MetaCubeX/metacubexd/compare/v1.212.0...v1.213.0) (2025-11-27)
 
 
