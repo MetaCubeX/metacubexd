@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.216.1](https://github.com/MetaCubeX/metacubexd/compare/v1.216.0...v1.216.1) (2025-11-27)
+
+
+### Bug Fixes
+
+* add cleanupOutdatedCaches to prevent iOS Web Clips stale cache issues ([#1744](https://github.com/MetaCubeX/metacubexd/issues/1744)) ([5783791](https://github.com/MetaCubeX/metacubexd/commit/5783791592f7e738eeaf224a29931091926ea042))
+* add safe-area-inset-top to modal header for Safari compatibility ([#1745](https://github.com/MetaCubeX/metacubexd/issues/1745)) ([10026de](https://github.com/MetaCubeX/metacubexd/commit/10026de25f2919f34dad43b3b7a2508c6e3217fc))
+* prevent iOS Safari rapid page refresh loop ([#1740](https://github.com/MetaCubeX/metacubexd/issues/1740)) ([e17fe4a](https://github.com/MetaCubeX/metacubexd/commit/e17fe4aadb734cf08aa387d01c77eef2fa31dc23))
+
 ## [1.216.0](https://github.com/MetaCubeX/metacubexd/compare/v1.215.0...v1.216.0) (2025-11-27)
 
 
