@@ -23,11 +23,13 @@ import {
   useUpdateBackendConfig,
 } from '~/query/hooks'
 import {
+  autoSwitchEndpoint,
   autoSwitchTheme,
   endpoint,
   favDayTheme,
   favNightTheme,
   fontFamily,
+  setAutoSwitchEndpoint,
   setAutoSwitchTheme,
   setFavDayTheme,
   setFavNightTheme,
@@ -458,6 +460,17 @@ const ConfigForXd = () => {
           >
             {t('switchEndpoint')}
           </Button>
+        </div>
+
+        <div class="flex flex-col items-center">
+          <ConfigTitle>{t('autoSwitchEndpoint')}</ConfigTitle>
+
+          <div class="h-10">
+            <Toggle
+              checked={autoSwitchEndpoint()}
+              onChange={(e) => setAutoSwitchEndpoint(e.target.checked)}
+            />
+          </div>
         </div>
       </div>
 

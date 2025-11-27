@@ -55,6 +55,7 @@ export default {
   listMode: 'List',
   urlForLatencyTest: 'URL for Latency Test',
   autoCloseConns: 'Automatically Close Connections',
+  autoSwitchEndpoint: 'Automatically Switch Endpoint',
   autoSwitchTheme: 'Automatically switch theme',
   favDayTheme: 'Favorite light theme',
   favNightTheme: 'Favorite dark theme',

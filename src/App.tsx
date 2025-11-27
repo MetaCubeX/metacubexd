@@ -4,6 +4,7 @@ import { twMerge } from 'tailwind-merge'
 import { Header } from '~/components'
 import { ROUTES } from '~/constants'
 import {
+  autoSwitchEndpoint,
   MemoryData,
   TrafficData,
   WsMsg,
@@ -18,17 +19,79 @@ import {
   setLatestMemory,
   setLatestTraffic,
   setRootElement,
+  tryAutoSwitchEndpoint,
   useWsRequest,
 } from '~/signals'
+
+// Connection health check timeout in milliseconds
+const AUTO_SWITCH_TIMEOUT_MS = 10000
+const AUTO_SWITCH_CHECK_INTERVAL_MS = 5000
 
 const ProtectedResources = () => {
   const latestConnectionMsg = useWsRequest<WsMsg>('connections')
   const traffic = useWsRequest<TrafficData>('traffic')
   const memory = useWsRequest<MemoryData>('memory')
 
+  // Track when we last received data using a ref-like pattern
+  const lastDataReceivedTime = { current: Date.now() }
+  const autoSwitchCheckInterval = {
+    current: null as ReturnType<typeof setInterval> | null,
+  }
+
+  // Reset the timer when we receive data
+  const resetDataTimer = () => {
+    lastDataReceivedTime.current = Date.now()
+  }
+
+  // Check connection health and trigger auto-switch if needed
+  const checkConnectionHealth = async () => {
+    if (!autoSwitchEndpoint()) return
+
+    const timeSinceLastData = Date.now() - lastDataReceivedTime.current
+
+    if (timeSinceLastData > AUTO_SWITCH_TIMEOUT_MS) {
+      console.log(
+        '[Auto Switch] Connection timeout detected, attempting to switch endpoint...',
+      )
+      const switched = await tryAutoSwitchEndpoint()
+
+      if (switched) {
+        // Reset timer after switching
+        lastDataReceivedTime.current = Date.now()
+        // Reload page to reconnect with new endpoint
+        window.location.reload()
+      }
+    }
+  }
+
+  // Consolidated effect to track data reception from all WebSocket sources
+  createEffect(() => {
+    const msg = latestConnectionMsg()
+    const t = traffic()
+    const m = memory()
+
+    if (msg || t || m) {
+      resetDataTimer()
+    }
+  })
+
   createEffect(() => setLatestConnectionMsg(latestConnectionMsg()))
   createEffect(() => setLatestTraffic(traffic()))
   createEffect(() => setLatestMemory(memory()))
+
+  // Set up periodic health check
+  onMount(() => {
+    autoSwitchCheckInterval.current = setInterval(
+      checkConnectionHealth,
+      AUTO_SWITCH_CHECK_INTERVAL_MS,
+    )
+  })
+
+  onCleanup(() => {
+    if (autoSwitchCheckInterval.current) {
+      clearInterval(autoSwitchCheckInterval.current)
+    }
+  })
 
   return null
 }

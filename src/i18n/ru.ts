@@ -57,6 +57,7 @@ export default {
   listMode: 'Список',
   urlForLatencyTest: 'URL для теста задержки',
   autoCloseConns: 'Автоматически закрывать соединения',
+  autoSwitchEndpoint: 'Автоматически переключать endpoint',
   autoSwitchTheme: 'Автоматически переключать тему',
   favDayTheme: 'Предпочитаемая светлая тема',
   favNightTheme: 'Предпочитаемая темная тема',
