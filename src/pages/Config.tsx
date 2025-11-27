@@ -29,6 +29,7 @@ import {
   favDayTheme,
   favNightTheme,
   fontFamily,
+  resetXdConfig,
   setAutoSwitchEndpoint,
   setAutoSwitchTheme,
   setFavDayTheme,
@@ -527,6 +528,12 @@ const ConfigForXd = () => {
             </div>
           </div>
         </Show>
+      </div>
+
+      <div class="col-span-1 flex flex-col gap-2 sm:col-span-2">
+        <Button class="btn-error" onClick={() => resetXdConfig()}>
+          {t('resetSettings')}
+        </Button>
       </div>
     </div>
   )

@@ -17,6 +17,7 @@ import {
   proxiesOrderingType,
   proxiesPreviewType,
   renderProxiesInTwoColumns,
+  resetProxiesSettings,
   setAutoCloseConns,
   setHideUnAvailableProxies,
   setIconHeight,
@@ -176,6 +177,15 @@ export const ProxiesSettingsModal: Component<{
             value={iconMarginRight()}
             onChange={(e) => setIconMarginRight(Number(e.target.value))}
           />
+        </div>
+
+        <div>
+          <button
+            class="btn w-full btn-error"
+            onClick={() => resetProxiesSettings()}
+          >
+            {t('resetSettings')}
+          </button>
         </div>
       </div>
     </Modal>

@@ -46,6 +46,7 @@ export default {
   inboundUser: 'Входящий пользователь',
   close: 'Закрыть',
   reset: 'Сбросить',
+  resetSettings: 'Сбросить настройки',
   dnsQuery: 'DNS-запрос',
   dots: 'Точки',
   bar: 'Полоса',

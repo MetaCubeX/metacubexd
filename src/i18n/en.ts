@@ -44,6 +44,7 @@ export default {
   inboundUser: 'Inbound User',
   close: 'Close',
   reset: 'Reset',
+  resetSettings: 'Reset Settings',
   dnsQuery: 'DNS Query',
   dots: 'Dots',
   bar: 'Bar',
