@@ -32,6 +32,8 @@ export default defineConfig({
         // Disable skipWaiting and clientsClaim to prevent iOS Safari refresh loops
         skipWaiting: false,
         clientsClaim: false,
+        // Clean up outdated caches to prevent iOS Web Clips from having stale resources
+        cleanupOutdatedCaches: true,
       },
       manifest: {
         name: 'MetaCubeXD',
