@@ -69,7 +69,7 @@
     "prettier-plugin-tailwindcss": "^0.7.1",
     "solid-js": "^1.9.10",
     "solid-toast": "^0.5.0",
-    "sort-package-json": "^3.4.0",
+    "sort-package-json": "^3.5.0",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.17",
     "typescript": "^5.9.3",
