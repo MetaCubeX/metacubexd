@@ -1,9 +1,11 @@
 // Screenshot generation script for CI
 // Usage: pnpm screenshot
+import { spawn, type ChildProcess } from 'node:child_process'
 import * as fs from 'node:fs'
 import { chromium } from 'playwright'
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:4199'
+const PORT = process.env.PORT || '4199'
+const BASE_URL = `http://localhost:${PORT}`
 const OUTPUT_DIR = process.env.OUTPUT_DIR || 'docs'
 const PC_DIR = `${OUTPUT_DIR}/pc`
 const MOBILE_DIR = `${OUTPUT_DIR}/mobile`
@@ -50,6 +52,87 @@ const PAGES: PageConfig[] = [
 
 const DESKTOP_VIEWPORT = { width: 1920, height: 1080 }
 const MOBILE_VIEWPORT = { width: 390, height: 844 } // iPhone 14 Pro size
+
+// Start vite preview server
+function startServer(): Promise<ChildProcess> {
+  return new Promise((resolve, reject) => {
+    console.log(`Starting preview server on port ${PORT}...`)
+
+    const server = spawn(
+      'npx',
+      ['vite', 'preview', '--port', PORT, '--strictPort'],
+      {
+        stdio: ['ignore', 'pipe', 'pipe'],
+        shell: true,
+      },
+    )
+
+    let started = false
+
+    const onData = (data: Buffer) => {
+      const output = data.toString()
+
+      if (!started && output.includes('Local:')) {
+        started = true
+        console.log(`Server started at ${BASE_URL}`)
+        resolve(server)
+      }
+    }
+
+    server.stdout?.on('data', onData)
+    server.stderr?.on('data', onData)
+
+    server.on('error', (err) => {
+      if (!started) {
+        reject(err)
+      }
+    })
+
+    server.on('close', (code) => {
+      if (!started) {
+        reject(new Error(`Server exited with code ${code} before starting`))
+      }
+    })
+
+    // Timeout after 30 seconds
+    setTimeout(() => {
+      if (!started) {
+        server.kill()
+        reject(new Error('Server startup timeout'))
+      }
+    }, 30000)
+  })
+}
+
+// Stop the server gracefully
+function stopServer(server: ChildProcess): Promise<void> {
+  return new Promise((resolve) => {
+    if (!server.pid) {
+      resolve()
+
+      return
+    }
+
+    console.log('Stopping preview server...')
+
+    server.on('close', () => {
+      console.log('Server stopped')
+      resolve()
+    })
+
+    // Try graceful shutdown first
+    server.kill('SIGTERM')
+
+    // Force kill after 5 seconds if still running
+    setTimeout(() => {
+      if (!server.killed) {
+        server.kill('SIGKILL')
+      }
+
+      resolve()
+    }, 5000)
+  })
+}
 
 async function takeScreenshots() {
   console.log('Starting screenshot generation...')
@@ -182,7 +265,28 @@ async function captureScreenshot(
   }
 }
 
-takeScreenshots().catch((error) => {
-  console.error('Screenshot generation failed:', error)
-  process.exit(1)
-})
+// Main entry point
+async function main() {
+  let server: ChildProcess | null = null
+
+  try {
+    // Start the preview server
+    server = await startServer()
+
+    // Wait a bit for the server to be fully ready
+    await new Promise((resolve) => setTimeout(resolve, 2000))
+
+    // Take screenshots
+    await takeScreenshots()
+  } catch (error) {
+    console.error('Screenshot generation failed:', error)
+    process.exitCode = 1
+  } finally {
+    // Always stop the server
+    if (server) {
+      await stopServer(server)
+    }
+  }
+}
+
+main()
