@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.216.0](https://github.com/MetaCubeX/metacubexd/compare/v1.215.0...v1.216.0) (2025-11-27)
+
+
+### Features
+
+* improve server startup logic in screenshot script ([311d69e](https://github.com/MetaCubeX/metacubexd/commit/311d69e60d332891dbc02190933402f57c806d23))
+
 ## [1.215.0](https://github.com/MetaCubeX/metacubexd/compare/v1.214.0...v1.215.0) (2025-11-27)
 
 
