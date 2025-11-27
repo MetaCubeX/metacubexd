@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.213.0](https://github.com/MetaCubeX/metacubexd/compare/v1.212.0...v1.213.0) (2025-11-27)
+
+
+### Features
+
+* add auto-switch endpoint when connection fails ([#1735](https://github.com/MetaCubeX/metacubexd/issues/1735)) ([36dbe98](https://github.com/MetaCubeX/metacubexd/commit/36dbe9809c4ff55dffad428393cf4182dcca77b0))
+* Support setting default backend URL via environment variable ([#1733](https://github.com/MetaCubeX/metacubexd/issues/1733)) ([f610ffc](https://github.com/MetaCubeX/metacubexd/commit/f610ffc85a05ec660e21bad36998441dc6bf08fd))
+
 ## [1.212.0](https://github.com/MetaCubeX/metacubexd/compare/v1.211.0...v1.212.0) (2025-11-26)
 
 
