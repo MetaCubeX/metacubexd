@@ -6,6 +6,7 @@ import { v4 as uuid } from 'uuid'
 import { z } from 'zod'
 import { checkEndpointAPI } from '~/apis'
 import { Button, DocumentTitle } from '~/components'
+import { FALLBACK_BACKEND_URL } from '~/constants'
 import { transformEndpointURL } from '~/helpers'
 import { useI18n } from '~/i18n'
 import {
@@ -110,8 +111,7 @@ export default () => {
         or user who is using default config won't be able to switch to another endpoint ever
       */
       const defaultBackendURL =
-        window.__METACUBEXD_CONFIG__?.defaultBackendURL ||
-        'http://127.0.0.1:9090'
+        window.__METACUBEXD_CONFIG__?.defaultBackendURL || FALLBACK_BACKEND_URL
 
       await onSubmit({
         'metacubexd-endpoint-url': defaultBackendURL,
@@ -143,13 +143,13 @@ export default () => {
               />
 
               <datalist id="defaultEndpoints">
-                <option value="http://127.0.0.1:9090" />
+                <option value={FALLBACK_BACKEND_URL} />
 
                 <Show
                   when={
                     window.__METACUBEXD_CONFIG__?.defaultBackendURL &&
                     window.__METACUBEXD_CONFIG__?.defaultBackendURL !==
-                      'http://127.0.0.1:9090'
+                      FALLBACK_BACKEND_URL
                   }
                 >
                   <option
@@ -157,7 +157,7 @@ export default () => {
                   />
                 </Show>
 
-                <Show when={window.location.origin !== 'http://127.0.0.1:9090'}>
+                <Show when={window.location.origin !== FALLBACK_BACKEND_URL}>
                   <option value={window.location.origin} />
                 </Show>
 
