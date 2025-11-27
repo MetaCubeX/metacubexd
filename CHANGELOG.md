@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.217.0](https://github.com/MetaCubeX/metacubexd/compare/v1.216.1...v1.217.0) (2025-11-27)
+
+
+### Features
+
+* add reset settings buttons for XD config and proxies settings ([#1747](https://github.com/MetaCubeX/metacubexd/issues/1747)) ([70eaf4f](https://github.com/MetaCubeX/metacubexd/commit/70eaf4f499862366969140108e31c7f8e99bf098))
+
 ## [1.216.1](https://github.com/MetaCubeX/metacubexd/compare/v1.216.0...v1.216.1) (2025-11-27)
 
 
