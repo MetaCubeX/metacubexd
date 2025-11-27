@@ -1,0 +1,1 @@
+import{cn as e}from"./index-BZbSGIBZ.js";var t=e(`outline`,`player-pause`,`PlayerPause`,[[`path`,{d:`M6 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z`}],[`path`,{d:`M14 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z`}]]),n=e(`outline`,`player-play`,`PlayerPlay`,[[`path`,{d:`M7 4v16l13 -8z`}]]);export{t as n,n as t};

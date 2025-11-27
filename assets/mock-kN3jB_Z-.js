@@ -1,0 +1,1 @@
+import{i as e,n as t,r as n,t as r}from"./mock-m0auDXaL.js";export{r as getMockData,t as hasMock,n as isMockMode,e as registerMock};

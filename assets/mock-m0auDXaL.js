@@ -1,0 +1,1 @@
+const e=()=>!1;var t=new Map;const n=(e,n)=>{t.set(e,n)},r=e=>{if(t.has(e))return t.get(e)();for(let[n,r]of t)if(e.includes(n))return r();return{message:`OK`}},i=e=>{if(t.has(e))return!0;for(let n of t.keys())if(e.includes(n))return!0;return!1};export{n as i,i as n,e as r,r as t};
