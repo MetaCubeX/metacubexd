@@ -22,7 +22,10 @@ export const Modal: ParentComponent<Props> = (props) => {
       class="modal modal-bottom sm:modal-middle"
     >
       <div class="modal-box p-0" onContextMenu={(e) => e.preventDefault()}>
-        <div class={twMerge(actionClassName, 'top-0 justify-between')}>
+        <div
+          class={twMerge(actionClassName, 'top-0 justify-between')}
+          style={{ 'padding-top': 'max(1rem, env(safe-area-inset-top))' }}
+        >
           <div class="flex items-center gap-4 text-xl font-bold">
             {props.icon}
 
