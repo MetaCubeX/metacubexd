@@ -109,8 +109,12 @@ export default () => {
         we only try auto login when there is nothing in endpoint list
         or user who is using default config won't be able to switch to another endpoint ever
       */
+      const defaultBackendURL =
+        window.__METACUBEXD_CONFIG__?.defaultBackendURL ||
+        'http://127.0.0.1:9090'
+
       await onSubmit({
-        'metacubexd-endpoint-url': 'http://127.0.0.1:9090',
+        'metacubexd-endpoint-url': defaultBackendURL,
         secret: '',
       })
     }
@@ -140,6 +144,18 @@ export default () => {
 
               <datalist id="defaultEndpoints">
                 <option value="http://127.0.0.1:9090" />
+
+                <Show
+                  when={
+                    window.__METACUBEXD_CONFIG__?.defaultBackendURL &&
+                    window.__METACUBEXD_CONFIG__?.defaultBackendURL !==
+                      'http://127.0.0.1:9090'
+                  }
+                >
+                  <option
+                    value={window.__METACUBEXD_CONFIG__?.defaultBackendURL}
+                  />
+                </Show>
 
                 <Show when={window.location.origin !== 'http://127.0.0.1:9090'}>
                   <option value={window.location.origin} />

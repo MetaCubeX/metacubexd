@@ -6,3 +6,11 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
+
+interface MetaCubeXDConfig {
+  defaultBackendURL?: string
+}
+
+interface Window {
+  __METACUBEXD_CONFIG__?: MetaCubeXDConfig
+}

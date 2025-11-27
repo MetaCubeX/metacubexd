@@ -59,6 +59,12 @@ Running
 docker run -d --restart always -p 80:80 --name metacubexd ghcr.io/metacubex/metacubexd
 ```
 
+Running with a custom default backend URL
+
+```shell
+docker run -d --restart always -p 80:80 --name metacubexd -e DEFAULT_BACKEND_URL=http://192.168.1.1:9090 ghcr.io/metacubex/metacubexd
+```
+
 Update and Restart
 
 ```shell
@@ -77,6 +83,9 @@ services:
     restart: always
     ports:
       - '80:80'
+    # Optional: set default backend URL
+    # environment:
+    #   - DEFAULT_BACKEND_URL=http://192.168.1.1:9090
 
   # optional
   meta:
