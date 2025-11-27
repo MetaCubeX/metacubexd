@@ -38,7 +38,6 @@ import {
   setSelectedEndpoint,
   useRequest,
 } from '~/signals'
-import { curThemeDefault, setCurTheme } from '~/signals/theme'
 import type { DNSQuery } from '~/types'
 
 const Toggle: ParentComponent<JSX.InputHTMLAttributes<HTMLInputElement>> = (
@@ -532,13 +531,7 @@ const ConfigForXd = () => {
       </div>
 
       <div class="col-span-1 flex flex-col gap-2 sm:col-span-2">
-        <Button
-          class="btn-error"
-          onClick={() => {
-            resetXdConfig()
-            setCurTheme(curThemeDefault)
-          }}
-        >
+        <Button class="btn-error" onClick={() => resetXdConfig()}>
           {t('resetSettings')}
         </Button>
       </div>

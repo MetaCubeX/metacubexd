@@ -13,6 +13,7 @@ import {
   TAILWINDCSS_SIZE,
   themes,
 } from '~/constants'
+import { curThemeDefault, setCurTheme } from '~/signals/theme'
 import {
   ConnectionsTableColumnOrder,
   ConnectionsTableColumnVisibility,
@@ -249,4 +250,5 @@ export const resetXdConfig = () => {
   setFontFamily(fontFamilyDefault)
   setFavDayTheme(favDayThemeDefault)
   setFavNightTheme(favNightThemeDefault)
+  setCurTheme(curThemeDefault)
 }
