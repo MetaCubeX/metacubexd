@@ -100,7 +100,12 @@ export class MockWebSocket {
     }
   }
 
-  addEventListener(type: string, listener: EventListenerOrEventListenerObject) {
+  addEventListener(
+    type: string,
+    listener:
+      | ((event: MessageEvent) => void)
+      | EventListenerOrEventListenerObject,
+  ) {
     if (!this.listeners.has(type)) {
       this.listeners.set(type, new Set())
     }
@@ -110,7 +115,9 @@ export class MockWebSocket {
 
   removeEventListener(
     type: string,
-    listener: EventListenerOrEventListenerObject,
+    listener:
+      | ((event: MessageEvent) => void)
+      | EventListenerOrEventListenerObject,
   ) {
     this.listeners.get(type)?.delete(listener as (event: MessageEvent) => void)
   }
