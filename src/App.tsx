@@ -14,6 +14,7 @@ import {
   favDayTheme,
   favNightTheme,
   fontFamily,
+  isMockMode,
   setCurTheme,
   setLatestConnectionMsg,
   setLatestMemory,
@@ -110,9 +111,9 @@ export const App: ParentComponent = ({ children }) => {
     document.documentElement.setAttribute('data-theme', curTheme())
   })
 
-  // Route guard: redirect to setup if no endpoint configured
+  // Route guard: redirect to setup if no endpoint configured (skip in mock mode)
   const isSetupPage = () => location.pathname === ROUTES.Setup
-  const needsRedirect = () => !endpoint() && !isSetupPage()
+  const needsRedirect = () => !isMockMode() && !endpoint() && !isSetupPage()
 
   return (
     <div
@@ -133,7 +134,7 @@ export const App: ParentComponent = ({ children }) => {
         </Show>
       </div>
 
-      <Show when={!!endpoint()}>
+      <Show when={!!endpoint() || isMockMode()}>
         <ProtectedResources />
       </Show>
     </div>

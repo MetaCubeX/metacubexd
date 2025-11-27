@@ -12,8 +12,25 @@ Mihomo Dashboard, The Official One, XD
 
 ## Preview
 
-![preview-overview](docs/preview-overview.webp)
-![preview-connections](docs/preview-connections.webp)
+### Desktop
+
+|                    Overview                     |                    Proxies                    |
+| :---------------------------------------------: | :-------------------------------------------: |
+| ![preview-overview](docs/preview-overview.webp) | ![preview-proxies](docs/preview-proxies.webp) |
+
+|                      Connections                      |                   Rules                   |
+| :---------------------------------------------------: | :---------------------------------------: |
+| ![preview-connections](docs/preview-connections.webp) | ![preview-rules](docs/preview-rules.webp) |
+
+|                  Logs                   |                   Config                    |
+| :-------------------------------------: | :-----------------------------------------: |
+| ![preview-logs](docs/preview-logs.webp) | ![preview-config](docs/preview-config.webp) |
+
+### Mobile
+
+|                           Overview                            |                           Proxies                           |                             Connections                             |
+| :-----------------------------------------------------------: | :---------------------------------------------------------: | :-----------------------------------------------------------------: |
+| ![preview-overview-mobile](docs/preview-overview-mobile.webp) | ![preview-proxies-mobile](docs/preview-proxies-mobile.webp) | ![preview-connections-mobile](docs/preview-connections-mobile.webp) |
 
 ## Published Official Links
 
