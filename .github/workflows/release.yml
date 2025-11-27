@@ -12,7 +12,9 @@ jobs:
   release-please:
     permissions:
       contents: write
+
     runs-on: ubuntu-latest
+
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
@@ -26,15 +28,14 @@ jobs:
           release-type: node
 
   release-assets:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+
     permissions:
       contents: read
       packages: write
 
-    needs: release-please
-
     runs-on: ubuntu-latest
-
-    if: ${{ needs.release-please.outputs.release_created }}
 
     steps:
       - uses: actions/checkout@v6
@@ -72,15 +73,14 @@ jobs:
           tag_name: ${{ needs.release-please.outputs.tag_name }}
 
   release-image:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+
     permissions:
       contents: read
       packages: write
 
-    needs: release-please
-
     runs-on: ubuntu-latest
-
-    if: ${{ needs.release-please.outputs.release_created }}
 
     steps:
       - uses: actions/checkout@v6
@@ -119,3 +119,41 @@ jobs:
           tags: |
             ghcr.io/metacubex/metacubexd:latest
             ghcr.io/metacubex/metacubexd:${{ needs.release-please.outputs.tag_name }}
+
+  update-screenshots:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+
+    permissions:
+      contents: write
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.CI_TOKEN }}
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v6
+        with:
+          cache: pnpm
+          node-version: latest
+
+      - name: install dependencies
+        run: pnpm install
+
+      - name: install playwright browsers
+        run: pnpm playwright install chromium
+
+      - name: generate screenshots
+        run: pnpm screenshot
+
+      - name: commit and push screenshots
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add docs/pc/*.png docs/mobile/*.png
+          git diff --staged --quiet || git commit -m "chore: update screenshots for ${{ needs.release-please.outputs.tag_name }} [skip ci]"
+          git push

@@ -1,5 +1,6 @@
 interface ImportMetaEnv {
   readonly VITE_APP_GH_TOKEN?: string
+  readonly VITE_MOCK_MODE?: string
   readonly APP_VERSION: string
 }
 

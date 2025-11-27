@@ -7,10 +7,15 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite --host",
+    "dev:mock": "VITE_MOCK_MODE=true vite --host",
     "format": "prettier -w .",
     "lint": "eslint --fix .",
     "prepare": "husky",
+    "preview": "vite preview --host",
+    "preview:mock": "VITE_MOCK_MODE=true vite preview --host",
+    "preview:screenshot": "vite preview --port 4199 --strictPort",
     "pwa-assets-generator": "pwa-assets-generator",
+    "screenshot": "VITE_MOCK_MODE=true pnpm build && (npx vite preview --port 4199 --strictPort & sleep 3 && npx tsx scripts/screenshot.ts; pkill -f 'vite preview'; true)",
     "serve": "vite preview"
   },
   "dependencies": {
@@ -64,6 +69,7 @@
     "lodash": "^4.17.21",
     "markdown-it": "^14.1.0",
     "match-sorter": "^8.2.0",
+    "playwright": "^1.49.0",
     "prettier": "^3.6.2",
     "prettier-plugin-organize-imports": "^4.3.0",
     "prettier-plugin-tailwindcss": "^0.7.1",
@@ -72,6 +78,7 @@
     "sort-package-json": "^3.5.0",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.17",
+    "tsx": "^4.19.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.48.0",
     "unplugin-auto-import": "^20.2.0",
