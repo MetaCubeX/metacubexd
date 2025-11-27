@@ -1,10 +1,8 @@
 import { makePersisted } from '@solid-primitives/storage'
 import { IconChevronRight, IconInfoSmall, IconX } from '@tabler/icons-solidjs'
-import { rankItem } from '@tanstack/match-sorter-utils'
 import {
   ColumnDef,
   createSolidTable,
-  FilterFn,
   getCoreRowModel,
   getExpandedRowModel,
   getFilteredRowModel,
@@ -19,7 +17,7 @@ import dayjs from 'dayjs'
 import { closeSingleConnectionAPI } from '~/apis'
 import { Button } from '~/components'
 import { CONNECTIONS_TABLE_ACCESSOR_KEY } from '~/constants'
-import { formatIPv6, formatTimeFromNow } from '~/helpers'
+import { formatIPv6, formatTimeFromNow, fuzzyFilter } from '~/helpers'
 import { useI18n } from '~/i18n'
 import type { Dict } from '~/i18n/dict'
 import {
@@ -33,13 +31,6 @@ import type { Connection } from '~/types'
 import { ActiveTab } from './ConnectionsToolbar'
 
 type ColMeta = { headerKey: keyof Dict }
-
-const fuzzyFilter: FilterFn<Connection> = (row, columnId, value, addMeta) => {
-  const itemRank = rankItem(row.getValue(columnId), value)
-  addMeta({ itemRank })
-
-  return itemRank.passed
-}
 
 interface UseConnectionsTableOptions {
   onShowDetails: (id: string) => void

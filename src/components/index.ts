@@ -1,3 +1,4 @@
+export * from './DataTable'
 export * from './Button'
 export * from './Changelog'
 export * from './Collapse'
