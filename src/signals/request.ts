@@ -11,15 +11,22 @@ import { autoSwitchEndpoint } from '~/signals/config'
 // Mock mode support
 export const isMockMode = () => import.meta.env.VITE_MOCK_MODE === 'true'
 
-// Lazy-loaded mock data module reference
-let mockDataModule: typeof import('~/mock/data') | null = null
+// Lazy-loaded mock module reference
+let mockModule: typeof import('~/apis/mock') | null = null
+let mockDefinitionsLoaded = false
 
-const getMockData = async () => {
-  if (!mockDataModule) {
-    mockDataModule = await import('~/mock/data')
+const loadMockModule = async () => {
+  if (!mockModule) {
+    mockModule = await import('~/apis/mock')
+
+    // Load definitions to register mock handlers
+    if (!mockDefinitionsLoaded) {
+      await import('~/apis/definitions')
+      mockDefinitionsLoaded = true
+    }
   }
 
-  return mockDataModule
+  return mockModule
 }
 
 // Timeout for testing endpoint connectivity
@@ -113,68 +120,18 @@ export const tryAutoSwitchEndpoint = async (): Promise<boolean> => {
 export const useRequest = () => {
   // In mock mode, use mock fetch handler
   if (isMockMode()) {
-    const mockHandler = async (url: string) => {
-      const mockData = await getMockData()
-      // Extract path from URL
-      const path = url
+    const mockHandler = async <T>(url: string): Promise<T> => {
+      const mock = await loadMockModule()
 
-      if (path.includes('version')) {
-        return mockData.mockVersion
-      }
-
-      if (path.includes('configs')) {
-        return mockData.mockConfig
-      }
-
-      if (path.includes('providers/proxies')) {
-        return {
-          providers: Object.fromEntries(
-            mockData.mockProxyProviders.map((p) => [p.name, p]),
-          ),
-        }
-      }
-
-      if (path.includes('proxies')) {
-        return {
-          proxies: Object.fromEntries(
-            mockData.mockProxies.map((p) => [p.name, p]),
-          ),
-        }
-      }
-
-      if (path.includes('rules/providers')) {
-        return {
-          providers: Object.fromEntries(
-            mockData.mockRuleProviders.map((p) => [p.name, p]),
-          ),
-        }
-      }
-
-      if (path.includes('rules')) {
-        return { rules: mockData.mockRules }
-      }
-
-      if (path.includes('connections')) {
-        return mockData.generateMockConnectionsMessage()
-      }
-
-      if (path.includes('memory')) {
-        return mockData.mockMemory
-      }
-
-      if (path.includes('traffic')) {
-        return mockData.mockTraffic
-      }
-
-      return { message: 'OK' }
+      return mock.getMockData(url) as T
     }
 
     return {
-      get: (url: string) => ({ json: () => mockHandler(url) }),
-      post: (url: string) => ({ json: () => mockHandler(url) }),
-      put: (url: string) => ({ json: () => mockHandler(url) }),
-      patch: (url: string) => ({ json: () => mockHandler(url) }),
-      delete: (url: string) => ({ json: () => mockHandler(url) }),
+      get: (url: string) => ({ json: <T>() => mockHandler<T>(url) }),
+      post: (url: string) => ({ json: <T>() => mockHandler<T>(url) }),
+      put: (url: string) => ({ json: <T>() => mockHandler<T>(url) }),
+      patch: (url: string) => ({ json: <T>() => mockHandler<T>(url) }),
+      delete: (url: string) => ({ json: <T>() => mockHandler<T>(url) }),
     }
   }
 
@@ -235,8 +192,8 @@ export const useWsRequest = <T>(
 
     const [data, setData] = createSignal<T | null>(null)
 
-    // Dynamically import mock module and create mock WebSocket
-    import('~/mock').then(({ MockWebSocket }) => {
+    // Dynamically import mock WebSocket module
+    import('~/apis/ws-mock').then(({ MockWebSocket }) => {
       const mockWs = new MockWebSocket(`ws://mock/${path}`)
 
       mockWs.addEventListener('message', (event: MessageEvent) => {

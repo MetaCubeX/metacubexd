@@ -1,4 +1,4 @@
-// Mock data for development and screenshot generation
+// API definitions with co-located mock data
 import { LOG_LEVEL } from '~/constants'
 import type {
   Config,
@@ -9,6 +9,11 @@ import type {
   Rule,
   RuleProvider,
 } from '~/types'
+import { registerMock } from './mock'
+
+// ============================================================================
+// Mock Data Generators
+// ============================================================================
 
 // Mock proxy nodes for url-test groups
 const createMockProxyNodes = (prefix: string, count: number) =>
@@ -41,7 +46,160 @@ const createMockProxyNodes = (prefix: string, count: number) =>
     },
   }))
 
-export const mockProxies: Proxy[] = [
+const mockHosts = [
+  'www.google.com',
+  'api.github.com',
+  'twitter.com',
+  'www.youtube.com',
+  'cdn.jsdelivr.net',
+  'registry.npmjs.org',
+  'api.openai.com',
+  'cloud.google.com',
+  'aws.amazon.com',
+  's3.amazonaws.com',
+]
+
+const mockProcesses = [
+  'Chrome',
+  'Firefox',
+  'Safari',
+  'curl',
+  'node',
+  'python3',
+  'Slack',
+  'Discord',
+  'Telegram',
+  'Spotify',
+]
+
+const mockChains = [
+  ['HK-1', 'Proxy', 'GLOBAL'],
+  ['JP-1', 'Proxy', 'GLOBAL'],
+  ['US-1', 'Proxy', 'GLOBAL'],
+  ['DIRECT'],
+  ['HK-2', 'Auto', 'Proxy', 'GLOBAL'],
+  ['SG-1', 'Proxy', 'GLOBAL'],
+]
+
+// Store connection state for consistent speed calculations
+const connectionState = new Map<string, { download: number; upload: number }>()
+
+const generateMockConnections = (count: number): Connection[] => {
+  const now = Date.now()
+
+  return Array.from({ length: count }, (_, i) => {
+    const id = `mock-conn-${i}`
+    const prev = connectionState.get(id) || { download: 0, upload: 0 }
+
+    // Increment download/upload by random amount (simulating traffic)
+    const downloadIncrement = Math.floor(Math.random() * 102400)
+    const uploadIncrement = Math.floor(Math.random() * 10240)
+
+    const newDownload = prev.download + downloadIncrement
+    const newUpload = prev.upload + uploadIncrement
+
+    connectionState.set(id, { download: newDownload, upload: newUpload })
+
+    return {
+      id,
+      download: newDownload,
+      upload: newUpload,
+      downloadSpeed: downloadIncrement,
+      uploadSpeed: uploadIncrement,
+      chains: mockChains[Math.floor(Math.random() * mockChains.length)],
+      rule: 'GEOSITE',
+      rulePayload: 'geolocation-!cn',
+      start: new Date(now - Math.random() * 3600000).toISOString(),
+      metadata: {
+        network: Math.random() > 0.3 ? 'tcp' : 'udp',
+        type: 'HTTPS',
+        destinationIP: `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
+        destinationPort: String(443),
+        dnsMode: 'normal',
+        host: mockHosts[Math.floor(Math.random() * mockHosts.length)],
+        inboundIP: '127.0.0.1',
+        inboundName: 'mixed-in',
+        inboundPort: '7890',
+        inboundUser: '',
+        process:
+          mockProcesses[Math.floor(Math.random() * mockProcesses.length)],
+        processPath:
+          '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+        remoteDestination: '',
+        sniffHost: '',
+        sourceIP: '127.0.0.1',
+        sourcePort: String(50000 + Math.floor(Math.random() * 10000)),
+        specialProxy: '',
+        specialRules: '',
+        uid: 501,
+      },
+    }
+  })
+}
+
+// ============================================================================
+// Version API
+// ============================================================================
+
+export type BackendVersion = {
+  version: string
+  meta?: boolean
+  premium?: boolean
+}
+
+registerMock<BackendVersion>('version', () => ({
+  version: 'Mihomo Meta alpha-1234abcd',
+  premium: true,
+  meta: true,
+}))
+
+// ============================================================================
+// Config API
+// ============================================================================
+
+registerMock<Partial<Config>>('configs', () => ({
+  mode: 'rule',
+  'mode-list': ['rule', 'global', 'direct'],
+  port: 7890,
+  'socks-port': 7891,
+  'redir-port': 0,
+  'tproxy-port': 0,
+  'mixed-port': 7890,
+  tun: {
+    enable: true,
+    device: 'utun',
+    stack: 'system',
+    'dns-hijack': null,
+    'auto-route': true,
+    'auto-detect-interface': true,
+    'file-descriptor': 0,
+  },
+  'tuic-server': {
+    enable: false,
+    listen: '',
+    certificate: '',
+    'private-key': '',
+  },
+  'ss-config': '',
+  'vmess-config': '',
+  'allow-lan': true,
+  'bind-address': '*',
+  authentication: null,
+  'log-level': 'info',
+  ipv6: true,
+  'geodata-mode': true,
+  'tcp-concurrent': true,
+  'find-process-mode': 'strict',
+  'global-client-fingerprint': false,
+  'interface-name': '',
+  sniffing: true,
+}))
+
+// ============================================================================
+// Proxies API
+// ============================================================================
+
+const mockProxies: Proxy[] = [
   // Global group (Selector)
   {
     name: 'GLOBAL',
@@ -244,7 +402,15 @@ export const mockProxies: Proxy[] = [
   },
 ]
 
-export const mockProxyProviders: ProxyProvider[] = [
+registerMock('proxies', () => ({
+  proxies: Object.fromEntries(mockProxies.map((p) => [p.name, p])),
+}))
+
+// ============================================================================
+// Proxy Providers API
+// ============================================================================
+
+const mockProxyProviders: ProxyProvider[] = [
   {
     name: 'Provider-A',
     proxies: [
@@ -305,18 +471,32 @@ export const mockProxyProviders: ProxyProvider[] = [
   },
 ]
 
-export const mockRules: Rule[] = [
-  { type: 'DOMAIN-SUFFIX', payload: 'google.com', proxy: 'Proxy', size: 0 },
-  { type: 'DOMAIN-SUFFIX', payload: 'github.com', proxy: 'Proxy', size: 0 },
-  { type: 'DOMAIN-SUFFIX', payload: 'twitter.com', proxy: 'Proxy', size: 0 },
-  { type: 'DOMAIN-SUFFIX', payload: 'youtube.com', proxy: 'Proxy', size: 0 },
-  { type: 'DOMAIN-KEYWORD', payload: 'google', proxy: 'Proxy', size: 0 },
-  { type: 'GEOIP', payload: 'CN', proxy: 'DIRECT', size: 0 },
-  { type: 'GEOSITE', payload: 'cn', proxy: 'DIRECT', size: 0 },
-  { type: 'MATCH', payload: '', proxy: 'Proxy', size: 0 },
+registerMock('providers/proxies', () => ({
+  providers: Object.fromEntries(mockProxyProviders.map((p) => [p.name, p])),
+}))
+
+// ============================================================================
+// Rules API
+// ============================================================================
+
+const mockRules: Rule[] = [
+  { type: 'DOMAIN-SUFFIX', payload: 'google.com', proxy: 'Proxy', size: 156 },
+  { type: 'DOMAIN-SUFFIX', payload: 'github.com', proxy: 'Proxy', size: 89 },
+  { type: 'DOMAIN-SUFFIX', payload: 'twitter.com', proxy: 'Proxy', size: 234 },
+  { type: 'DOMAIN-SUFFIX', payload: 'youtube.com', proxy: 'Proxy', size: 178 },
+  { type: 'DOMAIN-KEYWORD', payload: 'google', proxy: 'Proxy', size: 45 },
+  { type: 'GEOIP', payload: 'CN', proxy: 'DIRECT', size: 8934 },
+  { type: 'GEOSITE', payload: 'cn', proxy: 'DIRECT', size: 12580 },
+  { type: 'MATCH', payload: '', proxy: 'Proxy', size: 1 },
 ]
 
-export const mockRuleProviders: RuleProvider[] = [
+registerMock('rules', () => ({ rules: mockRules }))
+
+// ============================================================================
+// Rule Providers API
+// ============================================================================
+
+const mockRuleProviders: RuleProvider[] = [
   {
     behavior: 'domain',
     format: 'yaml',
@@ -346,98 +526,49 @@ export const mockRuleProviders: RuleProvider[] = [
   },
 ]
 
-// Generate mock connections with realistic data
-const mockHosts = [
-  'www.google.com',
-  'api.github.com',
-  'twitter.com',
-  'www.youtube.com',
-  'cdn.jsdelivr.net',
-  'registry.npmjs.org',
-  'api.openai.com',
-  'cloud.google.com',
-  'aws.amazon.com',
-  's3.amazonaws.com',
-]
+registerMock('providers/rules', () => ({
+  providers: Object.fromEntries(mockRuleProviders.map((p) => [p.name, p])),
+}))
 
-const mockProcesses = [
-  'Chrome',
-  'Firefox',
-  'Safari',
-  'curl',
-  'node',
-  'python3',
-  'Slack',
-  'Discord',
-  'Telegram',
-  'Spotify',
-]
+// ============================================================================
+// Connections API
+// ============================================================================
 
-const mockChains = [
-  ['HK-1', 'Proxy', 'GLOBAL'],
-  ['JP-1', 'Proxy', 'GLOBAL'],
-  ['US-1', 'Proxy', 'GLOBAL'],
-  ['DIRECT'],
-  ['HK-2', 'Auto', 'Proxy', 'GLOBAL'],
-  ['SG-1', 'Proxy', 'GLOBAL'],
-]
+export const generateMockConnectionsMessage = () => {
+  const connections = generateMockConnections(25)
+  const uploadTotal = connections.reduce((sum, c) => sum + c.upload, 0)
+  const downloadTotal = connections.reduce((sum, c) => sum + c.download, 0)
 
-// Store connection state for consistent speed calculations
-const connectionState = new Map<string, { download: number; upload: number }>()
-
-export const generateMockConnections = (count: number): Connection[] => {
-  const now = Date.now()
-
-  return Array.from({ length: count }, (_, i) => {
-    const id = `mock-conn-${i}`
-    const prev = connectionState.get(id) || { download: 0, upload: 0 }
-
-    // Increment download/upload by random amount (simulating traffic)
-    const downloadIncrement = Math.floor(Math.random() * 102400) // 0-100KB increment
-    const uploadIncrement = Math.floor(Math.random() * 10240) // 0-10KB increment
-
-    const newDownload = prev.download + downloadIncrement
-    const newUpload = prev.upload + uploadIncrement
-
-    // Store new state
-    connectionState.set(id, { download: newDownload, upload: newUpload })
-
-    return {
-      id,
-      download: newDownload,
-      upload: newUpload,
-      downloadSpeed: downloadIncrement, // Speed = increment since last update
-      uploadSpeed: uploadIncrement,
-      chains: mockChains[Math.floor(Math.random() * mockChains.length)],
-      rule: 'GEOSITE',
-      rulePayload: 'geolocation-!cn',
-      start: new Date(now - Math.random() * 3600000).toISOString(),
-      metadata: {
-        network: Math.random() > 0.3 ? 'tcp' : 'udp',
-        type: 'HTTPS',
-        destinationIP: `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
-        destinationPort: String(443),
-        dnsMode: 'normal',
-        host: mockHosts[Math.floor(Math.random() * mockHosts.length)],
-        inboundIP: '127.0.0.1',
-        inboundName: 'mixed-in',
-        inboundPort: '7890',
-        inboundUser: '',
-        process:
-          mockProcesses[Math.floor(Math.random() * mockProcesses.length)],
-        processPath:
-          '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-        remoteDestination: '',
-        sniffHost: '',
-        sourceIP: '127.0.0.1',
-        sourcePort: String(50000 + Math.floor(Math.random() * 10000)),
-        specialProxy: '',
-        specialRules: '',
-        uid: 501,
-      },
-    }
-  })
+  return {
+    connections,
+    uploadTotal,
+    downloadTotal,
+  }
 }
+
+registerMock('connections', generateMockConnectionsMessage)
+
+// ============================================================================
+// Memory API
+// ============================================================================
+
+registerMock('memory', () => ({
+  inuse: 52428800, // 50MB
+  oslimit: 0,
+}))
+
+// ============================================================================
+// Traffic API
+// ============================================================================
+
+registerMock('traffic', () => ({
+  up: 1048576, // 1MB/s
+  down: 5242880, // 5MB/s
+}))
+
+// ============================================================================
+// Logs Mock Data (for WebSocket)
+// ============================================================================
 
 export const mockLogs: Log[] = [
   {
@@ -474,69 +605,26 @@ export const mockLogs: Log[] = [
   },
 ]
 
-export const mockConfig: Partial<Config> = {
-  mode: 'rule',
-  'mode-list': ['rule', 'global', 'direct'],
-  port: 7890,
-  'socks-port': 7891,
-  'redir-port': 0,
-  'tproxy-port': 0,
-  'mixed-port': 7890,
-  tun: {
-    enable: true,
-    device: 'utun',
-    stack: 'system',
-    'dns-hijack': null,
-    'auto-route': true,
-    'auto-detect-interface': true,
-    'file-descriptor': 0,
-  },
-  'tuic-server': {
-    enable: false,
-    listen: '',
-    certificate: '',
-    'private-key': '',
-  },
-  'ss-config': '',
-  'vmess-config': '',
-  'allow-lan': true,
-  'bind-address': '*',
-  authentication: null,
-  'log-level': 'info',
-  ipv6: true,
-  'geodata-mode': true,
-  'tcp-concurrent': true,
-  'find-process-mode': 'strict',
-  'global-client-fingerprint': false,
-  'interface-name': '',
-  sniffing: true,
-}
+// ============================================================================
+// Proxy Latency Test API
+// ============================================================================
 
-export const mockMemory = {
-  inuse: 52428800, // 50MB
-  oslimit: 0,
-}
+registerMock('delay', () => ({
+  delay: 50 + Math.floor(Math.random() * 150),
+}))
 
-export const mockTraffic = {
-  up: 1048576, // 1MB/s
-  down: 5242880, // 5MB/s
-}
+// ============================================================================
+// Group Latency Test API
+// ============================================================================
 
-export const mockVersion = {
-  version: 'Mihomo Meta alpha-1234abcd',
-  premium: true,
-  meta: true,
-}
+registerMock('group', () => {
+  const result: Record<string, number> = {}
 
-// Mock WebSocket message generator for connections
-export const generateMockConnectionsMessage = () => {
-  const connections = generateMockConnections(25)
-  const uploadTotal = connections.reduce((sum, c) => sum + c.upload, 0)
-  const downloadTotal = connections.reduce((sum, c) => sum + c.download, 0)
+  mockProxies.forEach((p) => {
+    if (!p.all) {
+      result[p.name] = 50 + Math.floor(Math.random() * 200)
+    }
+  })
 
-  return {
-    connections,
-    uploadTotal,
-    downloadTotal,
-  }
-}
+  return result
+})
