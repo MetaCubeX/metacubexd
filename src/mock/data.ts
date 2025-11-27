@@ -382,42 +382,61 @@ const mockChains = [
   ['SG-1', 'Proxy', 'GLOBAL'],
 ]
 
+// Store connection state for consistent speed calculations
+const connectionState = new Map<string, { download: number; upload: number }>()
+
 export const generateMockConnections = (count: number): Connection[] => {
   const now = Date.now()
 
-  return Array.from({ length: count }, (_, i) => ({
-    id: `mock-conn-${i}`,
-    download: Math.floor(Math.random() * 10485760), // 0-10MB
-    upload: Math.floor(Math.random() * 1048576), // 0-1MB
-    downloadSpeed: Math.floor(Math.random() * 1048576), // 0-1MB/s
-    uploadSpeed: Math.floor(Math.random() * 102400), // 0-100KB/s
-    chains: mockChains[Math.floor(Math.random() * mockChains.length)],
-    rule: 'GEOSITE',
-    rulePayload: 'geolocation-!cn',
-    start: new Date(now - Math.random() * 3600000).toISOString(),
-    metadata: {
-      network: Math.random() > 0.3 ? 'tcp' : 'udp',
-      type: 'HTTPS',
-      destinationIP: `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
-      destinationPort: String(443),
-      dnsMode: 'normal',
-      host: mockHosts[Math.floor(Math.random() * mockHosts.length)],
-      inboundIP: '127.0.0.1',
-      inboundName: 'mixed-in',
-      inboundPort: '7890',
-      inboundUser: '',
-      process: mockProcesses[Math.floor(Math.random() * mockProcesses.length)],
-      processPath:
-        '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-      remoteDestination: '',
-      sniffHost: '',
-      sourceIP: '127.0.0.1',
-      sourcePort: String(50000 + Math.floor(Math.random() * 10000)),
-      specialProxy: '',
-      specialRules: '',
-      uid: 501,
-    },
-  }))
+  return Array.from({ length: count }, (_, i) => {
+    const id = `mock-conn-${i}`
+    const prev = connectionState.get(id) || { download: 0, upload: 0 }
+
+    // Increment download/upload by random amount (simulating traffic)
+    const downloadIncrement = Math.floor(Math.random() * 102400) // 0-100KB increment
+    const uploadIncrement = Math.floor(Math.random() * 10240) // 0-10KB increment
+
+    const newDownload = prev.download + downloadIncrement
+    const newUpload = prev.upload + uploadIncrement
+
+    // Store new state
+    connectionState.set(id, { download: newDownload, upload: newUpload })
+
+    return {
+      id,
+      download: newDownload,
+      upload: newUpload,
+      downloadSpeed: downloadIncrement, // Speed = increment since last update
+      uploadSpeed: uploadIncrement,
+      chains: mockChains[Math.floor(Math.random() * mockChains.length)],
+      rule: 'GEOSITE',
+      rulePayload: 'geolocation-!cn',
+      start: new Date(now - Math.random() * 3600000).toISOString(),
+      metadata: {
+        network: Math.random() > 0.3 ? 'tcp' : 'udp',
+        type: 'HTTPS',
+        destinationIP: `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
+        destinationPort: String(443),
+        dnsMode: 'normal',
+        host: mockHosts[Math.floor(Math.random() * mockHosts.length)],
+        inboundIP: '127.0.0.1',
+        inboundName: 'mixed-in',
+        inboundPort: '7890',
+        inboundUser: '',
+        process:
+          mockProcesses[Math.floor(Math.random() * mockProcesses.length)],
+        processPath:
+          '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+        remoteDestination: '',
+        sniffHost: '',
+        sourceIP: '127.0.0.1',
+        sourcePort: String(50000 + Math.floor(Math.random() * 10000)),
+        specialProxy: '',
+        specialRules: '',
+        uid: 501,
+      },
+    }
+  })
 }
 
 export const mockLogs: Log[] = [

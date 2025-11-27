@@ -1,72 +1,52 @@
 // Screenshot generation script for CI
 // Usage: pnpm screenshot
+import * as fs from 'node:fs'
 import { chromium } from 'playwright'
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:4173'
+const BASE_URL = process.env.BASE_URL || 'http://localhost:4199'
 const OUTPUT_DIR = process.env.OUTPUT_DIR || 'docs'
+const PC_DIR = `${OUTPUT_DIR}/pc`
+const MOBILE_DIR = `${OUTPUT_DIR}/mobile`
 
-type ScreenshotConfig = {
+type PageConfig = {
   name: string
-  path: string // Hash route path (e.g., '/overview' becomes '/#/overview')
+  path: string // Hash route path (e.g., '/#/overview')
   waitFor: string
-  mobile?: boolean
 }
 
-const DESKTOP_SCREENSHOTS: ScreenshotConfig[] = [
+// Pages to capture - same for both desktop and mobile
+const PAGES: PageConfig[] = [
   {
-    name: 'preview-overview',
+    name: 'overview',
     path: '/#/overview',
-    waitFor: '.stat-value',
+    waitFor: '.stat-value', // Overview page stats
   },
   {
-    name: 'preview-proxies',
+    name: 'proxies',
     path: '/#/proxies',
-    waitFor: '[class*="card"]',
+    waitFor: '.tabs', // Proxies page tabs
   },
   {
-    name: 'preview-connections',
+    name: 'connections',
     path: '/#/conns',
-    waitFor: '[class*="table"]',
+    waitFor: 'table', // Connections table
   },
   {
-    name: 'preview-rules',
+    name: 'rules',
     path: '/#/rules',
-    waitFor: '[class*="table"]',
+    waitFor: '.tabs', // Rules page tabs (uses virtual list, not table)
   },
   {
-    name: 'preview-logs',
+    name: 'logs',
     path: '/#/logs',
-    waitFor: '[class*="table"]',
+    waitFor: 'table', // Logs table
   },
   {
-    name: 'preview-config',
+    name: 'config',
     path: '/#/config',
-    waitFor: '[class*="card"]',
+    waitFor: '.fieldset', // Config fieldsets
   },
 ]
-
-const MOBILE_SCREENSHOTS: ScreenshotConfig[] = [
-  {
-    name: 'preview-overview-mobile',
-    path: '/#/overview',
-    waitFor: '.stat-value',
-    mobile: true,
-  },
-  {
-    name: 'preview-proxies-mobile',
-    path: '/#/proxies',
-    waitFor: '[class*="card"]',
-    mobile: true,
-  },
-  {
-    name: 'preview-connections-mobile',
-    path: '/#/connections',
-    waitFor: '[class*="table"]',
-    mobile: true,
-  },
-]
-
-const ALL_SCREENSHOTS = [...DESKTOP_SCREENSHOTS, ...MOBILE_SCREENSHOTS]
 
 const DESKTOP_VIEWPORT = { width: 1920, height: 1080 }
 const MOBILE_VIEWPORT = { width: 390, height: 844 } // iPhone 14 Pro size
@@ -75,6 +55,15 @@ async function takeScreenshots() {
   console.log('Starting screenshot generation...')
   console.log(`Base URL: ${BASE_URL}`)
   console.log(`Output directory: ${OUTPUT_DIR}`)
+
+  // Ensure output directories exist
+  if (!fs.existsSync(PC_DIR)) {
+    fs.mkdirSync(PC_DIR, { recursive: true })
+  }
+
+  if (!fs.existsSync(MOBILE_DIR)) {
+    fs.mkdirSync(MOBILE_DIR, { recursive: true })
+  }
 
   const browser = await chromium.launch({
     headless: true,
@@ -113,57 +102,84 @@ async function takeScreenshots() {
   await desktopPage.addInitScript(setupLocalStorage)
   await mobilePage.addInitScript(setupLocalStorage)
 
-  for (const screenshot of ALL_SCREENSHOTS) {
-    const isMobile = screenshot.mobile
-    const page = isMobile ? mobilePage : desktopPage
-    const label = isMobile ? '📱' : '🖥️'
+  // Take screenshots for each page in both desktop and mobile viewports
+  for (const pageConfig of PAGES) {
+    // Desktop screenshot
+    await captureScreenshot(
+      desktopPage,
+      pageConfig,
+      PC_DIR,
+      pageConfig.name,
+      '🖥️',
+    )
 
-    console.log(`${label} Taking screenshot: ${screenshot.name}`)
-
-    try {
-      // Navigate directly to the hash route
-      await page.goto(`${BASE_URL}${screenshot.path}`, {
-        waitUntil: 'domcontentloaded',
-        timeout: 30000,
-      })
-
-      // Wait for page to stabilize
-      await page.waitForTimeout(2000)
-
-      // Try to wait for specific element, but don't fail if not found
-      if (screenshot.waitFor) {
-        try {
-          await page.waitForSelector(screenshot.waitFor, { timeout: 5000 })
-        } catch {
-          console.log(
-            `  (element ${screenshot.waitFor} not found, continuing anyway)`,
-          )
-        }
-      }
-
-      // Log current URL for debugging
-      const currentUrl = page.url()
-      console.log(`  URL: ${currentUrl}`)
-
-      // Additional wait for animations
-      await page.waitForTimeout(500)
-
-      await page.screenshot({
-        path: `${OUTPUT_DIR}/${screenshot.name}.png`,
-        type: 'png',
-        fullPage: false,
-      })
-
-      console.log(`✓ Saved ${screenshot.name}.png`)
-    } catch (error) {
-      console.error(`✗ Failed to capture ${screenshot.name}:`, error)
-    }
+    // Mobile screenshot
+    await captureScreenshot(
+      mobilePage,
+      pageConfig,
+      MOBILE_DIR,
+      pageConfig.name,
+      '📱',
+    )
   }
 
   await desktopContext.close()
   await mobileContext.close()
   await browser.close()
   console.log('Screenshot generation complete!')
+}
+
+async function captureScreenshot(
+  page: Awaited<
+    ReturnType<typeof chromium.launch>
+  >['newPage'] extends () => Promise<infer P>
+    ? P
+    : never,
+  config: PageConfig,
+  outputDir: string,
+  filename: string,
+  label: string,
+) {
+  console.log(`${label} Taking screenshot: ${outputDir}/${filename}.png`)
+
+  try {
+    // Navigate directly to the hash route
+    await page.goto(`${BASE_URL}${config.path}`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 30000,
+    })
+
+    // Wait for page to stabilize
+    await page.waitForTimeout(2000)
+
+    // Try to wait for specific element, but don't fail if not found
+    if (config.waitFor) {
+      try {
+        await page.waitForSelector(config.waitFor, { timeout: 5000 })
+      } catch {
+        console.log(
+          `  (element ${config.waitFor} not found, continuing anyway)`,
+        )
+      }
+    }
+
+    // Log current URL for debugging
+    const currentUrl = page.url()
+    console.log(`  URL: ${currentUrl}`)
+
+    // Additional wait for animations
+    await page.waitForTimeout(500)
+
+    await page.screenshot({
+      path: `${outputDir}/${filename}.png`,
+      type: 'png',
+      fullPage: false,
+    })
+
+    console.log(`✓ Saved ${outputDir}/${filename}.png`)
+  } catch (error) {
+    console.error(`✗ Failed to capture ${filename}:`, error)
+  }
 }
 
 takeScreenshots().catch((error) => {

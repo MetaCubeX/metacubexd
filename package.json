@@ -13,8 +13,9 @@
     "prepare": "husky",
     "preview": "vite preview --host",
     "preview:mock": "VITE_MOCK_MODE=true vite preview --host",
+    "preview:screenshot": "vite preview --port 4199 --strictPort",
     "pwa-assets-generator": "pwa-assets-generator",
-    "screenshot": "VITE_MOCK_MODE=true pnpm build && (lsof -ti:4199 | xargs kill -9 2>/dev/null || true) && VITE_MOCK_MODE=true pnpm preview --port 4199 --strictPort & sleep 5 && BASE_URL=http://localhost:4199 npx tsx scripts/screenshot.ts; kill %1 2>/dev/null || true",
+    "screenshot": "VITE_MOCK_MODE=true pnpm build && pnpm preview:screenshot & sleep 3 && npx tsx scripts/screenshot.ts; pkill -f 'pnpm preview:screenshot' || true",
     "serve": "vite preview"
   },
   "dependencies": {

@@ -14,23 +14,31 @@ Mihomo Dashboard, The Official One, XD
 
 ### Desktop
 
-|                    Overview                     |                    Proxies                    |
-| :---------------------------------------------: | :-------------------------------------------: |
-| ![preview-overview](docs/preview-overview.webp) | ![preview-proxies](docs/preview-proxies.webp) |
+|                                Overview                                |                               Proxies                                |
+| :--------------------------------------------------------------------: | :------------------------------------------------------------------: |
+| <img src="docs/pc/overview.png" alt="preview-overview" height="300" /> | <img src="docs/pc/proxies.png" alt="preview-proxies" height="300" /> |
 
-|                      Connections                      |                   Rules                   |
-| :---------------------------------------------------: | :---------------------------------------: |
-| ![preview-connections](docs/preview-connections.webp) | ![preview-rules](docs/preview-rules.webp) |
+|                                 Connections                                  |                              Rules                               |
+| :--------------------------------------------------------------------------: | :--------------------------------------------------------------: |
+| <img src="docs/pc/connections.png" alt="preview-connections" height="300" /> | <img src="docs/pc/rules.png" alt="preview-rules" height="300" /> |
 
-|                  Logs                   |                   Config                    |
-| :-------------------------------------: | :-----------------------------------------: |
-| ![preview-logs](docs/preview-logs.webp) | ![preview-config](docs/preview-config.webp) |
+|                              Logs                              |                               Config                               |
+| :------------------------------------------------------------: | :----------------------------------------------------------------: |
+| <img src="docs/pc/logs.png" alt="preview-logs" height="300" /> | <img src="docs/pc/config.png" alt="preview-config" height="300" /> |
 
 ### Mobile
 
-|                           Overview                            |                           Proxies                           |                             Connections                             |
-| :-----------------------------------------------------------: | :---------------------------------------------------------: | :-----------------------------------------------------------------: |
-| ![preview-overview-mobile](docs/preview-overview-mobile.webp) | ![preview-proxies-mobile](docs/preview-proxies-mobile.webp) | ![preview-connections-mobile](docs/preview-connections-mobile.webp) |
+|                                     Overview                                      |                                     Proxies                                     |
+| :-------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------: |
+| <img src="docs/mobile/overview.png" alt="preview-overview-mobile" height="300" /> | <img src="docs/mobile/proxies.png" alt="preview-proxies-mobile" height="300" /> |
+
+|                                       Connections                                       |                                    Rules                                    |
+| :-------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------: |
+| <img src="docs/mobile/connections.png" alt="preview-connections-mobile" height="300" /> | <img src="docs/mobile/rules.png" alt="preview-rules-mobile" height="300" /> |
+
+|                                   Logs                                    |                                    Config                                     |
+| :-----------------------------------------------------------------------: | :---------------------------------------------------------------------------: |
+| <img src="docs/mobile/logs.png" alt="preview-logs-mobile" height="300" /> | <img src="docs/mobile/config.png" alt="preview-config-mobile" height="300" /> |
 
 ## Published Official Links
 
