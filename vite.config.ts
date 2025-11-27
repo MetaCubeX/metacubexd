@@ -25,9 +25,14 @@ export default defineConfig({
     }),
 
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       includeAssets: ['favicon.svg'],
-      workbox: { maximumFileSizeToCacheInBytes: 5 * 1024 * 1024 },
+      workbox: {
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+        // Disable skipWaiting and clientsClaim to prevent iOS Safari refresh loops
+        skipWaiting: false,
+        clientsClaim: false,
+      },
       manifest: {
         name: 'MetaCubeXD',
         short_name: 'MetaCubeXD',
