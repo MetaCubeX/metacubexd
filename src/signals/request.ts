@@ -8,6 +8,9 @@ import ky from 'ky'
 import _ from 'lodash'
 import { autoSwitchEndpoint } from '~/signals/config'
 
+// Timeout for testing endpoint connectivity
+const ENDPOINT_CONNECTIVITY_TIMEOUT_MS = 5000
+
 export const [selectedEndpoint, setSelectedEndpoint] = makePersisted(
   createSignal(''),
   {
@@ -28,7 +31,8 @@ export const [endpointList, setEndpointList] = makePersisted(
 )
 
 // Track if we're currently attempting to auto-switch to prevent concurrent switches
-let isAutoSwitching = false
+// Using an object reference to maintain state across async calls
+const autoSwitchState = { isAutoSwitching: false }
 
 // Test if an endpoint is reachable
 const testEndpointConnectivity = async (
@@ -40,7 +44,7 @@ const testEndpointConnectivity = async (
       url.endsWith('/') ? `${url}version` : `${url}/version`,
       {
         headers: secret ? { Authorization: `Bearer ${secret}` } : {},
-        timeout: 5000,
+        timeout: ENDPOINT_CONNECTIVITY_TIMEOUT_MS,
       },
     )
 
@@ -52,7 +56,7 @@ const testEndpointConnectivity = async (
 
 // Attempt to switch to the next available endpoint
 export const tryAutoSwitchEndpoint = async (): Promise<boolean> => {
-  if (!autoSwitchEndpoint() || isAutoSwitching) {
+  if (!autoSwitchEndpoint() || autoSwitchState.isAutoSwitching) {
     return false
   }
 
@@ -62,7 +66,7 @@ export const tryAutoSwitchEndpoint = async (): Promise<boolean> => {
     return false
   }
 
-  isAutoSwitching = true
+  autoSwitchState.isAutoSwitching = true
 
   try {
     const currentEndpointId = selectedEndpoint()
@@ -88,7 +92,7 @@ export const tryAutoSwitchEndpoint = async (): Promise<boolean> => {
 
     return false
   } finally {
-    isAutoSwitching = false
+    autoSwitchState.isAutoSwitching = false
   }
 }
 

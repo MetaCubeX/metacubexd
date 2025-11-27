@@ -23,29 +23,33 @@ import {
   useWsRequest,
 } from '~/signals'
 
+// Connection health check timeout in milliseconds
+const AUTO_SWITCH_TIMEOUT_MS = 10000
+const AUTO_SWITCH_CHECK_INTERVAL_MS = 5000
+
 const ProtectedResources = () => {
   const latestConnectionMsg = useWsRequest<WsMsg>('connections')
   const traffic = useWsRequest<TrafficData>('traffic')
   const memory = useWsRequest<MemoryData>('memory')
 
-  // Track when we last received data
-  let lastDataReceivedTime = Date.now()
-  let autoSwitchCheckInterval: ReturnType<typeof setInterval> | null = null
+  // Track when we last received data using a ref-like pattern
+  const lastDataReceivedTime = { current: Date.now() }
+  const autoSwitchCheckInterval = {
+    current: null as ReturnType<typeof setInterval> | null,
+  }
 
   // Reset the timer when we receive data
   const resetDataTimer = () => {
-    lastDataReceivedTime = Date.now()
+    lastDataReceivedTime.current = Date.now()
   }
 
   // Check connection health and trigger auto-switch if needed
   const checkConnectionHealth = async () => {
     if (!autoSwitchEndpoint()) return
 
-    const timeSinceLastData = Date.now() - lastDataReceivedTime
-    // If no data received for 10 seconds, try to switch endpoint
-    const timeout = 10000
+    const timeSinceLastData = Date.now() - lastDataReceivedTime.current
 
-    if (timeSinceLastData > timeout) {
+    if (timeSinceLastData > AUTO_SWITCH_TIMEOUT_MS) {
       console.log(
         '[Auto Switch] Connection timeout detected, attempting to switch endpoint...',
       )
@@ -53,33 +57,20 @@ const ProtectedResources = () => {
 
       if (switched) {
         // Reset timer after switching
-        lastDataReceivedTime = Date.now()
+        lastDataReceivedTime.current = Date.now()
         // Reload page to reconnect with new endpoint
         window.location.reload()
       }
     }
   }
 
+  // Consolidated effect to track data reception from all WebSocket sources
   createEffect(() => {
     const msg = latestConnectionMsg()
-
-    if (msg) {
-      resetDataTimer()
-    }
-  })
-
-  createEffect(() => {
     const t = traffic()
-
-    if (t) {
-      resetDataTimer()
-    }
-  })
-
-  createEffect(() => {
     const m = memory()
 
-    if (m) {
+    if (msg || t || m) {
       resetDataTimer()
     }
   })
@@ -90,12 +81,15 @@ const ProtectedResources = () => {
 
   // Set up periodic health check
   onMount(() => {
-    autoSwitchCheckInterval = setInterval(checkConnectionHealth, 5000)
+    autoSwitchCheckInterval.current = setInterval(
+      checkConnectionHealth,
+      AUTO_SWITCH_CHECK_INTERVAL_MS,
+    )
   })
 
   onCleanup(() => {
-    if (autoSwitchCheckInterval) {
-      clearInterval(autoSwitchCheckInterval)
+    if (autoSwitchCheckInterval.current) {
+      clearInterval(autoSwitchCheckInterval.current)
     }
   })
 
