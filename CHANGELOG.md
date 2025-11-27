@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.218.0](https://github.com/MetaCubeX/metacubexd/compare/v1.217.0...v1.218.0) (2025-11-27)
+
+
+### Features
+
+* add DataTable component for enhanced table rendering ([3636524](https://github.com/MetaCubeX/metacubexd/commit/36365247e113798eb9670084acc9e5f3e0c7842a))
+* enhance MockWebSocket to send initial historical data for traffic and memory metrics ([b133034](https://github.com/MetaCubeX/metacubexd/commit/b133034d2715e1c50e8c96e44b761ff9d93729e7))
+
 ## [1.217.0](https://github.com/MetaCubeX/metacubexd/compare/v1.216.1...v1.217.0) (2025-11-27)
 
 
