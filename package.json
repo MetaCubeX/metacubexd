@@ -15,7 +15,7 @@
     "preview:mock": "VITE_MOCK_MODE=true vite preview --host",
     "preview:screenshot": "vite preview --port 4199 --strictPort",
     "pwa-assets-generator": "pwa-assets-generator",
-    "screenshot": "VITE_MOCK_MODE=true pnpm build && pnpm preview:screenshot & sleep 3 && npx tsx scripts/screenshot.ts; pkill -f 'pnpm preview:screenshot' || true",
+    "screenshot": "VITE_MOCK_MODE=true pnpm build && (npx vite preview --port 4199 --strictPort & sleep 3 && npx tsx scripts/screenshot.ts; pkill -f 'vite preview'; true)",
     "serve": "vite preview"
   },
   "dependencies": {

@@ -9,9 +9,7 @@ import _ from 'lodash'
 import { autoSwitchEndpoint } from '~/signals/config'
 
 // Mock mode support
-export const isMockMode = () =>
-  typeof import.meta.env !== 'undefined' &&
-  import.meta.env.VITE_MOCK_MODE === 'true'
+export const isMockMode = () => import.meta.env.VITE_MOCK_MODE === 'true'
 
 // Lazy-loaded mock data module reference
 let mockDataModule: typeof import('~/mock/data') | null = null
