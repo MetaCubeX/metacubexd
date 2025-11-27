@@ -229,3 +229,24 @@ export const [iconMarginRight, setIconMarginRight] = makePersisted(
   createSignal(iconMarginRightDefault),
   { name: 'iconMarginRight', storage: localStorage },
 )
+
+export const resetProxiesSettings = () => {
+  setProxiesPreviewType(proxiesPreviewTypeDefault)
+  setProxiesOrderingType(proxiesOrderingTypeDefault)
+  setProxiesDisplayMode(proxiesDisplayModeDefault)
+  setRenderProxiesInTwoColumns(renderProxiesInTwoColumnsDefault)
+  setHideUnAvailableProxies(hideUnAvailableProxiesDefault)
+  setUrlForLatencyTest(urlForLatencyTestDefault)
+  setAutoCloseConns(autoCloseConnsDefault)
+  setLatencyTestTimeoutDuration(latencyTestTimeoutDurationDefault)
+  setIconHeight(iconHeightDefault)
+  setIconMarginRight(iconMarginRightDefault)
+}
+
+export const resetXdConfig = () => {
+  setAutoSwitchTheme(autoSwitchThemeDefault)
+  setAutoSwitchEndpoint(autoSwitchEndpointDefault)
+  setFontFamily(fontFamilyDefault)
+  setFavDayTheme(favDayThemeDefault)
+  setFavNightTheme(favNightThemeDefault)
+}

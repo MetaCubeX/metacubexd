@@ -46,6 +46,7 @@ export default {
   inboundUser: '入站用户',
   close: '关闭',
   reset: '重置',
+  resetSettings: '重置设置',
   dnsQuery: 'DNS 查询',
   dots: '点阵',
   bar: '条形',
