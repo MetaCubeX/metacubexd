@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.215.0](https://github.com/MetaCubeX/metacubexd/compare/v1.214.0...v1.215.0) (2025-11-27)
+
+
+### Features
+
+* update screenshot generation script and improve package.json commands ([bb51c53](https://github.com/MetaCubeX/metacubexd/commit/bb51c53fa1dbc0e118abb311b78f9d2413d9cc25))
+
 ## [1.214.0](https://github.com/MetaCubeX/metacubexd/compare/v1.213.0...v1.214.0) (2025-11-27)
 
 
