@@ -15,7 +15,8 @@
     "preview:mock": "VITE_MOCK_MODE=true vite preview --host",
     "pwa-assets-generator": "pwa-assets-generator",
     "screenshot": "VITE_MOCK_MODE=true pnpm build && npx tsx scripts/screenshot.ts",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "test:e2e": "VITE_MOCK_MODE=true pnpm build && npx tsx e2e/pages.spec.ts"
   },
   "dependencies": {
     "@commitlint/config-conventional": "^20.0.0",
