@@ -3,7 +3,18 @@
 import { spawn, type ChildProcess } from 'node:child_process'
 import { type BrowserContext, chromium, type Page } from 'playwright'
 
-const PORT = process.env.PORT || '4199'
+// Validate PORT is a valid number for security
+const validatePort = (port: string): string => {
+  const portNum = parseInt(port, 10)
+
+  if (isNaN(portNum) || portNum < 1 || portNum > 65535) {
+    throw new Error(`Invalid port: ${port}`)
+  }
+
+  return portNum.toString()
+}
+
+const PORT = validatePort(process.env.PORT || '4199')
 const BASE_URL = `http://localhost:${PORT}`
 
 // Helper function to assert element is visible
@@ -161,8 +172,8 @@ async function runTests(): Promise<{ passed: number; failed: number }> {
           timeout: 30000,
         })
 
-        // Wait for page to stabilize
-        await page.waitForTimeout(2000)
+        // Wait for page to stabilize using networkidle instead of fixed timeout
+        await page.waitForLoadState('networkidle')
 
         // Wait for expected element
         try {
@@ -192,7 +203,7 @@ async function runTests(): Promise<{ passed: number; failed: number }> {
         waitUntil: 'domcontentloaded',
         timeout: 30000,
       })
-      await page.waitForTimeout(1000)
+      await page.waitForLoadState('networkidle')
 
       // Verify we can navigate using the header
       const headerNav = page.locator('header, nav')
@@ -217,7 +228,7 @@ async function runTests(): Promise<{ passed: number; failed: number }> {
         waitUntil: 'domcontentloaded',
         timeout: 30000,
       })
-      await page.waitForTimeout(2000)
+      await page.waitForLoadState('networkidle')
 
       // Check that page still renders
       const stats = page.locator('.stats')
@@ -270,11 +281,10 @@ async function main() {
 
   try {
     // Start the preview server
+    // PORT is validated to be a safe numeric value
     console.log(`Starting preview server on port ${PORT}...`)
     server = spawn('npx', ['vite', 'preview', '--port', PORT, '--strictPort'], {
       stdio: 'inherit',
-      shell: true,
-      detached: false,
     })
 
     server.on('error', (err) => {
@@ -304,12 +314,13 @@ async function main() {
   } finally {
     if (server) {
       console.log('Stopping preview server...')
+      const serverToKill = server
 
-      server.kill('SIGTERM')
+      serverToKill.kill('SIGTERM')
       // Force kill after 5 seconds if still running
       setTimeout(() => {
-        if (!server!.killed) {
-          server!.kill('SIGKILL')
+        if (serverToKill && !serverToKill.killed) {
+          serverToKill.kill('SIGKILL')
         }
       }, 5000)
     }
