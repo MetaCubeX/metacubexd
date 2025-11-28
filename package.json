@@ -16,7 +16,7 @@
     "pwa-assets-generator": "pwa-assets-generator",
     "screenshot": "VITE_MOCK_MODE=true pnpm build && npx tsx scripts/screenshot.ts",
     "serve": "vite preview",
-    "test:e2e": "VITE_MOCK_MODE=true pnpm build && npx tsx e2e/pages.spec.ts"
+    "test:e2e": "VITE_MOCK_MODE=true pnpm build && vitest run --config vitest.config.e2e.ts"
   },
   "dependencies": {
     "@commitlint/config-conventional": "^20.0.0",
@@ -54,6 +54,7 @@
     "@types/node": "^24.10.1",
     "@types/uuid": "^11.0.0",
     "@vite-pwa/assets-generator": "^1.0.2",
+    "@vitest/browser-playwright": "^4.0.14",
     "baseline-browser-mapping": "^2.8.31",
     "byte-size": "^9.0.1",
     "commitlint": "^20.1.0",
@@ -80,14 +81,15 @@
     "tailwind-merge": "^3.4.0",
     "tailwind-variants": "^3.2.2",
     "tailwindcss": "^4.1.17",
-    "tsx": "^4.19.0",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.48.0",
     "unplugin-auto-import": "^20.3.0",
     "uuid": "^13.0.0",
     "vite": "^7.2.4",
-    "vite-plugin-pwa": "^1.1.0",
+    "vite-plugin-pwa": "^1.2.0",
     "vite-plugin-solid": "^2.11.10",
+    "vitest": "^4.0.14",
     "zod": "^4.1.13"
   },
   "packageManager": "pnpm@10.23.0",
