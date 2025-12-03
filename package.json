@@ -72,7 +72,7 @@
     "markdown-it": "^14.1.0",
     "match-sorter": "^8.2.0",
     "playwright": "^1.49.0",
-    "prettier": "^3.7.3",
+    "prettier": "^3.7.4",
     "prettier-plugin-organize-imports": "^4.3.0",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "solid-js": "^1.9.10",
