@@ -58,7 +58,7 @@
     "baseline-browser-mapping": "^2.8.32",
     "byte-size": "^9.0.1",
     "commitlint": "^20.1.0",
-    "daisyui": "^5.5.5",
+    "daisyui": "^5.5.8",
     "dayjs": "^1.11.19",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
