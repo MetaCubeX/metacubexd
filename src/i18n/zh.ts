@@ -116,6 +116,7 @@ export default {
   hideUnavailableProxies: '隐藏不可用节点',
   reloadConfig: '重载配置',
   flushFakeIP: '清空 Fake-IP',
+  flushDNSCache: '清空 DNS 缓存',
   tagClientSourceIPWithName: '为客户端源 IP 地址添加名称标记',
   tag: '标记',
   coreConfig: '核心配置',
