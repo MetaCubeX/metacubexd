@@ -43,6 +43,7 @@ export const [reloadingConfigFile, setReloadingConfigFile] = createSignal(false)
 export const [updatingGEODatabases, setUpdatingGEODatabases] =
   createSignal(false)
 export const [flushingFakeIPData, setFlushingFakeIPData] = createSignal(false)
+export const [flushingDNSCache, setFlushingDNSCache] = createSignal(false)
 export const [upgradingBackend, setUpgradingBackend] = createSignal(false)
 export const [upgradingUI, setUpgradingUI] = createSignal(false)
 export const [restartingBackend, setRestartingBackend] = createSignal(false)
@@ -70,6 +71,17 @@ export const flushFakeIPDataAPI = async () => {
     /* empty */
   }
   setFlushingFakeIPData(false)
+}
+
+export const flushDNSCacheAPI = async () => {
+  const request = useRequest()
+  setFlushingDNSCache(true)
+  try {
+    await request.post('cache/dns/flush')
+  } catch {
+    /* empty */
+  }
+  setFlushingDNSCache(false)
 }
 
 export const updateGEODatabasesAPI = async () => {

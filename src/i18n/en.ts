@@ -114,6 +114,7 @@ export default {
   hideUnavailableProxies: 'Hide Unavailable Proxies',
   reloadConfig: 'Reload Config',
   flushFakeIP: 'Flush Fake-IP',
+  flushDNSCache: 'Flush DNS Cache',
   tagClientSourceIPWithName: 'Tag Client Source IP With Name',
   tag: 'Tag',
   coreConfig: 'Core Config',
