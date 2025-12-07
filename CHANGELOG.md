@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.219.0](https://github.com/MetaCubeX/metacubexd/compare/v1.218.0...v1.219.0) (2025-12-07)
+
+
+### Features
+
+* Flush DNS Cache ([#1768](https://github.com/MetaCubeX/metacubexd/issues/1768)) ([c7f702b](https://github.com/MetaCubeX/metacubexd/commit/c7f702b29d483f44ec31abddc2baa2376f756374))
+
 ## [1.218.0](https://github.com/MetaCubeX/metacubexd/compare/v1.217.0...v1.218.0) (2025-11-27)
 
 
