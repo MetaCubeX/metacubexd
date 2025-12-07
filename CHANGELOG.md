@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.219.1](https://github.com/MetaCubeX/metacubexd/compare/v1.219.0...v1.219.1) (2025-12-07)
+
+
+### Bug Fixes
+
+* **release:** remove unnecessary load option from Docker build step ([fdff0ed](https://github.com/MetaCubeX/metacubexd/commit/fdff0edfc1a1e2b7d0862d90727d956441d8480d))
+
 ## [1.219.0](https://github.com/MetaCubeX/metacubexd/compare/v1.218.0...v1.219.0) (2025-12-07)
 
 
