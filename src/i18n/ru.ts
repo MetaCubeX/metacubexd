@@ -116,6 +116,7 @@ export default {
   hideUnavailableProxies: 'Скрыть недоступные прокси',
   reloadConfig: 'Перезагрузить конфиг',
   flushFakeIP: 'Очистить Fake-IP',
+  flushDNSCache: 'Очистить DNS-кэш',
   tagClientSourceIPWithName: 'Пометить IP клиента с именем',
   tag: 'Тег',
   coreConfig: 'Конфигурация ядра',

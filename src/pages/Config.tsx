@@ -7,6 +7,8 @@ import { z } from 'zod'
 import {
   flushFakeIPDataAPI,
   flushingFakeIPData,
+  flushDNSCacheAPI,
+  flushingDNSCache,
   reloadConfigFileAPI,
   reloadingConfigFile,
   restartBackendAPI,
@@ -352,6 +354,14 @@ const ConfigForm: ParentComponent<{
         </Button>
 
         <Button
+          class="btn-warning"
+          loading={restartingBackend()}
+          onClick={restartBackendAPI}
+        >
+          {t('restartCore')}
+        </Button>
+
+        <Button
           class="btn-accent"
           loading={flushingFakeIPData()}
           onClick={flushFakeIPDataAPI}
@@ -360,11 +370,11 @@ const ConfigForm: ParentComponent<{
         </Button>
 
         <Button
-          class="btn-warning"
-          loading={restartingBackend()}
-          onClick={restartBackendAPI}
+          class="btn-info"
+          loading={flushingDNSCache()}
+          onClick={flushDNSCacheAPI}
         >
-          {t('restartCore')}
+          {t('flushDNSCache')}
         </Button>
 
         <Show when={!isSingBox()}>
