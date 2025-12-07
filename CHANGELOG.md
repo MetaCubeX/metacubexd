@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.219.2](https://github.com/MetaCubeX/metacubexd/compare/v1.219.1...v1.219.2) (2025-12-07)
+
+
+### Bug Fixes
+
+* update project dependencies to latest versions for improved stability ([18eeb1c](https://github.com/MetaCubeX/metacubexd/commit/18eeb1cfdcc2cacb6650a49b72121a5f15f7d5d2))
+
 ## [1.219.1](https://github.com/MetaCubeX/metacubexd/compare/v1.219.0...v1.219.1) (2025-12-07)
 
 
