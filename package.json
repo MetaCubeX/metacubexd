@@ -55,7 +55,7 @@
     "@types/uuid": "^11.0.0",
     "@vite-pwa/assets-generator": "^1.0.2",
     "@vitest/browser-playwright": "^4.0.14",
-    "baseline-browser-mapping": "^2.9.0",
+    "baseline-browser-mapping": "^2.9.5",
     "byte-size": "^9.0.1",
     "commitlint": "^20.1.0",
     "daisyui": "^5.5.8",
