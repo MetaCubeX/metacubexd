@@ -93,8 +93,8 @@ importers:
         specifier: ^3.13.12
         version: 3.13.12(solid-js@1.9.10)
       '@tanstack/virtual-core':
-        specifier: ^3.13.12
-        version: 3.13.12
+        specifier: ^3.13.13
+        version: 3.13.13
       '@thisbeyond/solid-dnd':
         specifier: ^0.7.5
         version: 0.7.5(solid-js@1.9.10)
@@ -1871,6 +1871,9 @@ packages:
   '@tanstack/virtual-core@3.13.12':
     resolution: {integrity: sha512-1YBOJfRHV4sXUmWsFSf5rQor4Ss82G8dQWLRbnk3GA4jeP8hQt1hxXh0tmflpC0dz3VgEv/1+qwPyLeWkQuPFA==}
 
+  '@tanstack/virtual-core@3.13.13':
+    resolution: {integrity: sha512-uQFoSdKKf5S8k51W5t7b2qpfkyIbdHMzAn+AMQvHPxKUPeo1SsGaA4JRISQT87jm28b7z8OEqPcg1IOZagQHcA==}
+
   '@thisbeyond/solid-dnd@0.7.5':
     resolution: {integrity: sha512-DfI5ff+yYGpK9M21LhYwIPlbP2msKxN2ARwuu6GF8tT1GgNVDTI8VCQvH4TJFoVApP9d44izmAcTh/iTCH2UUw==}
     engines: {node: '>=18.0.0', pnpm: '>=8.6.0'}
@@ -2142,6 +2145,10 @@ packages:
 
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
+
+  baseline-browser-mapping@2.9.5:
+    resolution: {integrity: sha512-D5vIoztZOq1XM54LUdttJVc96ggEsIfju2JBvht06pSzpckp3C7HReun67Bghzrtdsq9XdMGbSSB3v3GhMNmAA==}
+    hasBin: true
 
   baseline-browser-mapping@2.9.5:
     resolution: {integrity: sha512-D5vIoztZOq1XM54LUdttJVc96ggEsIfju2JBvht06pSzpckp3C7HReun67Bghzrtdsq9XdMGbSSB3v3GhMNmAA==}
@@ -5891,6 +5898,8 @@ snapshots:
 
   '@tanstack/virtual-core@3.13.12': {}
 
+  '@tanstack/virtual-core@3.13.13': {}
+
   '@thisbeyond/solid-dnd@0.7.5(solid-js@1.9.10)':
     dependencies:
       solid-js: 1.9.10
@@ -6243,6 +6252,8 @@ snapshots:
       babel-plugin-jsx-dom-expressions: 0.39.8(@babel/core@7.28.4)
 
   balanced-match@1.0.2: {}
+
+  baseline-browser-mapping@2.9.5: {}
 
   baseline-browser-mapping@2.9.5: {}
 
