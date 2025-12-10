@@ -67,7 +67,7 @@ function isColumnSorted(col: ConnectionColumn, sortColumn: string) {
 </script>
 
 <template>
-  <div class="flex-1 overflow-x-auto rounded-md bg-base-300">
+  <div class="min-h-0 flex-1 overflow-auto rounded-md bg-base-300">
     <table class="table-pin-rows table table-zebra" :class="tableSizeClass">
       <!-- Desktop header - hidden on mobile -->
       <thead class="hidden md:table-header-group">
