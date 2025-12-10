@@ -19,6 +19,7 @@
   "dependencies": {
     "@antfu/eslint-config": "^4.15.1",
     "@commitlint/config-conventional": "^20.2.0",
+    "@floating-ui/vue": "^1.1.9",
     "@fontsource/fira-sans": "^5.2.7",
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@pinia/nuxt": "^0.11.3",

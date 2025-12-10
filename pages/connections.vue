@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { VNode } from 'vue'
 import type { Connection, ConnectionsTableColumnVisibility } from '~/types'
 import {
   IconChevronLeft,
@@ -55,7 +56,7 @@ const groupingColumn = useLocalStorage<string | null>(
   'connectionsTableGrouping',
   null,
 )
-const expandedGroups = ref(new Set<string>())
+const expandedGroups = ref<Record<string, boolean>>({})
 
 // Pagination state
 const currentPage = ref(0)
@@ -71,75 +72,203 @@ const newTagName = ref('')
 // Helpers
 const formatBytes = (bytes: number) => byteSize(bytes).toString()
 
-// Column definitions with groupable flag
-const allColumns: {
+// Cell value helpers - moved before column definitions
+function getProcess(conn: Connection) {
+  return (
+    conn.metadata.process ||
+    conn.metadata.processPath?.replace(/^.*[/\\](.*)$/, '$1') ||
+    '-'
+  )
+}
+
+function getHost(conn: Connection) {
+  return `${conn.metadata.host || formatIPv6(conn.metadata.destinationIP)}:${conn.metadata.destinationPort}`
+}
+
+function getRule(conn: Connection) {
+  return !conn.rulePayload ? conn.rule : `${conn.rule} : ${conn.rulePayload}`
+}
+
+function getSourceIP(conn: Connection) {
+  const src = conn.metadata.sourceIP || t('inner')
+  const tag = configStore.clientSourceIPTags.find((tag) => tag.sourceIP === src)
+  return tag?.tagName || src
+}
+
+function getDestination(conn: Connection) {
+  return (
+    conn.metadata.remoteDestination ||
+    conn.metadata.destinationIP ||
+    conn.metadata.host
+  )
+}
+
+// Close connection handler for render function
+function closeConnection(id: string) {
+  closeSingleConnectionAPI(id)
+}
+
+// Column definition interface
+interface ConnectionColumn {
   id: CONNECTIONS_TABLE_ACCESSOR_KEY
   key: string
-  groupable?: boolean
-}[] = [
-  { id: CONNECTIONS_TABLE_ACCESSOR_KEY.Close, key: 'close', groupable: false },
-  { id: CONNECTIONS_TABLE_ACCESSOR_KEY.Type, key: 'type', groupable: true },
+  groupable: boolean
+  sortable: boolean
+  sortId?: string
+  render: (conn: Connection) => VNode | string
+  groupValue?: (conn: Connection) => string
+}
+
+// Column definitions with render functions
+const allColumns: ConnectionColumn[] = [
+  {
+    id: CONNECTIONS_TABLE_ACCESSOR_KEY.Close,
+    key: 'close',
+    groupable: false,
+    sortable: false,
+    render: (conn: Connection) =>
+      h(
+        'button',
+        {
+          class: 'btn btn-circle btn-xs',
+          onClick: (e: Event) => {
+            e.stopPropagation()
+            closeConnection(conn.id)
+          },
+        },
+        h(IconX, { size: 16 }),
+      ),
+  },
+  {
+    id: CONNECTIONS_TABLE_ACCESSOR_KEY.Type,
+    key: 'type',
+    groupable: true,
+    sortable: true,
+    sortId: 'Type',
+    render: (conn: Connection) =>
+      `${conn.metadata.type}(${conn.metadata.network})`,
+    groupValue: (conn: Connection) =>
+      `${conn.metadata.type}(${conn.metadata.network})`,
+  },
   {
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.Process,
     key: 'process',
     groupable: true,
+    sortable: true,
+    sortId: 'Process',
+    render: (conn: Connection) => getProcess(conn),
+    groupValue: (conn: Connection) => getProcess(conn),
   },
-  { id: CONNECTIONS_TABLE_ACCESSOR_KEY.Host, key: 'host', groupable: true },
+  {
+    id: CONNECTIONS_TABLE_ACCESSOR_KEY.Host,
+    key: 'host',
+    groupable: true,
+    sortable: true,
+    sortId: 'Host',
+    render: (conn: Connection) => getHost(conn),
+    groupValue: (conn: Connection) => getHost(conn),
+  },
   {
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.SniffHost,
     key: 'sniffHost',
     groupable: true,
+    sortable: false,
+    render: (conn: Connection) => conn.metadata.sniffHost || '-',
+    groupValue: (conn: Connection) => conn.metadata.sniffHost || '-',
   },
-  { id: CONNECTIONS_TABLE_ACCESSOR_KEY.Rule, key: 'rule', groupable: true },
-  { id: CONNECTIONS_TABLE_ACCESSOR_KEY.Chains, key: 'chains', groupable: true },
+  {
+    id: CONNECTIONS_TABLE_ACCESSOR_KEY.Rule,
+    key: 'rule',
+    groupable: true,
+    sortable: false,
+    render: (conn: Connection) => getRule(conn),
+    groupValue: (conn: Connection) => getRule(conn),
+  },
+  {
+    id: CONNECTIONS_TABLE_ACCESSOR_KEY.Chains,
+    key: 'chains',
+    groupable: true,
+    sortable: false,
+    render: (conn: Connection) => {
+      const reversed = [...conn.chains].reverse()
+      const children: VNode[] = []
+      reversed.forEach((name, index) => {
+        if (index > 0) {
+          children.push(
+            h(IconChevronRight, { class: 'inline-block', size: 18 }),
+          )
+        }
+        children.push(h('span', { class: 'align-middle' }, name))
+      })
+      return h('span', children)
+    },
+    groupValue: (conn: Connection) => conn.chains.join(' > '),
+  },
   {
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.ConnectTime,
     key: 'connectTime',
     groupable: false,
+    sortable: true,
+    sortId: 'ConnectTime',
+    render: (conn: Connection) =>
+      formatTimeFromNow(conn.start, configStore.locale),
   },
   {
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.DlSpeed,
     key: 'dlSpeed',
     groupable: false,
+    sortable: true,
+    sortId: 'DlSpeed',
+    render: (conn: Connection) => `${formatBytes(conn.downloadSpeed)}/s`,
   },
   {
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.UlSpeed,
     key: 'ulSpeed',
     groupable: false,
+    sortable: true,
+    sortId: 'UlSpeed',
+    render: (conn: Connection) => `${formatBytes(conn.uploadSpeed)}/s`,
   },
   {
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.Download,
     key: 'dl',
     groupable: false,
+    sortable: true,
+    sortId: 'Download',
+    render: (conn: Connection) => formatBytes(conn.download),
   },
-  { id: CONNECTIONS_TABLE_ACCESSOR_KEY.Upload, key: 'ul', groupable: false },
+  {
+    id: CONNECTIONS_TABLE_ACCESSOR_KEY.Upload,
+    key: 'ul',
+    groupable: false,
+    sortable: true,
+    sortId: 'Upload',
+    render: (conn: Connection) => formatBytes(conn.upload),
+  },
   {
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.SourceIP,
     key: 'sourceIP',
     groupable: true,
+    sortable: true,
+    sortId: 'SourceIP',
+    render: (conn: Connection) => getSourceIP(conn),
+    groupValue: (conn: Connection) => getSourceIP(conn),
   },
   {
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.SourcePort,
     key: 'sourcePort',
     groupable: false,
+    sortable: false,
+    render: (conn: Connection) => String(conn.metadata.sourcePort),
   },
   {
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.Destination,
     key: 'destination',
     groupable: true,
+    sortable: false,
+    render: (conn: Connection) => getDestination(conn),
+    groupValue: (conn: Connection) => getDestination(conn),
   },
-]
-
-const sortableColumns = [
-  { id: 'ConnectTime', key: 'connectTime' },
-  { id: 'DlSpeed', key: 'dlSpeed' },
-  { id: 'UlSpeed', key: 'ulSpeed' },
-  { id: 'Download', key: 'dl' },
-  { id: 'Upload', key: 'ul' },
-  { id: 'Host', key: 'host' },
-  { id: 'Type', key: 'type' },
-  { id: 'Process', key: 'process' },
-  { id: 'SourceIP', key: 'sourceIP' },
 ]
 
 const visibleColumns = computed(() =>
@@ -147,10 +276,6 @@ const visibleColumns = computed(() =>
     (col) => configStore.connectionsTableColumnVisibility[col.id] !== false,
   ),
 )
-
-function isColumnVisible(id: CONNECTIONS_TABLE_ACCESSOR_KEY) {
-  return configStore.connectionsTableColumnVisibility[id] !== false
-}
 
 // Tabs
 const tabs = computed(() => [
@@ -324,66 +449,22 @@ watch([activeTab, globalFilter, sourceIPFilter, enableQuickFilter], () => {
   currentPage.value = 0
 })
 
-// Cell value helpers
-function getProcess(conn: Connection) {
-  return (
-    conn.metadata.process ||
-    conn.metadata.processPath?.replace(/^.*[/\\](.*)$/, '$1') ||
-    '-'
-  )
-}
-
-function getHost(conn: Connection) {
-  return `${conn.metadata.host || formatIPv6(conn.metadata.destinationIP)}:${conn.metadata.destinationPort}`
-}
-
-function getRule(conn: Connection) {
-  return !conn.rulePayload ? conn.rule : `${conn.rule} : ${conn.rulePayload}`
-}
-
-function getSourceIP(conn: Connection) {
-  const src = conn.metadata.sourceIP || t('inner')
-  const tag = configStore.clientSourceIPTags.find((tag) => tag.sourceIP === src)
-  return tag?.tagName || src
-}
-
-function getDestination(conn: Connection) {
-  return (
-    conn.metadata.remoteDestination ||
-    conn.metadata.destinationIP ||
-    conn.metadata.host
-  )
-}
-
-// Sortable columns set for quick lookup
-const sortableColumnIds = new Set(sortableColumns.map((c) => c.id))
-
-// Map from enum values to sort column ids
-const columnIdToSortId: Record<string, string> = {
-  [CONNECTIONS_TABLE_ACCESSOR_KEY.ConnectTime]: 'ConnectTime',
-  [CONNECTIONS_TABLE_ACCESSOR_KEY.DlSpeed]: 'DlSpeed',
-  [CONNECTIONS_TABLE_ACCESSOR_KEY.UlSpeed]: 'UlSpeed',
-  [CONNECTIONS_TABLE_ACCESSOR_KEY.Download]: 'Download',
-  [CONNECTIONS_TABLE_ACCESSOR_KEY.Upload]: 'Upload',
-  [CONNECTIONS_TABLE_ACCESSOR_KEY.Host]: 'Host',
-  [CONNECTIONS_TABLE_ACCESSOR_KEY.Type]: 'Type',
-  [CONNECTIONS_TABLE_ACCESSOR_KEY.Process]: 'Process',
-  [CONNECTIONS_TABLE_ACCESSOR_KEY.SourceIP]: 'SourceIP',
-}
-
+// Sortable column helpers using column definitions
 function isSortableColumn(colId: CONNECTIONS_TABLE_ACCESSOR_KEY) {
-  return sortableColumnIds.has(columnIdToSortId[colId] || '')
+  const col = allColumns.find((c) => c.id === colId)
+  return col?.sortable ?? false
 }
 
 function isColumnSorted(colId: CONNECTIONS_TABLE_ACCESSOR_KEY) {
-  return sortColumn.value === columnIdToSortId[colId]
+  const col = allColumns.find((c) => c.id === colId)
+  return col?.sortId ? sortColumn.value === col.sortId : false
 }
 
 function handleHeaderClick(colId: CONNECTIONS_TABLE_ACCESSOR_KEY) {
-  const mappedId = columnIdToSortId[colId]
-  if (!mappedId || !sortableColumnIds.has(mappedId)) return
+  const col = allColumns.find((c) => c.id === colId)
+  if (!col?.sortable || !col.sortId) return
 
-  if (sortColumn.value === mappedId) {
+  if (sortColumn.value === col.sortId) {
     // Three-state toggle: desc -> asc -> none
     if (sortDesc.value) {
       sortDesc.value = false
@@ -394,7 +475,7 @@ function handleHeaderClick(colId: CONNECTIONS_TABLE_ACCESSOR_KEY) {
     }
   } else {
     // Change sort column, start with desc
-    sortColumn.value = mappedId
+    sortColumn.value = col.sortId
     sortDesc.value = true
   }
 }
@@ -403,73 +484,84 @@ function handleHeaderClick(colId: CONNECTIONS_TABLE_ACCESSOR_KEY) {
 function toggleGrouping(colId: CONNECTIONS_TABLE_ACCESSOR_KEY) {
   if (groupingColumn.value === colId) {
     groupingColumn.value = null
-    expandedGroups.value.clear()
   } else {
     groupingColumn.value = colId
-    expandedGroups.value.clear()
   }
+  expandedGroups.value = {}
 }
 
 function toggleGroupExpanded(key: string) {
-  if (expandedGroups.value.has(key)) {
-    expandedGroups.value.delete(key)
-  } else {
-    expandedGroups.value.add(key)
-  }
-  // Trigger reactivity
-  expandedGroups.value = new Set(expandedGroups.value)
+  expandedGroups.value[key] = !expandedGroups.value[key]
 }
 
-function getGroupValue(conn: Connection, colId: string): string {
-  switch (colId) {
-    case CONNECTIONS_TABLE_ACCESSOR_KEY.Type:
-      return `${conn.metadata.type}(${conn.metadata.network})`
-    case CONNECTIONS_TABLE_ACCESSOR_KEY.Process:
-      return getProcess(conn)
-    case CONNECTIONS_TABLE_ACCESSOR_KEY.Host:
-      return getHost(conn)
-    case CONNECTIONS_TABLE_ACCESSOR_KEY.SniffHost:
-      return conn.metadata.sniffHost || '-'
-    case CONNECTIONS_TABLE_ACCESSOR_KEY.Rule:
-      return getRule(conn)
-    case CONNECTIONS_TABLE_ACCESSOR_KEY.Chains:
-      return conn.chains.join(' > ')
-    case CONNECTIONS_TABLE_ACCESSOR_KEY.SourceIP:
-      return getSourceIP(conn)
-    case CONNECTIONS_TABLE_ACCESSOR_KEY.Destination:
-      return getDestination(conn)
-    default:
-      return ''
-  }
+// Get current grouping column definition
+const groupingColumnDef = computed(() =>
+  groupingColumn.value
+    ? allColumns.find((c) => c.id === groupingColumn.value)
+    : null,
+)
+
+// Row types for unified row model (similar to TanStack Table)
+interface GroupRow {
+  type: 'group'
+  key: string
+  depth: number
+  subRows: Connection[]
 }
 
-// Group connections
-const groupedConnections = computed(() => {
-  if (!groupingColumn.value) return null
+interface DataRow {
+  type: 'data'
+  original: Connection
+  depth: number
+}
 
+type TableRow = GroupRow | DataRow
+
+// Unified row model (like TanStack's getRowModel)
+const rowModel = computed<TableRow[]>(() => {
+  const col = groupingColumnDef.value
+
+  // No grouping - return paginated data rows
+  if (!col?.groupValue) {
+    return paginatedConnections.value.map((conn) => ({
+      type: 'data' as const,
+      original: conn,
+      depth: 0,
+    }))
+  }
+
+  // Build grouped rows
   const groups = new Map<string, Connection[]>()
-
   for (const conn of filteredConnections.value) {
-    const key = getGroupValue(conn, groupingColumn.value)
-    if (!groups.has(key)) {
-      groups.set(key, [])
+    const key = col.groupValue(conn)
+    const group = groups.get(key)
+    if (group) {
+      group.push(conn)
+    } else {
+      groups.set(key, [conn])
     }
-    groups.get(key)!.push(conn)
   }
 
-  return Array.from(groups.entries()).map(([key, rows]) => ({
-    key,
-    rows,
-  }))
+  // Flatten into row model with group headers and expanded data rows
+  const rows: TableRow[] = []
+  for (const [key, subRows] of groups) {
+    // Group header row
+    rows.push({ type: 'group', key, depth: 0, subRows })
+
+    // Data rows (only if expanded)
+    if (expandedGroups.value[key]) {
+      for (const conn of subRows) {
+        rows.push({ type: 'data', original: conn, depth: 1 })
+      }
+    }
+  }
+
+  return rows
 })
 
 // Actions
 function toggleSortOrder() {
   sortDesc.value = !sortDesc.value
-}
-
-async function closeConnection(id: string) {
-  await closeSingleConnectionAPI(id)
 }
 
 async function handleCloseConnections() {
@@ -562,7 +654,8 @@ const PaginationButtons = defineComponent({
         ),
         ...props.visiblePages.flatMap((page, index) => {
           const elements = []
-          if (index > 0 && page - props.visiblePages[index - 1] > 1) {
+          const prevPage = props.visiblePages[index - 1]
+          if (index > 0 && prevPage !== undefined && page - prevPage > 1) {
             elements.push(
               h(
                 'span',
@@ -663,8 +756,12 @@ const PaginationButtons = defineComponent({
           {{ t('sortBy') }}
         </span>
         <select v-model="sortColumn" class="select select-sm select-primary">
-          <option v-for="opt in sortableColumns" :key="opt.id" :value="opt.id">
-            {{ t(opt.key) }}
+          <option
+            v-for="col in allColumns.filter((c) => c.sortable)"
+            :key="col.id"
+            :value="col.sortId"
+          >
+            {{ t(col.key) }}
           </option>
         </select>
         <Button class="btn btn-sm btn-primary" @click="toggleSortOrder">
@@ -759,247 +856,42 @@ const PaginationButtons = defineComponent({
           </tr>
         </thead>
         <tbody>
-          <!-- Grouped view -->
-          <template v-if="groupedConnections">
-            <template v-for="group in groupedConnections" :key="group.key">
-              <!-- Group header row -->
-              <tr
-                class="cursor-pointer bg-base-200"
-                @click="toggleGroupExpanded(group.key)"
-              >
-                <td :colspan="visibleColumns.length">
-                  <div class="flex items-center gap-2">
-                    <IconZoomOutFilled
-                      v-if="expandedGroups.has(group.key)"
-                      :size="18"
-                    />
-                    <IconZoomInFilled v-else :size="18" />
-                    <span>{{ group.key }}</span>
-                    <span class="text-base-content/60"
-                      >({{ group.rows.length }})</span
-                    >
-                  </div>
-                </td>
-              </tr>
-              <!-- Group rows -->
-              <template v-if="expandedGroups.has(group.key)">
-                <tr
-                  v-for="conn in group.rows"
-                  :key="conn.id"
-                  class="hover cursor-pointer"
-                  @click="showConnectionDetails(conn)"
-                >
-                  <td
-                    v-if="isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.Close)"
-                  >
-                    <Button
-                      class="btn-circle btn-xs"
-                      @click.stop="closeConnection(conn.id)"
-                    >
-                      <IconX :size="16" />
-                    </Button>
-                  </td>
-                  <td
-                    v-if="isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.Type)"
-                  >
-                    {{ conn.metadata.type }}({{ conn.metadata.network }})
-                  </td>
-                  <td
-                    v-if="
-                      isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.Process)
-                    "
-                  >
-                    {{ getProcess(conn) }}
-                  </td>
-                  <td
-                    v-if="isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.Host)"
-                  >
-                    {{ getHost(conn) }}
-                  </td>
-                  <td
-                    v-if="
-                      isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.SniffHost)
-                    "
-                  >
-                    {{ conn.metadata.sniffHost || '-' }}
-                  </td>
-                  <td
-                    v-if="isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.Rule)"
-                  >
-                    {{ getRule(conn) }}
-                  </td>
-                  <td
-                    v-if="
-                      isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.Chains)
-                    "
-                  >
-                    <template
-                      v-for="(name, index) in [...conn.chains].reverse()"
-                      :key="index"
-                    >
-                      <IconChevronRight
-                        v-if="index > 0"
-                        class="inline-block"
-                        :size="18"
-                      />
-                      <span class="align-middle">{{ name }}</span>
-                    </template>
-                  </td>
-                  <td
-                    v-if="
-                      isColumnVisible(
-                        CONNECTIONS_TABLE_ACCESSOR_KEY.ConnectTime,
-                      )
-                    "
-                  >
-                    {{ formatTimeFromNow(conn.start, configStore.locale) }}
-                  </td>
-                  <td
-                    v-if="
-                      isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.DlSpeed)
-                    "
-                  >
-                    {{ formatBytes(conn.downloadSpeed) }}/s
-                  </td>
-                  <td
-                    v-if="
-                      isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.UlSpeed)
-                    "
-                  >
-                    {{ formatBytes(conn.uploadSpeed) }}/s
-                  </td>
-                  <td
-                    v-if="
-                      isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.Download)
-                    "
-                  >
-                    {{ formatBytes(conn.download) }}
-                  </td>
-                  <td
-                    v-if="
-                      isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.Upload)
-                    "
-                  >
-                    {{ formatBytes(conn.upload) }}
-                  </td>
-                  <td
-                    v-if="
-                      isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.SourceIP)
-                    "
-                  >
-                    {{ getSourceIP(conn) }}
-                  </td>
-                  <td
-                    v-if="
-                      isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.SourcePort)
-                    "
-                  >
-                    {{ conn.metadata.sourcePort }}
-                  </td>
-                  <td
-                    v-if="
-                      isColumnVisible(
-                        CONNECTIONS_TABLE_ACCESSOR_KEY.Destination,
-                      )
-                    "
-                  >
-                    {{ getDestination(conn) }}
-                  </td>
-                </tr>
-              </template>
-            </template>
-          </template>
-          <!-- Non-grouped view -->
-          <template v-else>
+          <template
+            v-for="row in rowModel"
+            :key="row.type === 'group' ? `group-${row.key}` : row.original.id"
+          >
+            <!-- Group header row -->
             <tr
-              v-for="conn in paginatedConnections"
-              :key="conn.id"
-              class="hover cursor-pointer"
-              @click="showConnectionDetails(conn)"
+              v-if="row.type === 'group'"
+              class="cursor-pointer bg-base-200"
+              @click="toggleGroupExpanded(row.key)"
             >
-              <td v-if="isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.Close)">
-                <Button
-                  class="btn-circle btn-xs"
-                  @click.stop="closeConnection(conn.id)"
-                >
-                  <IconX :size="16" />
-                </Button>
-              </td>
-              <td v-if="isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.Type)">
-                {{ conn.metadata.type }}({{ conn.metadata.network }})
-              </td>
-              <td
-                v-if="isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.Process)"
-              >
-                {{ getProcess(conn) }}
-              </td>
-              <td v-if="isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.Host)">
-                {{ getHost(conn) }}
-              </td>
-              <td
-                v-if="isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.SniffHost)"
-              >
-                {{ conn.metadata.sniffHost || '-' }}
-              </td>
-              <td v-if="isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.Rule)">
-                {{ getRule(conn) }}
-              </td>
-              <td v-if="isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.Chains)">
-                <template
-                  v-for="(name, index) in [...conn.chains].reverse()"
-                  :key="index"
-                >
-                  <IconChevronRight
-                    v-if="index > 0"
-                    class="inline-block"
+              <td :colspan="visibleColumns.length">
+                <div class="flex items-center gap-2">
+                  <IconZoomOutFilled
+                    v-if="expandedGroups[row.key]"
                     :size="18"
                   />
-                  <span class="align-middle">{{ name }}</span>
-                </template>
+                  <IconZoomInFilled v-else :size="18" />
+                  <span>{{ row.key }}</span>
+                  <span class="text-base-content/60"
+                    >({{ row.subRows.length }})</span
+                  >
+                </div>
               </td>
+            </tr>
+            <!-- Data row -->
+            <tr
+              v-else
+              class="hover cursor-pointer"
+              @click="showConnectionDetails(row.original)"
+            >
               <td
-                v-if="
-                  isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.ConnectTime)
-                "
+                v-for="col in visibleColumns"
+                :key="col.id"
+                class="whitespace-nowrap"
               >
-                {{ formatTimeFromNow(conn.start, configStore.locale) }}
-              </td>
-              <td
-                v-if="isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.DlSpeed)"
-              >
-                {{ formatBytes(conn.downloadSpeed) }}/s
-              </td>
-              <td
-                v-if="isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.UlSpeed)"
-              >
-                {{ formatBytes(conn.uploadSpeed) }}/s
-              </td>
-              <td
-                v-if="isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.Download)"
-              >
-                {{ formatBytes(conn.download) }}
-              </td>
-              <td v-if="isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.Upload)">
-                {{ formatBytes(conn.upload) }}
-              </td>
-              <td
-                v-if="isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.SourceIP)"
-              >
-                {{ getSourceIP(conn) }}
-              </td>
-              <td
-                v-if="
-                  isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.SourcePort)
-                "
-              >
-                {{ conn.metadata.sourcePort }}
-              </td>
-              <td
-                v-if="
-                  isColumnVisible(CONNECTIONS_TABLE_ACCESSOR_KEY.Destination)
-                "
-              >
-                {{ getDestination(conn) }}
+                <component :is="() => col.render(row.original)" />
               </td>
             </tr>
           </template>
@@ -1007,10 +899,7 @@ const PaginationButtons = defineComponent({
       </table>
 
       <div
-        v-if="
-          (!groupedConnections && paginatedConnections.length === 0) ||
-          (groupedConnections && groupedConnections.length === 0)
-        "
+        v-if="rowModel.length === 0"
         class="py-8 text-center text-base-content/70"
       >
         {{ t('noData') }}

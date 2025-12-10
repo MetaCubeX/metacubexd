@@ -391,15 +391,6 @@ const isLoading = computed(
           </div>
 
           <div class="flex flex-col">
-            <ConfigTitle>{{ t('switchLanguage') }}</ConfigTitle>
-            <select v-model="configStore.locale" class="select w-full">
-              <option value="en-US">English</option>
-              <option value="zh-CN">简体中文</option>
-              <option value="ru-RU">Русский</option>
-            </select>
-          </div>
-
-          <div class="flex flex-col">
             <ConfigTitle>{{ endpointStore.currentEndpoint?.url }}</ConfigTitle>
             <Button class="btn-info" @click="switchEndpoint">
               {{ t('switchEndpoint') }}

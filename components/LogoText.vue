@@ -8,7 +8,7 @@ const hasEndpoint = computed(() => !!endpointStore.currentEndpoint)
     class="text-md flex items-center gap-1 font-bold whitespace-nowrap uppercase sm:text-xl"
   >
     <NuxtLink
-      class="bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent"
+      class="bg-linear-to-br from-primary to-secondary bg-clip-text text-transparent"
       :to="hasEndpoint ? '/' : '/setup'"
     >
       metacube

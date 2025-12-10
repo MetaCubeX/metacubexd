@@ -14,9 +14,7 @@ export interface UseDataTableOptions<T> {
   columns: DataTableColumn<T>[]
 }
 
-export function useDataTable<T extends Record<string, unknown>>(
-  options: UseDataTableOptions<T>,
-) {
+export function useDataTable<T>(options: UseDataTableOptions<T>) {
   // Sorting state
   const sortState = options.sortingKey
     ? useLocalStorage<SortState | null>(

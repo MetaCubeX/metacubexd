@@ -1,6 +1,7 @@
 export default {
   add: 'Add',
   setup: 'Setup',
+  setupDescription: 'Connect to your Mihomo backend to get started',
   overview: 'Overview',
   proxies: 'Proxies',
   proxiesSettings: 'Proxies Settings',
@@ -145,6 +146,7 @@ export default {
   remove: 'Remove',
   noDataUsageYet: 'No data usage recorded yet',
   noData: 'No data',
+  noRules: 'No rules',
   columns: 'Columns',
   sortBy: 'Sort by',
   rowsPerPage: 'Rows per page',

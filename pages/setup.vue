@@ -6,7 +6,7 @@ import { FALLBACK_BACKEND_URL } from '~/constants'
 import { transformEndpointURL } from '~/utils'
 
 definePageMeta({
-  layout: 'blank',
+  layout: 'default',
 })
 
 useHead({ title: 'Setup' })
@@ -30,6 +30,12 @@ const defaultBackendURL = computed(() => {
     (window as any).__METACUBEXD_CONFIG__?.defaultBackendURL ||
     FALLBACK_BACKEND_URL
   )
+})
+
+// Get current origin for datalist
+const currentOrigin = computed(() => {
+  if (typeof window === 'undefined') return ''
+  return window.location.origin
 })
 
 function onSetupSuccess(id: string) {
@@ -126,7 +132,32 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-screen-sm flex-col items-center gap-4 py-10">
+  <div
+    class="mx-auto flex h-full w-full max-w-screen-sm flex-col items-center justify-center gap-6 p-4"
+  >
+    <!-- Logo Section -->
+    <div class="flex flex-col items-center gap-2">
+      <div class="text-3xl font-bold uppercase sm:text-4xl">
+        <span
+          class="bg-linear-to-br from-primary to-secondary bg-clip-text text-transparent"
+        >
+          metacube
+        </span>
+        <span>(</span>
+        <a
+          class="inline-block text-primary transition-transform hover:scale-125 hover:rotate-90"
+          href="https://github.com/metacubex/metacubexd"
+          target="_blank"
+        >
+          xd
+        </a>
+        <span>)</span>
+      </div>
+      <p class="text-sm text-base-content/60">
+        {{ t('setupDescription') }}
+      </p>
+    </div>
+
     <form class="contents" @submit.prevent="onSubmit">
       <div class="flex w-full flex-col gap-4">
         <fieldset class="fieldset">
@@ -153,13 +184,8 @@ onMounted(async () => {
               :value="defaultBackendURL"
             />
             <option
-              v-if="
-                typeof window !== 'undefined' &&
-                window.location.origin !== FALLBACK_BACKEND_URL
-              "
-              :value="
-                typeof window !== 'undefined' ? window.location.origin : ''
-              "
+              v-if="currentOrigin && currentOrigin !== FALLBACK_BACKEND_URL"
+              :value="currentOrigin"
             />
             <option
               v-for="endpoint in endpointStore.endpointList"

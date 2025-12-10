@@ -10,7 +10,7 @@ function setTheme(theme: (typeof themes)[number]) {
 </script>
 
 <template>
-  <div class="drawer drawer-end w-auto sm:ml-auto">
+  <div class="drawer drawer-end w-auto">
     <input id="themes" type="checkbox" class="drawer-toggle" />
 
     <div class="drawer-content flex items-center">

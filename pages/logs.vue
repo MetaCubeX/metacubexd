@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import type { DataTableColumn } from '~/components/DataTable.vue'
+import type { VNode } from 'vue'
 import type { LogWithSeq } from '~/types'
 import {
   IconFileStack,
   IconPlayerPause,
   IconPlayerPlay,
   IconSettings,
+  IconSortAscending,
+  IconSortDescending,
+  IconZoomInFilled,
+  IconZoomOutFilled,
 } from '@tabler/icons-vue'
 import { LOG_LEVEL } from '~/constants'
 
@@ -19,103 +23,12 @@ const globalFilter = ref('')
 const settingsModal = ref<{ open: () => void; close: () => void }>()
 
 // Extract type from payload, e.g. "[dns] xxx" -> "dns"
-function extractType(payload: string) {
+function extractType(payload: string): string {
   const match = payload.match(/^\[([^\]]+)\]/)
-  return match ? match[1] : ''
+  return match?.[1] ?? ''
 }
 
-// Column definitions
-const columns: DataTableColumn<LogWithSeq>[] = [
-  {
-    id: 'seq',
-    label: t('sequence'),
-    accessor: 'seq',
-    sortable: true,
-    groupable: false,
-  },
-  {
-    id: 'level',
-    label: t('level'),
-    accessor: 'type',
-    sortable: true,
-    groupable: true,
-  },
-  {
-    id: 'type',
-    label: t('type'),
-    accessor: (row) => extractType(row.payload),
-    sortable: true,
-    groupable: true,
-  },
-  {
-    id: 'payload',
-    label: t('payload'),
-    accessor: 'payload',
-    sortable: false,
-    groupable: false,
-  },
-]
-
-// Use data table composable
-const { sortState, groupState, handleSort, handleGroup, sortRows, groupRows } =
-  useDataTable({
-    columns,
-    sortingKey: 'logsTableSorting',
-    groupingKey: 'logsTableGrouping',
-    defaultSort: { column: 'seq', desc: true },
-  })
-
-// Filtered logs
-const filteredLogs = computed(() => {
-  if (!globalFilter.value) return logsStore.logs
-
-  const filter = globalFilter.value.toLowerCase()
-  return logsStore.logs.filter(
-    (log) =>
-      log.payload.toLowerCase().includes(filter) ||
-      log.type.toLowerCase().includes(filter) ||
-      extractType(log.payload).toLowerCase().includes(filter),
-  )
-})
-
-// Custom sort value getter for logs
-function getSortValue(row: LogWithSeq, columnId: string): unknown {
-  switch (columnId) {
-    case 'seq':
-      return row.seq
-    case 'level':
-      return row.type
-    case 'type':
-      return extractType(row.payload)
-    default:
-      return ''
-  }
-}
-
-// Custom group value getter for logs
-function getGroupValue(row: LogWithSeq, columnId: string): string {
-  switch (columnId) {
-    case 'level':
-      return row.type
-    case 'type':
-      return extractType(row.payload) || '(empty)'
-    default:
-      return ''
-  }
-}
-
-// Processed rows (sorted)
-const sortedRows = computed(() => sortRows(filteredLogs.value, getSortValue))
-
-// Grouped rows (if grouping is active)
-const groupedRows = computed(() => {
-  if (!groupState.value.length) return undefined
-  return groupRows(sortedRows.value, getGroupValue)
-})
-
-// Final rows to display (non-grouped)
-const processedRows = computed(() => sortedRows.value)
-
+// Get level class for styling
 function getLevelClass(type: LOG_LEVEL) {
   switch (type) {
     case LOG_LEVEL.Error:
@@ -130,6 +43,202 @@ function getLevelClass(type: LOG_LEVEL) {
       return ''
   }
 }
+
+// Column definition interface
+interface LogColumn {
+  id: string
+  label: string
+  sortable: boolean
+  groupable: boolean
+  render: (log: LogWithSeq) => VNode | string
+  sortValue?: (log: LogWithSeq) => unknown
+  groupValue?: (log: LogWithSeq) => string
+}
+
+// Column definitions with render functions
+const columns: LogColumn[] = [
+  {
+    id: 'seq',
+    label: t('sequence'),
+    sortable: true,
+    groupable: false,
+    render: (log) => String(log.seq),
+    sortValue: (log) => log.seq,
+  },
+  {
+    id: 'level',
+    label: t('level'),
+    sortable: true,
+    groupable: true,
+    render: (log) =>
+      h('span', { class: getLevelClass(log.type) }, `[${log.type}]`),
+    sortValue: (log) => log.type,
+    groupValue: (log) => log.type,
+  },
+  {
+    id: 'type',
+    label: t('type'),
+    sortable: true,
+    groupable: true,
+    render: (log) =>
+      h('span', { class: 'opacity-70' }, extractType(log.payload)),
+    sortValue: (log) => extractType(log.payload),
+    groupValue: (log) => extractType(log.payload) || '(empty)',
+  },
+  {
+    id: 'payload',
+    label: t('payload'),
+    sortable: false,
+    groupable: false,
+    render: (log) => log.payload,
+  },
+]
+
+// Sort state
+const sortColumn = useLocalStorage('logsTableSortColumn', 'seq')
+const sortDesc = useLocalStorage('logsTableSortDesc', true)
+
+// Grouping state
+const groupingColumn = useLocalStorage<string | null>('logsTableGrouping', null)
+const expandedGroups = ref<Record<string, boolean>>({})
+
+// Filtered logs
+const filteredLogs = computed(() => {
+  if (!globalFilter.value) return logsStore.logs
+
+  const filter = globalFilter.value.toLowerCase()
+  return logsStore.logs.filter(
+    (log) =>
+      log.payload.toLowerCase().includes(filter) ||
+      log.type.toLowerCase().includes(filter) ||
+      extractType(log.payload).toLowerCase().includes(filter),
+  )
+})
+
+// Sorted logs
+const sortedLogs = computed(() => {
+  const col = columns.find((c) => c.id === sortColumn.value)
+  if (!col?.sortValue) return filteredLogs.value
+
+  return [...filteredLogs.value].sort((a, b) => {
+    const aVal = col.sortValue!(a)
+    const bVal = col.sortValue!(b)
+
+    let comparison = 0
+    if (typeof aVal === 'number' && typeof bVal === 'number') {
+      comparison = aVal - bVal
+    } else if (typeof aVal === 'string' && typeof bVal === 'string') {
+      comparison = aVal.localeCompare(bVal)
+    }
+
+    return sortDesc.value ? -comparison : comparison
+  })
+})
+
+// Get current grouping column definition
+const groupingColumnDef = computed(() =>
+  groupingColumn.value
+    ? columns.find((c) => c.id === groupingColumn.value)
+    : null,
+)
+
+// Row types for unified row model (similar to TanStack Table)
+interface GroupRow {
+  type: 'group'
+  key: string
+  subRows: LogWithSeq[]
+}
+
+interface DataRow {
+  type: 'data'
+  original: LogWithSeq
+}
+
+type TableRow = GroupRow | DataRow
+
+// Unified row model
+const rowModel = computed<TableRow[]>(() => {
+  const col = groupingColumnDef.value
+
+  // No grouping - return data rows
+  if (!col?.groupValue) {
+    return sortedLogs.value.map((log) => ({
+      type: 'data' as const,
+      original: log,
+    }))
+  }
+
+  // Build grouped rows
+  const groups = new Map<string, LogWithSeq[]>()
+  for (const log of sortedLogs.value) {
+    const key = col.groupValue(log)
+    const group = groups.get(key)
+    if (group) {
+      group.push(log)
+    } else {
+      groups.set(key, [log])
+    }
+  }
+
+  // Flatten into row model with group headers and expanded data rows
+  const rows: TableRow[] = []
+  for (const [key, subRows] of groups) {
+    rows.push({ type: 'group', key, subRows })
+
+    if (expandedGroups.value[key]) {
+      for (const log of subRows) {
+        rows.push({ type: 'data', original: log })
+      }
+    }
+  }
+
+  return rows
+})
+
+// Sorting
+function isSortableColumn(colId: string) {
+  return columns.find((c) => c.id === colId)?.sortable ?? false
+}
+
+function isColumnSorted(colId: string) {
+  return sortColumn.value === colId
+}
+
+function handleSort(colId: string) {
+  const col = columns.find((c) => c.id === colId)
+  if (!col?.sortable) return
+
+  if (sortColumn.value === colId) {
+    if (sortDesc.value) {
+      sortDesc.value = false
+    } else {
+      sortColumn.value = ''
+      sortDesc.value = true
+    }
+  } else {
+    sortColumn.value = colId
+    sortDesc.value = true
+  }
+}
+
+// Grouping
+function toggleGrouping(colId: string) {
+  if (groupingColumn.value === colId) {
+    groupingColumn.value = null
+  } else {
+    groupingColumn.value = colId
+  }
+  expandedGroups.value = {}
+}
+
+function toggleGroupExpanded(key: string) {
+  expandedGroups.value[key] = !expandedGroups.value[key]
+}
+
+// Table size class
+const tableSizeClass = computed(() =>
+  configStore.tableSizeClassName(configStore.logsTableSize),
+)
 </script>
 
 <template>
@@ -163,30 +272,85 @@ function getLevelClass(type: LOG_LEVEL) {
     <div
       class="flex-1 overflow-x-auto rounded-md bg-base-300 whitespace-nowrap"
     >
-      <DataTable
-        :columns="columns"
-        :rows="processedRows"
-        :sort-state="sortState"
-        :group-state="groupState"
-        :grouped-rows="groupedRows"
-        :size="configStore.logsTableSize"
-        row-key="seq"
-        sticky-header
-        row-hover
-        cell-class="py-2"
-        @sort="handleSort"
-        @group="handleGroup"
-      >
-        <template #cell-level="{ row }">
-          <span :class="getLevelClass(row.type)"> [{{ row.type }}] </span>
-        </template>
-        <template #cell-type="{ row }">
-          <span class="opacity-70">{{ extractType(row.payload) }}</span>
-        </template>
-      </DataTable>
+      <table class="table-pin-rows table table-zebra" :class="tableSizeClass">
+        <thead>
+          <tr>
+            <th v-for="col in columns" :key="col.id" class="bg-base-200">
+              <div class="flex items-center gap-2">
+                <div
+                  class="flex-1"
+                  :class="{
+                    'cursor-pointer select-none': isSortableColumn(col.id),
+                  }"
+                  @click="handleSort(col.id)"
+                >
+                  {{ col.label }}
+                </div>
+                <IconSortAscending
+                  v-if="isColumnSorted(col.id) && !sortDesc"
+                  :size="16"
+                />
+                <IconSortDescending
+                  v-else-if="isColumnSorted(col.id) && sortDesc"
+                  :size="16"
+                />
+                <!-- Grouping button -->
+                <button
+                  v-if="col.groupable"
+                  class="cursor-pointer"
+                  @click.stop="toggleGrouping(col.id)"
+                >
+                  <IconZoomOutFilled
+                    v-if="groupingColumn === col.id"
+                    :size="18"
+                  />
+                  <IconZoomInFilled v-else :size="18" />
+                </button>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <template
+            v-for="row in rowModel"
+            :key="row.type === 'group' ? `group-${row.key}` : row.original.seq"
+          >
+            <!-- Group header row -->
+            <tr
+              v-if="row.type === 'group'"
+              class="cursor-pointer bg-base-200"
+              @click="toggleGroupExpanded(row.key)"
+            >
+              <td :colspan="columns.length">
+                <div class="flex items-center gap-2">
+                  <IconZoomOutFilled
+                    v-if="expandedGroups[row.key]"
+                    :size="18"
+                  />
+                  <IconZoomInFilled v-else :size="18" />
+                  <span>{{ row.key }}</span>
+                  <span class="text-base-content/60"
+                    >({{ row.subRows.length }})</span
+                  >
+                </div>
+              </td>
+            </tr>
+            <!-- Data row -->
+            <tr v-else class="hover">
+              <td
+                v-for="col in columns"
+                :key="col.id"
+                class="whitespace-nowrap"
+              >
+                <component :is="() => col.render(row.original)" />
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
 
       <div
-        v-if="processedRows.length === 0"
+        v-if="rowModel.length === 0"
         class="py-8 text-center text-base-content/70"
       >
         {{ t('noData') }}

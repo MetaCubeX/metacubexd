@@ -48,7 +48,8 @@ const navItems = computed(() => [
       </ul>
     </nav>
 
-    <div class="navbar-end">
+    <div class="navbar-end gap-1">
+      <LangSwitcher />
       <ThemeSwitcher />
     </div>
   </header>

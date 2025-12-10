@@ -3,6 +3,7 @@ import type { Dict } from './index'
 export default {
   add: '添加',
   setup: '设置',
+  setupDescription: '连接到 Mihomo 后端以开始使用',
   overview: '概览',
   proxies: '代理',
   proxiesSettings: '代理设置',
@@ -147,6 +148,7 @@ export default {
   remove: '移除',
   noDataUsageYet: '暂无数据用量记录',
   noData: '暂无数据',
+  noRules: '暂无规则',
   columns: '列',
   sortBy: '排序',
   rowsPerPage: '每页行数',

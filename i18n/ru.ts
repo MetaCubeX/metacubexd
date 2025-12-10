@@ -3,6 +3,7 @@ import type { Dict } from './index'
 export default {
   add: 'Добавить',
   setup: 'Настройка',
+  setupDescription: 'Подключитесь к бэкенду Mihomo, чтобы начать',
   overview: 'Обзор',
   proxies: 'Прокси',
   proxiesSettings: 'Настройки прокси',
@@ -147,6 +148,7 @@ export default {
   remove: 'Удалить',
   noDataUsageYet: 'Данных пока нет',
   noData: 'Нет данных',
+  noRules: 'Нет правил',
   columns: 'Столбцы',
   sortBy: 'Сортировать по',
   rowsPerPage: 'Строк на странице',

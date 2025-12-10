@@ -147,7 +147,7 @@ const allProviderIsUpdating = computed(
           v-if="filteredRules.length === 0"
           class="py-8 text-center text-base-content/70"
         >
-          No rules
+          {{ t('noRules') }}
         </div>
       </div>
 
