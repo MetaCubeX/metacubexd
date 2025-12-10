@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const configStore = useConfigStore()
-const endpointStore = useEndpointStore()
 const globalStore = useGlobalStore()
 
 const rootElement = ref<HTMLElement | null>(null)
@@ -25,7 +24,7 @@ watch(
   { immediate: true },
 )
 
-// Sync theme to document.documentElement for CSS variables
+// Sync theme to document.documentElement
 watch(
   () => configStore.curTheme,
   (theme) => {
@@ -35,8 +34,6 @@ watch(
   },
   { immediate: true },
 )
-
-const hasEndpoint = computed(() => !!endpointStore.currentEndpoint)
 </script>
 
 <template>
@@ -46,13 +43,6 @@ const hasEndpoint = computed(() => !!endpointStore.currentEndpoint)
     :class="configStore.fontFamily"
     :data-theme="configStore.curTheme"
   >
-    <Header />
-
-    <div class="flex-1 overflow-y-auto p-2 sm:p-4">
-      <slot />
-    </div>
-
-    <!-- WebSocket connections manager -->
-    <ProtectedResources v-if="hasEndpoint" />
+    <slot />
   </div>
 </template>

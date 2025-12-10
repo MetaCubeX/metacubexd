@@ -5,6 +5,10 @@ import { checkEndpointAPI } from '~/composables/useApi'
 import { FALLBACK_BACKEND_URL } from '~/constants'
 import { transformEndpointURL } from '~/utils'
 
+definePageMeta({
+  layout: 'blank',
+})
+
 useHead({ title: 'Setup' })
 
 const { t } = useI18n()
