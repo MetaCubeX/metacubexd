@@ -31,7 +31,7 @@ const PAGES: PageConfig[] = [
   },
   {
     name: 'connections',
-    path: '/#/conns',
+    path: '/#/connections',
     waitFor: 'table', // Connections table
   },
   {
@@ -75,19 +75,19 @@ async function waitForServer(maxAttempts = 30): Promise<void> {
   throw new Error('Server failed to start within timeout')
 }
 
-// Start vite preview server
+// Start nuxt preview server
 function startServer(): ChildProcess {
   console.log(`Starting preview server on port ${PORT}...`)
 
-  const server = spawn(
-    'npx',
-    ['vite', 'preview', '--port', PORT, '--strictPort'],
-    {
-      stdio: 'inherit',
-      shell: true,
-      detached: false,
+  const server = spawn('npx', ['nuxt', 'preview'], {
+    stdio: 'inherit',
+    shell: true,
+    detached: true, // Create a new process group
+    env: {
+      ...process.env,
+      PORT,
     },
-  )
+  })
 
   server.on('error', (err) => {
     console.error('Server error:', err)
@@ -112,17 +112,23 @@ function stopServer(server: ChildProcess): Promise<void> {
       resolve()
     })
 
-    // Try graceful shutdown first
-    server.kill('SIGTERM')
+    // Kill the entire process group (negative PID)
+    try {
+      process.kill(-server.pid, 'SIGTERM')
+    } catch {
+      // Process might already be dead
+    }
 
-    // Force kill after 5 seconds if still running
+    // Force kill after 3 seconds if still running
     setTimeout(() => {
-      if (!server.killed) {
-        server.kill('SIGKILL')
+      try {
+        process.kill(-server.pid!, 'SIGKILL')
+      } catch {
+        // Process might already be dead
       }
 
       resolve()
-    }, 5000)
+    }, 3000)
   })
 }
 
@@ -161,21 +167,46 @@ async function takeScreenshots() {
   const desktopPage = await desktopContext.newPage()
   const mobilePage = await mobileContext.newPage()
 
-  // Set dark theme and mock endpoint for better screenshots
-  const setupLocalStorage = () => {
-    localStorage.setItem('curTheme', '"dark"')
-    // Set a mock endpoint to prevent redirect to setup page
-    localStorage.setItem('selectedEndpoint', '"mock-endpoint"')
-    localStorage.setItem(
-      'endpointList',
-      JSON.stringify([
-        { id: 'mock-endpoint', url: 'http://127.0.0.1:9090', secret: '' },
-      ]),
-    )
+  // Setup localStorage with mock endpoint to bypass auth redirect
+  // Must be done before first navigation, then reload to apply
+  const setupLocalStorage = async (
+    page: Awaited<ReturnType<typeof desktopContext.newPage>>,
+  ) => {
+    // Navigate to base URL first to set localStorage on correct origin
+    await page.goto(BASE_URL, { waitUntil: 'domcontentloaded' })
+    await page.evaluate(() => {
+      localStorage.setItem('curTheme', '"dark"')
+      // Set a mock endpoint to prevent redirect to setup page
+      // Note: VueUse's useLocalStorage<string> stores raw strings, not JSON-serialized
+      // But useLocalStorage<T[]> expects JSON-serialized arrays
+      localStorage.setItem('selectedEndpoint', 'mock-endpoint')
+      localStorage.setItem(
+        'endpointList',
+        JSON.stringify([
+          { id: 'mock-endpoint', url: 'http://127.0.0.1:9090', secret: '' },
+        ]),
+      )
+      // Set collapsedMap to expand all proxy groups by default
+      // true = expanded, false/undefined = collapsed
+      localStorage.setItem(
+        'collapsedMap',
+        JSON.stringify({
+          'Auto Select': true,
+          Proxy: true,
+          Streaming: true,
+          'AI Services': true,
+          'Provider A': true,
+          'Provider B': true,
+        }),
+      )
+    })
+    // Reload to apply localStorage changes to Pinia store
+    await page.reload({ waitUntil: 'domcontentloaded' })
   }
 
-  await desktopPage.addInitScript(setupLocalStorage)
-  await mobilePage.addInitScript(setupLocalStorage)
+  // Setup localStorage for both contexts
+  await setupLocalStorage(desktopPage)
+  await setupLocalStorage(mobilePage)
 
   // Take screenshots for each page in both desktop and mobile viewports
   for (const pageConfig of PAGES) {

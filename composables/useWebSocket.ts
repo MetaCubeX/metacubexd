@@ -1,4 +1,6 @@
 import type { Log, MemoryData, TrafficData, WsMsg } from '~/types'
+import { useMockMode } from './useApi'
+import { useMockData } from './useMockData'
 
 export function useBackendWebSocket() {
   const endpointStore = useEndpointStore()
@@ -12,6 +14,9 @@ export function useBackendWebSocket() {
   let trafficWs: WebSocket | null = null
   let memoryWs: WebSocket | null = null
   let logsWs: WebSocket | null = null
+
+  // Mock mode intervals
+  let mockInterval: ReturnType<typeof setInterval> | null = null
 
   const createWebSocket = (
     path: string,
@@ -46,6 +51,76 @@ export function useBackendWebSocket() {
 
   // Connect to all WebSocket endpoints
   const connect = () => {
+    // In mock mode, use mock data instead of WebSocket
+    if (useMockMode()) {
+      const mockData = useMockData()
+
+      // Immediately populate stores with mock data
+      connectionsStore.updateFromWsMsg({
+        connections: mockData.mockConnections,
+        uploadTotal: mockData.mockTrafficStats.up,
+        downloadTotal: mockData.mockTrafficStats.down,
+      } as WsMsg)
+
+      globalStore.setLatestTraffic(mockData.mockTrafficStats as TrafficData)
+      globalStore.setLatestMemory(mockData.mockMemory as MemoryData)
+
+      // Add initial chart data points for traffic and memory
+      const now = Date.now()
+      for (let i = 30; i >= 0; i--) {
+        const time = now - i * 1000
+        const trafficDown =
+          mockData.mockTrafficStats.down +
+          Math.floor(Math.random() * 100000) -
+          50000
+        const trafficUp =
+          mockData.mockTrafficStats.up +
+          Math.floor(Math.random() * 20000) -
+          10000
+        const memoryValue =
+          mockData.mockMemory.inuse +
+          Math.floor(Math.random() * 5000000) -
+          2500000
+        globalStore.addTrafficDataPoint(time, trafficDown, trafficUp)
+        globalStore.addMemoryDataPoint(time, memoryValue)
+      }
+
+      // Add mock logs
+      mockData.mockLogs.forEach((log) => {
+        logsStore.addLog(log as Log)
+      })
+
+      // Simulate periodic updates for traffic/memory
+      mockInterval = setInterval(() => {
+        const time = Date.now()
+        // Simulate traffic fluctuation
+        const trafficVariation = {
+          up: mockData.mockTrafficStats.up + Math.floor(Math.random() * 10000),
+          down:
+            mockData.mockTrafficStats.down + Math.floor(Math.random() * 50000),
+        }
+        globalStore.setLatestTraffic(trafficVariation as TrafficData)
+        globalStore.addTrafficDataPoint(
+          time,
+          trafficVariation.down,
+          trafficVariation.up,
+        )
+
+        // Simulate memory fluctuation
+        const memoryVariation = {
+          inuse:
+            mockData.mockMemory.inuse +
+            Math.floor(Math.random() * 5000000) -
+            2500000,
+          oslimit: mockData.mockMemory.oslimit,
+        }
+        globalStore.setLatestMemory(memoryVariation as MemoryData)
+        globalStore.addMemoryDataPoint(time, memoryVariation.inuse)
+      }, 1000)
+
+      return
+    }
+
     // Connections WebSocket
     connectionsWs = createWebSocket('connections', (data: unknown) => {
       connectionsStore.updateFromWsMsg(data as WsMsg)
@@ -83,6 +158,12 @@ export function useBackendWebSocket() {
 
   // Disconnect all WebSockets
   const disconnect = () => {
+    // Clear mock interval if in mock mode
+    if (mockInterval) {
+      clearInterval(mockInterval)
+      mockInterval = null
+    }
+
     connectionsWs?.close()
     trafficWs?.close()
     memoryWs?.close()

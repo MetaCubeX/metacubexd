@@ -13,7 +13,9 @@
     "postinstall": "nuxt prepare",
     "lint": "eslint --fix .",
     "prepare": "nuxt prepare && husky",
-    "preview": "nuxt preview --host"
+    "preview": "nuxt preview --host",
+    "screenshot": "tsx scripts/screenshot.ts",
+    "test:e2e": "vitest run e2e/"
   },
   "dependencies": {
     "@antfu/eslint-config": "^4.15.1",
@@ -22,6 +24,7 @@
     "@fontsource/fira-sans": "^5.2.7",
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@pinia/nuxt": "^0.11.3",
+    "@playwright/test": "^1.53.0",
     "@prettier/plugin-oxc": "^0.1.3",
     "@tabler/icons-vue": "^3.35.0",
     "@tailwindcss/typography": "^0.5.19",
@@ -54,6 +57,7 @@
     "match-sorter": "^8.2.0",
     "nuxt": "^4.2.2",
     "pinia": "^3.0.4",
+    "playwright": "^1.53.0",
     "prettier": "^3.7.4",
     "prettier-plugin-organize-imports": "^4.3.0",
     "prettier-plugin-tailwindcss": "^0.7.2",
@@ -61,8 +65,10 @@
     "tailwind-merge": "^3.4.0",
     "tailwind-variants": "^3.2.2",
     "tailwindcss": "^4.1.17",
+    "tsx": "^4.19.0",
     "typescript": "^5.9.3",
     "uuid": "^13.0.0",
+    "vitest": "^3.0.0",
     "vue": "^3.5.25",
     "vue-router": "^4.6.3",
     "vue-sonner": "^2.0.9",

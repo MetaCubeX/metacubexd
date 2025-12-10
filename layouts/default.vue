@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useMockMode } from '~/composables/useApi'
+
 const configStore = useConfigStore()
 const endpointStore = useEndpointStore()
 const globalStore = useGlobalStore()
@@ -36,7 +38,10 @@ watch(
   { immediate: true },
 )
 
-const hasEndpoint = computed(() => !!endpointStore.currentEndpoint)
+// In mock mode, always show protected resources
+const hasEndpoint = computed(
+  () => useMockMode() || !!endpointStore.currentEndpoint,
+)
 </script>
 
 <template>

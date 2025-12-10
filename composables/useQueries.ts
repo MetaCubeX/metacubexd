@@ -1,26 +1,11 @@
 import type { Config, Proxy, ProxyProvider, Rule, RuleProvider } from '~/types'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import ky from 'ky'
+import { useRequest } from './useApi'
 
 // ============== Request Helpers ==============
 
 function createRequest() {
-  const endpointStore = useEndpointStore()
-  const endpoint = endpointStore.currentEndpoint
-
-  if (!endpoint) {
-    return ky.create({})
-  }
-
-  const headers = new Headers()
-  if (endpoint.secret) {
-    headers.set('Authorization', `Bearer ${endpoint.secret}`)
-  }
-
-  return ky.create({
-    prefixUrl: endpoint.url,
-    headers,
-  })
+  return useRequest()
 }
 
 // ============== Query Keys ==============

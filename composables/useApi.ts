@@ -8,10 +8,55 @@ import type {
   RuleProvider,
 } from '~/types'
 import ky from 'ky'
+import { useMockData } from './useMockData'
 
 // Mock mode support
 export function useMockMode() {
   return import.meta.env.VITE_MOCK_MODE === 'true'
+}
+
+// Mock data resolver
+function getMockData(url: string): unknown {
+  // Lazy import to avoid bundling mock data in production
+  const mockData = import.meta.env.VITE_MOCK_MODE === 'true' ? useMockData() : null
+
+  if (!mockData) return {}
+
+  // Remove leading slash if present
+  const path = url.startsWith('/') ? url.slice(1) : url
+
+  // Map API endpoints to mock data
+  if (path === 'version') return mockData.mockVersion
+  if (path === 'configs') return mockData.mockConfig
+  if (path === 'proxies') return { proxies: mockData.mockProxies }
+  if (path === 'providers/proxies') return { providers: mockData.mockProxyProviders }
+  // Convert rules array to object for API compatibility
+  if (path === 'rules') {
+    const rulesObj: Record<string, typeof mockData.mockRules[0]> = {}
+    mockData.mockRules.forEach((rule, idx) => {
+      rulesObj[`rule-${idx}`] = rule
+    })
+
+    return { rules: rulesObj }
+  }
+  if (path === 'providers/rules') return { providers: mockData.mockRuleProviders }
+  if (path === 'connections') return { connections: mockData.mockConnections, downloadTotal: 850000000, uploadTotal: 125000000 }
+  if (path === 'group') return { groups: {} }
+
+  // Handle dynamic proxy endpoints
+  if (path.startsWith('proxies/')) {
+    const proxyName = decodeURIComponent(path.replace('proxies/', ''))
+
+    return (mockData.mockProxies as Record<string, unknown>)[proxyName] || {}
+  }
+
+  if (path.startsWith('providers/proxies/')) {
+    const providerName = decodeURIComponent(path.replace('providers/proxies/', ''))
+
+    return (mockData.mockProxyProviders as Record<string, unknown>)[providerName] || {}
+  }
+
+  return {}
 }
 
 export function useRequest() {
@@ -20,8 +65,8 @@ export function useRequest() {
 
   if (useMockMode()) {
     // In mock mode, return a mock handler
-    const mockHandler = async <T>(_url: string): Promise<T> => {
-      return {} as T
+    const mockHandler = async <T>(url: string): Promise<T> => {
+      return getMockData(url) as T
     }
 
     return {
