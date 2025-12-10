@@ -52,10 +52,14 @@ option {
 }
 
 /* Custom font families */
-.font-fira-sans {
-  font-family: FiraSans, 'Twemoji Mozilla', system-ui, monospace;
+.font-twemoji {
+  font-family:
+    'Twemoji Mozilla', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    'Noto Sans CJK SC', system-ui, sans-serif;
 }
 
-.font-system-ui {
-  font-family: 'Twemoji Mozilla', system-ui, monospace;
+.font-default {
+  font-family:
+    'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC',
+    system-ui, sans-serif;
 }

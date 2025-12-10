@@ -89,6 +89,7 @@ export default {
   switchEndpoint: 'Switch Endpoint',
   switchLanguage: 'Switch Language',
   switchFont: 'Switch Font',
+  enableTwemoji: 'Enable Twemoji',
   latencyTestTimeoutDuration: 'Latency Test Timeout Duration',
   all: 'All',
   sequence: 'Sequence',

@@ -8,7 +8,6 @@ import {
   CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
   CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY,
   DEFAULT_LOGS_TABLE_MAX_ROWS,
-  FONT_FAMILY,
   LANG,
   LATENCY_QUALITY_MAP_HTTP,
   LATENCY_QUALITY_MAP_HTTPS,
@@ -68,11 +67,8 @@ export const useConfigStore = defineStore('config', () => {
   // Auto switch endpoint
   const autoSwitchEndpoint = useLocalStorage('autoSwitchEndpoint', false)
 
-  // Font
-  const fontFamily = useLocalStorage<FONT_FAMILY>(
-    'fontFamily',
-    FONT_FAMILY.SystemUI,
-  )
+  // Twemoji support
+  const enableTwemoji = useLocalStorage('enableTwemoji', false)
 
   // Locale
   const locale = useLocalStorage<LANG>(
@@ -155,7 +151,7 @@ export const useConfigStore = defineStore('config', () => {
   const resetXdConfig = () => {
     autoSwitchTheme.value = false
     autoSwitchEndpoint.value = false
-    fontFamily.value = FONT_FAMILY.SystemUI
+    enableTwemoji.value = false
     favDayTheme.value = 'nord'
     favNightTheme.value = 'sunset'
     curTheme.value = 'sunset'
@@ -180,8 +176,8 @@ export const useConfigStore = defineStore('config', () => {
     iconMarginRight,
     // Endpoint
     autoSwitchEndpoint,
-    // Font
-    fontFamily,
+    // Twemoji
+    enableTwemoji,
     // Locale
     locale,
     // Connections

@@ -383,18 +383,12 @@ const isLoading = computed(
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div class="flex flex-col gap-2">
           <div class="flex flex-col">
-            <ConfigTitle>{{ t('switchFont') }}</ConfigTitle>
-            <select v-model="configStore.fontFamily" class="select w-full">
-              <option value="font-system-ui">SystemUI</option>
-              <option value="font-fira-sans">FiraSans</option>
-            </select>
-          </div>
-
-          <div class="flex flex-col">
-            <ConfigTitle>{{ endpointStore.currentEndpoint?.url }}</ConfigTitle>
-            <Button class="btn-info" @click="switchEndpoint">
-              {{ t('switchEndpoint') }}
-            </Button>
+            <ConfigTitle>{{ t('enableTwemoji') }}</ConfigTitle>
+            <input
+              v-model="configStore.enableTwemoji"
+              type="checkbox"
+              class="toggle"
+            />
           </div>
 
           <div class="flex flex-col items-center">
@@ -406,6 +400,13 @@ const isLoading = computed(
                 class="toggle"
               />
             </div>
+          </div>
+
+          <div class="flex flex-col">
+            <ConfigTitle>{{ endpointStore.currentEndpoint?.url }}</ConfigTitle>
+            <Button class="btn-info" @click="switchEndpoint">
+              {{ t('switchEndpoint') }}
+            </Button>
           </div>
         </div>
 

@@ -91,6 +91,7 @@ export default {
   switchEndpoint: '切换后端',
   switchLanguage: '切换语言',
   switchFont: '切换字体',
+  enableTwemoji: '启用 Twemoji',
   latencyTestTimeoutDuration: '测速超时时间',
   all: '全部',
   sequence: '序列号',
