@@ -11,8 +11,7 @@
     "format": "pnpm prettier --write --ignore-unknown .",
     "generate": "nuxt generate",
     "postinstall": "nuxt prepare",
-    "lint": "eslint .",
-    "lint:fix": "eslint --fix .",
+    "lint": "eslint --fix .",
     "prepare": "nuxt prepare && husky",
     "preview": "nuxt preview --host"
   },
