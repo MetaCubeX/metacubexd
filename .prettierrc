@@ -4,7 +4,7 @@
     "prettier-plugin-organize-imports",
     "prettier-plugin-tailwindcss"
   ],
-  "tailwindStylesheet": "./src/index.css",
+  "tailwindStylesheet": "./assets/css/main.css",
   "semi": false,
   "singleQuote": true,
   "endOfLine": "lf"

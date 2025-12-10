@@ -1,0 +1,61 @@
+@import '@fontsource/fira-sans';
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+@plugin 'daisyui' {
+  themes: all;
+}
+
+@font-face {
+  font-family: 'FiraSans';
+  src: url('~/assets/fonts/FiraSans-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Twemoji Mozilla';
+  src: url('~/assets/fonts/TwemojiMozilla-flags.woff2') format('woff2');
+}
+
+:root {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+::-webkit-scrollbar {
+  background: transparent;
+  display: none;
+}
+
+::-webkit-scrollbar:vertical {
+  width: 6px;
+}
+
+::-webkit-scrollbar:horizontal {
+  height: 6px;
+}
+
+@media (width >= 640px) {
+  :root {
+    scrollbar-color: hsl(var(--p)) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    display: block;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-box bg-primary;
+  }
+}
+
+option {
+  font-family: system-ui;
+}
+
+/* Custom font families */
+.font-fira-sans {
+  font-family: FiraSans, 'Twemoji Mozilla', system-ui, monospace;
+}
+
+.font-system-ui {
+  font-family: 'Twemoji Mozilla', system-ui, monospace;
+}

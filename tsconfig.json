@@ -1,20 +1,3 @@
 {
-  "compilerOptions": {
-    "strict": true,
-    "skipLibCheck": true,
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "jsx": "preserve",
-    "jsxImportSource": "solid-js",
-    "types": ["vite/client"],
-    "noEmit": true,
-    "isolatedModules": true,
-    "paths": {
-      "~/*": ["./src/*"]
-    }
-  }
+  "extends": "./.nuxt/tsconfig.json"
 }

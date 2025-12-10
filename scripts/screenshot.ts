@@ -1,6 +1,7 @@
+import type { ChildProcess } from 'node:child_process'
 // Screenshot generation script for CI
 // Usage: pnpm screenshot
-import { spawn, type ChildProcess } from 'node:child_process'
+import { spawn } from 'node:child_process'
 import * as fs from 'node:fs'
 import { chromium } from 'playwright'
 
@@ -10,7 +11,7 @@ const OUTPUT_DIR = process.env.OUTPUT_DIR || 'docs'
 const PC_DIR = `${OUTPUT_DIR}/pc`
 const MOBILE_DIR = `${OUTPUT_DIR}/mobile`
 
-type PageConfig = {
+interface PageConfig {
   name: string
   path: string // Hash route path (e.g., '/#/overview')
   waitFor: string

@@ -1,12 +1,14 @@
+import type { ChildProcess } from 'node:child_process'
+import type { BrowserContext, Page } from 'playwright'
 // Page-based e2e tests for metacubexd dashboard
 // Usage: pnpm test:e2e
-import { spawn, type ChildProcess } from 'node:child_process'
-import { type BrowserContext, chromium, type Page } from 'playwright'
+import { spawn } from 'node:child_process'
+import { chromium } from 'playwright'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 // Validate PORT is a valid number for security
-const validatePort = (port: string): string => {
-  const portNum = parseInt(port, 10)
+function validatePort(port: string): string {
+  const portNum = Number.parseInt(port, 10)
 
   if (isNaN(portNum) || portNum < 1 || portNum > 65535) {
     throw new Error(`Invalid port: ${port}`)
@@ -19,7 +21,7 @@ const PORT = validatePort(process.env.PORT || '4199')
 const BASE_URL = `http://localhost:${PORT}`
 
 // Setup localStorage to enable mock mode navigation
-const setupLocalStorage = () => {
+function setupLocalStorage() {
   localStorage.setItem('curTheme', '"dark"')
   // Set a mock endpoint to prevent redirect to setup page
   localStorage.setItem('selectedEndpoint', '"mock-endpoint"')
@@ -52,7 +54,7 @@ async function waitForServer(maxAttempts = 30): Promise<void> {
   throw new Error('Server failed to start within timeout')
 }
 
-describe('E2E Page Tests', () => {
+describe('e2E Page Tests', () => {
   let server: ChildProcess | null = null
   let browser: Awaited<ReturnType<typeof chromium.launch>> | null = null
   let context: BrowserContext | null = null
@@ -114,7 +116,7 @@ describe('E2E Page Tests', () => {
     }
   })
 
-  describe('Overview Page', () => {
+  describe('overview Page', () => {
     it('should display stats container and charts', async () => {
       await page!.goto(`${BASE_URL}/#/overview`, {
         waitUntil: 'domcontentloaded',
@@ -138,7 +140,7 @@ describe('E2E Page Tests', () => {
     })
   })
 
-  describe('Proxies Page', () => {
+  describe('proxies Page', () => {
     it('should display tabs and proxy cards', async () => {
       await page!.goto(`${BASE_URL}/#/proxies`, {
         waitUntil: 'domcontentloaded',
@@ -159,7 +161,7 @@ describe('E2E Page Tests', () => {
     })
   })
 
-  describe('Connections Page', () => {
+  describe('connections Page', () => {
     it('should display connections table', async () => {
       await page!.goto(`${BASE_URL}/#/conns`, {
         waitUntil: 'domcontentloaded',
@@ -180,7 +182,7 @@ describe('E2E Page Tests', () => {
     })
   })
 
-  describe('Rules Page', () => {
+  describe('rules Page', () => {
     it('should display rules tabs', async () => {
       await page!.goto(`${BASE_URL}/#/rules`, {
         waitUntil: 'domcontentloaded',
@@ -197,7 +199,7 @@ describe('E2E Page Tests', () => {
     })
   })
 
-  describe('Logs Page', () => {
+  describe('logs Page', () => {
     it('should display logs table', async () => {
       await page!.goto(`${BASE_URL}/#/logs`, {
         waitUntil: 'domcontentloaded',
@@ -214,7 +216,7 @@ describe('E2E Page Tests', () => {
     })
   })
 
-  describe('Config Page', () => {
+  describe('config Page', () => {
     it('should display config fieldsets', async () => {
       await page!.goto(`${BASE_URL}/#/config`, {
         waitUntil: 'domcontentloaded',
@@ -231,7 +233,7 @@ describe('E2E Page Tests', () => {
     })
   })
 
-  describe('Setup Page', () => {
+  describe('setup Page', () => {
     it('should display setup form with inputs', async () => {
       await page!.goto(`${BASE_URL}/#/setup`, {
         waitUntil: 'domcontentloaded',
@@ -260,7 +262,7 @@ describe('E2E Page Tests', () => {
     })
   })
 
-  describe('Navigation', () => {
+  describe('navigation', () => {
     it('should have header/navigation present', async () => {
       await page!.goto(`${BASE_URL}/#/setup`, {
         waitUntil: 'domcontentloaded',
@@ -274,7 +276,7 @@ describe('E2E Page Tests', () => {
     })
   })
 
-  describe('Mobile Viewport', () => {
+  describe('mobile Viewport', () => {
     it('should render correctly on mobile viewport', async () => {
       await page!.setViewportSize({ width: 390, height: 844 })
       await page!.goto(`${BASE_URL}/#/overview`, {
