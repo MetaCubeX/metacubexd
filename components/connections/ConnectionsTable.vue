@@ -69,7 +69,8 @@ function isColumnSorted(col: ConnectionColumn, sortColumn: string) {
 <template>
   <div class="flex-1 overflow-x-auto rounded-md bg-base-300">
     <table class="table-pin-rows table table-zebra" :class="tableSizeClass">
-      <thead>
+      <!-- Desktop header - hidden on mobile -->
+      <thead class="hidden md:table-header-group">
         <tr>
           <th v-for="col in columns" :key="col.id" class="bg-base-200">
             <div class="flex items-center gap-2">
@@ -128,13 +129,21 @@ function isColumnSorted(col: ConnectionColumn, sortColumn: string) {
               </div>
             </td>
           </tr>
-          <!-- Data row -->
+          <!-- Data row - card style on mobile, table row on desktop -->
           <tr
             v-else
-            class="hover cursor-pointer"
+            class="flex cursor-pointer flex-wrap rounded-xl border-4 border-base-300 px-2 odd:bg-base-100 even:bg-base-200 md:table-row md:rounded-none md:border-0 md:px-0 md:hover:bg-base-200"
             @click="emit('rowClick', row.original)"
           >
-            <td v-for="col in columns" :key="col.id" class="whitespace-nowrap">
+            <td
+              v-for="col in columns"
+              :key="col.id"
+              class="nth-2n:text-right sm:nth-2n:text-left sm:nth-3n:text-right md:nth-2n:text-start md:nth-3n:text-start w-1/2 min-w-1/2 pb-1.5 text-justify align-top wrap-break-word nth-last-2:mb-3 sm:w-1/3 sm:min-w-1/3 md:w-auto md:min-w-0 md:text-start md:align-middle md:whitespace-nowrap md:nth-last-2:mb-0"
+            >
+              <!-- Mobile label -->
+              <span class="block text-xs text-base-content/60 md:hidden">
+                {{ t(col.key) }}
+              </span>
               <component :is="() => col.render(row.original)" />
             </td>
           </tr>
