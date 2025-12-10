@@ -132,7 +132,7 @@ function handleGroup(columnId: string) {
         <th
           v-for="col in columns"
           :key="col.id"
-          class="bg-base-200"
+          class="bg-base-200 whitespace-nowrap"
           :class="col.thClass"
         >
           <div class="flex items-center gap-2">
@@ -209,6 +209,7 @@ function handleGroup(columnId: string) {
               <td
                 v-for="col in columns"
                 :key="col.id"
+                class="whitespace-nowrap"
                 :class="[col.tdClass, cellClass]"
                 @contextmenu="(e) => $emit('cell-contextmenu', row, col, e)"
               >
@@ -246,6 +247,7 @@ function handleGroup(columnId: string) {
           <td
             v-for="col in columns"
             :key="col.id"
+            class="whitespace-nowrap"
             :class="[col.tdClass, cellClass]"
             @contextmenu="(e) => $emit('cell-contextmenu', row, col, e)"
           >

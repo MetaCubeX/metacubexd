@@ -2,6 +2,7 @@
 import type { DataTableColumn } from '~/components/DataTable.vue'
 import type { LogWithSeq } from '~/types'
 import {
+  IconFileStack,
   IconPlayerPause,
   IconPlayerPlay,
   IconSettings,
@@ -194,61 +195,35 @@ function getLevelClass(type: LOG_LEVEL) {
 
     <!-- Settings Modal -->
     <Modal ref="settingsModal" :title="t('logsSettings')">
-      <div class="space-y-4">
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text">{{ t('tableSize') }}</span>
-          </label>
-          <select
-            v-model="configStore.logsTableSize"
-            class="select-bordered select"
-          >
-            <option value="xs">
-              {{ t('xs') }}
-            </option>
-            <option value="sm">
-              {{ t('sm') }}
-            </option>
-            <option value="md">
-              {{ t('md') }}
-            </option>
-            <option value="lg">
-              {{ t('lg') }}
-            </option>
+      <template #icon>
+        <IconFileStack :size="24" />
+      </template>
+
+      <div class="flex flex-col gap-4">
+        <div>
+          <ConfigTitle with-divider>{{ t('tableSize') }}</ConfigTitle>
+          <select v-model="configStore.logsTableSize" class="select w-full">
+            <option value="xs">{{ t('xs') }}</option>
+            <option value="sm">{{ t('sm') }}</option>
+            <option value="md">{{ t('md') }}</option>
+            <option value="lg">{{ t('lg') }}</option>
           </select>
         </div>
 
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text">{{ t('logLevel') }}</span>
-          </label>
-          <select v-model="configStore.logLevel" class="select-bordered select">
-            <option value="debug">
-              {{ t('debug') }}
-            </option>
-            <option value="info">
-              {{ t('info') }}
-            </option>
-            <option value="warning">
-              {{ t('warning') }}
-            </option>
-            <option value="error">
-              {{ t('error') }}
-            </option>
-            <option value="silent">
-              {{ t('silent') }}
-            </option>
+        <div>
+          <ConfigTitle with-divider>{{ t('logLevel') }}</ConfigTitle>
+          <select v-model="configStore.logLevel" class="select w-full">
+            <option value="info">{{ t('info') }}</option>
+            <option value="error">{{ t('error') }}</option>
+            <option value="warning">{{ t('warning') }}</option>
+            <option value="debug">{{ t('debug') }}</option>
+            <option value="silent">{{ t('silent') }}</option>
           </select>
         </div>
 
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text">{{ t('logMaxRows') }}</span>
-          </label>
-          <select
-            v-model="configStore.logMaxRows"
-            class="select-bordered select"
-          >
+        <div>
+          <ConfigTitle with-divider>{{ t('logMaxRows') }}</ConfigTitle>
+          <select v-model="configStore.logMaxRows" class="select w-full">
             <option :value="200">200</option>
             <option :value="300">300</option>
             <option :value="500">500</option>
