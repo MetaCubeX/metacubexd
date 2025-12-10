@@ -64,7 +64,7 @@ export default defineNuxtConfig({
           onerror: "window.__METACUBEXD_CONFIG__={defaultBackendURL:''}",
         },
         {
-          children: `window.__METACUBEXD_CONFIG__ = window.__METACUBEXD_CONFIG__ || { defaultBackendURL: '' }`,
+          innerHTML: `window.__METACUBEXD_CONFIG__ = window.__METACUBEXD_CONFIG__ || { defaultBackendURL: '' }`,
         },
       ],
     },
