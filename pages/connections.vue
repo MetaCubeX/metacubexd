@@ -17,6 +17,7 @@ import {
   IconZoomOutFilled,
 } from '@tabler/icons-vue'
 import byteSize from 'byte-size'
+import dayjs from 'dayjs'
 import { uniq } from 'lodash-es'
 import {
   closeAllConnectionsAPI,
@@ -1049,9 +1050,157 @@ const PaginationButtons = defineComponent({
         <IconNetwork :size="24" />
       </template>
 
-      <pre v-if="selectedConnection" class="overflow-auto text-sm">
-        <code>{{ JSON.stringify(selectedConnection, null, 2) }}</code>
-      </pre>
+      <div
+        v-if="selectedConnection"
+        class="flex max-h-[70vh] flex-col gap-4 overflow-x-hidden overflow-y-auto"
+      >
+        <!-- Basic Info -->
+        <div class="rounded-box bg-base-200 p-3">
+          <div class="mb-2 font-semibold text-primary">{{ t('basic') }}</div>
+          <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+            <div class="text-base-content/70">ID</div>
+            <div class="min-w-0 font-mono break-all">
+              {{ selectedConnection.id }}
+            </div>
+            <div class="text-base-content/70">{{ t('start') }}</div>
+            <div>{{ dayjs(selectedConnection.start).format('HH:mm:ss') }}</div>
+            <div class="text-base-content/70">{{ t('rule') }}</div>
+            <div>{{ selectedConnection.rule }}</div>
+            <div class="text-base-content/70">{{ t('rulePayload') }}</div>
+            <div class="break-all">
+              {{ selectedConnection.rulePayload || '-' }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Traffic -->
+        <div class="rounded-box bg-base-200 p-3">
+          <div class="mb-2 font-semibold text-primary">{{ t('traffic') }}</div>
+          <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+            <div class="text-base-content/70">{{ t('download') }}</div>
+            <div>{{ byteSize(selectedConnection.download) }}</div>
+            <div class="text-base-content/70">{{ t('upload') }}</div>
+            <div>{{ byteSize(selectedConnection.upload) }}</div>
+            <div class="text-base-content/70">{{ t('dlSpeed') }}</div>
+            <div>{{ byteSize(selectedConnection.downloadSpeed) }}/s</div>
+            <div class="text-base-content/70">{{ t('ulSpeed') }}</div>
+            <div>{{ byteSize(selectedConnection.uploadSpeed) }}/s</div>
+          </div>
+        </div>
+
+        <!-- Metadata -->
+        <div class="rounded-box bg-base-200 p-3">
+          <div class="mb-2 font-semibold text-primary">{{ t('metadata') }}</div>
+          <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+            <div class="text-base-content/70">{{ t('network') }}</div>
+            <div>{{ selectedConnection.metadata.network }}</div>
+            <div class="text-base-content/70">{{ t('type') }}</div>
+            <div>{{ selectedConnection.metadata.type }}</div>
+            <div class="text-base-content/70">{{ t('host') }}</div>
+            <div class="break-all">
+              {{ selectedConnection.metadata.host || '-' }}
+            </div>
+            <div class="text-base-content/70">{{ t('sniffHost') }}</div>
+            <div class="break-all">
+              {{ selectedConnection.metadata.sniffHost || '-' }}
+            </div>
+            <div class="text-base-content/70">{{ t('dnsMode') }}</div>
+            <div>{{ selectedConnection.metadata.dnsMode || '-' }}</div>
+          </div>
+        </div>
+
+        <!-- Source & Destination -->
+        <div class="rounded-box bg-base-200 p-3">
+          <div class="mb-2 font-semibold text-primary">
+            {{ t('sourceAndDestination') }}
+          </div>
+          <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+            <div class="text-base-content/70">{{ t('source') }}</div>
+            <div class="min-w-0 font-mono break-all">
+              {{
+                `${selectedConnection.metadata.sourceIP}:${selectedConnection.metadata.sourcePort}`
+              }}
+            </div>
+            <div class="text-base-content/70">{{ t('destination') }}</div>
+            <div class="min-w-0 font-mono break-all">
+              {{
+                selectedConnection.metadata.destinationIP
+                  ? `${selectedConnection.metadata.destinationIP}:${selectedConnection.metadata.destinationPort}`
+                  : `${selectedConnection.metadata.host}:${selectedConnection.metadata.destinationPort}`
+              }}
+            </div>
+            <div class="text-base-content/70">{{ t('remoteDestination') }}</div>
+            <div class="min-w-0 font-mono break-all">
+              {{ selectedConnection.metadata.remoteDestination || '-' }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Inbound -->
+        <div class="rounded-box bg-base-200 p-3">
+          <div class="mb-2 font-semibold text-primary">{{ t('inbound') }}</div>
+          <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+            <div class="text-base-content/70">{{ t('inboundName') }}</div>
+            <div>{{ selectedConnection.metadata.inboundName || '-' }}</div>
+            <div class="text-base-content/70">{{ t('inboundIP') }}</div>
+            <div class="min-w-0 font-mono break-all">
+              {{
+                selectedConnection.metadata.inboundIP
+                  ? `${selectedConnection.metadata.inboundIP}:${selectedConnection.metadata.inboundPort}`
+                  : '-'
+              }}
+            </div>
+            <div class="text-base-content/70">{{ t('inboundUser') }}</div>
+            <div>{{ selectedConnection.metadata.inboundUser || '-' }}</div>
+          </div>
+        </div>
+
+        <!-- Process -->
+        <div class="rounded-box bg-base-200 p-3">
+          <div class="mb-2 font-semibold text-primary">{{ t('process') }}</div>
+          <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+            <div class="text-base-content/70">{{ t('processName') }}</div>
+            <div>{{ selectedConnection.metadata.process || '-' }}</div>
+            <div class="text-base-content/70">{{ t('processPath') }}</div>
+            <div class="min-w-0 text-xs break-all">
+              {{ selectedConnection.metadata.processPath || '-' }}
+            </div>
+            <div class="text-base-content/70">UID</div>
+            <div>{{ selectedConnection.metadata.uid || '-' }}</div>
+          </div>
+        </div>
+
+        <!-- Chains -->
+        <div class="rounded-box bg-base-200 p-3">
+          <div class="mb-2 font-semibold text-primary">{{ t('chains') }}</div>
+          <div class="flex flex-wrap gap-1">
+            <span
+              v-for="(chain, index) in selectedConnection.chains"
+              :key="index"
+              class="badge badge-neutral"
+            >
+              {{ chain }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Special -->
+        <div
+          v-if="
+            selectedConnection.metadata.specialProxy ||
+            selectedConnection.metadata.specialRules
+          "
+          class="rounded-box bg-base-200 p-3"
+        >
+          <div class="mb-2 font-semibold text-primary">{{ t('special') }}</div>
+          <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+            <div class="text-base-content/70">{{ t('specialProxy') }}</div>
+            <div>{{ selectedConnection.metadata.specialProxy || '-' }}</div>
+            <div class="text-base-content/70">{{ t('specialRules') }}</div>
+            <div>{{ selectedConnection.metadata.specialRules || '-' }}</div>
+          </div>
+        </div>
+      </div>
     </Modal>
   </div>
 </template>
