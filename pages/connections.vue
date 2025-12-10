@@ -1,32 +1,15 @@
 <script setup lang="ts">
 import type { VNode } from 'vue'
-import type { Connection, ConnectionsTableColumnVisibility } from '~/types'
-import {
-  IconChevronLeft,
-  IconChevronRight,
-  IconChevronsLeft,
-  IconChevronsRight,
-  IconNetwork,
-  IconPlayerPause,
-  IconPlayerPlay,
-  IconSettings,
-  IconSortAscending,
-  IconSortDescending,
-  IconX,
-  IconZoomInFilled,
-  IconZoomOutFilled,
-} from '@tabler/icons-vue'
+import type { ConnectionColumn, TableRow } from '~/components/connections'
+import type { Connection } from '~/types'
+import { IconChevronRight, IconX } from '@tabler/icons-vue'
 import byteSize from 'byte-size'
-import dayjs from 'dayjs'
 import { uniq } from 'lodash-es'
 import {
   closeAllConnectionsAPI,
   closeSingleConnectionAPI,
 } from '~/composables/useApi'
-import {
-  CONNECTIONS_TABLE_ACCESSOR_KEY,
-  CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY,
-} from '~/constants'
+import { CONNECTIONS_TABLE_ACCESSOR_KEY } from '~/constants'
 import { formatIPv6, formatTimeFromNow } from '~/utils'
 
 useHead({ title: 'Connections' })
@@ -66,14 +49,10 @@ const pageSize = useLocalStorage('connectionsTablePageSize', 50)
 // Close connections
 const isClosingConnections = ref(false)
 
-// Tag form
-const newTagSourceIP = ref('')
-const newTagName = ref('')
-
 // Helpers
 const formatBytes = (bytes: number) => byteSize(bytes).toString()
 
-// Cell value helpers - moved before column definitions
+// Cell value helpers
 function getProcess(conn: Connection) {
   return (
     conn.metadata.process ||
@@ -107,17 +86,6 @@ function getDestination(conn: Connection) {
 // Close connection handler for render function
 function closeConnection(id: string) {
   closeSingleConnectionAPI(id)
-}
-
-// Column definition interface
-interface ConnectionColumn {
-  id: CONNECTIONS_TABLE_ACCESSOR_KEY
-  key: string
-  groupable: boolean
-  sortable: boolean
-  sortId?: string
-  render: (conn: Connection) => VNode | string
-  groupValue?: (conn: Connection) => string
 }
 
 // Column definitions with render functions
@@ -277,6 +245,8 @@ const visibleColumns = computed(() =>
     (col) => configStore.connectionsTableColumnVisibility[col.id] !== false,
   ),
 )
+
+const sortableColumns = computed(() => allColumns.filter((col) => col.sortable))
 
 // Tabs
 const tabs = computed(() => [
@@ -450,73 +420,12 @@ watch([activeTab, globalFilter, sourceIPFilter, enableQuickFilter], () => {
   currentPage.value = 0
 })
 
-// Sortable column helpers using column definitions
-function isSortableColumn(colId: CONNECTIONS_TABLE_ACCESSOR_KEY) {
-  const col = allColumns.find((c) => c.id === colId)
-  return col?.sortable ?? false
-}
-
-function isColumnSorted(colId: CONNECTIONS_TABLE_ACCESSOR_KEY) {
-  const col = allColumns.find((c) => c.id === colId)
-  return col?.sortId ? sortColumn.value === col.sortId : false
-}
-
-function handleHeaderClick(colId: CONNECTIONS_TABLE_ACCESSOR_KEY) {
-  const col = allColumns.find((c) => c.id === colId)
-  if (!col?.sortable || !col.sortId) return
-
-  if (sortColumn.value === col.sortId) {
-    // Three-state toggle: desc -> asc -> none
-    if (sortDesc.value) {
-      sortDesc.value = false
-    } else {
-      // Clear sorting
-      sortColumn.value = ''
-      sortDesc.value = true
-    }
-  } else {
-    // Change sort column, start with desc
-    sortColumn.value = col.sortId
-    sortDesc.value = true
-  }
-}
-
-// Grouping
-function toggleGrouping(colId: CONNECTIONS_TABLE_ACCESSOR_KEY) {
-  if (groupingColumn.value === colId) {
-    groupingColumn.value = null
-  } else {
-    groupingColumn.value = colId
-  }
-  expandedGroups.value = {}
-}
-
-function toggleGroupExpanded(key: string) {
-  expandedGroups.value[key] = !expandedGroups.value[key]
-}
-
 // Get current grouping column definition
 const groupingColumnDef = computed(() =>
   groupingColumn.value
     ? allColumns.find((c) => c.id === groupingColumn.value)
     : null,
 )
-
-// Row types for unified row model (similar to TanStack Table)
-interface GroupRow {
-  type: 'group'
-  key: string
-  depth: number
-  subRows: Connection[]
-}
-
-interface DataRow {
-  type: 'data'
-  original: Connection
-  depth: number
-}
-
-type TableRow = GroupRow | DataRow
 
 // Unified row model (like TanStack's getRowModel)
 const rowModel = computed<TableRow[]>(() => {
@@ -560,7 +469,40 @@ const rowModel = computed<TableRow[]>(() => {
   return rows
 })
 
-// Actions
+// Handlers
+function handleHeaderClick(colId: string) {
+  const col = allColumns.find((c) => c.id === colId)
+  if (!col?.sortable || !col.sortId) return
+
+  if (sortColumn.value === col.sortId) {
+    // Three-state toggle: desc -> asc -> none
+    if (sortDesc.value) {
+      sortDesc.value = false
+    } else {
+      // Clear sorting
+      sortColumn.value = ''
+      sortDesc.value = true
+    }
+  } else {
+    // Change sort column, start with desc
+    sortColumn.value = col.sortId
+    sortDesc.value = true
+  }
+}
+
+function toggleGrouping(colId: string) {
+  if (groupingColumn.value === colId) {
+    groupingColumn.value = null
+  } else {
+    groupingColumn.value = colId
+  }
+  expandedGroups.value = {}
+}
+
+function toggleGroupExpanded(key: string) {
+  expandedGroups.value[key] = !expandedGroups.value[key]
+}
+
 function toggleSortOrder() {
   sortDesc.value = !sortDesc.value
 }
@@ -586,227 +528,37 @@ function showConnectionDetails(conn: Connection) {
   selectedConnection.value = conn
   detailsModal.value?.open()
 }
-
-function toggleColumnVisibility(colId: CONNECTIONS_TABLE_ACCESSOR_KEY) {
-  configStore.connectionsTableColumnVisibility = {
-    ...configStore.connectionsTableColumnVisibility,
-    [colId]: !configStore.connectionsTableColumnVisibility[colId],
-  } as ConnectionsTableColumnVisibility
-}
-
-function addTag() {
-  if (newTagName.value && newTagSourceIP.value) {
-    const exists = configStore.clientSourceIPTags.some(
-      (tag) =>
-        tag.tagName === newTagName.value ||
-        tag.sourceIP === newTagSourceIP.value,
-    )
-    if (!exists) {
-      configStore.clientSourceIPTags = [
-        ...configStore.clientSourceIPTags,
-        { tagName: newTagName.value, sourceIP: newTagSourceIP.value },
-      ]
-    }
-    newTagName.value = ''
-    newTagSourceIP.value = ''
-  }
-}
-
-function removeTag(tagName: string) {
-  configStore.clientSourceIPTags = configStore.clientSourceIPTags.filter(
-    (tag) => tag.tagName !== tagName,
-  )
-}
-
-function resetSettings() {
-  configStore.connectionsTableColumnVisibility = {
-    ...CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY,
-  }
-}
-
-// Pagination Buttons Component
-const PaginationButtons = defineComponent({
-  props: {
-    currentPage: { type: Number, required: true },
-    totalPages: { type: Number, required: true },
-    visiblePages: { type: Array as () => number[], required: true },
-  },
-  emits: ['goToPage', 'previous', 'next'],
-  setup(props, { emit }) {
-    return () =>
-      h('div', { class: 'join shrink-0' }, [
-        h(
-          'button',
-          {
-            class: 'btn join-item btn-xs',
-            disabled: props.currentPage === 0,
-            onClick: () => emit('goToPage', 0),
-          },
-          h(IconChevronsLeft, { size: 14 }),
-        ),
-        h(
-          'button',
-          {
-            class: 'btn join-item btn-xs',
-            disabled: props.currentPage === 0,
-            onClick: () => emit('previous'),
-          },
-          h(IconChevronLeft, { size: 14 }),
-        ),
-        ...props.visiblePages.flatMap((page, index) => {
-          const elements = []
-          const prevPage = props.visiblePages[index - 1]
-          if (index > 0 && prevPage !== undefined && page - prevPage > 1) {
-            elements.push(
-              h(
-                'span',
-                {
-                  class: 'flex items-center px-1 text-xs text-base-content/40',
-                  key: `ellipsis-${page}`,
-                },
-                '···',
-              ),
-            )
-          }
-          elements.push(
-            h(
-              'button',
-              {
-                key: page,
-                class: [
-                  'btn join-item min-w-8 btn-xs',
-                  { 'btn-active': props.currentPage === page },
-                ],
-                onClick: () => emit('goToPage', page),
-              },
-              page + 1,
-            ),
-          )
-          return elements
-        }),
-        h(
-          'button',
-          {
-            class: 'btn join-item btn-xs',
-            disabled: props.currentPage >= props.totalPages - 1,
-            onClick: () => emit('next'),
-          },
-          h(IconChevronRight, { size: 14 }),
-        ),
-        h(
-          'button',
-          {
-            class: 'btn join-item btn-xs',
-            disabled: props.currentPage >= props.totalPages - 1,
-            onClick: () => emit('goToPage', props.totalPages - 1),
-          },
-          h(IconChevronsRight, { size: 14 }),
-        ),
-      ])
-  },
-})
 </script>
 
 <template>
   <div class="flex h-full flex-col gap-2">
-    <!-- Toolbar Row 1: Tabs + Quick filter + Source IP filter -->
-    <div class="flex flex-wrap items-center gap-2">
-      <div class="tabs-box tabs gap-2 tabs-sm">
-        <button
-          v-for="tab in tabs"
-          :key="tab.type"
-          class="tab gap-2 px-2"
-          :class="{ 'bg-primary text-neutral!': activeTab === tab.type }"
-          @click="activeTab = tab.type"
-        >
-          <span>{{ tab.name }}</span>
-          <div class="badge badge-sm">
-            {{ tab.count }}
-          </div>
-        </button>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <span class="hidden text-sm sm:inline-block">{{
-          t('quickFilter')
-        }}</span>
-        <input
-          v-model="enableQuickFilter"
-          type="checkbox"
-          class="toggle toggle-sm"
-        />
-      </div>
-
-      <select
-        v-model="sourceIPFilter"
-        class="select max-w-40 flex-1 select-sm select-primary"
-      >
-        <option value="">
-          {{ t('all') }}
-        </option>
-        <option v-for="ip in uniqueSourceIPs" :key="ip" :value="ip">
-          {{ ip }}
-        </option>
-      </select>
-    </div>
-
-    <!-- Toolbar Row 2: Sort + Search + Actions -->
-    <div class="flex flex-wrap items-center gap-2">
-      <div class="flex shrink-0 items-center gap-1">
-        <span class="hidden text-sm whitespace-nowrap sm:inline-block">
-          {{ t('sortBy') }}
-        </span>
-        <select v-model="sortColumn" class="select select-sm select-primary">
-          <option
-            v-for="col in allColumns.filter((c) => c.sortable)"
-            :key="col.id"
-            :value="col.sortId"
-          >
-            {{ t(col.key) }}
-          </option>
-        </select>
-        <Button class="btn btn-sm btn-primary" @click="toggleSortOrder">
-          <IconSortDescending v-if="sortDesc" />
-          <IconSortAscending v-else />
-        </Button>
-      </div>
-
-      <div class="join flex min-w-0 flex-1 items-center">
-        <input
-          v-model="globalFilter"
-          type="search"
-          class="input input-sm join-item min-w-0 flex-1 input-primary"
-          :placeholder="t('search')"
-        />
-
-        <Button
-          class="btn join-item btn-sm btn-primary"
-          @click="connectionsStore.paused = !connectionsStore.paused"
-        >
-          <IconPlayerPlay v-if="connectionsStore.paused" />
-          <IconPlayerPause v-else />
-        </Button>
-
-        <Button
-          class="btn join-item btn-sm btn-primary"
-          :loading="isClosingConnections"
-          @click="handleCloseConnections"
-        >
-          <IconX />
-        </Button>
-
-        <Button
-          class="btn join-item btn-sm btn-primary"
-          @click="settingsModal?.open()"
-        >
-          <IconSettings />
-        </Button>
-      </div>
-    </div>
+    <!-- Toolbar -->
+    <ConnectionsToolbar
+      :tabs="tabs"
+      :active-tab="activeTab"
+      :enable-quick-filter="enableQuickFilter"
+      :source-i-p-filter="sourceIPFilter"
+      :unique-source-i-ps="uniqueSourceIPs"
+      :sort-column="sortColumn"
+      :sort-desc="sortDesc"
+      :sortable-columns="sortableColumns"
+      :global-filter="globalFilter"
+      :paused="connectionsStore.paused"
+      :is-closing-connections="isClosingConnections"
+      @update:active-tab="activeTab = $event"
+      @update:enable-quick-filter="enableQuickFilter = $event"
+      @update:source-i-p-filter="sourceIPFilter = $event"
+      @update:sort-column="sortColumn = $event"
+      @update:global-filter="globalFilter = $event"
+      @toggle-sort-order="toggleSortOrder"
+      @toggle-paused="connectionsStore.paused = !connectionsStore.paused"
+      @close-connections="handleCloseConnections"
+      @open-settings="settingsModal?.open()"
+    />
 
     <!-- Mobile Pagination - Top -->
     <div class="flex shrink-0 items-center justify-center md:hidden">
-      <PaginationButtons
+      <ConnectionsPagination
         :current-page="currentPage"
         :total-pages="totalPages"
         :visible-pages="visiblePages"
@@ -817,95 +569,19 @@ const PaginationButtons = defineComponent({
     </div>
 
     <!-- Connections Table -->
-    <div class="flex-1 overflow-x-auto rounded-md bg-base-300">
-      <table class="table-pin-rows table table-zebra" :class="tableSizeClass">
-        <thead>
-          <tr>
-            <th v-for="col in visibleColumns" :key="col.id" class="bg-base-200">
-              <div class="flex items-center gap-2">
-                <div
-                  class="flex-1"
-                  :class="{
-                    'cursor-pointer select-none': isSortableColumn(col.id),
-                  }"
-                  @click="handleHeaderClick(col.id)"
-                >
-                  {{ t(col.key) }}
-                </div>
-                <IconSortAscending
-                  v-if="isColumnSorted(col.id) && !sortDesc"
-                  :size="16"
-                />
-                <IconSortDescending
-                  v-else-if="isColumnSorted(col.id) && sortDesc"
-                  :size="16"
-                />
-                <!-- Grouping button -->
-                <button
-                  v-if="col.groupable"
-                  class="cursor-pointer"
-                  @click.stop="toggleGrouping(col.id)"
-                >
-                  <IconZoomOutFilled
-                    v-if="groupingColumn === col.id"
-                    :size="18"
-                  />
-                  <IconZoomInFilled v-else :size="18" />
-                </button>
-              </div>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <template
-            v-for="row in rowModel"
-            :key="row.type === 'group' ? `group-${row.key}` : row.original.id"
-          >
-            <!-- Group header row -->
-            <tr
-              v-if="row.type === 'group'"
-              class="cursor-pointer bg-base-200"
-              @click="toggleGroupExpanded(row.key)"
-            >
-              <td :colspan="visibleColumns.length">
-                <div class="flex items-center gap-2">
-                  <IconZoomOutFilled
-                    v-if="expandedGroups[row.key]"
-                    :size="18"
-                  />
-                  <IconZoomInFilled v-else :size="18" />
-                  <span>{{ row.key }}</span>
-                  <span class="text-base-content/60"
-                    >({{ row.subRows.length }})</span
-                  >
-                </div>
-              </td>
-            </tr>
-            <!-- Data row -->
-            <tr
-              v-else
-              class="hover cursor-pointer"
-              @click="showConnectionDetails(row.original)"
-            >
-              <td
-                v-for="col in visibleColumns"
-                :key="col.id"
-                class="whitespace-nowrap"
-              >
-                <component :is="() => col.render(row.original)" />
-              </td>
-            </tr>
-          </template>
-        </tbody>
-      </table>
-
-      <div
-        v-if="rowModel.length === 0"
-        class="py-8 text-center text-base-content/70"
-      >
-        {{ t('noData') }}
-      </div>
-    </div>
+    <ConnectionsTable
+      :columns="visibleColumns"
+      :row-model="rowModel"
+      :sort-column="sortColumn"
+      :sort-desc="sortDesc"
+      :grouping-column="groupingColumn"
+      :expanded-groups="expandedGroups"
+      :table-size-class="tableSizeClass"
+      @header-click="handleHeaderClick"
+      @toggle-grouping="toggleGrouping"
+      @toggle-group-expanded="toggleGroupExpanded"
+      @row-click="showConnectionDetails"
+    />
 
     <!-- Desktop Pagination - Bottom -->
     <div class="hidden shrink-0 items-center justify-between gap-2 md:flex">
@@ -923,7 +599,7 @@ const PaginationButtons = defineComponent({
         </span>
       </div>
 
-      <PaginationButtons
+      <ConnectionsPagination
         :current-page="currentPage"
         :total-pages="totalPages"
         :visible-pages="visiblePages"
@@ -934,273 +610,16 @@ const PaginationButtons = defineComponent({
     </div>
 
     <!-- Settings Modal -->
-    <Modal ref="settingsModal" :title="t('connectionsSettings')">
-      <template #icon>
-        <IconNetwork :size="24" />
-      </template>
-
-      <div class="flex flex-col gap-4">
-        <div>
-          <ConfigTitle with-divider>
-            {{ t('quickFilter') }}
-          </ConfigTitle>
-          <input
-            v-model="configStore.quickFilterRegex"
-            type="text"
-            class="input w-full"
-            placeholder="DIRECT|direct|dns-out"
-          />
-        </div>
-
-        <div>
-          <ConfigTitle with-divider>
-            {{ t('tableSize') }}
-          </ConfigTitle>
-          <select
-            v-model="configStore.connectionsTableSize"
-            class="select w-full"
-          >
-            <option value="xs">
-              {{ t('xs') }}
-            </option>
-            <option value="sm">
-              {{ t('sm') }}
-            </option>
-            <option value="md">
-              {{ t('md') }}
-            </option>
-            <option value="lg">
-              {{ t('lg') }}
-            </option>
-          </select>
-        </div>
-
-        <div>
-          <ConfigTitle with-divider>
-            {{ t('tagClientSourceIPWithName') }}
-          </ConfigTitle>
-          <div class="flex flex-col gap-4">
-            <div class="join flex">
-              <select v-model="newTagSourceIP" class="select join-item">
-                <option value="" />
-                <option v-for="ip in untaggedSourceIPs" :key="ip" :value="ip">
-                  {{ ip || t('inner') }}
-                </option>
-              </select>
-              <input
-                v-model="newTagName"
-                class="input join-item flex-1"
-                placeholder="name"
-              />
-              <Button class="join-item" @click="addTag">
-                {{ t('tag') }}
-              </Button>
-            </div>
-
-            <div class="flex flex-col gap-2">
-              <div
-                v-for="tag in configStore.clientSourceIPTags"
-                :key="tag.tagName"
-                class="badge w-full items-center justify-between gap-2 py-4 badge-primary"
-              >
-                <span class="truncate"
-                  >{{ tag.tagName }} ({{ tag.sourceIP }})</span
-                >
-                <Button
-                  class="btn-circle btn-ghost btn-xs"
-                  @click="removeTag(tag.tagName)"
-                >
-                  <IconX :size="12" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <ConfigTitle with-divider>
-            {{ t('columns') }}
-          </ConfigTitle>
-          <div class="flex flex-col">
-            <div
-              v-for="col in allColumns"
-              :key="col.id"
-              class="flex items-center justify-between py-2"
-            >
-              <span>{{ t(col.key) }}</span>
-              <input
-                type="checkbox"
-                class="toggle"
-                :checked="configStore.connectionsTableColumnVisibility[col.id]"
-                @change="toggleColumnVisibility(col.id)"
-              />
-            </div>
-          </div>
-        </div>
-
-        <Button class="btn-sm btn-neutral" @click="resetSettings">
-          {{ t('reset') }}
-        </Button>
-      </div>
-    </Modal>
+    <ConnectionsSettingsModal
+      ref="settingsModal"
+      :all-columns="allColumns"
+      :untagged-source-i-ps="untaggedSourceIPs"
+    />
 
     <!-- Details Modal -->
-    <Modal ref="detailsModal" :title="t('connectionsDetails')">
-      <template #icon>
-        <IconNetwork :size="24" />
-      </template>
-
-      <div
-        v-if="selectedConnection"
-        class="flex max-h-[70vh] flex-col gap-4 overflow-x-hidden overflow-y-auto"
-      >
-        <!-- Basic Info -->
-        <div class="rounded-box bg-base-200 p-3">
-          <div class="mb-2 font-semibold text-primary">{{ t('basic') }}</div>
-          <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-            <div class="text-base-content/70">ID</div>
-            <div class="min-w-0 font-mono break-all">
-              {{ selectedConnection.id }}
-            </div>
-            <div class="text-base-content/70">{{ t('start') }}</div>
-            <div>{{ dayjs(selectedConnection.start).format('HH:mm:ss') }}</div>
-            <div class="text-base-content/70">{{ t('rule') }}</div>
-            <div>{{ selectedConnection.rule }}</div>
-            <div class="text-base-content/70">{{ t('rulePayload') }}</div>
-            <div class="break-all">
-              {{ selectedConnection.rulePayload || '-' }}
-            </div>
-          </div>
-        </div>
-
-        <!-- Traffic -->
-        <div class="rounded-box bg-base-200 p-3">
-          <div class="mb-2 font-semibold text-primary">{{ t('traffic') }}</div>
-          <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-            <div class="text-base-content/70">{{ t('download') }}</div>
-            <div>{{ byteSize(selectedConnection.download) }}</div>
-            <div class="text-base-content/70">{{ t('upload') }}</div>
-            <div>{{ byteSize(selectedConnection.upload) }}</div>
-            <div class="text-base-content/70">{{ t('dlSpeed') }}</div>
-            <div>{{ byteSize(selectedConnection.downloadSpeed) }}/s</div>
-            <div class="text-base-content/70">{{ t('ulSpeed') }}</div>
-            <div>{{ byteSize(selectedConnection.uploadSpeed) }}/s</div>
-          </div>
-        </div>
-
-        <!-- Metadata -->
-        <div class="rounded-box bg-base-200 p-3">
-          <div class="mb-2 font-semibold text-primary">{{ t('metadata') }}</div>
-          <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-            <div class="text-base-content/70">{{ t('network') }}</div>
-            <div>{{ selectedConnection.metadata.network }}</div>
-            <div class="text-base-content/70">{{ t('type') }}</div>
-            <div>{{ selectedConnection.metadata.type }}</div>
-            <div class="text-base-content/70">{{ t('host') }}</div>
-            <div class="break-all">
-              {{ selectedConnection.metadata.host || '-' }}
-            </div>
-            <div class="text-base-content/70">{{ t('sniffHost') }}</div>
-            <div class="break-all">
-              {{ selectedConnection.metadata.sniffHost || '-' }}
-            </div>
-            <div class="text-base-content/70">{{ t('dnsMode') }}</div>
-            <div>{{ selectedConnection.metadata.dnsMode || '-' }}</div>
-          </div>
-        </div>
-
-        <!-- Source & Destination -->
-        <div class="rounded-box bg-base-200 p-3">
-          <div class="mb-2 font-semibold text-primary">
-            {{ t('sourceAndDestination') }}
-          </div>
-          <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-            <div class="text-base-content/70">{{ t('source') }}</div>
-            <div class="min-w-0 font-mono break-all">
-              {{
-                `${selectedConnection.metadata.sourceIP}:${selectedConnection.metadata.sourcePort}`
-              }}
-            </div>
-            <div class="text-base-content/70">{{ t('destination') }}</div>
-            <div class="min-w-0 font-mono break-all">
-              {{
-                selectedConnection.metadata.destinationIP
-                  ? `${selectedConnection.metadata.destinationIP}:${selectedConnection.metadata.destinationPort}`
-                  : `${selectedConnection.metadata.host}:${selectedConnection.metadata.destinationPort}`
-              }}
-            </div>
-            <div class="text-base-content/70">{{ t('remoteDestination') }}</div>
-            <div class="min-w-0 font-mono break-all">
-              {{ selectedConnection.metadata.remoteDestination || '-' }}
-            </div>
-          </div>
-        </div>
-
-        <!-- Inbound -->
-        <div class="rounded-box bg-base-200 p-3">
-          <div class="mb-2 font-semibold text-primary">{{ t('inbound') }}</div>
-          <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-            <div class="text-base-content/70">{{ t('inboundName') }}</div>
-            <div>{{ selectedConnection.metadata.inboundName || '-' }}</div>
-            <div class="text-base-content/70">{{ t('inboundIP') }}</div>
-            <div class="min-w-0 font-mono break-all">
-              {{
-                selectedConnection.metadata.inboundIP
-                  ? `${selectedConnection.metadata.inboundIP}:${selectedConnection.metadata.inboundPort}`
-                  : '-'
-              }}
-            </div>
-            <div class="text-base-content/70">{{ t('inboundUser') }}</div>
-            <div>{{ selectedConnection.metadata.inboundUser || '-' }}</div>
-          </div>
-        </div>
-
-        <!-- Process -->
-        <div class="rounded-box bg-base-200 p-3">
-          <div class="mb-2 font-semibold text-primary">{{ t('process') }}</div>
-          <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-            <div class="text-base-content/70">{{ t('processName') }}</div>
-            <div>{{ selectedConnection.metadata.process || '-' }}</div>
-            <div class="text-base-content/70">{{ t('processPath') }}</div>
-            <div class="min-w-0 text-xs break-all">
-              {{ selectedConnection.metadata.processPath || '-' }}
-            </div>
-            <div class="text-base-content/70">UID</div>
-            <div>{{ selectedConnection.metadata.uid || '-' }}</div>
-          </div>
-        </div>
-
-        <!-- Chains -->
-        <div class="rounded-box bg-base-200 p-3">
-          <div class="mb-2 font-semibold text-primary">{{ t('chains') }}</div>
-          <div class="flex flex-wrap gap-1">
-            <span
-              v-for="(chain, index) in selectedConnection.chains"
-              :key="index"
-              class="badge badge-neutral"
-            >
-              {{ chain }}
-            </span>
-          </div>
-        </div>
-
-        <!-- Special -->
-        <div
-          v-if="
-            selectedConnection.metadata.specialProxy ||
-            selectedConnection.metadata.specialRules
-          "
-          class="rounded-box bg-base-200 p-3"
-        >
-          <div class="mb-2 font-semibold text-primary">{{ t('special') }}</div>
-          <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-            <div class="text-base-content/70">{{ t('specialProxy') }}</div>
-            <div>{{ selectedConnection.metadata.specialProxy || '-' }}</div>
-            <div class="text-base-content/70">{{ t('specialRules') }}</div>
-            <div>{{ selectedConnection.metadata.specialRules || '-' }}</div>
-          </div>
-        </div>
-      </div>
-    </Modal>
+    <ConnectionDetailsModal
+      ref="detailsModal"
+      :connection="selectedConnection"
+    />
   </div>
 </template>
