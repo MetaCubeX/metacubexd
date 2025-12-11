@@ -179,5 +179,7 @@
   "topProxies": "Топ прокси",
   "tcp": "TCP",
   "udp": "UDP",
-  "other": "Другое"
+  "other": "Другое",
+  "showTrafficIndicator": "Показать индикатор трафика",
+  "hideTrafficIndicator": "Скрыть индикатор трафика"
 }

@@ -59,5 +59,8 @@ const hasEndpoint = computed(
 
     <!-- WebSocket connections manager -->
     <ProtectedResources v-if="hasEndpoint" />
+
+    <!-- Global traffic indicator -->
+    <GlobalTrafficIndicator v-if="hasEndpoint" />
   </div>
 </template>

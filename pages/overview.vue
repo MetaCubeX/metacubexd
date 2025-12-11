@@ -309,8 +309,7 @@ watch(
           { seriesIndex: 0, time, value: newTraffic.down },
           { seriesIndex: 1, time, value: newTraffic.up },
         ])
-        // Store in global history
-        globalStore.addTrafficDataPoint(time, newTraffic.down, newTraffic.up)
+        // Data points are now added by WebSocket handler in useWebSocket.ts
         prevTrafficTime = time
       }
     }
@@ -327,8 +326,7 @@ watch(
       // Only add points if time has advanced (prevents duplicate points on remount)
       if (time > prevMemoryTime) {
         memoryChartRef.value.chartRef.addPoint(0, time, newMemory)
-        // Store in global history
-        globalStore.addMemoryDataPoint(time, newMemory)
+        // Data points are now added by WebSocket handler in useWebSocket.ts
         prevMemoryTime = time
       }
     }
@@ -345,8 +343,7 @@ watch(
       // Only add points if time has advanced (prevents duplicate points on remount)
       if (time > prevConnectionsTime) {
         connectionsChartRef.value.chartRef.addPoint(0, time, newCount)
-        // Store in global history
-        globalStore.addConnectionCountDataPoint(time, newCount)
+        // Data points are now added by WebSocket handler in useWebSocket.ts
         prevConnectionsTime = time
       }
     }

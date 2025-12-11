@@ -179,5 +179,7 @@
   "topProxies": "热门代理",
   "tcp": "TCP",
   "udp": "UDP",
-  "other": "其他"
+  "other": "其他",
+  "showTrafficIndicator": "显示流量指示器",
+  "hideTrafficIndicator": "隐藏流量指示器"
 }

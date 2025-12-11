@@ -49,6 +49,8 @@ const navItems = computed(() => [
     </nav>
 
     <div class="navbar-end gap-1">
+      <!-- Slot for collapsed traffic indicator -->
+      <div id="header-traffic-indicator" class="flex items-center" />
       <LangSwitcher />
       <ThemeSwitcher />
     </div>

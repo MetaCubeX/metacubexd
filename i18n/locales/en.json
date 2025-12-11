@@ -179,5 +179,7 @@
   "topProxies": "Top Proxies",
   "tcp": "TCP",
   "udp": "UDP",
-  "other": "Other"
+  "other": "Other",
+  "showTrafficIndicator": "Show Traffic Indicator",
+  "hideTrafficIndicator": "Hide Traffic Indicator"
 }

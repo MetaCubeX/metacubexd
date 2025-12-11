@@ -133,17 +133,33 @@ export function useBackendWebSocket() {
 
     // Connections WebSocket
     connectionsWs = createWebSocket('connections', (data: unknown) => {
-      connectionsStore.updateFromWsMsg(data as WsMsg)
+      const wsMsg = data as WsMsg
+      connectionsStore.updateFromWsMsg(wsMsg)
+      // Add data point for connection count history
+      if (wsMsg) {
+        const connectionCount = wsMsg.connections?.length ?? 0
+        globalStore.addConnectionCountDataPoint(Date.now(), connectionCount)
+      }
     })
 
     // Traffic WebSocket
     trafficWs = createWebSocket('traffic', (data: unknown) => {
-      globalStore.setLatestTraffic(data as TrafficData)
+      const trafficData = data as TrafficData
+      globalStore.setLatestTraffic(trafficData)
+      // Add data point for chart history
+      globalStore.addTrafficDataPoint(
+        Date.now(),
+        trafficData.down,
+        trafficData.up,
+      )
     })
 
     // Memory WebSocket
     memoryWs = createWebSocket('memory', (data: unknown) => {
-      globalStore.setLatestMemory(data as MemoryData)
+      const memoryData = data as MemoryData
+      globalStore.setLatestMemory(memoryData)
+      // Add data point for chart history
+      globalStore.addMemoryDataPoint(Date.now(), memoryData.inuse)
     })
 
     // Logs WebSocket
