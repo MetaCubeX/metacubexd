@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.222.0](https://github.com/MetaCubeX/metacubexd/compare/v1.221.0...v1.222.0) (2025-12-11)
+
+
+### Features
+
+* integrate Floating UI for tooltips in Versions component ([10cd114](https://github.com/MetaCubeX/metacubexd/commit/10cd1147ae8293ac61f7cd1cebfc53720ffd2d23))
+
 ## [1.221.0](https://github.com/MetaCubeX/metacubexd/compare/v1.220.0...v1.221.0) (2025-12-11)
 
 
