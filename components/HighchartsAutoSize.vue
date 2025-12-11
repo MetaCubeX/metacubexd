@@ -109,10 +109,22 @@ watch(
 
         chart.update(
           {
+            chart: {
+              backgroundColor: themeColors.backgroundColor,
+            },
             title: { style: { color: themeColors.textColor } },
             legend: {
               itemStyle: { color: themeColors.textColor },
               itemHoverStyle: { color: themeColors.textColorHover },
+            },
+            xAxis: {
+              labels: { style: { color: themeColors.textColor } },
+              lineColor: themeColors.lineColor,
+              tickColor: themeColors.tickColor,
+            },
+            yAxis: {
+              labels: { style: { color: themeColors.textColor } },
+              gridLineColor: themeColors.gridLineColor,
             },
           },
           true,

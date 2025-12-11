@@ -14,17 +14,29 @@ interface Props {
   seriesConfig: SeriesConfig[]
   isLoading?: boolean
   initialData?: [number, number][][]
+  valueMode?: 'bytes' | 'number'
 }
 
 const props = withDefaults(defineProps<Props>(), {
   isLoading: false,
   initialData: () => [],
+  valueMode: 'bytes',
 })
 
 // Expose methods for parent component to add data points
 const emit = defineEmits<{
   chartReady: [ref: ChartRef]
 }>()
+
+// Format value based on mode
+const formatValue = (value: number, withSuffix = false) => {
+  if (props.valueMode === 'number') {
+    return String(value)
+  }
+  return withSuffix
+    ? `${byteSize(value).toString()}/s`
+    : byteSize(value).toString()
+}
 
 export interface ChartRef {
   addPoint: (seriesIndex: number, time: number, value: number) => void
@@ -93,7 +105,7 @@ function createChartOptions(): Highcharts.Options {
           color: themeColors.textColor,
         },
         formatter() {
-          return byteSize(this.value as number).toString()
+          return formatValue(this.value as number)
         },
       },
       gridLineColor: themeColors.gridLineColor,
@@ -107,7 +119,7 @@ function createChartOptions(): Highcharts.Options {
         let html = `<b>${timeStr}</b><br/>`
 
         this.points?.forEach((point) => {
-          html += `<span style="color:${point.color}">\u25CF</span> ${point.series.name}: <b>${byteSize(point.y as number).toString()}/s</b><br/>`
+          html += `<span style="color:${point.color}">\u25CF</span> ${point.series.name}: <b>${formatValue(point.y as number, true)}</b><br/>`
         })
 
         return html
@@ -175,15 +187,11 @@ const chartRef: ChartRef = {
 
     // Add points to each series
     pointsBySeriesMap.forEach((seriesPoints, seriesIndex) => {
-      if (chart?.series[seriesIndex]) {
+      const series = chart?.series[seriesIndex]
+      if (series) {
         seriesPoints.forEach((point) => {
-          const shift =
-            chart!.series[seriesIndex].data.length >= CHART_MAX_XAXIS
-          chart!.series[seriesIndex].addPoint(
-            [point.time, point.value],
-            false,
-            shift,
-          )
+          const shift = series.data.length >= CHART_MAX_XAXIS
+          series.addPoint([point.time, point.value], false, shift)
         })
       }
     })
@@ -240,7 +248,7 @@ watch(
   },
 )
 
-// Update series config when it changes
+// Update series config when it changes (including colors for theme switching)
 watch(
   () => props.seriesConfig,
   (seriesConfig) => {
@@ -248,7 +256,7 @@ watch(
       seriesConfig.forEach((config, index) => {
         if (chart!.series[index]) {
           chart!.series[index].update(
-            { type: 'areaspline', name: config.name },
+            { type: 'areaspline', name: config.name, color: config.color },
             false,
           )
         }
@@ -270,6 +278,9 @@ watch(
 
         chart.update(
           {
+            chart: {
+              backgroundColor: themeColors.backgroundColor,
+            },
             title: { style: { color: themeColors.textColor } },
             legend: {
               itemStyle: { color: themeColors.textColor },

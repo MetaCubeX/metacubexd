@@ -65,8 +65,9 @@ export function useBackendWebSocket() {
       globalStore.setLatestTraffic(mockData.mockTrafficStats as TrafficData)
       globalStore.setLatestMemory(mockData.mockMemory as MemoryData)
 
-      // Add initial chart data points for traffic and memory
+      // Add initial chart data points for traffic, memory, and connections
       const now = Date.now()
+      const baseConnectionCount = mockData.mockConnections.length
       for (let i = 30; i >= 0; i--) {
         const time = now - i * 1000
         const trafficDown =
@@ -81,8 +82,12 @@ export function useBackendWebSocket() {
           mockData.mockMemory.inuse +
           Math.floor(Math.random() * 5000000) -
           2500000
+        // Simulate connection count fluctuation
+        const connectionCount =
+          baseConnectionCount + Math.floor(Math.random() * 10) - 5
         globalStore.addTrafficDataPoint(time, trafficDown, trafficUp)
         globalStore.addMemoryDataPoint(time, memoryValue)
+        globalStore.addConnectionCountDataPoint(time, connectionCount)
       }
 
       // Add mock logs
@@ -90,7 +95,7 @@ export function useBackendWebSocket() {
         logsStore.addLog(log as Log)
       })
 
-      // Simulate periodic updates for traffic/memory
+      // Simulate periodic updates for traffic/memory/connections
       mockInterval = setInterval(() => {
         const time = Date.now()
         // Simulate traffic fluctuation
@@ -116,6 +121,11 @@ export function useBackendWebSocket() {
         }
         globalStore.setLatestMemory(memoryVariation as MemoryData)
         globalStore.addMemoryDataPoint(time, memoryVariation.inuse)
+
+        // Simulate connection count fluctuation
+        const connectionCount =
+          mockData.mockConnections.length + Math.floor(Math.random() * 10) - 5
+        globalStore.addConnectionCountDataPoint(time, connectionCount)
       }, 1000)
 
       return

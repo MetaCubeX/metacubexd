@@ -17,7 +17,8 @@
     "prepare": "nuxt prepare && husky",
     "preview": "nuxt preview --host",
     "screenshot": "tsx scripts/screenshot.ts",
-    "test:e2e": "vitest run e2e/"
+    "test:e2e": "vitest run e2e/",
+    "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
     "@antfu/eslint-config": "^6.6.1",
@@ -62,7 +63,6 @@
     "pinia": "^3.0.4",
     "playwright": "^1.57.0",
     "prettier": "^3.7.4",
-    "prettier-plugin-organize-imports": "^4.3.0",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "sort-package-json": "^3.5.1",
     "tailwind-merge": "^3.4.0",
@@ -75,6 +75,7 @@
     "vue": "^3.5.25",
     "vue-router": "^4.6.3",
     "vue-sonner": "^2.0.9",
+    "vue-tsc": "^3.1.8",
     "zod": "^4.1.13"
   },
   "packageManager": "pnpm@10.25.0"

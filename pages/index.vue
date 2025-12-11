@@ -1,7 +1,7 @@
 <script setup lang="ts">
-useHead({ title: 'Home' })
-
 const { t } = useI18n()
+
+useHead({ title: computed(() => t('home')) })
 const endpointStore = useEndpointStore()
 const router = useRouter()
 

@@ -8,6 +8,11 @@ import {
   IconSettings,
 } from '@tabler/icons-vue'
 import byteSize from 'byte-size'
+import Button from '~/components/Button.vue'
+import ProxyNodeCard from '~/components/ProxyNodeCard.vue'
+import ProxyNodeListItem from '~/components/ProxyNodeListItem.vue'
+import ProxyNodePreview from '~/components/ProxyNodePreview.vue'
+import SubscriptionInfo from '~/components/SubscriptionInfo.vue'
 import {
   encodeSvg,
   filterProxiesByAvailability,
@@ -16,9 +21,9 @@ import {
   sortProxiesByOrderingType,
 } from '~/utils'
 
-useHead({ title: 'Proxies' })
-
 const { t, locale } = useI18n()
+
+useHead({ title: computed(() => t('proxies')) })
 const proxiesStore = useProxiesStore()
 const connectionsStore = useConnectionsStore()
 const configStore = useConfigStore()
@@ -288,7 +293,7 @@ const ProxyProviderTitle = defineComponent({
           h(
             'div',
             { class: 'text-sm text-slate-500' },
-            `${t('updated')} ${formatTimeFromNow(props.provider.updatedAt, locale)}`,
+            `${t('updated')} ${formatTimeFromNow(props.provider.updatedAt, locale.value)}`,
           ),
           !proxiesStore.collapsedMap[props.provider.name] &&
             h(ProxyNodePreview, {

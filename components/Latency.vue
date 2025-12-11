@@ -4,7 +4,7 @@ import { getLatencyClassName } from '~/utils'
 interface Props {
   proxyName: string
   testUrl: string | null
-  class?: string
+  class?: string | Record<string, boolean>
 }
 
 const props = defineProps<Props>()

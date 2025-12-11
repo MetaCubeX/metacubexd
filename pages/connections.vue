@@ -12,9 +12,9 @@ import {
 import { CONNECTIONS_TABLE_ACCESSOR_KEY } from '~/constants'
 import { formatIPv6, formatTimeFromNow } from '~/utils'
 
-useHead({ title: 'Connections' })
-
 const { t, locale } = useI18n()
+
+useHead({ title: computed(() => t('connections')) })
 const connectionsStore = useConnectionsStore()
 const configStore = useConfigStore()
 
@@ -179,8 +179,7 @@ const allColumns: ConnectionColumn[] = [
     groupable: false,
     sortable: true,
     sortId: 'ConnectTime',
-    render: (conn: Connection) =>
-      formatTimeFromNow(conn.start, locale),
+    render: (conn: Connection) => formatTimeFromNow(conn.start, locale.value),
   },
   {
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.DlSpeed,

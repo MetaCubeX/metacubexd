@@ -70,7 +70,7 @@ export const useProxiesStore = defineStore('proxies', () => {
           configStore.latencyQualityMap.NOT_CONNECTED
 
         acc.allTestUrlLatency[testUrl] = delay
-        acc.allTestUrlLatencyHistory[testUrl] = data.history
+        acc.allTestUrlLatencyHistory[testUrl] = data?.history
 
         return acc
       },
@@ -196,17 +196,17 @@ export const useProxiesStore = defineStore('proxies', () => {
 
   // Get now proxy node name (recursive)
   const getNowProxyNodeName = (name: string): string => {
-    let node = proxyNodeMap.value[name]
+    let node: ProxyInfo | undefined = proxyNodeMap.value[name]
 
     if (!name || !node) return name
 
-    while (node.latency && node.latency !== node.name) {
-      const nextNode = proxyNodeMap.value[node.latency]
+    while (node && node.latency && node.latency !== node.name) {
+      const nextNode: ProxyInfo | undefined = proxyNodeMap.value[node.latency]
       if (!nextNode) return node.name
       node = nextNode
     }
 
-    return node.name
+    return node?.name ?? name
   }
 
   // Get latency by name
@@ -255,17 +255,19 @@ export const useProxiesStore = defineStore('proxies', () => {
     // Fallback
     const childHistories = nowProxyNode?.latencyTestHistory || {}
     const childKeys = Object.keys(childHistories)
+    const firstChildKey = childKeys[0]
 
-    if (childKeys.length > 0) {
-      const hist = childHistories[childKeys[0]]
+    if (firstChildKey) {
+      const hist = childHistories[firstChildKey]
       if (hist && hist.length) return hist
     }
 
     const groupHistories = proxyNode?.latencyTestHistory || {}
     const groupKeys = Object.keys(groupHistories)
+    const firstGroupKey = groupKeys[0]
 
-    if (groupKeys.length > 0) {
-      const hist = groupHistories[groupKeys[0]]
+    if (firstGroupKey) {
+      const hist = groupHistories[firstGroupKey]
       if (hist && hist.length) return hist
     }
 

@@ -1,4 +1,5 @@
 {
+  "home": "Home",
   "add": "Add",
   "setup": "Setup",
   "setupDescription": "Connect to your Mihomo backend to get started",
@@ -172,5 +173,11 @@
   "processPath": "Process Path",
   "special": "Special",
   "specialProxy": "Special Proxy",
-  "specialRules": "Special Rules"
+  "specialRules": "Special Rules",
+  "connectionsChart": "Connections",
+  "networkTypes": "Network Types",
+  "topProxies": "Top Proxies",
+  "tcp": "TCP",
+  "udp": "UDP",
+  "other": "Other"
 }

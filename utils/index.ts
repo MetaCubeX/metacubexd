@@ -1,9 +1,18 @@
+import type {
+  LATENCY_QUALITY_MAP_HTTP,
+  LATENCY_QUALITY_MAP_HTTPS,
+} from '~/constants'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { LATENCY_QUALITY_MAP_HTTP, PROXIES_ORDERING_TYPE } from '~/constants'
+import { PROXIES_ORDERING_TYPE } from '~/constants'
 import 'dayjs/locale/zh-cn'
 import 'dayjs/locale/ru'
+
+// Type for latency quality map (can be either HTTP or HTTPS)
+type LatencyQualityMap =
+  | typeof LATENCY_QUALITY_MAP_HTTP
+  | typeof LATENCY_QUALITY_MAP_HTTPS
 
 dayjs.extend(relativeTime)
 dayjs.extend(duration)
@@ -94,13 +103,13 @@ export function formatProxyType(type: string = '', t: (key: string) => string) {
 
 export function getLatencyClassName(
   latency: number,
-  latencyQualityMap: typeof LATENCY_QUALITY_MAP_HTTP,
+  latencyQualityMap: LatencyQualityMap,
 ) {
   if (latency > latencyQualityMap.HIGH) {
     return 'text-red-500'
   } else if (latency > latencyQualityMap.MEDIUM) {
     return 'text-yellow-500'
-  } else if (latency === LATENCY_QUALITY_MAP_HTTP.NOT_CONNECTED) {
+  } else if (latency === latencyQualityMap.NOT_CONNECTED) {
     return 'text-gray'
   }
   return 'text-green-600'
@@ -131,7 +140,7 @@ export function sortProxiesByOrderingType({
   orderingType: PROXIES_ORDERING_TYPE
   testUrl: string | null
   getLatencyByName: (name: string, testUrl: string | null) => number
-  latencyQualityMap: typeof LATENCY_QUALITY_MAP_HTTP
+  latencyQualityMap: LatencyQualityMap
   urlForLatencyTest: string
 }) {
   if (orderingType === PROXIES_ORDERING_TYPE.NATURAL) {
@@ -181,7 +190,7 @@ export function filterProxiesByAvailability({
   testUrl: string | null
   getLatencyByName: (name: string, testUrl: string | null) => number
   isProxyGroup: (name: string) => boolean
-  latencyQualityMap: typeof LATENCY_QUALITY_MAP_HTTP
+  latencyQualityMap: LatencyQualityMap
   urlForLatencyTest: string
 }) {
   const finalTestUrl = testUrl || urlForLatencyTest
@@ -283,13 +292,13 @@ export function getChartThemeColors() {
     textColor: theme.baseContent,
     textColorHover: theme.primaryContent,
     // Grid and axis colors
-    gridLineColor: theme.neutral,
-    lineColor: theme.neutral,
-    tickColor: theme.neutral,
+    gridLineColor: theme.base300,
+    lineColor: theme.base300,
+    tickColor: theme.base300,
     // Series colors (using theme accent colors)
     seriesColors: [theme.info, theme.success, theme.warning, theme.error],
-    // Background
-    backgroundColor: 'transparent',
+    // Background - use base200 to match card background
+    backgroundColor: theme.base200,
   }
 }
 

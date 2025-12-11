@@ -55,7 +55,13 @@ export const useConnectionsStore = defineStore('connections', () => {
         !isNumber(prevConn.download) ||
         !isNumber(prevConn.upload)
       ) {
-        return { ...connection, downloadSpeed: 0, uploadSpeed: 0 }
+        // Preserve existing speed values if present (e.g., from mock data)
+        const conn = connection as Connection
+        return {
+          ...connection,
+          downloadSpeed: conn.downloadSpeed ?? 0,
+          uploadSpeed: conn.uploadSpeed ?? 0,
+        }
       }
 
       return {

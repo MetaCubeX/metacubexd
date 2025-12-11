@@ -217,7 +217,7 @@ export function proxyLatencyTestAPI(
 
   if (provider !== '') {
     return proxyProviderHealthCheckAPI(provider).then((latencyMap) => ({
-      delay: latencyMap[proxyName],
+      delay: latencyMap[proxyName] ?? 0,
     }))
   }
 
@@ -397,20 +397,23 @@ export async function backendReleaseAPI(currentVersion: string) {
 
   if (!match) return { isUpdateAvailable: false }
 
+  const versionSuffix = match[2] || ''
+  const channel = match[1] || ''
+
   const release = async (url: string) => {
     const { assets, body } = await githubAPI
       .get(`${repositoryURL}/${url}`)
       .json<ReleaseAPIResponse>()
 
-    const alreadyLatest = assets.some(({ name }) => name.includes(match[2]))
+    const alreadyLatest = assets.some(({ name }) =>
+      name.includes(versionSuffix),
+    )
 
     return {
       isUpdateAvailable: !alreadyLatest,
       changelog: body,
     }
   }
-
-  const channel = match[1]
 
   if (channel === 'meta') return await release('releases/latest')
 
@@ -449,7 +452,8 @@ export async function fetchBackendReleasesAPI(
 
   if (!match) return []
 
-  const channel = match[1]
+  const channel = match[1] || ''
+  const versionSuffix = match[2] || ''
   let releases: ReleaseAPIResponse[] = []
 
   if (channel === 'meta') {
@@ -479,6 +483,6 @@ export async function fetchBackendReleasesAPI(
     changelog: release.body,
     publishedAt: release.published_at,
     isCurrent:
-      release.assets?.some(({ name }) => name.includes(match[2])) ?? false,
+      release.assets?.some(({ name }) => name.includes(versionSuffix)) ?? false,
   }))
 }

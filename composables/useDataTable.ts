@@ -112,9 +112,9 @@ export function useDataTable<T>(options: UseDataTableOptions<T>) {
     rows: T[],
     getGroupValue?: (row: T, columnId: string) => string,
   ): GroupedRow<T>[] => {
-    if (!groupState.value.length) return []
-
     const groupColumnId = groupState.value[0]
+    if (!groupColumnId) return []
+
     const colDef = options.columns.find((c) => c.id === groupColumnId)
 
     if (!colDef) return []

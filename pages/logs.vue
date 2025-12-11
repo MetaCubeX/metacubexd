@@ -13,9 +13,9 @@ import {
 } from '@tabler/icons-vue'
 import { LOG_LEVEL } from '~/constants'
 
-useHead({ title: 'Logs' })
-
 const { t } = useI18n()
+
+useHead({ title: computed(() => t('logs')) })
 const logsStore = useLogsStore()
 const configStore = useConfigStore()
 

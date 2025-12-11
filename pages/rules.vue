@@ -9,9 +9,9 @@ import {
 } from '~/composables/useQueries'
 import { formatTimeFromNow, useStringBooleanMap } from '~/utils'
 
-useHead({ title: 'Rules' })
-
 const { t, locale } = useI18n()
+
+useHead({ title: computed(() => t('rules')) })
 const configStore = useConfigStore()
 
 // TanStack Query

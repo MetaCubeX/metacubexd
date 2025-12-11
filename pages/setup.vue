@@ -9,9 +9,9 @@ definePageMeta({
   layout: 'default',
 })
 
-useHead({ title: 'Setup' })
-
 const { t } = useI18n()
+
+useHead({ title: computed(() => t('setup')) })
 const router = useRouter()
 const route = useRoute()
 const endpointStore = useEndpointStore()

@@ -61,7 +61,7 @@ const notConnectedPercent = computed(
 <template>
   <div class="flex items-center gap-2">
     <div
-      class="my-1 flex flex-1 items-center justify-center overflow-hidden rounded-2xl [&>*]:h-2"
+      class="my-1 flex flex-1 items-center justify-center overflow-hidden rounded-2xl *:h-2"
     >
       <div class="bg-green-600" :style="{ width: `${goodPercent}%` }" />
       <div class="bg-yellow-500" :style="{ width: `${middlePercent}%` }" />

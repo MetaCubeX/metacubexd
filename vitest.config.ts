@@ -8,10 +8,7 @@ export default defineConfig({
     hookTimeout: 60000,
     // Run tests sequentially since they share a server
     pool: 'forks',
-    poolOptions: {
-      forks: {
-        singleFork: true,
-      },
-    },
+    // Use maxWorkers: 1 to run tests sequentially (replaces poolOptions.forks.singleFork)
+    maxWorkers: 1,
   },
 })

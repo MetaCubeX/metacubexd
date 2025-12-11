@@ -9,9 +9,9 @@ import {
 } from '~/composables/useQueries'
 import { themes } from '~/constants'
 
-useHead({ title: 'Config' })
-
 const { t } = useI18n()
+
+useHead({ title: computed(() => t('config')) })
 const router = useRouter()
 const configStore = useConfigStore()
 const endpointStore = useEndpointStore()

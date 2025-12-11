@@ -39,8 +39,9 @@ export const useEndpointStore = defineStore('endpoint', () => {
 
   const updateEndpoint = (id: string, updates: Partial<Endpoint>) => {
     const index = endpointList.value.findIndex((e) => e.id === id)
-    if (index !== -1) {
-      endpointList.value[index] = { ...endpointList.value[index], ...updates }
+    const existing = endpointList.value[index]
+    if (index !== -1 && existing) {
+      endpointList.value[index] = { ...existing, ...updates } as Endpoint
     }
   }
 

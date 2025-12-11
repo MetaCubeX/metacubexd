@@ -23,6 +23,9 @@ export const useGlobalStore = defineStore('global', () => {
 
   const memoryChartHistory = reactive<ChartDataPoint[]>([])
 
+  // Connection count history for chart
+  const connectionCountHistory = reactive<ChartDataPoint[]>([])
+
   // Helper functions
   const setLatestTraffic = (data: TrafficData | null) => {
     latestTraffic.value = data
@@ -58,10 +61,20 @@ export const useGlobalStore = defineStore('global', () => {
     }
   }
 
+  const addConnectionCountDataPoint = (time: number, count: number) => {
+    connectionCountHistory.push([time, count])
+
+    // Keep only the last CHART_MAX_XAXIS points
+    if (connectionCountHistory.length > CHART_MAX_XAXIS) {
+      connectionCountHistory.shift()
+    }
+  }
+
   const clearChartHistory = () => {
     trafficChartHistory.download.length = 0
     trafficChartHistory.upload.length = 0
     memoryChartHistory.length = 0
+    connectionCountHistory.length = 0
   }
 
   return {
@@ -70,10 +83,12 @@ export const useGlobalStore = defineStore('global', () => {
     latestMemory,
     trafficChartHistory,
     memoryChartHistory,
+    connectionCountHistory,
     setLatestTraffic,
     setLatestMemory,
     addTrafficDataPoint,
     addMemoryDataPoint,
+    addConnectionCountDataPoint,
     clearChartHistory,
   }
 })

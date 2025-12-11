@@ -86,7 +86,7 @@ const { floatingStyles, middlewareData, placement } = useFloating(
 // Arrow positioning based on placement
 const arrowStyles = computed(() => {
   const arrowData = middlewareData.value.arrow
-  const side = placement.value.split('-')[0]
+  const side = placement.value.split('-')[0] || 'top'
 
   const staticSide: Record<string, string> = {
     top: 'bottom',
@@ -95,10 +95,12 @@ const arrowStyles = computed(() => {
     left: 'right',
   }
 
+  const sideKey = staticSide[side] || 'bottom'
+
   return {
     left: arrowData?.x != null ? `${arrowData.x}px` : '',
     top: arrowData?.y != null ? `${arrowData.y}px` : '',
-    [staticSide[side]]: '-4px',
+    [sideKey]: '-4px',
   }
 })
 

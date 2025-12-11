@@ -41,7 +41,7 @@ function createMarkdownRenderer() {
     }
 
   md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
-    tokens[idx].attrSet('target', '_blank')
+    tokens[idx]?.attrSet('target', '_blank')
     return defaultRender(tokens, idx, options, env, self)
   }
 

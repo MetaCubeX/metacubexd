@@ -1,9 +1,5 @@
 {
-  "plugins": [
-    "@prettier/plugin-oxc",
-    "prettier-plugin-organize-imports",
-    "prettier-plugin-tailwindcss"
-  ],
+  "plugins": ["@prettier/plugin-oxc", "prettier-plugin-tailwindcss"],
   "tailwindStylesheet": "./assets/css/main.css",
   "semi": false,
   "singleQuote": true,

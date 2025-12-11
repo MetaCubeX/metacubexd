@@ -1,5 +1,10 @@
 {
   "cSpell.words": ["restruct"],
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "always",
+    "source.organizeImports": "never"
+  },
+  "editor.formatOnSave": true,
   "tailwindCSS.classAttributes": [
     "class",
     "className",
