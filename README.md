@@ -139,11 +139,11 @@ docker compose pull && docker compose up -d
 # Install dependencies
 pnpm install
 
-# Build
-pnpm build
+# Build for static hosting (gh-pages, etc.)
+pnpm generate
 
 # Preview
-pnpm serve
+pnpm preview
 ```
 
 ## 🛠️ Development
@@ -166,6 +166,7 @@ pnpm format
 
 ## 🙏 Credits
 
-- [SolidJS](https://github.com/solidjs/solid) - Reactive UI library
+- [Nuxt](https://github.com/nuxt/nuxt) - The Intuitive Vue Framework
+- [Vue.js](https://github.com/vuejs/core) - The Progressive JavaScript Framework
 - [daisyUI](https://github.com/saadeghi/daisyui) - Tailwind CSS components
 - [Tailwind CSS](https://tailwindcss.com) - Utility-first CSS framework

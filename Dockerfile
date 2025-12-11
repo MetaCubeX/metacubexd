@@ -20,7 +20,8 @@ EXPOSE 80
 
 WORKDIR /srv
 
-COPY --from=builder /build/dist/. .
+# Nuxt outputs static files to .output/public
+COPY --from=builder /build/.output/public/. .
 COPY Caddyfile .
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh

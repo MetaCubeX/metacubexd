@@ -1,3 +1,2 @@
-'package.json': 'sort-package-json'
-'*.{js,jsx,ts,tsx}': 'eslint --fix'
-'*.{js,jsx,ts,tsx,md,html,css,json,yml,yaml}': 'prettier --write'
+package.json: sort-package-json
+'*.{js,ts,vue,json,md,html,css,yml,yaml}': eslint --fix

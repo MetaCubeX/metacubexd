@@ -51,19 +51,19 @@ jobs:
         run: pnpm install
 
       - name: build
-        run: pnpm build
+        run: pnpm generate
 
       - name: publish gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.CI_TOKEN }}
-          publish_dir: ./dist
+          publish_dir: ./.output/public
           force_orphan: true
           cname: d.metacubex.one
           commit_message: ${{ needs.release-please.outputs.tag_name }}
 
       - name: compress dist
-        run: tar czvf compressed-dist.tgz -C dist .
+        run: tar czvf compressed-dist.tgz -C .output/public .
 
       - name: attach github release artifacts
         uses: softprops/action-gh-release@v2
@@ -145,6 +145,9 @@ jobs:
 
       - name: install playwright browsers
         run: pnpm playwright install chromium
+
+      - name: build with mock mode
+        run: pnpm generate:mock
 
       - name: generate screenshots
         run: pnpm screenshot
