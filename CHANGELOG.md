@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.225.0](https://github.com/MetaCubeX/metacubexd/compare/v1.224.0...v1.225.0) (2025-12-11)
+
+
+### Features
+
+* update release workflow to use Ubuntu runner for consistency ([d1283df](https://github.com/MetaCubeX/metacubexd/commit/d1283df72b606885bf32793a136051572a606a97))
+
 ## [1.224.0](https://github.com/MetaCubeX/metacubexd/compare/v1.223.0...v1.224.0) (2025-12-11)
 
 
