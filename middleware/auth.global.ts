@@ -2,6 +2,12 @@ export default defineNuxtRouteMiddleware((to) => {
   // Skip middleware on server
   if (import.meta.server) return
 
+  // Skip endpoint check in mock mode
+  const config = useRuntimeConfig()
+  if (config.public.mockMode === true) {
+    return
+  }
+
   const endpointStore = useEndpointStore()
   const hasEndpoint = !!endpointStore.currentEndpoint
 

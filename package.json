@@ -11,6 +11,7 @@
     "dev:mock": "MOCK_MODE=true nuxt dev --host",
     "format": "pnpm prettier --write --ignore-unknown .",
     "generate": "nuxt generate",
+    "generate:mock": "MOCK_MODE=true nuxt generate",
     "postinstall": "nuxt prepare",
     "lint": "eslint --fix .",
     "prepare": "nuxt prepare && husky",

@@ -51,7 +51,7 @@ jobs:
         run: pnpm install
 
       - name: build
-        run: pnpm build
+        run: pnpm generate
 
       - name: publish gh-pages
         uses: peaceiris/actions-gh-pages@v4
@@ -147,7 +147,7 @@ jobs:
         run: pnpm playwright install chromium
 
       - name: build with mock mode
-        run: pnpm build:mock
+        run: pnpm generate:mock
 
       - name: generate screenshots
         run: pnpm screenshot
