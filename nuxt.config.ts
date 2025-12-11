@@ -26,7 +26,41 @@ export default defineNuxtConfig({
   },
 
   // Modules
-  modules: ['@vueuse/nuxt', '@pinia/nuxt'],
+  modules: ['@vueuse/nuxt', '@pinia/nuxt', '@nuxtjs/i18n', '@nuxt/fonts'],
+
+  // i18n configuration
+  i18n: {
+    locales: [
+      { code: 'en', name: 'English', file: 'en.json' },
+      { code: 'zh', name: '简体中文', file: 'zh.json' },
+      { code: 'ru', name: 'Русский', file: 'ru.json' },
+    ],
+    defaultLocale: 'en',
+    langDir: 'locales',
+    strategy: 'no_prefix',
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'lang',
+      fallbackLocale: 'en',
+    },
+  },
+
+  // Fonts configuration - using Ubuntu font
+  fonts: {
+    families: [
+      {
+        name: 'Ubuntu',
+        provider: 'google',
+        weights: [300, 400, 500, 700],
+        styles: ['normal', 'italic'],
+      },
+    ],
+    defaults: {
+      weights: [400, 700],
+      styles: ['normal'],
+      subsets: ['latin', 'latin-ext', 'cyrillic', 'cyrillic-ext'],
+    },
+  },
 
   // TypeScript configuration
   typescript: {

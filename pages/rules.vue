@@ -11,7 +11,7 @@ import { formatTimeFromNow, useStringBooleanMap } from '~/utils'
 
 useHead({ title: 'Rules' })
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const configStore = useConfigStore()
 
 // TanStack Query
@@ -168,7 +168,7 @@ const allProviderIsUpdating = computed(
           <div class="text-xs text-slate-500">
             {{ provider.vehicleType }} / {{ provider.behavior }} /
             {{ t('updated') }}
-            {{ formatTimeFromNow(provider.updatedAt, configStore.locale) }}
+            {{ formatTimeFromNow(provider.updatedAt, locale) }}
           </div>
 
           <Button

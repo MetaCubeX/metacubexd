@@ -9,7 +9,7 @@ import {
 import byteSize from 'byte-size'
 import { formatDateRange, formatDuration } from '~/utils'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const connectionsStore = useConnectionsStore()
 const configStore = useConfigStore()
 
@@ -161,7 +161,7 @@ function handleRemoveEntry(sourceIP: string) {
                 formatDateRange(
                   totalStats.firstSeen,
                   totalStats.lastSeen,
-                  configStore.locale,
+                  locale,
                 )
               "
             >
@@ -293,7 +293,7 @@ function handleRemoveEntry(sourceIP: string) {
                       ? formatDateRange(
                           entry.firstSeen,
                           entry.lastSeen,
-                          configStore.locale,
+                          locale,
                         )
                       : '-'
                   "
@@ -454,7 +454,7 @@ function handleRemoveEntry(sourceIP: string) {
                     formatDateRange(
                       entry.firstSeen,
                       entry.lastSeen,
-                      configStore.locale,
+                      locale,
                     )
                   }}
                 </div>

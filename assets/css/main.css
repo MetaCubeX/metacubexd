@@ -1,13 +1,7 @@
-@import '@fontsource/fira-sans';
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 @plugin 'daisyui' {
   themes: all;
-}
-
-@font-face {
-  font-family: 'FiraSans';
-  src: url('~/assets/fonts/FiraSans-Regular.ttf') format('truetype');
 }
 
 @font-face {
@@ -51,15 +45,22 @@ option {
   font-family: system-ui;
 }
 
+/* Default font - Ubuntu from @nuxt/fonts */
+body {
+  font-family:
+    'Ubuntu', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    'Noto Sans CJK SC', system-ui, sans-serif;
+}
+
 /* Custom font families */
 .font-twemoji {
   font-family:
-    'Twemoji Mozilla', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
-    'Noto Sans CJK SC', system-ui, sans-serif;
+    'Twemoji Mozilla', 'Ubuntu', 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', 'Noto Sans CJK SC', system-ui, sans-serif;
 }
 
 .font-default {
   font-family:
-    'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC',
-    system-ui, sans-serif;
+    'Ubuntu', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    'Noto Sans CJK SC', system-ui, sans-serif;
 }

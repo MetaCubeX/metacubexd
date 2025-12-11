@@ -8,7 +8,6 @@ import {
   CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
   CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY,
   DEFAULT_LOGS_TABLE_MAX_ROWS,
-  LANG,
   LATENCY_QUALITY_MAP_HTTP,
   LATENCY_QUALITY_MAP_HTTPS,
   LOG_LEVEL,
@@ -69,14 +68,6 @@ export const useConfigStore = defineStore('config', () => {
 
   // Twemoji support
   const enableTwemoji = useLocalStorage('enableTwemoji', false)
-
-  // Locale
-  const locale = useLocalStorage<LANG>(
-    'lang',
-    typeof navigator !== 'undefined' && navigator.language in LANG
-      ? (navigator.language as LANG)
-      : LANG.EN,
-  )
 
   // Connections table settings
   const connectionsTableSize = useLocalStorage<TAILWINDCSS_SIZE>(
@@ -178,8 +169,6 @@ export const useConfigStore = defineStore('config', () => {
     autoSwitchEndpoint,
     // Twemoji
     enableTwemoji,
-    // Locale
-    locale,
     // Connections
     connectionsTableSize,
     connectionsTableColumnVisibility,

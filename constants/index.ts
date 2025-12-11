@@ -79,12 +79,6 @@ export enum PROXIES_DISPLAY_MODE {
   LIST = 'listMode',
 }
 
-export enum LANG {
-  EN = 'en-US',
-  ZH = 'zh-CN',
-  RU = 'ru-RU',
-}
-
 export enum CONNECTIONS_TABLE_ACCESSOR_KEY {
   Details = 'details',
   Close = 'close',

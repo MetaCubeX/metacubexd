@@ -18,7 +18,7 @@ import {
 
 useHead({ title: 'Proxies' })
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const proxiesStore = useProxiesStore()
 const connectionsStore = useConnectionsStore()
 const configStore = useConfigStore()
@@ -288,7 +288,7 @@ const ProxyProviderTitle = defineComponent({
           h(
             'div',
             { class: 'text-sm text-slate-500' },
-            `${t('updated')} ${formatTimeFromNow(props.provider.updatedAt, configStore.locale)}`,
+            `${t('updated')} ${formatTimeFromNow(props.provider.updatedAt, locale)}`,
           ),
           !proxiesStore.collapsedMap[props.provider.name] &&
             h(ProxyNodePreview, {

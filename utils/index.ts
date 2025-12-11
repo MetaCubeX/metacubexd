@@ -26,8 +26,8 @@ export function formatTimeFromNow(
   time: number | string,
   locale: string = 'en',
 ) {
-  const dayjsLocale =
-    locale === 'zh-CN' ? 'zh-cn' : locale === 'ru-RU' ? 'ru' : 'en'
+  // Map i18n locale codes to dayjs locale codes
+  const dayjsLocale = locale === 'zh' ? 'zh-cn' : locale === 'ru' ? 'ru' : 'en'
   return dayjs(time).locale(dayjsLocale).fromNow()
 }
 
@@ -54,8 +54,8 @@ export function formatDateRange(
   endTime: number,
   locale: string = 'en',
 ) {
-  const dayjsLocale =
-    locale === 'zh-CN' ? 'zh-cn' : locale === 'ru-RU' ? 'ru' : 'en'
+  // Map i18n locale codes to dayjs locale codes
+  const dayjsLocale = locale === 'zh' ? 'zh-cn' : locale === 'ru' ? 'ru' : 'en'
   const start = dayjs(startTime)
   const end = dayjs(endTime)
 

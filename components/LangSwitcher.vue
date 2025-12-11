@@ -1,14 +1,11 @@
 <script setup lang="ts">
 import { IconLanguage } from '@tabler/icons-vue'
-import { LANG } from '~/constants'
 
-const configStore = useConfigStore()
+const { locale, locales, setLocale } = useI18n()
 
-const languages = [
-  { value: LANG.EN, label: 'English' },
-  { value: LANG.ZH, label: '简体中文' },
-  { value: LANG.RU, label: 'Русский' },
-]
+const availableLocales = computed(() =>
+  locales.value.map((l) => (typeof l === 'string' ? { code: l, name: l } : l)),
+)
 </script>
 
 <template>
@@ -26,12 +23,12 @@ const languages = [
       tabindex="0"
       class="dropdown-content menu z-50 mt-2 w-40 rounded-box bg-base-200 p-2 shadow-lg"
     >
-      <li v-for="lang in languages" :key="lang.value">
+      <li v-for="lang in availableLocales" :key="lang.code">
         <button
-          :class="{ 'menu-active': configStore.locale === lang.value }"
-          @click="configStore.locale = lang.value"
+          :class="{ 'menu-active': locale === lang.code }"
+          @click="setLocale(lang.code)"
         >
-          {{ lang.label }}
+          {{ lang.name }}
         </button>
       </li>
     </ul>

@@ -14,7 +14,7 @@ import { formatIPv6, formatTimeFromNow } from '~/utils'
 
 useHead({ title: 'Connections' })
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const connectionsStore = useConnectionsStore()
 const configStore = useConfigStore()
 
@@ -180,7 +180,7 @@ const allColumns: ConnectionColumn[] = [
     sortable: true,
     sortId: 'ConnectTime',
     render: (conn: Connection) =>
-      formatTimeFromNow(conn.start, configStore.locale),
+      formatTimeFromNow(conn.start, locale),
   },
   {
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.DlSpeed,
