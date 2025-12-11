@@ -147,7 +147,7 @@ jobs:
         run: pnpm playwright install chromium
 
       - name: build with mock mode
-        run: MOCK_MODE=true pnpm build
+        run: pnpm build:mock
 
       - name: generate screenshots
         run: pnpm screenshot

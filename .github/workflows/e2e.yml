@@ -32,7 +32,7 @@ jobs:
         run: pnpm playwright install chromium
 
       - name: build with mock mode
-        run: MOCK_MODE=true pnpm build
+        run: pnpm build:mock
 
       - name: run e2e tests
         run: pnpm test:e2e
