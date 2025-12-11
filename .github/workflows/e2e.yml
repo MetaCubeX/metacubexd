@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   e2e-test:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v6
