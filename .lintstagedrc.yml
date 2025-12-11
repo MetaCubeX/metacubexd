@@ -1,3 +1,2 @@
-package.json: sort-package-json
 '*': prettier --write --ignore-unknown
-'*.{js,ts,vue,json,md,html,css,yml,yaml}': eslint --fix
+'*.{js,ts,vue,json}': eslint --fix
