@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.221.0](https://github.com/MetaCubeX/metacubexd/compare/v1.220.0...v1.221.0) (2025-12-11)
+
+
+### Features
+
+* update nuxt.config.ts for relative asset paths and adjust GitHub workflow for base URL ([07fe7e5](https://github.com/MetaCubeX/metacubexd/commit/07fe7e508b0d6579d984b1c0bdcacdd0146811f1))
+
 ## [1.220.0](https://github.com/MetaCubeX/metacubexd/compare/v1.219.2...v1.220.0) (2025-12-11)
 
 
