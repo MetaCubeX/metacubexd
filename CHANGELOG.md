@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.220.0](https://github.com/MetaCubeX/metacubexd/compare/v1.219.2...v1.220.0) (2025-12-11)
+
+
+### Features
+
+* update project configuration and enhance components ([c70c2e8](https://github.com/MetaCubeX/metacubexd/commit/c70c2e88d10c04d6e8449b6d787faebf8b355bfc))
+
 ## [1.219.2](https://github.com/MetaCubeX/metacubexd/compare/v1.219.1...v1.219.2) (2025-12-07)
 
 
