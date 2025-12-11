@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.223.0](https://github.com/MetaCubeX/metacubexd/compare/v1.222.0...v1.223.0) (2025-12-11)
+
+
+### Features
+
+* add GlobalTrafficIndicator component for real-time traffic monitoring ([ef49818](https://github.com/MetaCubeX/metacubexd/commit/ef498180b96c76bcd476874548c781f0b6eb8f11))
+
 ## [1.222.0](https://github.com/MetaCubeX/metacubexd/compare/v1.221.0...v1.222.0) (2025-12-11)
 
 
