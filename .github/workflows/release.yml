@@ -51,7 +51,7 @@ jobs:
         run: pnpm install
 
       - name: build
-        run: pnpm generate
+        run: NUXT_APP_BASE_URL='./' pnpm generate
 
       - name: publish gh-pages
         uses: peaceiris/actions-gh-pages@v4

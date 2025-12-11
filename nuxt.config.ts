@@ -83,6 +83,9 @@ export default defineNuxtConfig({
 
   // App configuration
   app: {
+    // Use relative paths for assets to support both root and subdirectory deployments
+    // Can be overridden with NUXT_APP_BASE_URL environment variable
+    baseURL: process.env.NUXT_APP_BASE_URL || '/',
     head: {
       charset: 'utf-8',
       viewport:
@@ -90,12 +93,13 @@ export default defineNuxtConfig({
       title: 'MetaCubeXD',
       meta: [{ name: 'theme-color', content: '#000000' }],
       link: [
-        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
-        { rel: 'apple-touch-icon', href: '/pwa-192x192.png' },
+        { rel: 'icon', type: 'image/svg+xml', href: 'favicon.svg' },
+        { rel: 'apple-touch-icon', href: 'pwa-192x192.png' },
       ],
       script: [
         {
-          src: '/config.js',
+          // Use relative path for config.js to support both root and subdirectory deployments
+          src: 'config.js',
           onerror: "window.__METACUBEXD_CONFIG__={defaultBackendURL:''}",
         },
         {
