@@ -7,7 +7,7 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev --host",
-    "dev:mock": "VITE_MOCK_MODE=true nuxt dev --host",
+    "dev:mock": "MOCK_MODE=true nuxt dev --host",
     "format": "pnpm prettier --write --ignore-unknown .",
     "generate": "nuxt generate",
     "postinstall": "nuxt prepare",

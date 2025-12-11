@@ -21,6 +21,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       appVersion: pkg.version,
+      mockMode: process.env.MOCK_MODE === 'true',
     },
   },
 

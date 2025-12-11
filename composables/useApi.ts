@@ -12,13 +12,16 @@ import { useMockData } from './useMockData'
 
 // Mock mode support
 export function useMockMode() {
-  return import.meta.env.VITE_MOCK_MODE === 'true'
+  const config = useRuntimeConfig()
+
+  return config.public.mockMode === true
 }
 
 // Mock data resolver
 function getMockData(url: string): unknown {
   // Lazy import to avoid bundling mock data in production
-  const mockData = import.meta.env.VITE_MOCK_MODE === 'true' ? useMockData() : null
+  const config = useRuntimeConfig()
+  const mockData = config.public.mockMode === true ? useMockData() : null
 
   if (!mockData) return {}
 
@@ -29,18 +32,25 @@ function getMockData(url: string): unknown {
   if (path === 'version') return mockData.mockVersion
   if (path === 'configs') return mockData.mockConfig
   if (path === 'proxies') return { proxies: mockData.mockProxies }
-  if (path === 'providers/proxies') return { providers: mockData.mockProxyProviders }
+  if (path === 'providers/proxies')
+    return { providers: mockData.mockProxyProviders }
   // Convert rules array to object for API compatibility
   if (path === 'rules') {
-    const rulesObj: Record<string, typeof mockData.mockRules[0]> = {}
+    const rulesObj: Record<string, (typeof mockData.mockRules)[0]> = {}
     mockData.mockRules.forEach((rule, idx) => {
       rulesObj[`rule-${idx}`] = rule
     })
 
     return { rules: rulesObj }
   }
-  if (path === 'providers/rules') return { providers: mockData.mockRuleProviders }
-  if (path === 'connections') return { connections: mockData.mockConnections, downloadTotal: 850000000, uploadTotal: 125000000 }
+  if (path === 'providers/rules')
+    return { providers: mockData.mockRuleProviders }
+  if (path === 'connections')
+    return {
+      connections: mockData.mockConnections,
+      downloadTotal: 850000000,
+      uploadTotal: 125000000,
+    }
   if (path === 'group') return { groups: {} }
 
   // Handle dynamic proxy endpoints
@@ -51,9 +61,14 @@ function getMockData(url: string): unknown {
   }
 
   if (path.startsWith('providers/proxies/')) {
-    const providerName = decodeURIComponent(path.replace('providers/proxies/', ''))
+    const providerName = decodeURIComponent(
+      path.replace('providers/proxies/', ''),
+    )
 
-    return (mockData.mockProxyProviders as Record<string, unknown>)[providerName] || {}
+    return (
+      (mockData.mockProxyProviders as Record<string, unknown>)[providerName] ||
+      {}
+    )
   }
 
   return {}
