@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.225.1](https://github.com/MetaCubeX/metacubexd/compare/v1.225.0...v1.225.1) (2025-12-11)
+
+
+### Bug Fixes
+
+* update docker build platforms to linux/amd64 only ([a065ef5](https://github.com/MetaCubeX/metacubexd/commit/a065ef5d89fc83611a1aa8ce69c1d65e11dcaaea))
+
 ## [1.225.0](https://github.com/MetaCubeX/metacubexd/compare/v1.224.0...v1.225.0) (2025-12-11)
 
 
