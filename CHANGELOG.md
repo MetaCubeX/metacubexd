@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.224.0](https://github.com/MetaCubeX/metacubexd/compare/v1.223.0...v1.224.0) (2025-12-11)
+
+
+### Features
+
+* update release workflow to use macOS runner for compatibility ([2a327af](https://github.com/MetaCubeX/metacubexd/commit/2a327af06229e3306d912a6a3323f0a482f87eee))
+
 ## [1.223.0](https://github.com/MetaCubeX/metacubexd/compare/v1.222.0...v1.223.0) (2025-12-11)
 
 
