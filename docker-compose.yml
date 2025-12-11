@@ -1,0 +1,63 @@
+# Docker Compose for MetaCubeXD with Mihomo
+# This configuration runs metacubexd dashboard with mihomo proxy server
+
+services:
+  # MetaCubeXD Dashboard
+  metacubexd:
+    build: .
+    container_name: metacubexd
+    restart: unless-stopped
+    ports:
+      - '80:80'
+    environment:
+      # Config directory for server mode (config file management)
+      - NUXT_CONFIG_DIR=/config
+      # Default backend URL (mihomo API)
+      - DEFAULT_BACKEND_URL=http://mihomo:9090
+    volumes:
+      # Shared config directory with mihomo
+      - ./config:/config
+    depends_on:
+      - mihomo
+    networks:
+      - mihomo-network
+
+  # Mihomo Proxy Server
+  mihomo:
+    image: metacubex/mihomo:latest
+    container_name: mihomo
+    restart: unless-stopped
+    # Use host network for TUN mode support
+    # Comment out if you don't need TUN and want to use bridge network
+    # network_mode: host
+    ports:
+      # API port
+      - '9090:9090'
+      # Mixed port (HTTP/SOCKS)
+      - '7890:7890'
+      # SOCKS port
+      - '7891:7891'
+      # Redir port (for transparent proxy)
+      # - "7892:7892"
+    volumes:
+      # Config directory
+      - ./config:/root/.config/mihomo
+    # Required for TUN mode
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    # devices:
+    #   - /dev/net/tun:/dev/net/tun
+    networks:
+      - mihomo-network
+
+networks:
+  mihomo-network:
+    driver: bridge
+
+# Note:
+# 1. Create a ./config directory before running
+# 2. Place your mihomo config file (config.yaml) in ./config
+# 3. Run with: docker-compose up -d
+# 4. Access dashboard at http://localhost
+# 5. The dashboard will auto-connect to mihomo at http://mihomo:9090

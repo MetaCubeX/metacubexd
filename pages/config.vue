@@ -14,6 +14,12 @@ useHead({ title: computed(() => t('config')) })
 const router = useRouter()
 const configStore = useConfigStore()
 const endpointStore = useEndpointStore()
+const serverStore = useServerStore()
+
+// Check server mode availability on mount
+onMounted(async () => {
+  await serverStore.checkServerStatus()
+})
 
 const configActions = useConfigActions()
 const runtimeConfig = useRuntimeConfig()
@@ -163,6 +169,17 @@ const isLoading = computed(
     </div>
 
     <template v-else>
+      <!-- Server Mode: Config File Manager -->
+      <template v-if="serverStore.serverAvailable">
+        <ConfigTitle with-divider>
+          {{ t('configManager.title') }}
+        </ConfigTitle>
+
+        <div class="min-h-[400px]">
+          <ConfigManager />
+        </div>
+      </template>
+
       <!-- DNS Query (hide for sing-box) -->
       <template v-if="!isSingBox">
         <ConfigTitle with-divider>

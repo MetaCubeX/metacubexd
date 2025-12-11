@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import tailwindcss from '@tailwindcss/vite'
+import monacoEditorPlugin from 'vite-plugin-monaco-editor'
 import pkg from './package.json'
 
 export default defineNuxtConfig({
@@ -19,6 +20,8 @@ export default defineNuxtConfig({
 
   // Runtime config
   runtimeConfig: {
+    // Server-side private config (can be overridden by NUXT_CONFIG_DIR env var)
+    configDir: '/config',
     public: {
       appVersion: pkg.version,
       mockMode: process.env.MOCK_MODE === 'true',
@@ -114,7 +117,12 @@ export default defineNuxtConfig({
     build: {
       chunkSizeWarningLimit: 1000,
     },
-    plugins: [tailwindcss()],
+    plugins: [
+      tailwindcss(),
+      monacoEditorPlugin({
+        languageWorkers: ['editorWorkerService'],
+      }),
+    ],
   },
 
   compatibilityDate: 'latest',

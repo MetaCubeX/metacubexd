@@ -17,6 +17,8 @@ RUN pnpm build
 FROM docker.io/node:alpine
 
 ENV PORT=80
+# Default config directory for server mode
+ENV NUXT_CONFIG_DIR=/config
 EXPOSE 80
 
 WORKDIR /app
@@ -25,5 +27,11 @@ WORKDIR /app
 COPY --from=builder /build/.output ./.output
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
+
+# Create default config directory
+RUN mkdir -p /config
+
+# Volume for config files
+VOLUME ["/config"]
 
 CMD ["/docker-entrypoint.sh"]

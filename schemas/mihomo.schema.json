@@ -1,0 +1,462 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Mihomo Configuration",
+  "description": "Configuration schema for Mihomo (Meta) proxy",
+  "type": "object",
+  "properties": {
+    "port": {
+      "type": "integer",
+      "description": "HTTP(S) proxy server port",
+      "minimum": 1,
+      "maximum": 65535
+    },
+    "socks-port": {
+      "type": "integer",
+      "description": "SOCKS5 proxy port",
+      "minimum": 1,
+      "maximum": 65535
+    },
+    "mixed-port": {
+      "type": "integer",
+      "description": "Mixed HTTP(S) and SOCKS proxy port",
+      "minimum": 1,
+      "maximum": 65535
+    },
+    "redir-port": {
+      "type": "integer",
+      "description": "Transparent proxy port for Linux and macOS",
+      "minimum": 1,
+      "maximum": 65535
+    },
+    "tproxy-port": {
+      "type": "integer",
+      "description": "Transparent proxy server port for Linux (TProxy TCP and TProxy UDP)",
+      "minimum": 1,
+      "maximum": 65535
+    },
+    "allow-lan": {
+      "type": "boolean",
+      "description": "Allow connections from LAN"
+    },
+    "bind-address": {
+      "type": "string",
+      "description": "Bind address, only works when allow-lan is true. '*' means all addresses"
+    },
+    "authentication": {
+      "type": "array",
+      "description": "HTTP/SOCKS authentication",
+      "items": {
+        "type": "string",
+        "pattern": "^[^:]+:[^:]+$"
+      }
+    },
+    "skip-auth-prefixes": {
+      "type": "array",
+      "description": "IP prefixes to skip authentication",
+      "items": {
+        "type": "string"
+      }
+    },
+    "lan-allowed-ips": {
+      "type": "array",
+      "description": "Allowed LAN IP ranges",
+      "items": {
+        "type": "string"
+      }
+    },
+    "lan-disallowed-ips": {
+      "type": "array",
+      "description": "Disallowed LAN IP ranges",
+      "items": {
+        "type": "string"
+      }
+    },
+    "find-process-mode": {
+      "type": "string",
+      "enum": ["always", "strict", "off"],
+      "description": "Process matching mode"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["rule", "global", "direct"],
+      "description": "Proxy mode"
+    },
+    "log-level": {
+      "type": "string",
+      "enum": ["silent", "error", "warning", "info", "debug"],
+      "description": "Log level"
+    },
+    "ipv6": {
+      "type": "boolean",
+      "description": "Enable IPv6"
+    },
+    "external-controller": {
+      "type": "string",
+      "description": "RESTful API listen address"
+    },
+    "external-controller-tls": {
+      "type": "string",
+      "description": "RESTful API HTTPS listen address"
+    },
+    "secret": {
+      "type": "string",
+      "description": "API secret for Authorization header"
+    },
+    "external-ui": {
+      "type": "string",
+      "description": "Web UI directory path"
+    },
+    "external-ui-name": {
+      "type": "string",
+      "description": "Web UI name"
+    },
+    "external-ui-url": {
+      "type": "string",
+      "description": "Web UI download URL"
+    },
+    "interface-name": {
+      "type": "string",
+      "description": "Outbound interface name"
+    },
+    "routing-mark": {
+      "type": "integer",
+      "description": "Routing mark for Linux"
+    },
+    "global-client-fingerprint": {
+      "type": "string",
+      "enum": ["chrome", "firefox", "safari", "ios", "random", "none"],
+      "description": "Global TLS fingerprint"
+    },
+    "geox-url": {
+      "type": "object",
+      "description": "Custom geodata URLs",
+      "properties": {
+        "geoip": { "type": "string" },
+        "geosite": { "type": "string" },
+        "mmdb": { "type": "string" }
+      }
+    },
+    "geo-auto-update": {
+      "type": "boolean",
+      "description": "Auto update geodata"
+    },
+    "geo-update-interval": {
+      "type": "integer",
+      "description": "Geodata update interval in hours"
+    },
+    "profile": {
+      "type": "object",
+      "description": "Profile settings",
+      "properties": {
+        "store-selected": {
+          "type": "boolean",
+          "description": "Store selected proxy"
+        },
+        "store-fake-ip": {
+          "type": "boolean",
+          "description": "Persist fake-ip data"
+        }
+      }
+    },
+    "tun": {
+      "type": "object",
+      "description": "TUN device configuration",
+      "properties": {
+        "enable": { "type": "boolean" },
+        "stack": {
+          "type": "string",
+          "enum": ["system", "gvisor", "mixed"]
+        },
+        "dns-hijack": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "auto-route": { "type": "boolean" },
+        "auto-detect-interface": { "type": "boolean" },
+        "auto-redirect": { "type": "boolean" },
+        "strict-route": { "type": "boolean" },
+        "mtu": { "type": "integer" },
+        "gso": { "type": "boolean" },
+        "device": { "type": "string" },
+        "route-address": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "route-exclude-address": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "dns": {
+      "type": "object",
+      "description": "DNS configuration",
+      "properties": {
+        "enable": { "type": "boolean" },
+        "listen": { "type": "string" },
+        "ipv6": { "type": "boolean" },
+        "prefer-h3": { "type": "boolean" },
+        "enhanced-mode": {
+          "type": "string",
+          "enum": ["fake-ip", "redir-host"]
+        },
+        "fake-ip-range": { "type": "string" },
+        "fake-ip-filter": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "fake-ip-filter-mode": {
+          "type": "string",
+          "enum": ["blacklist", "whitelist"]
+        },
+        "default-nameserver": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "nameserver": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "fallback": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "nameserver-policy": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "cache-algorithm": {
+          "type": "string",
+          "enum": ["arc", "lru"]
+        }
+      }
+    },
+    "sniffer": {
+      "type": "object",
+      "description": "Traffic sniffer configuration",
+      "properties": {
+        "enable": { "type": "boolean" },
+        "force-dns-mapping": { "type": "boolean" },
+        "parse-pure-ip": { "type": "boolean" },
+        "override-destination": { "type": "boolean" },
+        "sniff": { "type": "object" },
+        "force-domain": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "skip-domain": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "hosts": {
+      "type": "object",
+      "description": "Static hosts mapping",
+      "additionalProperties": {
+        "oneOf": [
+          { "type": "string" },
+          { "type": "array", "items": { "type": "string" } }
+        ]
+      }
+    },
+    "proxies": {
+      "type": "array",
+      "description": "Proxy servers",
+      "items": {
+        "type": "object",
+        "required": ["name", "type", "server", "port"],
+        "properties": {
+          "name": { "type": "string" },
+          "type": {
+            "type": "string",
+            "enum": [
+              "ss",
+              "ssr",
+              "vmess",
+              "vless",
+              "trojan",
+              "hysteria",
+              "hysteria2",
+              "wireguard",
+              "tuic",
+              "socks5",
+              "http",
+              "snell",
+              "ssh",
+              "dns",
+              "direct",
+              "mieru",
+              "anytls"
+            ]
+          },
+          "server": { "type": "string" },
+          "port": { "type": "integer" }
+        }
+      }
+    },
+    "proxy-groups": {
+      "type": "array",
+      "description": "Proxy groups",
+      "items": {
+        "type": "object",
+        "required": ["name", "type"],
+        "properties": {
+          "name": { "type": "string" },
+          "type": {
+            "type": "string",
+            "enum": ["select", "url-test", "fallback", "load-balance", "relay"]
+          },
+          "proxies": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "use": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "url": { "type": "string" },
+          "interval": { "type": "integer" },
+          "tolerance": { "type": "integer" },
+          "lazy": { "type": "boolean" },
+          "filter": { "type": "string" }
+        }
+      }
+    },
+    "proxy-providers": {
+      "type": "object",
+      "description": "Proxy providers",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["http", "file", "inline"]
+          },
+          "url": { "type": "string" },
+          "path": { "type": "string" },
+          "interval": { "type": "integer" },
+          "health-check": {
+            "type": "object",
+            "properties": {
+              "enable": { "type": "boolean" },
+              "url": { "type": "string" },
+              "interval": { "type": "integer" }
+            }
+          }
+        }
+      }
+    },
+    "rule-providers": {
+      "type": "object",
+      "description": "Rule providers",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["http", "file", "inline"]
+          },
+          "behavior": {
+            "type": "string",
+            "enum": ["domain", "ipcidr", "classical"]
+          },
+          "url": { "type": "string" },
+          "path": { "type": "string" },
+          "interval": { "type": "integer" },
+          "format": {
+            "type": "string",
+            "enum": ["yaml", "text", "mrs"]
+          }
+        }
+      }
+    },
+    "rules": {
+      "type": "array",
+      "description": "Routing rules",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sub-rules": {
+      "type": "object",
+      "description": "Sub-rules for advanced routing",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "type": "string" }
+      }
+    },
+    "listeners": {
+      "type": "array",
+      "description": "Inbound listeners",
+      "items": {
+        "type": "object",
+        "required": ["name", "type", "port"],
+        "properties": {
+          "name": { "type": "string" },
+          "type": {
+            "type": "string",
+            "enum": [
+              "socks",
+              "http",
+              "mixed",
+              "redir",
+              "tproxy",
+              "shadowsocks",
+              "vmess",
+              "vless",
+              "trojan",
+              "tuic",
+              "hysteria2",
+              "tunnel",
+              "tun",
+              "anytls",
+              "mieru"
+            ]
+          },
+          "port": { "type": "integer" },
+          "listen": { "type": "string" }
+        }
+      }
+    },
+    "tunnels": {
+      "type": "array",
+      "description": "Tunnel configurations",
+      "items": {
+        "oneOf": [
+          { "type": "string" },
+          {
+            "type": "object",
+            "properties": {
+              "network": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["tcp", "udp"]
+                }
+              },
+              "address": { "type": "string" },
+              "target": { "type": "string" },
+              "proxy": { "type": "string" }
+            }
+          }
+        ]
+      }
+    },
+    "tls": {
+      "type": "object",
+      "description": "TLS configuration",
+      "properties": {
+        "certificate": { "type": "string" },
+        "private-key": { "type": "string" }
+      }
+    },
+    "experimental": {
+      "type": "object",
+      "description": "Experimental features",
+      "properties": {
+        "quic-go-disable-gso": { "type": "boolean" }
+      }
+    }
+  }
+}

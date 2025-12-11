@@ -63,6 +63,8 @@
     "lodash-es": "^4.17.21",
     "markdown-it": "^14.1.0",
     "match-sorter": "^8.2.0",
+    "monaco-editor": "^0.55.1",
+    "monaco-yaml": "^5.4.0",
     "nuxt": "^4.2.2",
     "pinia": "^3.0.4",
     "playwright": "^1.57.0",
@@ -84,5 +86,8 @@
     "vue-tsc": "^3.1.8",
     "zod": "^4.1.13"
   },
-  "packageManager": "pnpm@10.25.0"
+  "packageManager": "pnpm@10.25.0",
+  "devDependencies": {
+    "vite-plugin-monaco-editor": "^1.1.0"
+  }
 }

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Toaster } from 'vue-sonner'
 import { useMockMode } from '~/composables/useApi'
 
 const configStore = useConfigStore()
@@ -60,5 +61,12 @@ const hasEndpoint = computed(
 
     <!-- Global traffic indicator -->
     <GlobalTrafficIndicator v-if="hasEndpoint" />
+
+    <!-- Toast notifications -->
+    <Toaster
+      position="top-right"
+      :theme="configStore.curTheme.includes('dark') ? 'dark' : 'light'"
+      rich-colors
+    />
   </div>
 </template>
