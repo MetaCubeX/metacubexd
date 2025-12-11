@@ -9,11 +9,11 @@ sanitize_url() {
 SANITIZED_URL=$(sanitize_url "${DEFAULT_BACKEND_URL:-}")
 
 # Generate config.js from environment variables
-cat > /srv/config.js << EOF
+cat > /app/.output/public/config.js << EOF
 window.__METACUBEXD_CONFIG__ = {
   defaultBackendURL: '${SANITIZED_URL}',
 }
 EOF
 
-# Start Caddy
-exec caddy run
+# Start Node.js server
+exec node /app/.output/server/index.mjs

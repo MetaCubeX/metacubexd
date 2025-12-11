@@ -10,19 +10,19 @@ COPY . .
 
 RUN npm install --force -g corepack
 RUN corepack enable
-RUN corepack prepare pnpm@latest --activate
+RUN corepack install
 RUN pnpm install
 RUN pnpm build
 
-FROM docker.io/caddy:alpine
+FROM docker.io/node:alpine
 
+ENV PORT=80
 EXPOSE 80
 
-WORKDIR /srv
+WORKDIR /app
 
-# Nuxt outputs static files to .output/public
-COPY --from=builder /build/.output/public/. .
-COPY Caddyfile .
+# Copy the entire Nuxt server output
+COPY --from=builder /build/.output ./.output
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
