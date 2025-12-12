@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.226.0](https://github.com/MetaCubeX/metacubexd/compare/v1.225.1...v1.226.0) (2025-12-12)
+
+
+### Features
+
+* implement virtual scrolling for rules and providers ([6ecb3ef](https://github.com/MetaCubeX/metacubexd/commit/6ecb3efc61789128531b3067fac93edcb4dffefb))
+
 ## [1.225.1](https://github.com/MetaCubeX/metacubexd/compare/v1.225.0...v1.225.1) (2025-12-11)
 
 
