@@ -315,7 +315,7 @@ watch(
         v-if="isFrontendTooltipOpen"
         ref="frontendFloating"
         :style="frontendFloatingStyles"
-        class="z-50 max-h-96 overflow-y-auto rounded-box bg-neutral p-4 text-neutral-content shadow-xl"
+        class="z-70 max-h-96 overflow-y-auto rounded-box bg-neutral p-4 text-neutral-content shadow-xl"
         @mouseenter="onFrontendTooltipMouseEnter"
         @mouseleave="onFrontendTooltipMouseLeave"
       >
@@ -365,7 +365,7 @@ watch(
         v-if="isBackendTooltipOpen"
         ref="backendFloating"
         :style="backendFloatingStyles"
-        class="z-50 max-h-96 overflow-y-auto rounded-box bg-neutral p-4 text-neutral-content shadow-xl"
+        class="z-70 max-h-96 overflow-y-auto rounded-box bg-neutral p-4 text-neutral-content shadow-xl"
         @mouseenter="onBackendTooltipMouseEnter"
         @mouseleave="onBackendTooltipMouseLeave"
       >
