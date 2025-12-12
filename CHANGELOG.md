@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.228.1](https://github.com/MetaCubeX/metacubexd/compare/v1.228.0...v1.228.1) (2025-12-12)
+
+
+### Bug Fixes
+
+* **Versions:** increase z-index for frontend and backend tooltips ([1d22667](https://github.com/MetaCubeX/metacubexd/commit/1d2266713e2888bcf25dd42b7dbcfffc0bfebed5))
+
 ## [1.228.0](https://github.com/MetaCubeX/metacubexd/compare/v1.227.0...v1.228.0) (2025-12-12)
 
 
