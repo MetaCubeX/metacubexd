@@ -71,8 +71,8 @@ function isColumnSorted(col: ConnectionColumn, sortColumn: string) {
     <table class="table-pin-rows table table-zebra" :class="tableSizeClass">
       <!-- Desktop header - hidden on mobile -->
       <thead class="hidden md:table-header-group">
-        <tr>
-          <th v-for="col in columns" :key="col.id" class="bg-base-200">
+        <tr class="bg-base-200">
+          <th v-for="col in columns" :key="col.id" class="text-base-content">
             <div class="flex items-center gap-2">
               <div
                 class="flex-1"
@@ -115,15 +115,15 @@ function isColumnSorted(col: ConnectionColumn, sortColumn: string) {
           <!-- Group header row -->
           <tr
             v-if="row.type === 'group'"
-            class="cursor-pointer bg-base-200"
+            class="cursor-pointer bg-base-200 hover:bg-base-300"
             @click="emit('toggleGroupExpanded', row.key)"
           >
-            <td :colspan="columns.length">
+            <td :colspan="columns.length" class="py-2">
               <div class="flex items-center gap-2">
                 <IconZoomOutFilled v-if="expandedGroups[row.key]" :size="18" />
                 <IconZoomInFilled v-else :size="18" />
-                <span>{{ row.key }}</span>
-                <span class="text-base-content/60"
+                <span class="font-semibold text-primary">{{ row.key }}</span>
+                <span class="text-xs text-base-content/60"
                   >({{ row.subRows.length }})</span
                 >
               </div>
@@ -132,7 +132,7 @@ function isColumnSorted(col: ConnectionColumn, sortColumn: string) {
           <!-- Data row - card style on mobile, table row on desktop -->
           <tr
             v-else
-            class="flex cursor-pointer flex-wrap rounded-xl border-4 border-base-300 px-2 odd:bg-base-100 even:bg-base-200 md:table-row md:rounded-none md:border-0 md:px-0 md:hover:bg-base-200"
+            class="md:hover flex cursor-pointer flex-wrap rounded-xl border-4 border-base-300 px-2 odd:bg-base-100 even:bg-base-200 md:table-row md:rounded-none md:border-0 md:px-0"
             @click="emit('rowClick', row.original)"
           >
             <td

@@ -152,6 +152,7 @@
   "noRuleProviders": "Нет провайдеров правил",
   "columns": "Столбцы",
   "sortBy": "Сортировать по",
+  "groupBy": "Группировать по",
   "rowsPerPage": "Строк на странице",
   "ipShort": "IP",
   "na": "Н/Д",

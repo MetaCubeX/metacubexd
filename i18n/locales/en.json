@@ -152,6 +152,7 @@
   "noRuleProviders": "No rule providers",
   "columns": "Columns",
   "sortBy": "Sort by",
+  "groupBy": "Group by",
   "rowsPerPage": "Rows per page",
   "ipShort": "IP",
   "na": "N/A",

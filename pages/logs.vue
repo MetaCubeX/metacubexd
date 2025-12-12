@@ -274,8 +274,8 @@ const tableSizeClass = computed(() =>
     >
       <table class="table-pin-rows table table-zebra" :class="tableSizeClass">
         <thead>
-          <tr>
-            <th v-for="col in columns" :key="col.id" class="bg-base-200">
+          <tr class="bg-base-200">
+            <th v-for="col in columns" :key="col.id" class="text-base-content">
               <div class="flex items-center gap-2">
                 <div
                   class="flex-1"
@@ -318,18 +318,18 @@ const tableSizeClass = computed(() =>
             <!-- Group header row -->
             <tr
               v-if="row.type === 'group'"
-              class="cursor-pointer bg-base-200"
+              class="cursor-pointer bg-base-200 hover:bg-base-300"
               @click="toggleGroupExpanded(row.key)"
             >
-              <td :colspan="columns.length">
+              <td :colspan="columns.length" class="py-2">
                 <div class="flex items-center gap-2">
                   <IconZoomOutFilled
                     v-if="expandedGroups[row.key]"
                     :size="18"
                   />
                   <IconZoomInFilled v-else :size="18" />
-                  <span>{{ row.key }}</span>
-                  <span class="text-base-content/60"
+                  <span class="font-semibold text-primary">{{ row.key }}</span>
+                  <span class="text-xs text-base-content/60"
                     >({{ row.subRows.length }})</span
                   >
                 </div>

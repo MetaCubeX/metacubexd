@@ -152,6 +152,7 @@
   "noRuleProviders": "暂无规则提供者",
   "columns": "列",
   "sortBy": "排序",
+  "groupBy": "分组",
   "rowsPerPage": "每页行数",
   "ipShort": "IP",
   "na": "无",
