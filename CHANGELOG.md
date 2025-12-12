@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.228.0](https://github.com/MetaCubeX/metacubexd/compare/v1.227.0...v1.228.0) (2025-12-12)
+
+
+### Features
+
+* add sidebar component and enhance UI interactions ([e6698f5](https://github.com/MetaCubeX/metacubexd/commit/e6698f567213678d532353ad77c029401e5eaed9))
+
 ## [1.227.0](https://github.com/MetaCubeX/metacubexd/compare/v1.226.0...v1.227.0) (2025-12-12)
 
 
