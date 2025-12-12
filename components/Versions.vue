@@ -284,12 +284,12 @@ watch(
 </script>
 
 <template>
-  <div v-if="!collapsed" class="mx-2 grid grid-cols-1 gap-2 md:mx-0">
+  <div v-if="!collapsed" class="mx-2 grid grid-cols-1 gap-2 pt-1 md:mx-0">
     <!-- Frontend Version -->
     <kbd
       ref="frontendReference"
       role="button"
-      class="relative kbd w-full cursor-pointer py-2"
+      class="relative kbd w-full cursor-pointer overflow-visible py-2"
       @click="handleFrontendUpgrade"
       @mouseenter="onFrontendMouseEnter"
       @mouseleave="onFrontendMouseLeave"
@@ -297,7 +297,7 @@ watch(
       <!-- Update indicator -->
       <span
         v-if="frontendRelease?.isUpdateAvailable"
-        class="absolute -top-1 -right-1 inline-grid *:[grid-area:1/1]"
+        class="absolute top-0 right-0 inline-grid translate-x-1/2 -translate-y-1/2 *:[grid-area:1/1]"
       >
         <span class="status animate-ping status-info" />
         <div class="status status-info" />
@@ -336,7 +336,7 @@ watch(
     <kbd
       ref="backendReference"
       role="button"
-      class="relative kbd w-full cursor-pointer py-2"
+      class="relative kbd w-full cursor-pointer overflow-visible py-2"
       @click="handleBackendUpgrade"
       @mouseenter="onBackendMouseEnter"
       @mouseleave="onBackendMouseLeave"
@@ -344,7 +344,7 @@ watch(
       <!-- Update indicator -->
       <span
         v-if="backendRelease?.isUpdateAvailable"
-        class="absolute -top-1 -right-1 inline-grid *:[grid-area:1/1]"
+        class="absolute top-0 right-0 inline-grid translate-x-1/2 -translate-y-1/2 *:[grid-area:1/1]"
       >
         <span class="status animate-ping status-info" />
         <div class="status status-info" />
