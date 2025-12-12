@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.227.0](https://github.com/MetaCubeX/metacubexd/compare/v1.226.0...v1.227.0) (2025-12-12)
+
+
+### Features
+
+* **DataUsageTable:** add grouping and sorting functionality for data usage entries ([caa46bd](https://github.com/MetaCubeX/metacubexd/commit/caa46bd6ebb79f61a67a79aef40a0ba4013ad826))
+
 ## [1.226.0](https://github.com/MetaCubeX/metacubexd/compare/v1.225.1...v1.226.0) (2025-12-12)
 
 
