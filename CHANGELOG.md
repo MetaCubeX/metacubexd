@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.230.0](https://github.com/MetaCubeX/metacubexd/compare/v1.229.0...v1.230.0) (2025-12-12)
+
+
+### Features
+
+* **Versions, config:** enhance layout and update styles for better UI consistency ([1f5033b](https://github.com/MetaCubeX/metacubexd/commit/1f5033b53db627581d3236ee63bdabe8f757a5e0))
+
 ## [1.229.0](https://github.com/MetaCubeX/metacubexd/compare/v1.228.1...v1.229.0) (2025-12-12)
 
 
