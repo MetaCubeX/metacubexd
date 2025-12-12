@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.231.0](https://github.com/MetaCubeX/metacubexd/compare/v1.230.0...v1.231.0) (2025-12-12)
+
+
+### Features
+
+* add IP information types and network topology interfaces ([dd4d49a](https://github.com/MetaCubeX/metacubexd/commit/dd4d49a2a9c410fc985c478c9ae6d0dd2f7be3cb))
+
 ## [1.230.0](https://github.com/MetaCubeX/metacubexd/compare/v1.229.0...v1.230.0) (2025-12-12)
 
 
