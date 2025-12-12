@@ -46,6 +46,7 @@
     "@vueuse/nuxt": "^14.1.0",
     "byte-size": "^9.0.1",
     "commitlint": "^20.2.0",
+    "d3": "^7.9.0",
     "daisyui": "^5.5.13",
     "dayjs": "^1.11.19",
     "eslint": "^9.39.1",
@@ -79,5 +80,8 @@
     "vue-tsc": "^3.1.8",
     "zod": "^4.1.13"
   },
-  "packageManager": "pnpm@10.25.0"
+  "packageManager": "pnpm@10.25.0",
+  "devDependencies": {
+    "@types/d3": "^7.4.3"
+  }
 }

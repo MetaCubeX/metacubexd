@@ -395,6 +395,17 @@ watch(
       </TrafficWidget>
     </div>
 
+    <!-- Endpoint Info -->
+    <div
+      v-if="endpointStore.currentEndpoint?.url"
+      class="flex items-center justify-center gap-2 rounded-lg bg-base-200 px-4 py-2 text-sm"
+    >
+      <span class="text-base-content/60">{{ t('connectedTo') }}:</span>
+      <span class="font-mono font-medium">{{
+        endpointStore.currentEndpoint?.url
+      }}</span>
+    </div>
+
     <!-- Charts -->
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
       <div class="card h-72 bg-base-200 p-2 shadow-sm lg:h-80">
@@ -458,14 +469,16 @@ watch(
       </div>
     </div>
 
+    <!-- Network Info Section -->
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <IPInfoCard />
+      <LatencyCard />
+    </div>
+
+    <!-- Network Topology -->
+    <NetworkTopology />
+
     <!-- Data Usage Table -->
     <DataUsageTable />
-
-    <!-- Footer -->
-    <footer
-      class="mx-auto mt-4 footer block footer-horizontal rounded-box bg-neutral p-4 text-center text-lg font-bold text-neutral-content"
-    >
-      {{ endpointStore.currentEndpoint?.url }}
-    </footer>
   </div>
 </template>
