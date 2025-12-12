@@ -12,14 +12,14 @@ defineExpose({ isTwoColumns })
 
 <template>
   <div v-if="isTwoColumns" class="flex gap-2">
-    <div class="flex-1 space-y-2">
+    <div class="isolate flex-1 space-y-2">
       <slot name="even" />
     </div>
-    <div class="flex-1 space-y-2">
+    <div class="isolate flex-1 space-y-2">
       <slot name="odd" />
     </div>
   </div>
-  <div v-else class="space-y-2">
+  <div v-else class="isolate space-y-2">
     <slot />
   </div>
 </template>

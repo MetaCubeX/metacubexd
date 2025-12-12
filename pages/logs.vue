@@ -242,9 +242,9 @@ const tableSizeClass = computed(() =>
 </script>
 
 <template>
-  <div class="flex h-full flex-col gap-2">
+  <div class="flex h-full min-h-0 flex-col gap-2">
     <!-- Toolbar -->
-    <div class="join w-full">
+    <div class="join w-full shrink-0">
       <input
         v-model="globalFilter"
         type="search"
@@ -270,7 +270,7 @@ const tableSizeClass = computed(() =>
 
     <!-- Logs Table -->
     <div
-      class="flex-1 overflow-x-auto rounded-md bg-base-300 whitespace-nowrap"
+      class="min-h-0 flex-1 overflow-auto rounded-md bg-base-300 whitespace-nowrap"
     >
       <table class="table-pin-rows table table-zebra" :class="tableSizeClass">
         <thead>

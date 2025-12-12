@@ -47,15 +47,13 @@ const hasEndpoint = computed(
 <template>
   <div
     ref="rootElement"
-    class="relative flex h-screen flex-col overscroll-y-none bg-base-100 subpixel-antialiased"
+    class="relative h-screen overscroll-y-none bg-base-100 subpixel-antialiased"
     :class="configStore.enableTwemoji ? 'font-twemoji' : 'font-default'"
     :data-theme="configStore.curTheme"
   >
-    <Header />
-
-    <div class="flex-1 overflow-y-auto p-2 sm:p-4">
+    <Sidebar>
       <slot />
-    </div>
+    </Sidebar>
 
     <!-- WebSocket connections manager -->
     <ProtectedResources v-if="hasEndpoint" />

@@ -54,7 +54,7 @@ const renderMarkdown = (content: string) => md.render(content)
 </script>
 
 <template>
-  <div class="w-full max-w-md">
+  <div class="w-full max-w-md min-w-80">
     <template v-if="!isLoading">
       <template v-if="releases.length > 0">
         <ul class="timeline timeline-vertical timeline-compact">

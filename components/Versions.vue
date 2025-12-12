@@ -15,13 +15,31 @@ import {
   frontendReleaseAPI,
   useConfigActions,
 } from '~/composables/useApi'
+import { useVersionQuery } from '~/composables/useQueries'
 
 interface Props {
-  frontendVersion: string
-  backendVersion: string
+  frontendVersion?: string
+  backendVersion?: string
+  collapsed?: boolean
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  frontendVersion: '',
+  backendVersion: '',
+  collapsed: false,
+})
+
+// Get versions from runtime config and queries if not provided
+const runtimeConfig = useRuntimeConfig()
+const { data: queryBackendVersion } = useVersionQuery()
+
+const actualFrontendVersion = computed(
+  () =>
+    props.frontendVersion || `v${runtimeConfig.public.appVersion || '0.0.0'}`,
+)
+const actualBackendVersion = computed(
+  () => props.backendVersion || queryBackendVersion.value || '',
+)
 
 // Use config actions composable for upgrade functions
 const configActions = useConfigActions()
@@ -192,14 +210,18 @@ function onBackendTooltipMouseLeave() {
 
 // Fetch release info
 async function fetchReleaseInfo() {
+  if (!actualFrontendVersion.value || !actualBackendVersion.value) return
+
   try {
-    frontendRelease.value = await frontendReleaseAPI(props.frontendVersion)
+    frontendRelease.value = await frontendReleaseAPI(
+      actualFrontendVersion.value,
+    )
   } catch (err) {
     console.error('Failed to fetch frontend release:', err)
   }
 
   try {
-    backendRelease.value = await backendReleaseAPI(props.backendVersion)
+    backendRelease.value = await backendReleaseAPI(actualBackendVersion.value)
   } catch (err) {
     console.error('Failed to fetch backend release:', err)
   }
@@ -212,7 +234,7 @@ async function fetchReleases() {
 
   try {
     frontendReleases.value = await fetchFrontendReleasesAPI(
-      props.frontendVersion,
+      actualFrontendVersion.value,
       10,
     )
   } catch (err) {
@@ -223,7 +245,7 @@ async function fetchReleases() {
 
   try {
     backendReleases.value = await fetchBackendReleasesAPI(
-      props.backendVersion,
+      actualBackendVersion.value,
       10,
     )
   } catch (err) {
@@ -250,7 +272,7 @@ async function handleBackendUpgrade() {
 
 // Watch for backend version changes
 watch(
-  () => props.backendVersion,
+  actualBackendVersion,
   (newVersion) => {
     if (newVersion) {
       fetchReleaseInfo()
@@ -262,12 +284,12 @@ watch(
 </script>
 
 <template>
-  <div class="mx-2 grid grid-cols-1 gap-4 sm:grid-cols-2 md:mx-0">
+  <div v-if="!collapsed" class="mx-2 grid grid-cols-1 gap-2 md:mx-0">
     <!-- Frontend Version -->
     <kbd
       ref="frontendReference"
       role="button"
-      class="relative kbd w-full cursor-pointer py-4"
+      class="relative kbd w-full cursor-pointer py-2"
       @click="handleFrontendUpgrade"
       @mouseenter="onFrontendMouseEnter"
       @mouseleave="onFrontendMouseLeave"
@@ -281,8 +303,8 @@ watch(
         <div class="status status-info" />
       </span>
 
-      <div class="flex w-full items-center justify-center gap-2">
-        {{ frontendVersion }}
+      <div class="flex w-full items-center justify-center gap-2 text-xs">
+        {{ actualFrontendVersion }}
         <span v-if="upgradingUI" class="loading loading-sm loading-infinity" />
       </div>
     </kbd>
@@ -314,7 +336,7 @@ watch(
     <kbd
       ref="backendReference"
       role="button"
-      class="relative kbd w-full cursor-pointer py-4"
+      class="relative kbd w-full cursor-pointer py-2"
       @click="handleBackendUpgrade"
       @mouseenter="onBackendMouseEnter"
       @mouseleave="onBackendMouseLeave"
@@ -328,8 +350,8 @@ watch(
         <div class="status status-info" />
       </span>
 
-      <div class="flex w-full items-center justify-center gap-2">
-        {{ backendVersion }}
+      <div class="flex w-full items-center justify-center gap-2 text-xs">
+        {{ actualBackendVersion }}
         <span
           v-if="upgradingBackend"
           class="loading loading-sm loading-infinity"

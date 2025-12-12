@@ -361,10 +361,10 @@ watch(
 </script>
 
 <template>
-  <div class="flex flex-col gap-2 lg:h-full">
+  <div class="flex h-full flex-col gap-4 overflow-y-auto">
     <!-- Stats -->
     <div
-      class="stats grid w-full shrink-0 stats-vertical grid-cols-2 bg-primary shadow lg:flex lg:stats-horizontal"
+      class="stats grid w-full shrink-0 stats-vertical grid-cols-2 bg-primary shadow sm:grid-cols-3 xl:grid-cols-6"
     >
       <TrafficWidget :label="t('upload')">
         {{ formatBytes(globalStore.latestTraffic?.up || 0) }}/s
@@ -396,7 +396,7 @@ watch(
     </div>
 
     <!-- Charts -->
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
       <div class="card h-72 bg-base-200 p-2 shadow-sm lg:h-80">
         <RealtimeLineChart
           ref="trafficChartRef"

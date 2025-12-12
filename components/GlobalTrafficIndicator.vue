@@ -15,7 +15,7 @@ const configStore = useConfigStore()
 
 // Visibility and collapsed state
 const isVisible = useLocalStorage('globalTrafficIndicatorVisible', true)
-const isCollapsed = useLocalStorage('globalTrafficIndicatorCollapsed', false)
+const isCollapsed = useLocalStorage('globalTrafficIndicatorCollapsed', true)
 
 // Position state for expanded view
 const position = useLocalStorage<{ x: number; y: number }>(
@@ -212,6 +212,84 @@ function updateChart() {
   chart.series[1]?.setData(uploadData, true)
 }
 
+// Update sidebar chart data
+function updateSidebarChart() {
+  if (!sidebarChart) return
+
+  const downloadData = [...globalStore.trafficChartHistory.download].slice(-30)
+  const uploadData = [...globalStore.trafficChartHistory.upload].slice(-30)
+
+  sidebarChart.series[0]?.setData(downloadData, false)
+  sidebarChart.series[1]?.setData(uploadData, true)
+}
+
+// Create sidebar chart
+function createSidebarChart() {
+  if (!sidebarChartContainer.value) return
+
+  // Destroy existing chart if any
+  if (sidebarChart) {
+    sidebarChart.destroy()
+    sidebarChart = undefined
+  }
+
+  const themeColors = getChartThemeColors()
+
+  sidebarChart = Highcharts.chart(sidebarChartContainer.value, {
+    chart: {
+      type: 'areaspline',
+      backgroundColor: 'transparent',
+      spacing: [0, 0, 0, 0],
+      margin: [0, 0, 0, 0],
+      animation: false,
+      height: 40,
+    },
+    credits: { enabled: false },
+    accessibility: { enabled: false },
+    title: { text: undefined },
+    legend: { enabled: false },
+    xAxis: {
+      visible: false,
+      type: 'datetime',
+    },
+    yAxis: {
+      visible: false,
+      min: 0,
+    },
+    tooltip: {
+      enabled: false,
+    },
+    plotOptions: {
+      areaspline: {
+        lineWidth: 1.5,
+        marker: { enabled: false },
+        fillOpacity: 0.2,
+        animation: false,
+      },
+    },
+    series: [
+      {
+        type: 'areaspline',
+        name: 'Download',
+        color: themeColors.seriesColors[0],
+        data:
+          globalStore.trafficChartHistory.download.length > 0
+            ? [...globalStore.trafficChartHistory.download].slice(-30)
+            : [[Date.now(), 0]],
+      },
+      {
+        type: 'areaspline',
+        name: 'Upload',
+        color: themeColors.seriesColors[1],
+        data:
+          globalStore.trafficChartHistory.upload.length > 0
+            ? [...globalStore.trafficChartHistory.upload].slice(-30)
+            : [[Date.now(), 0]],
+      },
+    ],
+  })
+}
+
 // Watch for traffic updates - create chart if needed, otherwise update
 watch(
   () => globalStore.latestTraffic,
@@ -225,6 +303,13 @@ watch(
       // Chart doesn't exist but conditions are met - create it
       createChart()
     }
+
+    // Also update sidebar chart
+    if (sidebarChart) {
+      updateSidebarChart()
+    } else if (sidebarChartContainer.value) {
+      createSidebarChart()
+    }
   },
 )
 
@@ -234,6 +319,9 @@ watch(
   () => {
     if (chartContainer.value && !isCollapsed.value && isVisible.value) {
       createChart()
+    }
+    if (sidebarChartContainer.value) {
+      createSidebarChart()
     }
   },
 )
@@ -272,8 +360,31 @@ watch(isVisible, (visible) => {
   }
 })
 
+// Watch sidebar expanded state to create sidebar chart
+watch(
+  () => configStore.sidebarExpanded,
+  (expanded) => {
+    if (expanded) {
+      // When sidebar expands, wait for DOM to update then create chart
+      nextTick(() => {
+        setTimeout(() => {
+          if (sidebarChartContainer.value && globalStore.latestTraffic) {
+            createSidebarChart()
+          }
+        }, 100)
+      })
+    }
+  },
+)
+
 // Check if teleport target exists
 const headerTargetExists = ref(false)
+const sidebarTargetExists = ref(false)
+const sidebarExpandedTargetExists = ref(false)
+
+// Sidebar chart container ref
+const sidebarChartContainer = ref<HTMLDivElement | null>(null)
+let sidebarChart: Highcharts.Chart | undefined
 
 // Create chart on mount if conditions are met
 onMounted(() => {
@@ -281,6 +392,12 @@ onMounted(() => {
   nextTick(() => {
     headerTargetExists.value = !!document.getElementById(
       'header-traffic-indicator',
+    )
+    sidebarTargetExists.value = !!document.getElementById(
+      'sidebar-traffic-indicator',
+    )
+    sidebarExpandedTargetExists.value = !!document.getElementById(
+      'sidebar-traffic-expanded',
     )
   })
 
@@ -292,6 +409,15 @@ onMounted(() => {
       }
     }, 100)
   }
+
+  // Create sidebar chart
+  if (globalStore.latestTraffic) {
+    setTimeout(() => {
+      if (sidebarChartContainer.value) {
+        createSidebarChart()
+      }
+    }, 150)
+  }
 })
 
 // Cleanup on unmount
@@ -299,6 +425,10 @@ onBeforeUnmount(() => {
   if (chart) {
     chart.destroy()
     chart = undefined
+  }
+  if (sidebarChart) {
+    sidebarChart.destroy()
+    sidebarChart = undefined
   }
 })
 </script>
@@ -325,13 +455,57 @@ onBeforeUnmount(() => {
     </div>
   </Teleport>
 
-  <!-- Fallback collapsed view (floating, when header target doesn't exist) -->
+  <!-- Collapsed view in sidebar (when target exists) -->
+  <Teleport v-if="sidebarTargetExists" to="#sidebar-traffic-indicator">
+    <div
+      v-if="globalStore.latestTraffic"
+      class="rounded-btn w-full cursor-pointer bg-base-100/50 px-2 py-2 transition-colors hover:bg-base-100"
+      @click="expandFromHeader"
+    >
+      <div class="flex items-center justify-center gap-1">
+        <IconArrowDown class="size-3 text-success" />
+        <span class="font-mono text-xs"
+          >{{ formatBytes(downloadSpeed) }}/s</span
+        >
+      </div>
+      <div class="flex items-center justify-center gap-1">
+        <IconArrowUp class="size-3 text-info" />
+        <span class="font-mono text-xs">{{ formatBytes(uploadSpeed) }}/s</span>
+      </div>
+    </div>
+  </Teleport>
+
+  <!-- Expanded view in sidebar with chart (when target exists) -->
+  <Teleport v-if="sidebarExpandedTargetExists" to="#sidebar-traffic-expanded">
+    <div
+      v-if="globalStore.latestTraffic"
+      class="rounded-btn w-full bg-base-100/50 p-2"
+    >
+      <!-- Mini chart -->
+      <div ref="sidebarChartContainer" class="mb-2 h-10 w-full" />
+
+      <!-- Stats -->
+      <div class="grid grid-cols-2 gap-1 text-xs">
+        <div class="flex items-center gap-1">
+          <IconArrowDown class="size-3 text-success" />
+          <span class="font-mono">{{ formatBytes(downloadSpeed) }}/s</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <IconArrowUp class="size-3 text-info" />
+          <span class="font-mono">{{ formatBytes(uploadSpeed) }}/s</span>
+        </div>
+      </div>
+    </div>
+  </Teleport>
+
+  <!-- Fallback collapsed view (floating, when no teleport targets exist) -->
   <div
     v-if="
       isVisible &&
       isCollapsed &&
       globalStore.latestTraffic &&
-      !headerTargetExists
+      !headerTargetExists &&
+      !sidebarTargetExists
     "
     class="fixed right-4 bottom-4 z-50 flex cursor-pointer items-center gap-2 rounded-box bg-base-200 px-3 py-2 shadow-lg"
     @click="expandFromHeader"

@@ -64,3 +64,34 @@ body {
     'Ubuntu', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Noto Sans CJK SC', system-ui, sans-serif;
 }
+
+/* Animated glow pulse effect for selected items */
+@keyframes glow-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 6px 1px color-mix(in oklch, var(--color-primary) 70%, transparent),
+      0 0 12px 2px color-mix(in oklch, var(--color-secondary) 40%, transparent);
+  }
+  33% {
+    box-shadow:
+      0 0 6px 1px color-mix(in oklch, var(--color-secondary) 70%, transparent),
+      0 0 12px 2px color-mix(in oklch, var(--color-accent) 40%, transparent);
+  }
+  66% {
+    box-shadow:
+      0 0 6px 1px color-mix(in oklch, var(--color-accent) 70%, transparent),
+      0 0 12px 2px color-mix(in oklch, var(--color-primary) 40%, transparent);
+  }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* Fix drawer height chain for proper scrolling */
+.drawer,
+.drawer-content {
+  height: 100%;
+  min-height: 0;
+}

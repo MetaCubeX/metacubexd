@@ -155,7 +155,7 @@ const isLoading = computed(
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-3xl flex-col gap-4">
+  <div class="mx-auto flex h-full max-w-3xl flex-col gap-4 overflow-y-auto">
     <!-- Loading State -->
     <div v-if="isLoading" class="flex h-64 items-center justify-center">
       <span class="loading loading-lg loading-spinner" />

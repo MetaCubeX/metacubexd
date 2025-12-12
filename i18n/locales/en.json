@@ -1,6 +1,7 @@
 {
   "home": "Home",
   "add": "Add",
+  "collapse": "Collapse",
   "setup": "Setup",
   "setupDescription": "Connect to your Mihomo backend to get started",
   "overview": "Overview",

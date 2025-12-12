@@ -157,119 +157,122 @@ function handleLatencyTest() {
 </script>
 
 <template>
-  <div
-    ref="reference"
-    class="relative rounded-lg"
-    :class="[
-      isSelected
-        ? 'bg-primary text-primary-content'
-        : 'bg-neutral text-neutral-content',
-    ]"
-    @mouseenter="onMouseEnter"
-    @mouseleave="onMouseLeave"
-  >
+  <!-- Wrapper for glow effect -->
+  <div class="relative" :class="isSelected ? 'z-10' : 'z-0'">
     <div
-      class="flex items-center gap-2 px-3 py-1.5"
-      :class="{ 'cursor-pointer hover:opacity-80': !!onClick }"
-      @click="onClick"
+      ref="reference"
+      class="relative rounded-lg transition-all duration-300"
+      :class="[
+        isSelected
+          ? 'animate-glow-pulse bg-primary text-primary-content'
+          : 'bg-neutral text-neutral-content hover:shadow-md',
+      ]"
+      @mouseenter="onMouseEnter"
+      @mouseleave="onMouseLeave"
     >
-      <!-- Selected indicator -->
-      <IconCircleCheckFilled v-if="isSelected" class="size-4 shrink-0" />
-
-      <!-- Proxy name -->
-      <span class="min-w-0 flex-1 truncate text-sm font-medium">
-        {{ proxyName }}
-      </span>
-
-      <!-- UDP indicator -->
-      <span v-if="isUDP" class="badge shrink-0 badge-xs badge-info">U</span>
-
-      <!-- Special types -->
-      <span
-        v-if="specialTypes"
-        class="hidden text-xs uppercase opacity-60 sm:inline"
-      >
-        {{ specialTypes }}
-      </span>
-
-      <!-- Proxy type -->
-      <span class="hidden text-xs uppercase opacity-75 sm:inline">
-        {{ proxyType }}
-      </span>
-
-      <!-- Latency -->
-      <Latency
-        :proxy-name="proxyName"
-        :test-url="testUrl"
-        class="shrink-0"
-        :class="{ 'animate-pulse': isTesting }"
-        @click.stop="handleLatencyTest"
-      />
-    </div>
-
-    <!-- Tooltip for latency history -->
-    <Teleport to="body">
       <div
-        v-if="isTooltipOpen"
-        ref="floating"
-        :style="floatingStyles"
-        class="z-50 w-max max-w-xs rounded-box bg-primary p-2.5 text-primary-content shadow-lg"
-        @mouseenter="onTooltipMouseEnter"
-        @mouseleave="onTooltipMouseLeave"
+        class="flex items-center gap-2 px-3 py-1.5"
+        :class="{ 'cursor-pointer hover:opacity-80': !!onClick }"
+        @click="onClick"
       >
-        <!-- Arrow -->
-        <div
-          ref="floatingArrow"
-          class="absolute size-2 rotate-45 bg-primary"
-          :style="arrowStyles"
+        <!-- Selected indicator -->
+        <IconCircleCheckFilled v-if="isSelected" class="size-4 shrink-0" />
+
+        <!-- Proxy name -->
+        <span class="min-w-0 flex-1 truncate text-sm font-medium">
+          {{ proxyName }}
+        </span>
+
+        <!-- UDP indicator -->
+        <span v-if="isUDP" class="badge shrink-0 badge-xs badge-info">U</span>
+
+        <!-- Special types -->
+        <span
+          v-if="specialTypes"
+          class="hidden text-xs uppercase opacity-60 sm:inline"
+        >
+          {{ specialTypes }}
+        </span>
+
+        <!-- Proxy type -->
+        <span class="hidden text-xs uppercase opacity-75 sm:inline">
+          {{ proxyType }}
+        </span>
+
+        <!-- Latency -->
+        <Latency
+          :proxy-name="proxyName"
+          :test-url="testUrl"
+          class="shrink-0"
+          :class="{ 'animate-pulse': isTesting }"
+          @click.stop="handleLatencyTest"
         />
+      </div>
 
-        <div class="flex flex-col items-center gap-2">
-          <h2 class="text-lg font-bold">{{ proxyName }}</h2>
+      <!-- Tooltip for latency history -->
+      <Teleport to="body">
+        <div
+          v-if="isTooltipOpen"
+          ref="floating"
+          :style="floatingStyles"
+          class="z-50 w-max max-w-xs rounded-box bg-primary p-2.5 text-primary-content shadow-lg"
+          @mouseenter="onTooltipMouseEnter"
+          @mouseleave="onTooltipMouseLeave"
+        >
+          <!-- Arrow -->
+          <div
+            ref="floatingArrow"
+            class="absolute size-2 rotate-45 bg-primary"
+            :style="arrowStyles"
+          />
 
-          <div v-if="specialTypes" class="w-full text-xs uppercase">
-            ({{ specialTypes }})
-          </div>
+          <div class="flex flex-col items-center gap-2">
+            <h2 class="text-lg font-bold">{{ proxyName }}</h2>
 
-          <template v-if="latencyTestHistory.length > 0">
-            <ul
-              class="timeline timeline-vertical timeline-compact max-h-60 overflow-y-auto timeline-snap-icon"
-            >
-              <li v-for="(result, index) in latencyTestHistory" :key="index">
-                <hr v-if="index > 0" />
+            <div v-if="specialTypes" class="w-full text-xs uppercase">
+              ({{ specialTypes }})
+            </div>
 
-                <div class="timeline-start space-y-2">
-                  <time class="text-sm italic">
-                    {{ dayjs(result.time).format('YYYY-MM-DD HH:mm:ss') }}
-                  </time>
+            <template v-if="latencyTestHistory.length > 0">
+              <ul
+                class="timeline timeline-vertical timeline-compact max-h-60 overflow-y-auto timeline-snap-icon"
+              >
+                <li v-for="(result, index) in latencyTestHistory" :key="index">
+                  <hr v-if="index > 0" />
 
-                  <div
-                    class="badge block"
-                    :class="
-                      getLatencyClassName(
-                        result.delay,
-                        configStore.latencyQualityMap,
-                      )
-                    "
-                  >
-                    {{ result.delay || '---' }}
+                  <div class="timeline-start space-y-2">
+                    <time class="text-sm italic">
+                      {{ dayjs(result.time).format('YYYY-MM-DD HH:mm:ss') }}
+                    </time>
+
+                    <div
+                      class="badge block"
+                      :class="
+                        getLatencyClassName(
+                          result.delay,
+                          configStore.latencyQualityMap,
+                        )
+                      "
+                    >
+                      {{ result.delay || '---' }}
+                    </div>
                   </div>
-                </div>
 
-                <div class="timeline-middle">
-                  <IconCircleCheckFilled class="size-4" />
-                </div>
+                  <div class="timeline-middle">
+                    <IconCircleCheckFilled class="size-4" />
+                  </div>
 
-                <hr v-if="index !== latencyTestHistory.length - 1" />
-              </li>
-            </ul>
-          </template>
+                  <hr v-if="index !== latencyTestHistory.length - 1" />
+                </li>
+              </ul>
+            </template>
 
-          <div v-else class="text-sm opacity-75">
-            {{ t('noLatencyHistory') }}
+            <div v-else class="text-sm opacity-75">
+              {{ t('noLatencyHistory') }}
+            </div>
           </div>
         </div>
-      </div>
-    </Teleport>
+      </Teleport>
+    </div>
   </div>
 </template>

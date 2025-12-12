@@ -36,7 +36,7 @@ const isListMode = computed(
       class="collapse-content transition-opacity duration-1000"
       :class="[
         isOpen ? 'opacity-100' : 'opacity-0',
-        isListMode ? 'flex flex-col gap-1' : 'grid gap-2',
+        isListMode ? 'isolate flex flex-col gap-2' : 'isolate grid gap-2',
       ]"
       :style="
         isListMode

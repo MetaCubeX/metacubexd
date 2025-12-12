@@ -5,13 +5,14 @@ const hasEndpoint = computed(() => !!endpointStore.currentEndpoint)
 
 <template>
   <div
-    class="text-md flex items-center gap-1 font-bold whitespace-nowrap uppercase sm:text-xl"
+    class="flex min-w-0 items-center gap-1 text-sm font-bold whitespace-nowrap uppercase sm:text-xl"
   >
     <NuxtLink
       class="bg-linear-to-br from-primary to-secondary bg-clip-text text-transparent"
       :to="hasEndpoint ? '/' : '/setup'"
     >
-      metacube
+      <span class="hidden min-[400px]:inline">metacube</span>
+      <span class="min-[400px]:hidden">mcx</span>
     </NuxtLink>
     <span>(</span>
     <a

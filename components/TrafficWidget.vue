@@ -5,12 +5,12 @@ defineProps<{
 </script>
 
 <template>
-  <div class="stat flex-1 place-items-center">
-    <div class="stat-title text-primary-content">
+  <div class="stat place-items-center px-2 py-3">
+    <div class="stat-title text-xs text-primary-content sm:text-sm">
       {{ label }}
     </div>
     <div
-      class="stat-value w-full truncate text-center text-2xl text-primary-content lg:text-3xl"
+      class="stat-value text-center text-lg whitespace-nowrap text-primary-content sm:text-xl lg:text-2xl"
     >
       <slot />
     </div>

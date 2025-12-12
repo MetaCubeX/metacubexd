@@ -1,6 +1,7 @@
 {
   "home": "首页",
   "add": "添加",
+  "collapse": "收起",
   "setup": "设置",
   "setupDescription": "连接到 Mihomo 后端以开始使用",
   "overview": "概览",

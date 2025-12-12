@@ -530,9 +530,10 @@ function showConnectionDetails(conn: Connection) {
 </script>
 
 <template>
-  <div class="flex h-full flex-col gap-2">
+  <div class="flex h-full min-h-0 flex-col gap-2">
     <!-- Toolbar -->
     <ConnectionsToolbar
+      class="shrink-0"
       :tabs="tabs"
       :active-tab="activeTab"
       :enable-quick-filter="enableQuickFilter"

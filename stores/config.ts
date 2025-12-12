@@ -69,6 +69,9 @@ export const useConfigStore = defineStore('config', () => {
   // Twemoji support
   const enableTwemoji = useLocalStorage('enableTwemoji', false)
 
+  // Sidebar expanded state (PC only)
+  const sidebarExpanded = useLocalStorage('sidebarExpanded', false)
+
   // Connections table settings
   const connectionsTableSize = useLocalStorage<TAILWINDCSS_SIZE>(
     'connectionsTableSize',
@@ -169,6 +172,8 @@ export const useConfigStore = defineStore('config', () => {
     autoSwitchEndpoint,
     // Twemoji
     enableTwemoji,
+    // Sidebar
+    sidebarExpanded,
     // Connections
     connectionsTableSize,
     connectionsTableColumnVisibility,
