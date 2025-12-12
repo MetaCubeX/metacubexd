@@ -40,7 +40,7 @@
     "@types/lodash": "^4.17.21",
     "@types/lodash-es": "^4.17.12",
     "@types/markdown-it": "^14.1.2",
-    "@types/node": "^24.10.2",
+    "@types/node": "^25.0.1",
     "@types/uuid": "^11.0.0",
     "@vueuse/core": "^14.1.0",
     "@vueuse/nuxt": "^14.1.0",
