@@ -13,11 +13,10 @@ import { formatDateRange, formatDuration } from '~/utils'
 
 const { t, locale } = useI18n()
 const connectionsStore = useConnectionsStore()
-const configStore = useConfigStore()
 
 type SortField = 'ip' | 'duration' | 'upload' | 'download' | 'total'
 type SortOrder = 'asc' | 'desc'
-type GroupField = 'ip' | 'mac' | null
+type GroupField = 'ip' | null
 
 const sortField = ref<SortField>('total')
 const sortOrder = ref<SortOrder>('desc')
@@ -118,14 +117,7 @@ const dataUsageEntries = computed<TableRow[]>(() => {
   // Build grouped rows
   const groups = new Map<string, typeof entries>()
   for (const entry of entries) {
-    let key: string
-    if (groupingField.value === 'ip') {
-      key = entry.sourceIP
-    } else if (groupingField.value === 'mac') {
-      key = entry.macAddress || t('na')
-    } else {
-      key = entry.sourceIP
-    }
+    const key = entry.sourceIP
 
     const group = groups.get(key)
     if (group) {
@@ -298,25 +290,6 @@ function handleRemoveEntry(sourceIP: string) {
               <tr class="bg-base-200">
                 <th class="text-base-content">
                   <div class="flex items-center gap-2">
-                    <span>{{ t('macAddress') }}</span>
-                    <button
-                      v-if="groupingField !== 'mac'"
-                      class="cursor-pointer"
-                      @click="handleToggleGrouping('mac')"
-                    >
-                      <IconZoomInFilled :size="16" />
-                    </button>
-                    <button
-                      v-else
-                      class="cursor-pointer text-primary"
-                      @click="handleToggleGrouping('mac')"
-                    >
-                      <IconZoomOutFilled :size="16" />
-                    </button>
-                  </div>
-                </th>
-                <th class="text-base-content">
-                  <div class="flex items-center gap-2">
                     <button
                       class="flex items-center gap-1 hover:text-primary"
                       @click="handleSort('ip')"
@@ -422,7 +395,7 @@ function handleRemoveEntry(sourceIP: string) {
             </thead>
             <tbody>
               <tr v-if="sortedDataUsageEntries.length === 0">
-                <td colspan="7" class="text-center text-base-content/70">
+                <td colspan="6" class="text-center text-base-content/70">
                   {{ t('noDataUsageYet') }}
                 </td>
               </tr>
@@ -441,15 +414,10 @@ function handleRemoveEntry(sourceIP: string) {
                     class="cursor-pointer bg-base-200 hover:bg-base-300"
                     @click="handleToggleGroupExpanded(row.key)"
                   >
-                    <td colspan="7" class="py-2">
+                    <td colspan="6" class="py-2">
                       <div class="flex items-center gap-2">
                         <span class="font-semibold text-primary">
-                          {{
-                            groupingField === 'ip'
-                              ? t('ipAddress')
-                              : t('macAddress')
-                          }}:
-                          {{ row.key }}
+                          {{ t('ipAddress') }}: {{ row.key }}
                         </span>
                         <span class="text-xs text-base-content/60">
                           ({{ row.subRows.length }}
@@ -482,9 +450,6 @@ function handleRemoveEntry(sourceIP: string) {
                     class="hover"
                     :style="{ paddingLeft: `${row.depth * 1}rem` }"
                   >
-                    <td class="text-base-content">
-                      {{ row.original.macAddress || t('na') }}
-                    </td>
                     <td class="font-mono text-base-content">
                       {{ row.original.sourceIP }}
                     </td>
@@ -646,18 +611,6 @@ function handleRemoveEntry(sourceIP: string) {
                   <IconZoomOutFilled v-if="groupingField === 'ip'" :size="12" />
                   <IconZoomInFilled v-else :size="12" />
                 </button>
-                <button
-                  class="btn flex-1 btn-xs"
-                  :class="groupingField === 'mac' ? 'btn-primary' : 'btn-ghost'"
-                  @click="handleToggleGrouping('mac')"
-                >
-                  MAC
-                  <IconZoomOutFilled
-                    v-if="groupingField === 'mac'"
-                    :size="12"
-                  />
-                  <IconZoomInFilled v-else :size="12" />
-                </button>
               </div>
             </div>
           </div>
@@ -689,12 +642,7 @@ function handleRemoveEntry(sourceIP: string) {
                 <div class="flex items-center justify-between">
                   <div>
                     <div class="font-semibold text-primary">
-                      {{
-                        groupingField === 'ip'
-                          ? t('ipAddress')
-                          : t('macAddress')
-                      }}:
-                      {{ row.key }}
+                      {{ t('ipAddress') }}: {{ row.key }}
                     </div>
                     <div class="text-xs text-base-content/60">
                       {{ row.subRows.length }}
@@ -741,17 +689,6 @@ function handleRemoveEntry(sourceIP: string) {
                   >
                     <IconTrash :size="16" />
                   </button>
-                </div>
-
-                <div v-if="row.original.macAddress" class="mb-2">
-                  <div
-                    class="text-xs font-semibold text-base-content/60 uppercase"
-                  >
-                    {{ t('macAddress') }}
-                  </div>
-                  <div class="text-sm text-base-content">
-                    {{ row.original.macAddress }}
-                  </div>
                 </div>
 
                 <div v-if="row.original.firstSeen" class="mb-2">
