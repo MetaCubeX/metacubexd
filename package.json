@@ -32,7 +32,7 @@
     "@prettier/plugin-oxc": "^0.1.3",
     "@tabler/icons-vue": "^3.35.0",
     "@tailwindcss/typography": "^0.5.19",
-    "@tailwindcss/vite": "^4.1.17",
+    "@tailwindcss/vite": "^4.1.18",
     "@tanstack/vue-query": "^5.92.1",
     "@tanstack/vue-table": "^8.21.3",
     "@tanstack/vue-virtual": "^3.13.13",
