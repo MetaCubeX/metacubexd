@@ -46,7 +46,7 @@
     "@vueuse/nuxt": "^14.1.0",
     "byte-size": "^9.0.1",
     "commitlint": "^20.2.0",
-    "daisyui": "^5.5.11",
+    "daisyui": "^5.5.13",
     "dayjs": "^1.11.19",
     "eslint": "^9.39.1",
     "eslint-plugin-format": "^1.1.0",
