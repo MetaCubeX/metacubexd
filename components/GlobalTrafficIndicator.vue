@@ -156,6 +156,7 @@ function createChart() {
       height: 48,
     },
     credits: { enabled: false },
+    accessibility: { enabled: false },
     title: { text: undefined },
     legend: { enabled: false },
     xAxis: {

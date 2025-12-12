@@ -63,6 +63,9 @@ const flowChartOptions = computed<Highcharts.Options>(() => ({
   credits: {
     enabled: false,
   },
+  accessibility: {
+    enabled: false,
+  },
   title: {
     text: t('flow'),
     style: {
@@ -144,6 +147,9 @@ const networkTypesChartOptions = computed<Highcharts.Options>(() => {
       animation: false,
     },
     credits: {
+      enabled: false,
+    },
+    accessibility: {
       enabled: false,
     },
     title: {
@@ -229,6 +235,9 @@ const topProxiesChartOptions = computed<Highcharts.Options>(() => {
       animation: false,
     },
     credits: {
+      enabled: false,
+    },
+    accessibility: {
       enabled: false,
     },
     title: {

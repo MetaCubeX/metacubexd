@@ -149,6 +149,7 @@
   "noDataUsageYet": "Данных пока нет",
   "noData": "Нет данных",
   "noRules": "Нет правил",
+  "noRuleProviders": "Нет провайдеров правил",
   "columns": "Столбцы",
   "sortBy": "Сортировать по",
   "rowsPerPage": "Строк на странице",

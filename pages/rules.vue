@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Rule, RuleProvider } from '~/types'
 import { IconReload } from '@tabler/icons-vue'
+import { useVirtualizer } from '@tanstack/vue-virtual'
 import { matchSorter } from 'match-sorter'
 import {
   useRuleProvidersQuery,
@@ -25,6 +26,10 @@ const globalFilter = ref('')
 
 const { map: updatingMap, setWithCallback: setUpdatingMap } =
   useStringBooleanMap()
+
+// Virtual scroll refs
+const rulesParentRef = ref<HTMLElement | null>(null)
+const providersParentRef = ref<HTMLElement | null>(null)
 
 const tabs = computed(() => [
   {
@@ -73,6 +78,36 @@ const isLoading = computed(
 )
 const allProviderIsUpdating = computed(
   () => updateProviderMutation.isPending.value,
+)
+
+// Virtual scrollers for rules
+const rulesVirtualizerOptions = computed(() => ({
+  count: filteredRules.value.length,
+  getScrollElement: () => rulesParentRef.value,
+  estimateSize: () => 80, // Estimated height of each rule card
+  overscan: 5, // Render 5 extra items outside visible area
+}))
+const rulesVirtualizer = useVirtualizer(rulesVirtualizerOptions)
+
+// Virtual scrollers for rule providers
+const providersVirtualizerOptions = computed(() => ({
+  count: filteredRuleProviders.value.length,
+  getScrollElement: () => providersParentRef.value,
+  estimateSize: () => 80, // Estimated height of each provider card
+  overscan: 5, // Render 5 extra items outside visible area
+}))
+const providersVirtualizer = useVirtualizer(providersVirtualizerOptions)
+
+// Computed virtual rows
+const virtualRules = computed(() => rulesVirtualizer.value.getVirtualItems())
+const virtualProviders = computed(() =>
+  providersVirtualizer.value.getVirtualItems(),
+)
+
+// Total sizes for virtual containers
+const rulesTotalSize = computed(() => rulesVirtualizer.value.getTotalSize())
+const providersTotalSize = computed(() =>
+  providersVirtualizer.value.getTotalSize(),
 )
 </script>
 
@@ -125,70 +160,124 @@ const allProviderIsUpdating = computed(
       <!-- Rules List -->
       <div
         v-if="activeTab === 'rules'"
-        class="flex-1 space-y-2 overflow-y-auto"
+        ref="rulesParentRef"
+        class="flex-1 overflow-y-auto"
       >
-        <div
-          v-for="rule in filteredRules"
-          :key="`${rule.type}-${rule.payload}-${rule.proxy}`"
-          class="card bg-base-200 p-4 card-sm card-border"
-        >
-          <div class="flex items-center gap-2">
-            <span class="break-all">{{ rule.payload }}</span>
-            <div v-if="rule.size !== -1" class="badge badge-sm">
-              {{ rule.size }}
-            </div>
-          </div>
-          <div class="text-xs text-slate-500">
-            {{ rule.type }} :: {{ rule.proxy }}
-          </div>
-        </div>
-
         <div
           v-if="filteredRules.length === 0"
           class="py-8 text-center text-base-content/70"
         >
           {{ t('noRules') }}
         </div>
+        <div
+          v-else
+          :style="{
+            height: `${rulesTotalSize}px`,
+            width: '100%',
+            position: 'relative',
+          }"
+        >
+          <div
+            v-for="virtualRow in virtualRules"
+            :key="`${filteredRules[virtualRow.index].type}-${filteredRules[virtualRow.index].payload}-${filteredRules[virtualRow.index].proxy}`"
+            :style="{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: `${virtualRow.size}px`,
+              transform: `translateY(${virtualRow.start}px)`,
+            }"
+          >
+            <div class="card mb-2 bg-base-200 p-4 card-sm card-border">
+              <div class="flex items-center gap-2">
+                <span class="break-all">{{
+                  filteredRules[virtualRow.index].payload
+                }}</span>
+                <div
+                  v-if="filteredRules[virtualRow.index].size !== -1"
+                  class="badge badge-sm"
+                >
+                  {{ filteredRules[virtualRow.index].size }}
+                </div>
+              </div>
+              <div class="text-xs text-slate-500">
+                {{ filteredRules[virtualRow.index].type }} ::
+                {{ filteredRules[virtualRow.index].proxy }}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Rule Providers List -->
-      <div v-else class="flex-1 space-y-2 overflow-y-auto">
-        <div
-          v-for="provider in filteredRuleProviders"
-          :key="`${provider.type}-${provider.name}`"
-          class="card relative bg-base-200 p-4 card-sm card-border"
-        >
-          <div class="flex items-center gap-2 pr-8">
-            <span class="break-all">{{ provider.name }}</span>
-            <div class="badge badge-sm">
-              {{ provider.ruleCount }}
-            </div>
-          </div>
-
-          <div class="text-xs text-slate-500">
-            {{ provider.vehicleType }} / {{ provider.behavior }} /
-            {{ t('updated') }}
-            {{ formatTimeFromNow(provider.updatedAt, locale) }}
-          </div>
-
-          <Button
-            class="absolute top-2 right-2 mr-2 btn-circle h-4 btn-sm"
-            :disabled="updatingMap[provider.name]"
-            @click="onUpdateProvider(provider.name)"
-          >
-            <IconReload
-              :class="{
-                'animate-spin text-success': updatingMap[provider.name],
-              }"
-            />
-          </Button>
-        </div>
-
+      <div v-else ref="providersParentRef" class="flex-1 overflow-y-auto">
         <div
           v-if="filteredRuleProviders.length === 0"
           class="py-8 text-center text-base-content/70"
         >
-          No rule providers
+          {{ t('noRuleProviders') }}
+        </div>
+        <div
+          v-else
+          :style="{
+            height: `${providersTotalSize}px`,
+            width: '100%',
+            position: 'relative',
+          }"
+        >
+          <div
+            v-for="virtualRow in virtualProviders"
+            :key="`${filteredRuleProviders[virtualRow.index].type}-${filteredRuleProviders[virtualRow.index].name}`"
+            :style="{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: `${virtualRow.size}px`,
+              transform: `translateY(${virtualRow.start}px)`,
+            }"
+          >
+            <div class="card relative mb-2 bg-base-200 p-4 card-sm card-border">
+              <div class="flex items-center gap-2 pr-8">
+                <span class="break-all">{{
+                  filteredRuleProviders[virtualRow.index].name
+                }}</span>
+                <div class="badge badge-sm">
+                  {{ filteredRuleProviders[virtualRow.index].ruleCount }}
+                </div>
+              </div>
+
+              <div class="text-xs text-slate-500">
+                {{ filteredRuleProviders[virtualRow.index].vehicleType }} /
+                {{ filteredRuleProviders[virtualRow.index].behavior }} /
+                {{ t('updated') }}
+                {{
+                  formatTimeFromNow(
+                    filteredRuleProviders[virtualRow.index].updatedAt,
+                    locale,
+                  )
+                }}
+              </div>
+
+              <Button
+                class="absolute top-2 right-2 mr-2 btn-circle h-4 btn-sm"
+                :disabled="
+                  updatingMap[filteredRuleProviders[virtualRow.index].name]
+                "
+                @click="
+                  onUpdateProvider(filteredRuleProviders[virtualRow.index].name)
+                "
+              >
+                <IconReload
+                  :class="{
+                    'animate-spin text-success':
+                      updatingMap[filteredRuleProviders[virtualRow.index].name],
+                  }"
+                />
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </template>

@@ -66,6 +66,9 @@ function createChartOptions(): Highcharts.Options {
     credits: {
       enabled: false,
     },
+    accessibility: {
+      enabled: false,
+    },
     title: {
       text: props.title,
       style: {

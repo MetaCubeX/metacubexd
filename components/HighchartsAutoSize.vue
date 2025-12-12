@@ -29,6 +29,9 @@ function getDefaultOptions(): Highcharts.Options {
     credits: {
       enabled: false,
     },
+    accessibility: {
+      enabled: false,
+    },
     legend: {
       itemStyle: {
         color: themeColors.textColor,
