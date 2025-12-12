@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.229.0](https://github.com/MetaCubeX/metacubexd/compare/v1.228.1...v1.229.0) (2025-12-12)
+
+
+### Features
+
+* implement ThemeSelector component and integrate it into config page ([f70d415](https://github.com/MetaCubeX/metacubexd/commit/f70d415e902ec6e547fc39ab22421d371f89ddb5))
+
 ## [1.228.1](https://github.com/MetaCubeX/metacubexd/compare/v1.228.0...v1.228.1) (2025-12-12)
 
 
