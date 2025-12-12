@@ -7,7 +7,6 @@ import {
   useUpdateConfigMutation,
   useVersionQuery,
 } from '~/composables/useQueries'
-import { themes } from '~/constants'
 
 const { t } = useI18n()
 
@@ -426,23 +425,12 @@ const isLoading = computed(
             <div class="flex flex-col gap-2">
               <div class="flex flex-col">
                 <ConfigTitle>{{ t('favDayTheme') }}</ConfigTitle>
-                <select v-model="configStore.favDayTheme" class="select w-full">
-                  <option v-for="theme in themes" :key="theme" :value="theme">
-                    {{ theme }}
-                  </option>
-                </select>
+                <ThemeSelector v-model="configStore.favDayTheme" />
               </div>
 
               <div class="flex flex-col">
                 <ConfigTitle>{{ t('favNightTheme') }}</ConfigTitle>
-                <select
-                  v-model="configStore.favNightTheme"
-                  class="select w-full"
-                >
-                  <option v-for="theme in themes" :key="theme" :value="theme">
-                    {{ theme }}
-                  </option>
-                </select>
+                <ThemeSelector v-model="configStore.favNightTheme" />
               </div>
             </div>
           </template>
