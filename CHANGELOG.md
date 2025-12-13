@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.234.1](https://github.com/MetaCubeX/metacubexd/compare/v1.234.0...v1.234.1) (2025-12-13)
+
+
+### Bug Fixes
+
+* improve layout and truncation for IPInfoCard and GlobalTrafficIndicator components ([3d9aaea](https://github.com/MetaCubeX/metacubexd/commit/3d9aaea888aac63251c5a6d731ea263b742d5ee7))
+
 ## [1.234.0](https://github.com/MetaCubeX/metacubexd/compare/v1.233.0...v1.234.0) (2025-12-13)
 
 
