@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type Highcharts from 'highcharts'
 import type { ChartRef } from '~/components/RealtimeLineChart.vue'
+import { IconChevronDown } from '@tabler/icons-vue'
 import byteSize from 'byte-size'
 import { getChartThemeColors } from '~/utils'
 
@@ -476,7 +477,23 @@ watch(
     </div>
 
     <!-- Network Topology -->
-    <NetworkTopology />
+    <div class="card bg-base-200 p-4 shadow-sm">
+      <div
+        class="flex cursor-pointer items-center justify-between"
+        @click="
+          configStore.showNetworkTopology = !configStore.showNetworkTopology
+        "
+      >
+        <h3 class="font-semibold">{{ t('networkTopology') }}</h3>
+        <button class="btn btn-circle btn-ghost btn-xs">
+          <IconChevronDown
+            class="h-5 w-5 transition-transform"
+            :class="{ 'rotate-180': configStore.showNetworkTopology }"
+          />
+        </button>
+      </div>
+      <NetworkTopology v-if="configStore.showNetworkTopology" class="mt-4" />
+    </div>
 
     <!-- Data Usage Table -->
     <DataUsageTable />

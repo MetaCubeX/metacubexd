@@ -107,6 +107,9 @@ export const useConfigStore = defineStore('config', () => {
     { tagName: string; sourceIP: string }[]
   >('clientSourceIPTags', [])
 
+  // Overview settings
+  const showNetworkTopology = useLocalStorage('showNetworkTopology', false)
+
   // Computed
   const isLatencyTestByHttps = computed(() =>
     urlForLatencyTest.value.startsWith('https'),
@@ -185,6 +188,8 @@ export const useConfigStore = defineStore('config', () => {
     logMaxRows,
     // Client tags
     clientSourceIPTags,
+    // Overview
+    showNetworkTopology,
     // Computed
     isLatencyTestByHttps,
     latencyQualityMap,

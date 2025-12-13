@@ -721,10 +721,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="card bg-base-200 p-4 shadow-sm">
+  <div>
     <div class="mb-4 flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <h3 class="font-semibold">{{ t('networkTopology') }}</h3>
         <button
           class="btn btn-circle btn-ghost btn-xs"
           :class="{ 'text-warning': isPaused }"
