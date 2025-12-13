@@ -62,36 +62,43 @@ function handleProviderChange(event: Event) {
     </div>
 
     <div v-else-if="ipInfo" class="space-y-2">
-      <div class="flex items-center justify-between">
-        <span class="text-base-content/60">{{ t('ipAddress') }}</span>
-        <span class="font-mono font-semibold">{{ ipInfo.ip }}</span>
+      <div class="flex items-center justify-between gap-2">
+        <span class="shrink-0 text-base-content/60">{{ t('ipAddress') }}</span>
+        <span class="truncate font-mono font-semibold" :title="ipInfo.ip">{{
+          ipInfo.ip
+        }}</span>
       </div>
 
-      <div v-if="ipInfo.country" class="flex items-center justify-between">
-        <span class="text-base-content/60">{{ t('country') }}</span>
-        <span>{{ ipInfo.country }}</span>
+      <div
+        v-if="ipInfo.country"
+        class="flex items-center justify-between gap-2"
+      >
+        <span class="shrink-0 text-base-content/60">{{ t('country') }}</span>
+        <span class="truncate">{{ ipInfo.country }}</span>
       </div>
 
-      <div v-if="ipInfo.city" class="flex items-center justify-between">
-        <span class="text-base-content/60">{{ t('city') }}</span>
-        <span>{{ ipInfo.city }}</span>
+      <div v-if="ipInfo.city" class="flex items-center justify-between gap-2">
+        <span class="shrink-0 text-base-content/60">{{ t('city') }}</span>
+        <span class="truncate">{{ ipInfo.city }}</span>
       </div>
 
-      <div v-if="ipInfo.org" class="flex items-center justify-between">
-        <span class="text-base-content/60">{{ t('organization') }}</span>
-        <span class="max-w-50 truncate text-right" :title="ipInfo.org">
+      <div v-if="ipInfo.org" class="flex items-center justify-between gap-2">
+        <span class="shrink-0 text-base-content/60">{{
+          t('organization')
+        }}</span>
+        <span class="truncate text-right" :title="ipInfo.org">
           {{ ipInfo.org }}
         </span>
       </div>
 
-      <div v-if="ipInfo.asn" class="flex items-center justify-between">
-        <span class="text-base-content/60">ASN</span>
-        <span class="font-mono">AS{{ ipInfo.asn }}</span>
+      <div v-if="ipInfo.asn" class="flex items-center justify-between gap-2">
+        <span class="shrink-0 text-base-content/60">ASN</span>
+        <span class="truncate font-mono">AS{{ ipInfo.asn }}</span>
       </div>
 
-      <div v-if="ipInfo.isp" class="flex items-center justify-between">
-        <span class="text-base-content/60">ISP</span>
-        <span class="max-w-50 truncate text-right" :title="ipInfo.isp">
+      <div v-if="ipInfo.isp" class="flex items-center justify-between gap-2">
+        <span class="shrink-0 text-base-content/60">ISP</span>
+        <span class="truncate text-right" :title="ipInfo.isp">
           {{ ipInfo.isp }}
         </span>
       </div>

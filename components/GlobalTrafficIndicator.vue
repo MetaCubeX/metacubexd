@@ -487,12 +487,16 @@ onBeforeUnmount(() => {
       <!-- Stats -->
       <div class="grid grid-cols-2 gap-1 text-xs">
         <div class="flex items-center gap-1">
-          <IconArrowDown class="size-3 text-success" />
-          <span class="font-mono">{{ formatBytes(downloadSpeed) }}/s</span>
+          <IconArrowDown class="size-3 shrink-0 text-success" />
+          <span class="truncate font-mono"
+            >{{ formatBytes(downloadSpeed) }}/s</span
+          >
         </div>
         <div class="flex items-center gap-1">
-          <IconArrowUp class="size-3 text-info" />
-          <span class="font-mono">{{ formatBytes(uploadSpeed) }}/s</span>
+          <IconArrowUp class="size-3 shrink-0 text-info" />
+          <span class="truncate font-mono"
+            >{{ formatBytes(uploadSpeed) }}/s</span
+          >
         </div>
       </div>
     </div>
