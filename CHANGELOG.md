@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.234.0](https://github.com/MetaCubeX/metacubexd/compare/v1.233.0...v1.234.0) (2025-12-13)
+
+
+### Features
+
+* add toggle for NetworkTopology visibility in overview page ([505c98e](https://github.com/MetaCubeX/metacubexd/commit/505c98e4b259938bce2c65638ea4cd8585c7e611))
+
 ## [1.233.0](https://github.com/MetaCubeX/metacubexd/compare/v1.232.0...v1.233.0) (2025-12-13)
 
 
