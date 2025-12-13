@@ -208,5 +208,6 @@
   "nodes": "节点",
   "proxyGroups": "代理组",
   "proxyNodes": "代理节点",
-  "ruleType": "规则类型"
+  "ruleType": "规则类型",
+  "useMobileBottomNav": "使用底部导航栏 (移动端)"
 }
