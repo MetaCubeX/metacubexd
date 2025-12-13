@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.233.0](https://github.com/MetaCubeX/metacubexd/compare/v1.232.0...v1.233.0) (2025-12-13)
+
+
+### Features
+
+* enhance ConnectionsSettingsModal with sortable columns and improved visibility handling ([a1ce722](https://github.com/MetaCubeX/metacubexd/commit/a1ce722517a5c3a52314dbde1fb009f2343709f7))
+
 ## [1.232.0](https://github.com/MetaCubeX/metacubexd/compare/v1.231.0...v1.232.0) (2025-12-13)
 
 
