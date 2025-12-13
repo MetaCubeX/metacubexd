@@ -537,9 +537,23 @@ function renderTree() {
   // Root offset is 0 since we manually adjusted node positions to start from 0
   const rootOffset = 0
 
+  // Calculate the actual width needed for the tree content
+  // Find the maximum x position (horizontal in our rotated tree) plus the node width at that position
+  let maxY = 0
+  root.each((d) => {
+    if (d.data.type !== 'root') {
+      const nodeWidth = nodeWidths.get(d.data.id) ?? 80
+      const rightEdge = (d.y ?? 0) + nodeWidth / 2
+      if (rightEdge > maxY) maxY = rightEdge
+    }
+  })
+
+  // Add left padding (60) and right padding (40)
+  const actualWidth = Math.max(containerWidth, maxY + 60 + 40)
+
   const svg = d3
     .select(svgRef.value)
-    .attr('width', containerWidth)
+    .attr('width', actualWidth)
     .attr('height', actualHeight)
 
   // Translate to center vertically and account for negative x values, plus top padding
@@ -766,7 +780,11 @@ onMounted(() => {
       <span>{{ t('waitingForConnections') }}</span>
     </div>
 
-    <div v-else ref="containerRef" class="overflow-x-auto">
+    <div
+      v-else
+      ref="containerRef"
+      class="touch-pan-x touch-pan-y overflow-x-auto"
+    >
       <svg ref="svgRef" class="min-h-100"></svg>
     </div>
   </div>
