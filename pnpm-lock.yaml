@@ -58,6 +58,9 @@ importers:
       '@types/byte-size':
         specifier: ^8.1.2
         version: 8.1.2
+      '@types/d3':
+        specifier: ^7.4.3
+        version: 7.4.3
       '@types/lodash':
         specifier: ^4.17.21
         version: 4.17.21
@@ -70,12 +73,18 @@ importers:
       '@types/node':
         specifier: ^25.0.1
         version: 25.0.1
+      '@types/sortablejs':
+        specifier: ^1.15.9
+        version: 1.15.9
       '@types/uuid':
         specifier: ^11.0.0
         version: 11.0.0
       '@vueuse/core':
         specifier: ^14.1.0
         version: 14.1.0(vue@3.5.25(typescript@5.9.3))
+      '@vueuse/integrations':
+        specifier: ^14.1.0
+        version: 14.1.0(change-case@5.4.4)(fuse.js@7.1.0)(sortablejs@1.15.6)(vue@3.5.25(typescript@5.9.3))
       '@vueuse/nuxt':
         specifier: ^14.1.0
         version: 14.1.0(magicast@0.5.1)(nuxt@4.2.2(@parcel/watcher@2.5.1)(@types/node@25.0.1)(@vue/compiler-sfc@3.5.25)(cac@6.7.14)(db0@0.3.4)(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(magicast@0.5.1)(optionator@0.9.4)(rolldown@1.0.0-beta.53)(rollup@4.53.3)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(vite@7.2.7(@types/node@25.0.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))(vue-tsc@3.1.8(typescript@5.9.3))(yaml@2.8.2))(vue@3.5.25(typescript@5.9.3))
@@ -145,6 +154,9 @@ importers:
       sort-package-json:
         specifier: ^3.5.1
         version: 3.5.1
+      sortablejs:
+        specifier: ^1.15.6
+        version: 1.15.6
       tailwind-merge:
         specifier: ^3.4.0
         version: 3.4.0
@@ -184,10 +196,6 @@ importers:
       zod:
         specifier: ^4.1.13
         version: 4.1.13
-    devDependencies:
-      '@types/d3':
-        specifier: ^7.4.3
-        version: 7.4.3
 
 packages:
   '@alloc/quick-lru@5.2.0':
@@ -3729,6 +3737,12 @@ packages:
         integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==,
       }
 
+  '@types/sortablejs@1.15.9':
+    resolution:
+      {
+        integrity: sha512-7HP+rZGE2p886PKV9c9OJzLBI6BBJu1O7lJGYnPyG3fS4/duUCcngkNCjsLwIMV+WMqANe3tt4irrXHSIe68OQ==,
+      }
+
   '@types/unist@3.0.3':
     resolution:
       {
@@ -4112,6 +4126,51 @@ packages:
       }
     peerDependencies:
       vue: ^3.5.0
+
+  '@vueuse/integrations@14.1.0':
+    resolution:
+      {
+        integrity: sha512-eNQPdisnO9SvdydTIXnTE7c29yOsJBD/xkwEyQLdhDC/LKbqrFpXHb3uS//7NcIrQO3fWVuvMGp8dbK6mNEMCA==,
+      }
+    peerDependencies:
+      async-validator: ^4
+      axios: ^1
+      change-case: ^5
+      drauu: ^0.4
+      focus-trap: ^7
+      fuse.js: ^7
+      idb-keyval: ^6
+      jwt-decode: ^4
+      nprogress: ^0.2
+      qrcode: ^1.5
+      sortablejs: ^1
+      universal-cookie: ^7 || ^8
+      vue: ^3.5.0
+    peerDependenciesMeta:
+      async-validator:
+        optional: true
+      axios:
+        optional: true
+      change-case:
+        optional: true
+      drauu:
+        optional: true
+      focus-trap:
+        optional: true
+      fuse.js:
+        optional: true
+      idb-keyval:
+        optional: true
+      jwt-decode:
+        optional: true
+      nprogress:
+        optional: true
+      qrcode:
+        optional: true
+      sortablejs:
+        optional: true
+      universal-cookie:
+        optional: true
 
   '@vueuse/metadata@14.1.0':
     resolution:
@@ -9728,6 +9787,12 @@ packages:
     engines: { node: '>=20' }
     hasBin: true
 
+  sortablejs@1.15.6:
+    resolution:
+      {
+        integrity: sha512-aNfiuwMEpfBM/CN6LY0ibyhxPfPbyFeBTYJKCvzkJ2GkUpazIt3H+QIPAMHwqQ7tMKaHz1Qj+rJJCqljnf4p3A==,
+      }
+
   source-map-js@1.2.1:
     resolution:
       {
@@ -13201,6 +13266,8 @@ snapshots:
 
   '@types/resolve@1.20.2': {}
 
+  '@types/sortablejs@1.15.9': {}
+
   '@types/unist@3.0.3': {}
 
   '@types/uuid@11.0.0':
@@ -13562,6 +13629,16 @@ snapshots:
       '@vueuse/metadata': 14.1.0
       '@vueuse/shared': 14.1.0(vue@3.5.25(typescript@5.9.3))
       vue: 3.5.25(typescript@5.9.3)
+
+  '@vueuse/integrations@14.1.0(change-case@5.4.4)(fuse.js@7.1.0)(sortablejs@1.15.6)(vue@3.5.25(typescript@5.9.3))':
+    dependencies:
+      '@vueuse/core': 14.1.0(vue@3.5.25(typescript@5.9.3))
+      '@vueuse/shared': 14.1.0(vue@3.5.25(typescript@5.9.3))
+      vue: 3.5.25(typescript@5.9.3)
+    optionalDependencies:
+      change-case: 5.4.4
+      fuse.js: 7.1.0
+      sortablejs: 1.15.6
 
   '@vueuse/metadata@14.1.0': {}
 
@@ -17258,6 +17335,8 @@ snapshots:
       semver: 7.7.3
       sort-object-keys: 2.0.1
       tinyglobby: 0.2.15
+
+  sortablejs@1.15.6: {}
 
   source-map-js@1.2.1: {}
 

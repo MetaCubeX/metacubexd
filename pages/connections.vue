@@ -239,11 +239,22 @@ const allColumns: ConnectionColumn[] = [
   },
 ]
 
-const visibleColumns = computed(() =>
-  allColumns.filter(
-    (col) => configStore.connectionsTableColumnVisibility[col.id] !== false,
-  ),
-)
+const visibleColumns = computed(() => {
+  const order = configStore.connectionsTableColumnOrder
+  const visibility = configStore.connectionsTableColumnVisibility
+
+  // Sort columns by order, then filter by visibility
+  return [...allColumns]
+    .sort((a, b) => {
+      const aIndex = order.indexOf(a.id)
+      const bIndex = order.indexOf(b.id)
+      // If not in order, put at the end
+      const aOrder = aIndex === -1 ? Infinity : aIndex
+      const bOrder = bIndex === -1 ? Infinity : bIndex
+      return aOrder - bOrder
+    })
+    .filter((col) => visibility[col.id] !== false)
+})
 
 const sortableColumns = computed(() => allColumns.filter((col) => col.sortable))
 

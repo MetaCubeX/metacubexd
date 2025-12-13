@@ -37,12 +37,15 @@
     "@tanstack/vue-table": "^8.21.3",
     "@tanstack/vue-virtual": "^3.13.13",
     "@types/byte-size": "^8.1.2",
+    "@types/d3": "^7.4.3",
     "@types/lodash": "^4.17.21",
     "@types/lodash-es": "^4.17.12",
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^25.0.1",
+    "@types/sortablejs": "^1.15.9",
     "@types/uuid": "^11.0.0",
     "@vueuse/core": "^14.1.0",
+    "@vueuse/integrations": "^14.1.0",
     "@vueuse/nuxt": "^14.1.0",
     "byte-size": "^9.0.1",
     "commitlint": "^20.2.0",
@@ -66,6 +69,7 @@
     "prettier": "^3.7.4",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "sort-package-json": "^3.5.1",
+    "sortablejs": "^1.15.6",
     "tailwind-merge": "^3.4.0",
     "tailwind-variants": "^3.2.2",
     "tailwindcss": "^4.1.18",
@@ -80,8 +84,5 @@
     "vue-tsc": "^3.1.8",
     "zod": "^4.1.13"
   },
-  "packageManager": "pnpm@10.25.0",
-  "devDependencies": {
-    "@types/d3": "^7.4.3"
-  }
+  "packageManager": "pnpm@10.25.0"
 }

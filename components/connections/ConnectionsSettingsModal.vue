@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import type { CONNECTIONS_TABLE_ACCESSOR_KEY } from '~/constants'
 import type { ConnectionsTableColumnVisibility } from '~/types'
-import { IconNetwork, IconX } from '@tabler/icons-vue'
-import { CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY } from '~/constants'
+import { IconGripVertical, IconNetwork, IconX } from '@tabler/icons-vue'
+import { useSortable } from '@vueuse/integrations/useSortable'
+import {
+  CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
+  CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY,
+} from '~/constants'
 
-defineProps<{
+const props = defineProps<{
   allColumns: Array<{
     id: CONNECTIONS_TABLE_ACCESSOR_KEY
     key: string
@@ -16,10 +20,37 @@ const { t } = useI18n()
 const configStore = useConfigStore()
 
 const modalRef = ref<{ open: () => void; close: () => void }>()
+const columnListRef = ref<HTMLElement | null>(null)
 
 // Tag form
 const newTagSourceIP = ref('')
 const newTagName = ref('')
+
+// Column order for sortable - sync with store
+const columnOrder = computed({
+  get: () => {
+    // Merge store order with all columns (in case new columns were added)
+    const storeOrder = configStore.connectionsTableColumnOrder
+    const allIds = props.allColumns.map((c) => c.id)
+    const orderedIds = storeOrder.filter((id) => allIds.includes(id))
+    const newIds = allIds.filter((id) => !storeOrder.includes(id))
+    return [...orderedIds, ...newIds]
+  },
+  set: (val) => {
+    configStore.connectionsTableColumnOrder = [...val]
+  },
+})
+
+// Get column info by id
+function getColumnById(id: CONNECTIONS_TABLE_ACCESSOR_KEY) {
+  return props.allColumns.find((c) => c.id === id)
+}
+
+// Setup sortable
+useSortable(columnListRef, columnOrder, {
+  handle: '.drag-handle',
+  animation: 150,
+})
 
 function toggleColumnVisibility(colId: CONNECTIONS_TABLE_ACCESSOR_KEY) {
   configStore.connectionsTableColumnVisibility = {
@@ -56,6 +87,9 @@ function resetSettings() {
   configStore.connectionsTableColumnVisibility = {
     ...CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY,
   }
+  configStore.connectionsTableColumnOrder = [
+    ...CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
+  ]
 }
 
 defineExpose({
@@ -152,18 +186,26 @@ defineExpose({
         <ConfigTitle with-divider>
           {{ t('columns') }}
         </ConfigTitle>
-        <div class="flex flex-col">
+        <div ref="columnListRef" class="flex flex-col gap-1">
           <div
-            v-for="col in allColumns"
-            :key="col.id"
-            class="flex items-center justify-between py-2"
+            v-for="colId in columnOrder"
+            :key="colId"
+            class="flex items-center justify-between gap-2 rounded-lg bg-base-200 px-3 py-2 transition-colors hover:bg-base-300"
           >
-            <span>{{ t(col.key) }}</span>
+            <div class="flex items-center gap-3">
+              <IconGripVertical
+                class="drag-handle shrink-0 cursor-grab text-base-content/40 transition-colors hover:text-base-content/70 active:cursor-grabbing"
+                :size="16"
+              />
+              <span class="text-sm">{{
+                t(getColumnById(colId)?.key || colId)
+              }}</span>
+            </div>
             <input
               type="checkbox"
-              class="toggle"
-              :checked="configStore.connectionsTableColumnVisibility[col.id]"
-              @change="toggleColumnVisibility(col.id)"
+              class="toggle toggle-primary toggle-sm"
+              :checked="configStore.connectionsTableColumnVisibility[colId]"
+              @change="toggleColumnVisibility(colId)"
             />
           </div>
         </div>
