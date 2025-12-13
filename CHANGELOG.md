@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.232.0](https://github.com/MetaCubeX/metacubexd/compare/v1.231.0...v1.232.0) (2025-12-13)
+
+
+### Features
+
+* **NetworkTopology:** adjust tree rendering width for better layout ([dcfa068](https://github.com/MetaCubeX/metacubexd/commit/dcfa068a83b8d728a77269da5c6d3f68043f40b8))
+
 ## [1.231.0](https://github.com/MetaCubeX/metacubexd/compare/v1.230.0...v1.231.0) (2025-12-12)
 
 
