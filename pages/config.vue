@@ -383,10 +383,20 @@ const isLoading = computed(
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div class="flex flex-col gap-2">
-          <div class="flex flex-col">
+          <div class="flex flex-col items-center">
             <ConfigTitle>{{ t('enableTwemoji') }}</ConfigTitle>
             <input
               v-model="configStore.enableTwemoji"
+              type="checkbox"
+              class="toggle"
+            />
+          </div>
+
+          <!-- Mobile Bottom Nav Toggle - only visible on mobile -->
+          <div class="flex flex-col items-center lg:hidden">
+            <ConfigTitle>{{ t('useMobileBottomNav') }}</ConfigTitle>
+            <input
+              v-model="configStore.useMobileBottomNav"
               type="checkbox"
               class="toggle"
             />

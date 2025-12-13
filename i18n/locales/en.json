@@ -208,5 +208,6 @@
   "nodes": "Nodes",
   "proxyGroups": "Proxy Groups",
   "proxyNodes": "Proxy Nodes",
-  "ruleType": "Rule Type"
+  "ruleType": "Rule Type",
+  "useMobileBottomNav": "Use Bottom Navigation (Mobile)"
 }

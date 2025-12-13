@@ -60,9 +60,9 @@ const toggleSidebar = () => {
       <header
         class="z-50 flex h-14 w-full shrink-0 items-center gap-2 bg-base-300 px-2 shadow-lg sm:px-4 lg:hidden"
       >
-        <!-- Mobile menu button -->
+        <!-- Mobile menu button (hidden when using bottom nav) -->
         <label
-          v-if="route.path !== '/setup'"
+          v-if="route.path !== '/setup' && !configStore.useMobileBottomNav"
           for="main-drawer"
           class="btn btn-ghost btn-sm"
           aria-label="open sidebar"
@@ -186,5 +186,11 @@ const toggleSidebar = () => {
         </div>
       </div>
     </div>
+
+    <!-- Mobile Bottom Navigation (when enabled) -->
+    <MobileBottomNav
+      v-if="configStore.useMobileBottomNav && route.path !== '/setup'"
+      :nav-items="navItems"
+    />
   </div>
 </template>

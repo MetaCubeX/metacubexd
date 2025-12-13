@@ -72,6 +72,9 @@ export const useConfigStore = defineStore('config', () => {
   // Sidebar expanded state (PC only)
   const sidebarExpanded = useLocalStorage('sidebarExpanded', false)
 
+  // Mobile navigation type (bottom nav vs side drawer)
+  const useMobileBottomNav = useLocalStorage('useMobileBottomNav', false)
+
   // Connections table settings
   const connectionsTableSize = useLocalStorage<TAILWINDCSS_SIZE>(
     'connectionsTableSize',
@@ -149,6 +152,7 @@ export const useConfigStore = defineStore('config', () => {
     autoSwitchTheme.value = false
     autoSwitchEndpoint.value = false
     enableTwemoji.value = false
+    useMobileBottomNav.value = false
     favDayTheme.value = 'nord'
     favNightTheme.value = 'sunset'
     curTheme.value = 'sunset'
@@ -177,6 +181,8 @@ export const useConfigStore = defineStore('config', () => {
     enableTwemoji,
     // Sidebar
     sidebarExpanded,
+    // Mobile navigation
+    useMobileBottomNav,
     // Connections
     connectionsTableSize,
     connectionsTableColumnVisibility,

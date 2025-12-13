@@ -15,10 +15,17 @@ const route = useRoute()
 
 const isActive = (href: string) => route.path === href
 
-// Add padding to body for mobile nav
+// Entrance animation state
+const isVisible = ref(false)
+
+// Add padding to body for mobile nav and animate entrance
 onMounted(() => {
   updateBodyPadding()
   window.addEventListener('resize', updateBodyPadding)
+  // Trigger entrance animation
+  requestAnimationFrame(() => {
+    isVisible.value = true
+  })
 })
 
 onUnmounted(() => {
@@ -27,41 +34,74 @@ onUnmounted(() => {
 })
 
 function updateBodyPadding() {
-  document.body.style.paddingBottom = window.innerWidth < 1024 ? '4rem' : '0'
+  document.body.style.paddingBottom = window.innerWidth < 1024 ? '4.5rem' : '0'
 }
 </script>
 
 <template>
   <nav
-    class="fixed inset-x-0 bottom-0 z-50 border-t border-base-content/10 bg-base-300/95 backdrop-blur-sm lg:hidden"
+    class="fixed inset-x-0 bottom-0 z-50 lg:hidden transform transition-all duration-500 ease-out"
+    :class="[
+      isVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0',
+    ]"
   >
-    <div class="grid h-16 grid-cols-6">
-      <NuxtLink
-        v-for="nav in navItems"
-        :key="nav.href"
-        :to="nav.href"
-        class="relative flex flex-col items-center justify-center gap-1 transition-all duration-200 hover:bg-base-200/50"
-      >
-        <div
-          v-if="isActive(nav.href)"
-          class="absolute top-0 left-1/2 h-1 w-8 -translate-x-1/2 transform rounded-b-full bg-primary"
-        />
-        <div
-          class="text-xl transition-all duration-200"
-          :class="{
-            'scale-110 text-primary': isActive(nav.href),
-            'text-base-content/70': !isActive(nav.href),
-          }"
+    <!-- Backdrop blur container -->
+    <div
+      class="mx-2 mb-2 overflow-hidden rounded-2xl border border-base-content/10 bg-base-300/90 shadow-lg backdrop-blur-md"
+    >
+      <div class="grid h-16 grid-cols-6">
+        <NuxtLink
+          v-for="nav in navItems"
+          :key="nav.href"
+          :to="nav.href"
+          class="group relative flex flex-col items-center justify-center gap-0.5 transition-all duration-300"
+          :class="[
+            isActive(nav.href)
+              ? 'text-primary'
+              : 'text-base-content/60 hover:text-base-content active:scale-90',
+          ]"
         >
-          <component :is="nav.icon" />
-        </div>
-        <span
-          v-if="isActive(nav.href)"
-          class="text-xs font-medium text-primary"
-        >
-          {{ nav.name }}
-        </span>
-      </NuxtLink>
+          <!-- Active background glow -->
+          <div
+            class="absolute inset-1 rounded-xl transition-all duration-300"
+            :class="[
+              isActive(nav.href)
+                ? 'bg-primary/10'
+                : 'bg-transparent group-hover:bg-base-content/5',
+            ]"
+          />
+
+          <!-- Active indicator pill -->
+          <div
+            class="absolute top-1 h-1 rounded-full bg-primary transition-all duration-300"
+            :class="[isActive(nav.href) ? 'w-8 opacity-100' : 'w-0 opacity-0']"
+          />
+
+          <!-- Icon with scale animation -->
+          <div
+            class="relative z-10 transition-all duration-300"
+            :class="[
+              isActive(nav.href)
+                ? 'scale-110 text-xl'
+                : 'scale-100 text-lg group-hover:scale-105',
+            ]"
+          >
+            <component :is="nav.icon" />
+          </div>
+
+          <!-- Label with fade animation -->
+          <span
+            class="relative z-10 text-[10px] font-medium transition-all duration-300"
+            :class="[
+              isActive(nav.href)
+                ? 'translate-y-0 opacity-100'
+                : '-translate-y-1 opacity-0',
+            ]"
+          >
+            {{ nav.name }}
+          </span>
+        </NuxtLink>
+      </div>
     </div>
   </nav>
 </template>
