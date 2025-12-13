@@ -1,0 +1,1 @@
+import{M as e,yt as t}from"./SdXlftKS.js";import{t as n}from"./ZC4cO_li.js";const r=e(`logs`,()=>{let e=n(),r=t([]),i=t(!1),a=1;return{logs:r,paused:i,addLog:t=>{i.value||(r.value=[{...t,seq:a},...r.value].slice(0,e.logMaxRows),a++)},clearLogs:()=>{r.value=[],a=1},togglePaused:()=>{i.value=!i.value}}});export{r as t};
