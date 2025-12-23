@@ -73,7 +73,7 @@ export const useConfigStore = defineStore('config', () => {
   const sidebarExpanded = useLocalStorage('sidebarExpanded', false)
 
   // Mobile navigation type (bottom nav vs side drawer)
-  const useMobileBottomNav = useLocalStorage('useMobileBottomNav', false)
+  const useMobileBottomNav = useLocalStorage('useMobileBottomNav', true)
 
   // Connections table settings
   const connectionsTableSize = useLocalStorage<TAILWINDCSS_SIZE>(
