@@ -40,7 +40,8 @@ function updateBodyPadding() {
 
 <template>
   <nav
-    class="fixed inset-x-0 bottom-0 z-50 lg:hidden transform transition-all duration-500 ease-out"
+    aria-label="Mobile bottom navigation"
+    class="fixed inset-x-0 bottom-0 z-50 transform transition-all duration-500 ease-out lg:hidden"
     :class="[
       isVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0',
     ]"
@@ -90,12 +91,19 @@ function updateBodyPadding() {
           </div>
 
           <!-- Label with fade animation -->
+          <!-- Screen reader label (always available even when visual label is hidden) -->
+          <span class="sr-only">
+            {{ `Navigate to ${nav.name}` }}
+          </span>
+
+          <!-- Visual label with fade animation -->
           <span
+            aria-hidden="true"
             class="relative z-10 text-[10px] font-medium transition-all duration-300"
             :class="[
               isActive(nav.href)
                 ? 'translate-y-0 opacity-100'
-                : '-translate-y-1 opacity-0',
+                : 'translate-y-0 opacity-80 group-hover:opacity-100 group-focus-visible:opacity-100',
             ]"
           >
             {{ nav.name }}

@@ -152,7 +152,7 @@ export const useConfigStore = defineStore('config', () => {
     autoSwitchTheme.value = false
     autoSwitchEndpoint.value = false
     enableTwemoji.value = false
-    useMobileBottomNav.value = false
+    useMobileBottomNav.value = true
     favDayTheme.value = 'nord'
     favNightTheme.value = 'sunset'
     curTheme.value = 'sunset'
