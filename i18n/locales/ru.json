@@ -208,5 +208,6 @@
   "nodes": "Узлы",
   "proxyGroups": "Группы прокси",
   "proxyNodes": "Узлы прокси",
-  "ruleType": "Тип правила"
+  "ruleType": "Тип правила",
+  "useMobileBottomNav": "Нижняя навигация (мобильный)"
 }
