@@ -1,0 +1,1 @@
+import{$ as e,Dt as t,J as n,lt as r,st as i}from"./C4vawhhX.js";var a=e({__name:`ConfigTitle`,props:{withDivider:{type:Boolean}},setup(e){return(a,o)=>(i(),n(`div`,{class:t([`py-2 text-center text-lg font-semibold`,{divider:e.withDivider}])},[r(a.$slots,`default`)],2))}}),o=Object.assign(a,{__name:`ConfigTitle`});export{o as t};
