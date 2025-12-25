@@ -68,7 +68,7 @@
     "playwright": "^1.57.0",
     "prettier": "^3.7.4",
     "prettier-plugin-tailwindcss": "^0.7.2",
-    "sort-package-json": "^3.5.1",
+    "sort-package-json": "^3.6.0",
     "sortablejs": "^1.15.6",
     "tailwind-merge": "^3.4.0",
     "tailwind-variants": "^3.2.2",
