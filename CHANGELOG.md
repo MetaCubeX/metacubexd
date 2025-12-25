@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.235.0](https://github.com/MetaCubeX/metacubexd/compare/v1.234.1...v1.235.0) (2025-12-25)
+
+
+### Features
+
+* **mobile:** Add bottom navigation option for mobile view ([#1805](https://github.com/MetaCubeX/metacubexd/issues/1805)) ([90ea708](https://github.com/MetaCubeX/metacubexd/commit/90ea708eb77355f376042fc793103df1c3458aa6))
+
 ## [1.234.1](https://github.com/MetaCubeX/metacubexd/compare/v1.234.0...v1.234.1) (2025-12-13)
 
 
