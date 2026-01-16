@@ -186,9 +186,11 @@ export type ConnectionsTableColumnVisibility = Partial<
 >
 export type ConnectionsTableColumnOrder = CONNECTIONS_TABLE_ACCESSOR_KEY[]
 
+export type DataUsageType = 'sourceIP' | 'host' | 'process' | 'outbound'
+
 export interface DataUsageEntry {
-  sourceIP: string
-  macAddress: string
+  type: DataUsageType
+  label: string
   upload: number
   download: number
   total: number

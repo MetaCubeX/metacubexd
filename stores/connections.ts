@@ -2,6 +2,7 @@ import type {
   Connection,
   ConnectionRawMessage,
   DataUsageEntry,
+  DataUsageType,
   WsMsg,
 } from '~/types'
 import { isNumber } from 'lodash-es'
@@ -19,10 +20,14 @@ export const useConnectionsStore = defineStore('connections', () => {
   const paused = ref(false)
 
   // Data usage tracking
-  const dataUsageMap = useLocalStorage<Record<string, DataUsageEntry>>(
-    'dataUsageMap',
-    {},
-  )
+  const dataUsageMap = useLocalStorage<
+    Record<DataUsageType, Record<string, DataUsageEntry>>
+  >('dataUsageMap', {
+    sourceIP: {},
+    host: {},
+    process: {},
+    outbound: {},
+  })
   const baselineTotals = useLocalStorage<{ upload: number; download: number }>(
     'dataUsageBaseline',
     { upload: 0, download: 0 },
@@ -116,14 +121,21 @@ export const useConnectionsStore = defineStore('connections', () => {
 
   // Clear all data usage
   const clearDataUsage = () => {
-    dataUsageMap.value = {}
+    dataUsageMap.value = {
+      sourceIP: {},
+      host: {},
+      process: {},
+      outbound: {},
+    }
     connectionLastData.clear()
   }
 
   // Remove specific entry
-  const removeDataUsageEntry = (sourceIP: string) => {
+  const removeDataUsageEntry = (type: DataUsageType, id: string) => {
     const updates = { ...dataUsageMap.value }
-    delete updates[sourceIP]
+    const typeUpdates = { ...updates[type] }
+    delete typeUpdates[id]
+    updates[type] = typeUpdates
     dataUsageMap.value = updates
   }
 
@@ -200,57 +212,70 @@ export const useConnectionsStore = defineStore('connections', () => {
       hasInitializedSession = true
     }
 
-    const updates: Record<string, DataUsageEntry> = { ...dataUsageMap.value }
+    const updates = { ...dataUsageMap.value }
     const now = Date.now()
 
-    const ipDataMap = new Map<
-      string,
-      { upload: number; download: number; connectionIds: Set<string> }
-    >()
+    const deltaMap = {
+      sourceIP: new Map<string, { upload: number; download: number }>(),
+      host: new Map<string, { upload: number; download: number }>(),
+      process: new Map<string, { upload: number; download: number }>(),
+      outbound: new Map<string, { upload: number; download: number }>(),
+    }
 
     connections.forEach((conn) => {
-      const sourceIP = conn.metadata.sourceIP
-      if (!sourceIP) return
-
       const currentUpload = conn.upload || 0
       const currentDownload = conn.download || 0
-
-      if (!ipDataMap.has(sourceIP)) {
-        ipDataMap.set(sourceIP, {
-          upload: 0,
-          download: 0,
-          connectionIds: new Set(),
-        })
-      }
-
-      const ipData = ipDataMap.get(sourceIP)!
-      ipData.connectionIds.add(conn.id)
+      let uploadDelta = 0
+      let downloadDelta = 0
 
       const lastData = connectionLastData.get(conn.id)
 
       if (lastData) {
-        const uploadDelta = Math.max(0, currentUpload - lastData.upload)
-        const downloadDelta = Math.max(0, currentDownload - lastData.download)
-        ipData.upload += uploadDelta
-        ipData.download += downloadDelta
+        uploadDelta = Math.max(0, currentUpload - lastData.upload)
+        downloadDelta = Math.max(0, currentDownload - lastData.download)
       } else {
-        ipData.upload += currentUpload
-        ipData.download += currentDownload
+        uploadDelta = currentUpload
+        downloadDelta = currentDownload
       }
 
       connectionLastData.set(conn.id, {
         upload: currentUpload,
         download: currentDownload,
       })
+
+      if (uploadDelta === 0 && downloadDelta === 0) return
+
+      const addToMap = (type: DataUsageType, id: string | undefined) => {
+        if (!id) return
+        if (!deltaMap[type].has(id)) {
+          deltaMap[type].set(id, { upload: 0, download: 0 })
+        }
+        const entry = deltaMap[type].get(id)!
+        entry.upload += uploadDelta
+        entry.download += downloadDelta
+      }
+
+      addToMap('sourceIP', conn.metadata.sourceIP || 'Inner')
+      addToMap('host', conn.metadata.host || conn.metadata.destinationIP)
+      addToMap('process', conn.metadata.process || 'Unknown')
+
+      const outbound =
+        conn.chains && conn.chains.length > 0 ? conn.chains[0] : 'DIRECT'
+      addToMap('outbound', outbound)
     })
 
     // Update data usage map
-    ipDataMap.forEach((data, sourceIP) => {
-      const existing = updates[sourceIP]
+    ;(Object.keys(deltaMap) as DataUsageType[]).forEach((type) => {
+      const typeDeltas = deltaMap[type]
+      const typeStore = { ...updates[type] }
+      let hasUpdates = false
 
-      if (existing) {
-        if (data.upload > 0 || data.download > 0) {
-          updates[sourceIP] = {
+      typeDeltas.forEach((data, id) => {
+        hasUpdates = true
+        const existing = typeStore[id]
+
+        if (existing) {
+          typeStore[id] = {
             ...existing,
             upload: existing.upload + data.upload,
             download: existing.download + data.download,
@@ -258,22 +283,23 @@ export const useConnectionsStore = defineStore('connections', () => {
               existing.upload +
               data.upload +
               (existing.download + data.download),
-            firstSeen: existing.firstSeen || now,
             lastSeen: now,
           }
         } else {
-          updates[sourceIP] = { ...existing, lastSeen: now }
+          typeStore[id] = {
+            type,
+            label: id,
+            upload: data.upload,
+            download: data.download,
+            total: data.upload + data.download,
+            firstSeen: now,
+            lastSeen: now,
+          }
         }
-      } else if (data.upload > 0 || data.download > 0) {
-        updates[sourceIP] = {
-          sourceIP,
-          macAddress: '',
-          upload: data.upload,
-          download: data.download,
-          total: data.upload + data.download,
-          firstSeen: now,
-          lastSeen: now,
-        }
+      })
+
+      if (hasUpdates) {
+        updates[type] = typeStore
       }
     })
 
