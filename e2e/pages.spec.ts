@@ -150,10 +150,10 @@ describe('e2E Page Tests', () => {
       })
       await page!.waitForLoadState('networkidle')
 
-      // Wait for page content - look for the tab buttons
-      await page!.waitForSelector('button', { timeout: 10000 })
+      // Wait for page container to be present
+      await page!.waitForSelector('div', { state: 'attached', timeout: 10000 })
 
-      // Check for tab-like buttons in the header area
+      // Check for buttons in the page (header buttons, etc.)
       const buttons = page!.locator('button')
       await expect(buttons.count()).resolves.toBeGreaterThan(0)
 
@@ -191,10 +191,10 @@ describe('e2E Page Tests', () => {
       })
       await page!.waitForLoadState('networkidle')
 
-      // Wait for page content - look for buttons (tab-like elements)
-      await page!.waitForSelector('button', { timeout: 10000 })
+      // Wait for page container to be present
+      await page!.waitForSelector('div', { state: 'attached', timeout: 10000 })
 
-      // Check for tab-like buttons
+      // Check for buttons in the page
       const buttons = page!.locator('button')
       await expect(buttons.count()).resolves.toBeGreaterThan(0)
     })
