@@ -282,7 +282,7 @@ const currentViewLabel = computed(() => {
 
         <!-- Mobile Pagination -->
         <div class="flex shrink-0 items-center justify-center py-2 md:hidden">
-          <ConnectionsConnectionsPagination
+          <ConnectionsPagination
             :current-page="currentPage"
             :total-pages="totalPages"
             :visible-pages="visiblePages"
@@ -669,7 +669,7 @@ const currentViewLabel = computed(() => {
             </span>
           </div>
 
-          <ConnectionsConnectionsPagination
+          <ConnectionsPagination
             :current-page="currentPage"
             :total-pages="totalPages"
             :visible-pages="visiblePages"
