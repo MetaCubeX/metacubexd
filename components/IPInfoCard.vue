@@ -26,16 +26,48 @@ function handleProviderChange(event: Event) {
 </script>
 
 <template>
-  <div class="card bg-base-200 p-4 shadow-sm">
-    <div class="mb-3 flex items-center justify-between">
+  <div
+    class="rounded-xl border p-4 shadow-sm"
+    style="
+      background: color-mix(in oklch, var(--color-base-200) 60%, transparent);
+      border-color: color-mix(
+        in oklch,
+        var(--color-base-content) 10%,
+        transparent
+      );
+      box-shadow: 0 2px 8px
+        color-mix(in oklch, var(--color-base-content) 5%, transparent);
+    "
+  >
+    <div class="mb-3.5 flex items-center justify-between gap-3">
       <div class="flex items-center gap-2">
-        <IconWorld class="h-5 w-5 text-primary" />
-        <h3 class="font-semibold">{{ t('currentIP') }}</h3>
+        <div
+          class="flex h-8 w-8 items-center justify-center rounded-lg text-primary"
+          style="
+            background: color-mix(
+              in oklch,
+              var(--color-primary) 15%,
+              transparent
+            );
+          "
+        >
+          <IconWorld :size="18" />
+        </div>
+        <h3 class="m-0 text-[0.9375rem] font-semibold text-base-content">
+          {{ t('currentIP') }}
+        </h3>
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5">
         <select
           :value="currentProvider"
-          class="select-bordered select select-sm"
+          class="cursor-pointer appearance-none rounded-md bg-base-100 py-1.5 pr-6 pl-2.5 text-xs text-base-content transition-all duration-200 focus:border-primary focus:outline-none"
+          style="
+            border: 1px solid
+              color-mix(in oklch, var(--color-base-content) 10%, transparent);
+            background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E&quot;);
+            background-repeat: no-repeat;
+            background-position: right 0.375rem center;
+          "
           @change="handleProviderChange"
         >
           <option v-for="p in providers" :key="p.value" :value="p.value">
@@ -43,81 +75,235 @@ function handleProviderChange(event: Event) {
           </option>
         </select>
         <button
-          class="btn btn-circle btn-ghost btn-sm"
+          class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md bg-transparent transition-all duration-200 hover:bg-base-300 hover:text-base-content disabled:cursor-not-allowed disabled:opacity-50"
           :class="{ 'animate-spin': isLoading }"
           :disabled="isLoading"
+          style="
+            border: 1px solid
+              color-mix(in oklch, var(--color-base-content) 10%, transparent);
+            color: color-mix(
+              in oklch,
+              var(--color-base-content) 60%,
+              transparent
+            );
+          "
           @click="fetchIP()"
         >
-          <IconRefresh class="h-4 w-4" />
+          <IconRefresh :size="16" />
         </button>
       </div>
     </div>
 
-    <div v-if="isLoading" class="flex justify-center py-4">
-      <span class="loading loading-md loading-spinner"></span>
+    <div v-if="isLoading" class="flex justify-center py-6">
+      <span
+        class="h-6 w-6 animate-spin rounded-full"
+        style="
+          border: 2px solid
+            color-mix(in oklch, var(--color-base-content) 10%, transparent);
+          border-top-color: var(--color-primary);
+        "
+      />
     </div>
 
-    <div v-else-if="error" class="alert alert-error">
+    <div
+      v-else-if="error"
+      class="rounded-lg p-3 text-[0.8125rem] text-error"
+      style="
+        background: color-mix(in oklch, var(--color-error) 10%, transparent);
+        border: 1px solid
+          color-mix(in oklch, var(--color-error) 20%, transparent);
+      "
+    >
       <span>{{ error }}</span>
     </div>
 
-    <div v-else-if="ipInfo" class="space-y-2">
-      <div class="flex items-center justify-between gap-2">
-        <span class="shrink-0 text-base-content/60">{{ t('ipAddress') }}</span>
-        <span class="truncate font-mono font-semibold" :title="ipInfo.ip">{{
-          ipInfo.ip
-        }}</span>
+    <div v-else-if="ipInfo" class="flex flex-col gap-2.5">
+      <div
+        class="-mx-1 -mt-1 mb-1 flex items-center justify-between gap-3 rounded-lg px-2.5 py-2"
+        style="
+          background: color-mix(in oklch, var(--color-primary) 8%, transparent);
+          border: 1px solid
+            color-mix(in oklch, var(--color-primary) 15%, transparent);
+        "
+      >
+        <span
+          class="shrink-0 text-[0.8125rem]"
+          style="
+            color: color-mix(
+              in oklch,
+              var(--color-base-content) 60%,
+              transparent
+            );
+          "
+        >
+          {{ t('ipAddress') }}
+        </span>
+        <span
+          class="overflow-hidden text-right font-mono text-[0.8125rem] font-semibold text-ellipsis whitespace-nowrap text-primary"
+          :title="ipInfo.ip"
+        >
+          {{ ipInfo.ip }}
+        </span>
       </div>
 
       <div
         v-if="ipInfo.country"
-        class="flex items-center justify-between gap-2"
+        class="flex items-center justify-between gap-3"
       >
-        <span class="shrink-0 text-base-content/60">{{ t('country') }}</span>
-        <span class="truncate">{{ ipInfo.country }}</span>
+        <span
+          class="shrink-0 text-[0.8125rem]"
+          style="
+            color: color-mix(
+              in oklch,
+              var(--color-base-content) 60%,
+              transparent
+            );
+          "
+        >
+          {{ t('country') }}
+        </span>
+        <span
+          class="overflow-hidden text-right text-[0.8125rem] font-medium text-ellipsis whitespace-nowrap text-base-content"
+        >
+          {{ ipInfo.country }}
+        </span>
       </div>
 
-      <div v-if="ipInfo.city" class="flex items-center justify-between gap-2">
-        <span class="shrink-0 text-base-content/60">{{ t('city') }}</span>
-        <span class="truncate">{{ ipInfo.city }}</span>
+      <div v-if="ipInfo.city" class="flex items-center justify-between gap-3">
+        <span
+          class="shrink-0 text-[0.8125rem]"
+          style="
+            color: color-mix(
+              in oklch,
+              var(--color-base-content) 60%,
+              transparent
+            );
+          "
+        >
+          {{ t('city') }}
+        </span>
+        <span
+          class="overflow-hidden text-right text-[0.8125rem] font-medium text-ellipsis whitespace-nowrap text-base-content"
+        >
+          {{ ipInfo.city }}
+        </span>
       </div>
 
-      <div v-if="ipInfo.org" class="flex items-center justify-between gap-2">
-        <span class="shrink-0 text-base-content/60">{{
-          t('organization')
-        }}</span>
-        <span class="truncate text-right" :title="ipInfo.org">
+      <div v-if="ipInfo.org" class="flex items-center justify-between gap-3">
+        <span
+          class="shrink-0 text-[0.8125rem]"
+          style="
+            color: color-mix(
+              in oklch,
+              var(--color-base-content) 60%,
+              transparent
+            );
+          "
+        >
+          {{ t('organization') }}
+        </span>
+        <span
+          class="overflow-hidden text-right text-[0.8125rem] font-medium text-ellipsis whitespace-nowrap text-base-content"
+          :title="ipInfo.org"
+        >
           {{ ipInfo.org }}
         </span>
       </div>
 
-      <div v-if="ipInfo.asn" class="flex items-center justify-between gap-2">
-        <span class="shrink-0 text-base-content/60">ASN</span>
-        <span class="truncate font-mono">AS{{ ipInfo.asn }}</span>
+      <div v-if="ipInfo.asn" class="flex items-center justify-between gap-3">
+        <span
+          class="shrink-0 text-[0.8125rem]"
+          style="
+            color: color-mix(
+              in oklch,
+              var(--color-base-content) 60%,
+              transparent
+            );
+          "
+        >
+          ASN
+        </span>
+        <span
+          class="overflow-hidden text-right font-mono text-[0.8125rem] font-semibold text-ellipsis whitespace-nowrap text-base-content"
+        >
+          AS{{ ipInfo.asn }}
+        </span>
       </div>
 
-      <div v-if="ipInfo.isp" class="flex items-center justify-between gap-2">
-        <span class="shrink-0 text-base-content/60">ISP</span>
-        <span class="truncate text-right" :title="ipInfo.isp">
+      <div v-if="ipInfo.isp" class="flex items-center justify-between gap-3">
+        <span
+          class="shrink-0 text-[0.8125rem]"
+          style="
+            color: color-mix(
+              in oklch,
+              var(--color-base-content) 60%,
+              transparent
+            );
+          "
+        >
+          ISP
+        </span>
+        <span
+          class="overflow-hidden text-right text-[0.8125rem] font-medium text-ellipsis whitespace-nowrap text-base-content"
+          :title="ipInfo.isp"
+        >
           {{ ipInfo.isp }}
         </span>
       </div>
 
       <div
         v-if="ipInfo.isProxy !== undefined || ipInfo.isVPN !== undefined"
-        class="flex items-center justify-between"
+        class="flex items-center justify-between gap-3"
       >
-        <span class="text-base-content/60">{{ t('proxyDetection') }}</span>
+        <span
+          class="shrink-0 text-[0.8125rem]"
+          style="
+            color: color-mix(
+              in oklch,
+              var(--color-base-content) 60%,
+              transparent
+            );
+          "
+        >
+          {{ t('proxyDetection') }}
+        </span>
         <div class="flex gap-1">
-          <span v-if="ipInfo.isProxy" class="badge badge-sm badge-warning">
+          <span
+            v-if="ipInfo.isProxy"
+            class="inline-flex items-center rounded-full px-2 py-0.5 text-[0.6875rem] font-semibold tracking-wide text-warning uppercase"
+            style="
+              background: color-mix(
+                in oklch,
+                var(--color-warning) 15%,
+                transparent
+              );
+            "
+          >
             Proxy
           </span>
-          <span v-if="ipInfo.isVPN" class="badge badge-sm badge-warning">
+          <span
+            v-if="ipInfo.isVPN"
+            class="inline-flex items-center rounded-full px-2 py-0.5 text-[0.6875rem] font-semibold tracking-wide text-warning uppercase"
+            style="
+              background: color-mix(
+                in oklch,
+                var(--color-warning) 15%,
+                transparent
+              );
+            "
+          >
             VPN
           </span>
           <span
             v-if="!ipInfo.isProxy && !ipInfo.isVPN"
-            class="badge badge-sm badge-success"
+            class="inline-flex items-center rounded-full px-2 py-0.5 text-[0.6875rem] font-semibold tracking-wide text-success uppercase"
+            style="
+              background: color-mix(
+                in oklch,
+                var(--color-success) 15%,
+                transparent
+              );
+            "
           >
             {{ t('clean') }}
           </span>
@@ -125,7 +311,13 @@ function handleProviderChange(event: Event) {
       </div>
     </div>
 
-    <div v-else class="py-4 text-center text-base-content/60">
+    <div
+      v-else
+      class="py-6 text-center text-sm"
+      style="
+        color: color-mix(in oklch, var(--color-base-content) 50%, transparent);
+      "
+    >
       {{ t('noData') }}
     </div>
   </div>

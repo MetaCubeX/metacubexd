@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IconX } from '@tabler/icons-vue'
+import { IconLink, IconLock, IconServer, IconX } from '@tabler/icons-vue'
 import { v4 as uuid } from 'uuid'
 import { checkEndpointAPI } from '~/composables/useApi'
 import { FALLBACK_BACKEND_URL } from '~/constants'
@@ -133,119 +133,204 @@ onMounted(async () => {
 
 <template>
   <div
-    class="mx-auto flex h-full w-full max-w-screen-sm flex-col items-center justify-center gap-6 p-4"
+    class="flex h-full items-center justify-center overflow-y-auto bg-gradient-to-b from-base-100 to-base-200 p-4"
   >
-    <!-- Logo Section -->
-    <div class="flex flex-col items-center gap-2">
-      <div class="text-3xl font-bold uppercase sm:text-4xl">
-        <span
-          class="bg-linear-to-br from-primary to-secondary bg-clip-text text-transparent"
-        >
-          metacube
-        </span>
-        <span>(</span>
-        <a
-          class="inline-block text-primary transition-transform hover:scale-125 hover:rotate-90"
-          href="https://github.com/metacubex/metacubexd"
-          target="_blank"
-        >
-          xd
-        </a>
-        <span>)</span>
+    <div class="animate-fade-slide-in mx-auto w-full max-w-md">
+      <!-- Logo Section -->
+      <div class="animate-fade-slide-in-delay-1 mb-8 text-center">
+        <div class="mb-4">
+          <div
+            class="shadow-primary-glow mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-secondary text-primary-content"
+          >
+            <IconServer :size="32" />
+          </div>
+          <h1 class="text-3xl font-bold tracking-wide uppercase sm:text-4xl">
+            <span
+              class="bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent"
+              >metacube</span
+            >
+            <span class="text-base-content">(</span>
+            <a
+              class="inline-block text-primary no-underline transition-all duration-300 hover:scale-110 hover:rotate-5"
+              href="https://github.com/metacubex/metacubexd"
+              target="_blank"
+            >
+              xd
+            </a>
+            <span class="text-base-content">)</span>
+          </h1>
+        </div>
+        <p class="text-[0.9375rem] text-base-content/60">
+          {{ t('setupDescription') }}
+        </p>
       </div>
-      <p class="text-sm text-base-content/60">
-        {{ t('setupDescription') }}
-      </p>
-    </div>
 
-    <form class="contents" @submit.prevent="onSubmit">
-      <div class="flex w-full flex-col gap-4">
-        <fieldset class="fieldset">
-          <label class="label" for="url">
-            <span>{{ t('endpointURL') }}</span>
-          </label>
-
-          <input
-            id="url"
-            v-model="formData.url"
-            type="url"
-            class="input w-full"
-            placeholder="http(s)://{hostname}:{port}"
-            list="defaultEndpoints"
-            autocomplete="on"
-          />
-
-          <datalist id="defaultEndpoints">
-            <option :value="FALLBACK_BACKEND_URL" />
-            <option
-              v-if="
-                defaultBackendURL && defaultBackendURL !== FALLBACK_BACKEND_URL
-              "
-              :value="defaultBackendURL"
-            />
-            <option
-              v-if="currentOrigin && currentOrigin !== FALLBACK_BACKEND_URL"
-              :value="currentOrigin"
-            />
-            <option
-              v-for="endpoint in endpointStore.endpointList"
-              :key="endpoint.id"
-              :value="endpoint.url"
-            />
-          </datalist>
-        </fieldset>
-
-        <!-- Hidden username field for password managers -->
-        <input
-          type="text"
-          name="username"
-          autocomplete="username"
-          class="hidden"
-          aria-hidden="true"
-          tabindex="-1"
-        />
-
-        <fieldset class="fieldset">
-          <label class="label" for="secret">
-            <span>{{ t('secret') }}</span>
-          </label>
-
-          <input
-            id="secret"
-            v-model="formData.secret"
-            type="password"
-            class="input w-full"
-            placeholder="secret"
-            autocomplete="current-password"
-          />
-        </fieldset>
-
-        <Button
-          type="submit"
-          class="uppercase btn-primary"
-          :loading="isSubmitting"
-        >
-          {{ t('add') }}
-        </Button>
-      </div>
-    </form>
-
-    <div class="grid w-full grid-cols-2 gap-4">
+      <!-- Form Card -->
       <div
-        v-for="endpoint in endpointStore.endpointList"
-        :key="endpoint.id"
-        class="badge flex w-full cursor-pointer items-center justify-between gap-4 py-4 badge-info"
-        @click="onEndpointSelect(endpoint.id)"
+        class="shadow-card animate-fade-slide-in-delay-2 rounded-2xl border border-base-content/8 bg-base-200/80 p-6 backdrop-blur-md"
       >
-        <span class="truncate">{{ endpoint.url }}</span>
+        <form class="flex flex-col gap-5" @submit.prevent="onSubmit">
+          <!-- URL Field -->
+          <div class="flex flex-col gap-2">
+            <label
+              class="flex items-center gap-2 text-sm font-medium text-base-content/70"
+              for="url"
+            >
+              <IconLink :size="16" />
+              <span>{{ t('endpointURL') }}</span>
+            </label>
+            <input
+              id="url"
+              v-model="formData.url"
+              type="url"
+              class="w-full rounded-lg border border-base-content/15 bg-base-100/80 px-4 py-3 text-[0.9375rem] text-base-content transition-all duration-200 placeholder:text-base-content/40 focus:border-primary focus:ring-3 focus:ring-primary/20 focus:outline-none"
+              placeholder="http(s)://{hostname}:{port}"
+              list="defaultEndpoints"
+              autocomplete="on"
+            />
+            <datalist id="defaultEndpoints">
+              <option :value="FALLBACK_BACKEND_URL" />
+              <option
+                v-if="
+                  defaultBackendURL &&
+                  defaultBackendURL !== FALLBACK_BACKEND_URL
+                "
+                :value="defaultBackendURL"
+              />
+              <option
+                v-if="currentOrigin && currentOrigin !== FALLBACK_BACKEND_URL"
+                :value="currentOrigin"
+              />
+              <option
+                v-for="endpoint in endpointStore.endpointList"
+                :key="endpoint.id"
+                :value="endpoint.url"
+              />
+            </datalist>
+          </div>
 
-        <Button
-          class="btn-circle text-white btn-ghost btn-xs"
-          @click.stop="onRemove(endpoint.id)"
+          <!-- Hidden username field for password managers -->
+          <input
+            type="text"
+            name="username"
+            autocomplete="username"
+            class="sr-only"
+            aria-hidden="true"
+            tabindex="-1"
+          />
+
+          <!-- Secret Field -->
+          <div class="flex flex-col gap-2">
+            <label
+              class="flex items-center gap-2 text-sm font-medium text-base-content/70"
+              for="secret"
+            >
+              <IconLock :size="16" />
+              <span>{{ t('secret') }}</span>
+            </label>
+            <input
+              id="secret"
+              v-model="formData.secret"
+              type="password"
+              class="w-full rounded-lg border border-base-content/15 bg-base-100/80 px-4 py-3 text-[0.9375rem] text-base-content transition-all duration-200 placeholder:text-base-content/40 focus:border-primary focus:ring-3 focus:ring-primary/20 focus:outline-none"
+              placeholder="secret"
+              autocomplete="current-password"
+            />
+          </div>
+
+          <!-- Submit Button -->
+          <Button
+            type="submit"
+            class="hover:shadow-primary-glow-lg w-full cursor-pointer rounded-lg border-none bg-gradient-to-br from-primary to-secondary px-6 py-3.5 text-[0.9375rem] font-semibold tracking-widest text-primary-content uppercase transition-all duration-300 hover:-translate-y-0.5"
+            :loading="isSubmitting"
+          >
+            {{ t('add') }}
+          </Button>
+        </form>
+      </div>
+
+      <!-- Saved Endpoints -->
+      <div
+        v-if="endpointStore.endpointList.length > 0"
+        class="animate-fade-slide-in-delay-3 mt-6"
+      >
+        <h3
+          class="mb-3 text-[0.8125rem] font-semibold tracking-widest text-base-content/50 uppercase"
         >
-          <IconX />
-        </Button>
+          Saved Endpoints
+        </h3>
+        <div class="grid grid-cols-2 gap-3">
+          <div
+            v-for="(endpoint, index) in endpointStore.endpointList"
+            :key="endpoint.id"
+            class="animate-fade-slide-in flex cursor-pointer items-center gap-2 rounded-xl border border-info/20 bg-info/10 p-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-info/30 hover:bg-info/15"
+            :style="{ animationDelay: `${index * 50}ms` }"
+            @click="onEndpointSelect(endpoint.id)"
+          >
+            <div
+              class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-info/20 text-info"
+            >
+              <IconServer :size="16" />
+            </div>
+            <span
+              class="min-w-0 flex-1 overflow-hidden text-[0.8125rem] font-medium text-ellipsis whitespace-nowrap text-base-content"
+              >{{ endpoint.url }}</span
+            >
+            <button
+              class="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-base-content/50 transition-all duration-200 hover:bg-error/15 hover:text-error"
+              @click.stop="onRemove(endpoint.id)"
+            >
+              <IconX :size="14" />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Custom animations that require keyframes */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-slide-in {
+  animation: fadeSlideIn 0.5s ease-out;
+}
+
+.animate-fade-slide-in-delay-1 {
+  animation: fadeSlideIn 0.5s ease-out 0.1s backwards;
+}
+
+.animate-fade-slide-in-delay-2 {
+  animation: fadeSlideIn 0.5s ease-out 0.2s backwards;
+}
+
+.animate-fade-slide-in-delay-3 {
+  animation: fadeSlideIn 0.5s ease-out 0.3s backwards;
+}
+
+/* Custom shadows using CSS variables */
+.shadow-primary-glow {
+  box-shadow: 0 8px 24px
+    color-mix(in oklch, var(--color-primary) 30%, transparent);
+}
+
+.shadow-primary-glow-lg {
+  box-shadow: 0 6px 20px
+    color-mix(in oklch, var(--color-primary) 40%, transparent);
+}
+
+.shadow-card {
+  box-shadow: 0 4px 24px
+    color-mix(in oklch, var(--color-base-content) 5%, transparent);
+}
+</style>

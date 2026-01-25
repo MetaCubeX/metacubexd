@@ -105,25 +105,25 @@ defineExpose({
     </template>
 
     <div class="flex flex-col gap-4">
-      <div>
+      <div class="flex flex-col">
         <ConfigTitle with-divider>
           {{ t('quickFilter') }}
         </ConfigTitle>
         <input
           v-model="configStore.quickFilterRegex"
           type="text"
-          class="input w-full"
+          class="w-full rounded-lg border border-base-content/15 bg-base-200/80 px-3 py-2 text-sm text-base-content transition-all duration-200 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
           placeholder="DIRECT|direct|dns-out"
         />
       </div>
 
-      <div>
+      <div class="flex flex-col">
         <ConfigTitle with-divider>
           {{ t('tableSize') }}
         </ConfigTitle>
         <select
           v-model="configStore.connectionsTableSize"
-          class="select w-full"
+          class="w-full cursor-pointer appearance-none rounded-lg border border-base-content/15 bg-base-200/80 bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[right_0.5rem_center] bg-no-repeat px-3 py-2 pr-8 text-sm text-base-content transition-all duration-200 focus:border-primary focus:outline-none"
         >
           <option value="xs">
             {{ t('xs') }}
@@ -140,13 +140,18 @@ defineExpose({
         </select>
       </div>
 
-      <div>
+      <div class="flex flex-col">
         <ConfigTitle with-divider>
           {{ t('tagClientSourceIPWithName') }}
         </ConfigTitle>
         <div class="flex flex-col gap-4">
-          <div class="join flex">
-            <select v-model="newTagSourceIP" class="select join-item">
+          <div
+            class="flex overflow-hidden rounded-lg border border-base-content/15"
+          >
+            <select
+              v-model="newTagSourceIP"
+              class="cursor-pointer appearance-none rounded-none border-r border-none border-base-content/15 bg-base-200/80 bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[right_0.5rem_center] bg-no-repeat px-3 py-2 pr-8 text-sm text-base-content transition-all duration-200 focus:border-primary focus:outline-none"
+            >
               <option value="" />
               <option v-for="ip in untaggedSourceIPs" :key="ip" :value="ip">
                 {{ ip || t('inner') }}
@@ -154,10 +159,10 @@ defineExpose({
             </select>
             <input
               v-model="newTagName"
-              class="input join-item flex-1"
+              class="flex-1 rounded-none border-none bg-base-200/80 px-3 py-2 text-sm text-base-content transition-all duration-200 focus:outline-none"
               placeholder="name"
             />
-            <Button class="join-item" @click="addTag">
+            <Button class="rounded-none" @click="addTag">
               {{ t('tag') }}
             </Button>
           </div>
@@ -166,23 +171,24 @@ defineExpose({
             <div
               v-for="tag in configStore.clientSourceIPTags"
               :key="tag.tagName"
-              class="badge w-full items-center justify-between gap-2 py-4 badge-primary"
+              class="flex items-center justify-between gap-2 rounded-lg bg-primary px-3 py-2 text-primary-content"
             >
-              <span class="truncate"
+              <span
+                class="min-w-0 flex-1 overflow-hidden text-sm text-ellipsis whitespace-nowrap"
                 >{{ tag.tagName }} ({{ tag.sourceIP }})</span
               >
-              <Button
-                class="btn-circle btn-ghost btn-xs"
+              <button
+                class="flex h-5 w-5 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-inherit opacity-70 transition-opacity duration-200 hover:opacity-100"
                 @click="removeTag(tag.tagName)"
               >
                 <IconX :size="12" />
-              </Button>
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      <div>
+      <div class="flex flex-col">
         <ConfigTitle with-divider>
           {{ t('columns') }}
         </ConfigTitle>
@@ -190,28 +196,36 @@ defineExpose({
           <div
             v-for="colId in columnOrder"
             :key="colId"
-            class="flex items-center justify-between gap-2 rounded-lg bg-base-200 px-3 py-2 transition-colors hover:bg-base-300"
+            class="flex items-center justify-between gap-2 rounded-lg bg-base-200/80 px-3 py-2 transition-colors duration-200 hover:bg-base-content/8"
           >
             <div class="flex items-center gap-3">
               <IconGripVertical
-                class="drag-handle shrink-0 cursor-grab text-base-content/40 transition-colors hover:text-base-content/70 active:cursor-grabbing"
+                class="drag-handle shrink-0 cursor-grab text-base-content/40 transition-colors duration-200 hover:text-base-content/70 active:cursor-grabbing"
                 :size="16"
               />
-              <span class="text-sm">{{
+              <span class="text-sm text-base-content">{{
                 t(getColumnById(colId)?.key || colId)
               }}</span>
             </div>
-            <input
-              type="checkbox"
-              class="toggle toggle-primary toggle-sm"
-              :checked="configStore.connectionsTableColumnVisibility[colId]"
-              @change="toggleColumnVisibility(colId)"
-            />
+            <label class="relative inline-block h-5 w-9 cursor-pointer">
+              <input
+                type="checkbox"
+                class="peer h-0 w-0 opacity-0"
+                :checked="configStore.connectionsTableColumnVisibility[colId]"
+                @change="toggleColumnVisibility(colId)"
+              />
+              <span
+                class="absolute inset-0 rounded-full bg-base-content/20 transition-all duration-200 peer-checked:bg-primary before:absolute before:top-1/2 before:left-0.5 before:h-3.5 before:w-3.5 before:-translate-y-1/2 before:rounded-full before:bg-base-100 before:shadow-sm before:transition-all before:duration-200 before:content-[''] peer-checked:before:left-[calc(100%-2px)] peer-checked:before:-translate-x-full"
+              />
+            </label>
           </div>
         </div>
       </div>
 
-      <Button class="btn-sm btn-neutral" @click="resetSettings">
+      <Button
+        class="cursor-pointer rounded-lg border-none bg-neutral px-4 py-2 text-sm text-neutral-content transition-all duration-200 hover:opacity-90"
+        @click="resetSettings"
+      >
         {{ t('reset') }}
       </Button>
     </div>

@@ -209,5 +209,8 @@
   "proxyGroups": "Proxy Groups",
   "proxyNodes": "Proxy Nodes",
   "ruleType": "Rule Type",
-  "useMobileBottomNav": "Use Bottom Navigation (Mobile)"
+  "useMobileBottomNav": "Use Bottom Navigation (Mobile)",
+  "fetchRemoteConfig": "Fetch Remote Config",
+  "remoteConfigURL": "Remote Config URL",
+  "remoteConfigURLPlaceholder": "Enter config file URL"
 }

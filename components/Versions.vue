@@ -286,10 +286,10 @@ watch(
 <template>
   <div v-if="!collapsed" class="mx-2 grid grid-cols-1 gap-2 pt-1 md:mx-0">
     <!-- Frontend Version -->
-    <kbd
+    <div
       ref="frontendReference"
       role="button"
-      class="relative kbd w-full cursor-pointer overflow-visible py-2"
+      class="version-badge relative flex w-full cursor-pointer items-center justify-center overflow-visible rounded-md p-2 transition-all duration-200 ease-in-out"
       @click="handleFrontendUpgrade"
       @mouseenter="onFrontendMouseEnter"
       @mouseleave="onFrontendMouseLeave"
@@ -297,46 +297,58 @@ watch(
       <!-- Update indicator -->
       <span
         v-if="frontendRelease?.isUpdateAvailable"
-        class="absolute top-0 right-0 inline-grid translate-x-1/2 -translate-y-1/2 *:[grid-area:1/1]"
+        class="absolute top-0 right-0 inline-grid translate-x-1/2 -translate-y-1/2"
       >
-        <span class="status animate-ping status-info" />
-        <div class="status status-info" />
+        <span
+          class="col-start-1 row-start-1 h-2 w-2 animate-ping rounded-full bg-info"
+        />
+        <span class="col-start-1 row-start-1 h-2 w-2 rounded-full bg-info" />
       </span>
 
       <div class="flex w-full items-center justify-center gap-2 text-xs">
         {{ actualFrontendVersion }}
-        <span v-if="upgradingUI" class="loading loading-sm loading-infinity" />
+        <span
+          v-if="upgradingUI"
+          class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent"
+        />
       </div>
-    </kbd>
+    </div>
 
     <!-- Frontend Changelog Tooltip -->
     <Teleport to="body">
-      <div
-        v-if="isFrontendTooltipOpen"
-        ref="frontendFloating"
-        :style="frontendFloatingStyles"
-        class="z-70 max-h-96 overflow-y-auto rounded-box bg-neutral p-4 text-neutral-content shadow-xl"
-        @mouseenter="onFrontendTooltipMouseEnter"
-        @mouseleave="onFrontendTooltipMouseLeave"
+      <Transition
+        enter-active-class="transition-opacity duration-150"
+        leave-active-class="transition-opacity duration-100"
+        enter-from-class="opacity-0"
+        leave-to-class="opacity-0"
       >
-        <!-- Arrow -->
         <div
-          ref="frontendArrow"
-          class="absolute size-2 rotate-45 bg-neutral"
-          :style="frontendArrowStyles"
-        />
-        <Changelog
-          :releases="frontendReleases"
-          :is-loading="isLoadingFrontendReleases"
-        />
-      </div>
+          v-if="isFrontendTooltipOpen"
+          ref="frontendFloating"
+          :style="frontendFloatingStyles"
+          class="z-70 max-h-96 overflow-y-auto rounded-xl bg-neutral p-4 text-neutral-content shadow-xl"
+          @mouseenter="onFrontendTooltipMouseEnter"
+          @mouseleave="onFrontendTooltipMouseLeave"
+        >
+          <!-- Arrow -->
+          <div
+            ref="frontendArrow"
+            class="absolute h-2 w-2 rotate-45 bg-neutral"
+            :style="frontendArrowStyles"
+          />
+          <Changelog
+            :releases="frontendReleases"
+            :is-loading="isLoadingFrontendReleases"
+          />
+        </div>
+      </Transition>
     </Teleport>
 
     <!-- Backend Version -->
-    <kbd
+    <div
       ref="backendReference"
       role="button"
-      class="relative kbd w-full cursor-pointer overflow-visible py-2"
+      class="version-badge relative flex w-full cursor-pointer items-center justify-center overflow-visible rounded-md p-2 transition-all duration-200 ease-in-out"
       @click="handleBackendUpgrade"
       @mouseenter="onBackendMouseEnter"
       @mouseleave="onBackendMouseLeave"
@@ -344,42 +356,64 @@ watch(
       <!-- Update indicator -->
       <span
         v-if="backendRelease?.isUpdateAvailable"
-        class="absolute top-0 right-0 inline-grid translate-x-1/2 -translate-y-1/2 *:[grid-area:1/1]"
+        class="absolute top-0 right-0 inline-grid translate-x-1/2 -translate-y-1/2"
       >
-        <span class="status animate-ping status-info" />
-        <div class="status status-info" />
+        <span
+          class="col-start-1 row-start-1 h-2 w-2 animate-ping rounded-full bg-info"
+        />
+        <span class="col-start-1 row-start-1 h-2 w-2 rounded-full bg-info" />
       </span>
 
       <div class="flex w-full items-center justify-center gap-2 text-xs">
         {{ actualBackendVersion }}
         <span
           v-if="upgradingBackend"
-          class="loading loading-sm loading-infinity"
+          class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent"
         />
       </div>
-    </kbd>
+    </div>
 
     <!-- Backend Changelog Tooltip -->
     <Teleport to="body">
-      <div
-        v-if="isBackendTooltipOpen"
-        ref="backendFloating"
-        :style="backendFloatingStyles"
-        class="z-70 max-h-96 overflow-y-auto rounded-box bg-neutral p-4 text-neutral-content shadow-xl"
-        @mouseenter="onBackendTooltipMouseEnter"
-        @mouseleave="onBackendTooltipMouseLeave"
+      <Transition
+        enter-active-class="transition-opacity duration-150"
+        leave-active-class="transition-opacity duration-100"
+        enter-from-class="opacity-0"
+        leave-to-class="opacity-0"
       >
-        <!-- Arrow -->
         <div
-          ref="backendArrow"
-          class="absolute size-2 rotate-45 bg-neutral"
-          :style="backendArrowStyles"
-        />
-        <Changelog
-          :releases="backendReleases"
-          :is-loading="isLoadingBackendReleases"
-        />
-      </div>
+          v-if="isBackendTooltipOpen"
+          ref="backendFloating"
+          :style="backendFloatingStyles"
+          class="z-70 max-h-96 overflow-y-auto rounded-xl bg-neutral p-4 text-neutral-content shadow-xl"
+          @mouseenter="onBackendTooltipMouseEnter"
+          @mouseleave="onBackendTooltipMouseLeave"
+        >
+          <!-- Arrow -->
+          <div
+            ref="backendArrow"
+            class="absolute h-2 w-2 rotate-45 bg-neutral"
+            :style="backendArrowStyles"
+          />
+          <Changelog
+            :releases="backendReleases"
+            :is-loading="isLoadingBackendReleases"
+          />
+        </div>
+      </Transition>
     </Teleport>
   </div>
 </template>
+
+<style scoped>
+.version-badge {
+  border: 1px solid
+    color-mix(in oklch, var(--color-base-content) 20%, transparent);
+  background: color-mix(in oklch, var(--color-base-200) 80%, transparent);
+  color: var(--color-base-content);
+}
+
+.version-badge:hover {
+  background: color-mix(in oklch, var(--color-base-content) 10%, transparent);
+}
+</style>

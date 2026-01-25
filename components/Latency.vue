@@ -35,11 +35,14 @@ const latencyText = computed(() => latency.value || '---')
 
 <template>
   <span
-    class="badge flex w-11 items-center justify-center whitespace-nowrap"
+    class="flex w-11 cursor-pointer items-center justify-center rounded-md px-1.5 py-1 text-xs font-semibold whitespace-nowrap transition-all duration-200 ease-in-out hover:scale-105"
     :class="[latencyClass, extraClass]"
     @click="$emit('click', $event)"
   >
-    <span v-if="isTesting" class="loading loading-sm loading-infinity" />
+    <span
+      v-if="isTesting"
+      class="h-4 w-4 animate-spin rounded-full border-2 border-current/30 border-t-current"
+    />
     <template v-else>{{ latencyText }}</template>
   </span>
 </template>

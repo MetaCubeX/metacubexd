@@ -146,11 +146,13 @@ watch(
       v-if="isLoading"
       class="absolute inset-0 flex items-center justify-center"
     >
-      <span class="loading loading-lg loading-dots" />
+      <span
+        class="inline-block size-10 bg-base-content [mask-image:url(&quot;data:image/svg+xml,%3Csvg_xmlns='http://www.w3.org/2000/svg'_viewBox='0_0_24_24'%3E%3Ccircle_cx='4'_cy='12'_r='2'_fill='currentColor'%3E%3Canimate_attributeName='opacity'_dur='0.75s'_values='1;0.5;1'_repeatCount='indefinite'_begin='0'/%3E%3C/circle%3E%3Ccircle_cx='12'_cy='12'_r='2'_fill='currentColor'%3E%3Canimate_attributeName='opacity'_dur='0.75s'_values='1;0.5;1'_repeatCount='indefinite'_begin='0.15s'/%3E%3C/circle%3E%3Ccircle_cx='20'_cy='12'_r='2'_fill='currentColor'%3E%3Canimate_attributeName='opacity'_dur='0.75s'_values='1;0.5;1'_repeatCount='indefinite'_begin='0.3s'/%3E%3C/circle%3E%3C/svg%3E&quot;)] [mask-size:contain] [mask-position:center] [mask-repeat:no-repeat]"
+      />
     </div>
     <div
       ref="containerRef"
-      class="h-full w-full"
+      class="h-full w-full transition-opacity duration-200 ease-in-out"
       :class="{ 'opacity-0': isLoading }"
     />
   </div>

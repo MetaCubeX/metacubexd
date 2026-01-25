@@ -315,11 +315,17 @@ watch(
       v-if="isLoading"
       class="absolute inset-0 flex items-center justify-center"
     >
-      <span class="loading loading-lg loading-dots" />
+      <span
+        class="inline-block h-10 w-10 bg-base-content [mask-size:contain] [mask-position:center] [mask-repeat:no-repeat]"
+        :style="{
+          maskImage: `url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Ccircle cx=%274%27 cy=%2712%27 r=%272%27 fill=%27currentColor%27%3E%3Canimate attributeName=%27opacity%27 dur=%270.75s%27 values=%271;0.5;1%27 repeatCount=%27indefinite%27 begin=%270%27/%3E%3C/circle%3E%3Ccircle cx=%2712%27 cy=%2712%27 r=%272%27 fill=%27currentColor%27%3E%3Canimate attributeName=%27opacity%27 dur=%270.75s%27 values=%271;0.5;1%27 repeatCount=%27indefinite%27 begin=%270.15s%27/%3E%3C/circle%3E%3Ccircle cx=%2720%27 cy=%2712%27 r=%272%27 fill=%27currentColor%27%3E%3Canimate attributeName=%27opacity%27 dur=%270.75s%27 values=%271;0.5;1%27 repeatCount=%27indefinite%27 begin=%270.3s%27/%3E%3C/circle%3E%3C/svg%3E')`,
+          WebkitMaskImage: `url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Ccircle cx=%274%27 cy=%2712%27 r=%272%27 fill=%27currentColor%27%3E%3Canimate attributeName=%27opacity%27 dur=%270.75s%27 values=%271;0.5;1%27 repeatCount=%27indefinite%27 begin=%270%27/%3E%3C/circle%3E%3Ccircle cx=%2712%27 cy=%2712%27 r=%272%27 fill=%27currentColor%27%3E%3Canimate attributeName=%27opacity%27 dur=%270.75s%27 values=%271;0.5;1%27 repeatCount=%27indefinite%27 begin=%270.15s%27/%3E%3C/circle%3E%3Ccircle cx=%2720%27 cy=%2712%27 r=%272%27 fill=%27currentColor%27%3E%3Canimate attributeName=%27opacity%27 dur=%270.75s%27 values=%271;0.5;1%27 repeatCount=%27indefinite%27 begin=%270.3s%27/%3E%3C/circle%3E%3C/svg%3E')`,
+        }"
+      />
     </div>
     <div
       ref="containerRef"
-      class="h-full w-full"
+      class="h-full w-full transition-opacity duration-200 ease-in-out"
       :class="{ 'opacity-0': isLoading }"
     />
   </div>

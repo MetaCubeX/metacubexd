@@ -38,14 +38,59 @@ const expireStr = computed(() => {
 <template>
   <template v-if="subscriptionInfo">
     <div class="flex items-center gap-2 pt-1">
-      <progress class="progress" :value="percentage" max="100" />
-      <div class="badge badge-sm badge-secondary">{{ percentage }}%</div>
+      <div
+        class="h-2 flex-1 overflow-hidden rounded-full"
+        style="
+          background: color-mix(
+            in oklch,
+            var(--color-base-content) 15%,
+            transparent
+          );
+        "
+      >
+        <div
+          class="h-full rounded-full transition-[width] duration-500 ease-out"
+          :style="{
+            width: `${percentage}%`,
+            background:
+              'linear-gradient(90deg, var(--color-primary), var(--color-secondary))',
+          }"
+        />
+      </div>
+      <div
+        class="flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold"
+        style="
+          background: var(--color-secondary);
+          color: var(--color-secondary-content);
+        "
+      >
+        {{ percentage }}%
+      </div>
     </div>
 
-    <div class="flex flex-wrap items-center justify-between">
-      <div class="text-sm text-slate-500">{{ used }} / {{ total }}</div>
-
-      <div class="text-sm text-slate-500">
+    <div class="mt-1.5 flex flex-wrap items-center justify-between gap-2">
+      <div
+        class="text-sm"
+        style="
+          color: color-mix(
+            in oklch,
+            var(--color-base-content) 60%,
+            transparent
+          );
+        "
+      >
+        {{ used }} / {{ total }}
+      </div>
+      <div
+        class="text-sm"
+        style="
+          color: color-mix(
+            in oklch,
+            var(--color-base-content) 60%,
+            transparent
+          );
+        "
+      >
         {{ t('expire') }}: {{ expireStr }}
       </div>
     </div>

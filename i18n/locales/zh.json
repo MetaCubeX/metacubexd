@@ -209,5 +209,8 @@
   "proxyGroups": "代理组",
   "proxyNodes": "代理节点",
   "ruleType": "规则类型",
-  "useMobileBottomNav": "使用底部导航栏 (移动端)"
+  "useMobileBottomNav": "使用底部导航栏 (移动端)",
+  "fetchRemoteConfig": "拉取远程配置",
+  "remoteConfigURL": "远程配置地址",
+  "remoteConfigURLPlaceholder": "输入配置文件 URL"
 }

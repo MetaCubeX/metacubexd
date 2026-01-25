@@ -1,8 +1,15 @@
 <script setup lang="ts">
 import type { Middleware } from '@floating-ui/vue'
-import { autoUpdate, flip, offset, shift, useFloating } from '@floating-ui/vue'
-import { IconCheck, IconChevronDown } from '@tabler/icons-vue'
-import { themes } from '~/constants'
+import type { themes } from '~/constants'
+import {
+  autoUpdate,
+  flip,
+  offset,
+  shift,
+  size,
+  useFloating,
+} from '@floating-ui/vue'
+import { IconChevronDown } from '@tabler/icons-vue'
 
 interface Props {
   modelValue: (typeof themes)[number]
@@ -23,15 +30,28 @@ const sameWidth: Middleware = {
   name: 'sameWidth',
   fn({ rects, elements }) {
     Object.assign(elements.floating.style, {
-      width: `${rects.reference.width}px`,
+      minWidth: `${Math.max(rects.reference.width, 160)}px`,
     })
     return {}
   },
 }
 
 const { floatingStyles } = useFloating(reference, floating, {
-  placement: 'bottom-start',
-  middleware: [offset(4), flip(), shift({ padding: 8 }), sameWidth],
+  placement: 'bottom-end',
+  middleware: [
+    offset(4),
+    size({
+      padding: 8,
+      apply({ availableHeight, elements }) {
+        Object.assign(elements.floating.style, {
+          maxHeight: `${availableHeight}px`,
+        })
+      },
+    }),
+    flip(),
+    shift({ padding: 8, crossAxis: true }),
+    sameWidth,
+  ],
   whileElementsMounted: autoUpdate,
 })
 
@@ -39,7 +59,7 @@ function toggleMenu() {
   isOpen.value = !isOpen.value
 }
 
-function selectTheme(theme: (typeof themes)[number]) {
+function onThemeSelect(theme: (typeof themes)[number]) {
   emit('update:modelValue', theme)
   isOpen.value = false
 }
@@ -53,52 +73,49 @@ function onClickOutside(event: MouseEvent) {
 }
 
 onMounted(() => {
-  document.addEventListener('click', onClickOutside)
+  document.addEventListener('click', onClickOutside, true)
 })
 
 onUnmounted(() => {
-  document.removeEventListener('click', onClickOutside)
+  document.removeEventListener('click', onClickOutside, true)
 })
 </script>
 
 <template>
-  <div class="relative">
+  <div class="relative min-w-32 shrink-0">
     <button
       ref="reference"
-      class="btn w-full justify-between btn-sm"
-      :data-theme="props.modelValue"
+      class="flex w-full cursor-pointer items-center justify-between gap-2 overflow-hidden rounded-lg border border-base-content/15 bg-base-200/80 px-3 py-1.5 text-sm text-base-content transition-all duration-200 ease-in-out hover:bg-base-content/10"
       @click.stop="toggleMenu"
     >
-      <span>{{ props.modelValue }}</span>
+      <span class="flex-1 truncate text-left capitalize">{{
+        props.modelValue
+      }}</span>
       <IconChevronDown
-        class="size-4 transition-transform"
+        class="size-4 transition-transform duration-200 ease-in-out"
         :class="{ 'rotate-180': isOpen }"
       />
     </button>
 
     <Teleport to="body">
-      <ul
-        v-if="isOpen"
-        ref="floating"
-        :style="floatingStyles"
-        class="menu z-70 max-h-64 flex-nowrap overflow-y-auto rounded-box bg-base-300 p-2 shadow-lg"
+      <Transition
+        enter-active-class="transition-opacity duration-150"
+        leave-active-class="transition-opacity duration-100"
+        enter-from-class="opacity-0"
+        leave-to-class="opacity-0"
       >
-        <li
-          v-for="theme in themes"
-          :key="theme"
-          :data-theme="theme"
-          class="rounded-btn"
+        <div
+          v-if="isOpen"
+          ref="floating"
+          :style="floatingStyles"
+          class="z-70 overflow-hidden shadow-lg"
         >
-          <button
-            class="btn justify-between btn-xs"
-            :class="{ 'btn-active': props.modelValue === theme }"
-            @click="selectTheme(theme)"
-          >
-            <span>{{ theme }}</span>
-            <IconCheck v-if="props.modelValue === theme" class="size-4" />
-          </button>
-        </li>
-      </ul>
+          <ThemeList
+            :model-value="props.modelValue"
+            @update:model-value="onThemeSelect"
+          />
+        </div>
+      </Transition>
     </Teleport>
   </div>
 </template>

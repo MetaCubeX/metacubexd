@@ -23,6 +23,8 @@ export default antfu({
     'scripts/**',
     'e2e/**',
     '**/*.md',
+    '**/*.yaml',
+    '**/*.yml',
   ],
 
   // Simplified rules

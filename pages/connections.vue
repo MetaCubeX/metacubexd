@@ -99,13 +99,13 @@ const allColumns: ConnectionColumn[] = [
       h(
         'button',
         {
-          class: 'btn btn-circle btn-xs',
+          class: 'conn-close-btn',
           onClick: (e: Event) => {
             e.stopPropagation()
             closeConnection(conn.id)
           },
         },
-        h(IconX, { size: 16 }),
+        h(IconX, { size: 14 }),
       ),
   },
   {
@@ -541,7 +541,7 @@ function showConnectionDetails(conn: Connection) {
 </script>
 
 <template>
-  <div class="flex h-full min-h-0 flex-col gap-2">
+  <div class="flex h-full min-h-0 flex-col gap-3">
     <!-- Toolbar -->
     <ConnectionsToolbar
       class="shrink-0"
@@ -568,7 +568,7 @@ function showConnectionDetails(conn: Connection) {
     />
 
     <!-- Mobile Pagination - Top -->
-    <div class="flex shrink-0 items-center justify-center md:hidden">
+    <div class="flex shrink-0 justify-center md:hidden">
       <ConnectionsPagination
         :current-page="currentPage"
         :total-pages="totalPages"
@@ -580,26 +580,30 @@ function showConnectionDetails(conn: Connection) {
     </div>
 
     <!-- Connections Table -->
-    <ConnectionsTable
-      :columns="visibleColumns"
-      :row-model="rowModel"
-      :sort-column="sortColumn"
-      :sort-desc="sortDesc"
-      :grouping-column="groupingColumn"
-      :expanded-groups="expandedGroups"
-      :table-size-class="tableSizeClass"
-      @header-click="handleHeaderClick"
-      @toggle-grouping="toggleGrouping"
-      @toggle-group-expanded="toggleGroupExpanded"
-      @row-click="showConnectionDetails"
-    />
+    <div
+      class="min-h-0 flex-1 overflow-auto rounded-xl border border-base-content/10 bg-base-200/50"
+    >
+      <ConnectionsTable
+        :columns="visibleColumns"
+        :row-model="rowModel"
+        :sort-column="sortColumn"
+        :sort-desc="sortDesc"
+        :grouping-column="groupingColumn"
+        :expanded-groups="expandedGroups"
+        :table-size-class="tableSizeClass"
+        @header-click="handleHeaderClick"
+        @toggle-grouping="toggleGrouping"
+        @toggle-group-expanded="toggleGroupExpanded"
+        @row-click="showConnectionDetails"
+      />
+    </div>
 
     <!-- Desktop Pagination - Bottom -->
-    <div class="hidden shrink-0 items-center justify-between gap-2 md:flex">
-      <div class="flex shrink-0 items-center gap-1.5">
+    <div class="hidden shrink-0 items-center justify-between gap-4 md:flex">
+      <div class="flex items-center gap-3">
         <select
           v-model.number="pageSize"
-          class="select-bordered select select-xs"
+          class="cursor-pointer rounded-md border border-base-content/10 bg-base-100 px-2.5 py-1.5 text-[0.8125rem] text-base-content transition-colors duration-200 focus:border-primary focus:outline-none"
         >
           <option v-for="size in [20, 50, 100, 200]" :key="size" :value="size">
             {{ size }}
@@ -634,3 +638,26 @@ function showConnectionDetails(conn: Connection) {
     />
   </div>
 </template>
+
+<style>
+/* Close button in table - uses :deep styles from parent, kept as global CSS
+   because it's rendered via h() function and needs specific styling */
+.conn-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: color-mix(in oklch, var(--color-error) 10%, transparent);
+  color: var(--color-error);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.conn-close-btn:hover {
+  background: color-mix(in oklch, var(--color-error) 20%, transparent);
+  transform: scale(1.1);
+}
+</style>

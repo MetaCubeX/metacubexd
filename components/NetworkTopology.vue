@@ -725,7 +725,7 @@ onMounted(() => {
     <div class="mb-4 flex items-center justify-between">
       <div class="flex items-center gap-2">
         <button
-          class="btn btn-circle btn-ghost btn-xs"
+          class="flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-base-content transition-all duration-200 ease-in-out hover:bg-base-content/10"
           :class="{ 'text-warning': isPaused }"
           :title="isPaused ? t('resume') : t('pause')"
           @click="togglePause"
@@ -784,7 +784,7 @@ onMounted(() => {
       ref="containerRef"
       class="touch-pan-x touch-pan-y overflow-x-auto"
     >
-      <svg ref="svgRef" class="min-h-100"></svg>
+      <svg ref="svgRef" class="min-h-[25rem]" />
     </div>
   </div>
 </template>

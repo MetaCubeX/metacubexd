@@ -20,13 +20,14 @@ defineEmits<{
 }>()
 
 const buttonClass = computed(() => props.class || '')
+// Only add 'btn' base class if using daisyUI button modifiers
+const needsBtnClass = computed(() => buttonClass.value.includes('btn-'))
 </script>
 
 <template>
   <button
     :type="type"
-    class="btn"
-    :class="[loading ? 'btn-disabled' : buttonClass]"
+    :class="[needsBtnClass && 'btn', loading ? 'btn-disabled' : buttonClass]"
     :disabled="disabled || loading"
     @click="$emit('click', $event)"
   >

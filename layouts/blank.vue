@@ -39,7 +39,7 @@ watch(
 <template>
   <div
     ref="rootElement"
-    class="relative flex h-screen flex-col overscroll-y-none bg-base-100 subpixel-antialiased"
+    class="relative flex h-screen flex-col overscroll-y-none bg-base-100 antialiased"
     :class="configStore.enableTwemoji ? 'font-twemoji' : 'font-default'"
     :data-theme="configStore.curTheme"
   >

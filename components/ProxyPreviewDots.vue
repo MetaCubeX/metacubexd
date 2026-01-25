@@ -18,19 +18,19 @@ const proxyLatencies = computed(() =>
   ]),
 )
 
-function getDotClassName(latency: number | undefined, selected: boolean) {
+function getDotClass(latency: number | undefined, selected: boolean): string {
   const notConnected = configStore.latencyQualityMap.NOT_CONNECTED
   const medium = configStore.latencyQualityMap.MEDIUM
   const high = configStore.latencyQualityMap.HIGH
 
   if (typeof latency !== 'number' || latency === notConnected) {
-    return selected ? 'bg-white border-4 border-neutral' : 'bg-neutral'
+    return selected ? 'dot-neutral-selected' : 'dot-neutral'
   } else if (latency > high) {
-    return selected ? 'bg-white border-4 border-red-500' : 'bg-red-500'
+    return selected ? 'dot-slow-selected' : 'dot-slow'
   } else if (latency > medium) {
-    return selected ? 'bg-white border-4 border-yellow-500' : 'bg-yellow-500'
+    return selected ? 'dot-medium-selected' : 'dot-medium'
   }
-  return selected ? 'bg-white border-4 border-green-600' : 'bg-green-600'
+  return selected ? 'dot-good-selected' : 'dot-good'
 }
 </script>
 
@@ -40,10 +40,10 @@ function getDotClassName(latency: number | undefined, selected: boolean) {
       <div
         v-for="[name, latency] in proxyLatencies"
         :key="name"
-        class="h-4 w-4 rounded-full"
+        class="size-4 rounded-full transition-transform duration-200 ease-out"
         :class="[
-          getDotClassName(latency, name === now),
-          onSelect && 'cursor-pointer transition-transform hover:scale-125',
+          getDotClass(latency, name === now),
+          onSelect && 'cursor-pointer hover:scale-125',
         ]"
         :title="name"
         @click.stop="onSelect && onSelect(name)"
@@ -53,3 +53,45 @@ function getDotClassName(latency: number | undefined, selected: boolean) {
     <Latency v-if="now" :proxy-name="now" :test-url="testUrl" />
   </div>
 </template>
+
+<style scoped>
+/* Good latency */
+.dot-good {
+  background: #16a34a;
+}
+
+.dot-good-selected {
+  background: white;
+  border: 4px solid #16a34a;
+}
+
+/* Medium latency */
+.dot-medium {
+  background: #eab308;
+}
+
+.dot-medium-selected {
+  background: white;
+  border: 4px solid #eab308;
+}
+
+/* Slow latency */
+.dot-slow {
+  background: #ef4444;
+}
+
+.dot-slow-selected {
+  background: white;
+  border: 4px solid #ef4444;
+}
+
+/* Not connected - uses CSS variable */
+.dot-neutral {
+  background: var(--color-neutral);
+}
+
+.dot-neutral-selected {
+  background: white;
+  border: 4px solid var(--color-neutral);
+}
+</style>

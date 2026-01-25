@@ -93,8 +93,8 @@ const tableClasses = computed(() => {
 
 const theadClasses = computed(() => {
   const classes: string[] = []
-  if (props.stickyHeader) classes.push('sticky top-0 z-10')
-  if (props.hideHeaderOnMobile) classes.push('hidden md:table-header-group')
+  if (props.stickyHeader) classes.push('sticky', 'top-0', 'z-10')
+  if (props.hideHeaderOnMobile) classes.push('hidden', 'md:table-header-group')
   return classes
 })
 
@@ -138,9 +138,7 @@ function handleGroup(columnId: string) {
           <div class="flex items-center gap-2">
             <div
               class="flex-1"
-              :class="{
-                'cursor-pointer select-none': col.sortable,
-              }"
+              :class="{ 'cursor-pointer select-none': col.sortable }"
               @click="col.sortable && handleSort(col.id)"
             >
               {{ col.label }}
@@ -159,7 +157,7 @@ function handleGroup(columnId: string) {
             <!-- Group button -->
             <button
               v-if="col.groupable"
-              class="cursor-pointer"
+              class="flex cursor-pointer items-center border-none bg-transparent p-0"
               @click.stop="handleGroup(col.id)"
             >
               <IconZoomOutFilled
@@ -201,7 +199,7 @@ function handleGroup(columnId: string) {
               :key="getRowKey(row, rowIndex)"
               :class="[
                 rowClasses,
-                rowHover ? 'hover:bg-primary! hover:text-primary-content' : '',
+                rowHover ? 'hover:!bg-primary hover:text-primary-content' : '',
               ]"
               @click="$emit('row-click', row)"
               @contextmenu="(e) => $emit('row-contextmenu', row, e)"
@@ -239,7 +237,7 @@ function handleGroup(columnId: string) {
           :key="getRowKey(row, rowIndex)"
           :class="[
             rowClasses,
-            rowHover ? 'hover:bg-primary! hover:text-primary-content' : '',
+            rowHover ? 'hover:!bg-primary hover:text-primary-content' : '',
           ]"
           @click="$emit('row-click', row)"
           @contextmenu="(e) => $emit('row-contextmenu', row, e)"

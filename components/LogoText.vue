@@ -8,20 +8,20 @@ const hasEndpoint = computed(() => !!endpointStore.currentEndpoint)
     class="flex min-w-0 items-center gap-1 text-sm font-bold whitespace-nowrap uppercase sm:text-xl"
   >
     <NuxtLink
-      class="bg-linear-to-br from-primary to-secondary bg-clip-text text-transparent"
+      class="bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent no-underline"
       :to="hasEndpoint ? '/' : '/setup'"
     >
       <span class="hidden min-[400px]:inline">metacube</span>
-      <span class="min-[400px]:hidden">mcx</span>
+      <span class="inline min-[400px]:hidden">mcx</span>
     </NuxtLink>
-    <span>(</span>
+    <span class="text-base-content">(</span>
     <a
-      class="text-primary transition-transform hover:scale-125 hover:rotate-90"
+      class="inline-block text-primary no-underline transition-transform duration-300 ease-in-out hover:scale-125 hover:rotate-90"
       href="https://github.com/metacubex/metacubexd"
       target="_blank"
     >
       xd
     </a>
-    <span>)</span>
+    <span class="text-base-content">)</span>
   </div>
 </template>

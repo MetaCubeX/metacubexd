@@ -5,6 +5,7 @@ import {
   IconFileStack,
   IconPlayerPause,
   IconPlayerPlay,
+  IconSearch,
   IconSettings,
   IconSortAscending,
   IconSortDescending,
@@ -32,13 +33,13 @@ function extractType(payload: string): string {
 function getLevelClass(type: LOG_LEVEL) {
   switch (type) {
     case LOG_LEVEL.Error:
-      return 'text-error'
+      return 'text-error font-semibold'
     case LOG_LEVEL.Warning:
-      return 'text-warning'
+      return 'text-warning font-semibold'
     case LOG_LEVEL.Info:
-      return 'text-info'
+      return 'text-info font-semibold'
     case LOG_LEVEL.Debug:
-      return 'text-success'
+      return 'text-success font-semibold'
     default:
       return ''
   }
@@ -81,7 +82,7 @@ const columns: LogColumn[] = [
     sortable: true,
     groupable: true,
     render: (log) =>
-      h('span', { class: 'opacity-70' }, extractType(log.payload)),
+      h('span', { class: 'text-base-content/60' }, extractType(log.payload)),
     sortValue: (log) => extractType(log.payload),
     groupValue: (log) => extractType(log.payload) || '(empty)',
   },
@@ -242,45 +243,64 @@ const tableSizeClass = computed(() =>
 </script>
 
 <template>
-  <div class="flex h-full min-h-0 flex-col gap-2">
+  <div class="flex h-full min-h-0 flex-col gap-3">
     <!-- Toolbar -->
-    <div class="join w-full shrink-0">
-      <input
-        v-model="globalFilter"
-        type="search"
-        class="input input-sm join-item flex-1 shrink-0 input-primary"
-        :placeholder="t('search')"
-      />
+    <div class="flex shrink-0 items-center gap-3">
+      <div class="relative flex-1">
+        <IconSearch
+          class="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-base-content/40"
+          :size="18"
+        />
+        <input
+          v-model="globalFilter"
+          type="search"
+          class="w-full rounded-lg border border-base-content/10 bg-base-200/60 py-2.5 pr-3.5 pl-10 text-sm text-base-content transition-all duration-200 placeholder:text-base-content/40 focus:border-primary focus:bg-base-100 focus:ring-3 focus:ring-primary/15 focus:outline-none"
+          :placeholder="t('search')"
+        />
+      </div>
 
-      <Button
-        class="btn join-item btn-sm btn-primary"
-        @click="logsStore.togglePaused()"
-      >
-        <IconPlayerPause v-if="!logsStore.paused" />
-        <IconPlayerPlay v-else />
-      </Button>
+      <div class="flex gap-2">
+        <button
+          class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-base-content/10 bg-base-200/60 text-base-content transition-all duration-200 hover:border-base-content/20 hover:bg-base-300"
+          :class="{
+            'border-warning/30 bg-warning/15 text-warning': logsStore.paused,
+          }"
+          @click="logsStore.togglePaused()"
+        >
+          <IconPlayerPause v-if="!logsStore.paused" :size="18" />
+          <IconPlayerPlay v-else :size="18" />
+        </button>
 
-      <Button
-        class="btn join-item btn-sm btn-primary"
-        @click="settingsModal?.open()"
-      >
-        <IconSettings />
-      </Button>
+        <button
+          class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-base-content/10 bg-base-200/60 text-base-content transition-all duration-200 hover:border-base-content/20 hover:bg-base-300"
+          @click="settingsModal?.open()"
+        >
+          <IconSettings :size="18" />
+        </button>
+      </div>
     </div>
 
     <!-- Logs Table -->
     <div
-      class="min-h-0 flex-1 overflow-auto rounded-md bg-base-300 whitespace-nowrap"
+      class="min-h-0 flex-1 overflow-auto rounded-xl border border-base-content/10 bg-base-200/50"
     >
-      <table class="table-pin-rows table table-zebra" :class="tableSizeClass">
+      <table
+        class="table w-full border-collapse whitespace-nowrap"
+        :class="tableSizeClass"
+      >
         <thead>
-          <tr class="bg-base-200">
-            <th v-for="col in columns" :key="col.id" class="text-base-content">
+          <tr class="sticky top-0 z-10 bg-base-200">
+            <th
+              v-for="col in columns"
+              :key="col.id"
+              class="border-b border-base-content/10 text-left font-semibold text-base-content"
+            >
               <div class="flex items-center gap-2">
                 <div
                   class="flex-1"
                   :class="{
-                    'cursor-pointer select-none': isSortableColumn(col.id),
+                    'cursor-pointer select-none hover:text-primary':
+                      isSortableColumn(col.id),
                   }"
                   @click="handleSort(col.id)"
                 >
@@ -288,23 +308,25 @@ const tableSizeClass = computed(() =>
                 </div>
                 <IconSortAscending
                   v-if="isColumnSorted(col.id) && !sortDesc"
+                  class="text-primary"
                   :size="16"
                 />
                 <IconSortDescending
                   v-else-if="isColumnSorted(col.id) && sortDesc"
+                  class="text-primary"
                   :size="16"
                 />
                 <!-- Grouping button -->
                 <button
                   v-if="col.groupable"
-                  class="cursor-pointer"
+                  class="flex cursor-pointer items-center justify-center border-none bg-transparent p-1 text-base-content/60 transition-colors duration-200 hover:text-primary"
                   @click.stop="toggleGrouping(col.id)"
                 >
                   <IconZoomOutFilled
                     v-if="groupingColumn === col.id"
-                    :size="18"
+                    :size="16"
                   />
-                  <IconZoomInFilled v-else :size="18" />
+                  <IconZoomInFilled v-else :size="16" />
                 </button>
               </div>
             </th>
@@ -312,23 +334,26 @@ const tableSizeClass = computed(() =>
         </thead>
         <tbody>
           <template
-            v-for="row in rowModel"
+            v-for="(row, index) in rowModel"
             :key="row.type === 'group' ? `group-${row.key}` : row.original.seq"
           >
             <!-- Group header row -->
             <tr
               v-if="row.type === 'group'"
-              class="cursor-pointer bg-base-200 hover:bg-base-300"
+              class="cursor-pointer bg-primary/5 hover:bg-primary/10"
               @click="toggleGroupExpanded(row.key)"
             >
-              <td :colspan="columns.length" class="py-2">
-                <div class="flex items-center gap-2">
+              <td
+                :colspan="columns.length"
+                class="border-b border-base-content/10"
+              >
+                <div class="flex items-center gap-2 text-primary">
                   <IconZoomOutFilled
                     v-if="expandedGroups[row.key]"
-                    :size="18"
+                    :size="16"
                   />
-                  <IconZoomInFilled v-else :size="18" />
-                  <span class="font-semibold text-primary">{{ row.key }}</span>
+                  <IconZoomInFilled v-else :size="16" />
+                  <span class="font-semibold">{{ row.key }}</span>
                   <span class="text-xs text-base-content/60"
                     >({{ row.subRows.length }})</span
                   >
@@ -336,11 +361,15 @@ const tableSizeClass = computed(() =>
               </td>
             </tr>
             <!-- Data row -->
-            <tr v-else class="hover">
+            <tr
+              v-else
+              class="animate-fade-in transition-colors duration-150 hover:bg-base-content/5"
+              :style="{ animationDelay: `${(index % 20) * 15}ms` }"
+            >
               <td
                 v-for="col in columns"
                 :key="col.id"
-                class="whitespace-nowrap"
+                class="border-b border-base-content/5"
               >
                 <component :is="() => col.render(row.original)" />
               </td>
@@ -351,9 +380,10 @@ const tableSizeClass = computed(() =>
 
       <div
         v-if="rowModel.length === 0"
-        class="py-8 text-center text-base-content/70"
+        class="flex flex-col items-center justify-center gap-4 px-4 py-12 text-base-content/40"
       >
-        {{ t('noData') }}
+        <IconFileStack :size="48" class="opacity-50" />
+        <span>{{ t('noData') }}</span>
       </div>
     </div>
 
@@ -363,10 +393,15 @@ const tableSizeClass = computed(() =>
         <IconFileStack :size="24" />
       </template>
 
-      <div class="flex flex-col gap-4">
-        <div>
-          <ConfigTitle with-divider>{{ t('tableSize') }}</ConfigTitle>
-          <select v-model="configStore.logsTableSize" class="select w-full">
+      <div class="flex flex-col gap-5">
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-medium text-base-content/70">{{
+            t('tableSize')
+          }}</label>
+          <select
+            v-model="configStore.logsTableSize"
+            class="w-full cursor-pointer rounded-lg border border-base-content/10 bg-base-100 px-3.5 py-2.5 text-sm text-base-content transition-colors duration-200 focus:border-primary focus:outline-none"
+          >
             <option value="xs">{{ t('xs') }}</option>
             <option value="sm">{{ t('sm') }}</option>
             <option value="md">{{ t('md') }}</option>
@@ -374,9 +409,14 @@ const tableSizeClass = computed(() =>
           </select>
         </div>
 
-        <div>
-          <ConfigTitle with-divider>{{ t('logLevel') }}</ConfigTitle>
-          <select v-model="configStore.logLevel" class="select w-full">
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-medium text-base-content/70">{{
+            t('logLevel')
+          }}</label>
+          <select
+            v-model="configStore.logLevel"
+            class="w-full cursor-pointer rounded-lg border border-base-content/10 bg-base-100 px-3.5 py-2.5 text-sm text-base-content transition-colors duration-200 focus:border-primary focus:outline-none"
+          >
             <option value="info">{{ t('info') }}</option>
             <option value="error">{{ t('error') }}</option>
             <option value="warning">{{ t('warning') }}</option>
@@ -385,9 +425,14 @@ const tableSizeClass = computed(() =>
           </select>
         </div>
 
-        <div>
-          <ConfigTitle with-divider>{{ t('logMaxRows') }}</ConfigTitle>
-          <select v-model="configStore.logMaxRows" class="select w-full">
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-medium text-base-content/70">{{
+            t('logMaxRows')
+          }}</label>
+          <select
+            v-model="configStore.logMaxRows"
+            class="w-full cursor-pointer rounded-lg border border-base-content/10 bg-base-100 px-3.5 py-2.5 text-sm text-base-content transition-colors duration-200 focus:border-primary focus:outline-none"
+          >
             <option :value="200">200</option>
             <option :value="300">300</option>
             <option :value="500">500</option>
@@ -399,3 +444,18 @@ const tableSizeClass = computed(() =>
     </Modal>
   </div>
 </template>
+
+<style scoped>
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out backwards;
+}
+</style>

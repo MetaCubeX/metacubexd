@@ -209,5 +209,8 @@
   "proxyGroups": "Группы прокси",
   "proxyNodes": "Узлы прокси",
   "ruleType": "Тип правила",
-  "useMobileBottomNav": "Нижняя навигация (мобильный)"
+  "useMobileBottomNav": "Нижняя навигация (мобильный)",
+  "fetchRemoteConfig": "Загрузить удалённую конфигурацию",
+  "remoteConfigURL": "URL удалённой конфигурации",
+  "remoteConfigURLPlaceholder": "Введите URL файла конфигурации"
 }

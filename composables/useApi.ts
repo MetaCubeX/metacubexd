@@ -286,6 +286,28 @@ export function useConfigActions() {
     reloadingConfigFile.value = false
   }
 
+  const fetchingRemoteConfig = ref(false)
+  const fetchRemoteConfigAPI = async (url: string) => {
+    const request = useRequest()
+    fetchingRemoteConfig.value = true
+    try {
+      // Fetch config content from remote URL
+      const response = await ky.get(url)
+      const payload = await response.text()
+
+      // Update config with fetched payload
+      await request.put('configs', {
+        searchParams: { force: true },
+        json: { path: '', payload },
+      })
+    } catch (error) {
+      console.error('Failed to fetch remote config:', error)
+      throw error
+    } finally {
+      fetchingRemoteConfig.value = false
+    }
+  }
+
   const flushFakeIPDataAPI = async () => {
     const request = useRequest()
     flushingFakeIPData.value = true
@@ -360,6 +382,7 @@ export function useConfigActions() {
     upgradingBackend,
     upgradingUI,
     restartingBackend,
+    fetchingRemoteConfig,
     reloadConfigFileAPI,
     flushFakeIPDataAPI,
     flushDNSCacheAPI,
@@ -367,6 +390,7 @@ export function useConfigActions() {
     upgradeBackendAPI,
     upgradeUIAPI,
     restartBackendAPI,
+    fetchRemoteConfigAPI,
   }
 }
 

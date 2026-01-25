@@ -158,15 +158,15 @@ function handleLatencyTest() {
 
 <template>
   <!-- Wrapper for glow effect -->
-  <div class="relative" :class="isSelected ? 'z-10' : 'z-0'">
+  <div class="relative z-0" :class="isSelected ? 'z-10' : ''">
     <div
       ref="reference"
       class="relative rounded-lg transition-all duration-300"
-      :class="[
+      :class="
         isSelected
           ? 'animate-glow-pulse bg-primary text-primary-content'
-          : 'bg-neutral text-neutral-content hover:shadow-md',
-      ]"
+          : 'bg-neutral text-neutral-content hover:shadow-md'
+      "
       @mouseenter="onMouseEnter"
       @mouseleave="onMouseLeave"
     >
@@ -184,7 +184,11 @@ function handleLatencyTest() {
         </span>
 
         <!-- UDP indicator -->
-        <span v-if="isUDP" class="badge shrink-0 badge-xs badge-info">U</span>
+        <span
+          v-if="isUDP"
+          class="shrink-0 rounded bg-info px-1.5 py-0.5 text-[0.625rem] font-semibold text-info-content"
+          >U</span
+        >
 
         <!-- Special types -->
         <span
@@ -211,67 +215,72 @@ function handleLatencyTest() {
 
       <!-- Tooltip for latency history -->
       <Teleport to="body">
-        <div
-          v-if="isTooltipOpen"
-          ref="floating"
-          :style="floatingStyles"
-          class="z-50 w-max max-w-xs rounded-box bg-primary p-2.5 text-primary-content shadow-lg"
-          @mouseenter="onTooltipMouseEnter"
-          @mouseleave="onTooltipMouseLeave"
+        <Transition
+          enter-active-class="transition-all duration-200 ease-out"
+          leave-active-class="transition-all duration-150 ease-in"
+          enter-from-class="opacity-0 scale-95"
+          leave-to-class="opacity-0 scale-95"
         >
-          <!-- Arrow -->
           <div
-            ref="floatingArrow"
-            class="absolute size-2 rotate-45 bg-primary"
-            :style="arrowStyles"
-          />
+            v-if="isTooltipOpen"
+            ref="floating"
+            :style="floatingStyles"
+            class="z-50 w-max max-w-80 rounded-xl bg-primary p-2.5 text-primary-content shadow-lg"
+            @mouseenter="onTooltipMouseEnter"
+            @mouseleave="onTooltipMouseLeave"
+          >
+            <!-- Arrow -->
+            <div
+              ref="floatingArrow"
+              class="absolute size-2 rotate-45 bg-primary"
+              :style="arrowStyles"
+            />
 
-          <div class="flex flex-col items-center gap-2">
-            <h2 class="text-lg font-bold">{{ proxyName }}</h2>
+            <div class="flex flex-col items-center gap-2">
+              <h2 class="text-lg font-bold">{{ proxyName }}</h2>
 
-            <div v-if="specialTypes" class="w-full text-xs uppercase">
-              ({{ specialTypes }})
-            </div>
+              <div v-if="specialTypes" class="w-full text-xs uppercase">
+                ({{ specialTypes }})
+              </div>
 
-            <template v-if="latencyTestHistory.length > 0">
-              <ul
-                class="timeline timeline-vertical timeline-compact max-h-60 overflow-y-auto timeline-snap-icon"
-              >
-                <li v-for="(result, index) in latencyTestHistory" :key="index">
-                  <hr v-if="index > 0" />
-
-                  <div class="timeline-start space-y-2">
-                    <time class="text-sm italic">
-                      {{ dayjs(result.time).format('YYYY-MM-DD HH:mm:ss') }}
-                    </time>
-
+              <template v-if="latencyTestHistory.length > 0">
+                <div
+                  class="flex max-h-60 w-full flex-col gap-2 overflow-y-auto"
+                >
+                  <div
+                    v-for="(result, index) in latencyTestHistory"
+                    :key="index"
+                    class="flex items-start gap-2"
+                  >
                     <div
-                      class="badge block"
-                      :class="
-                        getLatencyClassName(
-                          result.delay,
-                          configStore.latencyQualityMap,
-                        )
-                      "
-                    >
-                      {{ result.delay || '---' }}
+                      class="mt-1.5 size-2 rounded-full bg-current opacity-50"
+                    />
+                    <div class="flex flex-col gap-1">
+                      <time class="text-sm italic">
+                        {{ dayjs(result.time).format('YYYY-MM-DD HH:mm:ss') }}
+                      </time>
+                      <div
+                        class="inline-block rounded px-2 py-0.5 text-xs"
+                        :class="
+                          getLatencyClassName(
+                            result.delay,
+                            configStore.latencyQualityMap,
+                          )
+                        "
+                      >
+                        {{ result.delay || '---' }}
+                      </div>
                     </div>
                   </div>
+                </div>
+              </template>
 
-                  <div class="timeline-middle">
-                    <IconCircleCheckFilled class="size-4" />
-                  </div>
-
-                  <hr v-if="index !== latencyTestHistory.length - 1" />
-                </li>
-              </ul>
-            </template>
-
-            <div v-else class="text-sm opacity-75">
-              {{ t('noLatencyHistory') }}
+              <div v-else class="text-sm opacity-75">
+                {{ t('noLatencyHistory') }}
+              </div>
             </div>
           </div>
-        </div>
+        </Transition>
       </Teleport>
     </div>
   </div>

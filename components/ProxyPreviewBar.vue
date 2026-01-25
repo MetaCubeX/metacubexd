@@ -61,12 +61,15 @@ const notConnectedPercent = computed(
 <template>
   <div class="flex items-center gap-2">
     <div
-      class="my-1 flex flex-1 items-center justify-center overflow-hidden rounded-2xl *:h-2"
+      class="my-1 flex flex-1 items-center justify-center overflow-hidden rounded-2xl"
     >
-      <div class="bg-green-600" :style="{ width: `${goodPercent}%` }" />
-      <div class="bg-yellow-500" :style="{ width: `${middlePercent}%` }" />
-      <div class="bg-red-500" :style="{ width: `${slowPercent}%` }" />
-      <div class="bg-neutral" :style="{ width: `${notConnectedPercent}%` }" />
+      <div class="h-2 bg-green-600" :style="{ width: `${goodPercent}%` }" />
+      <div class="h-2 bg-yellow-500" :style="{ width: `${middlePercent}%` }" />
+      <div class="h-2 bg-red-500" :style="{ width: `${slowPercent}%` }" />
+      <div
+        class="h-2 bg-[var(--color-neutral)]"
+        :style="{ width: `${notConnectedPercent}%` }"
+      />
     </div>
 
     <Latency v-if="now" :proxy-name="now" :test-url="testUrl" />

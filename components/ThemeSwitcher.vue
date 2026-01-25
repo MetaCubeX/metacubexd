@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import type { themes } from '~/constants'
 import { autoUpdate, flip, offset, shift, useFloating } from '@floating-ui/vue'
 import { IconPalette } from '@tabler/icons-vue'
-import { themes } from '~/constants'
 
 const configStore = useConfigStore()
 
@@ -49,37 +49,44 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div>
+  <div class="relative">
     <button
       ref="reference"
-      class="btn btn-circle btn-sm btn-primary"
+      class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-none bg-primary text-primary-content transition-all duration-200 ease-in-out hover:scale-110 hover:shadow-[0_4px_12px_oklch(var(--p)/0.4)]"
+      :class="{ 'scale-110 rotate-[15deg]': isOpen }"
       @click.stop="toggleMenu"
     >
-      <IconPalette />
+      <IconPalette :size="18" />
     </button>
 
     <Teleport to="body">
-      <ul
-        v-if="isOpen"
-        ref="floating"
-        :style="floatingStyles"
-        class="menu z-70 max-h-64 w-40 flex-nowrap overflow-y-auto rounded-box bg-base-300 p-2 shadow-lg"
+      <Transition
+        enter-active-class="transition-opacity duration-150"
+        leave-active-class="transition-opacity duration-100"
+        enter-from-class="opacity-0"
+        leave-to-class="opacity-0"
       >
-        <li
-          v-for="theme in themes"
-          :key="theme"
-          :data-theme="theme"
-          class="rounded-btn"
+        <div
+          v-if="isOpen"
+          ref="floating"
+          :style="floatingStyles"
+          class="z-70 w-44 overflow-hidden rounded-xl shadow-lg"
         >
-          <button
-            class="btn justify-start btn-xs"
-            :class="{ 'btn-active': configStore.curTheme === theme }"
-            @click="setTheme(theme)"
+          <div
+            class="flex items-center border-b border-gray-700 bg-gray-800/90 px-3 py-2"
           >
-            {{ theme }}
-          </button>
-        </li>
-      </ul>
+            <span
+              class="text-[0.6875rem] font-semibold tracking-[0.05em] text-gray-400 uppercase"
+            >
+              Theme
+            </span>
+          </div>
+          <ThemeList
+            :model-value="configStore.curTheme"
+            @update:model-value="setTheme"
+          />
+        </div>
+      </Transition>
     </Teleport>
   </div>
 </template>

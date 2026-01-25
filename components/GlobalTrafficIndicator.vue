@@ -182,7 +182,7 @@ function createChart() {
       {
         type: 'areaspline',
         name: 'Download',
-        color: themeColors.seriesColors[0],
+        color: themeColors.seriesColors[1], // success (green) - matches download icon
         data:
           globalStore.trafficChartHistory.download.length > 0
             ? [...globalStore.trafficChartHistory.download].slice(-30)
@@ -191,7 +191,7 @@ function createChart() {
       {
         type: 'areaspline',
         name: 'Upload',
-        color: themeColors.seriesColors[1],
+        color: themeColors.seriesColors[0], // info (purple/blue) - matches upload icon
         data:
           globalStore.trafficChartHistory.upload.length > 0
             ? [...globalStore.trafficChartHistory.upload].slice(-30)
@@ -271,7 +271,7 @@ function createSidebarChart() {
       {
         type: 'areaspline',
         name: 'Download',
-        color: themeColors.seriesColors[0],
+        color: themeColors.seriesColors[1], // success (green) - matches download icon
         data:
           globalStore.trafficChartHistory.download.length > 0
             ? [...globalStore.trafficChartHistory.download].slice(-30)
@@ -280,7 +280,7 @@ function createSidebarChart() {
       {
         type: 'areaspline',
         name: 'Upload',
-        color: themeColors.seriesColors[1],
+        color: themeColors.seriesColors[0], // info (purple/blue) - matches upload icon
         data:
           globalStore.trafficChartHistory.upload.length > 0
             ? [...globalStore.trafficChartHistory.upload].slice(-30)
@@ -438,18 +438,20 @@ onBeforeUnmount(() => {
   <Teleport v-if="headerTargetExists" to="#header-traffic-indicator">
     <div
       v-if="isVisible && isCollapsed && globalStore.latestTraffic"
-      class="rounded-btn flex cursor-pointer items-center gap-2 bg-base-100/50 px-2 py-1 transition-colors hover:bg-base-100"
+      class="flex cursor-pointer items-center gap-2 rounded-lg bg-[color-mix(in_oklch,var(--color-base-100)_50%,transparent)] px-2 py-1 transition-[background] duration-200 ease-in-out hover:bg-[var(--color-base-100)]"
       @click="expandFromHeader"
     >
       <div class="flex items-center gap-1">
-        <IconArrowDown class="size-3 text-success" />
+        <IconArrowDown class="size-3 shrink-0 text-[var(--color-success)]" />
         <span class="font-mono text-xs"
           >{{ formatBytes(downloadSpeed) }}/s</span
         >
       </div>
-      <div class="h-3 w-px bg-base-content/20" />
+      <div
+        class="h-3 w-px bg-[color-mix(in_oklch,var(--color-base-content)_20%,transparent)]"
+      />
       <div class="flex items-center gap-1">
-        <IconArrowUp class="size-3 text-info" />
+        <IconArrowUp class="size-3 shrink-0 text-[var(--color-info)]" />
         <span class="font-mono text-xs">{{ formatBytes(uploadSpeed) }}/s</span>
       </div>
     </div>
@@ -459,17 +461,17 @@ onBeforeUnmount(() => {
   <Teleport v-if="sidebarTargetExists" to="#sidebar-traffic-indicator">
     <div
       v-if="globalStore.latestTraffic"
-      class="rounded-btn w-full cursor-pointer bg-base-100/50 px-2 py-2 transition-colors hover:bg-base-100"
+      class="w-full cursor-pointer rounded-lg bg-[color-mix(in_oklch,var(--color-base-100)_50%,transparent)] p-2 transition-[background] duration-200 ease-in-out hover:bg-[var(--color-base-100)]"
       @click="expandFromHeader"
     >
       <div class="flex items-center justify-center gap-1">
-        <IconArrowDown class="size-3 text-success" />
+        <IconArrowDown class="size-3 shrink-0 text-[var(--color-success)]" />
         <span class="font-mono text-xs"
           >{{ formatBytes(downloadSpeed) }}/s</span
         >
       </div>
       <div class="flex items-center justify-center gap-1">
-        <IconArrowUp class="size-3 text-info" />
+        <IconArrowUp class="size-3 shrink-0 text-[var(--color-info)]" />
         <span class="font-mono text-xs">{{ formatBytes(uploadSpeed) }}/s</span>
       </div>
     </div>
@@ -479,7 +481,7 @@ onBeforeUnmount(() => {
   <Teleport v-if="sidebarExpandedTargetExists" to="#sidebar-traffic-expanded">
     <div
       v-if="globalStore.latestTraffic"
-      class="rounded-btn w-full bg-base-100/50 p-2"
+      class="w-full rounded-lg bg-[color-mix(in_oklch,var(--color-base-100)_50%,transparent)] p-2"
     >
       <!-- Mini chart -->
       <div ref="sidebarChartContainer" class="mb-2 h-10 w-full" />
@@ -487,14 +489,14 @@ onBeforeUnmount(() => {
       <!-- Stats -->
       <div class="grid grid-cols-2 gap-1 text-xs">
         <div class="flex items-center gap-1">
-          <IconArrowDown class="size-3 shrink-0 text-success" />
-          <span class="truncate font-mono"
+          <IconArrowDown class="size-3 shrink-0 text-[var(--color-success)]" />
+          <span class="truncate font-mono text-xs"
             >{{ formatBytes(downloadSpeed) }}/s</span
           >
         </div>
         <div class="flex items-center gap-1">
-          <IconArrowUp class="size-3 shrink-0 text-info" />
-          <span class="truncate font-mono"
+          <IconArrowUp class="size-3 shrink-0 text-[var(--color-info)]" />
+          <span class="truncate font-mono text-xs"
             >{{ formatBytes(uploadSpeed) }}/s</span
           >
         </div>
@@ -511,16 +513,18 @@ onBeforeUnmount(() => {
       !headerTargetExists &&
       !sidebarTargetExists
     "
-    class="fixed right-4 bottom-4 z-50 flex cursor-pointer items-center gap-2 rounded-box bg-base-200 px-3 py-2 shadow-lg"
+    class="fixed right-4 bottom-4 z-50 flex cursor-pointer items-center gap-2 rounded-xl bg-[var(--color-base-200)] px-3 py-2 shadow-lg"
     @click="expandFromHeader"
   >
     <div class="flex items-center gap-1">
-      <IconArrowDown class="size-3 text-success" />
+      <IconArrowDown class="size-3 shrink-0 text-[var(--color-success)]" />
       <span class="font-mono text-xs">{{ formatBytes(downloadSpeed) }}/s</span>
     </div>
-    <div class="h-3 w-px bg-base-content/20" />
+    <div
+      class="h-3 w-px bg-[color-mix(in_oklch,var(--color-base-content)_20%,transparent)]"
+    />
     <div class="flex items-center gap-1">
-      <IconArrowUp class="size-3 text-info" />
+      <IconArrowUp class="size-3 shrink-0 text-[var(--color-info)]" />
       <span class="font-mono text-xs">{{ formatBytes(uploadSpeed) }}/s</span>
     </div>
   </div>
@@ -528,7 +532,7 @@ onBeforeUnmount(() => {
   <!-- Toggle button when hidden -->
   <button
     v-if="!isVisible"
-    class="btn fixed right-4 bottom-4 z-50 btn-circle shadow-lg btn-sm btn-primary"
+    class="fixed right-4 bottom-4 z-50 flex size-8 cursor-pointer items-center justify-center rounded-full border-none bg-[var(--color-primary)] text-[var(--color-primary-content)] shadow-lg transition-all duration-200 ease-in-out hover:scale-110"
     :title="$t('showTrafficIndicator')"
     @click="toggleVisibility"
   >
@@ -536,18 +540,11 @@ onBeforeUnmount(() => {
   </button>
 
   <!-- Expanded floating view -->
-  <Transition
-    enter-active-class="transition-all duration-300 ease-out"
-    enter-from-class="opacity-0 scale-95"
-    enter-to-class="opacity-100 scale-100"
-    leave-active-class="transition-all duration-200 ease-in"
-    leave-from-class="opacity-100 scale-100"
-    leave-to-class="opacity-0 scale-95"
-  >
+  <Transition name="traffic-expand">
     <div
       v-if="isVisible && !isCollapsed && globalStore.latestTraffic"
       ref="containerRef"
-      class="fixed z-50 min-w-56 rounded-box bg-base-200 shadow-lg select-none"
+      class="fixed z-50 min-w-56 rounded-xl bg-[var(--color-base-200)] shadow-lg select-none"
       :class="{ 'cursor-grabbing': isDragging }"
       :style="positionStyle"
     >
@@ -568,7 +565,7 @@ onBeforeUnmount(() => {
           <div class="flex items-center gap-1">
             <!-- Collapse button -->
             <button
-              class="btn btn-circle btn-ghost btn-xs"
+              class="flex size-6 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-[var(--color-base-content)] transition-[background] duration-200 ease-in-out hover:bg-[color-mix(in_oklch,var(--color-base-content)_10%,transparent)]"
               :title="$t('hideTrafficIndicator')"
               @click="toggleCollapsed"
             >
@@ -576,7 +573,7 @@ onBeforeUnmount(() => {
             </button>
             <!-- Close button -->
             <button
-              class="btn btn-circle btn-ghost btn-xs"
+              class="flex size-6 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-[var(--color-base-content)] transition-[background] duration-200 ease-in-out hover:bg-[color-mix(in_oklch,var(--color-base-content)_10%,transparent)]"
               :title="$t('hideTrafficIndicator')"
               @click="toggleVisibility"
             >
@@ -591,34 +588,55 @@ onBeforeUnmount(() => {
         <!-- Stats grid -->
         <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
           <!-- Download speed -->
-          <div class="flex items-center gap-1.5">
-            <IconArrowDown class="size-3 text-success" />
-            <span class="font-mono font-medium">
+          <div class="flex items-center gap-1">
+            <IconArrowDown
+              class="size-3 shrink-0 text-[var(--color-success)]"
+            />
+            <span class="font-mono text-xs font-medium">
               {{ formatBytes(downloadSpeed) }}/s
             </span>
           </div>
 
           <!-- Upload speed -->
-          <div class="flex items-center gap-1.5">
-            <IconArrowUp class="size-3 text-info" />
-            <span class="font-mono font-medium">
+          <div class="flex items-center gap-1">
+            <IconArrowUp class="size-3 shrink-0 text-[var(--color-info)]" />
+            <span class="font-mono text-xs font-medium">
               {{ formatBytes(uploadSpeed) }}/s
             </span>
           </div>
 
           <!-- Memory -->
-          <div class="flex items-center gap-1.5 opacity-70">
+          <div class="flex items-center gap-1 opacity-70">
             <span>{{ $t('memory') }}:</span>
-            <span class="font-mono">{{ formatBytes(memoryUsage) }}</span>
+            <span class="font-mono text-xs">{{
+              formatBytes(memoryUsage)
+            }}</span>
           </div>
 
           <!-- Connections -->
-          <div class="flex items-center gap-1.5 opacity-70">
+          <div class="flex items-center gap-1 opacity-70">
             <span>{{ $t('connections') }}:</span>
-            <span class="font-mono">{{ activeConnections }}</span>
+            <span class="font-mono text-xs">{{ activeConnections }}</span>
           </div>
         </div>
       </div>
     </div>
   </Transition>
 </template>
+
+<style scoped>
+/* Transition animations */
+.traffic-expand-enter-active {
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.traffic-expand-leave-active {
+  transition: all 0.2s ease-in;
+}
+
+.traffic-expand-enter-from,
+.traffic-expand-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}
+</style>
