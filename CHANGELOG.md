@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.235.3](https://github.com/MetaCubeX/metacubexd/compare/v1.235.2...v1.235.3) (2026-01-25)
+
+
+### Bug Fixes
+
+* correct ConnectionsPagination component name ([a6f51d4](https://github.com/MetaCubeX/metacubexd/commit/a6f51d4334f5a0026e87d7e0f661600d64b29caa))
+
 ## [1.235.2](https://github.com/MetaCubeX/metacubexd/compare/v1.235.1...v1.235.2) (2026-01-25)
 
 
