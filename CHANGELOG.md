@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.235.1](https://github.com/MetaCubeX/metacubexd/compare/v1.235.0...v1.235.1) (2026-01-25)
+
+
+### Bug Fixes
+
+* improve UI components and fix various issues ([b57eb3b](https://github.com/MetaCubeX/metacubexd/commit/b57eb3b0ae7bb82b80e8a1ff30c8f1c956ece4b6))
+* update e2e tests and screenshot selectors for new UI ([8c5785b](https://github.com/MetaCubeX/metacubexd/commit/8c5785b46510d62c0b6a2cc1ad0ecae5f3d62e57))
+
 ## [1.235.0](https://github.com/MetaCubeX/metacubexd/compare/v1.234.1...v1.235.0) (2025-12-25)
 
 
