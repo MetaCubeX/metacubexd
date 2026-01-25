@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.235.2](https://github.com/MetaCubeX/metacubexd/compare/v1.235.1...v1.235.2) (2026-01-25)
+
+
+### Bug Fixes
+
+* **e2e:** use attached state for waitForSelector to avoid visibility timeout ([7b56fca](https://github.com/MetaCubeX/metacubexd/commit/7b56fca74d35a47d213ad355654bd3b75360bc71))
+
 ## [1.235.1](https://github.com/MetaCubeX/metacubexd/compare/v1.235.0...v1.235.1) (2026-01-25)
 
 
