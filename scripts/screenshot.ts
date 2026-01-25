@@ -22,12 +22,12 @@ const PAGES: PageConfig[] = [
   {
     name: 'overview',
     path: '/#/overview',
-    waitFor: '.stat-value', // Overview page stats
+    waitFor: '.overview-stat-card', // Overview page stat cards
   },
   {
     name: 'proxies',
     path: '/#/proxies',
-    waitFor: '.tabs', // Proxies page tabs
+    waitFor: 'button', // Proxies page buttons
   },
   {
     name: 'connections',
@@ -37,7 +37,7 @@ const PAGES: PageConfig[] = [
   {
     name: 'rules',
     path: '/#/rules',
-    waitFor: '.tabs', // Rules page tabs (uses virtual list, not table)
+    waitFor: 'button', // Rules page buttons
   },
   {
     name: 'logs',
@@ -47,7 +47,7 @@ const PAGES: PageConfig[] = [
   {
     name: 'config',
     path: '/#/config',
-    waitFor: '.fieldset', // Config fieldsets
+    waitFor: '.config-card', // Config cards
   },
 ]
 
