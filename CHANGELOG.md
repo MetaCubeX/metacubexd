@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.236.0](https://github.com/MetaCubeX/metacubexd/compare/v1.235.3...v1.236.0) (2026-01-26)
+
+
+### Features
+
+* re-trigger release-please ([94b358d](https://github.com/MetaCubeX/metacubexd/commit/94b358d5dfdae03607dabbef34c20bcb0d22efa5))
+
 ## [1.235.3](https://github.com/MetaCubeX/metacubexd/compare/v1.235.2...v1.235.3) (2026-01-25)
 
 
