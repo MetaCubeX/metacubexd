@@ -181,20 +181,20 @@ function createChart() {
     series: [
       {
         type: 'areaspline',
-        name: 'Download',
-        color: themeColors.seriesColors[1], // success (green) - matches download icon
+        name: 'Upload',
+        color: themeColors.seriesColors[0], // info (purple/blue) - matches upload icon, drawn first (behind)
         data:
-          globalStore.trafficChartHistory.download.length > 0
-            ? [...globalStore.trafficChartHistory.download].slice(-30)
+          globalStore.trafficChartHistory.upload.length > 0
+            ? [...globalStore.trafficChartHistory.upload].slice(-30)
             : [[Date.now(), 0]],
       },
       {
         type: 'areaspline',
-        name: 'Upload',
-        color: themeColors.seriesColors[0], // info (purple/blue) - matches upload icon
+        name: 'Download',
+        color: themeColors.seriesColors[1], // success (green) - matches download icon, drawn last (on top)
         data:
-          globalStore.trafficChartHistory.upload.length > 0
-            ? [...globalStore.trafficChartHistory.upload].slice(-30)
+          globalStore.trafficChartHistory.download.length > 0
+            ? [...globalStore.trafficChartHistory.download].slice(-30)
             : [[Date.now(), 0]],
       },
     ],
@@ -208,8 +208,8 @@ function updateChart() {
   const downloadData = [...globalStore.trafficChartHistory.download].slice(-30)
   const uploadData = [...globalStore.trafficChartHistory.upload].slice(-30)
 
-  chart.series[0]?.setData(downloadData, false)
-  chart.series[1]?.setData(uploadData, true)
+  chart.series[0]?.setData(uploadData, false)
+  chart.series[1]?.setData(downloadData, true)
 }
 
 // Update sidebar chart data
@@ -219,8 +219,8 @@ function updateSidebarChart() {
   const downloadData = [...globalStore.trafficChartHistory.download].slice(-30)
   const uploadData = [...globalStore.trafficChartHistory.upload].slice(-30)
 
-  sidebarChart.series[0]?.setData(downloadData, false)
-  sidebarChart.series[1]?.setData(uploadData, true)
+  sidebarChart.series[0]?.setData(uploadData, false)
+  sidebarChart.series[1]?.setData(downloadData, true)
 }
 
 // Create sidebar chart
@@ -270,20 +270,20 @@ function createSidebarChart() {
     series: [
       {
         type: 'areaspline',
-        name: 'Download',
-        color: themeColors.seriesColors[1], // success (green) - matches download icon
+        name: 'Upload',
+        color: themeColors.seriesColors[0], // info (purple/blue) - matches upload icon, drawn first (behind)
         data:
-          globalStore.trafficChartHistory.download.length > 0
-            ? [...globalStore.trafficChartHistory.download].slice(-30)
+          globalStore.trafficChartHistory.upload.length > 0
+            ? [...globalStore.trafficChartHistory.upload].slice(-30)
             : [[Date.now(), 0]],
       },
       {
         type: 'areaspline',
-        name: 'Upload',
-        color: themeColors.seriesColors[0], // info (purple/blue) - matches upload icon
+        name: 'Download',
+        color: themeColors.seriesColors[1], // success (green) - matches download icon, drawn last (on top)
         data:
-          globalStore.trafficChartHistory.upload.length > 0
-            ? [...globalStore.trafficChartHistory.upload].slice(-30)
+          globalStore.trafficChartHistory.download.length > 0
+            ? [...globalStore.trafficChartHistory.download].slice(-30)
             : [[Date.now(), 0]],
       },
     ],
