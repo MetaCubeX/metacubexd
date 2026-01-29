@@ -99,7 +99,11 @@ export default defineNuxtConfig({
       script: [
         {
           // Use relative path for config.js to support both root and subdirectory deployments
+          // tagPosition: 'head' and blocking load ensure config is available before app runs
           src: 'config.js',
+          tagPosition: 'head',
+          defer: false,
+          async: false,
           onerror: "window.__METACUBEXD_CONFIG__={defaultBackendURL:''}",
         },
         {
