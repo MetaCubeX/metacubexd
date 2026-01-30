@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.236.1](https://github.com/MetaCubeX/metacubexd/compare/v1.236.0...v1.236.1) (2026-01-29)
+
+
+### Bug Fixes
+
+* correct traffic chart color order and unregister old service workers ([6fa7187](https://github.com/MetaCubeX/metacubexd/commit/6fa7187e659aa77e4857477d07799a26a8fcb0ee))
+* ensure config.js loads synchronously and fix saved endpoints display ([428d6f4](https://github.com/MetaCubeX/metacubexd/commit/428d6f4febe7af38fd1d8185fdb36d6a653f336d))
+
 ## [1.236.0](https://github.com/MetaCubeX/metacubexd/compare/v1.235.3...v1.236.0) (2026-01-26)
 
 
