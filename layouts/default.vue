@@ -1,9 +1,17 @@
 <script setup lang="ts">
 import { useMockMode } from '~/composables/useApi'
+import { useKeyboardShortcuts } from '~/composables/useKeyboardShortcuts'
 
 const configStore = useConfigStore()
 const endpointStore = useEndpointStore()
 const globalStore = useGlobalStore()
+const shortcutsStore = useShortcutsStore()
+
+// Initialize keyboard shortcuts
+const { setupKeyboardListeners } = useKeyboardShortcuts()
+onMounted(() => {
+  setupKeyboardListeners()
+})
 
 const rootElement = ref<HTMLElement | null>(null)
 
@@ -60,5 +68,8 @@ const hasEndpoint = computed(
 
     <!-- Global traffic indicator -->
     <GlobalTrafficIndicator v-if="hasEndpoint" />
+
+    <!-- Keyboard shortcuts help modal -->
+    <ShortcutsHelpModal />
   </div>
 </template>

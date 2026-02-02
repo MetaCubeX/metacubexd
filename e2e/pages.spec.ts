@@ -273,6 +273,103 @@ describe('e2E Page Tests', () => {
     })
   })
 
+  describe('keyboard Shortcuts', () => {
+    it('should open help modal when pressing ?', async () => {
+      await page!.goto(`${BASE_URL}/#/overview`, {
+        waitUntil: 'domcontentloaded',
+        timeout: 30000,
+      })
+      await page!.waitForLoadState('networkidle')
+
+      // Press ? key (Shift + /)
+      await page!.keyboard.press('Shift+/')
+
+      // Wait for modal to appear
+      await page!.waitForSelector('.modal-open', { timeout: 5000 })
+
+      // Check modal is visible
+      const modal = page!.locator('.modal-open')
+      await expect(modal.isVisible()).resolves.toBe(true)
+
+      // Check modal contains shortcuts content
+      const modalContent = page!.locator('.modal-box')
+      await expect(modalContent.isVisible()).resolves.toBe(true)
+
+      // Close with Escape
+      await page!.keyboard.press('Escape')
+
+      // Modal should be closed
+      await page!.waitForSelector('.modal-open', {
+        state: 'hidden',
+        timeout: 5000,
+      })
+    })
+
+    it('should navigate to proxies page with g+p', async () => {
+      await page!.goto(`${BASE_URL}/#/overview`, {
+        waitUntil: 'domcontentloaded',
+        timeout: 30000,
+      })
+      await page!.waitForLoadState('networkidle')
+
+      // Press g then p
+      await page!.keyboard.press('g')
+      await page!.waitForTimeout(100)
+      await page!.keyboard.press('p')
+
+      // Wait for navigation
+      await page!.waitForTimeout(500)
+
+      // Check URL changed to proxies
+      const url = page!.url()
+      expect(url).toContain('/proxies')
+    })
+
+    it('should navigate to connections page with g+c', async () => {
+      await page!.goto(`${BASE_URL}/#/overview`, {
+        waitUntil: 'domcontentloaded',
+        timeout: 30000,
+      })
+      await page!.waitForLoadState('networkidle')
+
+      // Press g then c
+      await page!.keyboard.press('g')
+      await page!.waitForTimeout(100)
+      await page!.keyboard.press('c')
+
+      // Wait for navigation
+      await page!.waitForTimeout(500)
+
+      // Check URL changed to connections
+      const url = page!.url()
+      expect(url).toContain('/connections')
+    })
+
+    it('should not trigger shortcuts when typing in input', async () => {
+      await page!.goto(`${BASE_URL}/#/config`, {
+        waitUntil: 'domcontentloaded',
+        timeout: 30000,
+      })
+      await page!.waitForLoadState('networkidle')
+
+      // Find an input field
+      const input = page!
+        .locator('input[type="text"], input[type="url"]')
+        .first()
+      await input.click()
+
+      // Type 'g' and 'p' in input - should not navigate
+      await input.type('gp')
+
+      // Wait a bit
+      await page!.waitForTimeout(500)
+
+      // Should still be on config page
+      const url = page!.url()
+      expect(url).toContain('/config')
+    })
+  })
+
   describe('mobile Viewport', () => {
     it('should render correctly on mobile viewport', async () => {
       await page!.setViewportSize({ width: 390, height: 844 })

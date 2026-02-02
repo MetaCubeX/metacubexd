@@ -212,5 +212,45 @@
   "useMobileBottomNav": "Use Bottom Navigation (Mobile)",
   "fetchRemoteConfig": "Fetch Remote Config",
   "remoteConfigURL": "Remote Config URL",
-  "remoteConfigURLPlaceholder": "Enter config file URL"
+  "remoteConfigURLPlaceholder": "Enter config file URL",
+  "shortcuts": {
+    "title": "Keyboard Shortcuts",
+    "category": {
+      "navigation": "Navigation",
+      "actions": "Actions"
+    },
+    "goToOverview": "Go to Overview",
+    "goToProxies": "Go to Proxies",
+    "goToConnections": "Go to Connections",
+    "goToRules": "Go to Rules",
+    "goToLogs": "Go to Logs",
+    "goToConfig": "Go to Config",
+    "refresh": "Refresh",
+    "closeModal": "Close Modal",
+    "showHelp": "Show Help",
+    "pressKey": "Press a key...",
+    "pressEscToClose": "Press Esc to close",
+    "customized": "customized",
+    "conflictWith": "Conflicts with",
+    "forceApply": "Apply anyway",
+    "resetToDefaults": "Reset to Defaults"
+  },
+  "recommendation": {
+    "title": "Smart Recommendation",
+    "recommended": "Recommended",
+    "testAll": "Test All",
+    "testAllGroups": "Test All Groups",
+    "switchToRecommended": "Switch to Recommended",
+    "testing": "Testing",
+    "score": "Score",
+    "latencyWeight": "Latency Weight",
+    "stabilityWeight": "Stability Weight",
+    "successRateWeight": "Success Rate Weight",
+    "autoSwitch": "Auto Switch to Recommended",
+    "autoSwitchDesc": "Automatically switch to the recommended node after testing",
+    "minTestInterval": "Minimum Test Interval (min)",
+    "excludedNodes": "Excluded Nodes",
+    "clearHistory": "Clear History",
+    "noScoreYet": "No score yet"
+  }
 }

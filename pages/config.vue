@@ -557,6 +557,12 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
               </template>
             </div>
 
+            <div class="divider my-2 text-xs opacity-40">
+              {{ t('shortcuts.title', 'Keyboard Shortcuts') }}
+            </div>
+
+            <ShortcutsSettings />
+
             <div class="divider my-2 text-xs opacity-40">ENDPOINT</div>
 
             <div class="flex flex-col gap-2">

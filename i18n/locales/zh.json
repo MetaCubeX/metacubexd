@@ -212,5 +212,45 @@
   "useMobileBottomNav": "使用底部导航栏 (移动端)",
   "fetchRemoteConfig": "拉取远程配置",
   "remoteConfigURL": "远程配置地址",
-  "remoteConfigURLPlaceholder": "输入配置文件 URL"
+  "remoteConfigURLPlaceholder": "输入配置文件 URL",
+  "shortcuts": {
+    "title": "键盘快捷键",
+    "category": {
+      "navigation": "导航",
+      "actions": "操作"
+    },
+    "goToOverview": "跳转到概览",
+    "goToProxies": "跳转到代理",
+    "goToConnections": "跳转到连接",
+    "goToRules": "跳转到规则",
+    "goToLogs": "跳转到日志",
+    "goToConfig": "跳转到配置",
+    "refresh": "刷新",
+    "closeModal": "关闭弹窗",
+    "showHelp": "显示帮助",
+    "pressKey": "按下按键...",
+    "pressEscToClose": "按 Esc 关闭",
+    "customized": "已自定义",
+    "conflictWith": "与以下冲突",
+    "forceApply": "强制应用",
+    "resetToDefaults": "重置为默认"
+  },
+  "recommendation": {
+    "title": "智能推荐",
+    "recommended": "推荐",
+    "testAll": "全部测速",
+    "testAllGroups": "测试所有代理组",
+    "switchToRecommended": "切换到推荐节点",
+    "testing": "测试中",
+    "score": "评分",
+    "latencyWeight": "延迟权重",
+    "stabilityWeight": "稳定性权重",
+    "successRateWeight": "成功率权重",
+    "autoSwitch": "自动切换到推荐节点",
+    "autoSwitchDesc": "测试完成后自动切换到推荐的节点",
+    "minTestInterval": "最小测试间隔（分钟）",
+    "excludedNodes": "排除的节点",
+    "clearHistory": "清除历史",
+    "noScoreYet": "暂无评分"
+  }
 }

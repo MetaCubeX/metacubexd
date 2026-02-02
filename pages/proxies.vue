@@ -10,6 +10,7 @@ import {
   IconGlobe,
   IconReload,
   IconSettings,
+  IconWand,
 } from '@tabler/icons-vue'
 import byteSize from 'byte-size'
 import Button from '~/components/Button.vue'
@@ -17,6 +18,7 @@ import ProxyNodeCard from '~/components/ProxyNodeCard.vue'
 import ProxyNodeListItem from '~/components/ProxyNodeListItem.vue'
 import ProxyNodePreview from '~/components/ProxyNodePreview.vue'
 import SubscriptionInfo from '~/components/SubscriptionInfo.vue'
+import { useBatchLatencyTest } from '~/composables/useBatchLatencyTest'
 import {
   encodeSvg,
   filterProxiesByAvailability,
@@ -24,6 +26,7 @@ import {
   formatTimeFromNow,
   sortProxiesByOrderingType,
 } from '~/utils'
+import { findRecommendedNode } from '~/utils/nodeScoring'
 
 const { t, locale } = useI18n()
 
@@ -31,6 +34,10 @@ useHead({ title: computed(() => t('proxies')) })
 const proxiesStore = useProxiesStore()
 const connectionsStore = useConnectionsStore()
 const configStore = useConfigStore()
+const nodeRecommendationStore = useNodeRecommendationStore()
+
+// Batch latency test
+const { isRunning: isBatchTesting, testMultipleGroups } = useBatchLatencyTest()
 
 const activeTab = ref<'proxies' | 'proxyProviders'>('proxies')
 const settingsModal = ref<{ open: () => void; close: () => void }>()
@@ -38,6 +45,31 @@ const proxyGroupsWrapper = ref<{ isTwoColumns: boolean }>()
 const providersWrapper = ref<{ isTwoColumns: boolean }>()
 
 const formatBytes = (bytes: number) => byteSize(bytes).toString()
+
+// Get recommended node for a proxy group
+const getRecommendedNode = (proxyGroup: ProxyType) => {
+  const nodeNames = proxyGroup.all ?? []
+  return findRecommendedNode(
+    nodeNames,
+    nodeRecommendationStore.performanceData,
+    nodeRecommendationStore.excludedNodes,
+    nodeRecommendationStore.scoringWeights,
+  )
+}
+
+// Test all proxy groups
+const testAllGroups = async () => {
+  const groupNames = renderProxies.value.map((p) => p.name)
+  await testMultipleGroups(groupNames)
+}
+
+// Switch to recommended node in a group
+const switchToRecommended = (proxyGroup: ProxyType) => {
+  const recommended = getRecommendedNode(proxyGroup)
+  if (recommended) {
+    proxiesStore.selectProxyInGroup(proxyGroup, recommended)
+  }
+}
 
 const renderProxies = computed(() =>
   proxiesStore.proxies.filter((proxy) => !proxy.hidden),
@@ -102,6 +134,13 @@ const ProxyGroupTitle = defineComponent({
     sortedProxyNames: { type: Array as () => string[], required: true },
   },
   setup(props) {
+    const recommendedNode = computed(() => getRecommendedNode(props.proxyGroup))
+    const hasRecommendation = computed(
+      () =>
+        recommendedNode.value !== null &&
+        recommendedNode.value !== props.proxyGroup.now,
+    )
+
     return () =>
       h('div', { class: 'flex flex-col gap-3 flex-1 min-w-0' }, [
         h(
@@ -154,6 +193,27 @@ const ProxyGroupTitle = defineComponent({
               ],
             ),
             h('div', { class: 'flex items-center gap-1.5 shrink-0' }, [
+              // Switch to Recommended button
+              hasRecommendation.value &&
+                h(
+                  Button,
+                  {
+                    class:
+                      'flex items-center justify-center w-9 h-9 rounded-lg bg-warning/10 border border-warning/20 text-warning transition-all duration-200 hover:bg-warning/20 hover:border-warning/40 hover:-translate-y-px hover:shadow-lg hover:shadow-warning/15 active:translate-y-0',
+                    title:
+                      t(
+                        'recommendation.switchToRecommended',
+                        'Switch to Recommended: ',
+                      ) + recommendedNode.value,
+                    onClick: (e: MouseEvent) => {
+                      e.stopPropagation()
+                      switchToRecommended(props.proxyGroup)
+                    },
+                  },
+                  {
+                    default: () => h(IconWand, { size: 18 }),
+                  },
+                ),
               h(
                 Button,
                 {
@@ -228,6 +288,8 @@ const ProxyNodes = defineComponent({
     sortedProxyNames: { type: Array as () => string[], required: true },
   },
   setup(props) {
+    const recommendedNode = computed(() => getRecommendedNode(props.proxyGroup))
+
     return () =>
       props.sortedProxyNames.map((proxyName) =>
         configStore.proxiesDisplayMode === 'listMode'
@@ -246,6 +308,7 @@ const ProxyNodes = defineComponent({
               testUrl: props.proxyGroup.testUrl || null,
               timeout: props.proxyGroup.timeout ?? null,
               isSelected: props.proxyGroup.now === proxyName,
+              isRecommended: recommendedNode.value === proxyName,
               groupName: props.proxyGroup.name,
               onClick: () =>
                 proxiesStore.selectProxyInGroup(props.proxyGroup, proxyName),
@@ -447,6 +510,42 @@ const ProviderProxyNodes = defineComponent({
 
       <!-- Action Buttons -->
       <div class="flex items-center gap-2">
+        <!-- Test All Groups Button -->
+        <Button
+          v-if="activeTab === 'proxies'"
+          class="flex h-9 items-center gap-1.5 rounded-[0.625rem] border border-base-content/10 bg-base-200/80 px-3 transition-all duration-200 hover:border-primary/30 hover:bg-primary/15 hover:text-primary"
+          :disabled="isBatchTesting"
+          :title="t('recommendation.testAllGroups', 'Test All Groups')"
+          @click="testAllGroups"
+        >
+          <IconBrandSpeedtest
+            :size="18"
+            :class="{ 'animate-pulse text-success': isBatchTesting }"
+          />
+          <span class="hidden text-sm font-medium sm:inline">
+            {{ t('recommendation.testAll', 'Test All') }}
+          </span>
+        </Button>
+
+        <!-- Batch Test Progress Indicator -->
+        <div
+          v-if="isBatchTesting"
+          class="flex items-center gap-2 rounded-lg bg-success/10 px-3 py-1.5 text-sm text-success"
+        >
+          <span class="loading loading-xs loading-spinner" />
+          <span>
+            {{ nodeRecommendationStore.batchTestProgress.completed }}/{{
+              nodeRecommendationStore.batchTestProgress.total
+            }}
+          </span>
+          <span
+            v-if="nodeRecommendationStore.batchTestProgress.current"
+            class="max-w-24 truncate text-xs opacity-70"
+          >
+            {{ nodeRecommendationStore.batchTestProgress.current }}
+          </span>
+        </div>
+
         <Button
           v-if="activeTab === 'proxyProviders'"
           class="flex h-9 w-9 items-center justify-center rounded-[0.625rem] border border-base-content/10 bg-base-200/80 transition-all duration-200 hover:border-primary/30 hover:bg-primary/15 hover:text-primary"

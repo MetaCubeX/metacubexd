@@ -7,25 +7,32 @@ import {
   shift,
   useFloating,
 } from '@floating-ui/vue'
-import { IconCircleCheckFilled } from '@tabler/icons-vue'
+import { IconCircleCheckFilled, IconStar } from '@tabler/icons-vue'
 import dayjs from 'dayjs'
 import {
   filterSpecialProxyType,
   formatProxyType,
   getLatencyClassName,
 } from '~/utils'
+import {
+  calculateNodeScore,
+  formatTimeSince,
+  getScoreColorClass,
+} from '~/utils/nodeScoring'
 
 interface Props {
   proxyName: string
   testUrl: string | null
   timeout: number | null
   isSelected?: boolean
+  isRecommended?: boolean
   providerName?: string
   groupName?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   isSelected: false,
+  isRecommended: false,
   providerName: '',
   groupName: '',
 })
@@ -36,6 +43,7 @@ const emit = defineEmits<{
 
 const proxiesStore = useProxiesStore()
 const configStore = useConfigStore()
+const nodeRecommendationStore = useNodeRecommendationStore()
 const { t } = useI18n()
 
 const proxyNode = computed(() => proxiesStore.proxyNodeMap[props.proxyName])
@@ -43,6 +51,31 @@ const proxyType = computed(() =>
   formatProxyType(proxyNode.value?.type || '', t),
 )
 const isUDP = computed(() => proxyNode.value?.xudp || proxyNode.value?.udp)
+
+// Node performance data
+const nodePerformance = computed(() =>
+  nodeRecommendationStore.getNodePerformance(props.proxyName),
+)
+
+// Node score
+const nodeScore = computed(() => {
+  const perf = nodePerformance.value
+  if (!perf || perf.history.length === 0) return null
+  return calculateNodeScore(perf, nodeRecommendationStore.scoringWeights)
+})
+
+// Last test time formatted
+const lastTestTimeFormatted = computed(() => {
+  const perf = nodePerformance.value
+  if (!perf) return null
+  return formatTimeSince(perf.lastTestTime)
+})
+
+// Score color class
+const scoreColorClass = computed(() => {
+  if (nodeScore.value === null) return ''
+  return getScoreColorClass(nodeScore.value)
+})
 
 // Check if this node is being tested (individually, via provider, or via group)
 const isProviderTesting = computed(() =>
@@ -199,6 +232,15 @@ function handleLatencyTest() {
         U
       </div>
 
+      <!-- Recommended badge -->
+      <div
+        v-if="isRecommended"
+        class="absolute -top-1 -left-1 z-1 flex size-4 items-center justify-center rounded-full bg-warning text-warning-content"
+        :title="t('recommendation.recommended', 'Recommended')"
+      >
+        <IconStar class="size-3" />
+      </div>
+
       <div
         class="flex flex-col gap-2 p-[0.625rem]"
         :class="{ 'cursor-pointer': !!onClick }"
@@ -211,8 +253,22 @@ function handleLatencyTest() {
         </h2>
 
         <div class="flex items-end justify-between gap-1">
-          <div class="text-xs font-semibold uppercase opacity-75">
-            {{ proxyType }}
+          <div class="flex flex-col gap-0.5">
+            <div class="text-xs font-semibold uppercase opacity-75">
+              {{ proxyType }}
+            </div>
+            <!-- Score display -->
+            <div
+              v-if="nodeScore !== null"
+              class="flex items-center gap-1 text-[0.625rem]"
+            >
+              <span :class="scoreColorClass" class="font-bold">
+                {{ nodeScore }}
+              </span>
+              <span v-if="lastTestTimeFormatted" class="opacity-50">
+                {{ lastTestTimeFormatted }}
+              </span>
+            </div>
           </div>
 
           <Latency
