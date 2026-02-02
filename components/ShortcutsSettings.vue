@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import type {ShortcutAction} from '~/constants/shortcuts';
+import type { ShortcutAction } from '~/constants/shortcuts'
 import {
   formatShortcutKey,
   SHORTCUT_CATEGORIES,
-  SHORTCUT_LABELS
-  
+  SHORTCUT_LABELS,
 } from '~/constants/shortcuts'
 
 const shortcutsStore = useShortcutsStore()
@@ -168,7 +167,17 @@ const isCustomized = (action: ShortcutAction) => {
     <!-- Reset button -->
     <div class="mt-2 flex justify-end">
       <button class="btn btn-outline btn-sm btn-error" @click="resetAll">
-        <span class="i-tabler-refresh size-4" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="size-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8" />
+          <path d="M3 3v5h5" />
+        </svg>
         {{ t('shortcuts.resetToDefaults', 'Reset to Defaults') }}
       </button>
     </div>

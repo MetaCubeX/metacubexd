@@ -71,6 +71,45 @@ const lastTestTimeFormatted = computed(() => {
   return formatTimeSince(perf.lastTestTime)
 })
 
+// Latency trend data for mini chart (from nodeRecommendationStore)
+const latencyTrendData = computed(() => {
+  const perf = nodePerformance.value
+  if (!perf || perf.history.length < 2) return null
+
+  // Get successful latency values (most recent first, so reverse for chronological order)
+  const latencies = perf.history
+    .filter((h) => h.success && h.latency !== null)
+    .map((h) => h.latency as number)
+    .slice(0, 10)
+    .reverse()
+
+  if (latencies.length < 2) return null
+
+  const min = Math.min(...latencies)
+  const max = Math.max(...latencies)
+  const range = max - min || 1
+
+  // Normalize to 0-100 for SVG viewBox
+  const points = latencies.map((lat, i) => ({
+    x: (i / (latencies.length - 1)) * 100,
+    y: 100 - ((lat - min) / range) * 80 - 10, // 10-90 range to leave padding
+  }))
+
+  return {
+    points,
+    min,
+    max,
+    avg: Math.round(latencies.reduce((a, b) => a + b, 0) / latencies.length),
+  }
+})
+
+// SVG path for sparkline
+const sparklinePath = computed(() => {
+  if (!latencyTrendData.value) return ''
+  const { points } = latencyTrendData.value
+  return points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')
+})
+
 // Score color class
 const scoreColorClass = computed(() => {
   if (nodeScore.value === null) return ''
@@ -306,6 +345,56 @@ function handleLatencyTest() {
                 class="w-full text-center text-xs uppercase opacity-80"
               >
                 {{ specialTypes }}
+              </div>
+
+              <!-- Latency Trend Mini Chart -->
+              <div
+                v-if="latencyTrendData"
+                class="w-full rounded-lg bg-[color-mix(in_oklch,var(--color-primary-content)_10%,transparent)] p-2"
+              >
+                <div
+                  class="mb-1 flex items-center justify-between text-[0.625rem] opacity-70"
+                >
+                  <span>{{ latencyTrendData.min }}ms</span>
+                  <span>avg: {{ latencyTrendData.avg }}ms</span>
+                  <span>{{ latencyTrendData.max }}ms</span>
+                </div>
+                <svg
+                  viewBox="0 0 100 50"
+                  class="h-8 w-full"
+                  preserveAspectRatio="none"
+                >
+                  <!-- Grid lines -->
+                  <line
+                    x1="0"
+                    y1="25"
+                    x2="100"
+                    y2="25"
+                    stroke="currentColor"
+                    stroke-opacity="0.1"
+                    stroke-dasharray="2,2"
+                  />
+                  <!-- Sparkline -->
+                  <path
+                    :d="sparklinePath"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="opacity-80"
+                  />
+                  <!-- Data points -->
+                  <circle
+                    v-for="(point, idx) in latencyTrendData.points"
+                    :key="idx"
+                    :cx="point.x"
+                    :cy="point.y"
+                    r="2"
+                    fill="currentColor"
+                    class="opacity-60"
+                  />
+                </svg>
               </div>
 
               <template v-if="latencyTestHistory.length > 0">

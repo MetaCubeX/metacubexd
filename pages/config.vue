@@ -9,6 +9,7 @@ import {
 } from '~/composables/useQueries'
 
 const { t } = useI18n()
+const nodeRecommendationStore = useNodeRecommendationStore()
 
 useHead({ title: computed(() => t('config')) })
 const router = useRouter()
@@ -562,6 +563,162 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
             </div>
 
             <ShortcutsSettings />
+
+            <div class="divider my-2 text-xs opacity-40">
+              {{ t('recommendation.title', 'Smart Recommendation') }}
+            </div>
+
+            <!-- Recommendation Settings -->
+            <div class="flex flex-col gap-2">
+              <!-- Auto Switch Toggle -->
+              <div
+                class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 transition-colors hover:bg-base-content/5"
+              >
+                <div class="flex flex-col gap-0.5">
+                  <span class="text-sm">{{
+                    t('recommendation.autoSwitch')
+                  }}</span>
+                  <span class="text-xs opacity-50">{{
+                    t('recommendation.autoSwitchDesc')
+                  }}</span>
+                </div>
+                <input
+                  v-model="nodeRecommendationStore.autoSwitchEnabled"
+                  type="checkbox"
+                  class="toggle toggle-primary"
+                />
+              </div>
+
+              <!-- Latency Weight -->
+              <div
+                class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 transition-colors hover:bg-base-content/5"
+              >
+                <div class="flex items-center gap-2 text-sm">
+                  <span>{{ t('recommendation.latencyWeight') }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <input
+                    v-model.number="
+                      nodeRecommendationStore.scoringWeights.latency
+                    "
+                    type="range"
+                    min="0"
+                    max="100"
+                    class="range w-24 range-primary range-xs"
+                  />
+                  <span class="w-8 text-right font-mono text-xs"
+                    >{{ nodeRecommendationStore.scoringWeights.latency }}%</span
+                  >
+                </div>
+              </div>
+
+              <!-- Stability Weight -->
+              <div
+                class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 transition-colors hover:bg-base-content/5"
+              >
+                <div class="flex items-center gap-2 text-sm">
+                  <span>{{ t('recommendation.stabilityWeight') }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <input
+                    v-model.number="
+                      nodeRecommendationStore.scoringWeights.stability
+                    "
+                    type="range"
+                    min="0"
+                    max="100"
+                    class="range w-24 range-secondary range-xs"
+                  />
+                  <span class="w-8 text-right font-mono text-xs"
+                    >{{
+                      nodeRecommendationStore.scoringWeights.stability
+                    }}%</span
+                  >
+                </div>
+              </div>
+
+              <!-- Success Rate Weight -->
+              <div
+                class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 transition-colors hover:bg-base-content/5"
+              >
+                <div class="flex items-center gap-2 text-sm">
+                  <span>{{ t('recommendation.successRateWeight') }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <input
+                    v-model.number="
+                      nodeRecommendationStore.scoringWeights.successRate
+                    "
+                    type="range"
+                    min="0"
+                    max="100"
+                    class="range w-24 range-accent range-xs"
+                  />
+                  <span class="w-8 text-right font-mono text-xs"
+                    >{{
+                      nodeRecommendationStore.scoringWeights.successRate
+                    }}%</span
+                  >
+                </div>
+              </div>
+
+              <!-- Min Test Interval -->
+              <div
+                class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 transition-colors hover:bg-base-content/5"
+              >
+                <div class="flex items-center gap-2 text-sm">
+                  <span>{{ t('recommendation.minTestInterval') }}</span>
+                </div>
+                <input
+                  v-model.number="nodeRecommendationStore.minTestInterval"
+                  type="number"
+                  min="1"
+                  max="60"
+                  class="input-bordered input input-sm w-20 text-center"
+                />
+              </div>
+
+              <!-- Excluded Nodes Count -->
+              <div
+                class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 transition-colors hover:bg-base-content/5"
+              >
+                <div class="flex items-center gap-2 text-sm">
+                  <span>{{ t('recommendation.excludedNodes') }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="badge badge-neutral">{{
+                    nodeRecommendationStore.excludedNodes.length
+                  }}</span>
+                  <button
+                    v-if="nodeRecommendationStore.excludedNodes.length > 0"
+                    class="btn btn-ghost btn-xs"
+                    @click="nodeRecommendationStore.excludedNodes = []"
+                  >
+                    {{ t('clearAll') }}
+                  </button>
+                </div>
+              </div>
+
+              <!-- Clear History Button -->
+              <Button
+                class="mt-2 w-full btn-outline btn-warning"
+                @click="nodeRecommendationStore.clearAllData()"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="size-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"
+                  />
+                </svg>
+                {{ t('recommendation.clearHistory') }}
+              </Button>
+            </div>
 
             <div class="divider my-2 text-xs opacity-40">ENDPOINT</div>
 
