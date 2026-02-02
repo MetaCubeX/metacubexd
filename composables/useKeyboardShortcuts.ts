@@ -1,5 +1,5 @@
 import type { ShortcutAction } from '~/constants/shortcuts'
-import { useActiveElement, useMagicKeys } from '@vueuse/core'
+import { useActiveElement } from '@vueuse/core'
 import { ROUTES } from '~/constants'
 
 export function useKeyboardShortcuts() {
@@ -21,9 +21,6 @@ export function useKeyboardShortcuts() {
       el.getAttribute('contenteditable') === 'true'
     )
   })
-
-  // Magic keys for keyboard detection
-  const keys = useMagicKeys()
 
   // Track "g" prefix for navigation shortcuts
   const gPrefixActive = ref(false)
@@ -80,92 +77,74 @@ export function useKeyboardShortcuts() {
     }
   }
 
-  // Parse shortcut string to check if it matches current key state
-  const parseShortcut = (
-    shortcut: string,
-  ): { prefix: string | null; key: string } => {
-    if (shortcut.includes('+')) {
-      const [prefix, key] = shortcut.split('+')
-      return { prefix: prefix ?? null, key: key ?? shortcut }
+  // Navigation key mapping
+  const navigationKeyMap: Record<string, ShortcutAction> = {
+    o: 'goToOverview',
+    p: 'goToProxies',
+    c: 'goToConnections',
+    u: 'goToRules',
+    l: 'goToLogs',
+    s: 'goToConfig',
+  }
+
+  // Keyboard event handler
+  const handleKeyDown = (event: KeyboardEvent) => {
+    // Skip if in input field
+    if (isInputFocused.value) return
+
+    const key = event.key.toLowerCase()
+
+    // Handle Escape
+    if (key === 'escape') {
+      executeAction('closeModal')
+      return
     }
-    return { prefix: null, key: shortcut }
-  }
 
-  // Watch for key presses
-  const setupKeyboardListeners = () => {
-    const shortcuts = shortcutsStore.shortcuts
+    // Handle ? (Shift + /)
+    if (event.shiftKey && (key === '/' || key === '?')) {
+      event.preventDefault()
+      executeAction('showHelp')
+      return
+    }
 
-    // Watch for 'g' key to activate prefix mode
-    watch(
-      () => keys.g?.value,
-      (pressed) => {
-        if (pressed && !isInputFocused.value) {
-          setGPrefix()
-        }
-      },
-    )
+    // Handle g prefix
+    if (key === 'g' && !gPrefixActive.value) {
+      setGPrefix()
+      return
+    }
 
-    // Navigation shortcuts (g + key)
-    const navigationActions: ShortcutAction[] = [
-      'goToOverview',
-      'goToProxies',
-      'goToConnections',
-      'goToRules',
-      'goToLogs',
-      'goToConfig',
-    ]
-
-    navigationActions.forEach((action) => {
-      const shortcut = shortcuts[action]
-      const parsed = parseShortcut(shortcut)
-
-      if (parsed.prefix === 'g') {
-        const keyRef = keys[parsed.key as keyof typeof keys]
-        if (keyRef && typeof keyRef === 'object' && 'value' in keyRef) {
-          watch(
-            () => (keyRef as Ref<boolean>).value,
-            (pressed) => {
-              if (pressed && gPrefixActive.value && !isInputFocused.value) {
-                executeAction(action)
-                clearGPrefix()
-              }
-            },
-          )
-        }
+    // Handle navigation shortcuts (g + key)
+    if (gPrefixActive.value) {
+      const action = navigationKeyMap[key]
+      if (action) {
+        event.preventDefault()
+        executeAction(action)
+        clearGPrefix()
+        return
       }
-    })
+    }
 
-    // Single key shortcuts
-    // Refresh (r)
-    watch(
-      () => keys.r?.value,
-      (pressed) => {
-        if (pressed && !isInputFocused.value && !gPrefixActive.value) {
-          executeAction('refresh')
-        }
-      },
-    )
-
-    // Show help (?) - using shift+slash combination
-    watch(
-      () => keys['?']?.value,
-      (pressed) => {
-        if (pressed && !isInputFocused.value) {
-          executeAction('showHelp')
-        }
-      },
-    )
-
-    // Escape
-    watch(
-      () => keys.escape?.value,
-      (pressed) => {
-        if (pressed) {
-          executeAction('closeModal')
-        }
-      },
-    )
+    // Handle r for refresh (only if g prefix is not active)
+    if (key === 'r' && !gPrefixActive.value) {
+      executeAction('refresh')
+      
+    }
   }
+
+  // Setup keyboard listeners using native event listener
+  const setupKeyboardListeners = () => {
+    if (import.meta.client) {
+      window.addEventListener('keydown', handleKeyDown)
+    }
+  }
+
+  // Cleanup on unmount
+  onUnmounted(() => {
+    if (import.meta.client) {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+    clearGPrefix()
+  })
 
   return {
     isInputFocused,
