@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.237.0](https://github.com/MetaCubeX/metacubexd/compare/v1.236.1...v1.237.0) (2026-02-02)
+
+
+### Features
+
+* **config:** add recommendation settings and fix shortcut button layout ([a6181c6](https://github.com/MetaCubeX/metacubexd/commit/a6181c6ecdf87a91bc0da86025b41e122c8e8bac))
+* **proxies:** add smart node recommendation with batch testing and scoring ([14df403](https://github.com/MetaCubeX/metacubexd/commit/14df4033908201761ae802da14c4ec51f96ee8e8))
+
+
+### Bug Fixes
+
+* **e2e:** fix keyboard shortcuts and test stability ([8c078d4](https://github.com/MetaCubeX/metacubexd/commit/8c078d4da7b42a66f383584f8ad3e7c3e49c150e))
+
 ## [1.236.1](https://github.com/MetaCubeX/metacubexd/compare/v1.236.0...v1.236.1) (2026-01-29)
 
 
