@@ -18,7 +18,7 @@
     "preview": "nuxt preview --host",
     "screenshot": "tsx scripts/screenshot.ts",
     "test:e2e": "vitest run e2e/",
-    "test:unit": "vitest run **/__tests__/**/*.spec.ts",
+    "test:unit": "vitest run --exclude='e2e/**'",
     "test:coverage": "vitest run --coverage",
     "typecheck": "vue-tsc --noEmit"
   },
