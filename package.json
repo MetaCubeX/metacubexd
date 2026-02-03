@@ -19,7 +19,7 @@
     "screenshot": "tsx scripts/screenshot.ts",
     "test:e2e": "vitest run e2e/",
     "test:unit": "vitest run --exclude='e2e/**'",
-    "test:coverage": "vitest run --coverage",
+    "test:coverage": "vitest run --coverage --exclude='e2e/**'",
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
