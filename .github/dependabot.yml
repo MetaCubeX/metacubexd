@@ -3,7 +3,11 @@ updates:
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: daily
+      interval: weekly
+    groups:
+      all-npm-dependencies:
+        patterns:
+          - '*'
 
   - package-ecosystem: docker
     directory: /
