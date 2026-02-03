@@ -18,6 +18,8 @@
     "preview": "nuxt preview --host",
     "screenshot": "tsx scripts/screenshot.ts",
     "test:e2e": "vitest run e2e/",
+    "test:unit": "vitest run **/__tests__/**/*.spec.ts",
+    "test:coverage": "vitest run --coverage",
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
@@ -84,5 +86,9 @@
     "vue-tsc": "^3.2.3",
     "zod": "^4.3.6"
   },
-  "packageManager": "pnpm@10.28.1"
+  "packageManager": "pnpm@10.28.1",
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.0.18",
+    "jsdom": "^28.0.0"
+  }
 }
