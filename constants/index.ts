@@ -45,7 +45,7 @@ export enum ROUTES {
   Setup = '/setup',
 }
 
-export const CHART_MAX_XAXIS = 10
+export const CHART_MAX_XAXIS = 30
 
 export enum LATENCY_QUALITY_MAP_HTTP {
   NOT_CONNECTED = 0,

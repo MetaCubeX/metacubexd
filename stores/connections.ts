@@ -306,12 +306,15 @@ export const useConnectionsStore = defineStore('connections', () => {
     dataUsageMap.value = updates
   }
 
-  // Computed: speed grouped by proxy name
+  // Computed: speed grouped by proxy name (excluding proxy groups)
   const speedGroupByName = computed(() => {
+    const proxiesStore = useProxiesStore()
     const returnMap: Record<string, number> = {}
 
     activeConnections.value.forEach((c) => {
       c.chains.forEach((chain) => {
+        if (proxiesStore.isProxyGroup(chain)) return
+
         if (!returnMap[chain]) {
           returnMap[chain] = 0
         }

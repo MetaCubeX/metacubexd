@@ -88,6 +88,20 @@ const latencyTrendData = computed(() => {
   const min = Math.min(...latencies)
   const max = Math.max(...latencies)
   const range = max - min || 1
+  const avg = Math.round(
+    latencies.reduce((a, b) => a + b, 0) / latencies.length,
+  )
+
+  // Calculate jitter (standard deviation)
+  const variance =
+    latencies.reduce((sum, lat) => sum + (lat - avg)**2, 0) /
+    latencies.length
+  const jitter = Math.round(Math.sqrt(variance))
+
+  // Calculate success rate
+  const totalTests = perf.history.length
+  const successTests = perf.history.filter((h) => h.success).length
+  const successRate = Math.round((successTests / totalTests) * 100)
 
   // Normalize to 0-100 for SVG viewBox
   const points = latencies.map((lat, i) => ({
@@ -99,7 +113,11 @@ const latencyTrendData = computed(() => {
     points,
     min,
     max,
-    avg: Math.round(latencies.reduce((a, b) => a + b, 0) / latencies.length),
+    avg,
+    jitter,
+    successRate,
+    totalTests,
+    successTests,
   }
 })
 
@@ -151,6 +169,19 @@ const latencyTestHistory = computed(() =>
     .getLatencyHistoryByName(props.proxyName, props.testUrl)
     .toReversed(),
 )
+
+// Stability bar: chronological order, each segment colored by latency quality
+const latencyStabilityBar = computed(() => {
+  const history = proxiesStore.getLatencyHistoryByName(
+    props.proxyName,
+    props.testUrl,
+  )
+  return history.map((result) => ({
+    colorClass: result.delay
+      ? getLatencyClassName(result.delay, configStore.latencyQualityMap)
+      : 'text-neutral-content/30',
+  }))
+})
 
 // Floating UI for tooltip
 const reference = ref<HTMLElement | null>(null)
@@ -208,10 +239,30 @@ function clearTimeouts() {
   }
 }
 
+function openTooltip() {
+  isTooltipOpen.value = true
+  document.addEventListener('click', onDocumentClick, true)
+  document.addEventListener('touchstart', onDocumentClick, true)
+}
+
+function closeTooltip() {
+  isTooltipOpen.value = false
+  document.removeEventListener('click', onDocumentClick, true)
+  document.removeEventListener('touchstart', onDocumentClick, true)
+}
+
+function onDocumentClick(e: Event) {
+  const target = e.target as Node
+  if (reference.value?.contains(target) || floating.value?.contains(target)) {
+    return
+  }
+  closeTooltip()
+}
+
 function onMouseEnter() {
   clearTimeouts()
   openTimeout = setTimeout(() => {
-    isTooltipOpen.value = true
+    openTooltip()
   }, 300)
 }
 
@@ -219,7 +270,7 @@ function onMouseLeave() {
   clearTimeouts()
   // Delay closing to allow mouse to move to tooltip
   closeTimeout = setTimeout(() => {
-    isTooltipOpen.value = false
+    closeTooltip()
   }, 100)
 }
 
@@ -229,8 +280,22 @@ function onTooltipMouseEnter() {
 
 function onTooltipMouseLeave() {
   clearTimeouts()
-  isTooltipOpen.value = false
+  closeTooltip()
 }
+
+function onTouchStart(e: TouchEvent) {
+  if (isTooltipOpen.value) {
+    return
+  }
+  e.preventDefault()
+  openTooltip()
+}
+
+onBeforeUnmount(() => {
+  clearTimeouts()
+  document.removeEventListener('click', onDocumentClick, true)
+  document.removeEventListener('touchstart', onDocumentClick, true)
+})
 
 function onClick() {
   emit('click')
@@ -262,6 +327,7 @@ function handleLatencyTest() {
       ]"
       @mouseenter="onMouseEnter"
       @mouseleave="onMouseLeave"
+      @touchstart="onTouchStart"
     >
       <!-- UDP indicator -->
       <div
@@ -317,6 +383,19 @@ function handleLatencyTest() {
             @click.stop="handleLatencyTest"
           />
         </div>
+
+        <!-- Latency stability bar -->
+        <div
+          v-if="latencyTestHistory.length > 1"
+          class="flex h-1.5 w-full gap-px overflow-hidden rounded-full"
+        >
+          <div
+            v-for="(result, index) in latencyStabilityBar"
+            :key="index"
+            class="h-full flex-1 bg-current first:rounded-l-full last:rounded-r-full"
+            :class="result.colorClass"
+          />
+        </div>
       </div>
 
       <!-- Tooltip for latency history -->
@@ -326,7 +405,7 @@ function handleLatencyTest() {
             v-if="isTooltipOpen"
             ref="floating"
             :style="floatingStyles"
-            class="z-50 w-max max-w-80 rounded-xl bg-primary p-3 text-primary-content shadow-[0_10px_40px_color-mix(in_oklch,var(--color-base-content)_30%,transparent)]"
+            class="z-50 w-max max-w-80 rounded-xl bg-primary p-3 text-primary-content shadow-[0_10px_40px_color-mix(in_oklch,var(--color-base-content)_30%,transparent)] transition-[opacity,transform] duration-200"
             @mouseenter="onTooltipMouseEnter"
             @mouseleave="onTooltipMouseLeave"
           >
@@ -395,10 +474,22 @@ function handleLatencyTest() {
                     class="opacity-60"
                   />
                 </svg>
+                <!-- Stability stats -->
+                <div
+                  class="mt-1 flex items-center justify-between text-[0.625rem] opacity-70"
+                >
+                  <span>jitter: {{ latencyTrendData.jitter }}ms</span>
+                  <span
+                    >{{ latencyTrendData.successTests }}/{{
+                      latencyTrendData.totalTests
+                    }}
+                    ({{ latencyTrendData.successRate }}%)</span
+                  >
+                </div>
               </div>
 
               <template v-if="latencyTestHistory.length > 0">
-                <ul class="m-0 max-h-60 w-full list-none overflow-y-auto p-0">
+                <ul class="m-0 max-h-48 w-full list-none overflow-y-auto p-0">
                   <li
                     v-for="(result, index) in latencyTestHistory"
                     :key="index"
@@ -409,20 +500,39 @@ function handleLatencyTest() {
                       <div class="shrink-0 opacity-80">
                         <IconCircleCheckFilled class="size-4" />
                       </div>
-                      <div class="flex min-w-0 flex-col gap-1">
+                      <div class="flex min-w-0 flex-1 flex-col gap-1">
                         <time class="text-xs italic opacity-80">
                           {{ dayjs(result.time).format('YYYY-MM-DD HH:mm:ss') }}
                         </time>
-                        <div
-                          class="inline-block rounded-full px-2 py-0.5 text-xs font-semibold"
-                          :class="
-                            getLatencyClassName(
-                              result.delay,
-                              configStore.latencyQualityMap,
-                            )
-                          "
-                        >
-                          {{ result.delay || '---' }}
+                        <div class="flex items-center gap-2">
+                          <div
+                            class="inline-block rounded-full px-2 py-0.5 text-xs font-semibold"
+                            :class="
+                              getLatencyClassName(
+                                result.delay,
+                                configStore.latencyQualityMap,
+                              )
+                            "
+                          >
+                            {{ result.delay || '---' }}
+                          </div>
+                          <div
+                            v-if="result.delay && latencyTrendData"
+                            class="h-1.5 flex-1 overflow-hidden rounded-full bg-[color-mix(in_oklch,var(--color-primary-content)_15%,transparent)]"
+                          >
+                            <div
+                              class="h-full rounded-full bg-current transition-all duration-300"
+                              :class="
+                                getLatencyClassName(
+                                  result.delay,
+                                  configStore.latencyQualityMap,
+                                )
+                              "
+                              :style="{
+                                width: `${Math.min((result.delay / latencyTrendData.max) * 100, 100)}%`,
+                              }"
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -464,5 +574,18 @@ function handleLatencyTest() {
     box-shadow: 0 0 25px
       color-mix(in oklch, var(--color-primary) 60%, transparent);
   }
+}
+
+.proxy-tooltip-enter-active,
+.proxy-tooltip-leave-active {
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+
+.proxy-tooltip-enter-from,
+.proxy-tooltip-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
 }
 </style>
