@@ -215,72 +215,63 @@ function handleLatencyTest() {
 
       <!-- Tooltip for latency history -->
       <Teleport to="body">
-        <Transition
-          enter-active-class="transition-all duration-200 ease-out"
-          leave-active-class="transition-all duration-150 ease-in"
-          enter-from-class="opacity-0 scale-95"
-          leave-to-class="opacity-0 scale-95"
+        <div
+          v-if="isTooltipOpen"
+          ref="floating"
+          :style="floatingStyles"
+          class="z-50 w-max max-w-80 rounded-xl bg-primary p-2.5 text-primary-content shadow-lg"
+          @mouseenter="onTooltipMouseEnter"
+          @mouseleave="onTooltipMouseLeave"
         >
+          <!-- Arrow -->
           <div
-            v-if="isTooltipOpen"
-            ref="floating"
-            :style="floatingStyles"
-            class="z-50 w-max max-w-80 rounded-xl bg-primary p-2.5 text-primary-content shadow-lg"
-            @mouseenter="onTooltipMouseEnter"
-            @mouseleave="onTooltipMouseLeave"
-          >
-            <!-- Arrow -->
-            <div
-              ref="floatingArrow"
-              class="absolute size-2 rotate-45 bg-primary"
-              :style="arrowStyles"
-            />
+            ref="floatingArrow"
+            class="absolute size-2 rotate-45 bg-primary"
+            :style="arrowStyles"
+          />
 
-            <div class="flex flex-col items-center gap-2">
-              <h2 class="text-lg font-bold">{{ proxyName }}</h2>
+          <div class="flex flex-col items-center gap-2">
+            <h2 class="text-lg font-bold">{{ proxyName }}</h2>
 
-              <div v-if="specialTypes" class="w-full text-xs uppercase">
-                ({{ specialTypes }})
-              </div>
+            <div v-if="specialTypes" class="w-full text-xs uppercase">
+              ({{ specialTypes }})
+            </div>
 
-              <template v-if="latencyTestHistory.length > 0">
+            <template v-if="latencyTestHistory.length > 0">
+              <div class="flex max-h-60 w-full flex-col gap-2 overflow-y-auto">
                 <div
-                  class="flex max-h-60 w-full flex-col gap-2 overflow-y-auto"
+                  v-for="(result, index) in latencyTestHistory"
+                  :key="index"
+                  class="flex items-start gap-2"
                 >
                   <div
-                    v-for="(result, index) in latencyTestHistory"
-                    :key="index"
-                    class="flex items-start gap-2"
-                  >
+                    class="mt-1.5 size-2 rounded-full bg-current opacity-50"
+                  />
+                  <div class="flex flex-col gap-1">
+                    <time class="text-sm italic">
+                      {{ dayjs(result.time).format('YYYY-MM-DD HH:mm:ss') }}
+                    </time>
                     <div
-                      class="mt-1.5 size-2 rounded-full bg-current opacity-50"
-                    />
-                    <div class="flex flex-col gap-1">
-                      <time class="text-sm italic">
-                        {{ dayjs(result.time).format('YYYY-MM-DD HH:mm:ss') }}
-                      </time>
-                      <div
-                        class="inline-block rounded px-2 py-0.5 text-xs"
-                        :class="
-                          getLatencyClassName(
-                            result.delay,
-                            configStore.latencyQualityMap,
-                          )
-                        "
-                      >
-                        {{ result.delay || '---' }}
-                      </div>
+                      class="inline-block rounded px-2 py-0.5 text-xs"
+                      :class="
+                        getLatencyClassName(
+                          result.delay,
+                          configStore.latencyQualityMap,
+                        )
+                      "
+                    >
+                      {{ result.delay || '---' }}
                     </div>
                   </div>
                 </div>
-              </template>
-
-              <div v-else class="text-sm opacity-75">
-                {{ t('noLatencyHistory') }}
               </div>
+            </template>
+
+            <div v-else class="text-sm opacity-75">
+              {{ t('noLatencyHistory') }}
             </div>
           </div>
-        </Transition>
+        </div>
       </Teleport>
     </div>
   </div>
