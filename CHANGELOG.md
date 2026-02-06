@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.239.0](https://github.com/MetaCubeX/metacubexd/compare/v1.238.1...v1.239.0) (2026-02-06)
+
+
+### Features
+
+* make proxy preview auto-switch threshold configurable ([#1817](https://github.com/MetaCubeX/metacubexd/issues/1817)) ([a6cbc2c](https://github.com/MetaCubeX/metacubexd/commit/a6cbc2c8c3dedca5fdf25d84947f33983b3e934b))
+
+
+### Bug Fixes
+
+* remove popover animation from latency history tooltip ([9e0009c](https://github.com/MetaCubeX/metacubexd/commit/9e0009c9e116f8f8c0476bd3c023beb53be68ce5))
+
 ## [1.238.1](https://github.com/MetaCubeX/metacubexd/compare/v1.238.0...v1.238.1) (2026-02-06)
 
 
