@@ -179,7 +179,7 @@ function handleLatencyTest() {
         <IconCircleCheckFilled v-if="isSelected" class="size-4 shrink-0" />
 
         <!-- Proxy name -->
-        <span class="min-w-0 flex-1 truncate text-sm font-medium">
+        <span class="line-clamp-1 min-w-0 flex-1 text-sm font-medium break-all">
           {{ proxyName }}
         </span>
 

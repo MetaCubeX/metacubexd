@@ -419,12 +419,7 @@ export async function backendReleaseAPI(currentVersion: string) {
   const repositoryURL = 'repos/MetaCubeX/mihomo'
   const match = /(alpha|beta|meta)-?(\w+)/.exec(currentVersion)
 
-  if (!match) return { isUpdateAvailable: false }
-
-  const versionSuffix = match[2] || ''
-  const channel = match[1] || ''
-
-  const release = async (url: string) => {
+  const releaseByAssets = async (url: string, versionSuffix: string) => {
     const { assets, body } = await githubAPI
       .get(`${repositoryURL}/${url}`)
       .json<ReleaseAPIResponse>()
@@ -439,12 +434,31 @@ export async function backendReleaseAPI(currentVersion: string) {
     }
   }
 
-  if (channel === 'meta') return await release('releases/latest')
+  if (match) {
+    const versionSuffix = match[2] || ''
+    const channel = match[1] || ''
 
-  if (channel === 'alpha')
-    return await release('releases/tags/Prerelease-Alpha')
+    if (channel === 'meta')
+      return await releaseByAssets('releases/latest', versionSuffix)
 
-  return { isUpdateAvailable: false }
+    if (channel === 'alpha')
+      return await releaseByAssets(
+        'releases/tags/Prerelease-Alpha',
+        versionSuffix,
+      )
+
+    return { isUpdateAvailable: false }
+  }
+
+  // Stable version (e.g. "v1.19.9") - compare tag_name directly
+  const { tag_name, body } = await githubAPI
+    .get(`${repositoryURL}/releases/latest`)
+    .json<ReleaseAPIResponse>()
+
+  return {
+    isUpdateAvailable: tag_name !== currentVersion,
+    changelog: body,
+  }
 }
 
 export async function fetchFrontendReleasesAPI(
@@ -474,7 +488,25 @@ export async function fetchBackendReleasesAPI(
   const repositoryURL = 'repos/MetaCubeX/mihomo'
   const match = /(alpha|beta|meta)-?(\w+)/.exec(currentVersion)
 
-  if (!match) return []
+  if (!match) {
+    // Stable version (e.g. "v1.19.9") - fetch stable releases
+    let releases = await githubAPI
+      .get(`${repositoryURL}/releases`, {
+        searchParams: { per_page: count },
+      })
+      .json<ReleaseAPIResponse[]>()
+    releases = releases.filter(
+      (r) =>
+        !r.tag_name.includes('Alpha') && !r.tag_name.includes('Prerelease'),
+    )
+
+    return releases.map((release) => ({
+      version: release.tag_name,
+      changelog: release.body,
+      publishedAt: release.published_at,
+      isCurrent: release.tag_name === currentVersion,
+    }))
+  }
 
   const channel = match[1] || ''
   const versionSuffix = match[2] || ''

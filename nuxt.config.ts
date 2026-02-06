@@ -40,7 +40,7 @@ export default defineNuxtConfig({
     strategy: 'no_prefix',
     detectBrowserLanguage: {
       useCookie: true,
-      cookieKey: 'lang',
+      cookieKey: 'metacubexd_lang',
       fallbackLocale: 'en',
     },
   },

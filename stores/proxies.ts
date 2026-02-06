@@ -124,7 +124,12 @@ export const useProxiesStore = defineStore('proxies', () => {
         provider,
       }
 
-      newLatencyMap[proxy.name] = allTestUrlLatency
+      const hasNewLatency = Object.values(allTestUrlLatency).some(
+        (v) => v !== configStore.latencyQualityMap.NOT_CONNECTED,
+      )
+      if (hasNewLatency || !newLatencyMap[proxy.name]) {
+        newLatencyMap[proxy.name] = allTestUrlLatency
+      }
     })
 
     proxyNodeMap.value = newProxyNodeMap
