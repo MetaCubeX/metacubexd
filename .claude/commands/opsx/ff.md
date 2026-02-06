@@ -1,21 +1,17 @@
 ---
-name: openspec-ff-change
-description: Fast-forward through OpenSpec artifact creation. Use when the user wants to quickly create all artifacts needed for implementation without stepping through each one individually.
-license: MIT
-compatibility: Requires openspec CLI.
-metadata:
-  author: openspec
-  version: '1.0'
-  generatedBy: '1.1.1'
+name: 'OPSX: Fast Forward'
+description: Create a change and generate all artifacts needed for implementation in one go
+category: Workflow
+tags: [workflow, artifacts, experimental]
 ---
 
-Fast-forward through artifact creation - generate everything needed to start implementation in one go.
+Fast-forward through artifact creation - generate everything needed to start implementation.
 
-**Input**: The user's request should include a change name (kebab-case) OR a description of what they want to build.
+**Input**: The argument after `/opsx:ff` is the change name (kebab-case), OR a description of what the user wants to build.
 
 **Steps**
 
-1. **If no clear input provided, ask what they want to build**
+1. **If no input provided, ask what they want to build**
 
    Use the **AskUserQuestion tool** (open-ended, no preset options) to ask:
 
@@ -87,22 +83,19 @@ After completing all artifacts, summarize:
 - Change name and location
 - List of artifacts created with brief descriptions
 - What's ready: "All artifacts created! Ready for implementation."
-- Prompt: "Run `/opsx-apply` or ask me to implement to start working on the tasks."
+- Prompt: "Run `/opsx:apply` to start implementing."
 
 **Artifact Creation Guidelines**
 
 - Follow the `instruction` field from `openspec instructions` for each artifact type
 - The schema defines what each artifact should contain - follow it
 - Read dependency artifacts for context before creating new ones
-- Use `template` as the structure for your output file - fill in its sections
-- **IMPORTANT**: `context` and `rules` are constraints for YOU, not content for the file
-  - Do NOT copy `<context>`, `<rules>`, `<project_context>` blocks into the artifact
-  - These guide what you write, but should never appear in the output
+- Use the `template` as a starting point, filling in based on context
 
 **Guardrails**
 
 - Create ALL artifacts needed for implementation (as defined by schema's `apply.requires`)
 - Always read dependency artifacts before creating a new one
 - If context is critically unclear, ask the user - but prefer making reasonable decisions to keep momentum
-- If a change with that name already exists, suggest continuing that change instead
+- If a change with that name already exists, ask if user wants to continue it or create a new one
 - Verify each artifact file exists after writing before proceeding to next

@@ -1,10 +1,13 @@
 ---
+name: 'OPSX: Archive'
 description: Archive a completed change in the experimental workflow
+category: Workflow
+tags: [workflow, archive, experimental]
 ---
 
 Archive a completed change in the experimental workflow.
 
-**Input**: Optionally specify a change name after `/opsx-archive` (e.g., `/opsx-archive add-auth`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
+**Input**: Optionally specify a change name after `/opsx:archive` (e.g., `/opsx:archive add-auth`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
 **Steps**
 
@@ -56,7 +59,7 @@ Archive a completed change in the experimental workflow.
    - If changes needed: "Sync now (recommended)", "Archive without syncing"
    - If already synced: "Archive now", "Sync anyway", "Cancel"
 
-   If user chooses sync, execute `/opsx-sync` logic. Proceed to archive regardless of choice.
+   If user chooses sync, execute `/opsx:sync` logic. Proceed to archive regardless of choice.
 
 5. **Perform the archive**
 
@@ -152,5 +155,5 @@ Target archive directory already exists.
 - Don't block archive on warnings - just inform and confirm
 - Preserve .openspec.yaml when moving to archive (it moves with the directory)
 - Show clear summary of what happened
-- If sync is requested, use /opsx-sync approach (agent-driven)
+- If sync is requested, use /opsx:sync approach (agent-driven)
 - If delta specs exist, always run the sync assessment and show the combined summary before prompting

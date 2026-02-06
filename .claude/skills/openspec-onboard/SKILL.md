@@ -23,7 +23,7 @@ openspec status --json 2>&1 || echo "NOT_INITIALIZED"
 
 **If not initialized:**
 
-> OpenSpec isn't set up in this project yet. Run `openspec init` first, then come back to `/opsx-onboard`.
+> OpenSpec isn't set up in this project yet. Run `openspec init` first, then come back to `/opsx:onboard`.
 
 Stop here if not initialized.
 
@@ -150,7 +150,7 @@ Spend 1-2 minutes investigating the relevant code:
 │   [Optional: ASCII diagram if helpful]  │
 └─────────────────────────────────────────┘
 
-Explore mode (`/opsx-explore`) is for this kind of thinking—investigating before implementing. You can use it anytime you need to think through a problem.
+Explore mode (`/opsx:explore`) is for this kind of thinking—investigating before implementing. You can use it anytime you need to think through a problem.
 
 Now let's create a change to hold our work.
 ```
@@ -479,19 +479,19 @@ This same rhythm works for any size change—a small fix or a major feature.
 
 | Command | What it does |
 |---------|--------------|
-| `/opsx-explore` | Think through problems before/during work |
-| `/opsx-new` | Start a new change, step through artifacts |
-| `/opsx-ff` | Fast-forward: create all artifacts at once |
-| `/opsx-continue` | Continue working on an existing change |
-| `/opsx-apply` | Implement tasks from a change |
-| `/opsx-verify` | Verify implementation matches artifacts |
-| `/opsx-archive` | Archive a completed change |
+| `/opsx:explore` | Think through problems before/during work |
+| `/opsx:new` | Start a new change, step through artifacts |
+| `/opsx:ff` | Fast-forward: create all artifacts at once |
+| `/opsx:continue` | Continue working on an existing change |
+| `/opsx:apply` | Implement tasks from a change |
+| `/opsx:verify` | Verify implementation matches artifacts |
+| `/opsx:archive` | Archive a completed change |
 
 ---
 
 ## What's Next?
 
-Try `/opsx-new` or `/opsx-ff` on something you actually want to build. You've got the rhythm now!
+Try `/opsx:new` or `/opsx:ff` on something you actually want to build. You've got the rhythm now!
 ```
 
 ---
@@ -506,8 +506,8 @@ If the user says they need to stop, want to pause, or seem disengaged:
 No problem! Your change is saved at `openspec/changes/<name>/`.
 
 To pick up where we left off later:
-- `/opsx-continue <name>` - Resume artifact creation
-- `/opsx-apply <name>` - Jump to implementation (if tasks exist)
+- `/opsx:continue <name>` - Resume artifact creation
+- `/opsx:apply <name>` - Jump to implementation (if tasks exist)
 
 The work won't be lost. Come back whenever you're ready.
 ```
@@ -523,15 +523,15 @@ If the user says they just want to see the commands or skip the tutorial:
 
 | Command | What it does |
 |---------|--------------|
-| `/opsx-explore` | Think through problems (no code changes) |
-| `/opsx-new <name>` | Start a new change, step by step |
-| `/opsx-ff <name>` | Fast-forward: all artifacts at once |
-| `/opsx-continue <name>` | Continue an existing change |
-| `/opsx-apply <name>` | Implement tasks |
-| `/opsx-verify <name>` | Verify implementation |
-| `/opsx-archive <name>` | Archive when done |
+| `/opsx:explore` | Think through problems (no code changes) |
+| `/opsx:new <name>` | Start a new change, step by step |
+| `/opsx:ff <name>` | Fast-forward: all artifacts at once |
+| `/opsx:continue <name>` | Continue an existing change |
+| `/opsx:apply <name>` | Implement tasks |
+| `/opsx:verify <name>` | Verify implementation |
+| `/opsx:archive <name>` | Archive when done |
 
-Try `/opsx-new` to start your first change, or `/opsx-ff` if you want to move fast.
+Try `/opsx:new` to start your first change, or `/opsx:ff` if you want to move fast.
 ```
 
 Exit gracefully.

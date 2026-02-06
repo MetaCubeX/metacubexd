@@ -1,5 +1,8 @@
 ---
+name: 'OPSX: Bulk Archive'
 description: Archive multiple completed changes at once
+category: Workflow
+tags: [workflow, archive, experimental, bulk]
 ---
 
 Archive multiple completed changes in a single operation.
@@ -227,7 +230,7 @@ Failed K changes:
 ```
 ## No Changes to Archive
 
-No active changes found. Use `/opsx-new` to create a new change.
+No active changes found. Use `/opsx:new` to create a new change.
 ```
 
 **Guardrails**
