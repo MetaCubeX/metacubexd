@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.238.1](https://github.com/MetaCubeX/metacubexd/compare/v1.238.0...v1.238.1) (2026-02-06)
+
+
+### Bug Fixes
+
+* resolve multiple issues ([#1834](https://github.com/MetaCubeX/metacubexd/issues/1834), [#1814](https://github.com/MetaCubeX/metacubexd/issues/1814), [#1485](https://github.com/MetaCubeX/metacubexd/issues/1485), [#1129](https://github.com/MetaCubeX/metacubexd/issues/1129)) ([6d473c7](https://github.com/MetaCubeX/metacubexd/commit/6d473c7aa623e2a887e80c58a8d2339baf62a8d8))
+
 ## [1.238.0](https://github.com/MetaCubeX/metacubexd/compare/v1.237.0...v1.238.0) (2026-02-06)
 
 
