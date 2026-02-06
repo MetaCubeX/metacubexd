@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.240.0](https://github.com/MetaCubeX/metacubexd/compare/v1.239.0...v1.240.0) (2026-02-06)
+
+
+### Features
+
+* support linux/arm64 docker image ([#1851](https://github.com/MetaCubeX/metacubexd/issues/1851)) ([e5c6875](https://github.com/MetaCubeX/metacubexd/commit/e5c68759993d1d312ae07b76eaa7467cd265c31d)), closes [#1815](https://github.com/MetaCubeX/metacubexd/issues/1815)
+
 ## [1.239.0](https://github.com/MetaCubeX/metacubexd/compare/v1.238.1...v1.239.0) (2026-02-06)
 
 
