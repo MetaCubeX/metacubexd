@@ -35,6 +35,10 @@ export const useConfigStore = defineStore('config', () => {
     'proxiesPreviewType',
     PROXIES_PREVIEW_TYPE.Auto,
   )
+  const proxiesPreviewAutoThreshold = useLocalStorage<number>(
+    'proxiesPreviewAutoThreshold',
+    10,
+  )
   const proxiesOrderingType = useLocalStorage<PROXIES_ORDERING_TYPE>(
     'proxiesOrderingType',
     PROXIES_ORDERING_TYPE.NATURAL,
@@ -166,6 +170,7 @@ export const useConfigStore = defineStore('config', () => {
     favNightTheme,
     // Proxies
     proxiesPreviewType,
+    proxiesPreviewAutoThreshold,
     proxiesOrderingType,
     proxiesDisplayMode,
     renderProxiesInTwoColumns,

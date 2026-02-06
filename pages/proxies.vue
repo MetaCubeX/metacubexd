@@ -866,6 +866,20 @@ const ProviderProxyNodes = defineComponent({
               {{ t('off') }}
             </option>
           </select>
+
+          <template
+            v-if="configStore.proxiesPreviewType === PROXIES_PREVIEW_TYPE.Auto"
+          >
+            <ConfigTitle with-divider>
+              {{ t('proxiesPreviewAutoThreshold') }}
+            </ConfigTitle>
+            <input
+              v-model.number="configStore.proxiesPreviewAutoThreshold"
+              class="input-bordered input w-full"
+              type="number"
+              min="1"
+            />
+          </template>
         </div>
 
         <div>

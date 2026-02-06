@@ -16,7 +16,9 @@ const isOff = computed(
   () => configStore.proxiesPreviewType === PROXIES_PREVIEW_TYPE.OFF,
 )
 
-const isSmallGroup = computed(() => props.proxyNameList.length <= 10)
+const isSmallGroup = computed(
+  () => props.proxyNameList.length <= configStore.proxiesPreviewAutoThreshold,
+)
 
 const isShowBar = computed(() => {
   const type = configStore.proxiesPreviewType

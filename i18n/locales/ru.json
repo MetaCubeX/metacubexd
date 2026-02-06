@@ -56,6 +56,7 @@
   "auto": "Авто",
   "off": "Выкл",
   "proxiesPreviewType": "Тип предпросмотра прокси",
+  "proxiesPreviewAutoThreshold": "Порог автопереключения",
   "proxiesDisplayMode": "Режим отображения",
   "cardMode": "Карточки",
   "listMode": "Список",
