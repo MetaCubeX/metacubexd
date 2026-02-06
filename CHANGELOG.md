@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.238.0](https://github.com/MetaCubeX/metacubexd/compare/v1.237.0...v1.238.0) (2026-02-06)
+
+
+### Features
+
+* **test:** add comprehensive unit test coverage for stores, composables, and utils ([c211ea5](https://github.com/MetaCubeX/metacubexd/commit/c211ea56d22ec391b997e3daa328739ac2eff139))
+
+
+### Bug Fixes
+
+* improve proxy node card UX and overview accuracy ([#1846](https://github.com/MetaCubeX/metacubexd/issues/1846), [#1847](https://github.com/MetaCubeX/metacubexd/issues/1847)) ([7f803a9](https://github.com/MetaCubeX/metacubexd/commit/7f803a972ea206341298d8f8fb8ad17095700ea7))
+* **test:** exclude e2e tests from coverage command ([fd93b8d](https://github.com/MetaCubeX/metacubexd/commit/fd93b8d57ad84d7f6541fb5729f094c318b83796))
+* **test:** fix test:unit script to exclude e2e tests correctly ([e1bf292](https://github.com/MetaCubeX/metacubexd/commit/e1bf2922b8f60af390eca14dbe4bdce2793245a8))
+
 ## [1.237.0](https://github.com/MetaCubeX/metacubexd/compare/v1.236.1...v1.237.0) (2026-02-02)
 
 
