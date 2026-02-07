@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.240.3](https://github.com/MetaCubeX/metacubexd/compare/v1.240.2...v1.240.3) (2026-02-07)
+
+
+### Bug Fixes
+
+* remove gradient text effect that hides proxy group titles ([#1857](https://github.com/MetaCubeX/metacubexd/issues/1857)) ([a51a739](https://github.com/MetaCubeX/metacubexd/commit/a51a73913125b4aead507c679f2165ab35de50aa))
+* use fixed positioning for latency tooltip to prevent page jitter ([#1856](https://github.com/MetaCubeX/metacubexd/issues/1856)) ([8648fb8](https://github.com/MetaCubeX/metacubexd/commit/8648fb897e61ceffdd32a3f79afefe3096eea04d))
+
 ## [1.240.2](https://github.com/MetaCubeX/metacubexd/compare/v1.240.1...v1.240.2) (2026-02-07)
 
 
