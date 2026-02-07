@@ -1,0 +1,1 @@
+import{P as e,xt as t}from"./BOiFqXHJ.js";import{t as n}from"./B62cDcDU.js";const r=e(`logs`,()=>{let e=n(),r=t([]),i=t(!1),a=1;return{logs:r,paused:i,addLog:t=>{i.value||(r.value=[{...t,seq:a},...r.value].slice(0,e.logMaxRows),a++)},clearLogs:()=>{r.value=[],a=1},togglePaused:()=>{i.value=!i.value}}});export{r as t};
