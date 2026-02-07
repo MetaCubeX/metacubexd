@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.240.1](https://github.com/MetaCubeX/metacubexd/compare/v1.240.0...v1.240.1) (2026-02-07)
+
+
+### Bug Fixes
+
+* prevent mobile header scroll-away and replace inline styles with Tailwind ([7914ad5](https://github.com/MetaCubeX/metacubexd/commit/7914ad5160e352cfc96bec7217ae17f9caa6fd1a))
+
 ## [1.240.0](https://github.com/MetaCubeX/metacubexd/compare/v1.239.0...v1.240.0) (2026-02-06)
 
 
