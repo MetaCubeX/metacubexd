@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.240.2](https://github.com/MetaCubeX/metacubexd/compare/v1.240.1...v1.240.2) (2026-02-07)
+
+
+### Bug Fixes
+
+* **deps:** resolve dependabot security vulnerabilities ([f4ed011](https://github.com/MetaCubeX/metacubexd/commit/f4ed011d9511e2c4aea62f99dfc109ac16c4d384))
+
 ## [1.240.1](https://github.com/MetaCubeX/metacubexd/compare/v1.240.0...v1.240.1) (2026-02-07)
 
 
