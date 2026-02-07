@@ -178,7 +178,7 @@ const ProxyGroupTitle = defineComponent({
                   'span',
                   {
                     class:
-                      'text-lg font-semibold tracking-tight line-clamp-1 break-all bg-gradient-to-br from-base-content to-base-content/70 bg-clip-text text-transparent',
+                      'text-lg font-semibold tracking-tight line-clamp-1 break-all text-base-content',
                   },
                   props.proxyGroup.name,
                 ),
@@ -345,7 +345,7 @@ const ProxyProviderTitle = defineComponent({
                   'span',
                   {
                     class:
-                      'text-lg font-semibold tracking-tight line-clamp-1 break-all bg-gradient-to-br from-base-content to-base-content/70 bg-clip-text text-transparent',
+                      'text-lg font-semibold tracking-tight line-clamp-1 break-all text-base-content',
                   },
                   props.provider.name,
                 ),
