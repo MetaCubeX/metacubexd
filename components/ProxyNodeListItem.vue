@@ -73,6 +73,7 @@ const { floatingStyles, middlewareData, placement } = useFloating(
   floating,
   {
     placement: 'top',
+    strategy: 'fixed',
     middleware: [
       offset(10),
       flip(),
