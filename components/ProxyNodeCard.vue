@@ -282,12 +282,37 @@ function onTooltipMouseLeave() {
   closeTooltip()
 }
 
+let touchStartX = 0
+let touchStartY = 0
+let isTouchMoved = false
+const TOUCH_MOVE_THRESHOLD = 10
+
 function onTouchStart(e: TouchEvent) {
   if (isTooltipOpen.value) {
     return
   }
-  e.preventDefault()
-  openTooltip()
+  const touch = e.touches[0]
+  if (!touch) return
+  touchStartX = touch.clientX
+  touchStartY = touch.clientY
+  isTouchMoved = false
+}
+
+function onTouchMove(e: TouchEvent) {
+  if (isTouchMoved) return
+  const touch = e.touches[0]
+  if (!touch) return
+  const dx = Math.abs(touch.clientX - touchStartX)
+  const dy = Math.abs(touch.clientY - touchStartY)
+  if (dx > TOUCH_MOVE_THRESHOLD || dy > TOUCH_MOVE_THRESHOLD) {
+    isTouchMoved = true
+  }
+}
+
+function onTouchEnd() {
+  if (!isTouchMoved && !isTooltipOpen.value) {
+    openTooltip()
+  }
 }
 
 onBeforeUnmount(() => {
@@ -327,6 +352,8 @@ function handleLatencyTest() {
       @mouseenter="onMouseEnter"
       @mouseleave="onMouseLeave"
       @touchstart="onTouchStart"
+      @touchmove="onTouchMove"
+      @touchend="onTouchEnd"
     >
       <!-- UDP indicator -->
       <div
@@ -487,7 +514,9 @@ function handleLatencyTest() {
             </div>
 
             <template v-if="latencyTestHistory.length > 0">
-              <ul class="m-0 max-h-48 w-full list-none overflow-y-auto p-0">
+              <ul
+                class="m-0 max-h-48 w-full list-none overflow-y-auto p-0 pr-2 [scrollbar-color:color-mix(in_oklch,var(--color-primary-content)_30%,transparent)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar]:block [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:rounded-sm [&::-webkit-scrollbar-thumb]:bg-[color-mix(in_oklch,var(--color-primary-content)_30%,transparent)] [&::-webkit-scrollbar-track]:bg-transparent"
+              >
                 <li v-for="(result, index) in latencyTestHistory" :key="index">
                   <div
                     class="flex items-start gap-2 border-b border-[color-mix(in_oklch,var(--color-primary-content)_15%,transparent)] py-1.5 last:border-b-0"

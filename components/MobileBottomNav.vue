@@ -18,24 +18,12 @@ const isActive = (href: string) => route.path === href
 // Entrance animation state
 const isVisible = ref(false)
 
-// Add padding to body for mobile nav and animate entrance
 onMounted(() => {
-  updateBodyPadding()
-  window.addEventListener('resize', updateBodyPadding)
   // Trigger entrance animation
   requestAnimationFrame(() => {
     isVisible.value = true
   })
 })
-
-onUnmounted(() => {
-  document.body.style.paddingBottom = '0'
-  window.removeEventListener('resize', updateBodyPadding)
-})
-
-function updateBodyPadding() {
-  document.body.style.paddingBottom = window.innerWidth < 1024 ? '4.5rem' : '0'
-}
 </script>
 
 <template>

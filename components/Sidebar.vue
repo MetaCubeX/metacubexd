@@ -84,7 +84,14 @@ const toggleSidebar = () => {
       </header>
 
       <!-- Page content slot -->
-      <div class="flex min-h-0 flex-1 flex-col p-2 sm:p-4">
+      <div
+        class="flex min-h-0 flex-1 flex-col p-2 sm:p-4"
+        :class="
+          configStore.useMobileBottomNav && route.path !== '/setup'
+            ? 'pb-[4.5rem] lg:pb-4'
+            : ''
+        "
+      >
         <slot />
       </div>
     </div>

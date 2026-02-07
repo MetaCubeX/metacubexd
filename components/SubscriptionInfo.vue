@@ -38,16 +38,7 @@ const expireStr = computed(() => {
 <template>
   <template v-if="subscriptionInfo">
     <div class="flex items-center gap-2 pt-1">
-      <div
-        class="h-2 flex-1 overflow-hidden rounded-full"
-        style="
-          background: color-mix(
-            in oklch,
-            var(--color-base-content) 15%,
-            transparent
-          );
-        "
-      >
+      <div class="h-2 flex-1 overflow-hidden rounded-full bg-base-content/15">
         <div
           class="h-full rounded-full transition-[width] duration-500 ease-out"
           :style="{
@@ -58,39 +49,15 @@ const expireStr = computed(() => {
         />
       </div>
       <div
-        class="flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold"
-        style="
-          background: var(--color-secondary);
-          color: var(--color-secondary-content);
-        "
+        class="flex items-center justify-center rounded-full bg-secondary px-2 py-0.5 text-xs font-semibold text-secondary-content"
       >
         {{ percentage }}%
       </div>
     </div>
 
     <div class="mt-1.5 flex flex-wrap items-center justify-between gap-2">
-      <div
-        class="text-sm"
-        style="
-          color: color-mix(
-            in oklch,
-            var(--color-base-content) 60%,
-            transparent
-          );
-        "
-      >
-        {{ used }} / {{ total }}
-      </div>
-      <div
-        class="text-sm"
-        style="
-          color: color-mix(
-            in oklch,
-            var(--color-base-content) 60%,
-            transparent
-          );
-        "
-      >
+      <div class="text-sm text-base-content/60">{{ used }} / {{ total }}</div>
+      <div class="text-sm text-base-content/60">
         {{ t('expire') }}: {{ expireStr }}
       </div>
     </div>

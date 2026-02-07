@@ -75,18 +75,9 @@ function handleProviderChange(event: Event) {
           </option>
         </select>
         <button
-          class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md bg-transparent transition-all duration-200 hover:bg-base-300 hover:text-base-content disabled:cursor-not-allowed disabled:opacity-50"
+          class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border border-base-content/10 bg-transparent text-base-content/60 transition-all duration-200 hover:bg-base-300 hover:text-base-content disabled:cursor-not-allowed disabled:opacity-50"
           :class="{ 'animate-spin': isLoading }"
           :disabled="isLoading"
-          style="
-            border: 1px solid
-              color-mix(in oklch, var(--color-base-content) 10%, transparent);
-            color: color-mix(
-              in oklch,
-              var(--color-base-content) 60%,
-              transparent
-            );
-          "
           @click="fetchIP()"
         >
           <IconRefresh :size="16" />
@@ -96,12 +87,7 @@ function handleProviderChange(event: Event) {
 
     <div v-if="isLoading" class="flex justify-center py-6">
       <span
-        class="h-6 w-6 animate-spin rounded-full"
-        style="
-          border: 2px solid
-            color-mix(in oklch, var(--color-base-content) 10%, transparent);
-          border-top-color: var(--color-primary);
-        "
+        class="h-6 w-6 animate-spin rounded-full border-2 border-base-content/10 border-t-primary"
       />
     </div>
 
@@ -126,16 +112,7 @@ function handleProviderChange(event: Event) {
             color-mix(in oklch, var(--color-primary) 15%, transparent);
         "
       >
-        <span
-          class="shrink-0 text-[0.8125rem]"
-          style="
-            color: color-mix(
-              in oklch,
-              var(--color-base-content) 60%,
-              transparent
-            );
-          "
-        >
+        <span class="shrink-0 text-[0.8125rem] text-base-content/60">
           {{ t('ipAddress') }}
         </span>
         <span
@@ -150,16 +127,7 @@ function handleProviderChange(event: Event) {
         v-if="ipInfo.country"
         class="flex items-center justify-between gap-3"
       >
-        <span
-          class="shrink-0 text-[0.8125rem]"
-          style="
-            color: color-mix(
-              in oklch,
-              var(--color-base-content) 60%,
-              transparent
-            );
-          "
-        >
+        <span class="shrink-0 text-[0.8125rem] text-base-content/60">
           {{ t('country') }}
         </span>
         <span
@@ -170,16 +138,7 @@ function handleProviderChange(event: Event) {
       </div>
 
       <div v-if="ipInfo.city" class="flex items-center justify-between gap-3">
-        <span
-          class="shrink-0 text-[0.8125rem]"
-          style="
-            color: color-mix(
-              in oklch,
-              var(--color-base-content) 60%,
-              transparent
-            );
-          "
-        >
+        <span class="shrink-0 text-[0.8125rem] text-base-content/60">
           {{ t('city') }}
         </span>
         <span
@@ -190,16 +149,7 @@ function handleProviderChange(event: Event) {
       </div>
 
       <div v-if="ipInfo.org" class="flex items-center justify-between gap-3">
-        <span
-          class="shrink-0 text-[0.8125rem]"
-          style="
-            color: color-mix(
-              in oklch,
-              var(--color-base-content) 60%,
-              transparent
-            );
-          "
-        >
+        <span class="shrink-0 text-[0.8125rem] text-base-content/60">
           {{ t('organization') }}
         </span>
         <span
@@ -211,16 +161,7 @@ function handleProviderChange(event: Event) {
       </div>
 
       <div v-if="ipInfo.asn" class="flex items-center justify-between gap-3">
-        <span
-          class="shrink-0 text-[0.8125rem]"
-          style="
-            color: color-mix(
-              in oklch,
-              var(--color-base-content) 60%,
-              transparent
-            );
-          "
-        >
+        <span class="shrink-0 text-[0.8125rem] text-base-content/60">
           ASN
         </span>
         <span
@@ -231,16 +172,7 @@ function handleProviderChange(event: Event) {
       </div>
 
       <div v-if="ipInfo.isp" class="flex items-center justify-between gap-3">
-        <span
-          class="shrink-0 text-[0.8125rem]"
-          style="
-            color: color-mix(
-              in oklch,
-              var(--color-base-content) 60%,
-              transparent
-            );
-          "
-        >
+        <span class="shrink-0 text-[0.8125rem] text-base-content/60">
           ISP
         </span>
         <span
@@ -255,16 +187,7 @@ function handleProviderChange(event: Event) {
         v-if="ipInfo.isProxy !== undefined || ipInfo.isVPN !== undefined"
         class="flex items-center justify-between gap-3"
       >
-        <span
-          class="shrink-0 text-[0.8125rem]"
-          style="
-            color: color-mix(
-              in oklch,
-              var(--color-base-content) 60%,
-              transparent
-            );
-          "
-        >
+        <span class="shrink-0 text-[0.8125rem] text-base-content/60">
           {{ t('proxyDetection') }}
         </span>
         <div class="flex gap-1">
@@ -311,13 +234,7 @@ function handleProviderChange(event: Event) {
       </div>
     </div>
 
-    <div
-      v-else
-      class="py-6 text-center text-sm"
-      style="
-        color: color-mix(in oklch, var(--color-base-content) 50%, transparent);
-      "
-    >
+    <div v-else class="py-6 text-center text-sm text-base-content/50">
       {{ t('noData') }}
     </div>
   </div>
