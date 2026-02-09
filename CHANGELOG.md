@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.241.0](https://github.com/MetaCubeX/metacubexd/compare/v1.240.3...v1.241.0) (2026-02-09)
+
+
+### Features
+
+* add inbound user information to connection details ([#1861](https://github.com/MetaCubeX/metacubexd/issues/1861)) ([71f577e](https://github.com/MetaCubeX/metacubexd/commit/71f577ed347b5ab262bef7196682f5c8e2a27cbf))
+
 ## [1.240.3](https://github.com/MetaCubeX/metacubexd/compare/v1.240.2...v1.240.3) (2026-02-07)
 
 
