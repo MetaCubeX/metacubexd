@@ -83,6 +83,16 @@ function getDestination(conn: Connection) {
   )
 }
 
+function getInboundUser(conn: Connection) {
+  return (
+    conn.metadata.inboundUser ||
+    conn.metadata.inboundIP ||
+    conn.metadata.inboundName ||
+    conn.metadata.type ||
+    "-"
+  )
+}
+
 // Close connection handler for render function
 function closeConnection(id: string) {
   closeSingleConnectionAPI(id)
@@ -236,6 +246,14 @@ const allColumns: ConnectionColumn[] = [
     sortable: false,
     render: (conn: Connection) => getDestination(conn),
     groupValue: (conn: Connection) => getDestination(conn),
+  },
+  {
+    id: CONNECTIONS_TABLE_ACCESSOR_KEY.InboundUser,
+    key: 'inboundUser',
+    groupable: true,
+    sortable: true,
+    render: (conn: Connection) => getInboundUser(conn),
+    groupValue: (conn: Connection) => getInboundUser(conn),
   },
 ]
 
