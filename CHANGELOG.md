@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.241.1](https://github.com/MetaCubeX/metacubexd/compare/v1.241.0...v1.241.1) (2026-02-13)
+
+
+### Bug Fixes
+
+* resolve multiple UI bugs ([#1863](https://github.com/MetaCubeX/metacubexd/issues/1863), [#1849](https://github.com/MetaCubeX/metacubexd/issues/1849), [#1865](https://github.com/MetaCubeX/metacubexd/issues/1865)) ([a342249](https://github.com/MetaCubeX/metacubexd/commit/a34224969a5ebbc11348282206eda5db974a06fb))
+
 ## [1.241.0](https://github.com/MetaCubeX/metacubexd/compare/v1.240.3...v1.241.0) (2026-02-09)
 
 
