@@ -544,9 +544,7 @@ watch(
       >
         <HighchartsAutoSize
           :options="flowChartOptions"
-          :is-loading="
-            !connectionsStore.latestConnectionMsg?.connections?.length
-          "
+          :is-loading="!connectionsStore.latestConnectionMsg"
         />
       </div>
 
@@ -570,9 +568,7 @@ watch(
           :title="t('connectionsChart')"
           :series-config="connectionsSeriesConfig"
           :initial-data="connectionsInitialData"
-          :is-loading="
-            !connectionsStore.latestConnectionMsg?.connections?.length
-          "
+          :is-loading="!connectionsStore.latestConnectionMsg"
           value-mode="number"
         />
       </div>
@@ -582,9 +578,7 @@ watch(
       >
         <HighchartsAutoSize
           :options="networkTypesChartOptions"
-          :is-loading="
-            !connectionsStore.latestConnectionMsg?.connections?.length
-          "
+          :is-loading="!connectionsStore.latestConnectionMsg"
         />
       </div>
 
@@ -593,9 +587,7 @@ watch(
       >
         <HighchartsAutoSize
           :options="topProxiesChartOptions"
-          :is-loading="
-            Object.keys(connectionsStore.speedGroupByName).length === 0
-          "
+          :is-loading="!connectionsStore.latestConnectionMsg"
         />
       </div>
     </div>

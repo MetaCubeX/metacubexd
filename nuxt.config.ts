@@ -18,10 +18,13 @@ export default defineNuxtConfig({
   },
 
   // Runtime config
+  // Public keys can be overridden at runtime via NUXT_PUBLIC_* env vars
+  // e.g. NUXT_PUBLIC_DEFAULT_BACKEND_URL=http://host:port
   runtimeConfig: {
     public: {
       appVersion: pkg.version,
       mockMode: process.env.MOCK_MODE === 'true',
+      defaultBackendURL: '',
     },
   },
 

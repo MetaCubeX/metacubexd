@@ -160,7 +160,7 @@ const ProxyGroupTitle = defineComponent({
                         style: {
                           height: `${configStore.iconHeight}px`,
                           width: `${configStore.iconHeight}px`,
-                          color: 'oklch(var(--p) / var(--tw-bg-opacity))',
+                          color: 'var(--color-primary)',
                           backgroundColor: 'currentColor',
                           marginRight: `${configStore.iconMarginRight}px`,
                           maskImage: `url('${encodeSvg(props.proxyGroup.icon)}')`,

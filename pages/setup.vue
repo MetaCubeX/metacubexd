@@ -24,12 +24,19 @@ const formData = reactive({
 const isSubmitting = ref(false)
 
 // Get default backend URL from config
+// Priority: runtime config (NUXT_PUBLIC_DEFAULT_BACKEND_URL) > config.js > fallback
+const runtimeConfig = useRuntimeConfig()
 const defaultBackendURL = computed(() => {
-  if (typeof window === 'undefined') return ''
-  return (
-    (window as any).__METACUBEXD_CONFIG__?.defaultBackendURL ||
-    FALLBACK_BACKEND_URL
-  )
+  if (runtimeConfig.public.defaultBackendURL) {
+    return runtimeConfig.public.defaultBackendURL
+  }
+  if (
+    typeof window !== 'undefined' &&
+    (window as any).__METACUBEXD_CONFIG__?.defaultBackendURL
+  ) {
+    return (window as any).__METACUBEXD_CONFIG__.defaultBackendURL
+  }
+  return FALLBACK_BACKEND_URL
 })
 
 // Get current origin for datalist
