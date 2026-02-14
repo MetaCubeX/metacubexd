@@ -70,6 +70,7 @@
     "playwright": "^1.58.2",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
+    "semver": "^7.7.4",
     "sort-package-json": "^3.6.1",
     "sortablejs": "^1.15.6",
     "tailwind-merge": "^3.4.0",
@@ -96,6 +97,7 @@
     }
   },
   "devDependencies": {
+    "@types/semver": "^7.7.1",
     "@vitest/coverage-v8": "^4.0.18",
     "jsdom": "^28.0.0"
   }

@@ -8,6 +8,7 @@ import type {
   RuleProvider,
 } from '~/types'
 import ky from 'ky'
+import semver from 'semver'
 import { useMockData } from './useMockData'
 
 // Mock mode support
@@ -409,7 +410,10 @@ export async function frontendReleaseAPI(currentVersion: string) {
     .json<ReleaseAPIResponse>()
 
   return {
-    isUpdateAvailable: tag_name !== currentVersion,
+    isUpdateAvailable: semver.gt(
+      semver.coerce(tag_name) || '0.0.0',
+      semver.coerce(currentVersion) || '0.0.0',
+    ),
     changelog: body,
   }
 }
@@ -450,13 +454,16 @@ export async function backendReleaseAPI(currentVersion: string) {
     return { isUpdateAvailable: false }
   }
 
-  // Stable version (e.g. "v1.19.9") - compare tag_name directly
+  // Stable version (e.g. "v1.19.9") - compare using semver
   const { tag_name, body } = await githubAPI
     .get(`${repositoryURL}/releases/latest`)
     .json<ReleaseAPIResponse>()
 
   return {
-    isUpdateAvailable: tag_name !== currentVersion,
+    isUpdateAvailable: semver.gt(
+      semver.coerce(tag_name) || '0.0.0',
+      semver.coerce(currentVersion) || '0.0.0',
+    ),
     changelog: body,
   }
 }
