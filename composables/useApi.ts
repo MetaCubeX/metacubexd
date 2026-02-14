@@ -394,6 +394,29 @@ export function useConfigActions() {
   }
 }
 
+// Semver comparison: returns true if version a is newer than version b
+function isNewerVersion(a: string, b: string): boolean {
+  const parse = (v: string) =>
+    v
+      .replace(/^v/, '')
+      .split('.')
+      .map((n) => Number.parseInt(n, 10) || 0)
+
+  const pa = parse(a)
+  const pb = parse(b)
+  const len = Math.max(pa.length, pb.length)
+
+  for (let i = 0; i < len; i++) {
+    const na = pa[i] || 0
+    const nb = pb[i] || 0
+
+    if (na > nb) return true
+    if (na < nb) return false
+  }
+
+  return false
+}
+
 // Release API
 interface ReleaseAPIResponse {
   tag_name: string
@@ -409,7 +432,7 @@ export async function frontendReleaseAPI(currentVersion: string) {
     .json<ReleaseAPIResponse>()
 
   return {
-    isUpdateAvailable: tag_name !== currentVersion,
+    isUpdateAvailable: isNewerVersion(tag_name, currentVersion),
     changelog: body,
   }
 }
@@ -450,13 +473,13 @@ export async function backendReleaseAPI(currentVersion: string) {
     return { isUpdateAvailable: false }
   }
 
-  // Stable version (e.g. "v1.19.9") - compare tag_name directly
+  // Stable version (e.g. "v1.19.9") - compare using semver
   const { tag_name, body } = await githubAPI
     .get(`${repositoryURL}/releases/latest`)
     .json<ReleaseAPIResponse>()
 
   return {
-    isUpdateAvailable: tag_name !== currentVersion,
+    isUpdateAvailable: isNewerVersion(tag_name, currentVersion),
     changelog: body,
   }
 }
