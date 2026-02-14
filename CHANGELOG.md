@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.241.2](https://github.com/MetaCubeX/metacubexd/compare/v1.241.1...v1.241.2) (2026-02-14)
+
+
+### Bug Fixes
+
+* use semver comparison for version update checks ([#1868](https://github.com/MetaCubeX/metacubexd/issues/1868)) ([023030f](https://github.com/MetaCubeX/metacubexd/commit/023030fd741cbd7316afdc780503c28420133ce2))
+
 ## [1.241.1](https://github.com/MetaCubeX/metacubexd/compare/v1.241.0...v1.241.1) (2026-02-13)
 
 
