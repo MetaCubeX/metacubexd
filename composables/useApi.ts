@@ -8,6 +8,7 @@ import type {
   RuleProvider,
 } from '~/types'
 import ky from 'ky'
+import semver from 'semver'
 import { useMockData } from './useMockData'
 
 // Mock mode support
@@ -394,29 +395,6 @@ export function useConfigActions() {
   }
 }
 
-// Semver comparison: returns true if version a is newer than version b
-function isNewerVersion(a: string, b: string): boolean {
-  const parse = (v: string) =>
-    v
-      .replace(/^v/, '')
-      .split('.')
-      .map((n) => Number.parseInt(n, 10) || 0)
-
-  const pa = parse(a)
-  const pb = parse(b)
-  const len = Math.max(pa.length, pb.length)
-
-  for (let i = 0; i < len; i++) {
-    const na = pa[i] || 0
-    const nb = pb[i] || 0
-
-    if (na > nb) return true
-    if (na < nb) return false
-  }
-
-  return false
-}
-
 // Release API
 interface ReleaseAPIResponse {
   tag_name: string
@@ -432,7 +410,10 @@ export async function frontendReleaseAPI(currentVersion: string) {
     .json<ReleaseAPIResponse>()
 
   return {
-    isUpdateAvailable: isNewerVersion(tag_name, currentVersion),
+    isUpdateAvailable: semver.gt(
+      semver.coerce(tag_name) || '0.0.0',
+      semver.coerce(currentVersion) || '0.0.0',
+    ),
     changelog: body,
   }
 }
@@ -479,7 +460,10 @@ export async function backendReleaseAPI(currentVersion: string) {
     .json<ReleaseAPIResponse>()
 
   return {
-    isUpdateAvailable: isNewerVersion(tag_name, currentVersion),
+    isUpdateAvailable: semver.gt(
+      semver.coerce(tag_name) || '0.0.0',
+      semver.coerce(currentVersion) || '0.0.0',
+    ),
     changelog: body,
   }
 }

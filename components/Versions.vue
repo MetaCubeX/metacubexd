@@ -257,14 +257,14 @@ async function fetchReleases() {
 
 // Upgrade handlers
 async function handleFrontendUpgrade() {
-  if (upgradingUI.value) return
+  if (upgradingUI.value || !frontendRelease.value?.isUpdateAvailable) return
 
   await configActions.upgradeUIAPI()
   window.location.reload()
 }
 
 async function handleBackendUpgrade() {
-  if (upgradingBackend.value) return
+  if (upgradingBackend.value || !backendRelease.value?.isUpdateAvailable) return
 
   await configActions.upgradeBackendAPI()
   window.location.reload()
