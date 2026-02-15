@@ -63,7 +63,7 @@
     "lint-staged": "^16.2.7",
     "lodash": "^4.17.23",
     "lodash-es": "^4.17.23",
-    "markdown-it": "^14.1.0",
+    "markdown-it": "^14.1.1",
     "match-sorter": "^8.2.0",
     "nuxt": "^4.3.1",
     "pinia": "^3.0.4",
