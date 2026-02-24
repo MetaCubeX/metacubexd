@@ -21,8 +21,16 @@ const globalStore = useGlobalStore()
 const connectionsStore = useConnectionsStore()
 const endpointStore = useEndpointStore()
 const configStore = useConfigStore()
+const proxiesStore = useProxiesStore()
 
 const formatBytes = (bytes: number) => byteSize(bytes).toString()
+
+// Ensure proxy data is available for isProxyGroup filtering in top proxies chart
+onMounted(() => {
+  if (proxiesStore.proxies.length === 0) {
+    proxiesStore.fetchProxies()
+  }
+})
 
 // Reactive theme colors - recomputes when theme changes
 const themeColors = computed(() => {
@@ -230,8 +238,9 @@ const networkTypesChartOptions = computed<Highcharts.Options>(() => {
 const topProxiesChartOptions = computed<Highcharts.Options>(() => {
   const speedByName = connectionsStore.speedGroupByName
 
-  // Get top 5 proxies by speed
+  // Get top 5 proxies by speed, excluding proxy groups
   const sortedProxies = Object.entries(speedByName)
+    .filter(([name]) => !proxiesStore.isProxyGroup(name))
     .sort(([, a], [, b]) => b - a)
     .slice(0, 5)
 
