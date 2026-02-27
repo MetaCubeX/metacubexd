@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.241.3](https://github.com/MetaCubeX/metacubexd/compare/v1.241.2...v1.241.3) (2026-02-27)
+
+
+### Bug Fixes
+
+* move proxy group filter from speedGroupByName to overview page ([#1847](https://github.com/MetaCubeX/metacubexd/issues/1847)) ([#1877](https://github.com/MetaCubeX/metacubexd/issues/1877)) ([b5c6eb6](https://github.com/MetaCubeX/metacubexd/commit/b5c6eb669b7690a1ad44380e822f9ffe137a3f37))
+
 ## [1.241.2](https://github.com/MetaCubeX/metacubexd/compare/v1.241.1...v1.241.2) (2026-02-14)
 
 
