@@ -513,6 +513,25 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                 class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 transition-colors hover:bg-base-content/5"
               >
                 <div class="flex items-center gap-2 text-sm">
+                  <span>{{ t('defaultPage') }}</span>
+                </div>
+                <select
+                  v-model="configStore.defaultPage"
+                  class="select-bordered select select-sm"
+                >
+                  <option value="overview">{{ t('overview') }}</option>
+                  <option value="proxies">{{ t('proxies') }}</option>
+                  <option value="connections">{{ t('connections') }}</option>
+                  <option value="rules">{{ t('rules') }}</option>
+                  <option value="logs">{{ t('logs') }}</option>
+                  <option value="config">{{ t('config') }}</option>
+                </select>
+              </div>
+
+              <div
+                class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 transition-colors hover:bg-base-content/5"
+              >
+                <div class="flex items-center gap-2 text-sm">
                   <span>{{ t('autoSwitchEndpoint') }}</span>
                 </div>
                 <input

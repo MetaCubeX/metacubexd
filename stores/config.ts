@@ -79,6 +79,9 @@ export const useConfigStore = defineStore('config', () => {
   // Mobile navigation type (bottom nav vs side drawer)
   const useMobileBottomNav = useLocalStorage('useMobileBottomNav', true)
 
+  // Default start page
+  const defaultPage = useLocalStorage('defaultPage', 'overview')
+
   // Connections table settings
   const connectionsTableSize = useLocalStorage<TAILWINDCSS_SIZE>(
     'connectionsTableSize',
@@ -164,6 +167,7 @@ export const useConfigStore = defineStore('config', () => {
     favDayTheme.value = 'nord'
     favNightTheme.value = 'sunset'
     curTheme.value = 'sunset'
+    defaultPage.value = 'overview'
   }
 
   return {
@@ -192,6 +196,8 @@ export const useConfigStore = defineStore('config', () => {
     sidebarExpanded,
     // Mobile navigation
     useMobileBottomNav,
+    // Default page
+    defaultPage,
     // Connections
     connectionsTableSize,
     connectionsTableColumnVisibility,

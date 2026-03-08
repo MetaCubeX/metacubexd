@@ -64,6 +64,7 @@
   "autoCloseConns": "Автоматически закрывать соединения",
   "autoSwitchEndpoint": "Автоматически переключать эндпоинт",
   "autoSwitchTheme": "Автоматически переключать тему",
+  "defaultPage": "Страница по умолчанию",
   "favDayTheme": "Любимая светлая тема",
   "favNightTheme": "Любимая тёмная тема",
   "renderInTwoColumns": "Отображать в два столбца",
