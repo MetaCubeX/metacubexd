@@ -94,6 +94,10 @@ export const useConfigStore = defineStore('config', () => {
       'connectionsTableColumnOrder',
       CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
     )
+  const useMobileConnectionsTable = useLocalStorage(
+    'useMobileConnectionsTable',
+    false,
+  )
 
   // Logs settings
   const logsTableSize = useLocalStorage<TAILWINDCSS_SIZE>(
@@ -192,6 +196,7 @@ export const useConfigStore = defineStore('config', () => {
     connectionsTableSize,
     connectionsTableColumnVisibility,
     connectionsTableColumnOrder,
+    useMobileConnectionsTable,
     quickFilterRegex,
     // Logs
     logsTableSize,

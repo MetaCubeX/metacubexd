@@ -254,5 +254,6 @@
     "clearHistory": "清除历史",
     "noScoreYet": "暂无评分"
   },
-  "themeColorTooltip": "颜色顺序：背景、强调色、文字"
+  "themeColorTooltip": "颜色顺序：背景、强调色、文字",
+  "useMobileConnectionsTable": "在移动端使用表格视图"
 }

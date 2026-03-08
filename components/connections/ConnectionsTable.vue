@@ -54,6 +54,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const configStore = useConfigStore()
 
 function isSortableColumn(
   col: ConnectionColumn,
@@ -68,9 +69,22 @@ function isColumnSorted(col: ConnectionColumn, sortColumn: string) {
 
 <template>
   <div class="conn-table-container min-h-0 flex-1 rounded-xl">
-    <table class="table w-full border-collapse" :class="tableSizeClass">
-      <!-- Desktop header - hidden on mobile -->
-      <thead class="hidden md:table-header-group">
+    <table
+      class="table w-full border-collapse"
+      :class="[
+        tableSizeClass,
+        configStore.useMobileConnectionsTable ? 'force-table' : '',
+      ]"
+    >
+      <!-- Desktop header - hidden on mobile unless force-table -->
+      <thead
+        class="md:table-header-group"
+        :class="
+          configStore.useMobileConnectionsTable
+            ? 'table-header-group'
+            : 'hidden'
+        "
+      >
         <tr class="sticky top-0 z-10 bg-base-200">
           <th
             v-for="col in columns"
@@ -158,6 +172,7 @@ function isColumnSorted(col: ConnectionColumn, sortColumn: string) {
               <!-- Mobile label -->
               <span
                 class="conn-td-label mb-0.5 block text-[0.6875rem] tracking-wide uppercase md:hidden"
+                :class="{ hidden: configStore.useMobileConnectionsTable }"
               >
                 {{ t(col.key) }}
               </span>
@@ -260,6 +275,24 @@ function isColumnSorted(col: ConnectionColumn, sortColumn: string) {
   }
 }
 
+.force-table .conn-data-row {
+  display: table-row;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.force-table .conn-data-row:nth-child(even) {
+  background: color-mix(in oklch, var(--color-base-content) 2%, transparent);
+}
+
+.force-table .conn-data-row:hover {
+  background: color-mix(in oklch, var(--color-base-content) 5%, transparent);
+  box-shadow: none;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -306,6 +339,16 @@ function isColumnSorted(col: ConnectionColumn, sortColumn: string) {
     border-bottom: 1px solid
       color-mix(in oklch, var(--color-base-content) 5%, transparent);
   }
+}
+
+.force-table .conn-td {
+  width: auto;
+  min-width: 0;
+  text-align: left !important;
+  vertical-align: middle;
+  white-space: nowrap;
+  border-bottom: 1px solid
+    color-mix(in oklch, var(--color-base-content) 5%, transparent);
 }
 
 .conn-td-label {

@@ -145,17 +145,33 @@ defineExpose({
         </select>
       </div>
 
+      <div class="flex items-center justify-between">
+        <span class="text-sm font-medium text-base-content">{{
+          t('useMobileConnectionsTable')
+        }}</span>
+        <label class="relative inline-block h-6 w-11 cursor-pointer">
+          <input
+            v-model="configStore.useMobileConnectionsTable"
+            type="checkbox"
+            class="peer h-0 w-0 opacity-0"
+          />
+          <span
+            class="absolute inset-0 rounded-full bg-base-content/20 transition-all duration-300 peer-checked:bg-primary before:absolute before:bottom-1 before:left-1 before:h-4 before:w-4 before:rounded-full before:bg-base-100 before:shadow-sm before:transition-all before:duration-300 before:content-[''] peer-checked:before:translate-x-5"
+          />
+        </label>
+      </div>
+
       <div class="flex flex-col">
         <ConfigTitle with-divider>
           {{ t('tagClientSourceIPWithName') }}
         </ConfigTitle>
         <div class="flex flex-col gap-4">
           <div
-            class="group flex h-10 overflow-hidden rounded-lg border border-base-content/15 transition-all duration-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
+            class="group flex h-10 w-full overflow-hidden rounded-lg border border-base-content/15 transition-all duration-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
           >
             <select
               v-model="newTagSourceIP"
-              class="w-32 cursor-pointer appearance-none border-none bg-base-300/50 px-3 py-2 pr-8 text-sm text-base-content transition-all duration-200 hover:bg-base-300 focus:outline-none"
+              class="w-24 shrink-0 cursor-pointer appearance-none border-none bg-base-300/50 px-3 py-2 pr-8 text-sm text-base-content transition-all duration-200 hover:bg-base-300 focus:outline-none sm:w-32"
               style="
                 background-image: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E');
                 background-position: right 0.5rem center;
@@ -167,14 +183,16 @@ defineExpose({
                 {{ ip || t('inner') }}
               </option>
             </select>
-            <div class="h-6 self-center border-r border-base-content/10" />
+            <div
+              class="h-6 shrink-0 self-center border-r border-base-content/10"
+            />
             <input
               v-model="newTagName"
-              class="flex-1 border-none bg-base-200/80 px-3 py-2 text-sm text-base-content transition-all duration-200 focus:outline-none"
+              class="min-w-0 flex-1 shrink border-none bg-base-200/80 px-3 py-2 text-sm text-base-content transition-all duration-200 focus:outline-none"
               :placeholder="t('name')"
             />
             <Button
-              class="rounded-none bg-primary px-4 font-semibold text-primary-content transition-colors duration-200 hover:bg-primary/90"
+              class="shrink-0 rounded-none bg-primary px-3 font-semibold text-primary-content transition-colors duration-200 hover:bg-primary/90 sm:px-4"
               @click="addTag"
             >
               {{ t('tag') }}

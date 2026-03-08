@@ -43,6 +43,8 @@
 
 option {
   font-family: system-ui;
+  background-color: var(--color-base-200);
+  color: var(--color-base-content);
 }
 
 /* Default font - Ubuntu from @nuxt/fonts */

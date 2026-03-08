@@ -254,5 +254,6 @@
     "clearHistory": "Clear History",
     "noScoreYet": "No score yet"
   },
-  "themeColorTooltip": "Color order: Background, Accent, Text"
+  "themeColorTooltip": "Color order: Background, Accent, Text",
+  "useMobileConnectionsTable": "Use Table View on Mobile"
 }

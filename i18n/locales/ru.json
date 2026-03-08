@@ -214,5 +214,6 @@
   "fetchRemoteConfig": "Загрузить удалённую конфигурацию",
   "remoteConfigURL": "URL удалённой конфигурации",
   "remoteConfigURLPlaceholder": "Введите URL файла конфигурации",
-  "themeColorTooltip": "Порядок цветов: Фон, Акцент, Текст"
+  "themeColorTooltip": "Порядок цветов: Фон, Акцент, Текст",
+  "useMobileConnectionsTable": "Включить табличный вид на мобильных"
 }

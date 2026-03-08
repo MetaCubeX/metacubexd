@@ -13,10 +13,15 @@ const emit = defineEmits<{
 
 const dialogRef = ref<HTMLDialogElement>()
 const isOpen = ref(false)
+const isRendered = ref(false)
 
 function open() {
   dialogRef.value?.showModal()
-  isOpen.value = true
+  isRendered.value = true
+  // Small delay to allow the DOM to render before animating
+  requestAnimationFrame(() => {
+    isOpen.value = true
+  })
 }
 
 function close() {
@@ -24,6 +29,7 @@ function close() {
   // Wait for animation to complete
   setTimeout(() => {
     dialogRef.value?.close()
+    isRendered.value = false
     emit('close')
   }, 200)
 }
@@ -95,13 +101,13 @@ defineExpose({ open, close })
       </div>
 
       <!-- Content -->
-      <div class="flex-1 overflow-y-auto p-5">
+      <div v-if="isRendered" class="flex-1 overflow-y-auto p-5">
         <slot />
       </div>
 
       <!-- Actions -->
       <div
-        v-if="$slots.actions"
+        v-if="isRendered && $slots.actions"
         class="sticky bottom-0 z-10 flex items-center justify-end px-5 py-4"
         :style="{
           background: 'var(--color-base-200)',
