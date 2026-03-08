@@ -253,5 +253,6 @@
     "excludedNodes": "Excluded Nodes",
     "clearHistory": "Clear History",
     "noScoreYet": "No score yet"
-  }
+  },
+  "themeColorTooltip": "Color order: Background, Accent, Text"
 }

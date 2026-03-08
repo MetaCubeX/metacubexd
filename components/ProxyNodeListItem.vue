@@ -20,10 +20,12 @@ interface Props {
   testUrl: string | null
   timeout: number | null
   isSelected?: boolean
+  providerName?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   isSelected: false,
+  providerName: '',
 })
 
 const emit = defineEmits<{
@@ -39,8 +41,15 @@ const proxyType = computed(() =>
   formatProxyType(proxyNode.value?.type || '', t),
 )
 const isUDP = computed(() => proxyNode.value?.xudp || proxyNode.value?.udp)
+const isProviderTesting = computed(() =>
+  props.providerName
+    ? proxiesStore.proxyProviderLatencyTestingMap[props.providerName] || false
+    : false,
+)
 const isTesting = computed(
-  () => proxiesStore.proxyLatencyTestingMap[props.proxyName] || false,
+  () =>
+    proxiesStore.proxyLatencyTestingMap[props.proxyName] ||
+    isProviderTesting.value,
 )
 
 const specialTypes = computed(() => {
@@ -61,6 +70,19 @@ const latencyTestHistory = computed(() =>
     .getLatencyHistoryByName(props.proxyName, props.testUrl)
     .toReversed(),
 )
+
+// Stability bar: chronological order, each segment colored by latency quality
+const latencyStabilityBar = computed(() => {
+  const history = proxiesStore.getLatencyHistoryByName(
+    props.proxyName,
+    props.testUrl,
+  )
+  return history.map((result) => ({
+    colorClass: result.delay
+      ? getLatencyClassName(result.delay, configStore.latencyQualityMap)
+      : 'text-neutral-content/30',
+  }))
+})
 
 // Floating UI for tooltip
 const reference = ref<HTMLElement | null>(null)
@@ -205,13 +227,27 @@ function handleLatencyTest() {
         </span>
 
         <!-- Latency -->
-        <Latency
-          :proxy-name="proxyName"
-          :test-url="testUrl"
-          class="shrink-0"
-          :class="{ 'animate-pulse': isTesting }"
-          @click.stop="handleLatencyTest"
-        />
+        <div class="flex shrink-0 flex-col items-end gap-1">
+          <Latency
+            :proxy-name="proxyName"
+            :test-url="testUrl"
+            :provider-name="providerName"
+            :class="{ 'animate-pulse': isTesting }"
+            @click.stop="handleLatencyTest"
+          />
+          <!-- Latency stability bar -->
+          <div
+            v-if="latencyTestHistory.length > 1"
+            class="flex h-[3px] w-full max-w-[44px] gap-px overflow-hidden rounded-full"
+          >
+            <div
+              v-for="(result, index) in latencyStabilityBar"
+              :key="index"
+              class="h-full flex-1 bg-current first:rounded-l-full last:rounded-r-full"
+              :class="result.colorClass"
+            />
+          </div>
+        </div>
       </div>
 
       <!-- Tooltip for latency history -->

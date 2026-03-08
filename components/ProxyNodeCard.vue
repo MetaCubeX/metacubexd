@@ -406,6 +406,8 @@ function handleLatencyTest() {
           <Latency
             :proxy-name="proxyName"
             :test-url="testUrl"
+            :provider-name="providerName"
+            :group-name="groupName"
             :class="{ 'animate-pulse': isTesting }"
             @click.stop="handleLatencyTest"
           />

@@ -4,10 +4,15 @@ import { getLatencyClassName } from '~/utils'
 interface Props {
   proxyName: string
   testUrl: string | null
+  providerName?: string
+  groupName?: string
   class?: string | Record<string, boolean>
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  providerName: '',
+  groupName: '',
+})
 
 defineEmits<{
   click: [event: MouseEvent]
@@ -22,8 +27,22 @@ const latency = computed(() =>
   proxiesStore.getLatencyByName(props.proxyName, props.testUrl),
 )
 
+const isProviderTesting = computed(() =>
+  props.providerName
+    ? proxiesStore.proxyProviderLatencyTestingMap[props.providerName] || false
+    : false,
+)
+const isGroupTesting = computed(() =>
+  props.groupName
+    ? proxiesStore.proxyGroupLatencyTestingMap[props.groupName] || false
+    : false,
+)
+
 const isTesting = computed(
-  () => proxiesStore.proxyLatencyTestingMap[props.proxyName] || false,
+  () =>
+    proxiesStore.proxyLatencyTestingMap[props.proxyName] ||
+    isProviderTesting.value ||
+    isGroupTesting.value,
 )
 
 const latencyClass = computed(() =>

@@ -213,5 +213,6 @@
   "useMobileBottomNav": "Нижняя навигация (мобильный)",
   "fetchRemoteConfig": "Загрузить удалённую конфигурацию",
   "remoteConfigURL": "URL удалённой конфигурации",
-  "remoteConfigURLPlaceholder": "Введите URL файла конфигурации"
+  "remoteConfigURLPlaceholder": "Введите URL файла конфигурации",
+  "themeColorTooltip": "Порядок цветов: Фон, Акцент, Текст"
 }
