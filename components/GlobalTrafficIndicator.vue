@@ -464,15 +464,21 @@ onBeforeUnmount(() => {
       class="w-full cursor-pointer rounded-lg bg-[color-mix(in_oklch,var(--color-base-100)_50%,transparent)] p-2 transition-[background] duration-200 ease-in-out hover:bg-[var(--color-base-100)]"
       @click="expandFromHeader"
     >
-      <div class="flex items-center justify-center gap-1">
-        <IconArrowDown class="size-3 shrink-0 text-[var(--color-success)]" />
-        <span class="font-mono text-xs"
-          >{{ formatBytes(downloadSpeed) }}/s</span
-        >
-      </div>
-      <div class="flex items-center justify-center gap-1">
-        <IconArrowUp class="size-3 shrink-0 text-[var(--color-info)]" />
-        <span class="font-mono text-xs">{{ formatBytes(uploadSpeed) }}/s</span>
+      <div class="flex w-full flex-col items-center gap-2 overflow-hidden py-1">
+        <div class="flex flex-col items-center gap-0.5">
+          <IconArrowDown class="size-3 shrink-0 text-[var(--color-success)]" />
+          <span
+            class="font-mono text-[9px] font-medium tracking-tighter whitespace-nowrap"
+            >{{ formatBytes(downloadSpeed).replace(' ', '') }}/s</span
+          >
+        </div>
+        <div class="flex flex-col items-center gap-0.5">
+          <IconArrowUp class="size-3 shrink-0 text-[var(--color-info)]" />
+          <span
+            class="font-mono text-[9px] font-medium tracking-tighter whitespace-nowrap"
+            >{{ formatBytes(uploadSpeed).replace(' ', '') }}/s</span
+          >
+        </div>
       </div>
     </div>
   </Teleport>

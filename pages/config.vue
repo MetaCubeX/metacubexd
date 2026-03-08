@@ -791,8 +791,9 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
             >
               <input
                 v-model="remoteConfigURL"
-                type="url"
-                class="input-bordered input flex-1"
+                type="text"
+                inputmode="url"
+                class="input-bordered input h-10 min-h-10 flex-1 appearance-none px-3"
                 :placeholder="t('remoteConfigURLPlaceholder')"
               />
               <Button
@@ -954,15 +955,16 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
               >
                 <input
                   v-model="dnsQuery.name"
-                  type="search"
-                  class="input-bordered input flex-1 font-mono"
+                  type="text"
+                  enterkeyhint="search"
+                  class="input-bordered input h-10 min-h-10 flex-1 appearance-none px-3 font-mono"
                   placeholder="google.com"
                   @input="onDnsQueryInput"
                 />
 
                 <select
                   v-model="dnsQuery.type"
-                  class="select-bordered select w-full sm:w-auto"
+                  class="select-bordered select h-10 min-h-10 w-full appearance-none px-3 sm:w-auto"
                 >
                   <option>A</option>
                   <option>AAAA</option>

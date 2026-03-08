@@ -91,12 +91,15 @@ function selectTheme(theme: (typeof themes)[number]) {
             :style="{ backgroundColor: getThemeColors(theme).accent }"
           />
         </span>
-        <span class="flex-1 text-left text-gray-200 capitalize">{{
-          theme
-        }}</span>
+        <span
+          class="flex-1 text-left capitalize"
+          :style="{ color: getThemeColors(theme).primary }"
+          >{{ theme }}</span
+        >
         <IconCheck
           v-if="props.modelValue === theme"
-          class="size-4 shrink-0 text-white"
+          class="size-4 shrink-0"
+          :style="{ color: getThemeColors(theme).accent }"
         />
       </button>
     </li>

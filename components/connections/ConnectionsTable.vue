@@ -75,7 +75,7 @@ function isColumnSorted(col: ConnectionColumn, sortColumn: string) {
           <th
             v-for="col in columns"
             :key="col.id"
-            class="conn-th text-left text-xs font-semibold tracking-wide whitespace-nowrap uppercase"
+            class="conn-th resize-x overflow-hidden text-left text-xs font-semibold tracking-wide whitespace-nowrap uppercase"
           >
             <div class="flex items-center gap-1.5">
               <div
