@@ -36,7 +36,7 @@ onMounted(() => {
   >
     <!-- Backdrop blur container -->
     <div
-      class="mx-2 mb-2 overflow-hidden rounded-2xl shadow-lg backdrop-blur-[12px]"
+      class="mx-1 mb-2 overflow-hidden rounded-2xl shadow-lg backdrop-blur-[12px] sm:mx-2"
       :style="{
         border:
           '1px solid color-mix(in oklch, var(--color-base-content) 10%, transparent)',
@@ -44,7 +44,7 @@ onMounted(() => {
           'color-mix(in oklch, var(--color-base-300) 90%, transparent)',
       }"
     >
-      <div class="grid h-16 grid-cols-6">
+      <div class="grid h-16 w-full grid-cols-7">
         <NuxtLink
           v-for="nav in navItems"
           :key="nav.href"
@@ -90,7 +90,7 @@ onMounted(() => {
           <!-- Visual label with fade animation -->
           <span
             aria-hidden="true"
-            class="relative z-10 text-[10px] font-medium transition-all duration-300 ease-in-out group-hover:opacity-100"
+            class="relative z-10 truncate px-0.5 text-[9px] font-medium transition-all duration-300 ease-in-out group-hover:opacity-100 sm:text-[10px]"
             :class="isActive(nav.href) ? 'opacity-100' : 'opacity-80'"
           >
             {{ nav.name }}

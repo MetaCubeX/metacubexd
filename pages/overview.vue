@@ -629,9 +629,6 @@ watch(
       </div>
       <NetworkTopology v-if="configStore.showNetworkTopology" class="mt-4" />
     </div>
-
-    <!-- Data Usage Table -->
-    <DataUsageTable />
   </div>
 </template>
 

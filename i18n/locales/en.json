@@ -1,4 +1,9 @@
 {
+  "lastHour": "Last Hour",
+  "lastDay": "Last Day",
+  "lastMonth": "Last Month",
+  "customRange": "Custom Range",
+  "noDetailedData": "No detailed data available.",
   "home": "Home",
   "add": "Add",
   "collapse": "Collapse",

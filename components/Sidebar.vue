@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+  IconChartAreaLine,
   IconChevronsLeft,
   IconChevronsRight,
   IconFileStack,
@@ -20,6 +21,7 @@ const navItems = computed(() => [
   { href: '/proxies', name: t('proxies'), icon: IconGlobe },
   { href: '/rules', name: t('rules'), icon: IconRuler },
   { href: '/connections', name: t('connections'), icon: IconNetwork },
+  { href: '/traffic', name: t('dataUsage'), icon: IconChartAreaLine },
   { href: '/logs', name: t('logs'), icon: IconFileStack },
   { href: '/config', name: t('config'), icon: IconSettings },
 ])

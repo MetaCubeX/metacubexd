@@ -1,4 +1,9 @@
 {
+  "lastHour": "上一小时",
+  "lastDay": "最近一天",
+  "lastMonth": "最近一月",
+  "customRange": "自定义时间",
+  "noDetailedData": "暂无详细数据",
   "home": "首页",
   "add": "添加",
   "collapse": "收起",
@@ -138,7 +143,7 @@
   "quickFilter": "快速过滤",
   "iconHeight": "图标高度",
   "iconMarginRight": "图标右边距",
-  "dataUsage": "数据用量",
+  "dataUsage": "用量",
   "clearAll": "清空全部",
   "confirmClearAll": "清除所有数据用量记录？",
   "devices": "设备",
