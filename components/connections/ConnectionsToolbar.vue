@@ -114,10 +114,7 @@ const { t } = useI18n()
           </option>
         </select>
       </div>
-    </div>
 
-    <!-- Toolbar Row 2: Sort + Search + Actions -->
-    <div class="flex flex-wrap items-center gap-2">
       <div class="flex shrink-0 items-center gap-1.5">
         <span
           class="hidden text-[0.8125rem] whitespace-nowrap text-base-content/60 sm:inline-block"

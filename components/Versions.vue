@@ -289,7 +289,7 @@ watch(
     <div
       ref="frontendReference"
       role="button"
-      class="version-badge relative flex w-full cursor-pointer items-center justify-center overflow-visible rounded-md p-2 transition-all duration-200 ease-in-out"
+      class="btn relative btn-sm"
       @click="handleFrontendUpgrade"
       @mouseenter="onFrontendMouseEnter"
       @mouseleave="onFrontendMouseLeave"
@@ -297,7 +297,7 @@ watch(
       <!-- Update indicator -->
       <span
         v-if="frontendRelease?.isUpdateAvailable"
-        class="absolute top-0 right-0 inline-grid translate-x-1/2 -translate-y-1/2"
+        class="absolute top-2 right-2 inline-grid translate-x-1/2 -translate-y-1/2"
       >
         <span
           class="col-start-1 row-start-1 h-2 w-2 animate-ping rounded-full bg-info"
@@ -326,14 +326,14 @@ watch(
           v-if="isFrontendTooltipOpen"
           ref="frontendFloating"
           :style="frontendFloatingStyles"
-          class="z-70 max-h-96 overflow-y-auto rounded-xl bg-neutral p-4 text-neutral-content shadow-xl"
+          class="z-70 max-h-96 overflow-y-auto rounded-xl bg-base-100 p-4 text-neutral-content shadow-xl"
           @mouseenter="onFrontendTooltipMouseEnter"
           @mouseleave="onFrontendTooltipMouseLeave"
         >
           <!-- Arrow -->
           <div
             ref="frontendArrow"
-            class="absolute h-2 w-2 rotate-45 bg-neutral"
+            class="absolute h-2 w-2 rotate-45 bg-base-100"
             :style="frontendArrowStyles"
           />
           <Changelog
@@ -348,7 +348,7 @@ watch(
     <div
       ref="backendReference"
       role="button"
-      class="version-badge relative flex w-full cursor-pointer items-center justify-center overflow-visible rounded-md p-2 transition-all duration-200 ease-in-out"
+      class="btn relative btn-sm"
       @click="handleBackendUpgrade"
       @mouseenter="onBackendMouseEnter"
       @mouseleave="onBackendMouseLeave"
@@ -356,7 +356,7 @@ watch(
       <!-- Update indicator -->
       <span
         v-if="backendRelease?.isUpdateAvailable"
-        class="absolute top-0 right-0 inline-grid translate-x-1/2 -translate-y-1/2"
+        class="absolute top-2 right-2 inline-grid translate-x-1/2 -translate-y-1/2"
       >
         <span
           class="col-start-1 row-start-1 h-2 w-2 animate-ping rounded-full bg-info"
@@ -385,14 +385,14 @@ watch(
           v-if="isBackendTooltipOpen"
           ref="backendFloating"
           :style="backendFloatingStyles"
-          class="z-70 max-h-96 overflow-y-auto rounded-xl bg-neutral p-4 text-neutral-content shadow-xl"
+          class="z-70 max-h-96 overflow-y-auto rounded-xl bg-base-100 p-4 text-neutral-content shadow-xl"
           @mouseenter="onBackendTooltipMouseEnter"
           @mouseleave="onBackendTooltipMouseLeave"
         >
           <!-- Arrow -->
           <div
             ref="backendArrow"
-            class="absolute h-2 w-2 rotate-45 bg-neutral"
+            class="absolute h-2 w-2 rotate-45 bg-base-100"
             :style="backendArrowStyles"
           />
           <Changelog

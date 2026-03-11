@@ -460,7 +460,7 @@ const currentViewLabel = computed(() => {
               </div>
               <div class="flex flex-1 gap-2">
                 <button
-                  class="flex-1 rounded px-2 py-1 text-xs transition-colors"
+                  class="flex h-9 flex-1 items-center justify-center rounded px-2 py-1 text-xs transition-colors"
                   :class="
                     sortField === 'label'
                       ? 'bg-primary text-primary-content'
@@ -479,7 +479,7 @@ const currentViewLabel = computed(() => {
                   />
                 </button>
                 <button
-                  class="flex-1 rounded px-2 py-1 text-xs transition-colors"
+                  class="flex h-9 flex-1 items-center justify-center rounded px-2 py-1 text-xs transition-colors"
                   :class="
                     sortField === 'duration'
                       ? 'bg-primary text-primary-content'
@@ -498,7 +498,7 @@ const currentViewLabel = computed(() => {
                   />
                 </button>
                 <button
-                  class="flex-1 rounded px-2 py-1 text-xs transition-colors"
+                  class="flex h-9 flex-1 items-center justify-center rounded px-2 py-1 text-xs transition-colors"
                   :class="
                     sortField === 'upload'
                       ? 'bg-primary text-primary-content'
@@ -517,7 +517,7 @@ const currentViewLabel = computed(() => {
                   />
                 </button>
                 <button
-                  class="flex-1 rounded px-2 py-1 text-xs transition-colors"
+                  class="flex h-9 flex-1 items-center justify-center rounded px-2 py-1 text-xs transition-colors"
                   :class="
                     sortField === 'download'
                       ? 'bg-primary text-primary-content'
@@ -536,7 +536,7 @@ const currentViewLabel = computed(() => {
                   />
                 </button>
                 <button
-                  class="flex-1 rounded px-2 py-1 text-xs transition-colors"
+                  class="flex h-9 flex-1 items-center justify-center rounded px-2 py-1 text-xs transition-colors"
                   :class="
                     sortField === 'total'
                       ? 'bg-primary text-primary-content'

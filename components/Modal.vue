@@ -41,7 +41,7 @@ defineExpose({ open, close })
     }"
   >
     <div
-      class="flex max-h-[90vh] flex-col overflow-hidden rounded-2xl p-0 transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
+      class="modal-box flex max-h-[90vh] flex-col overflow-hidden rounded-2xl p-0 transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
       :class="
         isOpen
           ? 'translate-y-0 scale-100 opacity-100'

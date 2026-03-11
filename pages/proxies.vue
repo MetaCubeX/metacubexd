@@ -479,7 +479,7 @@ const ProviderProxyNodes = defineComponent({
 </script>
 
 <template>
-  <div class="flex h-full flex-col gap-3 overflow-y-auto p-2">
+  <div class="flex h-full flex-col gap-3 overflow-y-auto">
     <!-- Header with Tabs and Actions -->
     <div class="animate-fade-slide-in flex flex-wrap items-center gap-3">
       <!-- Tabs -->
