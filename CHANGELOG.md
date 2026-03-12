@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.242.0](https://github.com/MetaCubeX/metacubexd/compare/v1.241.3...v1.242.0) (2026-03-12)
+
+
+### Features
+
+* UI/UX enhancements, marquee effects, and default start page ([#1892](https://github.com/MetaCubeX/metacubexd/issues/1892)) ([36c14a1](https://github.com/MetaCubeX/metacubexd/commit/36c14a1a1369a0f434b4cc69c7e38f1a9d285f5b))
+
+
+### Bug Fixes
+
+* handle unreachable backend gracefully instead of blocking UI ([#1896](https://github.com/MetaCubeX/metacubexd/issues/1896)) ([a373690](https://github.com/MetaCubeX/metacubexd/commit/a3736903dcbd1d41dbe1d63262c9d57375024398))
+
 ## [1.241.3](https://github.com/MetaCubeX/metacubexd/compare/v1.241.2...v1.241.3) (2026-02-27)
 
 
