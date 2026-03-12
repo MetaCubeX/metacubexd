@@ -69,6 +69,7 @@
   "autoCloseConns": "自动断开连接",
   "autoSwitchEndpoint": "自动切换后端",
   "autoSwitchTheme": "自动切换主题",
+  "defaultPage": "默认页面",
   "favDayTheme": "浅色主题偏好",
   "favNightTheme": "深色主题偏好",
   "renderInTwoColumns": "双列渲染",
@@ -261,5 +262,7 @@
     "excludedNodes": "排除的节点",
     "clearHistory": "清除历史",
     "noScoreYet": "暂无评分"
-  }
+  },
+  "themeColorTooltip": "颜色顺序：背景、强调色、文字",
+  "useMobileConnectionsTable": "在移动端使用表格视图"
 }

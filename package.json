@@ -85,6 +85,7 @@
     "vue-router": "^5.0.2",
     "vue-sonner": "^2.0.9",
     "vue-tsc": "^3.2.4",
+    "vue3-marquee": "^4.2.2",
     "zod": "^4.3.6"
   },
   "packageManager": "pnpm@10.28.2",

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Config, DNSQuery } from '~/types'
 import { useMutation } from '@tanstack/vue-query'
+import { Vue3Marquee } from 'vue3-marquee'
 import { useConfigActions, useRequest } from '~/composables/useApi'
 import {
   useConfigQuery,
@@ -566,6 +567,25 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                 class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 transition-colors hover:bg-base-content/5"
               >
                 <div class="flex items-center gap-2 text-sm">
+                  <span>{{ t('defaultPage') }}</span>
+                </div>
+                <select
+                  v-model="configStore.defaultPage"
+                  class="select-bordered select select-sm"
+                >
+                  <option value="overview">{{ t('overview') }}</option>
+                  <option value="proxies">{{ t('proxies') }}</option>
+                  <option value="connections">{{ t('connections') }}</option>
+                  <option value="rules">{{ t('rules') }}</option>
+                  <option value="logs">{{ t('logs') }}</option>
+                  <option value="config">{{ t('config') }}</option>
+                </select>
+              </div>
+
+              <div
+                class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 transition-colors hover:bg-base-content/5"
+              >
+                <div class="flex items-center gap-2 text-sm">
                   <span>{{ t('autoSwitchEndpoint') }}</span>
                 </div>
                 <input
@@ -845,8 +865,9 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
             >
               <input
                 v-model="remoteConfigURL"
-                type="url"
-                class="input-bordered input w-full"
+                type="text"
+                inputmode="url"
+                class="input-bordered input h-10 min-h-10 flex-1 appearance-none px-3"
                 :placeholder="t('remoteConfigURLPlaceholder')"
               />
               <Button
@@ -892,7 +913,16 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                     d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"
                   />
                 </svg>
-                {{ t('reloadConfig') }}
+                <Vue3Marquee
+                  :animate-on-overflow-only="true"
+                  :duration="10"
+                  :delay="2"
+                  :clone="false"
+                  :pause-on-hover="true"
+                  class="w-full flex-1 overflow-hidden"
+                >
+                  <span class="pr-6">{{ t('reloadConfig') }}</span>
+                </Vue3Marquee>
               </Button>
 
               <Button
@@ -910,7 +940,16 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                 >
                   <polygon points="5 3 19 12 5 21 5 3" />
                 </svg>
-                {{ t('restartCore') }}
+                <Vue3Marquee
+                  :animate-on-overflow-only="true"
+                  :duration="10"
+                  :delay="2"
+                  :clone="false"
+                  :pause-on-hover="true"
+                  class="w-full flex-1 overflow-hidden"
+                >
+                  <span class="pr-6">{{ t('restartCore') }}</span>
+                </Vue3Marquee>
               </Button>
 
               <Button
@@ -930,7 +969,16 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                     d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"
                   />
                 </svg>
-                {{ t('flushFakeIP') }}
+                <Vue3Marquee
+                  :animate-on-overflow-only="true"
+                  :duration="10"
+                  :delay="2"
+                  :clone="false"
+                  :pause-on-hover="true"
+                  class="w-full flex-1 overflow-hidden"
+                >
+                  <span class="pr-6">{{ t('flushFakeIP') }}</span>
+                </Vue3Marquee>
               </Button>
 
               <Button
@@ -950,7 +998,16 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                   <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
                   <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
                 </svg>
-                {{ t('flushDNSCache') }}
+                <Vue3Marquee
+                  :animate-on-overflow-only="true"
+                  :duration="10"
+                  :delay="2"
+                  :clone="false"
+                  :pause-on-hover="true"
+                  class="w-full flex-1 overflow-hidden"
+                >
+                  <span class="pr-6">{{ t('flushDNSCache') }}</span>
+                </Vue3Marquee>
               </Button>
 
               <Button
@@ -972,7 +1029,16 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                     d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"
                   />
                 </svg>
-                {{ t('updateGEODatabases') }}
+                <Vue3Marquee
+                  :animate-on-overflow-only="true"
+                  :duration="10"
+                  :delay="2"
+                  :clone="false"
+                  :pause-on-hover="true"
+                  class="w-full flex-1 overflow-hidden"
+                >
+                  <span class="pr-6">{{ t('updateGEODatabases') }}</span>
+                </Vue3Marquee>
               </Button>
             </div>
           </div>
@@ -1008,15 +1074,16 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
               >
                 <input
                   v-model="dnsQuery.name"
-                  type="search"
-                  class="input-bordered input w-full font-mono"
+                  type="text"
+                  enterkeyhint="search"
+                  class="input-bordered input h-10 min-h-10 flex-1 appearance-none px-3 font-mono"
                   placeholder="google.com"
                   @input="onDnsQueryInput"
                 />
 
                 <select
                   v-model="dnsQuery.type"
-                  class="select-bordered select w-full sm:w-auto"
+                  class="select-bordered select h-10 min-h-10 w-full appearance-none px-3 sm:w-auto"
                 >
                   <option>A</option>
                   <option>AAAA</option>

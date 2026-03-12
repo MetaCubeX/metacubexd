@@ -13,10 +13,15 @@ const emit = defineEmits<{
 
 const dialogRef = ref<HTMLDialogElement>()
 const isOpen = ref(false)
+const isRendered = ref(false)
 
 function open() {
   dialogRef.value?.showModal()
-  isOpen.value = true
+  isRendered.value = true
+  // Small delay to allow the DOM to render before animating
+  requestAnimationFrame(() => {
+    isOpen.value = true
+  })
 }
 
 function close() {
@@ -24,6 +29,7 @@ function close() {
   // Wait for animation to complete
   setTimeout(() => {
     dialogRef.value?.close()
+    isRendered.value = false
     emit('close')
   }, 200)
 }
@@ -41,19 +47,17 @@ defineExpose({ open, close })
     }"
   >
     <div
-      class="modal-box flex max-h-[90vh] flex-col overflow-hidden rounded-2xl p-0 transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
+      class="flex max-h-[90vh] w-[95%] max-w-2xl flex-col overflow-hidden rounded-2xl p-0 transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] sm:w-11/12"
       :class="
         isOpen
           ? 'translate-y-0 scale-100 opacity-100'
           : 'translate-y-2.5 scale-95 opacity-0'
       "
       :style="{
-        background:
-          'color-mix(in oklch, var(--color-base-100) 98%, transparent)',
+        background: 'var(--color-base-100)',
         border: '1px solid var(--modal-border)',
         boxShadow:
           '0 25px 50px -12px color-mix(in oklch, var(--color-base-content) 25%, transparent), 0 0 0 1px var(--modal-border)',
-        backdropFilter: 'blur(16px)',
       }"
       @contextmenu.prevent
     >
@@ -61,10 +65,8 @@ defineExpose({ open, close })
       <div
         class="sticky top-0 z-10 flex items-center justify-between px-5 py-4 max-sm:pt-[max(1rem,env(safe-area-inset-top))]"
         :style="{
-          background:
-            'color-mix(in oklch, var(--color-base-200) 80%, transparent)',
+          background: 'var(--color-base-200)',
           borderBottom: '1px solid var(--modal-border)',
-          backdropFilter: 'blur(12px)',
         }"
       >
         <div
@@ -99,19 +101,17 @@ defineExpose({ open, close })
       </div>
 
       <!-- Content -->
-      <div class="flex-1 overflow-y-auto p-5">
+      <div v-if="isRendered" class="flex-1 overflow-y-auto p-5">
         <slot />
       </div>
 
       <!-- Actions -->
       <div
-        v-if="$slots.actions"
+        v-if="isRendered && $slots.actions"
         class="sticky bottom-0 z-10 flex items-center justify-end px-5 py-4"
         :style="{
-          background:
-            'color-mix(in oklch, var(--color-base-200) 80%, transparent)',
+          background: 'var(--color-base-200)',
           borderTop: '1px solid var(--modal-border)',
-          backdropFilter: 'blur(12px)',
         }"
       >
         <div class="flex justify-end gap-2">
@@ -122,7 +122,7 @@ defineExpose({ open, close })
 
     <form
       method="dialog"
-      class="fixed inset-0 modal-backdrop -z-[1] backdrop-blur-[8px]"
+      class="fixed inset-0 modal-backdrop -z-[1]"
       :style="{
         background:
           'color-mix(in oklch, var(--color-base-content) 50%, transparent)',

@@ -68,8 +68,9 @@
   "urlForLatencyTest": "URL for Latency Test",
   "autoCloseConns": "Automatically Close Connections",
   "autoSwitchEndpoint": "Automatically Switch Endpoint",
-  "autoSwitchTheme": "Automatically switch theme",
-  "favDayTheme": "Favorite light theme",
+  "autoSwitchTheme": "Auto Switch Theme",
+  "defaultPage": "Default Page",
+  "favDayTheme": "Favorite Day Theme",
   "favNightTheme": "Favorite dark theme",
   "renderInTwoColumns": "Render In Two Columns",
   "updateGEODatabases": "Update GEO Databases",
@@ -261,5 +262,7 @@
     "excludedNodes": "Excluded Nodes",
     "clearHistory": "Clear History",
     "noScoreYet": "No score yet"
-  }
+  },
+  "themeColorTooltip": "Color order: Background, Accent, Text",
+  "useMobileConnectionsTable": "Use Table View on Mobile"
 }

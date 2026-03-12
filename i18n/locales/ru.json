@@ -69,6 +69,7 @@
   "autoCloseConns": "Автоматически закрывать соединения",
   "autoSwitchEndpoint": "Автоматически переключать эндпоинт",
   "autoSwitchTheme": "Автоматически переключать тему",
+  "defaultPage": "Страница по умолчанию",
   "favDayTheme": "Любимая светлая тема",
   "favNightTheme": "Любимая тёмная тема",
   "renderInTwoColumns": "Отображать в два столбца",
@@ -219,7 +220,6 @@
   "fetchRemoteConfig": "Загрузить удалённую конфигурацию",
   "remoteConfigURL": "URL удалённой конфигурации",
   "remoteConfigURLPlaceholder": "Введите URL файла конфигурации",
-  "connectionError": "Бэкенд недоступен",
-  "connectionErrorDesc": "Не удаётся подключиться к бэкенду. Проверьте, работает ли бэкенд, или переключитесь на другой эндпоинт.",
-  "retry": "Повторить"
+  "themeColorTooltip": "Порядок цветов: Фон, Акцент, Текст",
+  "useMobileConnectionsTable": "Включить табличный вид на мобильных"
 }
