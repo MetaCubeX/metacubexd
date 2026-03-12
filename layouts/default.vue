@@ -63,6 +63,9 @@ const hasEndpoint = computed(
       <slot />
     </Sidebar>
 
+    <!-- Connection error banner - shown when backend is unreachable -->
+    <ConnectionErrorBanner v-if="hasEndpoint" />
+
     <!-- WebSocket connections manager -->
     <ProtectedResources v-if="hasEndpoint" />
 

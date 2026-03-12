@@ -218,5 +218,8 @@
   "useMobileBottomNav": "Нижняя навигация (мобильный)",
   "fetchRemoteConfig": "Загрузить удалённую конфигурацию",
   "remoteConfigURL": "URL удалённой конфигурации",
-  "remoteConfigURLPlaceholder": "Введите URL файла конфигурации"
+  "remoteConfigURLPlaceholder": "Введите URL файла конфигурации",
+  "connectionError": "Бэкенд недоступен",
+  "connectionErrorDesc": "Не удаётся подключиться к бэкенду. Проверьте, работает ли бэкенд, или переключитесь на другой эндпоинт.",
+  "retry": "Повторить"
 }

@@ -107,6 +107,7 @@ export function useRequest() {
   return ky.create({
     prefixUrl: endpoint.url,
     headers,
+    timeout: 5000,
   })
 }
 
@@ -128,6 +129,7 @@ export function checkEndpointAPI(url: string, secret: string) {
   return ky
     .get(url.endsWith('/') ? `${url}version` : `${url}/version`, {
       headers: secret ? { Authorization: `Bearer ${secret}` } : {},
+      timeout: 5000,
     })
     .then(({ ok }) => ok)
     .catch((err) => {

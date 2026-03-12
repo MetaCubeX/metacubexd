@@ -241,6 +241,9 @@
     "forceApply": "Apply anyway",
     "resetToDefaults": "Reset to Defaults"
   },
+  "connectionError": "Backend Unreachable",
+  "connectionErrorDesc": "Cannot connect to the backend. Please check if the backend is running or switch to another endpoint.",
+  "retry": "Retry",
   "recommendation": {
     "title": "Smart Recommendation",
     "recommended": "Recommended",

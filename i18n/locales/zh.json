@@ -241,6 +241,9 @@
     "forceApply": "强制应用",
     "resetToDefaults": "重置为默认"
   },
+  "connectionError": "后端不可达",
+  "connectionErrorDesc": "无法连接到后端，请检查后端是否正在运行，或切换到其他后端。",
+  "retry": "重试",
   "recommendation": {
     "title": "智能推荐",
     "recommended": "推荐",
