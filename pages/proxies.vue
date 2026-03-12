@@ -13,6 +13,7 @@ import {
   IconWand,
 } from '@tabler/icons-vue'
 import byteSize from 'byte-size'
+import { throttle } from 'lodash-es'
 import Button from '~/components/Button.vue'
 import ProxyNodeCard from '~/components/ProxyNodeCard.vue'
 import ProxyNodeListItem from '~/components/ProxyNodeListItem.vue'
@@ -126,6 +127,14 @@ function getProviderProxyNames(
 onMounted(() => {
   proxiesStore.fetchProxies()
 })
+
+// Enable window focus refetch for proxies data
+watch(
+  useWindowFocus(),
+  throttle((focused) => {
+    if (focused) proxiesStore.fetchProxies()
+  }, 30000),
+)
 
 // ProxyGroupTitle component
 const ProxyGroupTitle = defineComponent({
@@ -479,7 +488,7 @@ const ProviderProxyNodes = defineComponent({
 </script>
 
 <template>
-  <div class="flex h-full flex-col gap-3 overflow-y-auto p-2">
+  <div class="flex h-full flex-col gap-3 overflow-y-auto">
     <!-- Header with Tabs and Actions -->
     <div class="animate-fade-slide-in flex flex-wrap items-center gap-3">
       <!-- Tabs -->

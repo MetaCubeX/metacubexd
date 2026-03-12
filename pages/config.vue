@@ -170,7 +170,7 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
 </script>
 
 <template>
-  <div class="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-2">
+  <div class="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
     <!-- Loading State -->
     <div v-if="isLoading" class="flex h-64 items-center justify-center">
       <div class="flex flex-col items-center gap-4">
@@ -792,7 +792,7 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
               <input
                 v-model="remoteConfigURL"
                 type="url"
-                class="input-bordered input flex-1"
+                class="input-bordered input w-full"
                 :placeholder="t('remoteConfigURLPlaceholder')"
               />
               <Button
@@ -955,7 +955,7 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                 <input
                   v-model="dnsQuery.name"
                   type="search"
-                  class="input-bordered input flex-1 font-mono"
+                  class="input-bordered input w-full font-mono"
                   placeholder="google.com"
                   @input="onDnsQueryInput"
                 />

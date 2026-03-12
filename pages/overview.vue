@@ -380,9 +380,7 @@ watch(
 </script>
 
 <template>
-  <div
-    class="flex h-full flex-col gap-4 overflow-x-hidden overflow-y-auto p-1 pr-2 sm:pr-3"
-  >
+  <div class="flex h-full flex-col gap-4 overflow-x-hidden overflow-y-auto">
     <!-- Stats Grid -->
     <div
       class="-m-1 grid min-w-0 grid-cols-2 gap-3 p-1 sm:grid-cols-3 xl:grid-cols-6"
@@ -620,7 +618,7 @@ watch(
           <h3>{{ t('networkTopology') }}</h3>
         </div>
         <button
-          class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-base-content transition-colors duration-200 hover:bg-base-content/10"
+          class="flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-base-content transition-colors duration-200 hover:bg-base-content/10"
         >
           <IconChevronDown
             :size="20"
@@ -631,9 +629,6 @@ watch(
       </div>
       <NetworkTopology v-if="configStore.showNetworkTopology" class="mt-4" />
     </div>
-
-    <!-- Data Usage Table -->
-    <DataUsageTable />
   </div>
 </template>
 

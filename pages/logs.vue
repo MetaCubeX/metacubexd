@@ -367,8 +367,9 @@ const tableSizeClass = computed(() =>
               :style="{ animationDelay: `${(index % 20) * 15}ms` }"
             >
               <td
-                v-for="col in columns"
+                v-for="(col, index) in columns"
                 :key="col.id"
+                :class="index === 0 ? 'py-1 leading-6' : ''"
                 class="border-b border-base-content/5"
               >
                 <component :is="() => col.render(row.original)" />
