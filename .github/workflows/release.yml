@@ -87,7 +87,7 @@ jobs:
 
       - uses: docker/setup-qemu-action@v4
 
-      - uses: docker/setup-docker-action@v4
+      - uses: docker/setup-docker-action@v5
         with:
           daemon-config: |
             {
