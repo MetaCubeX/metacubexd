@@ -8,7 +8,7 @@ import type {
   RuleProvider,
 } from '~/types'
 import ky from 'ky'
-import semver from 'semver'
+import { compareVersions } from '~/utils'
 import { useMockData } from './useMockData'
 
 // Mock mode support
@@ -107,6 +107,7 @@ export function useRequest() {
   return ky.create({
     prefixUrl: endpoint.url,
     headers,
+    timeout: 5000,
   })
 }
 
@@ -128,6 +129,7 @@ export function checkEndpointAPI(url: string, secret: string) {
   return ky
     .get(url.endsWith('/') ? `${url}version` : `${url}/version`, {
       headers: secret ? { Authorization: `Bearer ${secret}` } : {},
+      timeout: 5000,
     })
     .then(({ ok }) => ok)
     .catch((err) => {
@@ -410,10 +412,7 @@ export async function frontendReleaseAPI(currentVersion: string) {
     .json<ReleaseAPIResponse>()
 
   return {
-    isUpdateAvailable: semver.gt(
-      semver.coerce(tag_name) || '0.0.0',
-      semver.coerce(currentVersion) || '0.0.0',
-    ),
+    isUpdateAvailable: compareVersions(tag_name, currentVersion) > 0,
     changelog: body,
   }
 }
@@ -460,10 +459,7 @@ export async function backendReleaseAPI(currentVersion: string) {
     .json<ReleaseAPIResponse>()
 
   return {
-    isUpdateAvailable: semver.gt(
-      semver.coerce(tag_name) || '0.0.0',
-      semver.coerce(currentVersion) || '0.0.0',
-    ),
+    isUpdateAvailable: compareVersions(tag_name, currentVersion) > 0,
     changelog: body,
   }
 }

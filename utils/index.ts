@@ -2,6 +2,7 @@ import type {
   LATENCY_QUALITY_MAP_HTTP,
   LATENCY_QUALITY_MAP_HTTPS,
 } from '~/constants'
+import byteSize from 'byte-size'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -16,6 +17,32 @@ type LatencyQualityMap =
 
 dayjs.extend(relativeTime)
 dayjs.extend(duration)
+
+// Version comparison helper
+export function compareVersions(v1: string, v2: string): number {
+  const parse = (v: string) =>
+    v
+      .replace(/^v/, '')
+      .split(/[-.+]/)[0]
+      .split('.')
+      .map((n) => Number.parseInt(n, 10) || 0)
+
+  const parts1 = parse(v1)
+  const parts2 = parse(v2)
+  const len = Math.max(parts1.length, parts2.length)
+
+  for (let i = 0; i < len; i++) {
+    const p1 = parts1[i] || 0
+    const p2 = parts2[i] || 0
+    if (p1 > p2) return 1
+    if (p1 < p2) return -1
+  }
+  return 0
+}
+
+export function formatBytes(bytes: number) {
+  return byteSize(bytes).toString()
+}
 
 // URL helpers
 export function transformEndpointURL(url: string) {

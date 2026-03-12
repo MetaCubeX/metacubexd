@@ -119,7 +119,7 @@ const providersTotalSize = computed(() =>
 </script>
 
 <template>
-  <div class="rules-page flex h-full flex-col gap-3 overflow-y-auto p-2">
+  <div class="rules-page flex h-full flex-col gap-3 overflow-y-auto">
     <!-- Loading State -->
     <div v-if="isLoading" class="flex flex-1 items-center justify-center">
       <div class="flex flex-col items-center gap-4">

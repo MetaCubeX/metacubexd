@@ -27,7 +27,11 @@ const needsBtnClass = computed(() => buttonClass.value.includes('btn-'))
 <template>
   <button
     :type="type"
-    :class="[needsBtnClass && 'btn', loading ? 'btn-disabled' : buttonClass]"
+    class="inline-flex items-center justify-center gap-2" :class="[
+      needsBtnClass && 'btn',
+      buttonClass,
+      loading && 'btn-disabled cursor-wait',
+    ]"
     :disabled="disabled || loading"
     @click="$emit('click', $event)"
   >

@@ -23,8 +23,16 @@ const runtimeConfig = useRuntimeConfig()
 const frontendVersion = `v${runtimeConfig.public.appVersion || '0.0.0'}`
 
 // TanStack Query
-const { data: backendConfig, isLoading: isLoadingConfig } = useConfigQuery()
-const { data: backendVersion, isLoading: isLoadingVersion } = useVersionQuery()
+const {
+  data: backendConfig,
+  isLoading: isLoadingConfig,
+  isError: isErrorConfig,
+} = useConfigQuery()
+const {
+  data: backendVersion,
+  isLoading: isLoadingVersion,
+  isError: isErrorVersion,
+} = useVersionQuery()
 const updateConfigMutation = useUpdateConfigMutation()
 
 // Check if sing-box backend
@@ -166,17 +174,63 @@ const isLoading = computed(
   () => isLoadingConfig.value || isLoadingVersion.value,
 )
 
+const isError = computed(() => isErrorConfig.value || isErrorVersion.value)
+
 // Active section for mobile tabs
 const activeSection = ref<'core' | 'xd' | 'tools'>('core')
 </script>
 
 <template>
-  <div class="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-2">
+  <div class="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
     <!-- Loading State -->
-    <div v-if="isLoading" class="flex h-64 items-center justify-center">
+    <div
+      v-if="isLoading && !isError"
+      class="flex h-64 items-center justify-center"
+    >
       <div class="flex flex-col items-center gap-4">
         <span class="loading loading-lg loading-ring text-primary" />
         <span class="text-sm opacity-60">{{ t('config') }}</span>
+      </div>
+    </div>
+
+    <!-- Error State - Backend Unreachable -->
+    <div v-else-if="isError" class="flex h-64 items-center justify-center">
+      <div class="flex flex-col items-center gap-4 text-center">
+        <div
+          class="flex h-16 w-16 items-center justify-center rounded-full bg-error/10 text-error"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="size-8"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <path d="M15 9l-6 6M9 9l6 6" />
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-lg font-bold">{{ t('connectionError') }}</h2>
+          <p class="mt-1 max-w-sm text-sm opacity-60">
+            {{ t('connectionErrorDesc') }}
+          </p>
+          <p class="mt-1 text-xs opacity-40">
+            {{ endpointStore.currentEndpoint?.url }}
+          </p>
+        </div>
+        <div class="flex gap-2">
+          <button class="btn btn-sm btn-primary" @click="$router.go(0)">
+            {{ t('retry') }}
+          </button>
+          <button
+            class="btn btn-outline btn-sm btn-info"
+            @click="switchEndpoint"
+          >
+            {{ t('switchEndpoint') }}
+          </button>
+        </div>
       </div>
     </div>
 
