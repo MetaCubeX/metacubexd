@@ -1,0 +1,1 @@
+import{c as e}from"./CG1hdfJC.js";var o=e("outline","chevrons-left","ChevronsLeft",[["path",{d:"M11 7l-5 5l5 5",key:"svg-0"}],["path",{d:"M17 7l-5 5l5 5",key:"svg-1"}]]);var h=e("outline","chevrons-right","ChevronsRight",[["path",{d:"M7 7l5 5l-5 5",key:"svg-0"}],["path",{d:"M13 7l5 5l-5 5",key:"svg-1"}]]);export{o as I,h as a};

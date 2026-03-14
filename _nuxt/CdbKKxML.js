@@ -1,0 +1,1 @@
+import{c as o}from"./CG1hdfJC.js";var r=o("outline","chevron-right","ChevronRight",[["path",{d:"M9 6l6 6l-6 6",key:"svg-0"}]]);function i(t){var e=typeof t;return t!=null&&(e=="object"||e=="function")}export{r as I,i};
