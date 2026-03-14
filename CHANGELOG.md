@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.243.0](https://github.com/MetaCubeX/metacubexd/compare/v1.242.0...v1.243.0) (2026-03-14)
+
+
+### Features
+
+* **ui:** enhance UI components and layout rendering ([#1899](https://github.com/MetaCubeX/metacubexd/issues/1899)) ([0ef2d84](https://github.com/MetaCubeX/metacubexd/commit/0ef2d84d749171b343728433de6894fbde313167))
+
 ## [1.242.0](https://github.com/MetaCubeX/metacubexd/compare/v1.241.3...v1.242.0) (2026-03-12)
 
 
