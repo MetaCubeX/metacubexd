@@ -224,7 +224,6 @@ const toggleSidebar = () => {
     <!-- Mobile Bottom Navigation (when enabled) -->
     <MobileBottomNav
       v-if="configStore.useMobileBottomNav && route.path !== '/setup'"
-      :nav-items="navItems"
     />
   </div>
 </template>
