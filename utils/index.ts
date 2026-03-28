@@ -19,11 +19,14 @@ dayjs.extend(relativeTime)
 dayjs.extend(duration)
 
 // Version comparison helper
+const VERSION_PREFIX_RE = /^v/
+const VERSION_PRERELEASE_RE = /[-+]/
+
 export function compareVersions(v1: string, v2: string): number {
   const parse = (v: string) =>
     v
-      .replace(/^v/, '')
-      .split(/[-.+]/)[0]
+      .replace(VERSION_PREFIX_RE, '')
+      .split(VERSION_PRERELEASE_RE)[0]
       .split('.')
       .map((n) => Number.parseInt(n, 10) || 0)
 
@@ -45,13 +48,16 @@ export function formatBytes(bytes: number) {
 }
 
 // URL helpers
+const URL_PROTOCOL_RE = /^https?:\/\//
+
 export function transformEndpointURL(url: string) {
-  return /^https?:\/\//.test(url) ? url : `${window.location.protocol}//${url}`
+  return URL_PROTOCOL_RE.test(url) ? url : `${window.location.protocol}//${url}`
 }
 
+const IPV6_RE = /:{1,2}/
+
 export function formatIPv6(ip: string) {
-  const regexr = /:{1,2}/
-  if (regexr.test(ip)) {
+  if (IPV6_RE.test(ip)) {
     return `[${ip}]`
   }
   return ip
@@ -330,19 +336,27 @@ export function getChartThemeColors() {
 }
 
 // SVG encoder for proxy icons
+const SVG_QUOTE_RE = /"/g
+const SVG_PERCENT_RE = /%/g
+const SVG_HASH_RE = /#/g
+const SVG_LBRACE_RE = /\{/g
+const SVG_RBRACE_RE = /\}/g
+const SVG_LT_RE = /</g
+const SVG_GT_RE = />/g
+
 export function encodeSvg(svg: string) {
   return svg
     .replace(
       '<svg',
-      ~svg.indexOf('xmlns')
+      svg.includes('xmlns')
         ? '<svg'
         : '<svg xmlns="http://www.w3.org/2000/svg"',
     )
-    .replace(/"/g, "'")
-    .replace(/%/g, '%25')
-    .replace(/#/g, '%23')
-    .replace(/\{/g, '%7B')
-    .replace(/\}/g, '%7D')
-    .replace(/</g, '%3C')
-    .replace(/>/g, '%3E')
+    .replace(SVG_QUOTE_RE, "'")
+    .replace(SVG_PERCENT_RE, '%25')
+    .replace(SVG_HASH_RE, '%23')
+    .replace(SVG_LBRACE_RE, '%7B')
+    .replace(SVG_RBRACE_RE, '%7D')
+    .replace(SVG_LT_RE, '%3C')
+    .replace(SVG_GT_RE, '%3E')
 }

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  compareVersions,
   encodeSvg,
   filterSpecialProxyType,
   formatDuration,
@@ -181,6 +182,38 @@ describe('utils/index', () => {
     it('returns false for null value', () => {
       const row = { getValue: () => null }
       expect(fuzzyFilter(row, 'col', 'test')).toBe(false)
+    })
+  })
+
+  describe('compareVersions', () => {
+    it('returns positive when v1 is newer', () => {
+      expect(compareVersions('v1.243.0', 'v1.242.0')).toBeGreaterThan(0)
+      expect(compareVersions('1.243.0', '1.242.0')).toBeGreaterThan(0)
+      expect(compareVersions('v2.0.0', 'v1.999.999')).toBeGreaterThan(0)
+    })
+
+    it('returns negative when v1 is older', () => {
+      expect(compareVersions('v1.241.3', 'v1.242.0')).toBeLessThan(0)
+      expect(compareVersions('1.0.0', '1.0.1')).toBeLessThan(0)
+    })
+
+    it('returns zero for equal versions', () => {
+      expect(compareVersions('v1.242.0', 'v1.242.0')).toBe(0)
+      expect(compareVersions('1.242.0', 'v1.242.0')).toBe(0)
+    })
+
+    it('strips pre-release suffixes before comparing', () => {
+      expect(compareVersions('1.243.0-beta.1', '1.243.0')).toBe(0)
+      expect(compareVersions('1.244.0-rc.1', '1.243.0')).toBeGreaterThan(0)
+    })
+
+    it('strips build metadata before comparing', () => {
+      expect(compareVersions('1.243.0+build123', '1.243.0')).toBe(0)
+    })
+
+    it('handles different segment counts', () => {
+      expect(compareVersions('1.243', '1.243.0')).toBe(0)
+      expect(compareVersions('1.243.1', '1.243')).toBeGreaterThan(0)
     })
   })
 
