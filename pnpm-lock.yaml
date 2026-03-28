@@ -2650,16 +2650,6 @@ packages:
     cpu: [x64]
     os: [darwin]
 
-  '@rollup/rollup-freebsd-arm64@4.57.1':
-    resolution: {integrity: sha512-R+/WwhsjmwodAcz65guCGFRkMb4gKWTcIeLy60JJQbXrJ97BOXHxnkPFrP+YwFlaS0m+uWJTstrUA9o+UchFug==}
-    cpu: [arm64]
-    os: [freebsd]
-
-  '@rollup/rollup-freebsd-arm64@4.59.0':
-    resolution: {integrity: sha512-EsKaJ5ytAu9jI3lonzn3BgG8iRBjV4LxZexygcQbpiU0wU0ATxhNVEpXKfUa0pS05gTcSDMKpn3Sx+QB9RlTTA==}
-    cpu: [arm64]
-    os: [freebsd]
-
   '@rollup/rollup-freebsd-x64@4.57.1':
     resolution: {integrity: sha512-IEQTCHeiTOnAUC3IDQdzRAGj3jOAYNr9kBguI7MQAAZK3caezRrg0GxAb6Hchg4lxdZEI5Oq3iov/w/hnFWY9Q==}
     cpu: [x64]
@@ -9928,12 +9918,6 @@ snapshots:
   '@rollup/rollup-darwin-x64@4.59.0':
     optional: true
 
-  '@rollup/rollup-freebsd-arm64@4.57.1':
-    optional: true
-
-  '@rollup/rollup-freebsd-arm64@4.59.0':
-    optional: true
-
   '@rollup/rollup-freebsd-x64@4.57.1':
     optional: true
 
@@ -14568,7 +14552,6 @@ snapshots:
       '@rollup/rollup-android-arm64': 4.57.1
       '@rollup/rollup-darwin-arm64': 4.57.1
       '@rollup/rollup-darwin-x64': 4.57.1
-      '@rollup/rollup-freebsd-arm64': 4.57.1
       '@rollup/rollup-freebsd-x64': 4.57.1
       '@rollup/rollup-linux-arm-gnueabihf': 4.57.1
       '@rollup/rollup-linux-arm-musleabihf': 4.57.1
@@ -14599,7 +14582,6 @@ snapshots:
       '@rollup/rollup-android-arm64': 4.59.0
       '@rollup/rollup-darwin-arm64': 4.59.0
       '@rollup/rollup-darwin-x64': 4.59.0
-      '@rollup/rollup-freebsd-arm64': 4.59.0
       '@rollup/rollup-freebsd-x64': 4.59.0
       '@rollup/rollup-linux-arm-gnueabihf': 4.59.0
       '@rollup/rollup-linux-arm-musleabihf': 4.59.0
