@@ -338,10 +338,10 @@ function handleLatencyTest() {
 
 <template>
   <!-- Wrapper for glow effect -->
-  <div class="relative p-1" :class="isSelected ? 'z-10' : 'z-0'">
+  <div class="relative h-full p-1" :class="isSelected ? 'z-10' : 'z-0'">
     <div
       ref="reference"
-      class="relative w-full rounded-[0.625rem] transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
+      class="relative h-full w-full rounded-[0.625rem] transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
       :class="[
         isSelected
           ? 'scale-[1.02] animate-[glowPulse_2s_ease-in-out_infinite] bg-primary text-primary-content'
@@ -374,7 +374,7 @@ function handleLatencyTest() {
       </div>
 
       <div
-        class="flex flex-col gap-2 p-[0.625rem]"
+        class="flex h-full flex-col gap-2 p-[0.625rem]"
         :class="{ 'cursor-pointer': !!onClick }"
         @click="onClick"
       >
@@ -413,16 +413,23 @@ function handleLatencyTest() {
           />
         </div>
 
-        <!-- Latency stability bar -->
-        <div
-          v-if="latencyTestHistory.length > 1"
-          class="flex h-1.5 w-full gap-px overflow-hidden rounded-full"
-        >
+        <div class="mt-auto min-h-[0.375rem]">
+          <!-- Latency stability bar -->
           <div
-            v-for="(result, index) in latencyStabilityBar"
-            :key="index"
-            class="h-full flex-1 bg-current first:rounded-l-full last:rounded-r-full"
-            :class="result.colorClass"
+            v-if="latencyStabilityBar.length > 0"
+            class="flex h-1.5 w-full gap-px overflow-hidden rounded-full"
+          >
+            <div
+              v-for="(result, index) in latencyStabilityBar"
+              :key="index"
+              class="h-full flex-1 bg-current first:rounded-l-full last:rounded-r-full"
+              :class="result.colorClass"
+            />
+          </div>
+          <div
+            v-else
+            class="h-1.5 w-full rounded-full bg-current opacity-[0.15]"
+            aria-hidden="true"
           />
         </div>
       </div>

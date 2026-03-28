@@ -144,6 +144,13 @@ const ProxyGroupTitle = defineComponent({
   },
   setup(props) {
     const recommendedNode = computed(() => getRecommendedNode(props.proxyGroup))
+    const totalProxyCount = computed(() => props.proxyGroup.all?.length ?? 0)
+    const aliveProxyCount = computed(
+      () =>
+        props.proxyGroup.all?.filter(
+          (proxyName) => proxiesStore.proxyNodeMap[proxyName]?.alive === true,
+        ).length ?? 0,
+    )
     const hasRecommendation = computed(
       () =>
         recommendedNode.value !== null &&
@@ -197,7 +204,7 @@ const ProxyGroupTitle = defineComponent({
                     class:
                       'badge badge-sm text-[0.7rem] font-semibold px-2 py-1 rounded-md bg-primary/12 text-primary border border-primary/20',
                   },
-                  props.proxyGroup.all?.length,
+                  `${aliveProxyCount.value} / ${totalProxyCount.value}`,
                 ),
               ],
             ),
