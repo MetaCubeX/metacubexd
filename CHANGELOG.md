@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.243.2](https://github.com/MetaCubeX/metacubexd/compare/v1.243.1...v1.243.2) (2026-03-28)
+
+
+### Bug Fixes
+
+* correct regex in compareVersions that broke version update detection ([#1927](https://github.com/MetaCubeX/metacubexd/issues/1927)) ([8508936](https://github.com/MetaCubeX/metacubexd/commit/85089366bd4445c93df578eed56f96cc22354b61))
+
 ## [1.243.1](https://github.com/MetaCubeX/metacubexd/compare/v1.243.0...v1.243.1) (2026-03-28)
 
 
