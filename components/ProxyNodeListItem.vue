@@ -237,7 +237,7 @@ function handleLatencyTest() {
           />
           <!-- Latency stability bar -->
           <div
-            v-if="latencyTestHistory.length > 1"
+            v-if="latencyStabilityBar.length > 0"
             class="flex h-[3px] w-full max-w-[44px] gap-px overflow-hidden rounded-full"
           >
             <div
