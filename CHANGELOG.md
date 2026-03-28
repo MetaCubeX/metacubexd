@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.243.1](https://github.com/MetaCubeX/metacubexd/compare/v1.243.0...v1.243.1) (2026-03-28)
+
+
+### Bug Fixes
+
+* **deps:** override vulnerable transitive dependencies ([4b38650](https://github.com/MetaCubeX/metacubexd/commit/4b38650f5ef7d90a8a03bec17850eeeea59ac5f0))
+
 ## [1.243.0](https://github.com/MetaCubeX/metacubexd/compare/v1.242.0...v1.243.0) (2026-03-14)
 
 
