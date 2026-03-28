@@ -18,6 +18,7 @@ import {
 
 interface ProxyInfo {
   name: string
+  alive?: boolean
   udp: boolean
   tfo: boolean
   latencyTestHistory: Record<string, Proxy['history'] | undefined>
@@ -112,8 +113,10 @@ export const useProxiesStore = defineStore('proxies', () => {
         getLatencyFromProxy(proxy)
 
       const { udp, xudp, type, now, name, tfo, provider = '' } = proxy
+      const alive = 'alive' in proxy ? proxy.alive : undefined
 
       newProxyNodeMap[proxy.name] = {
+        alive,
         udp,
         xudp,
         type,
