@@ -95,6 +95,7 @@ function getSortedProxyNames(proxyGroup: ProxyType) {
     orderingType: configStore.proxiesOrderingType,
     testUrl: proxyGroup.testUrl || null,
     getLatencyByName: proxiesStore.getLatencyByName,
+    isProxyGroup: proxiesStore.isProxyGroup,
     latencyQualityMap: configStore.latencyQualityMap,
     urlForLatencyTest: configStore.urlForLatencyTest,
   })
@@ -118,6 +119,7 @@ function getProviderProxyNames(
     orderingType: configStore.proxiesOrderingType,
     testUrl: provider.testUrl,
     getLatencyByName: proxiesStore.getLatencyByName,
+    isProxyGroup: proxiesStore.isProxyGroup,
     latencyQualityMap: configStore.latencyQualityMap,
     urlForLatencyTest: configStore.urlForLatencyTest,
   })

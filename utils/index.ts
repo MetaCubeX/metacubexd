@@ -166,6 +166,7 @@ export function sortProxiesByOrderingType({
   orderingType,
   testUrl,
   getLatencyByName,
+  isProxyGroup,
   latencyQualityMap,
   urlForLatencyTest,
 }: {
@@ -173,6 +174,7 @@ export function sortProxiesByOrderingType({
   orderingType: PROXIES_ORDERING_TYPE
   testUrl: string | null
   getLatencyByName: (name: string, testUrl: string | null) => number
+  isProxyGroup?: (name: string) => boolean
   latencyQualityMap: LatencyQualityMap
   urlForLatencyTest: string
 }) {
@@ -185,6 +187,15 @@ export function sortProxiesByOrderingType({
   return [...proxyNames].sort((a, b) => {
     const prevLatency = getLatencyByName(a, finalTestUrl)
     const nextLatency = getLatencyByName(b, finalTestUrl)
+
+    const prevIsProxyGroup = isProxyGroup?.(a) ?? false
+    const nextIsProxyGroup = isProxyGroup?.(b) ?? false
+    const proxyGroupPriority =
+      Number(nextIsProxyGroup) - Number(prevIsProxyGroup)
+
+    if (proxyGroupPriority !== 0) {
+      return proxyGroupPriority
+    }
 
     switch (orderingType) {
       case PROXIES_ORDERING_TYPE.LATENCY_ASC:
