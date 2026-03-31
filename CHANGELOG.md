@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.244.0](https://github.com/MetaCubeX/metacubexd/compare/v1.243.2...v1.244.0) (2026-03-31)
+
+
+### Features
+
+* prioritize proxy groups in sorting ([#1929](https://github.com/MetaCubeX/metacubexd/issues/1929)) ([9d3b079](https://github.com/MetaCubeX/metacubexd/commit/9d3b0794458b80a2dfb3db95242a267271c66135))
+
 ## [1.243.2](https://github.com/MetaCubeX/metacubexd/compare/v1.243.1...v1.243.2) (2026-03-28)
 
 
