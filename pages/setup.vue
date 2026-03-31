@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import type {EndpointCheckError} from '~/composables/useApi';
 import { IconLink, IconLock, IconServer, IconX } from '@tabler/icons-vue'
 import { v4 as uuid } from 'uuid'
-import { checkEndpointAPI } from '~/composables/useApi'
+import { checkEndpointAPI  } from '~/composables/useApi'
 import { FALLBACK_BACKEND_URL } from '~/constants'
 import { transformEndpointURL } from '~/utils'
 
@@ -22,6 +23,7 @@ const formData = reactive({
 })
 
 const isSubmitting = ref(false)
+const endpointError = ref<EndpointCheckError>(null)
 
 // Get default backend URL from config
 // Priority: runtime config (NUXT_PUBLIC_DEFAULT_BACKEND_URL) > config.js > fallback
@@ -54,20 +56,28 @@ async function onEndpointSelect(id: string) {
   const endpoint = endpointStore.endpointList.find((e) => e.id === id)
   if (!endpoint) return
 
-  if (!(await checkEndpointAPI(endpoint.url, endpoint.secret))) return
+  const error = await checkEndpointAPI(endpoint.url, endpoint.secret)
+  if (error) {
+    endpointError.value = error
+    return
+  }
 
+  endpointError.value = null
   onSetupSuccess(id)
 }
 
 async function onSubmit() {
   isSubmitting.value = true
+  endpointError.value = null
 
   try {
     const url = formData.url
     const secret = formData.secret
     const transformedURL = transformEndpointURL(url)
 
-    if (!(await checkEndpointAPI(transformedURL, secret))) {
+    const error = await checkEndpointAPI(transformedURL, secret)
+    if (error) {
+      endpointError.value = error
       isSubmitting.value = false
       return
     }
@@ -243,6 +253,19 @@ onMounted(async () => {
               placeholder="secret"
               autocomplete="current-password"
             />
+          </div>
+
+          <!-- Error Message -->
+          <div
+            v-if="endpointError"
+            class="rounded-lg border border-error/20 bg-error/10 px-4 py-3 text-sm text-error"
+          >
+            <template v-if="endpointError === 'mixed_content'">
+              {{ t('mixedContentError') }}
+            </template>
+            <template v-else>
+              {{ t('endpointConnectError') }}
+            </template>
           </div>
 
           <!-- Submit Button -->

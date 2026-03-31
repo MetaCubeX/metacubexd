@@ -264,5 +264,7 @@
     "noScoreYet": "暂无评分"
   },
   "themeColorTooltip": "颜色顺序：背景、强调色、文字",
-  "useMobileConnectionsTable": "在移动端使用表格视图"
+  "useMobileConnectionsTable": "在移动端使用表格视图",
+  "mixedContentError": "无法连接：当前页面通过 HTTPS 加载，但后端地址为 HTTP，浏览器会出于安全原因拦截此请求。请直接通过后端地址访问面板（如 http://127.0.0.1:9090/ui），或将面板部署在 HTTP 环境下。",
+  "endpointConnectError": "无法连接后端，请检查地址是否正确以及后端是否正在运行。"
 }

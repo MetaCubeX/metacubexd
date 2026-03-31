@@ -125,17 +125,30 @@ export function useGithubAPI() {
 }
 
 // API Functions
-export function checkEndpointAPI(url: string, secret: string) {
+export type EndpointCheckError = 'mixed_content' | 'network_error' | null
+
+export function checkEndpointAPI(
+  url: string,
+  secret: string,
+): Promise<EndpointCheckError> {
   return ky
     .get(url.endsWith('/') ? `${url}version` : `${url}/version`, {
       headers: secret ? { Authorization: `Bearer ${secret}` } : {},
       timeout: 5000,
     })
-    .then(({ ok }) => ok)
+    .then(({ ok }) => (ok ? null : 'network_error'))
     .catch((err) => {
       console.error(err)
 
-      return false
+      if (
+        typeof window !== 'undefined' &&
+        window.location.protocol === 'https:' &&
+        url.startsWith('http://')
+      ) {
+        return 'mixed_content'
+      }
+
+      return 'network_error'
     })
 }
 
@@ -398,6 +411,8 @@ export function useConfigActions() {
 }
 
 // Release API
+const BACKEND_VERSION_RE = /(alpha|beta|meta)-?(\w+)/
+
 interface ReleaseAPIResponse {
   tag_name: string
   body: string
@@ -420,7 +435,7 @@ export async function frontendReleaseAPI(currentVersion: string) {
 export async function backendReleaseAPI(currentVersion: string) {
   const githubAPI = useGithubAPI()
   const repositoryURL = 'repos/MetaCubeX/mihomo'
-  const match = /(alpha|beta|meta)-?(\w+)/.exec(currentVersion)
+  const match = BACKEND_VERSION_RE.exec(currentVersion)
 
   const releaseByAssets = async (url: string, versionSuffix: string) => {
     const { assets, body } = await githubAPI
@@ -489,7 +504,7 @@ export async function fetchBackendReleasesAPI(
 ): Promise<ReleaseInfo[]> {
   const githubAPI = useGithubAPI()
   const repositoryURL = 'repos/MetaCubeX/mihomo'
-  const match = /(alpha|beta|meta)-?(\w+)/.exec(currentVersion)
+  const match = BACKEND_VERSION_RE.exec(currentVersion)
 
   if (!match) {
     // Stable version (e.g. "v1.19.9") - fetch stable releases
