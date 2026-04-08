@@ -61,7 +61,7 @@
     "is-ip": "^5.0.1",
     "ky": "^1.14.3",
     "lint-staged": "^16.4.0",
-    "lodash": "^4.17.23",
+    "lodash": "^4.18.1",
     "lodash-es": "^4.18.1",
     "markdown-it": "^14.1.1",
     "match-sorter": "^8.2.0",
