@@ -1,6 +1,6 @@
 import type { Config, Proxy, ProxyProvider, Rule, RuleProvider } from '~/types'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { useRequest } from './useApi'
+import { toggleRuleDisabledAPI, useRequest } from './useApi'
 
 // ============== Request Helpers ==============
 
@@ -168,8 +168,30 @@ export function useRulesQuery() {
       const request = createRequest()
       const { rules } = await request
         .get('rules')
-        .json<{ rules: Record<string, Rule> }>()
-      return Object.values(rules)
+        .json<{ rules: Record<string, Omit<Rule, 'index'>> }>()
+      return Object.entries(rules).map(([index, rule]) => ({
+        ...rule,
+        index: Number(index),
+      }))
+    },
+  })
+}
+
+export function useToggleRuleDisabledMutation() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({
+      index,
+      disabled,
+    }: {
+      index: number
+      disabled: boolean
+    }) => {
+      await toggleRuleDisabledAPI(index, disabled)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.rules })
     },
   })
 }

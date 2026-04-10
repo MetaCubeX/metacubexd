@@ -52,11 +52,21 @@ export interface ProxyProvider {
   vehicleType: string
 }
 
+export interface RuleExtra {
+  disabled?: boolean
+  hitCount?: number
+  hitAt?: string
+  missCount?: number
+  missAt?: string
+}
+
 export interface Rule {
+  index: number
   type: string
   payload: string
   proxy: string
   size: number
+  extra?: RuleExtra
 }
 
 export interface RuleProvider {

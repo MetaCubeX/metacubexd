@@ -3,9 +3,11 @@ import type { Rule, RuleProvider } from '~/types'
 import { IconFilter, IconReload, IconSearch } from '@tabler/icons-vue'
 import { useVirtualizer } from '@tanstack/vue-virtual'
 import { matchSorter } from 'match-sorter'
+import { computed, ref } from 'vue'
 import {
   useRuleProvidersQuery,
   useRulesQuery,
+  useToggleRuleDisabledMutation,
   useUpdateRuleProviderMutation,
 } from '~/composables/useQueries'
 import { formatTimeFromNow, useStringBooleanMap } from '~/utils'
@@ -19,6 +21,7 @@ const { data: rules = ref([]), isLoading: isLoadingRules } = useRulesQuery()
 const { data: ruleProviders = ref([]), isLoading: isLoadingProviders } =
   useRuleProvidersQuery()
 const updateProviderMutation = useUpdateRuleProviderMutation()
+const toggleRuleDisabledMutation = useToggleRuleDisabledMutation()
 
 const activeTab = ref<'rules' | 'ruleProviders'>('rules')
 const globalFilter = ref('')
@@ -58,6 +61,15 @@ const filteredRuleProviders = computed(() =>
       })
     : (ruleProviders.value ?? []),
 )
+
+async function onToggleRuleDisabled(rule: Rule) {
+  await setUpdatingMap(`rule-${rule.index}`, () =>
+    toggleRuleDisabledMutation.mutateAsync({
+      index: rule.index,
+      disabled: !rule.extra?.disabled,
+    }),
+  )
+}
 
 async function onUpdateProvider(name: string) {
   await setUpdatingMap(name, () => updateProviderMutation.mutateAsync(name))
@@ -186,79 +198,119 @@ const providersTotalSize = computed(() =>
       </div>
 
       <!-- Rules List -->
-      <div
-        v-if="activeTab === 'rules'"
-        ref="rulesParentRef"
-        class="flex-1 overflow-y-auto"
-      >
-        <div
-          v-if="filteredRules.length === 0"
-          class="animate-fade-in flex flex-col items-center justify-center py-16"
-        >
-          <IconFilter :size="48" class="mb-4 opacity-20" />
-          <span class="text-base-content/50">{{ t('noRules') }}</span>
-        </div>
-        <div
-          v-else
-          :style="{
-            height: `${rulesTotalSize}px`,
-            width: '100%',
-            position: 'relative',
-          }"
-        >
+      <template v-if="activeTab === 'rules'">
+        <div ref="rulesParentRef" class="flex-1 overflow-y-auto">
           <div
-            v-for="(item, index) in virtualRulesWithData"
-            :key="`${item.data.type}-${item.data.payload}-${item.data.proxy}`"
-            class="pb-2"
+            v-if="filteredRules.length === 0"
+            class="animate-fade-in flex flex-col items-center justify-center py-16"
+          >
+            <IconFilter :size="48" class="mb-4 opacity-20" />
+            <span class="text-base-content/50">{{ t('noRules') }}</span>
+          </div>
+          <div
+            v-else
             :style="{
-              position: 'absolute',
-              top: 0,
-              left: 0,
+              height: `${rulesTotalSize}px`,
               width: '100%',
-              height: `${item.size}px`,
-              transform: `translateY(${item.start}px)`,
+              position: 'relative',
             }"
           >
             <div
-              class="animate-fade-slide-in h-full rounded-xl border border-base-content/8 bg-base-200/60 backdrop-blur-xs transition-all duration-200 hover:border-primary/25 hover:shadow-[0_4px_12px] hover:shadow-primary/8"
-              :style="{ animationDelay: `${(index % 10) * 30}ms` }"
+              v-for="(item, index) in virtualRulesWithData"
+              :key="item.data.index"
+              class="pb-2"
+              :style="{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: `${item.size}px`,
+                transform: `translateY(${item.start}px)`,
+              }"
             >
-              <div class="p-3.5 px-4">
-                <div class="flex items-start justify-between gap-3">
-                  <div class="min-w-0 flex-1">
-                    <div
-                      class="mb-1 leading-[1.4] font-medium break-all text-base-content"
-                    >
-                      {{ item.data.payload }}
-                    </div>
-                    <div
-                      class="flex flex-wrap items-center gap-2 text-xs text-base-content/60"
-                    >
-                      <span
-                        class="inline-flex rounded-md bg-primary/15 px-2 py-0.5 font-medium text-primary"
-                      >
-                        {{ item.data.type }}
-                      </span>
-                      <span class="opacity-40">-></span>
-                      <span
-                        class="inline-flex rounded-md bg-secondary/15 px-2 py-0.5 font-medium text-secondary"
-                      >
-                        {{ item.data.proxy }}
-                      </span>
-                    </div>
-                  </div>
+              <div
+                class="animate-fade-slide-in h-full rounded-xl border border-base-content/8 bg-base-200/60 backdrop-blur-xs transition-all duration-200 hover:border-primary/25 hover:shadow-[0_4px_12px] hover:shadow-primary/8"
+                :style="{ animationDelay: `${(index % 10) * 30}ms` }"
+              >
+                <div
+                  class="flex h-full flex-col justify-center gap-1.5 px-4 py-2.5"
+                >
                   <div
-                    v-if="item.data.size !== -1"
-                    class="inline-flex rounded-lg bg-accent/15 px-2.5 py-1 text-xs font-semibold text-accent"
+                    class="truncate leading-[1.35] font-medium text-base-content"
                   >
-                    {{ item.data.size }}
+                    {{ item.data.payload || item.data.type }}
+                  </div>
+
+                  <div class="flex items-center gap-3 overflow-hidden">
+                    <input
+                      :checked="!item.data.extra?.disabled"
+                      class="toggle shrink-0 toggle-primary toggle-sm"
+                      type="checkbox"
+                      :disabled="updatingMap[`rule-${item.data.index}`]"
+                      @change="onToggleRuleDisabled(item.data)"
+                    />
+
+                    <div
+                      class="min-w-0 flex-1 overflow-hidden text-xs text-base-content/60"
+                    >
+                      <div
+                        class="flex min-w-0 items-center gap-2 whitespace-nowrap"
+                      >
+                        <span
+                          class="shrink-0 rounded-md bg-primary/15 px-2 py-0.5 font-medium text-primary"
+                        >
+                          {{ item.data.type }}
+                        </span>
+                        <span class="shrink-0 opacity-40">-></span>
+                        <span
+                          class="max-w-32 shrink-0 truncate rounded-md bg-secondary/15 px-2 py-0.5 font-medium text-secondary sm:max-w-none"
+                        >
+                          {{ item.data.proxy }}
+                        </span>
+                        <span
+                          class="shrink-0 rounded-md bg-success/10 px-2 py-0.5 font-medium text-success"
+                        >
+                          {{ item.data.extra?.hitCount ?? 0 }}
+                        </span>
+                        <span
+                          class="shrink-0 rounded-md bg-warning/10 px-2 py-0.5 font-medium text-warning"
+                        >
+                          {{ item.data.extra?.missCount ?? 0 }}
+                        </span>
+                        <span
+                          v-if="item.data.extra?.hitAt"
+                          class="hidden shrink-0 text-[11px] text-base-content/50 md:inline"
+                          :title="`${t('lastMatchedAt')} ${formatTimeFromNow(item.data.extra.hitAt, locale)}`"
+                        >
+                          {{ t('lastMatchedAt') }}
+                          {{ formatTimeFromNow(item.data.extra.hitAt, locale) }}
+                        </span>
+                        <span
+                          v-if="item.data.extra?.missAt"
+                          class="hidden shrink-0 text-[11px] text-base-content/45 lg:inline"
+                          :title="`${t('lastUnmatchedAt')} ${formatTimeFromNow(item.data.extra.missAt, locale)}`"
+                        >
+                          {{ t('lastUnmatchedAt') }}
+                          {{
+                            formatTimeFromNow(item.data.extra.missAt, locale)
+                          }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div
+                      v-if="item.data.size !== -1"
+                      class="hidden shrink-0 rounded-lg bg-accent/15 px-2.5 py-1 text-xs font-semibold text-accent sm:inline-flex"
+                    >
+                      {{ item.data.size }}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </template>
 
       <!-- Rule Providers List -->
       <div v-else ref="providersParentRef" class="flex-1 overflow-y-auto">

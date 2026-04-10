@@ -39,13 +39,14 @@ function getMockData(url: string): unknown {
   if (path === 'rules') {
     const rulesObj: Record<string, (typeof mockData.mockRules)[0]> = {}
     mockData.mockRules.forEach((rule, idx) => {
-      rulesObj[`rule-${idx}`] = rule
+      rulesObj[String(idx)] = rule
     })
 
     return { rules: rulesObj }
   }
   if (path === 'providers/rules')
     return { providers: mockData.mockRuleProviders }
+  if (path === 'rules/disable') return {}
   if (path === 'connections')
     return {
       connections: mockData.mockConnections,
@@ -276,6 +277,14 @@ export function updateRuleProviderAPI(providerName: string) {
   const request = useRequest()
 
   return request.put(`providers/rules/${encodeURIComponent(providerName)}`)
+}
+
+export function toggleRuleDisabledAPI(index: number, disabled: boolean) {
+  const request = useRequest()
+
+  return request.patch('rules/disable', {
+    json: { [index]: disabled },
+  })
 }
 
 // Config Actions with loading states
