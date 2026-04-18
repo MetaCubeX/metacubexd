@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.245.1](https://github.com/MetaCubeX/metacubexd/compare/v1.245.0...v1.245.1) (2026-04-18)
+
+
+### Bug Fixes
+
+* **api:** update ky client configuration from prefixUrl to prefix ([#1949](https://github.com/MetaCubeX/metacubexd/issues/1949)) ([b0f699f](https://github.com/MetaCubeX/metacubexd/commit/b0f699f2f85400de92eabd97c13e5a6e5f7047ce))
+
 ## [1.245.0](https://github.com/MetaCubeX/metacubexd/compare/v1.244.2...v1.245.0) (2026-04-18)
 
 
