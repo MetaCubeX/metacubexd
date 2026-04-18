@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.245.0](https://github.com/MetaCubeX/metacubexd/compare/v1.244.2...v1.245.0) (2026-04-18)
+
+
+### Features
+
+* **rules:** add rule toggle and match stats ([#1943](https://github.com/MetaCubeX/metacubexd/issues/1943)) ([acdcf3a](https://github.com/MetaCubeX/metacubexd/commit/acdcf3a58aa6a2cf5372a205a27f6d8dfb40764d))
+
+
+### Bug Fixes
+
+* update ky v2 API - prefixUrl to prefix ([#1942](https://github.com/MetaCubeX/metacubexd/issues/1942)) ([e76c7da](https://github.com/MetaCubeX/metacubexd/commit/e76c7da98bf5936da75517e1b2882af9e918f492))
+
 ## [1.244.2](https://github.com/MetaCubeX/metacubexd/compare/v1.244.1...v1.244.2) (2026-04-01)
 
 
