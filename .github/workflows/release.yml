@@ -66,7 +66,7 @@ jobs:
         run: tar czvf compressed-dist.tgz -C .output/public .
 
       - name: attach github release artifacts
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           token: ${{ secrets.CI_TOKEN }}
           files: compressed-dist.tgz
