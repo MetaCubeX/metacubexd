@@ -182,7 +182,19 @@ export const mockRules = generateMockRules()
 function generateMockRules() {
   const rules = [
     // Domain suffix rules
-    { type: 'DOMAIN-SUFFIX', payload: 'google.com', proxy: 'Proxy', size: 156 },
+    {
+      type: 'DOMAIN-SUFFIX',
+      payload: 'google.com',
+      proxy: 'Proxy',
+      size: 156,
+      extra: {
+        disabled: false,
+        hitCount: 128,
+        hitAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+        missCount: 3,
+        missAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+      },
+    },
     {
       type: 'DOMAIN-SUFFIX',
       payload: 'googleapis.com',
@@ -368,8 +380,36 @@ function generateMockRules() {
     { type: 'RULE-SET', payload: 'direct', proxy: 'DIRECT', size: 5678 },
     { type: 'RULE-SET', payload: 'proxy', proxy: 'Proxy', size: 2345 },
     // Match rule (final)
-    { type: 'MATCH', payload: '', proxy: 'Proxy', size: 1 },
+    {
+      type: 'MATCH',
+      payload: '',
+      proxy: 'Proxy',
+      size: 1,
+      extra: {
+        disabled: false,
+        hitCount: 2048,
+        hitAt: new Date(Date.now() - 30 * 1000).toISOString(),
+        missCount: 0,
+      },
+    },
   ]
+
+  for (const [index, rule] of rules.entries()) {
+    if (!('extra' in rule)) {
+      const hitCount = index % 4 === 0 ? 0 : (index + 1) * 7
+      ;(rule as { extra?: Record<string, unknown> }).extra = {
+        disabled: index % 9 === 0,
+        hitCount,
+        hitAt:
+          hitCount > 0
+            ? new Date(Date.now() - (index + 1) * 60 * 1000).toISOString()
+            : undefined,
+        missCount:
+          hitCount === 0 ? index + 2 : Math.max(0, Math.floor(hitCount / 6)),
+        missAt: new Date(Date.now() - (index + 3) * 90 * 1000).toISOString(),
+      }
+    }
+  }
 
   return rules
 }
