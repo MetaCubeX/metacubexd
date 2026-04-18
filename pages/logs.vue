@@ -22,10 +22,30 @@ const configStore = useConfigStore()
 
 const globalFilter = ref('')
 const settingsModal = ref<{ open: () => void; close: () => void }>()
+const detailModal = ref<{ open: () => void; close: () => void }>()
+const selectedLog = ref<LogWithSeq | null>(null)
+
+function formatTime(timestamp: number) {
+  if (!timestamp || Number.isNaN(timestamp)) return String(timestamp ?? '')
+  const date = new Date(timestamp)
+  if (Number.isNaN(date.getTime())) return String(timestamp)
+  const hours = date.getHours().toString().padStart(2, '0')
+  const minutes = date.getMinutes().toString().padStart(2, '0')
+  const seconds = date.getSeconds().toString().padStart(2, '0')
+  const ms = date.getMilliseconds().toString().padStart(3, '0')
+  return `${hours}:${minutes}:${seconds}.${ms}`
+}
+
+function showLogDetail(log: LogWithSeq) {
+  selectedLog.value = log
+  detailModal.value?.open()
+}
+
+const TYPE_EXTRACT_REGEX = /^\[([^\]]+)\]/
 
 // Extract type from payload, e.g. "[dns] xxx" -> "dns"
 function extractType(payload: string): string {
-  const match = payload.match(/^\[([^\]]+)\]/)
+  const match = payload.match(TYPE_EXTRACT_REGEX)
   return match?.[1] ?? ''
 }
 
@@ -59,6 +79,20 @@ interface LogColumn {
 // Column definitions with render functions
 const columns: LogColumn[] = [
   {
+    id: 'time',
+    label: t('time'),
+    sortable: true,
+    groupable: false,
+    render: (log) =>
+      h(
+        'span',
+        { class: 'font-mono text-base-content/70' },
+        log.time ? formatTime(log.time) : '-',
+      ),
+    sortValue: (log) =>
+      log.time != null && !Number.isNaN(log.time) ? log.time : 0,
+  },
+  {
     id: 'seq',
     label: t('sequence'),
     sortable: true,
@@ -91,7 +125,18 @@ const columns: LogColumn[] = [
     label: t('payload'),
     sortable: false,
     groupable: false,
-    render: (log) => log.payload,
+    render: (log) =>
+      h(
+        'span',
+        {
+          class: 'cursor-pointer hover:text-primary',
+          title: t('doubleClickToViewDetail'),
+          onDblclick: () => showLogDetail(log),
+        },
+        log.payload.length > 200
+          ? `${log.payload.slice(0, 200)}...`
+          : log.payload,
+      ),
   },
 ]
 
@@ -367,9 +412,9 @@ const tableSizeClass = computed(() =>
               :style="{ animationDelay: `${(index % 20) * 15}ms` }"
             >
               <td
-                v-for="(col, index) in columns"
-                :key="col.id"
-                :class="index === 0 ? 'py-1 leading-6' : ''"
+                v-for="col in columns"
+                :key="`${row.original.seq}-${col.id}`"
+                :class="columns.indexOf(col) === 0 ? 'py-1 leading-6' : ''"
                 class="border-b border-base-content/5"
               >
                 <component :is="() => col.render(row.original)" />
@@ -440,6 +485,42 @@ const tableSizeClass = computed(() =>
             <option :value="800">800</option>
             <option :value="1000">1000</option>
           </select>
+        </div>
+      </div>
+    </Modal>
+
+    <!-- Detail Modal -->
+    <Modal ref="detailModal" :title="t('logDetail')">
+      <template #icon>
+        <IconFileStack :size="24" />
+      </template>
+
+      <div v-if="selectedLog" class="flex flex-col gap-4">
+        <div class="flex flex-wrap gap-4 text-sm">
+          <div class="flex items-center gap-2">
+            <span class="text-base-content/60">{{ t('sequence') }}:</span>
+            <span class="font-mono font-semibold">{{ selectedLog.seq }}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-base-content/60">{{ t('level') }}:</span>
+            <span :class="getLevelClass(selectedLog.type)"
+              >[{{ selectedLog.type }}]</span
+            >
+          </div>
+          <div v-if="selectedLog.time" class="flex items-center gap-2">
+            <span class="text-base-content/60">{{ t('time') }}:</span>
+            <span class="font-mono">{{ formatTime(selectedLog.time) }}</span>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-medium text-base-content/70">{{
+            t('payload')
+          }}</label>
+          <pre
+            class="max-h-[50vh] overflow-auto rounded-lg border border-base-content/10 bg-base-200/50 p-4 font-mono text-sm leading-relaxed break-all whitespace-pre-wrap"
+            >{{ selectedLog.payload }}</pre
+          >
         </div>
       </div>
     </Modal>
