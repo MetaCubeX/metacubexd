@@ -105,7 +105,7 @@ export function useRequest() {
   }
 
   return ky.create({
-    prefixUrl: endpoint.url,
+    prefix: endpoint.url,
     headers,
     timeout: 5000,
   })
@@ -119,7 +119,7 @@ export function useGithubAPI() {
   }
 
   return ky.create({
-    prefixUrl: 'https://api.github.com',
+    prefix: 'https://api.github.com',
     headers,
   })
 }
