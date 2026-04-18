@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.246.0](https://github.com/MetaCubeX/metacubexd/compare/v1.245.1...v1.246.0) (2026-04-18)
+
+
+### Features
+
+* **logs:** add timestamp and detail view to logs ([#1953](https://github.com/MetaCubeX/metacubexd/issues/1953)) ([d48d3aa](https://github.com/MetaCubeX/metacubexd/commit/d48d3aad258d22c87c8f9a09a87c4d6390701b28))
+
 ## [1.245.1](https://github.com/MetaCubeX/metacubexd/compare/v1.245.0...v1.245.1) (2026-04-18)
 
 
