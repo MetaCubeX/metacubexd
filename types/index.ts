@@ -118,6 +118,7 @@ export type Connection = ConnectionRawMessage & {
 export interface Log {
   type: LOG_LEVEL
   payload: string
+  time?: number
 }
 
 export type LogWithSeq = Log & { seq: number }

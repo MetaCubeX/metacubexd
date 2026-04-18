@@ -13,10 +13,10 @@ export const useLogsStore = defineStore('logs', () => {
   const addLog = (log: Log) => {
     if (paused.value) return
 
-    logs.value = [{ ...log, seq }, ...logs.value].slice(
-      0,
-      configStore.logMaxRows,
-    )
+    logs.value = [
+      { ...log, seq, time: log.time ?? Date.now() },
+      ...logs.value,
+    ].slice(0, configStore.logMaxRows)
     seq++
   }
 
