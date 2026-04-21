@@ -13,6 +13,7 @@ export interface BatchTestOptions {
 
 export function useBatchLatencyTest() {
   const configStore = useConfigStore()
+  const proxiesStore = useProxiesStore()
   const nodeRecommendationStore = useNodeRecommendationStore()
 
   const isRunning = ref(false)
@@ -24,12 +25,14 @@ export function useBatchLatencyTest() {
     proxyName: string,
     url: string,
     timeout: number,
+    signal?: AbortSignal,
   ): Promise<{ proxyName: string; delay: number }> => {
     try {
       const request = useRequest()
       const result = await request
         .get(`proxies/${encodeURIComponent(proxyName)}/delay`, {
           searchParams: { url, timeout },
+          signal,
         })
         .json<{ delay: number }>()
       return { proxyName, delay: result.delay }
@@ -92,7 +95,12 @@ export function useBatchLatencyTest() {
           progress.value.current = nodeName
           nodeRecommendationStore.batchTestProgress.current = nodeName
 
-          const result = await testSingleNode(nodeName, url, timeout)
+          const result = await testSingleNode(
+            nodeName,
+            url,
+            timeout,
+            abortController.value?.signal,
+          )
           results[nodeName] = result.delay
 
           progress.value.completed++
@@ -131,6 +139,9 @@ export function useBatchLatencyTest() {
         isRunning: false,
       }
       abortController.value = null
+
+      // Refresh proxy data so UI shows latest latency
+      await proxiesStore.fetchProxies()
     }
 
     return results
@@ -157,6 +168,9 @@ export function useBatchLatencyTest() {
 
       // Record all results
       nodeRecommendationStore.recordBatchResults(results)
+
+      // Refresh proxy data so UI shows latest latency
+      await proxiesStore.fetchProxies()
 
       return results
     } finally {

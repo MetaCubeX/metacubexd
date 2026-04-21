@@ -26,6 +26,9 @@ export function useKeyboardShortcuts() {
   const gPrefixActive = ref(false)
   const gPrefixTimeout = ref<ReturnType<typeof setTimeout> | null>(null)
 
+  // Track if listeners are already setup
+  let listenersSetup = false
+
   // Clear g prefix after timeout
   const clearGPrefix = () => {
     gPrefixActive.value = false
@@ -53,8 +56,7 @@ export function useKeyboardShortcuts() {
     goToLogs: () => router.push(ROUTES.Log),
     goToConfig: () => router.push(ROUTES.Config),
     refresh: () => {
-      // Emit a custom event that pages can listen to
-      window.dispatchEvent(new CustomEvent('shortcut:refresh'))
+      window.location.reload()
     },
     closeModal: () => {
       // Close help modal if open
@@ -113,8 +115,12 @@ export function useKeyboardShortcuts() {
       return
     }
 
-    // Handle navigation shortcuts (g + key)
+    // Handle navigation shortcuts (g + key, ignore if modifier keys are pressed)
     if (gPrefixActive.value) {
+      if (event.metaKey || event.ctrlKey) {
+        clearGPrefix()
+        return
+      }
       const action = navigationKeyMap[key]
       if (action) {
         event.preventDefault()
@@ -122,26 +128,31 @@ export function useKeyboardShortcuts() {
         clearGPrefix()
         return
       }
+      // Clear g prefix on invalid navigation key
+      clearGPrefix()
+      return
     }
 
-    // Handle r for refresh (only if g prefix is not active)
-    if (key === 'r' && !gPrefixActive.value) {
+    // Handle r for refresh (only if g prefix is not active and no modifier keys)
+    if (key === 'r' && !event.metaKey && !event.ctrlKey) {
+      event.preventDefault()
       executeAction('refresh')
-      
     }
   }
 
   // Setup keyboard listeners using native event listener
   const setupKeyboardListeners = () => {
-    if (import.meta.client) {
+    if (typeof window !== 'undefined' && !listenersSetup) {
+      listenersSetup = true
       window.addEventListener('keydown', handleKeyDown)
     }
   }
 
   // Cleanup on unmount
   onUnmounted(() => {
-    if (import.meta.client) {
+    if (typeof window !== 'undefined') {
       window.removeEventListener('keydown', handleKeyDown)
+      listenersSetup = false
     }
     clearGPrefix()
   })

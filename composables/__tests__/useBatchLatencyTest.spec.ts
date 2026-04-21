@@ -30,8 +30,13 @@ const mockNodeRecommendationStore = {
   recordBatchResults: vi.fn(),
 }
 
+const mockProxiesStore = {
+  fetchProxies: vi.fn(),
+}
+
 vi.stubGlobal('useConfigStore', () => mockConfigStore)
 vi.stubGlobal('useNodeRecommendationStore', () => mockNodeRecommendationStore)
+vi.stubGlobal('useProxiesStore', () => mockProxiesStore)
 
 describe('composables/useBatchLatencyTest', () => {
   beforeEach(() => {

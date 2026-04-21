@@ -202,8 +202,10 @@ describe('utils/index', () => {
       expect(compareVersions('1.242.0', 'v1.242.0')).toBe(0)
     })
 
-    it('strips pre-release suffixes before comparing', () => {
-      expect(compareVersions('1.243.0-beta.1', '1.243.0')).toBe(0)
+    it('handles pre-release suffixes correctly per semver', () => {
+      // Pre-release versions are lower than stable versions
+      expect(compareVersions('1.243.0-beta.1', '1.243.0')).toBeLessThan(0)
+      expect(compareVersions('1.243.0', '1.243.0-beta.1')).toBeGreaterThan(0)
       expect(compareVersions('1.244.0-rc.1', '1.243.0')).toBeGreaterThan(0)
     })
 

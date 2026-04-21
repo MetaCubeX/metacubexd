@@ -3,6 +3,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 import { useKeyboardShortcuts } from '../useKeyboardShortcuts'
 
+// Mock window.location.reload
+const mockReload = vi.fn()
+Object.defineProperty(window, 'location', {
+  value: {
+    ...window.location,
+    reload: mockReload,
+  },
+  writable: true,
+})
+
 // Mock useRouter
 const mockPush = vi.fn()
 vi.mock('vue-router', () => ({
@@ -110,7 +120,7 @@ describe('composables/useKeyboardShortcuts', () => {
 
   describe('navigation shortcuts (g+key)', () => {
     it('activates g prefix when g is pressed', () => {
-      const { gPrefixActive, executeAction } = useKeyboardShortcuts()
+      const { gPrefixActive } = useKeyboardShortcuts()
 
       expect(gPrefixActive.value).toBe(false)
 
@@ -200,15 +210,57 @@ describe('composables/useKeyboardShortcuts', () => {
   })
 
   describe('refresh action', () => {
-    it('dispatches refresh event', () => {
-      const dispatchSpy = vi.spyOn(window, 'dispatchEvent')
+    it('reloads page when refresh action is executed', () => {
+      mockReload.mockClear()
       const { executeAction } = useKeyboardShortcuts()
 
       executeAction('refresh')
 
-      expect(dispatchSpy).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'shortcut:refresh' }),
+      expect(mockReload).toHaveBeenCalled()
+    })
+
+    it('does not intercept Cmd+R on macOS', () => {
+      mockReload.mockClear()
+      const { setupKeyboardListeners } = useKeyboardShortcuts()
+      setupKeyboardListeners()
+
+      window.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: 'r',
+          metaKey: true,
+        }),
       )
+
+      expect(mockReload).not.toHaveBeenCalled()
+    })
+
+    it('does not intercept Ctrl+R on Windows/Linux', () => {
+      mockReload.mockClear()
+      const { setupKeyboardListeners } = useKeyboardShortcuts()
+      setupKeyboardListeners()
+
+      window.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: 'r',
+          ctrlKey: true,
+        }),
+      )
+
+      expect(mockReload).not.toHaveBeenCalled()
+    })
+
+    it('reloads page when plain r key is pressed', () => {
+      mockReload.mockClear()
+      const { setupKeyboardListeners } = useKeyboardShortcuts()
+      setupKeyboardListeners()
+
+      window.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: 'r',
+        }),
+      )
+
+      expect(mockReload).toHaveBeenCalled()
     })
   })
 })
