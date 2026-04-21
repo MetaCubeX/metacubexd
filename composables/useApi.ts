@@ -137,7 +137,7 @@ export function checkEndpointAPI(
       headers: secret ? { Authorization: `Bearer ${secret}` } : {},
       timeout: 5000,
     })
-    .then(({ ok }) => (ok ? null : 'network_error'))
+    .then(() => null)
     .catch((err) => {
       console.error(err)
 
@@ -307,8 +307,9 @@ export function useConfigActions() {
       })
     } catch {
       /* empty */
+    } finally {
+      reloadingConfigFile.value = false
     }
-    reloadingConfigFile.value = false
   }
 
   const fetchingRemoteConfig = ref(false)
@@ -340,8 +341,9 @@ export function useConfigActions() {
       await request.post('cache/fakeip/flush')
     } catch {
       /* empty */
+    } finally {
+      flushingFakeIPData.value = false
     }
-    flushingFakeIPData.value = false
   }
 
   const flushDNSCacheAPI = async () => {
@@ -351,8 +353,9 @@ export function useConfigActions() {
       await request.post('cache/dns/flush')
     } catch {
       /* empty */
+    } finally {
+      flushingDNSCache.value = false
     }
-    flushingDNSCache.value = false
   }
 
   const updateGEODatabasesAPI = async () => {
@@ -362,8 +365,9 @@ export function useConfigActions() {
       await request.post('configs/geo')
     } catch {
       /* empty */
+    } finally {
+      updatingGEODatabases.value = false
     }
-    updatingGEODatabases.value = false
   }
 
   const upgradeBackendAPI = async () => {
@@ -373,8 +377,9 @@ export function useConfigActions() {
       await request.post('upgrade')
     } catch {
       /* empty */
+    } finally {
+      upgradingBackend.value = false
     }
-    upgradingBackend.value = false
   }
 
   const upgradeUIAPI = async () => {
@@ -384,8 +389,9 @@ export function useConfigActions() {
       await request.post('upgrade/ui')
     } catch {
       /* empty */
+    } finally {
+      upgradingUI.value = false
     }
-    upgradingUI.value = false
   }
 
   const restartBackendAPI = async () => {
@@ -395,8 +401,9 @@ export function useConfigActions() {
       await request.post('restart')
     } catch {
       /* empty */
+    } finally {
+      restartingBackend.value = false
     }
-    restartingBackend.value = false
   }
 
   return {

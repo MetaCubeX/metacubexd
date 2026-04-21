@@ -343,7 +343,7 @@ const providersTotalSize = computed(() =>
             }"
           >
             <div
-              class="animate-fade-slide-in h-full rounded-xl border border-base-content/8 bg-gradient-to-br from-base-200/60 to-secondary/5 backdrop-blur-xs transition-all duration-200 hover:border-primary/25 hover:shadow-[0_4px_12px] hover:shadow-primary/8"
+              class="animate-fade-slide-in h-full rounded-xl border border-base-content/8 bg-linear-to-br from-base-200/60 to-secondary/5 backdrop-blur-xs transition-all duration-200 hover:border-primary/25 hover:shadow-[0_4px_12px] hover:shadow-primary/8"
               :style="{ animationDelay: `${(index % 10) * 30}ms` }"
             >
               <div class="p-3.5 px-4">

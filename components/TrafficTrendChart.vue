@@ -22,9 +22,10 @@ const containerRef = ref<HTMLDivElement>()
 let chart: Highcharts.Chart | undefined
 
 // Configure Highcharts to use local time (global setting)
+// In Highcharts v12, useUTC was removed; local timezone is now the default
 if (typeof window !== 'undefined') {
   Highcharts.setOptions({
-    time: { useUTC: false },
+    time: {},
   })
 }
 
@@ -133,8 +134,8 @@ watch([configStore.curTheme], () => {
 
 watch(locale, () => {
   if (chart) {
-    chart.series[0]?.update({ name: t('upload') }, false)
-    chart.series[1]?.update({ name: t('download') }, true)
+    chart.series[0]?.update({ type: 'areaspline', name: t('upload') }, false)
+    chart.series[1]?.update({ type: 'areaspline', name: t('download') }, true)
   }
 })
 

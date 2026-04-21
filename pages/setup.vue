@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type {EndpointCheckError} from '~/composables/useApi';
+import type { EndpointCheckError } from '~/composables/useApi'
 import { IconLink, IconLock, IconServer, IconX } from '@tabler/icons-vue'
 import { v4 as uuid } from 'uuid'
-import { checkEndpointAPI  } from '~/composables/useApi'
+import { checkEndpointAPI } from '~/composables/useApi'
 import { FALLBACK_BACKEND_URL } from '~/constants'
 import { transformEndpointURL } from '~/utils'
 
@@ -150,20 +150,20 @@ onMounted(async () => {
 
 <template>
   <div
-    class="flex h-full items-center justify-center overflow-y-auto bg-gradient-to-b from-base-100 to-base-200 p-4"
+    class="flex h-full items-center justify-center overflow-y-auto bg-linear-to-b from-base-100 to-base-200 p-4"
   >
     <div class="animate-fade-slide-in mx-auto w-full max-w-md">
       <!-- Logo Section -->
       <div class="animate-fade-slide-in-delay-1 mb-8 text-center">
         <div class="mb-4">
           <div
-            class="shadow-primary-glow mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-secondary text-primary-content"
+            class="shadow-primary-glow mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-primary to-secondary text-primary-content"
           >
             <IconServer :size="32" />
           </div>
           <h1 class="text-3xl font-bold tracking-wide uppercase sm:text-4xl">
             <span
-              class="bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent"
+              class="bg-linear-to-br from-primary to-secondary bg-clip-text text-transparent"
               >metacube</span
             >
             <span class="text-base-content">(</span>
@@ -271,7 +271,7 @@ onMounted(async () => {
           <!-- Submit Button -->
           <Button
             type="submit"
-            class="hover:shadow-primary-glow-lg w-full cursor-pointer rounded-lg border-none bg-gradient-to-br from-primary to-secondary px-6 py-3.5 text-[0.9375rem] font-semibold tracking-widest text-primary-content uppercase transition-all duration-300 hover:-translate-y-0.5"
+            class="hover:shadow-primary-glow-lg w-full cursor-pointer rounded-lg border-none bg-linear-to-br from-primary to-secondary px-6 py-3.5 text-[0.9375rem] font-semibold tracking-widest text-primary-content uppercase transition-all duration-300 hover:-translate-y-0.5"
             :loading="isSubmitting"
           >
             {{ t('add') }}

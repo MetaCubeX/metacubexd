@@ -19,10 +19,9 @@ import { useDataUsage } from '~/composables/useDataUsage'
 import { formatBytes, formatDuration } from '~/utils'
 
 // Configure Highcharts to use local time
+// In Highcharts v12, useUTC was removed; local timezone is now the default
 Highcharts.setOptions({
-  time: {
-    useUTC: false,
-  },
+  time: {},
 })
 
 const { t } = useI18n()
@@ -114,7 +113,7 @@ const fetchData = async () => {
     // Auto-select first row if nothing is selected
     const sorted = sortedDataUsageEntries.value
     if (!selectedRow.value && sorted.length > 0) {
-      handleRowClick(sorted[0].label)
+      handleRowClick(sorted[0]!.label)
     } else if (selectedRow.value) {
       await loadSubStats(selectedRow.value)
     }
@@ -276,7 +275,7 @@ const currentViewLabel = computed(
             'bg-primary! text-primary-content! shadow-[0_2px_8px_color-mix(in_oklch,var(--color-primary)_30%,transparent)]':
               activeView === opt.value,
           }"
-          @click="activeView = opt.value"
+          @click="activeView = opt.value as DataUsageType"
         >
           <component :is="opt.icon" :size="16" />
           <span class="hidden sm:inline">{{ opt.label }}</span>
