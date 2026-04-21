@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.245.1](https://github.com/MetaCubeX/metacubexd/compare/v1.245.0...v1.245.1) (2026-04-21)
+
+
+### Bug Fixes
+
+* correct logic bugs and improve error handling ([90a601f](https://github.com/MetaCubeX/metacubexd/commit/90a601ffd691100a7f5939fc1a369d0934775d39))
+* make batch latency test reactive and fix keyboard shortcut refresh ([fbdb4a7](https://github.com/MetaCubeX/metacubexd/commit/fbdb4a7f12a5019068f684f0807d10d04d5d746e))
+* resolve TypeScript errors and update dependency compatibility ([83d5c9d](https://github.com/MetaCubeX/metacubexd/commit/83d5c9d9aaec35ea1ea3f48861c492f58adca381))
+
 ## [1.245.0](https://github.com/MetaCubeX/metacubexd/compare/v1.244.2...v1.245.0) (2026-04-18)
 
 
