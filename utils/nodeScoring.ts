@@ -54,7 +54,7 @@ export function calculateStabilityScore(latencies: (number | null)[]): number {
   if (validLatencies.length < 2) return 50 // Not enough data, neutral score
 
   const mean = validLatencies.reduce((a, b) => a + b, 0) / validLatencies.length
-  const squaredDiffs = validLatencies.map((l) => (l - mean)**2)
+  const squaredDiffs = validLatencies.map((l) => (l - mean) ** 2)
   const variance =
     squaredDiffs.reduce((a, b) => a + b, 0) / validLatencies.length
   const stdDev = Math.sqrt(variance)
@@ -99,6 +99,7 @@ export function calculateNodeScore(
 
   // Normalize weights to ensure they sum to 100
   const totalWeight = weights.latency + weights.stability + weights.successRate
+  if (totalWeight === 0) return 0
   const normalizedLatency = weights.latency / totalWeight
   const normalizedStability = weights.stability / totalWeight
   const normalizedSuccessRate = weights.successRate / totalWeight

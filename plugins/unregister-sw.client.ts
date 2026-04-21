@@ -3,10 +3,17 @@
 // See: https://github.com/MetaCubeX/metacubexd/issues/1796
 export default defineNuxtPlugin(() => {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.getRegistrations().then((registrations) => {
-      for (const registration of registrations) {
-        registration.unregister()
-      }
-    })
+    navigator.serviceWorker
+      .getRegistrations()
+      .then((registrations) => {
+        for (const registration of registrations) {
+          registration.unregister().catch(() => {
+            // Ignore unregister errors
+          })
+        }
+      })
+      .catch(() => {
+        // Ignore getRegistrations errors
+      })
   }
 })

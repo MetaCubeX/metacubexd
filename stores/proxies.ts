@@ -193,11 +193,10 @@ export const useProxiesStore = defineStore('proxies', () => {
       )
 
       if (activeConns.length > 0) {
-        activeConns.forEach(({ id, chains }) => {
-          if (chains.includes(proxy.name)) {
-            closeSingleConnectionAPI(id)
-          }
-        })
+        const closePromises = activeConns
+          .filter(({ chains }) => chains.includes(proxy.name))
+          .map(({ id }) => closeSingleConnectionAPI(id))
+        await Promise.allSettled(closePromises)
       }
     }
   }
@@ -208,7 +207,10 @@ export const useProxiesStore = defineStore('proxies', () => {
 
     if (!name || !node) return name
 
+    const visited = new Set<string>()
     while (node && node.latency && node.latency !== node.name) {
+      if (visited.has(node.name)) return node.name
+      visited.add(node.name)
       const nextNode: ProxyInfo | undefined = proxyNodeMap.value[node.latency]
       if (!nextNode) return node.name
       node = nextNode
@@ -363,8 +365,11 @@ export const useProxiesStore = defineStore('proxies', () => {
       /* empty */
     }
 
-    await fetchProxies()
-    updatingMap.value[providerName] = false
+    try {
+      await fetchProxies()
+    } finally {
+      updatingMap.value[providerName] = false
+    }
   }
 
   // Update all providers

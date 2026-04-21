@@ -23,7 +23,7 @@ export const useConnectionsStore = defineStore('connections', () => {
 
   // Data usage tracking (IndexedDB buffer)
   const logBuffer: DataUsageLog[] = []
-  let flushTimeout: NodeJS.Timeout | null = null
+  let flushTimeout: ReturnType<typeof setTimeout> | null = null
 
   const flushLogs = async () => {
     if (logBuffer.length === 0) return
@@ -79,12 +79,10 @@ export const useConnectionsStore = defineStore('connections', () => {
         !isNumber(prevConn.download) ||
         !isNumber(prevConn.upload)
       ) {
-        // Preserve existing speed values if present (e.g., from mock data)
-        const conn = connection as Connection
         return {
           ...connection,
-          downloadSpeed: conn.downloadSpeed ?? 0,
-          uploadSpeed: conn.uploadSpeed ?? 0,
+          downloadSpeed: 0,
+          uploadSpeed: 0,
         }
       }
 
@@ -100,16 +98,16 @@ export const useConnectionsStore = defineStore('connections', () => {
     const seen = new Set<string>()
     const merged: Connection[] = []
 
-    // Keep existing order from previous list first
-    for (const c of allConnections.value) {
+    // Add new active connections first (fresh data)
+    for (const c of activeConns) {
       if (!seen.has(c.id)) {
         seen.add(c.id)
         merged.push(c)
       }
     }
 
-    // Append new active connections not yet seen
-    for (const c of activeConns) {
+    // Append previous connections not in the new active list
+    for (const c of allConnections.value) {
       if (!seen.has(c.id)) {
         seen.add(c.id)
         merged.push(c)
@@ -146,7 +144,7 @@ export const useConnectionsStore = defineStore('connections', () => {
   }
 
   // Remove specific entry (Note: In IndexedDB model, "removing" an entry might mean deleting all logs for that label in a timeframe, but usually we just clear all or let it expire)
-  const removeDataUsageEntry = async (type: DataUsageType, id: string) => {
+  const removeDataUsageEntry = async (_type: DataUsageType, _id: string) => {
     // This is harder with the log-based model. We might want to just skip this or implement a more complex deletion
     // For now, let's keep it as a placeholder or ignore since we are moving to a historical model
     console.warn(
@@ -254,9 +252,7 @@ export const useConnectionsStore = defineStore('connections', () => {
         sourceIP: conn.metadata.sourceIP || 'Inner',
         host: conn.metadata.host || conn.metadata.destinationIP,
         process: conn.metadata.process || 'Unknown',
-        outbound:
-          (conn.chains && conn.chains.length > 0 ? conn.chains[0] : 'DIRECT') ||
-          'DIRECT',
+        outbound: conn.chains[0] ?? 'DIRECT',
         upload: uploadDelta,
         download: downloadDelta,
       })
