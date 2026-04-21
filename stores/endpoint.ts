@@ -14,7 +14,13 @@ export const useEndpointStore = defineStore('endpoint', () => {
   const wsEndpointURL = computed(() => {
     const endpoint = currentEndpoint.value
     if (!endpoint) return ''
-    return new URL(endpoint.url).href.replace('http', 'ws').replace(/\/$/, '')
+    try {
+      return new URL(endpoint.url).href
+        .replace(/^http/, 'ws')
+        .replace(/\/$/, '')
+    } catch {
+      return ''
+    }
   })
 
   // Actions

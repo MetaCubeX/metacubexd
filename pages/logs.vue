@@ -23,9 +23,11 @@ const configStore = useConfigStore()
 const globalFilter = ref('')
 const settingsModal = ref<{ open: () => void; close: () => void }>()
 
+const LOG_TYPE_REGEX = /^\[([^\]]+)\]/
+
 // Extract type from payload, e.g. "[dns] xxx" -> "dns"
 function extractType(payload: string): string {
-  const match = payload.match(/^\[([^\]]+)\]/)
+  const match = payload.match(LOG_TYPE_REGEX)
   return match?.[1] ?? ''
 }
 

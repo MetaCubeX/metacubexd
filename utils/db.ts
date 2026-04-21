@@ -18,6 +18,9 @@ export class DataUsageDB {
 
   async open(): Promise<IDBDatabase> {
     if (this.db) return this.db
+    if (typeof indexedDB === 'undefined') {
+      return Promise.reject(new Error('IndexedDB is not available'))
+    }
 
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(DB_NAME, DB_VERSION)
@@ -57,7 +60,7 @@ export class DataUsageDB {
       logs.forEach((log) => store.add(log))
 
       transaction.oncomplete = () => resolve()
-      transaction.onerror = (event) => reject(transaction.error)
+      transaction.onerror = (_event) => reject(transaction.error)
     })
   }
 
@@ -81,7 +84,7 @@ export class DataUsageDB {
         }
       }
 
-      request.onerror = (event) => reject(request.error)
+      request.onerror = (_event) => reject(request.error)
     })
   }
 
@@ -93,7 +96,7 @@ export class DataUsageDB {
       const request = store.clear()
 
       request.onsuccess = () => resolve()
-      request.onerror = (event) => reject(request.error)
+      request.onerror = (_event) => reject(request.error)
     })
   }
 
@@ -116,7 +119,7 @@ export class DataUsageDB {
         }
       }
 
-      request.onerror = (event) => reject(request.error)
+      request.onerror = (_event) => reject(request.error)
     })
   }
 }

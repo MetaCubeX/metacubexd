@@ -52,11 +52,13 @@ const isClosingConnections = ref(false)
 // Helpers
 const formatBytes = (bytes: number) => byteSize(bytes).toString()
 
+const PROCESS_PATH_REGEX = /^.*[/\\](.*)$/
+
 // Cell value helpers
 function getProcess(conn: Connection) {
   return (
     conn.metadata.process ||
-    conn.metadata.processPath?.replace(/^.*[/\\](.*)$/, '$1') ||
+    conn.metadata.processPath?.replace(PROCESS_PATH_REGEX, '$1') ||
     '-'
   )
 }
@@ -89,7 +91,7 @@ function getInboundUser(conn: Connection) {
     conn.metadata.inboundIP ||
     conn.metadata.inboundName ||
     conn.metadata.type ||
-    "-"
+    '-'
   )
 }
 

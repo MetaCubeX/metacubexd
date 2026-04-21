@@ -5,7 +5,6 @@ import { useKeyboardShortcuts } from '~/composables/useKeyboardShortcuts'
 const configStore = useConfigStore()
 const endpointStore = useEndpointStore()
 const globalStore = useGlobalStore()
-const shortcutsStore = useShortcutsStore()
 
 // Initialize keyboard shortcuts
 const { setupKeyboardListeners } = useKeyboardShortcuts()
