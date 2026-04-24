@@ -22,7 +22,7 @@ jobs:
     steps:
       - name: release-please
         id: release
-        uses: googleapis/release-please-action@v4
+        uses: googleapis/release-please-action@v5
         with:
           token: ${{ secrets.CI_TOKEN }}
           release-type: node
