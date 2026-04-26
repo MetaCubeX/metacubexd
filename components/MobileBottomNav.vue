@@ -22,6 +22,9 @@ const primaryItems = computed(() => [
   { href: '/connections', name: t('connections'), icon: IconNetwork },
 ])
 
+const leftPrimaryItems = computed(() => primaryItems.value.slice(0, 2))
+const rightPrimaryItems = computed(() => primaryItems.value.slice(2, 4))
+
 // Secondary items in the FAB popup
 const secondaryItems = computed(() => [
   { href: '/traffic', name: t('dataUsage'), icon: IconChartAreaLine },
@@ -90,8 +93,8 @@ onMounted(() => {
           class="flex items-center gap-3 px-5 py-3 text-sm font-medium no-underline transition-colors duration-200"
           :class="
             isActive(item.href)
-              ? 'text-primary bg-primary/10'
-              : 'text-base-content/70 hover:text-base-content hover:bg-base-content/5'
+              ? 'bg-primary/10 text-primary'
+              : 'text-base-content/70 hover:bg-base-content/5 hover:text-base-content'
           "
         >
           <component :is="item.icon" class="h-5 w-5 shrink-0" />
@@ -126,7 +129,7 @@ onMounted(() => {
       <div class="grid h-16 w-full grid-cols-5">
         <!-- Left 2 items: Overview, Proxies -->
         <NuxtLink
-          v-for="nav in primaryItems.slice(0, 2)"
+          v-for="nav in leftPrimaryItems"
           :key="nav.href"
           :to="nav.href"
           class="group relative flex flex-col items-center justify-center gap-0.5 no-underline transition-all duration-200 ease-in-out active:scale-90"
@@ -208,7 +211,7 @@ onMounted(() => {
 
         <!-- Right 2 items: Rules, Connections -->
         <NuxtLink
-          v-for="nav in primaryItems.slice(2, 4)"
+          v-for="nav in rightPrimaryItems"
           :key="nav.href"
           :to="nav.href"
           class="group relative flex flex-col items-center justify-center gap-0.5 no-underline transition-all duration-200 ease-in-out active:scale-90"

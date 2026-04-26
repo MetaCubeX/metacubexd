@@ -4,6 +4,25 @@ import { useRequest } from './useApi'
 const BATCH_SIZE = 10 // Max concurrent tests
 const BATCH_DELAY = 200 // Delay between batches in ms
 
+function waitForBatchDelay(signal?: AbortSignal): Promise<void> {
+  if (signal?.aborted) return Promise.resolve()
+
+  return new Promise((resolve) => {
+    const timeoutId = setTimeout(() => {
+      signal?.removeEventListener('abort', resolveDelay)
+      resolve()
+    }, BATCH_DELAY)
+
+    function resolveDelay() {
+      clearTimeout(timeoutId)
+      signal?.removeEventListener('abort', resolveDelay)
+      resolve()
+    }
+
+    signal?.addEventListener('abort', resolveDelay, { once: true })
+  })
+}
+
 export interface BatchTestOptions {
   url: string
   timeout: number
@@ -126,7 +145,7 @@ export function useBatchLatencyTest() {
           i + BATCH_SIZE < nodeNames.length &&
           !abortController.value?.signal.aborted
         ) {
-          await new Promise((resolve) => setTimeout(resolve, BATCH_DELAY))
+          await waitForBatchDelay(abortController.value?.signal)
         }
       }
     } finally {

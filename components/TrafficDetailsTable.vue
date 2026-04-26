@@ -41,6 +41,7 @@ const subPageSize = useLocalStorage('traffic_sub_page_size', 50)
 type SubSortField = 'label' | 'upload' | 'download' | 'total'
 const subSortField = ref<SubSortField>('total')
 const subSortOrder = ref<'asc' | 'desc'>('desc')
+const pageSizeOptions = [20, 50, 100, 200]
 
 const handleSort = (field: SubSortField) => {
   if (subSortField.value === field) {
@@ -110,6 +111,19 @@ const subPaginationInfo = computed(() => {
   return total > 0 ? `${start}-${end} / ${total}` : `0 / 0`
 })
 
+const getSubRowKey = (subLabel: string) => `${props.selectedRow}:${subLabel}`
+
+const getSubRowProxyStats = (subLabel: string) =>
+  props.proxyStatsMap[getSubRowKey(subLabel)] || []
+
+const getSortIcon = (field: SubSortField) => {
+  if (subSortField.value !== field) return IconSelector
+  return subSortOrder.value === 'asc' ? IconSortAscending : IconSortDescending
+}
+
+const getSortIconClass = (field: SubSortField) =>
+  subSortField.value === field ? 'text-primary' : 'opacity-30'
+
 watch(
   () => props.selectedRow,
   () => {
@@ -162,17 +176,9 @@ watch(
                   activeView === 'host' ? t('devices') : t('host')
                 }}</span>
                 <component
-                  :is="
-                    subSortField === 'label'
-                      ? subSortOrder === 'asc'
-                        ? IconSortAscending
-                        : IconSortDescending
-                      : IconSelector
-                  "
+                  :is="getSortIcon('label')"
                   :size="14"
-                  :class="
-                    subSortField === 'label' ? 'text-primary' : 'opacity-30'
-                  "
+                  :class="getSortIconClass('label')"
                 />
               </div>
             </th>
@@ -183,17 +189,9 @@ watch(
               <div class="flex items-center gap-1">
                 <span>{{ t('upload') }}</span>
                 <component
-                  :is="
-                    subSortField === 'upload'
-                      ? subSortOrder === 'asc'
-                        ? IconSortAscending
-                        : IconSortDescending
-                      : IconSelector
-                  "
+                  :is="getSortIcon('upload')"
                   :size="14"
-                  :class="
-                    subSortField === 'upload' ? 'text-primary' : 'opacity-30'
-                  "
+                  :class="getSortIconClass('upload')"
                 />
               </div>
             </th>
@@ -204,17 +202,9 @@ watch(
               <div class="flex items-center gap-1">
                 <span>{{ t('download') }}</span>
                 <component
-                  :is="
-                    subSortField === 'download'
-                      ? subSortOrder === 'asc'
-                        ? IconSortAscending
-                        : IconSortDescending
-                      : IconSelector
-                  "
+                  :is="getSortIcon('download')"
                   :size="14"
-                  :class="
-                    subSortField === 'download' ? 'text-primary' : 'opacity-30'
-                  "
+                  :class="getSortIconClass('download')"
                 />
               </div>
             </th>
@@ -225,17 +215,9 @@ watch(
               <div class="flex items-center justify-end gap-1 md:justify-start">
                 <span>{{ t('total') }}</span>
                 <component
-                  :is="
-                    subSortField === 'total'
-                      ? subSortOrder === 'asc'
-                        ? IconSortAscending
-                        : IconSortDescending
-                      : IconSelector
-                  "
+                  :is="getSortIcon('total')"
                   :size="14"
-                  :class="
-                    subSortField === 'total' ? 'text-primary' : 'opacity-30'
-                  "
+                  :class="getSortIconClass('total')"
                 />
               </div>
             </th>
@@ -250,7 +232,7 @@ watch(
               class="animate-in fade-in slide-in-from-bottom-1 m-1 flex cursor-pointer flex-wrap rounded-lg bg-base-100 p-2 transition-all duration-200 hover:bg-base-content/5 hover:shadow-[0_2px_8px_rgba(var(--color-base-content),0.08)] md:m-0 md:table-row md:rounded-none md:bg-transparent md:p-0 md:shadow-none md:even:bg-base-content/5 md:hover:bg-base-content/10 md:hover:shadow-none"
               :class="{
                 'bg-primary/10! md:bg-primary/10!':
-                  selectedSubRow === `${selectedRow}:${sub.label}`,
+                  selectedSubRow === getSubRowKey(sub.label),
               }"
               :style="{ animationDelay: `${(index % 20) * 15}ms` }"
               @click="emit('subRowClick', selectedRow, sub.label)"
@@ -260,7 +242,7 @@ watch(
                   <div class="flex items-center gap-2 font-mono text-xs">
                     <div class="shrink-0 opacity-30">
                       <IconChevronDown
-                        v-if="selectedSubRow === `${selectedRow}:${sub.label}`"
+                        v-if="selectedSubRow === getSubRowKey(sub.label)"
                         :size="14"
                       />
                       <IconChevronRight v-else :size="14" />
@@ -300,7 +282,7 @@ watch(
 
             <!-- 3rd Level Breakdown -->
             <tr
-              v-if="selectedSubRow === `${selectedRow}:${sub.label}`"
+              v-if="selectedSubRow === getSubRowKey(sub.label)"
               class="animate-in fade-in slide-in-from-top-1 block w-full md:table-row"
             >
               <td
@@ -311,7 +293,7 @@ watch(
                   class="grid w-full grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3"
                 >
                   <div
-                    v-for="item in proxyStatsMap[`${selectedRow}:${sub.label}`]"
+                    v-for="item in getSubRowProxyStats(sub.label)"
                     :key="item.label"
                     class="flex h-full flex-col justify-between gap-1 rounded-lg border border-[color-mix(in_oklch,var(--color-base-content)_10%,transparent)] bg-base-300/30 p-2 shadow-sm transition-all hover:border-primary/30 sm:rounded-xl sm:p-3"
                   >
@@ -370,7 +352,7 @@ watch(
           v-model.number="subPageSize"
           class="cursor-pointer rounded-md border border-[color-mix(in_oklch,var(--color-base-content)_10%,transparent)] bg-base-100 px-2.5 py-1.5 text-[0.8125rem] text-base-content transition-colors duration-200 focus:border-primary focus:outline-none"
         >
-          <option v-for="size in [20, 50, 100, 200]" :key="size" :value="size">
+          <option v-for="size in pageSizeOptions" :key="size" :value="size">
             {{ size }}
           </option>
         </select>

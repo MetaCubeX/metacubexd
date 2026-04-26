@@ -1,4 +1,5 @@
 import type { Log, MemoryData, TrafficData, WsMsg } from '~/types'
+import { getCurrentScope, onScopeDispose } from 'vue'
 import { useMockMode } from './useApi'
 import { useMockData } from './useMockData'
 
@@ -51,6 +52,8 @@ export function useBackendWebSocket() {
 
   // Connect to all WebSocket endpoints
   const connect = () => {
+    disconnect()
+
     // In mock mode, use mock data instead of WebSocket
     if (useMockMode()) {
       const mockData = useMockData()
@@ -211,7 +214,11 @@ export function useBackendWebSocket() {
   // Reconnect (e.g., when log level changes)
   const reconnectLogs = () => {
     logsWs?.close()
-    logsWs = createLogsWebSocket()
+    logsWs = useMockMode() ? null : createLogsWebSocket()
+  }
+
+  if (getCurrentScope()) {
+    onScopeDispose(disconnect)
   }
 
   return {
