@@ -196,7 +196,12 @@ export type ConnectionsTableColumnVisibility = Partial<
 >
 export type ConnectionsTableColumnOrder = CONNECTIONS_TABLE_ACCESSOR_KEY[]
 
-export type DataUsageType = 'sourceIP' | 'host' | 'process' | 'outbound'
+export type DataUsageType =
+  | 'sourceIP'
+  | 'host'
+  | 'process'
+  | 'outbound'
+  | 'inboundUser'
 
 export interface DataUsageEntry {
   type: DataUsageType
