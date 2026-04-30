@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
-@plugin 'daisyui' {
+@plugin 'daisyui/index.js' {
   themes: all;
 }
 
