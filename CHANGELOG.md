@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.246.1](https://github.com/MetaCubeX/metacubexd/compare/v1.246.0...v1.246.1) (2026-04-30)
+
+
+### Bug Fixes
+
+* restore release CI build ([4634095](https://github.com/MetaCubeX/metacubexd/commit/46340951cd08dd8f2b2a57366e017d4dbdeb108f))
+
 ## [1.246.0](https://github.com/MetaCubeX/metacubexd/compare/v1.245.1...v1.246.0) (2026-04-30)
 
 
