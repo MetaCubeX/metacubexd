@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.246.2](https://github.com/MetaCubeX/metacubexd/compare/v1.246.1...v1.246.2) (2026-04-30)
+
+
+### Bug Fixes
+
+* build docker image on native builder platform ([6a87b05](https://github.com/MetaCubeX/metacubexd/commit/6a87b0579e359c592dc729bb1c8e186960e8061b))
+
 ## [1.246.1](https://github.com/MetaCubeX/metacubexd/compare/v1.246.0...v1.246.1) (2026-04-30)
 
 
