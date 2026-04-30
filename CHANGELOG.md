@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.246.0](https://github.com/MetaCubeX/metacubexd/compare/v1.245.1...v1.246.0) (2026-04-30)
+
+
+### Features
+
+* **traffic:** improve data usage analytics ([#1959](https://github.com/MetaCubeX/metacubexd/issues/1959)) ([34fa949](https://github.com/MetaCubeX/metacubexd/commit/34fa94971272af42afd7e371d3e6c7719a82af27))
+
 ## [1.245.1](https://github.com/MetaCubeX/metacubexd/compare/v1.245.0...v1.245.1) (2026-04-21)
 
 
