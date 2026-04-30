@@ -27,7 +27,7 @@
     "@commitlint/config-conventional": "^20.5.0",
     "@floating-ui/vue": "^1.1.11",
     "@nuxt/fonts": "^0.14.0",
-    "@nuxtjs/i18n": "^10.2.4",
+    "@nuxtjs/i18n": "^10.3.0",
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@pinia/nuxt": "^0.11.3",
     "@playwright/test": "^1.59.1",
@@ -35,7 +35,7 @@
     "@tabler/icons-vue": "^3.41.1",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.2.4",
-    "@tanstack/vue-query": "^5.99.2",
+    "@tanstack/vue-query": "^5.100.6",
     "@tanstack/vue-table": "^8.21.3",
     "@tanstack/vue-virtual": "^3.13.24",
     "@types/byte-size": "^8.1.2",
@@ -50,7 +50,7 @@
     "@vueuse/integrations": "^14.2.1",
     "@vueuse/nuxt": "^14.2.1",
     "byte-size": "^9.0.1",
-    "commitlint": "^20.5.0",
+    "commitlint": "^20.5.2",
     "d3": "^7.9.0",
     "daisyui": "^5.5.19",
     "dayjs": "^1.11.20",
@@ -69,7 +69,7 @@
     "pinia": "^3.0.4",
     "playwright": "^1.59.1",
     "prettier": "^3.8.3",
-    "prettier-plugin-tailwindcss": "^0.7.2",
+    "prettier-plugin-tailwindcss": "^0.8.0",
     "semver": "^7.7.4",
     "sort-package-json": "^3.6.1",
     "sortablejs": "^1.15.7",
@@ -80,10 +80,10 @@
     "tsx": "^4.21.0",
     "typescript": "^6.0.3",
     "uuid": "^14.0.0",
-    "vite": "7.3.2",
+    "vite": "8.0.10",
     "vitest": "^4.1.5",
-    "vue": "^3.5.32",
-    "vue-router": "^5.0.4",
+    "vue": "^3.5.33",
+    "vue-router": "^5.0.6",
     "vue-sonner": "^2.0.9",
     "vue-tsc": "^3.2.7",
     "vue3-marquee": "^4.2.2",
@@ -107,13 +107,13 @@
       "serialize-javascript": ">=7.0.5",
       "srvx": ">=0.11.13",
       "tar": ">=7.5.7",
-      "vite": "7.3.2",
+      "vite": "8.0.10",
       "yaml": ">=2.8.3"
     }
   },
   "devDependencies": {
     "@types/semver": "^7.7.1",
     "@vitest/coverage-v8": "^4.1.5",
-    "jsdom": "^29.0.2"
+    "jsdom": "^29.1.0"
   }
 }
