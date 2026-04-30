@@ -22,18 +22,29 @@ export const useConnectionsStore = defineStore('connections', () => {
   const paused = ref(false)
 
   // Data usage tracking (IndexedDB buffer)
-  const logBuffer: DataUsageLog[] = []
+  const dataRetention = useLocalStorage('traffic_data_retention', -1)
+  const logBuffer = new Map<string, DataUsageLog>()
   let flushTimeout: ReturnType<typeof setTimeout> | null = null
 
+  const getDataUsageBufferKey = (log: DataUsageLog) =>
+    JSON.stringify([
+      log.timestamp,
+      log.sourceIP,
+      log.host,
+      log.outbound,
+      log.process,
+      log.inboundUser,
+    ])
+
   const flushLogs = async () => {
-    if (logBuffer.length === 0) return
-    const logsToFlush = [...logBuffer]
-    logBuffer.length = 0
+    if (logBuffer.size === 0) return
+    const logsToFlush = Array.from(logBuffer.values())
+    logBuffer.clear()
     try {
       await db.addLogs(logsToFlush)
-      // Periodic cleanup: delete logs older than 30 days
-      const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000
-      await db.cleanup(thirtyDaysAgo)
+      if (dataRetention.value > 0) {
+        await db.cleanup(Date.now() - dataRetention.value)
+      }
     } catch (e) {
       console.error('[Data Usage] Failed to flush logs to IndexedDB', e)
     }
@@ -41,10 +52,12 @@ export const useConnectionsStore = defineStore('connections', () => {
 
   const scheduleFlush = () => {
     if (flushTimeout) return
+    const delay = 30000 - (Date.now() % 30000) || 30000
     flushTimeout = setTimeout(async () => {
       await flushLogs()
       flushTimeout = null
-    }, 5000)
+      if (logBuffer.size > 0) scheduleFlush()
+    }, delay)
   }
 
   const baselineTotals = useLocalStorage<{ upload: number; download: number }>(
@@ -138,7 +151,7 @@ export const useConnectionsStore = defineStore('connections', () => {
 
   // Clear all data usage
   const clearDataUsage = async () => {
-    logBuffer.length = 0
+    logBuffer.clear()
     await db.clearAll()
     connectionLastData.clear()
   }
@@ -221,6 +234,7 @@ export const useConnectionsStore = defineStore('connections', () => {
     }
 
     const now = Date.now()
+    const minuteStart = Math.floor(now / 60000) * 60000
     let hasDeltas = false
 
     connections.forEach((conn) => {
@@ -247,15 +261,29 @@ export const useConnectionsStore = defineStore('connections', () => {
       if (uploadDelta === 0 && downloadDelta === 0) return
 
       hasDeltas = true
-      logBuffer.push({
-        timestamp: now,
+      const log: DataUsageLog = {
+        timestamp: minuteStart,
         sourceIP: conn.metadata.sourceIP || 'Inner',
         host: conn.metadata.host || conn.metadata.destinationIP,
         process: conn.metadata.process || 'Unknown',
         outbound: conn.chains[0] ?? 'DIRECT',
+        inboundUser:
+          conn.metadata.inboundUser ||
+          conn.metadata.inboundIP ||
+          conn.metadata.inboundName ||
+          conn.metadata.type ||
+          'Unknown',
         upload: uploadDelta,
         download: downloadDelta,
-      })
+      }
+      const key = getDataUsageBufferKey(log)
+      const existing = logBuffer.get(key)
+      if (existing) {
+        existing.upload += uploadDelta
+        existing.download += downloadDelta
+      } else {
+        logBuffer.set(key, log)
+      }
     })
 
     if (hasDeltas) {

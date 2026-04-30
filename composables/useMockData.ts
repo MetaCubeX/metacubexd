@@ -30,7 +30,12 @@ export const mockConfig = {
 }
 
 // Helper to create metadata
-function createMetadata(host: string, destIP: string, process = '') {
+function createMetadata(
+  host: string,
+  destIP: string,
+  process = '',
+  inboundUser = '',
+) {
   return {
     network: 'tcp',
     type: 'HTTP Connect',
@@ -41,7 +46,7 @@ function createMetadata(host: string, destIP: string, process = '') {
     inboundIP: '127.0.0.1',
     inboundName: 'mixed-in',
     inboundPort: '7893',
-    inboundUser: '',
+    inboundUser,
     process,
     processPath: process ? `/Applications/${process}.app` : '',
     remoteDestination: '',
@@ -668,12 +673,14 @@ function generateMockConnections() {
     ['AI Services', 'United States'],
     ['DIRECT'],
   ]
+  const inboundUsers = ['alice', 'bob', 'mobile-user', 'guest', '']
 
   const connections = []
 
   for (let i = 0; i < 60; i++) {
     const hostInfo = hosts[i % hosts.length]!
     const process = processes[Math.floor(Math.random() * processes.length)]
+    const inboundUser = inboundUsers[i % inboundUsers.length]
     const chain =
       hostInfo.proxy === 'DIRECT'
         ? ['DIRECT']
@@ -683,7 +690,7 @@ function generateMockConnections() {
     connections.push({
       id: `conn-${i + 1}`,
       metadata: {
-        ...createMetadata(hostInfo.host, hostInfo.ip, process),
+        ...createMetadata(hostInfo.host, hostInfo.ip, process, inboundUser),
         network: isUDP ? 'udp' : 'tcp',
         type: isUDP ? 'QUIC' : 'HTTP Connect',
         sourcePort: String(50000 + i),

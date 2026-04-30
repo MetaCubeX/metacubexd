@@ -10,6 +10,7 @@ import {
   IconSum,
   IconTrash,
   IconUpload,
+  IconUser,
   IconWorld,
 } from '@tabler/icons-vue'
 import dayjs from 'dayjs'
@@ -53,6 +54,13 @@ const timeRangeOptions = computed(() => [
   { label: t('customRange'), value: -1 },
 ])
 const selectedTimeRange = useLocalStorage('traffic_time_range', 3600000)
+const retentionOptions = computed(() => [
+  { label: t('forever'), value: -1 },
+  { label: t('lastHour'), value: 3600000 },
+  { label: t('lastDay'), value: 86400000 },
+  { label: t('lastMonth'), value: 2592000000 },
+])
+const selectedDataRetention = useLocalStorage('traffic_data_retention', -1)
 
 // Custom Time Range State (Persisted)
 const customStart = useLocalStorage(
@@ -150,6 +158,7 @@ watch(
 
 const viewOptions = computed(() => [
   { label: t('devices'), value: 'sourceIP', icon: IconDevices },
+  { label: t('user'), value: 'inboundUser', icon: IconUser },
   { label: t('host'), value: 'host', icon: IconWorld },
   { label: t('proxies'), value: 'outbound', icon: IconArrowsExchange },
   { label: t('process'), value: 'process', icon: IconCpu },
@@ -303,25 +312,58 @@ const currentViewLabel = computed(
           />
         </div>
 
-        <div class="relative">
-          <select
-            v-model.number="selectedTimeRange"
-            class="cursor-pointer appearance-none rounded-lg border border-[color-mix(in_oklch,var(--color-base-content)_12%,transparent)] bg-base-200/60 py-1.5 pr-8 pl-3 text-[0.8125rem] text-base-content transition-all duration-200 hover:border-[color-mix(in_oklch,var(--color-base-content)_20%,transparent)] focus:border-primary focus:outline-none"
-            style="
-              background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E&quot;);
-              background-repeat: no-repeat;
-              background-position: right 0.5rem center;
-              background-size: 1rem;
-            "
-          >
-            <option
-              v-for="opt in timeRangeOptions"
-              :key="opt.value"
-              :value="opt.value"
+        <div class="flex items-center gap-1">
+          <span class="hidden text-[0.75rem] text-base-content/50 md:inline">
+            {{ t('timeRange') }}
+          </span>
+          <div class="relative">
+            <select
+              v-model.number="selectedTimeRange"
+              :title="t('timeRange')"
+              class="cursor-pointer appearance-none rounded-lg border border-[color-mix(in_oklch,var(--color-base-content)_12%,transparent)] bg-base-200/60 py-1.5 pr-8 pl-3 text-[0.8125rem] text-base-content transition-all duration-200 hover:border-[color-mix(in_oklch,var(--color-base-content)_20%,transparent)] focus:border-primary focus:outline-none"
+              style="
+                background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E&quot;);
+                background-repeat: no-repeat;
+                background-position: right 0.5rem center;
+                background-size: 1rem;
+              "
             >
-              {{ opt.label }}
-            </option>
-          </select>
+              <option
+                v-for="opt in timeRangeOptions"
+                :key="opt.value"
+                :value="opt.value"
+              >
+                {{ opt.label }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-1">
+          <span class="hidden text-[0.75rem] text-base-content/50 md:inline">
+            {{ t('dataRetention') }}
+          </span>
+          <div class="relative">
+            <select
+              v-model.number="selectedDataRetention"
+              :title="t('dataRetention')"
+              class="cursor-pointer appearance-none rounded-lg border border-[color-mix(in_oklch,var(--color-base-content)_12%,transparent)] bg-base-200/60 py-1.5 pr-8 pl-3 text-[0.8125rem] text-base-content transition-all duration-200 hover:border-[color-mix(in_oklch,var(--color-base-content)_20%,transparent)] focus:border-primary focus:outline-none"
+              style="
+                background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E&quot;);
+                background-repeat: no-repeat;
+                background-position: right 0.5rem center;
+                background-size: 1rem;
+              "
+            >
+              <option
+                v-for="opt in retentionOptions"
+                :key="opt.value"
+                :value="opt.value"
+              >
+                {{ opt.label }}
+              </option>
+            </select>
+          </div>
         </div>
 
         <button

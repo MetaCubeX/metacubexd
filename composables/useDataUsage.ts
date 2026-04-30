@@ -33,6 +33,9 @@ export const useDataUsage = () => {
         case 'process':
           label = log.process
           break
+        case 'inboundUser':
+          label = log.inboundUser
+          break
       }
 
       const existing = map.get(label)
@@ -70,6 +73,8 @@ export const useDataUsage = () => {
           return log.outbound === label
         case 'process':
           return log.process === label
+        case 'inboundUser':
+          return log.inboundUser === label
       }
       return false
     })
@@ -114,6 +119,8 @@ export const useDataUsage = () => {
           return log.process === parentLabel
         case 'outbound':
           return log.outbound === parentLabel
+        case 'inboundUser':
+          return log.inboundUser === parentLabel
       }
       return false
     })

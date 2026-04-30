@@ -5,6 +5,7 @@ export interface DataUsageLog {
   host: string
   outbound: string
   process: string
+  inboundUser: string
   upload: number
   download: number
 }
@@ -77,7 +78,10 @@ export class DataUsageDB {
       request.onsuccess = (event) => {
         const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result
         if (cursor) {
-          results.push(cursor.value)
+          results.push({
+            ...cursor.value,
+            inboundUser: cursor.value.inboundUser || 'Unknown',
+          })
           cursor.continue()
         } else {
           resolve(results)
