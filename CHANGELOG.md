@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.246.3](https://github.com/MetaCubeX/metacubexd/compare/v1.246.2...v1.246.3) (2026-05-03)
+
+
+### Bug Fixes
+
+* avoid rewriting docker config asset ([119adcd](https://github.com/MetaCubeX/metacubexd/commit/119adcd5d97012236a45e941bb140eafa74a7c3d))
+
 ## [1.246.2](https://github.com/MetaCubeX/metacubexd/compare/v1.246.1...v1.246.2) (2026-04-30)
 
 
