@@ -1,5 +1,36 @@
 # Changelog
 
+## [1.247.0](https://github.com/MetaCubeX/metacubexd/compare/v1.246.3...v1.247.0) (2026-05-09)
+
+
+### Features
+
+* **connections:** add card render branch with aux-line helper ([29def02](https://github.com/MetaCubeX/metacubexd/commit/29def027e48e4877fe2ae403a1be7b6e7be8eb12))
+* **connections:** add composite column enum keys and default visibility ([c7d0f03](https://github.com/MetaCubeX/metacubexd/commit/c7d0f037f2e0149f54c9c7a6d746de8ada990c83))
+* **connections:** add renderText to ConnectionColumn for card aux line ([d642866](https://github.com/MetaCubeX/metacubexd/commit/d642866551c61d455489364f64cd89aa9d7509cb))
+* **connections:** add renderTwoLineCell utility for composite cells ([52aa207](https://github.com/MetaCubeX/metacubexd/commit/52aa20767c75ec1c361d8fcb0867c5cd6b40c4a7))
+* **connections:** card-mode sort and group dropdowns in toolbar ([2027d9e](https://github.com/MetaCubeX/metacubexd/commit/2027d9e6183ee95ab18936f79c6c43f1b829f024))
+* **connections:** replace useMobileConnectionsTable with three-state displayMode ([36abfca](https://github.com/MetaCubeX/metacubexd/commit/36abfcaae211912d87c8d126a87ef13d4d61d3d0))
+* **connections:** three-state displayMode radio in settings modal ([dafdcab](https://github.com/MetaCubeX/metacubexd/commit/dafdcab8706f325dc55040201dfdc47d0a5111cb))
+* **connections:** wire Flow composite column ([56ef0ef](https://github.com/MetaCubeX/metacubexd/commit/56ef0ef556852b37b3daa105e8fd2bb0d43f9208))
+* **connections:** wire HostProcess composite column ([2e846c4](https://github.com/MetaCubeX/metacubexd/commit/2e846c4cb89f2082b19325ad1de43521d1795d6e))
+* **connections:** wire RuleChains composite column ([e85c04d](https://github.com/MetaCubeX/metacubexd/commit/e85c04d98be85a56405bfa43123aaa3ec1673217))
+* **connections:** wire Traffic composite column ([a10b20b](https://github.com/MetaCubeX/metacubexd/commit/a10b20b3024b2c4b827ec759a5aab233f5c973a8))
+* **ui:** introduce motion design system ([c066846](https://github.com/MetaCubeX/metacubexd/commit/c066846aa9bae6c7bb4dec0270d384a833efd8b2))
+
+
+### Bug Fixes
+
+* **connections:** address final review — visibility migration, scoped CSS, zh header collision ([ff348a2](https://github.com/MetaCubeX/metacubexd/commit/ff348a2ac33859e08c756cdc8c7ab25bec2d7a72))
+* **connections:** center primary line when aux is empty ([32a7bf3](https://github.com/MetaCubeX/metacubexd/commit/32a7bf36625104bff8d6fb3ed8414b0d9a730795))
+* **connections:** correct describe casing and remove redundant type cast ([8f5a2d6](https://github.com/MetaCubeX/metacubexd/commit/8f5a2d6cc76697a3b10b30541490f88b3d709b9d))
+* **connections:** correct describe casing and remove redundant type cast ([4bdf9d4](https://github.com/MetaCubeX/metacubexd/commit/4bdf9d4c6321344a6cbaa5269c6b08271272e6f2))
+* **connections:** dedupe HostProcess aux and guard Flow aux against empty destination ([5726b2a](https://github.com/MetaCubeX/metacubexd/commit/5726b2a88f33557f21c414bccbbb407852a8b98d))
+* **connections:** drop custom JSON serializer for displayMode ([13bde1e](https://github.com/MetaCubeX/metacubexd/commit/13bde1e3bfbcd6821bd65faf2a6709cd39cd73df))
+* **connections:** drop double getCloseButton call and fix group-card indent selector ([c593f76](https://github.com/MetaCubeX/metacubexd/commit/c593f76b03db160c750b3a9fb265de7e8815a2a6))
+* **connections:** make composite cell typography honor table-size setting ([8c2c273](https://github.com/MetaCubeX/metacubexd/commit/8c2c273ad7834d82ca62e712cff0fbe0e2a064fa))
+* **connections:** remove duplicate card-mode sort UI and dead enum entry ([7de5682](https://github.com/MetaCubeX/metacubexd/commit/7de568252ae5d748bb19d27d192601c747c8e83b))
+
 ## [1.246.3](https://github.com/MetaCubeX/metacubexd/compare/v1.246.2...v1.246.3) (2026-05-03)
 
 
