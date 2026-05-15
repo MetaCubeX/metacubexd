@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.247.1](https://github.com/MetaCubeX/metacubexd/compare/v1.247.0...v1.247.1) (2026-05-15)
+
+
+### Bug Fixes
+
+* **proxies:** restore latency tooltip placement next to its anchor ([0a0b15e](https://github.com/MetaCubeX/metacubexd/commit/0a0b15e4430c80406effeced284c8b7ffcc70796)), closes [#1976](https://github.com/MetaCubeX/metacubexd/issues/1976)
+
 ## [1.247.0](https://github.com/MetaCubeX/metacubexd/compare/v1.246.3...v1.247.0) (2026-05-09)
 
 
