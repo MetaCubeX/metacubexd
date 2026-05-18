@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.248.0](https://github.com/MetaCubeX/metacubexd/compare/v1.247.1...v1.248.0) (2026-05-18)
+
+
+### Features
+
+* **proxies:** allow manual latency color thresholds ([c3614fd](https://github.com/MetaCubeX/metacubexd/commit/c3614fd254a94feab395c2bc946f7374cc333594)), closes [#1980](https://github.com/MetaCubeX/metacubexd/issues/1980)
+
 ## [1.247.1](https://github.com/MetaCubeX/metacubexd/compare/v1.247.0...v1.247.1) (2026-05-15)
 
 
