@@ -64,6 +64,9 @@ export const useConfigStore = defineStore('config', () => {
     'latencyTestTimeoutDuration',
     5000,
   )
+  // Latency color thresholds. 0 = auto (use protocol-based defaults).
+  const latencyMediumThreshold = useLocalStorage('latencyMediumThreshold', 0)
+  const latencyHighThreshold = useLocalStorage('latencyHighThreshold', 0)
   const iconHeight = useLocalStorage('iconHeight', 24)
   const iconMarginRight = useLocalStorage('iconMarginRight', 8)
 
@@ -150,11 +153,24 @@ export const useConfigStore = defineStore('config', () => {
     urlForLatencyTest.value.startsWith('https'),
   )
 
-  const latencyQualityMap = computed(() =>
-    isLatencyTestByHttps.value
+  const latencyQualityMap = computed(() => {
+    const defaults = isLatencyTestByHttps.value
       ? LATENCY_QUALITY_MAP_HTTPS
-      : LATENCY_QUALITY_MAP_HTTP,
-  )
+      : LATENCY_QUALITY_MAP_HTTP
+    const medium =
+      latencyMediumThreshold.value > 0
+        ? latencyMediumThreshold.value
+        : defaults.MEDIUM
+    const high =
+      latencyHighThreshold.value > 0
+        ? latencyHighThreshold.value
+        : defaults.HIGH
+    return {
+      NOT_CONNECTED: defaults.NOT_CONNECTED,
+      MEDIUM: medium,
+      HIGH: high,
+    }
+  })
 
   const tableSizeClassName = (size: TAILWINDCSS_SIZE) => {
     const classMap: Record<TAILWINDCSS_SIZE, string> = {
@@ -176,6 +192,8 @@ export const useConfigStore = defineStore('config', () => {
     urlForLatencyTest.value = 'https://www.gstatic.com/generate_204'
     autoCloseConns.value = true
     latencyTestTimeoutDuration.value = 5000
+    latencyMediumThreshold.value = 0
+    latencyHighThreshold.value = 0
     iconHeight.value = 24
     iconMarginRight.value = 8
   }
@@ -207,6 +225,8 @@ export const useConfigStore = defineStore('config', () => {
     urlForLatencyTest,
     autoCloseConns,
     latencyTestTimeoutDuration,
+    latencyMediumThreshold,
+    latencyHighThreshold,
     iconHeight,
     iconMarginRight,
     // Endpoint

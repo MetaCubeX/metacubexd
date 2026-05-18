@@ -1,7 +1,3 @@
-import type {
-  LATENCY_QUALITY_MAP_HTTP,
-  LATENCY_QUALITY_MAP_HTTPS,
-} from '~/constants'
 import byteSize from 'byte-size'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
@@ -10,10 +6,11 @@ import { PROXIES_ORDERING_TYPE } from '~/constants'
 import 'dayjs/locale/zh-cn'
 import 'dayjs/locale/ru'
 
-// Type for latency quality map (can be either HTTP or HTTPS)
-type LatencyQualityMap =
-  | typeof LATENCY_QUALITY_MAP_HTTP
-  | typeof LATENCY_QUALITY_MAP_HTTPS
+interface LatencyQualityMap {
+  NOT_CONNECTED: number
+  MEDIUM: number
+  HIGH: number
+}
 
 dayjs.extend(relativeTime)
 dayjs.extend(duration)

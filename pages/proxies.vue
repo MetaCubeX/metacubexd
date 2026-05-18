@@ -796,6 +796,32 @@ const ProviderProxyNodes = defineComponent({
 
         <div>
           <ConfigTitle with-divider>
+            {{ t('latencyMediumThreshold') }} ({{ t('ms') }})
+          </ConfigTitle>
+          <input
+            v-model.number="configStore.latencyMediumThreshold"
+            :placeholder="t('thresholdAutoPlaceholder')"
+            class="input-bordered input w-full"
+            type="number"
+            min="0"
+          />
+        </div>
+
+        <div>
+          <ConfigTitle with-divider>
+            {{ t('latencyHighThreshold') }} ({{ t('ms') }})
+          </ConfigTitle>
+          <input
+            v-model.number="configStore.latencyHighThreshold"
+            :placeholder="t('thresholdAutoPlaceholder')"
+            class="input-bordered input w-full"
+            type="number"
+            min="0"
+          />
+        </div>
+
+        <div>
+          <ConfigTitle with-divider>
             {{ t('proxiesSorting') }}
           </ConfigTitle>
           <select
