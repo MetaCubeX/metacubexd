@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.248.1](https://github.com/MetaCubeX/metacubexd/compare/v1.248.0...v1.248.1) (2026-05-19)
+
+
+### Bug Fixes
+
+* stabilize latency testing state ([daf4b14](https://github.com/MetaCubeX/metacubexd/commit/daf4b14050578e2f5d0887e52eb0b80c50c331f4))
+
 ## [1.248.0](https://github.com/MetaCubeX/metacubexd/compare/v1.247.1...v1.248.0) (2026-05-18)
 
 
