@@ -92,6 +92,7 @@ export function useBatchLatencyTest() {
     abortController.value = new AbortController()
 
     // Update store progress
+    proxiesStore.clearLatencyTestStateForNodes?.(nodeNames, url)
     nodeRecommendationStore.batchTestProgress = {
       total: nodeNames.length,
       completed: 0,
@@ -121,6 +122,7 @@ export function useBatchLatencyTest() {
             abortController.value?.signal,
           )
           results[nodeName] = result.delay
+          proxiesStore.recordLatencyTestResult?.(nodeName, url, result.delay)
 
           progress.value.completed++
           nodeRecommendationStore.batchTestProgress.completed++
@@ -175,6 +177,7 @@ export function useBatchLatencyTest() {
     const timeout = options?.timeout ?? configStore.latencyTestTimeoutDuration
 
     isRunning.value = true
+    proxiesStore.clearLatencyTestStateForGroup?.(groupName, url)
     nodeRecommendationStore.batchTestProgress = {
       total: 1,
       completed: 0,
@@ -190,6 +193,7 @@ export function useBatchLatencyTest() {
 
       // Refresh proxy data so UI shows latest latency
       await proxiesStore.fetchProxies()
+      proxiesStore.recordLatencyTestResults?.(results, url)
 
       return results
     } finally {

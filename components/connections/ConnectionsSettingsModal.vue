@@ -7,6 +7,7 @@ import {
   CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
   CONNECTIONS_TABLE_INITIAL_COLUMN_VISIBILITY,
 } from '~/constants'
+import { createConnectionsColumnSortableOptions } from './columnSortable'
 
 const props = defineProps<{
   allColumns: Array<{
@@ -47,10 +48,11 @@ function getColumnById(id: CONNECTIONS_TABLE_ACCESSOR_KEY) {
 }
 
 // Setup sortable
-useSortable(columnListRef, columnOrder, {
-  handle: '.drag-handle',
-  animation: 150,
-})
+useSortable(
+  columnListRef,
+  columnOrder,
+  createConnectionsColumnSortableOptions(),
+)
 
 function toggleColumnVisibility(colId: CONNECTIONS_TABLE_ACCESSOR_KEY) {
   configStore.connectionsTableColumnVisibility = {

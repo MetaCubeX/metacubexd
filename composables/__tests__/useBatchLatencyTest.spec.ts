@@ -31,7 +31,11 @@ const mockNodeRecommendationStore = {
 }
 
 const mockProxiesStore = {
+  clearLatencyTestStateForGroup: vi.fn(),
+  clearLatencyTestStateForNodes: vi.fn(),
   fetchProxies: vi.fn(),
+  recordLatencyTestResult: vi.fn(),
+  recordLatencyTestResults: vi.fn(),
 }
 
 vi.stubGlobal('useConfigStore', () => mockConfigStore)
@@ -132,6 +136,26 @@ describe('composables/useBatchLatencyTest', () => {
         150,
         true,
       )
+      expect(mockProxiesStore.recordLatencyTestResult).toHaveBeenCalledWith(
+        'node1',
+        'https://test.com',
+        150,
+      )
+    })
+
+    it('clears old node latency state before batch testing starts', async () => {
+      mockJson.mockResolvedValue({ delay: 100 })
+
+      const { batchTestNodes } = useBatchLatencyTest()
+
+      await batchTestNodes(['node1', 'node2'], {
+        url: 'https://test.com',
+        timeout: 5000,
+      })
+
+      expect(
+        mockProxiesStore.clearLatencyTestStateForNodes,
+      ).toHaveBeenCalledWith(['node1', 'node2'], 'https://test.com')
     })
 
     it('handles failed tests with delay 0', async () => {
@@ -288,6 +312,22 @@ describe('composables/useBatchLatencyTest', () => {
       expect(
         mockNodeRecommendationStore.recordBatchResults,
       ).toHaveBeenCalledWith(groupResults)
+      expect(mockProxiesStore.recordLatencyTestResults).toHaveBeenCalledWith(
+        groupResults,
+        mockConfigStore.urlForLatencyTest,
+      )
+    })
+
+    it('clears old group latency state before group testing starts', async () => {
+      mockJson.mockResolvedValue({ node1: 100 })
+
+      const { testGroupNodes } = useBatchLatencyTest()
+
+      await testGroupNodes('group1')
+
+      expect(
+        mockProxiesStore.clearLatencyTestStateForGroup,
+      ).toHaveBeenCalledWith('group1', mockConfigStore.urlForLatencyTest)
     })
   })
 })

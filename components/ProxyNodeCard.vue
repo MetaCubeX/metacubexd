@@ -330,6 +330,8 @@ function onClick() {
 }
 
 function handleLatencyTest() {
+  clearTimeouts()
+  closeTooltip()
   proxiesStore.proxyLatencyTest(
     props.proxyName,
     proxyNode.value?.provider || '',
@@ -530,7 +532,7 @@ function handleLatencyTest() {
 
             <template v-if="latencyTestHistory.length > 0">
               <ul
-                class="m-0 max-h-48 w-full list-none overflow-y-auto p-0 pr-2 [scrollbar-color:color-mix(in_oklch,var(--color-primary-content)_30%,transparent)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar]:block [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:rounded-sm [&::-webkit-scrollbar-thumb]:bg-[color-mix(in_oklch,var(--color-primary-content)_30%,transparent)] [&::-webkit-scrollbar-track]:bg-transparent"
+                class="m-0 max-h-48 w-full [scrollbar-width:thin] [scrollbar-color:color-mix(in_oklch,var(--color-primary-content)_30%,transparent)_transparent] list-none overflow-y-auto p-0 pr-2 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:rounded-sm [&::-webkit-scrollbar-thumb]:bg-[color-mix(in_oklch,var(--color-primary-content)_30%,transparent)] [&::-webkit-scrollbar-track]:bg-transparent"
               >
                 <li v-for="(result, index) in latencyTestHistory" :key="index">
                   <div
