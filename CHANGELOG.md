@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.248.3](https://github.com/MetaCubeX/metacubexd/compare/v1.248.2...v1.248.3) (2026-05-23)
+
+
+### Bug Fixes
+
+* **proxies:** enforce singleton latency history popover ([1ef2f21](https://github.com/MetaCubeX/metacubexd/commit/1ef2f21280b169f3b47c11d7701f0f561dcd137f))
+
 ## [1.248.2](https://github.com/MetaCubeX/metacubexd/compare/v1.248.1...v1.248.2) (2026-05-23)
 
 
