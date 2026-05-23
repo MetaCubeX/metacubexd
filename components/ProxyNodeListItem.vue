@@ -141,10 +141,20 @@ function clearTimeouts() {
   }
 }
 
+function openTooltip() {
+  acquireSingletonPopover(closeTooltip)
+  isTooltipOpen.value = true
+}
+
+function closeTooltip() {
+  isTooltipOpen.value = false
+  releaseSingletonPopover(closeTooltip)
+}
+
 function onMouseEnter() {
   clearTimeouts()
   openTimeout = setTimeout(() => {
-    isTooltipOpen.value = true
+    openTooltip()
   }, 300)
 }
 
@@ -152,7 +162,7 @@ function onMouseLeave() {
   clearTimeouts()
   // Delay closing to allow mouse to move to tooltip
   closeTimeout = setTimeout(() => {
-    isTooltipOpen.value = false
+    closeTooltip()
   }, 100)
 }
 
@@ -162,7 +172,7 @@ function onTooltipMouseEnter() {
 
 function onTooltipMouseLeave() {
   clearTimeouts()
-  isTooltipOpen.value = false
+  closeTooltip()
 }
 
 function onClick() {
@@ -171,7 +181,7 @@ function onClick() {
 
 function handleLatencyTest() {
   clearTimeouts()
-  isTooltipOpen.value = true
+  openTooltip()
   proxiesStore.proxyLatencyTest(
     props.proxyName,
     proxyNode.value?.provider || '',
@@ -179,6 +189,11 @@ function handleLatencyTest() {
     props.timeout,
   )
 }
+
+onBeforeUnmount(() => {
+  clearTimeouts()
+  releaseSingletonPopover(closeTooltip)
+})
 </script>
 
 <template>

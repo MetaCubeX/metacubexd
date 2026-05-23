@@ -243,6 +243,7 @@ function clearTimeouts() {
 }
 
 function openTooltip() {
+  acquireSingletonPopover(closeTooltip)
   isTooltipOpen.value = true
   document.addEventListener('click', onDocumentClick, true)
   document.addEventListener('touchstart', onDocumentClick, true)
@@ -252,6 +253,7 @@ function closeTooltip() {
   isTooltipOpen.value = false
   document.removeEventListener('click', onDocumentClick, true)
   document.removeEventListener('touchstart', onDocumentClick, true)
+  releaseSingletonPopover(closeTooltip)
 }
 
 function onDocumentClick(e: Event) {
@@ -323,6 +325,7 @@ onBeforeUnmount(() => {
   clearTimeouts()
   document.removeEventListener('click', onDocumentClick, true)
   document.removeEventListener('touchstart', onDocumentClick, true)
+  releaseSingletonPopover(closeTooltip)
 })
 
 function onClick() {
