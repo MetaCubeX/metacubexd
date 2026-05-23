@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.248.2](https://github.com/MetaCubeX/metacubexd/compare/v1.248.1...v1.248.2) (2026-05-23)
+
+
+### Bug Fixes
+
+* **proxies:** keep latency tests resilient and update history live ([5b15390](https://github.com/MetaCubeX/metacubexd/commit/5b153903d01599c010d30e44ebf0d1460dfb2302))
+
 ## [1.248.1](https://github.com/MetaCubeX/metacubexd/compare/v1.248.0...v1.248.1) (2026-05-19)
 
 
