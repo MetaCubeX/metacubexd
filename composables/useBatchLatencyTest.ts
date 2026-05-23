@@ -71,6 +71,11 @@ export function useBatchLatencyTest() {
       const result = await request
         .get(`group/${encodeURIComponent(groupName)}/delay`, {
           searchParams: { url, timeout },
+          // The backend timeout is per-node; the group test fans out to every
+          // member, so the overall round trip easily exceeds ky's 5s default.
+          // Scale the client timeout generously, floored at 30s, plus 10s of
+          // headroom.
+          timeout: Math.max(30_000, timeout * 2 + 10_000),
         })
         .json<Record<string, number>>()
       return result
@@ -177,7 +182,10 @@ export function useBatchLatencyTest() {
     const timeout = options?.timeout ?? configStore.latencyTestTimeoutDuration
 
     isRunning.value = true
-    proxiesStore.clearLatencyTestStateForGroup?.(groupName, url)
+    // Don't pre-clear latencyMap — testProxyGroup swallows transport errors
+    // into `{}`, and any node not present in the response would otherwise be
+    // stuck displaying "---" forever. Preserving the previous values means
+    // failed/skipped tests just don't update.
     nodeRecommendationStore.batchTestProgress = {
       total: 1,
       completed: 0,
@@ -188,11 +196,19 @@ export function useBatchLatencyTest() {
     try {
       const results = await testProxyGroup(groupName, url, timeout)
 
-      // Record all results
+      // Record whatever we got. recordBatchResults / recordLatencyTestResults
+      // are no-ops on empty input, so an empty `{}` cleanly means "preserve
+      // existing state".
       nodeRecommendationStore.recordBatchResults(results)
 
-      // Refresh proxy data so UI shows latest latency
-      await proxiesStore.fetchProxies()
+      // Refresh proxy data so UI shows latest latency. Don't propagate a
+      // fetch failure — that would abort the surrounding `testMultipleGroups`
+      // loop and leave the global testing flag stuck.
+      try {
+        await proxiesStore.fetchProxies()
+      } catch {
+        /* best-effort refresh */
+      }
       proxiesStore.recordLatencyTestResults?.(results, url)
 
       return results

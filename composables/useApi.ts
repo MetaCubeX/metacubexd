@@ -18,6 +18,80 @@ export function useMockMode() {
   return config.public.mockMode === true
 }
 
+interface MockHistory { time: string; delay: number }
+interface MockProxyShape {
+  name?: string
+  all?: string[]
+  history?: MockHistory[]
+}
+interface MockProviderShape { proxies?: MockProxyShape[] }
+
+const MOCK_HISTORY_CAP = 10
+
+function pickJitteredDelay(previous: number | undefined): number {
+  if (!previous || previous <= 0) {
+    // No prior datapoint: 90% chance of a "successful" test in the 40-300ms range
+    return Math.random() < 0.9 ? Math.round(40 + Math.random() * 260) : 0
+  }
+  // ±20% jitter around the previous value, never below 1ms
+  const variance = previous * 0.2
+  return Math.round(
+    Math.max(1, previous - variance) + Math.random() * variance * 2,
+  )
+}
+
+function appendMockHistory(proxy: MockProxyShape, delay: number) {
+  const entry: MockHistory = { time: new Date().toISOString(), delay }
+  proxy.history = [...(proxy.history ?? []), entry].slice(-MOCK_HISTORY_CAP)
+}
+
+function simulateProxyDelay(
+  proxies: Record<string, MockProxyShape>,
+  proxyName: string,
+): { delay: number } {
+  const proxy = proxies[proxyName]
+  if (!proxy) return { delay: 0 }
+  const previous = proxy.history?.at(-1)?.delay
+  const delay = pickJitteredDelay(previous)
+  appendMockHistory(proxy, delay)
+  return { delay }
+}
+
+function simulateGroupDelay(
+  proxies: Record<string, MockProxyShape>,
+  groupName: string,
+): Record<string, number> {
+  const group = proxies[groupName]
+  if (!group?.all) return {}
+  const results: Record<string, number> = {}
+  for (const child of group.all) {
+    results[child] = simulateProxyDelay(proxies, child).delay
+  }
+  return results
+}
+
+function simulateProviderHealthCheck(
+  providers: Record<string, MockProviderShape>,
+  proxies: Record<string, MockProxyShape>,
+  providerName: string,
+): Record<string, number> {
+  const provider = providers[providerName]
+  if (!provider?.proxies) return {}
+  const results: Record<string, number> = {}
+  for (const node of provider.proxies) {
+    if (!node.name) continue
+    const previous =
+      proxies[node.name]?.history?.at(-1)?.delay ?? node.history?.at(-1)?.delay
+    const delay = pickJitteredDelay(previous)
+    results[node.name] = delay
+    // Keep both the provider's copy and the top-level proxy in sync so a
+    // subsequent fetchProxies reflects the new history.
+    appendMockHistory(node, delay)
+    if (proxies[node.name]) appendMockHistory(proxies[node.name]!, delay)
+  }
+  return results
+}
+
 // Mock data resolver
 function getMockData(url: string): unknown {
   // Lazy import to avoid bundling mock data in production
@@ -54,6 +128,36 @@ function getMockData(url: string): unknown {
       uploadTotal: 125000000,
     }
   if (path === 'group') return { groups: {} }
+
+  // Latency-test endpoints — must be matched before the generic `proxies/` catch-all
+  if (path.startsWith('proxies/') && path.endsWith('/delay')) {
+    const proxyName = decodeURIComponent(
+      path.slice('proxies/'.length, -'/delay'.length),
+    )
+    return simulateProxyDelay(
+      mockData.mockProxies as Record<string, MockProxyShape>,
+      proxyName,
+    )
+  }
+  if (path.startsWith('group/') && path.endsWith('/delay')) {
+    const groupName = decodeURIComponent(
+      path.slice('group/'.length, -'/delay'.length),
+    )
+    return simulateGroupDelay(
+      mockData.mockProxies as Record<string, MockProxyShape>,
+      groupName,
+    )
+  }
+  if (path.startsWith('providers/proxies/') && path.endsWith('/healthcheck')) {
+    const providerName = decodeURIComponent(
+      path.slice('providers/proxies/'.length, -'/healthcheck'.length),
+    )
+    return simulateProviderHealthCheck(
+      mockData.mockProxyProviders as Record<string, MockProviderShape>,
+      mockData.mockProxies as Record<string, MockProxyShape>,
+      providerName,
+    )
+  }
 
   // Handle dynamic proxy endpoints
   if (path.startsWith('proxies/')) {
@@ -252,9 +356,13 @@ export function proxyGroupLatencyTestAPI(
 ) {
   const request = useRequest()
 
+  // The backend's `timeout` is per-node; the group test fans out to every
+  // member, so the overall round trip easily exceeds ky's 5s default. Scale
+  // the client timeout generously, floored at 30s, plus 10s of headroom.
   return request
     .get(`group/${encodeURIComponent(groupName)}/delay`, {
       searchParams: { url, timeout },
+      timeout: Math.max(30_000, timeout * 2 + 10_000),
     })
     .json<Record<string, number>>()
 }

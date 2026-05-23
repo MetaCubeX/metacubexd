@@ -331,7 +331,7 @@ function onClick() {
 
 function handleLatencyTest() {
   clearTimeouts()
-  closeTooltip()
+  openTooltip()
   proxiesStore.proxyLatencyTest(
     props.proxyName,
     proxyNode.value?.provider || '',

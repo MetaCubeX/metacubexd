@@ -30,12 +30,20 @@ const mockNodeRecommendationStore = {
   recordBatchResults: vi.fn(),
 }
 
-const mockProxiesStore = {
+const mockProxiesStore: {
+  clearLatencyTestStateForGroup: ReturnType<typeof vi.fn>
+  clearLatencyTestStateForNodes: ReturnType<typeof vi.fn>
+  fetchProxies: ReturnType<typeof vi.fn>
+  recordLatencyTestResult: ReturnType<typeof vi.fn>
+  recordLatencyTestResults: ReturnType<typeof vi.fn>
+  proxies: { name: string; all: string[] }[]
+} = {
   clearLatencyTestStateForGroup: vi.fn(),
   clearLatencyTestStateForNodes: vi.fn(),
   fetchProxies: vi.fn(),
   recordLatencyTestResult: vi.fn(),
   recordLatencyTestResults: vi.fn(),
+  proxies: [],
 }
 
 vi.stubGlobal('useConfigStore', () => mockConfigStore)
@@ -318,16 +326,63 @@ describe('composables/useBatchLatencyTest', () => {
       )
     })
 
-    it('clears old group latency state before group testing starts', async () => {
+    it('does not clear the existing latency state before group testing starts', async () => {
       mockJson.mockResolvedValue({ node1: 100 })
 
       const { testGroupNodes } = useBatchLatencyTest()
 
       await testGroupNodes('group1')
 
+      // Pre-clearing was the root cause of "Test All -> all pills become ---"
+      // when the request didn't return every member. The spinner provided by
+      // isTesting already hides the value during the in-flight phase, so we
+      // leave latencyMap alone here.
       expect(
         mockProxiesStore.clearLatencyTestStateForGroup,
-      ).toHaveBeenCalledWith('group1', mockConfigStore.urlForLatencyTest)
+      ).not.toHaveBeenCalled()
+    })
+
+    it('resolves with an empty map and leaves latencyMap untouched when the request times out', async () => {
+      mockJson.mockRejectedValue(new Error('Request timed out'))
+      mockProxiesStore.proxies = [{ name: 'group1', all: ['node-a', 'node-b'] }]
+
+      const { testGroupNodes, isRunning } = useBatchLatencyTest()
+
+      // testProxyGroup swallows the error into {} — testGroupNodes shouldn't
+      // synthesize failures into latencyMap (would leave pills stuck at "---");
+      // recordLatencyTestResults still runs with the empty map so callers can
+      // observe "no fresh data" without us clobbering existing values.
+      await expect(testGroupNodes('group1')).resolves.toEqual({})
+      expect(isRunning.value).toBe(false)
+      expect(
+        mockNodeRecommendationStore.recordBatchResults,
+      ).toHaveBeenCalledWith({})
+      expect(mockProxiesStore.recordLatencyTestResults).toHaveBeenCalledWith(
+        {},
+        mockConfigStore.urlForLatencyTest,
+      )
+      expect(
+        mockProxiesStore.clearLatencyTestStateForGroup,
+      ).not.toHaveBeenCalled()
+    })
+
+    it('does not crash when fetchProxies itself fails after the group test', async () => {
+      mockJson.mockResolvedValue({ 'node-a': 80 })
+      mockProxiesStore.proxies = [{ name: 'group1', all: ['node-a'] }]
+      mockProxiesStore.fetchProxies.mockRejectedValueOnce(
+        new Error('network down'),
+      )
+
+      const { testGroupNodes, isRunning } = useBatchLatencyTest()
+
+      await expect(testGroupNodes('group1')).resolves.toEqual({
+        'node-a': 80,
+      })
+      expect(isRunning.value).toBe(false)
+      expect(mockProxiesStore.recordLatencyTestResults).toHaveBeenCalledWith(
+        { 'node-a': 80 },
+        mockConfigStore.urlForLatencyTest,
+      )
     })
   })
 })

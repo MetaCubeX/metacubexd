@@ -7,13 +7,14 @@ const apiMocks = vi.hoisted(() => ({
   fetchProxyProvidersAPI: vi.fn(),
   fetchProxiesAPI: vi.fn(),
   proxyLatencyTestAPI: vi.fn(),
+  proxyGroupLatencyTestAPI: vi.fn(),
 }))
 
 vi.mock('~/composables/useApi', () => ({
   closeSingleConnectionAPI: vi.fn(),
   fetchProxiesAPI: apiMocks.fetchProxiesAPI,
   fetchProxyProvidersAPI: apiMocks.fetchProxyProvidersAPI,
-  proxyGroupLatencyTestAPI: vi.fn(),
+  proxyGroupLatencyTestAPI: apiMocks.proxyGroupLatencyTestAPI,
   proxyLatencyTestAPI: apiMocks.proxyLatencyTestAPI,
   proxyProviderHealthCheckAPI: vi.fn(),
   selectProxyInGroupAPI: vi.fn(),
@@ -37,6 +38,13 @@ vi.stubGlobal('useConnectionsStore', () => ({
   restructRawMsgToConnection: vi.fn(() => []),
 }))
 
+const recordTestResultMock = vi.fn()
+const recordBatchResultsMock = vi.fn()
+vi.stubGlobal('useNodeRecommendationStore', () => ({
+  recordTestResult: recordTestResultMock,
+  recordBatchResults: recordBatchResultsMock,
+}))
+
 function proxy(overrides: Record<string, unknown> = {}) {
   return {
     name: 'node-a',
@@ -56,10 +64,12 @@ describe('stores/proxies latency state', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     vi.clearAllMocks()
+    recordTestResultMock.mockReset()
+    recordBatchResultsMock.mockReset()
     apiMocks.fetchProxyProvidersAPI.mockResolvedValue({ providers: {} })
   })
 
-  it('clears stale latency without clearing history when an individual latency test starts', async () => {
+  it('preserves the previous latency value while an individual test is in flight', async () => {
     let resolveLatency!: (value: { delay: number }) => void
     apiMocks.proxyLatencyTestAPI.mockReturnValue(
       new Promise((resolve) => {
@@ -97,7 +107,11 @@ describe('stores/proxies latency state', () => {
 
     const testing = store.proxyLatencyTest('node-a', '', null, null)
 
-    expect(store.getLatencyByName('node-a', null)).toBe(0)
+    // The Latency pill renders a spinner via proxyLatencyTestingMap; the
+    // underlying value should stay at its previous reading so that on failure
+    // we don't leak "---" out the other side.
+    expect(store.proxyLatencyTestingMap['node-a']).toBe(true)
+    expect(store.getLatencyByName('node-a', null)).toBe(88)
     expect(store.getLatencyHistoryByName('node-a', null)).toEqual([
       { time: '2026-05-19T13:17:31.000Z', delay: 88 },
     ])
@@ -106,7 +120,7 @@ describe('stores/proxies latency state', () => {
     await testing
   })
 
-  it('keeps existing latency history when recording an individual test result', async () => {
+  it('appends new latency to history while preserving prior entries', async () => {
     apiMocks.proxyLatencyTestAPI.mockResolvedValue({ delay: 42 })
 
     const store = useProxiesStore()
@@ -136,10 +150,171 @@ describe('stores/proxies latency state', () => {
     await store.proxyLatencyTest('node-a', '', null, null)
 
     expect(store.getLatencyByName('node-a', null)).toBe(42)
-    expect(store.getLatencyHistoryByName('node-a', null)).toEqual([
-      { time: '2026-05-19T13:17:31.000Z', delay: 88 },
-    ])
-    expect(store.getLatencyHistoryByName('node-a', null)).toHaveLength(1)
+
+    const history = store.getLatencyHistoryByName('node-a', null)
+    expect(history).toHaveLength(2)
+    expect(history[0]).toEqual({
+      time: '2026-05-19T13:17:31.000Z',
+      delay: 88,
+    })
+    expect(history[1]?.delay).toBe(42)
+    expect(typeof history[1]?.time).toBe('string')
+  })
+
+  it('records a failed entry in history without clobbering the latency map when an individual test errors', async () => {
+    apiMocks.proxyLatencyTestAPI.mockRejectedValue(new Error('boom'))
+
+    const store = useProxiesStore()
+    store.proxyNodeMap = {
+      'node-a': {
+        name: 'node-a',
+        alive: true,
+        udp: false,
+        tfo: false,
+        latencyTestHistory: {
+          [mockConfigStore.urlForLatencyTest]: [
+            { time: '2026-05-19T13:17:31.000Z', delay: 88 },
+          ],
+        },
+        latency: '',
+        xudp: false,
+        type: 'ss',
+        provider: '',
+      },
+    }
+    store.latencyMap = {
+      'node-a': {
+        [mockConfigStore.urlForLatencyTest]: 88,
+      },
+    }
+
+    await store.proxyLatencyTest('node-a', '', null, null)
+
+    // Previous value preserved so the pill stays informative on transport
+    // failures; the failure datapoint surfaces via stability bar / sparkline
+    // through history + nodeRecommendation.
+    expect(store.getLatencyByName('node-a', null)).toBe(88)
+
+    const history = store.getLatencyHistoryByName('node-a', null)
+    expect(history).toHaveLength(2)
+    expect(history[1]?.delay).toBe(0)
+
+    expect(recordTestResultMock).toHaveBeenCalledWith('node-a', null, false)
+  })
+
+  it('preserves prior latency map values when a group latency test fails, only recording failure history', async () => {
+    apiMocks.proxyGroupLatencyTestAPI.mockRejectedValue(
+      new Error('Request timed out'),
+    )
+    apiMocks.fetchProxiesAPI.mockResolvedValue({ proxies: {} })
+
+    const store = useProxiesStore()
+    store.proxies = [
+      {
+        name: 'GROUP',
+        type: 'Selector',
+        all: ['node-a', 'node-b'],
+        extra: {},
+        history: [],
+        hidden: false,
+        udp: false,
+        xudp: false,
+        tfo: false,
+        now: 'node-a',
+      } as never,
+    ]
+    store.proxyNodeMap = {
+      'node-a': {
+        name: 'node-a',
+        alive: true,
+        udp: false,
+        tfo: false,
+        latencyTestHistory: {
+          [mockConfigStore.urlForLatencyTest]: [
+            { time: '2026-05-19T13:17:31.000Z', delay: 88 },
+          ],
+        },
+        latency: '',
+        xudp: false,
+        type: 'ss',
+        provider: '',
+      },
+      'node-b': {
+        name: 'node-b',
+        alive: true,
+        udp: false,
+        tfo: false,
+        latencyTestHistory: {},
+        latency: '',
+        xudp: false,
+        type: 'ss',
+        provider: '',
+      },
+    }
+    store.latencyMap = {
+      'node-a': { [mockConfigStore.urlForLatencyTest]: 88 },
+      'node-b': { [mockConfigStore.urlForLatencyTest]: 120 },
+    }
+
+    // Must not reject — store should swallow the network failure.
+    await expect(store.proxyGroupLatencyTest('GROUP')).resolves.toBeUndefined()
+
+    expect(store.proxyGroupLatencyTestingMap.GROUP).toBe(false)
+    expect(recordBatchResultsMock).toHaveBeenCalledWith({
+      'node-a': 0,
+      'node-b': 0,
+    })
+
+    // Latency map values stay at what they were before the failed test —
+    // the user's pills don't suddenly turn into "---".
+    expect(store.getLatencyByName('node-a', null)).toBe(88)
+    expect(store.getLatencyByName('node-b', null)).toBe(120)
+
+    const aHistory = store.getLatencyHistoryByName('node-a', null)
+    expect(aHistory).toHaveLength(2)
+    expect(aHistory[1]?.delay).toBe(0)
+
+    const bHistory = store.getLatencyHistoryByName('node-b', null)
+    expect(bHistory).toHaveLength(1)
+    expect(bHistory[0]?.delay).toBe(0)
+  })
+
+  it('notifies node recommendation store after a proxy group latency test', async () => {
+    apiMocks.proxyGroupLatencyTestAPI.mockResolvedValue({
+      'node-a': 120,
+      'node-b': 0,
+    })
+    apiMocks.fetchProxiesAPI.mockResolvedValue({
+      proxies: {
+        GROUP: {
+          name: 'GROUP',
+          type: 'Selector',
+          all: ['node-a', 'node-b'],
+          extra: {},
+          history: [],
+          hidden: false,
+          udp: false,
+          xudp: false,
+          tfo: false,
+          now: 'node-a',
+        },
+        'node-a': proxy({
+          name: 'node-a',
+          history: [{ time: '2026-05-19T13:18:00.000Z', delay: 120 }],
+        }),
+        'node-b': proxy({ name: 'node-b' }),
+      },
+    })
+
+    const store = useProxiesStore()
+    await store.proxyGroupLatencyTest('GROUP')
+
+    expect(recordBatchResultsMock).toHaveBeenCalledWith({
+      'node-a': 120,
+      'node-b': 0,
+    })
+    expect(store.getLatencyByName('node-a', null)).toBe(120)
+    expect(store.getLatencyByName('node-b', null)).toBe(0)
   })
 
   it('drops stale latency when fresh proxy data has no successful history', async () => {
