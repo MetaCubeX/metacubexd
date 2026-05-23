@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.248.4](https://github.com/MetaCubeX/metacubexd/compare/v1.248.3...v1.248.4) (2026-05-23)
+
+
+### Bug Fixes
+
+* **ui:** stabilize sidebar toggle, overview cards, and logo layout ([0b1aeac](https://github.com/MetaCubeX/metacubexd/commit/0b1aeaca416e183b76e0eed63f5206be05c68f2e))
+
 ## [1.248.3](https://github.com/MetaCubeX/metacubexd/compare/v1.248.2...v1.248.3) (2026-05-23)
 
 
