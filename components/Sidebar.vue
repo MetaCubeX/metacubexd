@@ -119,7 +119,7 @@ const toggleSidebar = () => {
         >
           <!-- Logo row -->
           <div
-            class="flex items-center"
+            class="flex items-center lg:min-h-7"
             :class="configStore.sidebarExpanded ? '' : 'lg:justify-center'"
           >
             <LogoText
@@ -130,8 +130,12 @@ const toggleSidebar = () => {
           </div>
           <!-- Expand/Collapse button (desktop only) -->
           <button
-            class="press-tactile hidden w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-[var(--sidebar-border)] bg-transparent p-2 text-sm text-base-content hover:border-[color-mix(in_oklch,var(--color-base-content)_20%,transparent)] hover:bg-[var(--sidebar-hover)] lg:flex"
-            :class="configStore.sidebarExpanded ? '' : 'aspect-square w-auto'"
+            class="press-tactile hidden cursor-pointer items-center justify-center gap-2 rounded-lg border border-[var(--sidebar-border)] bg-transparent p-2 text-sm text-base-content hover:border-[color-mix(in_oklch,var(--color-base-content)_20%,transparent)] hover:bg-[var(--sidebar-hover)] lg:flex"
+            :class="
+              configStore.sidebarExpanded
+                ? 'w-full'
+                : 'aspect-square w-9 self-center'
+            "
             @click="toggleSidebar"
           >
             <IconChevronsRight
@@ -300,29 +304,22 @@ const toggleSidebar = () => {
   );
 }
 
-/* Active indicator — appears with spring overshoot from collapsed pill */
+/* Active indicator — gentle fade-in, no vertical pop */
 .nav-link__indicator {
   width: 3px;
   height: 60%;
   box-shadow:
     0 0 8px color-mix(in oklch, var(--color-primary) 60%, transparent),
     0 0 2px color-mix(in oklch, var(--color-primary) 80%, transparent);
-  animation: indicatorMorph 360ms var(--ease-spring);
-  transform-origin: left center;
+  animation: indicatorFadeIn var(--dur-base) var(--ease-soft);
 }
 
-@keyframes indicatorMorph {
-  0% {
+@keyframes indicatorFadeIn {
+  from {
     opacity: 0;
-    transform: translateY(-50%) scaleY(0) scaleX(0.5);
   }
-  60% {
+  to {
     opacity: 1;
-    transform: translateY(-50%) scaleY(1.05) scaleX(1.4);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(-50%) scaleY(1) scaleX(1);
   }
 }
 

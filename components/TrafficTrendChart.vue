@@ -115,22 +115,25 @@ watch([() => props.startTime, () => props.endTime], () => {
   }
 })
 
-watch([configStore.curTheme], () => {
-  if (chart) {
-    const themeColors = getChartThemeColors()
-    chart.update({
-      xAxis: {
-        labels: { style: { color: themeColors.textColor } },
-        lineColor: themeColors.lineColor,
-      },
-      yAxis: {
-        labels: { style: { color: themeColors.textColor } },
-        gridLineColor: themeColors.gridLineColor,
-      },
-      legend: { itemStyle: { color: themeColors.textColor } },
-    })
-  }
-})
+watch(
+  () => configStore.curTheme,
+  () => {
+    if (chart) {
+      const themeColors = getChartThemeColors()
+      chart.update({
+        xAxis: {
+          labels: { style: { color: themeColors.textColor } },
+          lineColor: themeColors.lineColor,
+        },
+        yAxis: {
+          labels: { style: { color: themeColors.textColor } },
+          gridLineColor: themeColors.gridLineColor,
+        },
+        legend: { itemStyle: { color: themeColors.textColor } },
+      })
+    }
+  },
+)
 
 watch(locale, () => {
   if (chart) {

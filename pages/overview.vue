@@ -12,7 +12,6 @@ import {
   IconServer,
 } from '@tabler/icons-vue'
 import byteSize from 'byte-size'
-import { Vue3Marquee } from 'vue3-marquee'
 import { getChartThemeColors } from '~/utils'
 
 const { t } = useI18n()
@@ -381,11 +380,9 @@ watch(
 </script>
 
 <template>
-  <div class="flex h-full flex-col gap-4 overflow-x-hidden overflow-y-auto">
+  <div class="flex h-full flex-col gap-4 overflow-x-hidden overflow-y-auto p-2">
     <!-- Stats Grid -->
-    <div
-      class="-m-1 grid min-w-0 grid-cols-2 gap-3 p-1 sm:grid-cols-3 xl:grid-cols-6"
-    >
+    <div class="grid min-w-0 grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
       <div
         class="overview-stat-card animate-fade-slide-in flex min-w-0 items-center gap-3 overflow-hidden rounded-xl border border-base-content/10 bg-base-200 p-4 transition-all duration-200 [animation-delay:0ms] hover:z-10 hover:-translate-y-0.5 hover:border-base-content/20"
       >
@@ -395,16 +392,9 @@ watch(
           <IconArrowUpRight :size="20" />
         </div>
         <div class="flex w-full min-w-0 flex-col gap-0.5 overflow-hidden">
-          <Vue3Marquee
-            :animate-on-overflow-only="true"
-            :duration="10"
-            :delay="2"
-            :clone="false"
-            :pause-on-hover="true"
-            class="text-xs text-base-content/60"
-          >
-            <span class="pr-6">{{ t('upload') }}</span>
-          </Vue3Marquee>
+          <span class="text-xs leading-tight break-words text-base-content/60">
+            {{ t('upload') }}
+          </span>
           <span
             class="text-base font-semibold whitespace-nowrap text-base-content tabular-nums"
           >
@@ -422,16 +412,9 @@ watch(
           <IconArrowDownRight :size="20" />
         </div>
         <div class="flex w-full min-w-0 flex-col gap-0.5 overflow-hidden">
-          <Vue3Marquee
-            :animate-on-overflow-only="true"
-            :duration="10"
-            :delay="2"
-            :clone="false"
-            :pause-on-hover="true"
-            class="text-xs text-base-content/60"
-          >
-            <span class="pr-6">{{ t('download') }}</span>
-          </Vue3Marquee>
+          <span class="text-xs leading-tight break-words text-base-content/60">
+            {{ t('download') }}
+          </span>
           <span
             class="text-base font-semibold whitespace-nowrap text-base-content tabular-nums"
           >
@@ -449,16 +432,9 @@ watch(
           <IconCloud :size="20" />
         </div>
         <div class="flex w-full min-w-0 flex-col gap-0.5 overflow-hidden">
-          <Vue3Marquee
-            :animate-on-overflow-only="true"
-            :duration="10"
-            :delay="2"
-            :clone="false"
-            :pause-on-hover="true"
-            class="text-xs text-base-content/60"
-          >
-            <span class="pr-6">{{ t('uploadTotal') }}</span>
-          </Vue3Marquee>
+          <span class="text-xs leading-tight break-words text-base-content/60">
+            {{ t('uploadTotal') }}
+          </span>
           <span
             class="text-base font-semibold whitespace-nowrap text-base-content tabular-nums"
           >
@@ -480,16 +456,9 @@ watch(
           <IconCloud :size="20" />
         </div>
         <div class="flex w-full min-w-0 flex-col gap-0.5 overflow-hidden">
-          <Vue3Marquee
-            :animate-on-overflow-only="true"
-            :duration="10"
-            :delay="2"
-            :clone="false"
-            :pause-on-hover="true"
-            class="text-xs text-base-content/60"
-          >
-            <span class="pr-6">{{ t('downloadTotal') }}</span>
-          </Vue3Marquee>
+          <span class="text-xs leading-tight break-words text-base-content/60">
+            {{ t('downloadTotal') }}
+          </span>
           <span
             class="text-base font-semibold whitespace-nowrap text-base-content tabular-nums"
           >
@@ -511,16 +480,9 @@ watch(
           <IconPlugConnected :size="20" />
         </div>
         <div class="flex w-full min-w-0 flex-col gap-0.5 overflow-hidden">
-          <Vue3Marquee
-            :animate-on-overflow-only="true"
-            :duration="10"
-            :delay="2"
-            :clone="false"
-            :pause-on-hover="true"
-            class="text-xs text-base-content/60"
-          >
-            <span class="pr-6">{{ t('activeConnections') }}</span>
-          </Vue3Marquee>
+          <span class="text-xs leading-tight break-words text-base-content/60">
+            {{ t('activeConnections') }}
+          </span>
           <span
             class="text-base font-semibold whitespace-nowrap text-base-content tabular-nums"
           >
@@ -538,16 +500,9 @@ watch(
           <IconCpu :size="20" />
         </div>
         <div class="flex w-full min-w-0 flex-col gap-0.5 overflow-hidden">
-          <Vue3Marquee
-            :animate-on-overflow-only="true"
-            :duration="10"
-            :delay="2"
-            :clone="false"
-            :pause-on-hover="true"
-            class="text-xs text-base-content/60"
-          >
-            <span class="pr-6">{{ t('memoryUsage') }}</span>
-          </Vue3Marquee>
+          <span class="text-xs leading-tight break-words text-base-content/60">
+            {{ t('memoryUsage') }}
+          </span>
           <span
             class="text-base font-semibold whitespace-nowrap text-base-content tabular-nums"
           >
