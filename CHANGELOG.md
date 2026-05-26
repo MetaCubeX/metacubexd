@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.248.5](https://github.com/MetaCubeX/metacubexd/compare/v1.248.4...v1.248.5) (2026-05-26)
+
+
+### Bug Fixes
+
+* **proxies:** make provider batch latency test use per-node delay API ([6d9122f](https://github.com/MetaCubeX/metacubexd/commit/6d9122f437a23998e01e7647ddd9f4bf2c9c6054))
+
 ## [1.248.4](https://github.com/MetaCubeX/metacubexd/compare/v1.248.3...v1.248.4) (2026-05-23)
 
 
