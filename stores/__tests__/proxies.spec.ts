@@ -279,6 +279,78 @@ describe('stores/proxies latency state', () => {
     expect(bHistory[0]?.delay).toBe(0)
   })
 
+  it('batch-tests every provider node via the delay API', async () => {
+    apiMocks.proxyLatencyTestAPI
+      .mockResolvedValueOnce({ delay: 120 })
+      .mockResolvedValueOnce({ delay: 88 })
+    apiMocks.fetchProxiesAPI.mockResolvedValue({ proxies: {} })
+
+    const store = useProxiesStore()
+    store.proxyProviders = [
+      {
+        name: '订阅',
+        vehicleType: 'HTTP',
+        updatedAt: '2026-05-27T00:00:00.000Z',
+        testUrl: 'https://latency.test/provider',
+        timeout: 3000,
+        proxies: [{ name: 'node-a' }, { name: 'node-b' }],
+      } as never,
+    ]
+    store.proxyNodeMap = {
+      'node-a': {
+        name: 'node-a',
+        alive: true,
+        udp: false,
+        tfo: false,
+        latencyTestHistory: {},
+        latency: '',
+        xudp: false,
+        type: 'ss',
+        provider: '订阅',
+      },
+      'node-b': {
+        name: 'node-b',
+        alive: true,
+        udp: false,
+        tfo: false,
+        latencyTestHistory: {},
+        latency: '',
+        xudp: false,
+        type: 'ss',
+        provider: '订阅',
+      },
+    }
+
+    await store.proxyProviderLatencyTest('订阅')
+
+    expect(apiMocks.proxyLatencyTestAPI).toHaveBeenCalledTimes(2)
+    expect(apiMocks.proxyLatencyTestAPI).toHaveBeenNthCalledWith(
+      1,
+      'node-a',
+      '',
+      'https://latency.test/provider',
+      3000,
+    )
+    expect(apiMocks.proxyLatencyTestAPI).toHaveBeenNthCalledWith(
+      2,
+      'node-b',
+      '',
+      'https://latency.test/provider',
+      3000,
+    )
+    expect(recordBatchResultsMock).toHaveBeenCalledWith({
+      'node-a': 120,
+      'node-b': 88,
+    })
+    expect(
+      store.getLatencyByName('node-a', 'https://latency.test/provider'),
+    ).toBe(120)
+    expect(
+      store.getLatencyByName('node-b', 'https://latency.test/provider'),
+    ).toBe(88)
+    expect(store.proxyProviderLatencyTestingMap['订阅']).toBe(false)
+  })
+
   it('notifies node recommendation store after a proxy group latency test', async () => {
     apiMocks.proxyGroupLatencyTestAPI.mockResolvedValue({
       'node-a': 120,

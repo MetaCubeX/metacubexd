@@ -11,7 +11,6 @@ import {
   fetchProxyProvidersAPI,
   proxyGroupLatencyTestAPI,
   proxyLatencyTestAPI,
-  proxyProviderHealthCheckAPI,
   selectProxyInGroupAPI,
   updateProxyProviderAPI,
 } from '~/composables/useApi'
@@ -532,6 +531,8 @@ export const useProxiesStore = defineStore('proxies', () => {
     }
   }
 
+  const PROVIDER_LATENCY_BATCH_SIZE = 10
+
   // Proxy provider latency test
   const proxyProviderLatencyTest = async (providerName: string) => {
     const nodeRecommendationStore = useNodeRecommendationStore()
@@ -541,25 +542,51 @@ export const useProxiesStore = defineStore('proxies', () => {
       (item) => item.name === providerName,
     )
     const finalTestUrl = provider?.testUrl || configStore.urlForLatencyTest
+    const timeout = provider?.timeout ?? configStore.latencyTestTimeoutDuration
     const memberNames = provider?.proxies.map((proxy) => proxy.name) ?? []
+    const results: Record<string, number> = {}
 
     try {
-      const results = await proxyProviderHealthCheckAPI(providerName)
-      await fetchProxies()
-      recordLatencyTestResults(results, finalTestUrl)
-      nodeRecommendationStore.recordBatchResults(results)
-    } catch {
-      // Transport failure: preserve latencyMap, only record failure datapoints
-      // in history / recommendation.
-      const failedDelay = configStore.latencyQualityMap.NOT_CONNECTED
-      const failedResults: Record<string, number> = {}
-      for (const memberName of memberNames) {
-        const resolved = getNowProxyNodeName(memberName)
-        if (!resolved) continue
-        failedResults[resolved] = failedDelay
-        appendLatencyHistoryEntry(resolved, finalTestUrl, failedDelay)
+      for (
+        let i = 0;
+        i < memberNames.length;
+        i += PROVIDER_LATENCY_BATCH_SIZE
+      ) {
+        const batch = memberNames.slice(i, i + PROVIDER_LATENCY_BATCH_SIZE)
+        await Promise.all(
+          batch.map(async (memberName) => {
+            const nodeName = getNowProxyNodeName(memberName)
+            try {
+              const { delay } = await proxyLatencyTestAPI(
+                nodeName,
+                '',
+                finalTestUrl,
+                timeout,
+              )
+              results[nodeName] = delay
+              recordLatencyTestResult(nodeName, finalTestUrl, delay)
+              appendLatencyHistoryEntry(nodeName, finalTestUrl, delay)
+              nodeRecommendationStore.recordTestResult(
+                nodeName,
+                delay > 0 ? delay : null,
+                delay > 0,
+              )
+            } catch {
+              const failedDelay = configStore.latencyQualityMap.NOT_CONNECTED
+              results[nodeName] = failedDelay
+              appendLatencyHistoryEntry(nodeName, finalTestUrl, failedDelay)
+              nodeRecommendationStore.recordTestResult(nodeName, null, false)
+            }
+          }),
+        )
       }
-      nodeRecommendationStore.recordBatchResults(failedResults)
+
+      try {
+        await fetchProxies()
+      } catch {
+        /* best-effort refresh */
+      }
+      nodeRecommendationStore.recordBatchResults(results)
     } finally {
       proxyProviderLatencyTestingMap.value[providerName] = false
     }

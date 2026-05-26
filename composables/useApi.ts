@@ -18,13 +18,18 @@ export function useMockMode() {
   return config.public.mockMode === true
 }
 
-interface MockHistory { time: string; delay: number }
+interface MockHistory {
+  time: string
+  delay: number
+}
 interface MockProxyShape {
   name?: string
   all?: string[]
   history?: MockHistory[]
 }
-interface MockProviderShape { proxies?: MockProxyShape[] }
+interface MockProviderShape {
+  proxies?: MockProxyShape[]
+}
 
 const MOCK_HISTORY_CAP = 10
 
@@ -313,11 +318,13 @@ export function updateProxyProviderAPI(providerName: string) {
 export function proxyProviderHealthCheckAPI(providerName: string) {
   const request = useRequest()
 
-  return request
-    .get(`providers/proxies/${encodeURIComponent(providerName)}/healthcheck`, {
+  // Mihomo returns 204 No Content — this only triggers an async health check.
+  return request.get(
+    `providers/proxies/${encodeURIComponent(providerName)}/healthcheck`,
+    {
       timeout: 20 * 1000,
-    })
-    .json<Record<string, number>>()
+    },
+  )
 }
 
 export function selectProxyInGroupAPI(groupName: string, proxyName: string) {
@@ -330,18 +337,14 @@ export function selectProxyInGroupAPI(groupName: string, proxyName: string) {
 
 export function proxyLatencyTestAPI(
   proxyName: string,
-  provider: string,
+  _provider: string,
   url: string,
   timeout: number,
 ) {
   const request = useRequest()
 
-  if (provider !== '') {
-    return proxyProviderHealthCheckAPI(provider).then((latencyMap) => ({
-      delay: latencyMap[proxyName] ?? 0,
-    }))
-  }
-
+  // Provider nodes are merged into /proxies by mihomo; the per-node delay
+  // endpoint returns synchronous results with url/timeout control.
   return request
     .get(`proxies/${encodeURIComponent(proxyName)}/delay`, {
       searchParams: { url, timeout },
