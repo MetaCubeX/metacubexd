@@ -151,9 +151,15 @@ export const useConnectionsStore = defineStore('connections', () => {
 
   // Clear all data usage
   const clearDataUsage = async () => {
+    // Clear in-memory tracking synchronously BEFORE awaiting IndexedDB. On the
+    // service-restart path in updateFromWsMsg this is called without `await`,
+    // so deferring connectionLastData.clear() until after the await would wipe
+    // the fresh baseline that updateDataUsage rebuilds in the same tick —
+    // making the next message count each connection's cumulative total as a
+    // single delta.
     logBuffer.clear()
-    await db.clearAll()
     connectionLastData.clear()
+    await db.clearAll()
   }
 
   // Remove specific entry (Note: In IndexedDB model, "removing" an entry might mean deleting all logs for that label in a timeframe, but usually we just clear all or let it expire)
