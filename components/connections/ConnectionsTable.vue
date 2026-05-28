@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { VNode } from 'vue'
+import type { FunctionalComponent, VNode } from 'vue'
 import type { CONNECTIONS_TABLE_ACCESSOR_KEY } from '~/constants'
 import type { Connection } from '~/types'
 import {
@@ -61,6 +61,18 @@ const emit = defineEmits<{
   toggleGroupExpanded: [key: string]
   rowClick: [conn: Connection]
 }>()
+
+// Render a cell's VNode through a component with a STABLE identity. Passing an
+// inline `() => render(...)` straight to `<component :is>` produced a brand new
+// component type on every render, so Vue unmounted + remounted every cell on
+// each (high-frequency, WebSocket-driven) connections update instead of
+// patching it in place. A constant wrapper keeps the vnode type stable; the
+// changing `render` prop just triggers a patch. Fallthrough `class` is applied
+// to the rendered root as before.
+const CellRenderer: FunctionalComponent<{
+  render: () => VNode | string | null
+}> = (props) => props.render() as VNode
+CellRenderer.props = ['render']
 
 const { t } = useI18n()
 const configStore = useConfigStore()
@@ -252,7 +264,10 @@ function getCardProcessText(
               >
                 {{ t(col.key) }}
               </span>
-              <component :is="() => col.render(row.original)" />
+              <component
+                :is="CellRenderer"
+                :render="() => col.render(row.original)"
+              />
             </td>
           </tr>
         </template>
@@ -293,7 +308,8 @@ function getCardProcessText(
               getCardProcessText(row.original, props.columns)
             }}</span>
             <component
-              :is="() => getCloseButton(row.original, props.columns)"
+              :is="CellRenderer"
+              :render="() => getCloseButton(row.original, props.columns)"
               class="conn-card__action"
             />
           </div>
