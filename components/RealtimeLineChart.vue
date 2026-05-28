@@ -238,6 +238,9 @@ onMounted(() => {
   onUnmounted(() => {
     resizeObserver.disconnect()
     chart?.destroy()
+    // Null the ref so a queued requestAnimationFrame (theme watcher) can't call
+    // .update() on a destroyed instance after the component unmounts.
+    chart = undefined
   })
 })
 

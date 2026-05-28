@@ -20,6 +20,7 @@ const { t, locale } = useI18n()
 const configStore = useConfigStore()
 const containerRef = ref<HTMLDivElement>()
 let chart: Highcharts.Chart | undefined
+let resizeObserver: ResizeObserver | undefined
 
 // Configure Highcharts to use local time (global setting)
 // In Highcharts v12, useUTC was removed; local timezone is now the default
@@ -145,7 +146,7 @@ watch(locale, () => {
 onMounted(() => {
   initChart()
   updateData()
-  const resizeObserver = new ResizeObserver(() => {
+  resizeObserver = new ResizeObserver(() => {
     if (chart && containerRef.value) {
       chart.setSize(
         containerRef.value.clientWidth,
@@ -158,7 +159,9 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  if (chart) chart.destroy()
+  resizeObserver?.disconnect()
+  chart?.destroy()
+  chart = undefined
 })
 </script>
 
