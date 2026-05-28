@@ -22,6 +22,7 @@ class MockWebSocket {
 
   onmessage: ((event: MessageEvent<string>) => void) | null = null
   onerror: ((event: Event) => void) | null = null
+  onclose: ((event: Event) => void) | null = null
   close = vi.fn()
 
   constructor(public url: string) {
@@ -110,5 +111,45 @@ describe('composables/useWebSocket', () => {
     reconnectLogs()
 
     expect(MockWebSocket.instances).toHaveLength(0)
+  })
+
+  it('reconnects after an unexpected socket close (e.g. Restart Core)', async () => {
+    vi.useFakeTimers()
+
+    const { connect } = useBackendWebSocket()
+    connect()
+    expect(MockWebSocket.instances).toHaveLength(4)
+
+    // The backend restarting drops every socket at once.
+    for (const socket of [...MockWebSocket.instances]) {
+      socket.onclose?.(new Event('close'))
+    }
+
+    // Debounced into a single reconnect that rebuilds all four sockets
+    // (3000ms RECONNECT_DELAY; advance past it).
+    await vi.advanceTimersByTimeAsync(4000)
+
+    expect(MockWebSocket.instances).toHaveLength(8)
+
+    vi.useRealTimers()
+  })
+
+  it('does not reconnect after an intentional disconnect', async () => {
+    vi.useFakeTimers()
+
+    const { connect, disconnect } = useBackendWebSocket()
+    connect()
+    const sockets = [...MockWebSocket.instances]
+
+    disconnect()
+    // disconnect detaches each onclose handler, so firing them is a no-op.
+    for (const socket of sockets) {
+      socket.onclose?.(new Event('close'))
+    }
+    await vi.advanceTimersByTimeAsync(4000)
+
+    expect(MockWebSocket.instances).toHaveLength(4)
+
+    vi.useRealTimers()
   })
 })

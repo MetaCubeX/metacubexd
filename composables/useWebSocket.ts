@@ -3,6 +3,9 @@ import { getCurrentScope, onScopeDispose } from 'vue'
 import { useMockMode } from './useApi'
 import { useMockData } from './useMockData'
 
+// Delay before retrying after an unexpected socket close (e.g. "Restart Core").
+const RECONNECT_DELAY = 3000
+
 export function useBackendWebSocket() {
   const endpointStore = useEndpointStore()
   const connectionsStore = useConnectionsStore()
@@ -18,6 +21,31 @@ export function useBackendWebSocket() {
 
   // Mock mode intervals
   let mockInterval: ReturnType<typeof setInterval> | null = null
+
+  // Auto-reconnect bookkeeping
+  let reconnectTimer: ReturnType<typeof setTimeout> | null = null
+
+  // Close a socket WITHOUT triggering its auto-reconnect handler. Used for
+  // intentional teardown (reconnect, unmount), so we don't reconnect a socket
+  // we closed on purpose.
+  const closeWs = (ws: WebSocket | null) => {
+    if (!ws) return
+    ws.onclose = null
+    ws.close()
+  }
+
+  // Debounced reconnect. A backend restart ("Restart Core") drops every socket
+  // at once, so coalesce into a single attempt; each failed attempt's socket
+  // fires onclose again, so this keeps retrying until the backend is back.
+  const scheduleReconnect = () => {
+    if (useMockMode()) return
+    if (reconnectTimer) return
+    if (!endpointStore.currentEndpoint) return
+    reconnectTimer = setTimeout(() => {
+      reconnectTimer = null
+      connect()
+    }, RECONNECT_DELAY)
+  }
 
   const createWebSocket = (
     path: string,
@@ -45,6 +73,10 @@ export function useBackendWebSocket() {
 
     ws.onerror = (error) => {
       console.error(`WebSocket error for ${path}:`, error)
+    }
+
+    ws.onclose = () => {
+      scheduleReconnect()
     }
 
     return ws
@@ -171,16 +203,22 @@ export function useBackendWebSocket() {
 
   // Disconnect all WebSockets
   const disconnect = () => {
+    // Cancel any pending reconnect — this is an intentional teardown.
+    if (reconnectTimer) {
+      clearTimeout(reconnectTimer)
+      reconnectTimer = null
+    }
+
     // Clear mock interval if in mock mode
     if (mockInterval) {
       clearInterval(mockInterval)
       mockInterval = null
     }
 
-    connectionsWs?.close()
-    trafficWs?.close()
-    memoryWs?.close()
-    logsWs?.close()
+    closeWs(connectionsWs)
+    closeWs(trafficWs)
+    closeWs(memoryWs)
+    closeWs(logsWs)
 
     connectionsWs = null
     trafficWs = null
@@ -208,12 +246,16 @@ export function useBackendWebSocket() {
       }
     }
 
+    ws.onclose = () => {
+      scheduleReconnect()
+    }
+
     return ws
   }
 
   // Reconnect (e.g., when log level changes)
   const reconnectLogs = () => {
-    logsWs?.close()
+    closeWs(logsWs)
     logsWs = useMockMode() ? null : createLogsWebSocket()
   }
 
