@@ -18,17 +18,55 @@ dayjs.extend(duration)
 // Version comparison helper
 const VERSION_PREFIX_RE = /^v/
 const VERSION_BUILDMETA_RE = /\+.*$/
-const VERSION_PRERELEASE_RE = /-/
+const PRERELEASE_NUMERIC_RE = /^\d+$/
+
+// Compare two SemVer pre-release strings (the part after the first `-`) per the
+// SemVer precedence rules: identifiers are dot-separated and compared left to
+// right; purely numeric identifiers compare numerically, numeric identifiers
+// rank below non-numeric ones, and a longer set of identifiers wins when all
+// preceding ones are equal.
+function comparePrerelease(a: string, b: string): number {
+  const aIds = a.split('.')
+  const bIds = b.split('.')
+  const len = Math.max(aIds.length, bIds.length)
+
+  for (let i = 0; i < len; i++) {
+    const aId = aIds[i]
+    const bId = bIds[i]
+    if (aId === undefined) return -1
+    if (bId === undefined) return 1
+
+    const aIsNum = PRERELEASE_NUMERIC_RE.test(aId)
+    const bIsNum = PRERELEASE_NUMERIC_RE.test(bId)
+
+    if (aIsNum && bIsNum) {
+      const diff = Number(aId) - Number(bId)
+      if (diff !== 0) return diff > 0 ? 1 : -1
+    } else if (aIsNum !== bIsNum) {
+      // Numeric identifiers always have lower precedence than non-numeric.
+      return aIsNum ? -1 : 1
+    } else {
+      const cmp = aId.localeCompare(bId)
+      if (cmp !== 0) return cmp > 0 ? 1 : -1
+    }
+  }
+
+  return 0
+}
 
 export function compareVersions(v1: string, v2: string): number {
   const parse = (v: string) => {
     const cleaned = v
       .replace(VERSION_PREFIX_RE, '')
       .replace(VERSION_BUILDMETA_RE, '')
-    const [main, prerelease] = cleaned.split(VERSION_PRERELEASE_RE)
+    // Split on the FIRST `-` only — the whole remainder is the pre-release
+    // string, which may itself contain `-` (e.g. `1.0.0-beta-1`).
+    const dashIndex = cleaned.indexOf('-')
+    const main = dashIndex === -1 ? cleaned : cleaned.slice(0, dashIndex)
+    const prerelease = dashIndex === -1 ? null : cleaned.slice(dashIndex + 1)
     return {
-      parts: (main ?? '').split('.').map((n) => Number.parseInt(n, 10) || 0),
-      prerelease: prerelease || null,
+      parts: main.split('.').map((n) => Number.parseInt(n, 10) || 0),
+      prerelease,
     }
   }
 
@@ -43,12 +81,12 @@ export function compareVersions(v1: string, v2: string): number {
     if (p1 < p2) return -1
   }
 
-  // If main version parts are equal, compare prerelease
-  // No prerelease > any prerelease (stable is newer)
+  // If main version parts are equal, compare prerelease.
+  // No prerelease > any prerelease (stable is newer).
   if (!v1Parsed.prerelease && v2Parsed.prerelease) return 1
   if (v1Parsed.prerelease && !v2Parsed.prerelease) return -1
   if (v1Parsed.prerelease && v2Parsed.prerelease) {
-    return v1Parsed.prerelease.localeCompare(v2Parsed.prerelease)
+    return comparePrerelease(v1Parsed.prerelease, v2Parsed.prerelease)
   }
 
   return 0

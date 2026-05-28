@@ -209,6 +209,30 @@ describe('utils/index', () => {
       expect(compareVersions('1.244.0-rc.1', '1.243.0')).toBeGreaterThan(0)
     })
 
+    it('compares numeric pre-release identifiers numerically, not lexically', () => {
+      // beta.2 is OLDER than beta.11 (2 < 11), even though "2" > "1" lexically.
+      expect(compareVersions('1.0.0-beta.2', '1.0.0-beta.11')).toBeLessThan(0)
+      expect(compareVersions('1.0.0-beta.11', '1.0.0-beta.2')).toBeGreaterThan(
+        0,
+      )
+      expect(compareVersions('1.0.0-beta.2', '1.0.0-beta.2')).toBe(0)
+    })
+
+    it('orders pre-release identifiers per semver precedence rules', () => {
+      // Alphabetic identifiers compare in ASCII order.
+      expect(compareVersions('1.0.0-alpha', '1.0.0-beta')).toBeLessThan(0)
+      // A larger set of fields wins when the preceding ones are equal.
+      expect(compareVersions('1.0.0-alpha.1', '1.0.0-alpha')).toBeGreaterThan(0)
+      // Numeric identifiers rank below non-numeric ones.
+      expect(compareVersions('1.0.0-1', '1.0.0-alpha')).toBeLessThan(0)
+    })
+
+    it('keeps the full pre-release string when it contains dashes', () => {
+      // `1.0.0-beta-1` vs `1.0.0-beta-2`: the trailing segment must not be
+      // dropped (both previously parsed to just "beta" and compared equal).
+      expect(compareVersions('1.0.0-beta-1', '1.0.0-beta-2')).toBeLessThan(0)
+    })
+
     it('strips build metadata before comparing', () => {
       expect(compareVersions('1.243.0+build123', '1.243.0')).toBe(0)
     })
