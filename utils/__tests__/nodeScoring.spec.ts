@@ -43,9 +43,13 @@ describe('nodeScoring', () => {
   })
 
   describe('calculateStabilityScore', () => {
-    it('returns 50 for less than 2 data points', () => {
+    it('returns 50 for a single data point (neutral, no variance yet)', () => {
       expect(calculateStabilityScore([100])).toBe(50)
-      expect(calculateStabilityScore([])).toBe(50)
+    })
+
+    it('returns 0 when there are no successful measurements', () => {
+      expect(calculateStabilityScore([])).toBe(0)
+      expect(calculateStabilityScore([null, null])).toBe(0)
     })
 
     it('returns 100 for very stable latencies (low CV)', () => {
@@ -131,6 +135,22 @@ describe('nodeScoring', () => {
       const score = calculateNodeScore(data, weights)
       expect(score).toBe(100) // Only latency matters, and it's perfect
     })
+
+    it('scores an all-failed node at 0 (never recommend a dead node)', () => {
+      const data = {
+        nodeName: 'dead',
+        history: [
+          { timestamp: Date.now(), latency: null, success: false },
+          { timestamp: Date.now(), latency: null, success: false },
+          { timestamp: Date.now(), latency: null, success: false },
+        ],
+        lastTestTime: Date.now(),
+        score: null,
+      }
+      // Previously this returned 15 (neutral stability score leaking through),
+      // which let a 100%-failing node outrank never-tested nodes.
+      expect(calculateNodeScore(data)).toBe(0)
+    })
   })
 
   describe('getScoreColorClass', () => {
@@ -183,6 +203,11 @@ describe('nodeScoring', () => {
     it('formats days correctly', () => {
       const now = Date.now()
       expect(formatTimeSince(now - 172800000)).toBe('2d ago')
+    })
+
+    it('clamps future timestamps to 0s instead of showing negatives', () => {
+      const now = Date.now()
+      expect(formatTimeSince(now + 120000)).toBe('0s ago')
     })
   })
 

@@ -51,7 +51,12 @@ export function calculateStabilityScore(latencies: (number | null)[]): number {
   const validLatencies = latencies.filter(
     (l): l is number => l !== null && l > 0,
   )
-  if (validLatencies.length < 2) return 50 // Not enough data, neutral score
+  // No successful measurements at all → the node never connected, so it is not
+  // "neutral" stable. Returning 0 here stops an all-failed node from collecting
+  // the neutral score (which previously let dead nodes score 15 and outrank
+  // never-tested ones in findRecommendedNode).
+  if (validLatencies.length === 0) return 0
+  if (validLatencies.length < 2) return 50 // Single sample, neutral score
 
   const mean = validLatencies.reduce((a, b) => a + b, 0) / validLatencies.length
   const squaredDiffs = validLatencies.map((l) => (l - mean) ** 2)
@@ -134,7 +139,8 @@ export function getScoreBgClass(score: number): string {
  * Format time since last test
  */
 export function formatTimeSince(timestamp: number): string {
-  const seconds = Math.floor((Date.now() - timestamp) / 1000)
+  // Clamp to 0 so a future timestamp (clock skew) doesn't render "-120s ago".
+  const seconds = Math.max(0, Math.floor((Date.now() - timestamp) / 1000))
 
   if (seconds < 60) return `${seconds}s ago`
   if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`
