@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.248.6](https://github.com/MetaCubeX/metacubexd/compare/v1.248.5...v1.248.6) (2026-05-28)
+
+
+### Bug Fixes
+
+* **charts:** dispose highcharts and resize observers on unmount ([f56a237](https://github.com/MetaCubeX/metacubexd/commit/f56a2371f5677833523a01355b70e616a7369529))
+* **connections:** auto-reconnect websockets after backend restart ([6e6c735](https://github.com/MetaCubeX/metacubexd/commit/6e6c735e291d5f302b7673203e29ce15225c1d8b)), closes [#1994](https://github.com/MetaCubeX/metacubexd/issues/1994)
+* **connections:** clear usage tracking before awaiting IndexedDB ([4c705d6](https://github.com/MetaCubeX/metacubexd/commit/4c705d6bfd98cf715124944b7769c5cae76a0e74))
+* **connections:** stop remounting table cells on every update ([fb7e9b2](https://github.com/MetaCubeX/metacubexd/commit/fb7e9b2bd9f9640cbb4b8d9f69c4ee64af73ea48))
+* **overview:** correct Cloudflare network latency probe ([678256d](https://github.com/MetaCubeX/metacubexd/commit/678256d076bafe877745c51b91680d5115ae6e74)), closes [#1993](https://github.com/MetaCubeX/metacubexd/issues/1993)
+* **proxies:** keep multi-group latency test progress stable ([f0ba13b](https://github.com/MetaCubeX/metacubexd/commit/f0ba13b955eb73a0d1a9664e3fe977bf5608cb59))
+* **proxies:** stop recommending nodes that always fail ([a77cb67](https://github.com/MetaCubeX/metacubexd/commit/a77cb676a15ca485e4cb725bc8097cbfc264aa5a))
+* **utils:** compare semver pre-release identifiers per spec ([5a08f30](https://github.com/MetaCubeX/metacubexd/commit/5a08f3051d3b18aad3cef7adcb3e49949777b620))
+
 ## [1.248.5](https://github.com/MetaCubeX/metacubexd/compare/v1.248.4...v1.248.5) (2026-05-26)
 
 
