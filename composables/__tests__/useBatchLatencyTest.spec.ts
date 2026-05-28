@@ -385,4 +385,44 @@ describe('composables/useBatchLatencyTest', () => {
       )
     })
   })
+
+  describe('testMultipleGroups', () => {
+    it('keeps global progress owned by the outer loop while each group runs', async () => {
+      vi.useRealTimers()
+      mockJson.mockResolvedValue({ node1: 100 })
+
+      const { testMultipleGroups, isRunning } = useBatchLatencyTest()
+
+      // Capture the shared state at the moment each group refreshes proxies
+      // (mid-run, inside testGroupNodes). The inner call must NOT reset total
+      // back to 1 (it previously did, corrupting the multi-group progress bar).
+      const seen: { total: number; running: boolean; storeRunning: boolean }[] =
+        []
+      mockProxiesStore.fetchProxies.mockImplementation(async () => {
+        seen.push({
+          total: mockNodeRecommendationStore.batchTestProgress.total,
+          running: isRunning.value,
+          storeRunning: mockNodeRecommendationStore.batchTestProgress.isRunning,
+        })
+      })
+
+      await testMultipleGroups(['group1', 'group2'])
+
+      expect(seen).toHaveLength(2)
+      for (const snapshot of seen) {
+        expect(snapshot.total).toBe(2)
+        expect(snapshot.running).toBe(true)
+        expect(snapshot.storeRunning).toBe(true)
+      }
+
+      // After completion the outer loop resets everything.
+      expect(isRunning.value).toBe(false)
+      expect(mockNodeRecommendationStore.batchTestProgress).toEqual({
+        total: 2,
+        completed: 2,
+        current: null,
+        isRunning: false,
+      })
+    })
+  })
 })

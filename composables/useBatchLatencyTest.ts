@@ -177,20 +177,26 @@ export function useBatchLatencyTest() {
   const testGroupNodes = async (
     groupName: string,
     options?: Partial<BatchTestOptions>,
+    // When false, the caller (e.g. testMultipleGroups) owns the shared
+    // `isRunning` / `batchTestProgress` state; this call must not touch it,
+    // otherwise its finally-block would reset the global progress mid-run.
+    manageGlobalProgress = true,
   ): Promise<Record<string, number>> => {
     const url = options?.url ?? configStore.urlForLatencyTest
     const timeout = options?.timeout ?? configStore.latencyTestTimeoutDuration
 
-    isRunning.value = true
     // Don't pre-clear latencyMap — testProxyGroup swallows transport errors
     // into `{}`, and any node not present in the response would otherwise be
     // stuck displaying "---" forever. Preserving the previous values means
     // failed/skipped tests just don't update.
-    nodeRecommendationStore.batchTestProgress = {
-      total: 1,
-      completed: 0,
-      current: groupName,
-      isRunning: true,
+    if (manageGlobalProgress) {
+      isRunning.value = true
+      nodeRecommendationStore.batchTestProgress = {
+        total: 1,
+        completed: 0,
+        current: groupName,
+        isRunning: true,
+      }
     }
 
     try {
@@ -213,12 +219,14 @@ export function useBatchLatencyTest() {
 
       return results
     } finally {
-      isRunning.value = false
-      nodeRecommendationStore.batchTestProgress = {
-        total: 1,
-        completed: 1,
-        current: null,
-        isRunning: false,
+      if (manageGlobalProgress) {
+        isRunning.value = false
+        nodeRecommendationStore.batchTestProgress = {
+          total: 1,
+          completed: 1,
+          current: null,
+          isRunning: false,
+        }
       }
     }
   }
@@ -246,7 +254,7 @@ export function useBatchLatencyTest() {
         nodeRecommendationStore.batchTestProgress.current = groupName
         nodeRecommendationStore.batchTestProgress.completed = i
 
-        const results = await testGroupNodes(groupName, options)
+        const results = await testGroupNodes(groupName, options, false)
         allResults[groupName] = results
 
         // Delay between groups
