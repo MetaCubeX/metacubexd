@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.248.7](https://github.com/MetaCubeX/metacubexd/compare/v1.248.6...v1.248.7) (2026-05-29)
+
+
+### Bug Fixes
+
+* **connections:** keep usage history when switching endpoints ([83f283a](https://github.com/MetaCubeX/metacubexd/commit/83f283a130bce7ae26efbff4573454aba2615f47))
+* **queries:** scope cached data to the current endpoint ([38f96a6](https://github.com/MetaCubeX/metacubexd/commit/38f96a6d68fdf2a69f4d146680297d9339028461))
+
 ## [1.248.6](https://github.com/MetaCubeX/metacubexd/compare/v1.248.5...v1.248.6) (2026-05-28)
 
 
