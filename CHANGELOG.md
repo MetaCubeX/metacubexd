@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.249.0](https://github.com/MetaCubeX/metacubexd/compare/v1.248.7...v1.249.0) (2026-05-29)
+
+
+### Features
+
+* **proxies:** add compact card sizes and sticky group headers ([70a6050](https://github.com/MetaCubeX/metacubexd/commit/70a60505dd815f40cc0ccb1eb0e9fb4c1a3e5a0e)), closes [#1975](https://github.com/MetaCubeX/metacubexd/issues/1975)
+* **pwa:** restore PWA support ([15a8a8f](https://github.com/MetaCubeX/metacubexd/commit/15a8a8face66945c3205a42e4930b57eb9739d46)), closes [#1986](https://github.com/MetaCubeX/metacubexd/issues/1986)
+
+
+### Performance Improvements
+
+* cut realtime CPU and first-paint cost ([#1987](https://github.com/MetaCubeX/metacubexd/issues/1987)) ([3d9f105](https://github.com/MetaCubeX/metacubexd/commit/3d9f1057a3a92ab531abb94339a950e6bda93969))
+
 ## [1.248.7](https://github.com/MetaCubeX/metacubexd/compare/v1.248.6...v1.248.7) (2026-05-29)
 
 
