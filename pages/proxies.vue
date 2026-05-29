@@ -874,6 +874,39 @@ const ProviderProxyNodes = defineComponent({
 
         <div>
           <ConfigTitle with-divider>
+            {{ t('proxiesCardSize') }}
+          </ConfigTitle>
+          <select
+            v-model="configStore.proxiesCardSize"
+            class="select-bordered select w-full"
+          >
+            <option value="comfortable">
+              {{ t('cardSizeComfortable') }}
+            </option>
+            <option value="compact">
+              {{ t('cardSizeCompact') }}
+            </option>
+            <option value="tight">
+              {{ t('cardSizeTight') }}
+            </option>
+          </select>
+        </div>
+
+        <div>
+          <ConfigTitle with-divider>
+            {{ t('stickyGroupHeader') }}
+          </ConfigTitle>
+          <div class="flex w-full justify-center">
+            <input
+              v-model="configStore.stickyGroupHeader"
+              class="toggle toggle-primary"
+              type="checkbox"
+            />
+          </div>
+        </div>
+
+        <div>
+          <ConfigTitle with-divider>
             {{ t('proxiesDisplayMode') }}
           </ConfigTitle>
           <select

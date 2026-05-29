@@ -11,6 +11,7 @@ import {
   LATENCY_QUALITY_MAP_HTTP,
   LATENCY_QUALITY_MAP_HTTPS,
   LOG_LEVEL,
+  PROXIES_CARD_SIZE,
   PROXIES_DISPLAY_MODE,
   PROXIES_ORDERING_TYPE,
   PROXIES_PREVIEW_TYPE,
@@ -51,6 +52,13 @@ export const useConfigStore = defineStore('config', () => {
     'renderProxiesInTwoColumns',
     true,
   )
+  // Node-card density: controls how many cards fit per row (see PROXIES_CARD_SIZE_MIN_WIDTH)
+  const proxiesCardSize = useLocalStorage<PROXIES_CARD_SIZE>(
+    'proxiesCardSize',
+    PROXIES_CARD_SIZE.COMFORTABLE,
+  )
+  // Keep the group header pinned to the top while scrolling a long expanded group
+  const stickyGroupHeader = useLocalStorage('stickyGroupHeader', true)
   const hideUnAvailableProxies = useLocalStorage(
     'hideUnAvailableProxies',
     false,
@@ -198,6 +206,8 @@ export const useConfigStore = defineStore('config', () => {
     proxiesOrderingType.value = PROXIES_ORDERING_TYPE.NATURAL
     proxiesDisplayMode.value = PROXIES_DISPLAY_MODE.CARD
     renderProxiesInTwoColumns.value = true
+    proxiesCardSize.value = PROXIES_CARD_SIZE.COMFORTABLE
+    stickyGroupHeader.value = true
     hideUnAvailableProxies.value = false
     urlForLatencyTest.value = 'https://www.gstatic.com/generate_204'
     autoCloseConns.value = true
@@ -232,6 +242,8 @@ export const useConfigStore = defineStore('config', () => {
     proxiesOrderingType,
     proxiesDisplayMode,
     renderProxiesInTwoColumns,
+    proxiesCardSize,
+    stickyGroupHeader,
     hideUnAvailableProxies,
     urlForLatencyTest,
     autoCloseConns,

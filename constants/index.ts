@@ -79,6 +79,29 @@ export enum PROXIES_DISPLAY_MODE {
   LIST = 'listMode',
 }
 
+export enum PROXIES_CARD_SIZE {
+  COMFORTABLE = 'comfortable',
+  COMPACT = 'compact',
+  TIGHT = 'tight',
+}
+
+// Minimum node-card width (px) per density preset. Used as the lower bound of
+// the auto-fill grid track, so the layout stays responsive (more columns on
+// wider screens) while denser presets fit more cards per row on narrow ones.
+export const PROXIES_CARD_SIZE_MIN_WIDTH: Record<PROXIES_CARD_SIZE, number> = {
+  [PROXIES_CARD_SIZE.COMFORTABLE]: 180,
+  [PROXIES_CARD_SIZE.COMPACT]: 132,
+  [PROXIES_CARD_SIZE.TIGHT]: 104,
+}
+
+// Grid gap (px) between node cards per density preset, paired with the
+// min-width above so denser presets also tighten the spacing between cards.
+export const PROXIES_CARD_SIZE_GAP: Record<PROXIES_CARD_SIZE, number> = {
+  [PROXIES_CARD_SIZE.COMFORTABLE]: 8,
+  [PROXIES_CARD_SIZE.COMPACT]: 6,
+  [PROXIES_CARD_SIZE.TIGHT]: 4,
+}
+
 export enum CONNECTIONS_TABLE_ACCESSOR_KEY {
   Details = 'details',
   Close = 'close',

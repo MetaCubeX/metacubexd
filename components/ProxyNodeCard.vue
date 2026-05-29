@@ -346,7 +346,7 @@ function handleLatencyTest() {
 
 <template>
   <!-- Wrapper for glow effect -->
-  <div class="relative h-full p-1" :class="isSelected ? 'z-10' : 'z-0'">
+  <div class="relative h-full p-0.5" :class="isSelected ? 'z-10' : 'z-0'">
     <div
       ref="reference"
       class="proxy-card relative h-full w-full rounded-[0.625rem]"
