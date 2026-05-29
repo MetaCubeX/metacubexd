@@ -110,6 +110,8 @@
   "switchLanguage": "Switch Language",
   "switchFont": "Switch Font",
   "enableTwemoji": "Enable Twemoji",
+  "enableDataUsageTracking": "Track Data Usage",
+  "enableDataUsageTrackingDesc": "Records per-connection traffic for the Data Usage page. Runs on every page; turn off to reduce CPU usage.",
   "latencyTestTimeoutDuration": "Latency Test Timeout Duration",
   "latencyMediumThreshold": "Latency Yellow Threshold",
   "latencyHighThreshold": "Latency Red Threshold",

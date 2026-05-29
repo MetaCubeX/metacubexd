@@ -14,16 +14,9 @@ import {
   IconWorld,
 } from '@tabler/icons-vue'
 import dayjs from 'dayjs'
-import Highcharts from 'highcharts'
 import { throttle } from 'lodash-es'
 import { useDataUsage } from '~/composables/useDataUsage'
 import { formatBytes, formatDuration } from '~/utils'
-
-// Configure Highcharts to use local time
-// In Highcharts v12, useUTC was removed; local timezone is now the default
-Highcharts.setOptions({
-  time: {},
-})
 
 const { t } = useI18n()
 const connectionsStore = useConnectionsStore()

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import Highcharts from 'highcharts'
+import type Highcharts from 'highcharts'
+import { loadHighcharts } from '~/composables/useHighcharts'
 import { getChartThemeColors } from '~/utils'
 
 interface Props {
@@ -13,6 +14,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 const containerRef = ref<HTMLDivElement>()
 let chart: Highcharts.Chart | undefined
+let hc: typeof Highcharts | undefined
+let resizeObserver: ResizeObserver | undefined
 
 const configStore = useConfigStore()
 
@@ -48,7 +51,11 @@ function getDefaultOptions(): Highcharts.Options {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
+  if (!containerRef.value) return
+
+  hc = await loadHighcharts()
+  // The component may have unmounted while Highcharts was loading.
   if (!containerRef.value) return
 
   const defaultOptions = getDefaultOptions()
@@ -61,13 +68,13 @@ onMounted(() => {
     },
   }
 
-  chart = Highcharts.chart(containerRef.value, mergedOptions)
+  chart = hc.chart(containerRef.value, mergedOptions)
 
   // Track previous dimensions to avoid unnecessary resize
   let lastWidth = containerRef.value.clientWidth
   let lastHeight = containerRef.value.clientHeight
 
-  const resizeObserver = new ResizeObserver(() => {
+  resizeObserver = new ResizeObserver(() => {
     if (chart && containerRef.value) {
       const newWidth = containerRef.value.clientWidth
       const newHeight = containerRef.value.clientHeight
@@ -82,14 +89,14 @@ onMounted(() => {
   })
 
   resizeObserver.observe(containerRef.value)
+})
 
-  onUnmounted(() => {
-    resizeObserver.disconnect()
-    chart?.destroy()
-    // Null the ref so a queued requestAnimationFrame (theme watcher) can't call
-    // .update() on a destroyed instance after the component unmounts.
-    chart = undefined
-  })
+onUnmounted(() => {
+  resizeObserver?.disconnect()
+  chart?.destroy()
+  // Null the ref so a queued requestAnimationFrame (theme watcher) can't call
+  // .update() on a destroyed instance after the component unmounts.
+  chart = undefined
 })
 
 // Update chart when options change

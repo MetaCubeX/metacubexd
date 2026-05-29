@@ -12,8 +12,14 @@ export const useGlobalStore = defineStore('global', () => {
   // Memory data
   const latestMemory = ref<MemoryData | null>(null)
 
-  // Chart history data for persistence across page navigation
-  const trafficChartHistory = reactive<{
+  // Chart history buffers, persisted across page navigation. Deliberately
+  // NON-reactive: charts read a snapshot once on mount (via initialData) and
+  // are then updated imperatively through addPoint/setData. Deep reactivity
+  // here only cost CPU — proxying every [time, value] pair and re-running
+  // consumer computeds — on each per-second push, for no rendering benefit.
+  // markRaw keeps them raw even though Pinia exposes them through a reactive
+  // store proxy (which would otherwise deep-proxy these arrays on access).
+  const trafficChartHistory = markRaw<{
     download: ChartDataPoint[]
     upload: ChartDataPoint[]
   }>({
@@ -21,10 +27,10 @@ export const useGlobalStore = defineStore('global', () => {
     upload: [],
   })
 
-  const memoryChartHistory = reactive<ChartDataPoint[]>([])
+  const memoryChartHistory = markRaw<ChartDataPoint[]>([])
 
   // Connection count history for chart
-  const connectionCountHistory = reactive<ChartDataPoint[]>([])
+  const connectionCountHistory = markRaw<ChartDataPoint[]>([])
 
   // Helper functions
   const setLatestTraffic = (data: TrafficData | null) => {

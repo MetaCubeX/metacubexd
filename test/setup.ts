@@ -3,10 +3,20 @@
 
 import { useLocalStorage, useSessionStorage } from '@vueuse/core'
 import { beforeEach, vi } from 'vitest'
-import { computed, reactive, ref, watch, watchEffect } from 'vue'
+import {
+  computed,
+  markRaw,
+  reactive,
+  ref,
+  shallowRef,
+  watch,
+  watchEffect,
+} from 'vue'
 
 // Provide Vue and VueUse auto-imports globally (Nuxt auto-import simulation)
 vi.stubGlobal('ref', ref)
+vi.stubGlobal('shallowRef', shallowRef)
+vi.stubGlobal('markRaw', markRaw)
 vi.stubGlobal('computed', computed)
 vi.stubGlobal('reactive', reactive)
 vi.stubGlobal('watch', watch)

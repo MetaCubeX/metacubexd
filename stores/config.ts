@@ -148,6 +148,16 @@ export const useConfigStore = defineStore('config', () => {
   // Overview settings
   const showNetworkTopology = useLocalStorage('showNetworkTopology', false)
 
+  // Data usage tracking. When enabled, every connections WebSocket message is
+  // diffed per-connection and buffered into IndexedDB so the Data Usage page
+  // can show historical stats. This is a metacubexd-only feature that runs on
+  // EVERY page (the connections socket is global); turning it off removes the
+  // largest piece of per-second background work for users who don't need it.
+  const enableDataUsageTracking = useLocalStorage(
+    'enableDataUsageTracking',
+    true,
+  )
+
   // Computed
   const isLatencyTestByHttps = computed(() =>
     urlForLatencyTest.value.startsWith('https'),
@@ -207,6 +217,7 @@ export const useConfigStore = defineStore('config', () => {
     favNightTheme.value = 'sunset'
     curTheme.value = 'sunset'
     defaultPage.value = 'overview'
+    enableDataUsageTracking.value = true
   }
 
   return {
@@ -253,6 +264,8 @@ export const useConfigStore = defineStore('config', () => {
     clientSourceIPTags,
     // Overview
     showNetworkTopology,
+    // Data usage
+    enableDataUsageTracking,
     // Computed
     isLatencyTestByHttps,
     latencyQualityMap,

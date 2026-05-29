@@ -35,9 +35,11 @@ vi.stubGlobal('localStorage', localStorageMock)
 
 const mockGlobalStore = { clearChartHistory: vi.fn() }
 const mockEndpointStore = reactive({ selectedEndpoint: 'endpoint-a' })
+const mockConfigStore = { enableDataUsageTracking: true }
 
 vi.stubGlobal('useGlobalStore', () => mockGlobalStore)
 vi.stubGlobal('useEndpointStore', () => mockEndpointStore)
+vi.stubGlobal('useConfigStore', () => mockConfigStore)
 
 function makeConn(id: string, upload: number, download: number) {
   return {

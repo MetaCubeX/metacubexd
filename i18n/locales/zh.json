@@ -110,6 +110,8 @@
   "switchLanguage": "切换语言",
   "switchFont": "切换字体",
   "enableTwemoji": "启用 Twemoji",
+  "enableDataUsageTracking": "记录流量用量",
+  "enableDataUsageTrackingDesc": "为「流量用量」页面按连接记录流量。该统计在所有页面后台运行,关闭可降低 CPU 占用。",
   "latencyTestTimeoutDuration": "测速超时时间",
   "latencyMediumThreshold": "延迟黄色阈值",
   "latencyHighThreshold": "延迟红色阈值",

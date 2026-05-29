@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import type Highcharts from 'highcharts'
 import byteSize from 'byte-size'
-import Highcharts from 'highcharts'
+import { loadHighcharts } from '~/composables/useHighcharts'
 import { CHART_MAX_XAXIS } from '~/constants'
 import { getChartThemeColors } from '~/utils'
 
@@ -48,6 +49,8 @@ export interface ChartRef {
 
 const containerRef = ref<HTMLDivElement>()
 let chart: Highcharts.Chart | undefined
+let hc: typeof Highcharts | undefined
+let resizeObserver: ResizeObserver | undefined
 
 const configStore = useConfigStore()
 
@@ -149,7 +152,7 @@ function createChartOptions(): Highcharts.Options {
       color:
         config.color ||
         themeColors.seriesColors[index] ||
-        Highcharts.getOptions().colors?.[index] ||
+        hc?.getOptions().colors?.[index] ||
         `hsl(${index * 120}, 70%, 50%)`,
       data: (props.initialData?.[index] || []) as [number, number][],
     })),
@@ -215,15 +218,19 @@ const chartRef: ChartRef = {
 // Expose chartRef
 defineExpose({ chartRef })
 
-onMounted(() => {
+onMounted(async () => {
   if (!containerRef.value) return
 
-  chart = Highcharts.chart(containerRef.value, createChartOptions())
+  hc = await loadHighcharts()
+  // The component may have unmounted while Highcharts was loading.
+  if (!containerRef.value) return
+
+  chart = hc.chart(containerRef.value, createChartOptions())
 
   // Emit chart ready event
   emit('chartReady', chartRef)
 
-  const resizeObserver = new ResizeObserver(() => {
+  resizeObserver = new ResizeObserver(() => {
     if (chart && containerRef.value) {
       chart.setSize(
         containerRef.value.clientWidth,
@@ -234,14 +241,14 @@ onMounted(() => {
   })
 
   resizeObserver.observe(containerRef.value)
+})
 
-  onUnmounted(() => {
-    resizeObserver.disconnect()
-    chart?.destroy()
-    // Null the ref so a queued requestAnimationFrame (theme watcher) can't call
-    // .update() on a destroyed instance after the component unmounts.
-    chart = undefined
-  })
+onUnmounted(() => {
+  resizeObserver?.disconnect()
+  chart?.destroy()
+  // Null the ref so a queued requestAnimationFrame (theme watcher) can't call
+  // .update() on a destroyed instance after the component unmounts.
+  chart = undefined
 })
 
 // Update title when it changes

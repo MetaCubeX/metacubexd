@@ -13,12 +13,18 @@ import { db } from '~/utils/db'
 
 export const useConnectionsStore = defineStore('connections', () => {
   const globalStore = useGlobalStore()
+  const configStore = useConfigStore()
 
   // State
-  const allConnections = ref<Connection[]>([])
-  const activeConnections = ref<Connection[]>([])
-  const closedConnections = ref<Connection[]>([])
-  const latestConnectionMsg = ref<WsMsg>(null)
+  // shallowRef: these hold large arrays of connection objects replaced wholesale
+  // on every (per-second) WebSocket message. A deep `ref` would proxy every
+  // connection and every nested metadata field reactively on each update — a
+  // major per-second cost with hundreds/thousands of connections. We only ever
+  // reassign `.value`, so shallow reactivity is sufficient and far cheaper.
+  const allConnections = shallowRef<Connection[]>([])
+  const activeConnections = shallowRef<Connection[]>([])
+  const closedConnections = shallowRef<Connection[]>([])
+  const latestConnectionMsg = shallowRef<WsMsg>(null)
   const paused = ref(false)
 
   // Data usage tracking (IndexedDB buffer)
@@ -26,15 +32,12 @@ export const useConnectionsStore = defineStore('connections', () => {
   const logBuffer = new Map<string, DataUsageLog>()
   let flushTimeout: ReturnType<typeof setTimeout> | null = null
 
+  // Cheap composite key: JSON.stringify ran once per active connection per
+  // second and showed up in profiles. A delimiter join over the same fields is
+  // an order of magnitude cheaper; \x1f (unit separator) can't appear in hosts,
+  // IPs or process names so collisions aren't a concern.
   const getDataUsageBufferKey = (log: DataUsageLog) =>
-    JSON.stringify([
-      log.timestamp,
-      log.sourceIP,
-      log.host,
-      log.outbound,
-      log.process,
-      log.inboundUser,
-    ])
+    `${log.timestamp}\x1F${log.sourceIP}\x1F${log.host}\x1F${log.outbound}\x1F${log.process}\x1F${log.inboundUser}`
 
   const flushLogs = async () => {
     if (logBuffer.size === 0) return
@@ -134,12 +137,9 @@ export const useConnectionsStore = defineStore('connections', () => {
   }
 
   const diffClosedConnections = (
-    activeConns: Connection[],
+    activeIds: Set<string>,
     allConns: Connection[],
-  ) => {
-    const activeIds = new Set(activeConns.map((c) => c.id))
-    return allConns.filter((c) => !activeIds.has(c.id))
-  }
+  ) => allConns.filter((c) => !activeIds.has(c.id))
 
   // Reset connection tracking data
   const resetConnectionTracking = () => {
@@ -171,14 +171,11 @@ export const useConnectionsStore = defineStore('connections', () => {
     )
   }
 
-  // Cleanup inactive connections
-  const cleanupInactiveConnections = (activeConns?: Connection[]) => {
-    const activeConnectionIds = activeConns
-      ? new Set(activeConns.map((conn) => conn.id))
-      : new Set(allConnections.value.map((conn) => conn.id))
-
+  // Cleanup inactive connections — drop per-connection tracking state for ids
+  // that are no longer active. Receives a prebuilt id set from the caller.
+  const cleanupInactiveConnections = (activeIds: Set<string>) => {
     connectionLastData.forEach((_, connId) => {
-      if (!activeConnectionIds.has(connId)) {
+      if (!activeIds.has(connId)) {
         connectionLastData.delete(connId)
       }
     })
@@ -212,20 +209,24 @@ export const useConnectionsStore = defineStore('connections', () => {
       activeConnections.value,
     )
 
-    // Update data usage tracking
-    updateDataUsage(activeConns)
+    // Build the active-id set once and reuse it for both cleanup and the
+    // closed-connection diff instead of rebuilding it in each helper.
+    const activeIds = new Set(activeConns.map((c) => c.id))
+
+    // Data usage tracking is opt-out: skip the per-connection diff + IndexedDB
+    // buffering entirely when the user has disabled it.
+    if (configStore.enableDataUsageTracking) {
+      updateDataUsage(activeConns)
+    }
 
     // Cleanup inactive connections
-    cleanupInactiveConnections(activeConns)
+    cleanupInactiveConnections(activeIds)
 
     // Merge all connections
     mergeAllConnections(activeConns)
 
     if (!paused.value) {
-      const closedConns = diffClosedConnections(
-        activeConns,
-        allConnections.value,
-      )
+      const closedConns = diffClosedConnections(activeIds, allConnections.value)
       activeConnections.value = activeConns
       closedConnections.value = closedConns.slice(
         -CONNECTIONS_TABLE_MAX_CLOSED_ROWS,

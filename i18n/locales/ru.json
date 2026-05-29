@@ -110,6 +110,8 @@
   "switchLanguage": "Сменить язык",
   "switchFont": "Сменить шрифт",
   "enableTwemoji": "Включить Twemoji",
+  "enableDataUsageTracking": "Отслеживать трафик",
+  "enableDataUsageTrackingDesc": "Записывает трафик по каждому соединению для страницы «Использование данных». Работает на всех страницах; отключите, чтобы снизить нагрузку на ЦП.",
   "latencyTestTimeoutDuration": "Таймаут теста задержки",
   "latencyMediumThreshold": "Жёлтый порог задержки",
   "latencyHighThreshold": "Красный порог задержки",
