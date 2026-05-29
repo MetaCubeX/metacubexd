@@ -313,6 +313,23 @@ export const useConnectionsStore = defineStore('connections', () => {
     return returnMap
   })
 
+  // Switching endpoints uses SPA navigation (no page reload), so this store
+  // singleton keeps lastUpload/DownloadTotal from the previous backend. A new
+  // backend whose cumulative totals are lower would otherwise look like a
+  // kernel restart and trigger clearDataUsage() + clearChartHistory(),
+  // destroying the user's accumulated usage history. On endpoint change reset
+  // only the restart-detection baselines; the new backend's first message then
+  // establishes a fresh baseline without wiping history or the chart.
+  const endpointStore = useEndpointStore()
+  watch(
+    () => endpointStore.selectedEndpoint,
+    () => {
+      lastUploadTotal = 0
+      lastDownloadTotal = 0
+      connectionLastData.clear()
+    },
+  )
+
   return {
     allConnections,
     activeConnections,
