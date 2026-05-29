@@ -1,4 +1,6 @@
 {
+  "pwaUpdateAvailable": "Доступна новая версия",
+  "pwaUpdateReload": "Обновить",
   "lastHour": "Последний час",
   "lastDay": "Последний день",
   "lastMonth": "Последний месяц",

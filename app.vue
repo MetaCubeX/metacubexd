@@ -13,4 +13,6 @@ useHead({
       }"
     />
   </NuxtLayout>
+
+  <PwaUpdatePrompt />
 </template>

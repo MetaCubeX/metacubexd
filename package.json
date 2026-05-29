@@ -113,6 +113,7 @@
   },
   "devDependencies": {
     "@types/semver": "^7.7.1",
+    "@vite-pwa/nuxt": "^1.1.1",
     "@vitest/coverage-v8": "^4.1.6",
     "jsdom": "^29.1.1"
   }

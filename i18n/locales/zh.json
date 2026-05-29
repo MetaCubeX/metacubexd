@@ -1,4 +1,6 @@
 {
+  "pwaUpdateAvailable": "发现新版本",
+  "pwaUpdateReload": "刷新",
   "lastHour": "上一小时",
   "lastDay": "最近一天",
   "lastMonth": "最近一月",

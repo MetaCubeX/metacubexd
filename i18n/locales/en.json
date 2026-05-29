@@ -1,4 +1,6 @@
 {
+  "pwaUpdateAvailable": "A new version is available",
+  "pwaUpdateReload": "Reload",
   "lastHour": "Last Hour",
   "lastDay": "Last Day",
   "lastMonth": "Last Month",
