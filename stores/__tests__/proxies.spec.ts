@@ -410,4 +410,63 @@ describe('stores/proxies latency state', () => {
     expect(store.getLatencyByName('node-a', null)).toBe(0)
     expect(store.getLatencyHistoryByName('node-a', null)).toEqual([])
   })
+
+  it('reuses a node latency measured under a provider test url when the proxy view queries the global url', async () => {
+    const store = useProxiesStore()
+    apiMocks.fetchProxiesAPI.mockResolvedValue({
+      proxies: {
+        'node-a': proxy({
+          name: 'node-a',
+          type: 'vless',
+          // Backend only has a reading under the provider's health-check url;
+          // the global url (used by the proxies view) was never measured.
+          extra: {
+            'https://latency.test/provider': {
+              history: [{ time: '2026-05-19T13:17:31.000Z', delay: 506 }],
+            },
+          },
+          history: [],
+        }),
+      },
+    })
+
+    await store.fetchProxies()
+    await nextTick()
+
+    // Provider view (queries the provider url) shows the real value.
+    expect(
+      store.getLatencyByName('node-a', 'https://latency.test/provider'),
+    ).toBe(506)
+
+    // Proxies view falls back to the global url. It must reuse the value that
+    // was actually measured rather than reporting "---" (0).
+    expect(store.getLatencyByName('node-a', null)).toBe(506)
+  })
+
+  it('reuses a node latency history measured under a provider test url when the proxy view queries the global url', async () => {
+    const store = useProxiesStore()
+    apiMocks.fetchProxiesAPI.mockResolvedValue({
+      proxies: {
+        'node-a': proxy({
+          name: 'node-a',
+          type: 'vless',
+          extra: {
+            'https://latency.test/provider': {
+              history: [{ time: '2026-05-19T13:17:31.000Z', delay: 506 }],
+            },
+          },
+          history: [],
+        }),
+      },
+    })
+
+    await store.fetchProxies()
+    await nextTick()
+
+    // The stability bar / sparkline reads history. It must reuse the measured
+    // series instead of the empty placeholder bucket for the global url.
+    expect(store.getLatencyHistoryByName('node-a', null)).toEqual([
+      { time: '2026-05-19T13:17:31.000Z', delay: 506 },
+    ])
+  })
 })

@@ -103,8 +103,34 @@ export const useProxiesStore = defineStore('proxies', () => {
   const normalizeLatencyTestUrl = (testUrl: string | null) =>
     testUrl || configStore.urlForLatencyTest
 
-  const hasOwn = (source: Record<string, unknown>, key: string) =>
-    Object.hasOwn(source, key)
+  // First positive (successful) latency among a node's per-test-url readings.
+  // NOT_CONNECTED (0) reads are treated as "no data" and skipped, so a node
+  // that only succeeded under a different test url (e.g. its provider's own
+  // health-check url) still surfaces a value instead of "---".
+  const findPositiveLatency = (
+    latencies: Record<string, number> | undefined,
+  ) => {
+    if (!latencies) return undefined
+    for (const value of Object.values(latencies)) {
+      if (value > 0) return value
+    }
+    return undefined
+  }
+
+  // Non-empty latency series for the requested url, else any non-empty series
+  // the node recorded under another url — mirrors findPositiveLatency so the
+  // stability bar matches the pill.
+  const pickLatencyHistory = (
+    histories: Record<string, Proxy['history'] | undefined>,
+    finalTestUrl: string,
+  ) => {
+    const exact = histories[finalTestUrl]
+    if (exact?.length) return exact
+    for (const series of Object.values(histories)) {
+      if (series?.length) return series
+    }
+    return undefined
+  }
 
   const replaceNodeLatency = (
     nodeName: string,
@@ -333,73 +359,43 @@ export const useProxiesStore = defineStore('proxies', () => {
     const latencyMapValue = latencyMap.value
     const nowName = getNowProxyNodeName(name)
 
-    const direct = latencyMapValue[nowName]?.[finalTestUrl]
-    const groupDirect = latencyMapValue[name]?.[finalTestUrl]
-
-    if (direct != null) return direct
-    if (groupDirect != null) return groupDirect
-
-    // Fallback
     const nodeLatencies = latencyMapValue[nowName]
-    if (nodeLatencies && Object.keys(nodeLatencies).length > 0) {
-      const keys = Object.keys(nodeLatencies)
-      const pickUrl =
-        nodeLatencies[finalTestUrl] != null ? finalTestUrl : keys[0]
-      if (pickUrl) return nodeLatencies[pickUrl] as number
-    }
-
     const groupLatencies = latencyMapValue[name]
-    if (groupLatencies && Object.keys(groupLatencies).length > 0) {
-      const keys = Object.keys(groupLatencies)
-      if (keys[0]) return groupLatencies[keys[0]] as number
-    }
 
-    return configStore.latencyQualityMap.NOT_CONNECTED
+    // A successful reading for the requested test url always wins.
+    const direct = nodeLatencies?.[finalTestUrl]
+    if (direct) return direct
+    const groupDirect = groupLatencies?.[finalTestUrl]
+    if (groupDirect) return groupDirect
+
+    // The requested url has no successful reading — either the key is missing,
+    // or it's present but NOT_CONNECTED (0). The latter happens when a node was
+    // only ever health-checked under its provider's own test url: the proxies
+    // view queries the global url and would otherwise show "---" forever even
+    // though a real measurement exists. Reuse any successful reading instead.
+    const reused =
+      findPositiveLatency(nodeLatencies) ?? findPositiveLatency(groupLatencies)
+    if (reused != null) return reused
+
+    // Nothing succeeded anywhere — surface NOT_CONNECTED so the pill shows "---".
+    return direct ?? groupDirect ?? configStore.latencyQualityMap.NOT_CONNECTED
   }
 
   // Get latency history by name
   const getLatencyHistoryByName = (name: string, testUrl: string | null) => {
-    const proxyNode = proxyNodeMap.value[name]
-    const nowProxyNodeName = getNowProxyNodeName(name)
-    const nowProxyNode = proxyNodeMap.value[nowProxyNodeName]
     const finalTestUrl = testUrl || configStore.urlForLatencyTest
+    const nowProxyNodeName = getNowProxyNodeName(name)
+    const nowHistories =
+      proxyNodeMap.value[nowProxyNodeName]?.latencyTestHistory || {}
+    const proxyHistories = proxyNodeMap.value[name]?.latencyTestHistory || {}
 
-    const nowHistories = nowProxyNode?.latencyTestHistory || {}
-    if (hasOwn(nowHistories, finalTestUrl)) {
-      return nowHistories[finalTestUrl] ?? []
-    }
-
-    const proxyHistories = proxyNode?.latencyTestHistory || {}
-    if (hasOwn(proxyHistories, finalTestUrl)) {
-      return proxyHistories[finalTestUrl] ?? []
-    }
-
-    const exact =
-      nowProxyNode?.latencyTestHistory[finalTestUrl] ||
-      proxyNode?.latencyTestHistory[finalTestUrl]
-
-    if (exact && exact.length) return exact
-
-    // Fallback
-    const childHistories = nowProxyNode?.latencyTestHistory || {}
-    const childKeys = Object.keys(childHistories)
-    const firstChildKey = childKeys[0]
-
-    if (firstChildKey) {
-      const hist = childHistories[firstChildKey]
-      if (hist && hist.length) return hist
-    }
-
-    const groupHistories = proxyNode?.latencyTestHistory || {}
-    const groupKeys = Object.keys(groupHistories)
-    const firstGroupKey = groupKeys[0]
-
-    if (firstGroupKey) {
-      const hist = groupHistories[firstGroupKey]
-      if (hist && hist.length) return hist
-    }
-
-    return []
+    // Prefer the requested url's series; otherwise reuse any non-empty series
+    // the node recorded under another url so the bar mirrors getLatencyByName.
+    return (
+      pickLatencyHistory(nowHistories, finalTestUrl) ??
+      pickLatencyHistory(proxyHistories, finalTestUrl) ??
+      []
+    )
   }
 
   // Check if proxy is a group
