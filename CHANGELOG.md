@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.249.1](https://github.com/MetaCubeX/metacubexd/compare/v1.249.0...v1.249.1) (2026-05-30)
+
+
+### Bug Fixes
+
+* **proxies:** reuse measured latency across test urls in the proxies view ([4e4bef2](https://github.com/MetaCubeX/metacubexd/commit/4e4bef2062d78eebe558785dd907614a90d24e9b))
+
 ## [1.249.0](https://github.com/MetaCubeX/metacubexd/compare/v1.248.7...v1.249.0) (2026-05-29)
 
 
