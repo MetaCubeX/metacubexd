@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.249.2](https://github.com/MetaCubeX/metacubexd/compare/v1.249.1...v1.249.2) (2026-06-02)
+
+
+### Bug Fixes
+
+* **i18n:** improve Russian locale accuracy and terminology ([#1999](https://github.com/MetaCubeX/metacubexd/issues/1999)) ([99cfb8c](https://github.com/MetaCubeX/metacubexd/commit/99cfb8cb37f90698b8ba331fa68418bdb1cd9378))
+
 ## [1.249.1](https://github.com/MetaCubeX/metacubexd/compare/v1.249.0...v1.249.1) (2026-05-30)
 
 
