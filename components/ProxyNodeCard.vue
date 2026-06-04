@@ -94,10 +94,11 @@ const latencyTrendData = computed(() => {
   const successTests = perf.history.filter((h) => h.success).length
   const successRate = Math.round((successTests / totalTests) * 100)
 
-  // Normalize to 0-100 for SVG viewBox
+  // Normalize into the SVG coordinate space (viewBox is 100 x 50 below).
+  // y must stay within 0-50 or the sparkline is clipped by the viewBox.
   const points = latencies.map((lat, i) => ({
     x: (i / (latencies.length - 1)) * 100,
-    y: 100 - ((lat - min) / range) * 80 - 10, // 10-90 range to leave padding
+    y: 50 - ((lat - min) / range) * 40 - 5, // 5-45 range to leave padding
   }))
 
   return {
