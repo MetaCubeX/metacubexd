@@ -101,7 +101,6 @@
   "orderQuality_desc": "By quality from high to low",
   "orderName_asc": "By name alphabetically (A-Z)",
   "orderName_desc": "By name alphabetically (Z-A)",
-  "groupSortingHint": "Tip: Each proxy group can also have its own sorting option set below its title",
   "ms": "ms",
   "updated": "Updated",
   "tableSize": "Table size",

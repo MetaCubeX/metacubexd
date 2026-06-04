@@ -44,21 +44,6 @@ export const useConfigStore = defineStore('config', () => {
     'proxiesOrderingType',
     PROXIES_ORDERING_TYPE.QUALITY_DESC,
   )
-  const proxyGroupOrderingTypes = useLocalStorage<
-    Record<string, PROXIES_ORDERING_TYPE>
-  >('proxyGroupOrderingTypes', {})
-  const getProxyGroupOrderingType = (groupName: string) =>
-    proxyGroupOrderingTypes.value[groupName] ??
-    PROXIES_ORDERING_TYPE.QUALITY_DESC
-  const setProxyGroupOrderingType = (
-    groupName: string,
-    type: PROXIES_ORDERING_TYPE,
-  ) => {
-    proxyGroupOrderingTypes.value = {
-      ...proxyGroupOrderingTypes.value,
-      [groupName]: type,
-    }
-  }
   const proxiesDisplayMode = useLocalStorage<PROXIES_DISPLAY_MODE>(
     'proxiesDisplayMode',
     PROXIES_DISPLAY_MODE.CARD,
@@ -255,9 +240,6 @@ export const useConfigStore = defineStore('config', () => {
     proxiesPreviewType,
     proxiesPreviewAutoThreshold,
     proxiesOrderingType,
-    proxyGroupOrderingTypes,
-    getProxyGroupOrderingType,
-    setProxyGroupOrderingType,
     proxiesDisplayMode,
     renderProxiesInTwoColumns,
     proxiesCardSize,

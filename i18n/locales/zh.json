@@ -101,7 +101,6 @@
   "orderQuality_desc": "按质量从高到低",
   "orderName_asc": "按名称字母排序 (A-Z)",
   "orderName_desc": "按名称字母排序 (Z-A)",
-  "groupSortingHint": "提示：每个代理组标题下方也可设置单独的排序方式",
   "ms": "毫秒",
   "updated": "更新于",
   "tableSize": "表格大小",
