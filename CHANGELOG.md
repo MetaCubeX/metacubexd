@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.251.0](https://github.com/MetaCubeX/metacubexd/compare/v1.250.0...v1.251.0) (2026-06-04)
+
+
+### Features
+
+* **proxies:** add unfix action and provider-scoped node health check ([ccc5e72](https://github.com/MetaCubeX/metacubexd/commit/ccc5e727842951242121be32720222ad0a020653))
+
 ## [1.250.0](https://github.com/MetaCubeX/metacubexd/compare/v1.249.2...v1.250.0) (2026-06-04)
 
 
