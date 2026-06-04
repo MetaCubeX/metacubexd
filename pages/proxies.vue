@@ -20,6 +20,7 @@ import ProxyNodeListItem from '~/components/ProxyNodeListItem.vue'
 import ProxyNodePreview from '~/components/ProxyNodePreview.vue'
 import SubscriptionInfo from '~/components/SubscriptionInfo.vue'
 import { useBatchLatencyTest } from '~/composables/useBatchLatencyTest'
+import { PROXIES_ORDERING_TYPE } from '~/constants'
 import {
   encodeSvg,
   filterProxiesByAvailability,
@@ -90,14 +91,16 @@ const tabs = computed(() => [
 ])
 
 function getSortedProxyNames(proxyGroup: ProxyType) {
+  const orderingType = configStore.getProxyGroupOrderingType(proxyGroup.name)
   const sorted = sortProxiesByOrderingType({
     proxyNames: proxyGroup.all ?? [],
-    orderingType: configStore.proxiesOrderingType,
+    orderingType,
     testUrl: proxyGroup.testUrl || null,
     getLatencyByName: proxiesStore.getLatencyByName,
     isProxyGroup: proxiesStore.isProxyGroup,
     latencyQualityMap: configStore.latencyQualityMap,
     urlForLatencyTest: configStore.urlForLatencyTest,
+    performanceData: nodeRecommendationStore.performanceData,
   })
 
   return filterProxiesByAvailability({
@@ -122,6 +125,7 @@ function getProviderProxyNames(
     isProxyGroup: proxiesStore.isProxyGroup,
     latencyQualityMap: configStore.latencyQualityMap,
     urlForLatencyTest: configStore.urlForLatencyTest,
+    performanceData: nodeRecommendationStore.performanceData,
   })
 }
 
@@ -145,6 +149,9 @@ const ProxyGroupTitle = defineComponent({
     sortedProxyNames: { type: Array as () => string[], required: true },
   },
   setup(props) {
+    const groupOrderingType = computed(() =>
+      configStore.getProxyGroupOrderingType(props.proxyGroup.name),
+    )
     const recommendedNode = computed(() => getRecommendedNode(props.proxyGroup))
     const totalProxyCount = computed(() => props.proxyGroup.all?.length ?? 0)
     const aliveProxyCount = computed(
@@ -211,6 +218,61 @@ const ProxyGroupTitle = defineComponent({
               ],
             ),
             h('div', { class: 'flex items-center gap-1.5 shrink-0' }, [
+              // Group sorting selector
+              h(
+                'select',
+                {
+                  class:
+                    'select select-bordered select-xs max-w-[9rem] text-xs',
+                  title: t('proxiesSorting'),
+                  value: groupOrderingType.value,
+                  onClick: (e: MouseEvent) => e.stopPropagation(),
+                  onChange: (e: Event) => {
+                    const target = e.target as HTMLSelectElement
+                    configStore.setProxyGroupOrderingType(
+                      props.proxyGroup.name,
+                      target.value as PROXIES_ORDERING_TYPE,
+                    )
+                  },
+                },
+                [
+                  h(
+                    'option',
+                    { value: PROXIES_ORDERING_TYPE.NATURAL },
+                    t('orderNatural'),
+                  ),
+                  h(
+                    'option',
+                    { value: PROXIES_ORDERING_TYPE.LATENCY_ASC },
+                    t('orderLatency_asc'),
+                  ),
+                  h(
+                    'option',
+                    { value: PROXIES_ORDERING_TYPE.LATENCY_DESC },
+                    t('orderLatency_desc'),
+                  ),
+                  h(
+                    'option',
+                    { value: PROXIES_ORDERING_TYPE.QUALITY_ASC },
+                    t('orderQuality_asc'),
+                  ),
+                  h(
+                    'option',
+                    { value: PROXIES_ORDERING_TYPE.QUALITY_DESC },
+                    t('orderQuality_desc'),
+                  ),
+                  h(
+                    'option',
+                    { value: PROXIES_ORDERING_TYPE.NAME_ASC },
+                    t('orderName_asc'),
+                  ),
+                  h(
+                    'option',
+                    { value: PROXIES_ORDERING_TYPE.NAME_DESC },
+                    t('orderName_desc'),
+                  ),
+                ],
+              ),
               // Switch to Recommended button
               hasRecommendation.value &&
                 h(
@@ -837,6 +899,12 @@ const ProviderProxyNodes = defineComponent({
             <option value="orderLatency_desc">
               {{ t('orderLatency_desc') }}
             </option>
+            <option value="orderQuality_asc">
+              {{ t('orderQuality_asc') }}
+            </option>
+            <option value="orderQuality_desc">
+              {{ t('orderQuality_desc') }}
+            </option>
             <option value="orderName_asc">
               {{ t('orderName_asc') }}
             </option>
@@ -844,6 +912,9 @@ const ProviderProxyNodes = defineComponent({
               {{ t('orderName_desc') }}
             </option>
           </select>
+          <p class="mt-2 text-xs text-base-content/60">
+            {{ t('groupSortingHint') }}
+          </p>
         </div>
 
         <div>

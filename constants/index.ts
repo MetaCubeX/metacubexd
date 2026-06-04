@@ -72,6 +72,8 @@ export enum PROXIES_ORDERING_TYPE {
   LATENCY_DESC = 'orderLatency_desc',
   NAME_ASC = 'orderName_asc',
   NAME_DESC = 'orderName_desc',
+  QUALITY_ASC = 'orderQuality_asc',
+  QUALITY_DESC = 'orderQuality_desc',
 }
 
 export enum PROXIES_DISPLAY_MODE {

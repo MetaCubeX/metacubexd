@@ -1,8 +1,10 @@
+import type { NodePerformanceData } from '~/stores/nodeRecommendation'
 import byteSize from 'byte-size'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { PROXIES_ORDERING_TYPE } from '~/constants'
+import { calculateNodeScore } from './nodeScoring'
 import 'dayjs/locale/zh-cn'
 import 'dayjs/locale/ru'
 
@@ -224,6 +226,7 @@ export function sortProxiesByOrderingType({
   isProxyGroup,
   latencyQualityMap,
   urlForLatencyTest,
+  performanceData,
 }: {
   proxyNames: string[]
   orderingType: PROXIES_ORDERING_TYPE
@@ -232,6 +235,7 @@ export function sortProxiesByOrderingType({
   isProxyGroup?: (name: string) => boolean
   latencyQualityMap: LatencyQualityMap
   urlForLatencyTest: string
+  performanceData?: Map<string, NodePerformanceData>
 }) {
   if (orderingType === PROXIES_ORDERING_TYPE.NATURAL) {
     return proxyNames
@@ -268,6 +272,28 @@ export function sortProxiesByOrderingType({
 
       case PROXIES_ORDERING_TYPE.NAME_DESC:
         return b.localeCompare(a)
+
+      case PROXIES_ORDERING_TYPE.QUALITY_ASC: {
+        const prevData = performanceData?.get(a)
+        const nextData = performanceData?.get(b)
+        const prevScore = prevData ? calculateNodeScore(prevData) : 0
+        const nextScore = nextData ? calculateNodeScore(nextData) : 0
+
+        if (prevScore === 0 && nextScore > 0) return 1
+        if (nextScore === 0 && prevScore > 0) return -1
+        return prevScore - nextScore
+      }
+
+      case PROXIES_ORDERING_TYPE.QUALITY_DESC: {
+        const prevData = performanceData?.get(a)
+        const nextData = performanceData?.get(b)
+        const prevScore = prevData ? calculateNodeScore(prevData) : 0
+        const nextScore = nextData ? calculateNodeScore(nextData) : 0
+
+        if (prevScore === 0 && nextScore > 0) return 1
+        if (nextScore === 0 && prevScore > 0) return -1
+        return nextScore - prevScore
+      }
 
       default:
         return 0

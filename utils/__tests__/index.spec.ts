@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+import { PROXIES_ORDERING_TYPE } from '~/constants'
 import {
   compareVersions,
   encodeSvg,
@@ -8,6 +9,7 @@ import {
   formatProxyType,
   fuzzyFilter,
   getLatencyClassName,
+  sortProxiesByOrderingType,
   transformEndpointURL,
 } from '../index'
 
@@ -262,6 +264,69 @@ describe('utils/index', () => {
       const encoded = encodeSvg(svg)
       // Should not have duplicate xmlns
       expect(encoded.match(/xmlns/g)?.length).toBe(1)
+    })
+  })
+
+  describe('sortProxiesByOrderingType - quality', () => {
+    const buildHistory = (latencies: number[], success = true) =>
+      latencies.map((l) => ({ latency: l, success, timestamp: Date.now() }))
+
+    const buildPerformanceData = () => {
+      const map = new Map()
+      map.set('high', { history: buildHistory([50, 60]) })
+      map.set('mid', { history: buildHistory([200, 250]) })
+      map.set('low', { history: buildHistory([1000, 1200]) })
+      return map
+    }
+
+    const noopGetLatency = vi.fn(() => 0)
+    const noopIsProxyGroup = vi.fn(() => false)
+    const latencyQualityMap = { NOT_CONNECTED: -1, MEDIUM: 300, HIGH: 800 }
+
+    it('qUALITY_DESC: sorts by score descending, missing data sinks to the end', () => {
+      const result = sortProxiesByOrderingType({
+        proxyNames: ['mid', 'unknown', 'high', 'low'],
+        orderingType: PROXIES_ORDERING_TYPE.QUALITY_DESC,
+        testUrl: null,
+        getLatencyByName: noopGetLatency,
+        isProxyGroup: noopIsProxyGroup,
+        latencyQualityMap,
+        urlForLatencyTest: 'http://test',
+        performanceData: buildPerformanceData(),
+      })
+
+      expect(result).toEqual(['high', 'mid', 'low', 'unknown'])
+    })
+
+    it('qUALITY_ASC: sorts by score ascending, missing data sinks to the end', () => {
+      const result = sortProxiesByOrderingType({
+        proxyNames: ['high', 'unknown', 'low', 'mid'],
+        orderingType: PROXIES_ORDERING_TYPE.QUALITY_ASC,
+        testUrl: null,
+        getLatencyByName: noopGetLatency,
+        isProxyGroup: noopIsProxyGroup,
+        latencyQualityMap,
+        urlForLatencyTest: 'http://test',
+        performanceData: buildPerformanceData(),
+      })
+
+      expect(result).toEqual(['low', 'mid', 'high', 'unknown'])
+    })
+
+    it('qUALITY_DESC: tolerates undefined performanceData', () => {
+      const result = sortProxiesByOrderingType({
+        proxyNames: ['a', 'b'],
+        orderingType: PROXIES_ORDERING_TYPE.QUALITY_DESC,
+        testUrl: null,
+        getLatencyByName: noopGetLatency,
+        isProxyGroup: noopIsProxyGroup,
+        latencyQualityMap,
+        urlForLatencyTest: 'http://test',
+      })
+
+      // Both nodes have no performance data, so order is stable/arbitrary,
+      // but the function must not throw.
+      expect(result).toHaveLength(2)
     })
   })
 })
