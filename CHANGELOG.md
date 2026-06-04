@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.251.1](https://github.com/MetaCubeX/metacubexd/compare/v1.251.0...v1.251.1) (2026-06-04)
+
+
+### Bug Fixes
+
+* **proxies:** keep latency sparkline within tooltip chart viewBox ([5854d9b](https://github.com/MetaCubeX/metacubexd/commit/5854d9b3d173af0dc8d4ddc9fb314514ed4166f7))
+
 ## [1.251.0](https://github.com/MetaCubeX/metacubexd/compare/v1.250.0...v1.251.0) (2026-06-04)
 
 
