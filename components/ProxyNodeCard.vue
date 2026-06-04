@@ -1,12 +1,4 @@
 <script setup lang="ts">
-import {
-  arrow,
-  autoUpdate,
-  flip,
-  offset,
-  shift,
-  useFloating,
-} from '@floating-ui/vue'
 import { IconCircleCheckFilled, IconStar } from '@tabler/icons-vue'
 import dayjs from 'dayjs'
 import {
@@ -182,51 +174,9 @@ const latencyStabilityBar = computed(() => {
   }))
 })
 
-// Floating UI for tooltip
+// Anchor element for the lazily-mounted tooltip
 const reference = ref<HTMLElement | null>(null)
-const floating = ref<HTMLElement | null>(null)
-const floatingArrow = ref<HTMLElement | null>(null)
 const isTooltipOpen = ref(false)
-
-const { floatingStyles, middlewareData, placement } = useFloating(
-  reference,
-  floating,
-  {
-    placement: 'top',
-    strategy: 'fixed',
-    // Position via top/left; the floating element runs animate-pop-in,
-    // whose transform would otherwise override floating-ui's translate.
-    transform: false,
-    middleware: [
-      offset(10),
-      flip(),
-      shift({ padding: 8 }),
-      arrow({ element: floatingArrow }),
-    ],
-    whileElementsMounted: autoUpdate,
-  },
-)
-
-// Arrow positioning based on placement
-const arrowStyles = computed(() => {
-  const arrowData = middlewareData.value.arrow
-  const side = placement.value.split('-')[0] || 'top'
-
-  const staticSide: Record<string, string> = {
-    top: 'bottom',
-    right: 'left',
-    bottom: 'top',
-    left: 'right',
-  }
-
-  const sideKey = staticSide[side] || 'bottom'
-
-  return {
-    left: arrowData?.x != null ? `${arrowData.x}px` : '',
-    top: arrowData?.y != null ? `${arrowData.y}px` : '',
-    [sideKey]: '-4px',
-  }
-})
 
 let openTimeout: ReturnType<typeof setTimeout> | null = null
 let closeTimeout: ReturnType<typeof setTimeout> | null = null
@@ -258,9 +208,9 @@ function closeTooltip() {
 
 function onDocumentClick(e: Event) {
   const target = e.target as Node
-  if (reference.value?.contains(target) || floating.value?.contains(target)) {
+  if (reference.value?.contains(target)) return
+  if (target instanceof Element && target.closest('[data-proxy-tooltip]'))
     return
-  }
   closeTooltip()
 }
 
@@ -444,152 +394,141 @@ function handleLatencyTest() {
         </div>
       </div>
 
-      <!-- Tooltip for latency history -->
-      <Teleport to="body">
-        <div
-          v-if="isTooltipOpen"
-          ref="floating"
-          :style="floatingStyles"
-          class="animate-pop-in z-50 w-max max-w-80 rounded-xl bg-primary p-3 text-primary-content shadow-[0_10px_40px_color-mix(in_oklch,var(--color-base-content)_30%,transparent)]"
-          @mouseenter="onTooltipMouseEnter"
-          @mouseleave="onTooltipMouseLeave"
-        >
-          <!-- Arrow -->
+      <!-- Tooltip for latency history (mounted lazily while open) -->
+      <ProxyNodeTooltip
+        v-if="isTooltipOpen"
+        :reference="reference"
+        @mouse-enter="onTooltipMouseEnter"
+        @mouse-leave="onTooltipMouseLeave"
+      >
+        <div class="flex flex-col items-center gap-2">
+          <h2 class="m-0 text-lg font-bold">{{ proxyName }}</h2>
+
           <div
-            ref="floatingArrow"
-            class="absolute size-2 rotate-45 bg-primary"
-            :style="arrowStyles"
-          />
+            v-if="specialTypes"
+            class="w-full text-center text-xs uppercase opacity-80"
+          >
+            {{ specialTypes }}
+          </div>
 
-          <div class="flex flex-col items-center gap-2">
-            <h2 class="m-0 text-lg font-bold">{{ proxyName }}</h2>
-
+          <!-- Latency Trend Mini Chart -->
+          <div
+            v-if="latencyTrendData"
+            class="w-full rounded-lg bg-[color-mix(in_oklch,var(--color-primary-content)_10%,transparent)] p-2"
+          >
             <div
-              v-if="specialTypes"
-              class="w-full text-center text-xs uppercase opacity-80"
+              class="mb-1 flex items-center justify-between text-[0.625rem] opacity-70"
             >
-              {{ specialTypes }}
+              <span>{{ latencyTrendData.min }}ms</span>
+              <span>avg: {{ latencyTrendData.avg }}ms</span>
+              <span>{{ latencyTrendData.max }}ms</span>
             </div>
-
-            <!-- Latency Trend Mini Chart -->
-            <div
-              v-if="latencyTrendData"
-              class="w-full rounded-lg bg-[color-mix(in_oklch,var(--color-primary-content)_10%,transparent)] p-2"
+            <svg
+              viewBox="0 0 100 50"
+              class="h-8 w-full"
+              preserveAspectRatio="none"
             >
-              <div
-                class="mb-1 flex items-center justify-between text-[0.625rem] opacity-70"
+              <!-- Grid lines -->
+              <line
+                x1="0"
+                y1="25"
+                x2="100"
+                y2="25"
+                stroke="currentColor"
+                stroke-opacity="0.1"
+                stroke-dasharray="2,2"
+              />
+              <!-- Sparkline -->
+              <path
+                :d="sparklinePath"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="opacity-80"
+              />
+              <!-- Data points -->
+              <circle
+                v-for="(point, idx) in latencyTrendData.points"
+                :key="idx"
+                :cx="point.x"
+                :cy="point.y"
+                r="2"
+                fill="currentColor"
+                class="opacity-60"
+              />
+            </svg>
+            <!-- Stability stats -->
+            <div
+              class="mt-1 flex items-center justify-between text-[0.625rem] opacity-70"
+            >
+              <span>jitter: {{ latencyTrendData.jitter }}ms</span>
+              <span
+                >{{ latencyTrendData.successTests }}/{{
+                  latencyTrendData.totalTests
+                }}
+                ({{ latencyTrendData.successRate }}%)</span
               >
-                <span>{{ latencyTrendData.min }}ms</span>
-                <span>avg: {{ latencyTrendData.avg }}ms</span>
-                <span>{{ latencyTrendData.max }}ms</span>
-              </div>
-              <svg
-                viewBox="0 0 100 50"
-                class="h-8 w-full"
-                preserveAspectRatio="none"
-              >
-                <!-- Grid lines -->
-                <line
-                  x1="0"
-                  y1="25"
-                  x2="100"
-                  y2="25"
-                  stroke="currentColor"
-                  stroke-opacity="0.1"
-                  stroke-dasharray="2,2"
-                />
-                <!-- Sparkline -->
-                <path
-                  :d="sparklinePath"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="opacity-80"
-                />
-                <!-- Data points -->
-                <circle
-                  v-for="(point, idx) in latencyTrendData.points"
-                  :key="idx"
-                  :cx="point.x"
-                  :cy="point.y"
-                  r="2"
-                  fill="currentColor"
-                  class="opacity-60"
-                />
-              </svg>
-              <!-- Stability stats -->
-              <div
-                class="mt-1 flex items-center justify-between text-[0.625rem] opacity-70"
-              >
-                <span>jitter: {{ latencyTrendData.jitter }}ms</span>
-                <span
-                  >{{ latencyTrendData.successTests }}/{{
-                    latencyTrendData.totalTests
-                  }}
-                  ({{ latencyTrendData.successRate }}%)</span
+            </div>
+          </div>
+
+          <template v-if="latencyTestHistory.length > 0">
+            <ul
+              class="m-0 max-h-48 w-full [scrollbar-width:thin] [scrollbar-color:color-mix(in_oklch,var(--color-primary-content)_30%,transparent)_transparent] list-none overflow-y-auto p-0 pr-2 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:rounded-sm [&::-webkit-scrollbar-thumb]:bg-[color-mix(in_oklch,var(--color-primary-content)_30%,transparent)] [&::-webkit-scrollbar-track]:bg-transparent"
+            >
+              <li v-for="(result, index) in latencyTestHistory" :key="index">
+                <div
+                  class="flex items-start gap-2 border-b border-[color-mix(in_oklch,var(--color-primary-content)_15%,transparent)] py-1.5 last:border-b-0"
                 >
-              </div>
-            </div>
-
-            <template v-if="latencyTestHistory.length > 0">
-              <ul
-                class="m-0 max-h-48 w-full [scrollbar-width:thin] [scrollbar-color:color-mix(in_oklch,var(--color-primary-content)_30%,transparent)_transparent] list-none overflow-y-auto p-0 pr-2 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:rounded-sm [&::-webkit-scrollbar-thumb]:bg-[color-mix(in_oklch,var(--color-primary-content)_30%,transparent)] [&::-webkit-scrollbar-track]:bg-transparent"
-              >
-                <li v-for="(result, index) in latencyTestHistory" :key="index">
-                  <div
-                    class="flex items-start gap-2 border-b border-[color-mix(in_oklch,var(--color-primary-content)_15%,transparent)] py-1.5 last:border-b-0"
-                  >
-                    <div class="shrink-0 opacity-80">
-                      <IconCircleCheckFilled class="size-4" />
-                    </div>
-                    <div class="flex min-w-0 flex-1 flex-col gap-1">
-                      <time class="text-xs italic opacity-80">
-                        {{ dayjs(result.time).format('YYYY-MM-DD HH:mm:ss') }}
-                      </time>
-                      <div class="flex items-center gap-2">
+                  <div class="shrink-0 opacity-80">
+                    <IconCircleCheckFilled class="size-4" />
+                  </div>
+                  <div class="flex min-w-0 flex-1 flex-col gap-1">
+                    <time class="text-xs italic opacity-80">
+                      {{ dayjs(result.time).format('YYYY-MM-DD HH:mm:ss') }}
+                    </time>
+                    <div class="flex items-center gap-2">
+                      <div
+                        class="inline-block rounded-full px-2 py-0.5 text-xs font-semibold"
+                        :class="
+                          getLatencyClassName(
+                            result.delay,
+                            configStore.latencyQualityMap,
+                          )
+                        "
+                      >
+                        {{ result.delay || '---' }}
+                      </div>
+                      <div
+                        v-if="result.delay && latencyTrendData"
+                        class="h-1.5 flex-1 overflow-hidden rounded-full bg-[color-mix(in_oklch,var(--color-primary-content)_15%,transparent)]"
+                      >
                         <div
-                          class="inline-block rounded-full px-2 py-0.5 text-xs font-semibold"
+                          class="h-full rounded-full bg-current transition-all duration-300"
                           :class="
                             getLatencyClassName(
                               result.delay,
                               configStore.latencyQualityMap,
                             )
                           "
-                        >
-                          {{ result.delay || '---' }}
-                        </div>
-                        <div
-                          v-if="result.delay && latencyTrendData"
-                          class="h-1.5 flex-1 overflow-hidden rounded-full bg-[color-mix(in_oklch,var(--color-primary-content)_15%,transparent)]"
-                        >
-                          <div
-                            class="h-full rounded-full bg-current transition-all duration-300"
-                            :class="
-                              getLatencyClassName(
-                                result.delay,
-                                configStore.latencyQualityMap,
-                              )
-                            "
-                            :style="{
-                              width: `${Math.min((result.delay / latencyTrendData.max) * 100, 100)}%`,
-                            }"
-                          />
-                        </div>
+                          :style="{
+                            width: `${Math.min((result.delay / latencyTrendData.max) * 100, 100)}%`,
+                          }"
+                        />
                       </div>
                     </div>
                   </div>
-                </li>
-              </ul>
-            </template>
+                </div>
+              </li>
+            </ul>
+          </template>
 
-            <div v-else class="text-center text-sm opacity-75">
-              {{ t('noLatencyHistory') }}
-            </div>
+          <div v-else class="text-center text-sm opacity-75">
+            {{ t('noLatencyHistory') }}
           </div>
         </div>
-      </Teleport>
+      </ProxyNodeTooltip>
     </div>
   </div>
 </template>

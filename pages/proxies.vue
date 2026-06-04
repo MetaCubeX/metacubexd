@@ -45,6 +45,14 @@ const settingsModal = ref<{ open: () => void; close: () => void }>()
 const proxyGroupsWrapper = ref<{ isTwoColumns: boolean }>()
 const providersWrapper = ref<{ isTwoColumns: boolean }>()
 
+// Progressive rendering: only mount a window of nodes per group, growing as the
+// user scrolls near the bottom. Avoids mounting hundreds of cards in one frame
+// when a large group is expanded (the main cause of jank with many nodes).
+const PROXIES_INITIAL_RENDER_COUNT = 50
+const PROXIES_RENDER_STEP = 50
+const proxiesScrollEl = ref<HTMLElement | null>(null)
+const providersScrollEl = ref<HTMLElement | null>(null)
+
 const formatBytes = (bytes: number) => byteSize(bytes).toString()
 
 // Get recommended node for a proxy group
@@ -127,6 +135,25 @@ function getProviderProxyNames(
     performanceData: nodeRecommendationStore.performanceData,
   })
 }
+
+// Cache sorted/filtered proxy names per group so each render reuses the result
+// instead of recomputing the sort + availability filter on every re-render
+// (previously called twice per group per frame from the template).
+const sortedNamesByGroup = computed(() => {
+  const map: Record<string, string[]> = {}
+  for (const proxyGroup of renderProxies.value) {
+    map[proxyGroup.name] = getSortedProxyNames(proxyGroup)
+  }
+  return map
+})
+
+const sortedNamesByProvider = computed(() => {
+  const map: Record<string, string[]> = {}
+  for (const provider of proxiesStore.proxyProviders) {
+    map[provider.name] = getProviderProxyNames(provider)
+  }
+  return map
+})
 
 // Fetch proxies on mount
 onMounted(() => {
@@ -310,9 +337,41 @@ const ProxyNodes = defineComponent({
   },
   setup(props) {
     const recommendedNode = computed(() => getRecommendedNode(props.proxyGroup))
+    const renderCount = ref(PROXIES_INITIAL_RENDER_COUNT)
+    const loadMoreSentinel = ref<HTMLElement | null>(null)
 
-    return () =>
-      props.sortedProxyNames.map((proxyName) =>
+    // Keep the currently selected node within the rendered window, otherwise
+    // it could be hidden below the fold after expanding the group.
+    watch(
+      () => [props.sortedProxyNames, props.proxyGroup.now] as const,
+      ([names, now]) => {
+        const index = names.indexOf(now)
+        if (index >= renderCount.value) {
+          renderCount.value = index + PROXIES_RENDER_STEP
+        }
+      },
+      { immediate: true },
+    )
+
+    useIntersectionObserver(
+      loadMoreSentinel,
+      (entries) => {
+        if (
+          entries[0]?.isIntersecting &&
+          renderCount.value < props.sortedProxyNames.length
+        ) {
+          renderCount.value = Math.min(
+            renderCount.value + PROXIES_RENDER_STEP,
+            props.sortedProxyNames.length,
+          )
+        }
+      },
+      { root: proxiesScrollEl, rootMargin: '600px' },
+    )
+
+    return () => {
+      const names = props.sortedProxyNames
+      const children = names.slice(0, renderCount.value).map((proxyName) =>
         configStore.proxiesDisplayMode === 'listMode'
           ? h(ProxyNodeListItem, {
               key: proxyName,
@@ -335,6 +394,21 @@ const ProxyNodes = defineComponent({
                 proxiesStore.selectProxyInGroup(props.proxyGroup, proxyName),
             }),
       )
+
+      if (renderCount.value < names.length) {
+        children.push(
+          h('div', {
+            ref: loadMoreSentinel,
+            key: '__load_more__',
+            'aria-hidden': 'true',
+            class: 'h-px w-full',
+            style: { gridColumn: '1 / -1' },
+          }),
+        )
+      }
+
+      return children
+    }
   },
 })
 
@@ -477,8 +551,28 @@ const ProviderProxyNodes = defineComponent({
     sortedProxyNames: { type: Array as () => string[], required: true },
   },
   setup(props) {
-    return () =>
-      props.sortedProxyNames.map((proxyName) =>
+    const renderCount = ref(PROXIES_INITIAL_RENDER_COUNT)
+    const loadMoreSentinel = ref<HTMLElement | null>(null)
+
+    useIntersectionObserver(
+      loadMoreSentinel,
+      (entries) => {
+        if (
+          entries[0]?.isIntersecting &&
+          renderCount.value < props.sortedProxyNames.length
+        ) {
+          renderCount.value = Math.min(
+            renderCount.value + PROXIES_RENDER_STEP,
+            props.sortedProxyNames.length,
+          )
+        }
+      },
+      { root: providersScrollEl, rootMargin: '600px' },
+    )
+
+    return () => {
+      const names = props.sortedProxyNames
+      const children = names.slice(0, renderCount.value).map((proxyName) =>
         configStore.proxiesDisplayMode === 'listMode'
           ? h(ProxyNodeListItem, {
               key: proxyName,
@@ -495,6 +589,21 @@ const ProviderProxyNodes = defineComponent({
               providerName: props.provider.name,
             }),
       )
+
+      if (renderCount.value < names.length) {
+        children.push(
+          h('div', {
+            ref: loadMoreSentinel,
+            key: '__load_more__',
+            'aria-hidden': 'true',
+            class: 'h-px w-full',
+            style: { gridColumn: '1 / -1' },
+          }),
+        )
+      }
+
+      return children
+    }
   },
 })
 </script>
@@ -596,7 +705,11 @@ const ProviderProxyNodes = defineComponent({
     </div>
 
     <!-- Proxy Groups Content -->
-    <div v-if="activeTab === 'proxies'" class="min-h-0 flex-1 overflow-y-auto">
+    <div
+      v-if="activeTab === 'proxies'"
+      ref="proxiesScrollEl"
+      class="min-h-0 flex-1 overflow-y-auto"
+    >
       <ProxiesRenderWrapper ref="proxyGroupsWrapper">
         <template v-if="proxyGroupsWrapper?.isTwoColumns" #even>
           <Collapse
@@ -614,12 +727,12 @@ const ProviderProxyNodes = defineComponent({
             <template #title>
               <ProxyGroupTitle
                 :proxy-group="proxyGroup"
-                :sorted-proxy-names="getSortedProxyNames(proxyGroup)"
+                :sorted-proxy-names="sortedNamesByGroup[proxyGroup.name] || []"
               />
             </template>
             <ProxyNodes
               :proxy-group="proxyGroup"
-              :sorted-proxy-names="getSortedProxyNames(proxyGroup)"
+              :sorted-proxy-names="sortedNamesByGroup[proxyGroup.name] || []"
             />
           </Collapse>
         </template>
@@ -640,12 +753,12 @@ const ProviderProxyNodes = defineComponent({
             <template #title>
               <ProxyGroupTitle
                 :proxy-group="proxyGroup"
-                :sorted-proxy-names="getSortedProxyNames(proxyGroup)"
+                :sorted-proxy-names="sortedNamesByGroup[proxyGroup.name] || []"
               />
             </template>
             <ProxyNodes
               :proxy-group="proxyGroup"
-              :sorted-proxy-names="getSortedProxyNames(proxyGroup)"
+              :sorted-proxy-names="sortedNamesByGroup[proxyGroup.name] || []"
             />
           </Collapse>
         </template>
@@ -664,12 +777,12 @@ const ProviderProxyNodes = defineComponent({
             <template #title>
               <ProxyGroupTitle
                 :proxy-group="proxyGroup"
-                :sorted-proxy-names="getSortedProxyNames(proxyGroup)"
+                :sorted-proxy-names="sortedNamesByGroup[proxyGroup.name] || []"
               />
             </template>
             <ProxyNodes
               :proxy-group="proxyGroup"
-              :sorted-proxy-names="getSortedProxyNames(proxyGroup)"
+              :sorted-proxy-names="sortedNamesByGroup[proxyGroup.name] || []"
             />
           </Collapse>
         </template>
@@ -677,7 +790,7 @@ const ProviderProxyNodes = defineComponent({
     </div>
 
     <!-- Proxy Providers Content -->
-    <div v-else class="min-h-0 flex-1 overflow-y-auto">
+    <div v-else ref="providersScrollEl" class="min-h-0 flex-1 overflow-y-auto">
       <ProxiesRenderWrapper ref="providersWrapper">
         <template v-if="providersWrapper?.isTwoColumns" #even>
           <Collapse
@@ -695,12 +808,12 @@ const ProviderProxyNodes = defineComponent({
             <template #title>
               <ProxyProviderTitle
                 :provider="provider"
-                :sorted-proxy-names="getProviderProxyNames(provider)"
+                :sorted-proxy-names="sortedNamesByProvider[provider.name] || []"
               />
             </template>
             <ProviderProxyNodes
               :provider="provider"
-              :sorted-proxy-names="getProviderProxyNames(provider)"
+              :sorted-proxy-names="sortedNamesByProvider[provider.name] || []"
             />
           </Collapse>
         </template>
@@ -721,12 +834,12 @@ const ProviderProxyNodes = defineComponent({
             <template #title>
               <ProxyProviderTitle
                 :provider="provider"
-                :sorted-proxy-names="getProviderProxyNames(provider)"
+                :sorted-proxy-names="sortedNamesByProvider[provider.name] || []"
               />
             </template>
             <ProviderProxyNodes
               :provider="provider"
-              :sorted-proxy-names="getProviderProxyNames(provider)"
+              :sorted-proxy-names="sortedNamesByProvider[provider.name] || []"
             />
           </Collapse>
         </template>
@@ -745,12 +858,12 @@ const ProviderProxyNodes = defineComponent({
             <template #title>
               <ProxyProviderTitle
                 :provider="provider"
-                :sorted-proxy-names="getProviderProxyNames(provider)"
+                :sorted-proxy-names="sortedNamesByProvider[provider.name] || []"
               />
             </template>
             <ProviderProxyNodes
               :provider="provider"
-              :sorted-proxy-names="getProviderProxyNames(provider)"
+              :sorted-proxy-names="sortedNamesByProvider[provider.name] || []"
             />
           </Collapse>
         </template>
