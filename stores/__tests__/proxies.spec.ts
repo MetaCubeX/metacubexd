@@ -8,6 +8,7 @@ const apiMocks = vi.hoisted(() => ({
   fetchProxiesAPI: vi.fn(),
   proxyLatencyTestAPI: vi.fn(),
   proxyGroupLatencyTestAPI: vi.fn(),
+  unfixProxyInGroupAPI: vi.fn(),
 }))
 
 vi.mock('~/composables/useApi', () => ({
@@ -18,6 +19,7 @@ vi.mock('~/composables/useApi', () => ({
   proxyLatencyTestAPI: apiMocks.proxyLatencyTestAPI,
   proxyProviderHealthCheckAPI: vi.fn(),
   selectProxyInGroupAPI: vi.fn(),
+  unfixProxyInGroupAPI: apiMocks.unfixProxyInGroupAPI,
   updateProxyProviderAPI: vi.fn(),
 }))
 
@@ -279,7 +281,7 @@ describe('stores/proxies latency state', () => {
     expect(bHistory[0]?.delay).toBe(0)
   })
 
-  it('batch-tests every provider node via the delay API', async () => {
+  it('batch-tests every provider node via the provider health-check endpoint', async () => {
     apiMocks.proxyLatencyTestAPI
       .mockResolvedValueOnce({ delay: 120 })
       .mockResolvedValueOnce({ delay: 88 })
@@ -327,14 +329,14 @@ describe('stores/proxies latency state', () => {
     expect(apiMocks.proxyLatencyTestAPI).toHaveBeenNthCalledWith(
       1,
       'node-a',
-      '',
+      '订阅',
       'https://latency.test/provider',
       3000,
     )
     expect(apiMocks.proxyLatencyTestAPI).toHaveBeenNthCalledWith(
       2,
       'node-b',
-      '',
+      '订阅',
       'https://latency.test/provider',
       3000,
     )
@@ -349,6 +351,16 @@ describe('stores/proxies latency state', () => {
       store.getLatencyByName('node-b', 'https://latency.test/provider'),
     ).toBe(88)
     expect(store.proxyProviderLatencyTestingMap['订阅']).toBe(false)
+  })
+
+  it('unfixes an automatic group and refreshes proxies', async () => {
+    apiMocks.fetchProxiesAPI.mockResolvedValue({ proxies: {} })
+
+    const store = useProxiesStore()
+    await store.unfixProxyInGroup('AUTO')
+
+    expect(apiMocks.unfixProxyInGroupAPI).toHaveBeenCalledWith('AUTO')
+    expect(apiMocks.fetchProxiesAPI).toHaveBeenCalled()
   })
 
   it('notifies node recommendation store after a proxy group latency test', async () => {

@@ -12,6 +12,7 @@ import {
   proxyGroupLatencyTestAPI,
   proxyLatencyTestAPI,
   selectProxyInGroupAPI,
+  unfixProxyInGroupAPI,
   updateProxyProviderAPI,
 } from '~/composables/useApi'
 
@@ -315,24 +316,38 @@ export const useProxiesStore = defineStore('proxies', () => {
     setProxiesInfo(allProxies)
   }
 
+  // Close active connections currently routed through a group so a selection
+  // change (manual pick or unpin) takes effect immediately instead of waiting
+  // for the existing connections to die naturally. No-op unless the user opted
+  // into autoCloseConns.
+  const closeConnectionsThroughGroup = async (groupName: string) => {
+    if (!configStore.autoCloseConns) return
+
+    const activeConns = connectionsStore.restructRawMsgToConnection(
+      connectionsStore.latestConnectionMsg?.connections ?? [],
+      [],
+    )
+    if (activeConns.length === 0) return
+
+    const closePromises = activeConns
+      .filter(({ chains }) => chains.includes(groupName))
+      .map(({ id }) => closeSingleConnectionAPI(id))
+    await Promise.allSettled(closePromises)
+  }
+
   // Select proxy in group
   const selectProxyInGroup = async (proxy: Proxy, proxyName: string) => {
     await selectProxyInGroupAPI(proxy.name, proxyName)
     await fetchProxies()
+    await closeConnectionsThroughGroup(proxy.name)
+  }
 
-    if (configStore.autoCloseConns) {
-      const activeConns = connectionsStore.restructRawMsgToConnection(
-        connectionsStore.latestConnectionMsg?.connections ?? [],
-        [],
-      )
-
-      if (activeConns.length > 0) {
-        const closePromises = activeConns
-          .filter(({ chains }) => chains.includes(proxy.name))
-          .map(({ id }) => closeSingleConnectionAPI(id))
-        await Promise.allSettled(closePromises)
-      }
-    }
+  // Clear a manual pin on an automatic group (url-test/fallback/load-balance),
+  // restoring automatic selection.
+  const unfixProxyInGroup = async (groupName: string) => {
+    await unfixProxyInGroupAPI(groupName)
+    await fetchProxies()
+    await closeConnectionsThroughGroup(groupName)
   }
 
   // Get now proxy node name (recursive)
@@ -555,7 +570,7 @@ export const useProxiesStore = defineStore('proxies', () => {
             try {
               const { delay } = await proxyLatencyTestAPI(
                 nodeName,
-                '',
+                providerName,
                 finalTestUrl,
                 timeout,
               )
@@ -601,6 +616,7 @@ export const useProxiesStore = defineStore('proxies', () => {
     collapsedMap,
     fetchProxies,
     selectProxyInGroup,
+    unfixProxyInGroup,
     getNowProxyNodeName,
     getLatencyByName,
     getLatencyHistoryByName,

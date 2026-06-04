@@ -154,13 +154,24 @@ function getMockData(url: string): unknown {
     )
   }
   if (path.startsWith('providers/proxies/') && path.endsWith('/healthcheck')) {
-    const providerName = decodeURIComponent(
-      path.slice('providers/proxies/'.length, -'/healthcheck'.length),
+    const middle = path.slice(
+      'providers/proxies/'.length,
+      -'/healthcheck'.length,
     )
+    // Two shapes share this prefix: `{provider}/healthcheck` triggers the whole
+    // provider (returns a name->delay map), while `{provider}/{node}/healthcheck`
+    // tests a single node (returns { delay }, like the per-node delay endpoint).
+    const segments = middle.split('/')
+    if (segments.length === 2) {
+      return simulateProxyDelay(
+        mockData.mockProxies as Record<string, MockProxyShape>,
+        decodeURIComponent(segments[1]!),
+      )
+    }
     return simulateProviderHealthCheck(
       mockData.mockProxyProviders as Record<string, MockProviderShape>,
       mockData.mockProxies as Record<string, MockProxyShape>,
-      providerName,
+      decodeURIComponent(middle),
     )
   }
 
@@ -335,18 +346,34 @@ export function selectProxyInGroupAPI(groupName: string, proxyName: string) {
   })
 }
 
+export function unfixProxyInGroupAPI(groupName: string) {
+  const request = useRequest()
+
+  // Clears a manual pin on an automatic group (url-test/fallback/load-balance),
+  // restoring automatic selection. Mihomo returns 400 for Selector groups,
+  // which have no "fixed" concept — callers should only offer this on groups
+  // that report a non-empty `fixed`.
+  return request.delete(`proxies/${encodeURIComponent(groupName)}`)
+}
+
 export function proxyLatencyTestAPI(
   proxyName: string,
-  _provider: string,
+  provider: string,
   url: string,
   timeout: number,
 ) {
   const request = useRequest()
 
-  // Provider nodes are merged into /proxies by mihomo; the per-node delay
-  // endpoint returns synchronous results with url/timeout control.
+  // A provider node may not be present in the global /proxies map (or its name
+  // may collide with another provider's node), so when the provider is known we
+  // hit the provider-scoped health-check endpoint to test that exact node.
+  // Both endpoints share mihomo's getProxyDelay handler and return { delay }.
+  const path = provider
+    ? `providers/proxies/${encodeURIComponent(provider)}/${encodeURIComponent(proxyName)}/healthcheck`
+    : `proxies/${encodeURIComponent(proxyName)}/delay`
+
   return request
-    .get(`proxies/${encodeURIComponent(proxyName)}/delay`, {
+    .get(path, {
       searchParams: { url, timeout },
     })
     .json<{ delay: number }>()

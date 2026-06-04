@@ -8,6 +8,7 @@ import {
   IconBrandSpeedtest,
   IconChevronRight,
   IconGlobe,
+  IconPinnedOff,
   IconReload,
   IconSettings,
   IconWand,
@@ -260,6 +261,24 @@ const ProxyGroupTitle = defineComponent({
                   },
                   {
                     default: () => h(IconWand, { size: 18 }),
+                  },
+                ),
+              // Unfix button — only shown when this automatic group has a manual
+              // pin (mihomo reports it via `fixed`). Clicking restores auto-select.
+              !!props.proxyGroup.fixed &&
+                h(
+                  Button,
+                  {
+                    class:
+                      'flex items-center justify-center w-9 h-9 rounded-lg bg-warning/10 border border-warning/20 text-warning transition-all duration-200 hover:bg-warning/20 hover:border-warning/40 hover:-translate-y-px hover:shadow-lg hover:shadow-warning/15 active:translate-y-0',
+                    title: t('unfixProxy'),
+                    onClick: (e: MouseEvent) => {
+                      e.stopPropagation()
+                      proxiesStore.unfixProxyInGroup(props.proxyGroup.name)
+                    },
+                  },
+                  {
+                    default: () => h(IconPinnedOff, { size: 18 }),
                   },
                 ),
               h(

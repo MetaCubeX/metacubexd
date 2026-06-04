@@ -15,6 +15,9 @@ export interface Proxy {
   xudp: boolean
   tfo: boolean
   now: string
+  // Present on automatic groups (url-test/fallback/load-balance): the node the
+  // user manually pinned. Empty/absent means the group is auto-selecting.
+  fixed?: string
   testUrl?: string
   timeout?: number
 }
