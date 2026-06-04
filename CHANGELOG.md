@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.250.0](https://github.com/MetaCubeX/metacubexd/compare/v1.249.2...v1.250.0) (2026-06-04)
+
+
+### Features
+
+* **proxies:** add quality-based proxy sorting and per-group sort settings ([#2001](https://github.com/MetaCubeX/metacubexd/issues/2001)) ([112d891](https://github.com/MetaCubeX/metacubexd/commit/112d891dcd7556958b6a4feedb53a72f28865110))
+
 ## [1.249.2](https://github.com/MetaCubeX/metacubexd/compare/v1.249.1...v1.249.2) (2026-06-02)
 
 
