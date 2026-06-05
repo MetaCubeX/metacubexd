@@ -11,9 +11,9 @@ export function loadHighcharts(): Promise<typeof Highcharts> {
   if (!highchartsPromise) {
     highchartsPromise = import('highcharts').then((module) => {
       const hc = module.default
-      // v12 removed useUTC; local timezone is the default. Apply once here
-      // instead of repeating it in every chart component.
-      hc.setOptions({ time: {} })
+      // v12 defaults to timezone: 'UTC'. Explicitly set to undefined so
+      // Intl.DateTimeFormat falls back to the browser's local timezone.
+      hc.setOptions({ time: { timezone: undefined } })
       return hc
     })
   }
