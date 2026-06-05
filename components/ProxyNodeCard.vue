@@ -63,17 +63,19 @@ const lastTestTimeFormatted = computed(() => {
   return formatTimeSince(perf.lastTestTime)
 })
 
-// Latency trend data for mini chart (from nodeRecommendationStore)
+// Latency trend data for the mini chart — derived from the SAME kernel history
+// the detail list below renders (getLatencyHistoryByName), so the sparkline,
+// the min/avg/max/jitter stats and the per-test list always agree.
 const latencyTrendData = computed(() => {
-  const perf = nodePerformance.value
-  if (!perf || perf.history.length < 2) return null
+  const history = proxiesStore.getLatencyHistoryByName(
+    props.proxyName,
+    props.testUrl,
+  )
+  if (history.length === 0) return null
 
-  // Get successful latency values (most recent first, so reverse for chronological order)
-  const latencies = perf.history
-    .filter((h) => h.success && h.latency !== null)
-    .map((h) => h.latency as number)
-    .slice(0, 10)
-    .reverse()
+  // Successful measurements only — delay === 0 is NOT_CONNECTED (a failed test).
+  // Already chronological, so the sparkline reads left (oldest) to right (newest).
+  const latencies = history.filter((h) => h.delay > 0).map((h) => h.delay)
 
   if (latencies.length < 2) return null
 
@@ -84,14 +86,14 @@ const latencyTrendData = computed(() => {
     latencies.reduce((a, b) => a + b, 0) / latencies.length,
   )
 
-  // Calculate jitter (standard deviation)
+  // Jitter = standard deviation of the successful latencies
   const variance =
     latencies.reduce((sum, lat) => sum + (lat - avg) ** 2, 0) / latencies.length
   const jitter = Math.round(Math.sqrt(variance))
 
-  // Calculate success rate
-  const totalTests = perf.history.length
-  const successTests = perf.history.filter((h) => h.success).length
+  // Success rate spans the full history (failed tests counted in the divisor)
+  const totalTests = history.length
+  const successTests = latencies.length
   const successRate = Math.round((successTests / totalTests) * 100)
 
   // Normalize into the SVG coordinate space (viewBox is 100 x 50 below).
