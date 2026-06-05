@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.251.3](https://github.com/MetaCubeX/metacubexd/compare/v1.251.2...v1.251.3) (2026-06-05)
+
+
+### Bug Fixes
+
+* **charts:** use browser local timezone instead of UTC in Highcharts ([#2009](https://github.com/MetaCubeX/metacubexd/issues/2009)) ([47c631b](https://github.com/MetaCubeX/metacubexd/commit/47c631bafdef7b3540b021555612426fdd74a9a9))
+
 ## [1.251.2](https://github.com/MetaCubeX/metacubexd/compare/v1.251.1...v1.251.2) (2026-06-05)
 
 
