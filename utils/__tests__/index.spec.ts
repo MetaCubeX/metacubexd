@@ -328,5 +328,46 @@ describe('utils/index', () => {
       // but the function must not throw.
       expect(result).toHaveLength(2)
     })
+
+    it('qUALITY_DESC: a currently-disconnected node sinks below connected ones despite good history', () => {
+      // 'high' has a great historical score but is unreachable right now;
+      // 'alive' is connected but was never quality-tested (score 0). The live
+      // failure must outweigh the stale good history.
+      const getLatencyByName = vi.fn((name: string) =>
+        name === 'high' ? latencyQualityMap.NOT_CONNECTED : 100,
+      )
+
+      const result = sortProxiesByOrderingType({
+        proxyNames: ['high', 'alive'],
+        orderingType: PROXIES_ORDERING_TYPE.QUALITY_DESC,
+        testUrl: null,
+        getLatencyByName,
+        isProxyGroup: noopIsProxyGroup,
+        latencyQualityMap,
+        urlForLatencyTest: 'http://test',
+        performanceData: buildPerformanceData(),
+      })
+
+      expect(result).toEqual(['alive', 'high'])
+    })
+
+    it('qUALITY_ASC: a currently-disconnected node sinks below connected ones despite good history', () => {
+      const getLatencyByName = vi.fn((name: string) =>
+        name === 'high' ? latencyQualityMap.NOT_CONNECTED : 100,
+      )
+
+      const result = sortProxiesByOrderingType({
+        proxyNames: ['high', 'alive'],
+        orderingType: PROXIES_ORDERING_TYPE.QUALITY_ASC,
+        testUrl: null,
+        getLatencyByName,
+        isProxyGroup: noopIsProxyGroup,
+        latencyQualityMap,
+        urlForLatencyTest: 'http://test',
+        performanceData: buildPerformanceData(),
+      })
+
+      expect(result).toEqual(['alive', 'high'])
+    })
   })
 })

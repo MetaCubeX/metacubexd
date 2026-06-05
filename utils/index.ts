@@ -274,6 +274,12 @@ export function sortProxiesByOrderingType({
         return b.localeCompare(a)
 
       case PROXIES_ORDERING_TYPE.QUALITY_ASC: {
+        // A node that is unreachable right now must sink to the bottom no matter
+        // how good its historical quality score is — a stale good run shouldn't
+        // outrank a node that actually connects.
+        if (prevLatency === latencyQualityMap.NOT_CONNECTED) return 1
+        if (nextLatency === latencyQualityMap.NOT_CONNECTED) return -1
+
         const prevData = performanceData?.get(a)
         const nextData = performanceData?.get(b)
         const prevScore = prevData ? calculateNodeScore(prevData) : 0
@@ -285,6 +291,12 @@ export function sortProxiesByOrderingType({
       }
 
       case PROXIES_ORDERING_TYPE.QUALITY_DESC: {
+        // A node that is unreachable right now must sink to the bottom no matter
+        // how good its historical quality score is — a stale good run shouldn't
+        // outrank a node that actually connects.
+        if (prevLatency === latencyQualityMap.NOT_CONNECTED) return 1
+        if (nextLatency === latencyQualityMap.NOT_CONNECTED) return -1
+
         const prevData = performanceData?.get(a)
         const nextData = performanceData?.get(b)
         const prevScore = prevData ? calculateNodeScore(prevData) : 0
