@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.251.2](https://github.com/MetaCubeX/metacubexd/compare/v1.251.1...v1.251.2) (2026-06-05)
+
+
+### Bug Fixes
+
+* **proxies:** sink currently-unreachable nodes when sorting by quality ([a1d504a](https://github.com/MetaCubeX/metacubexd/commit/a1d504aa667724b95e637d931cd0e8787d79b00f))
+* **proxies:** source node tooltip latency chart from kernel history ([d4e8a89](https://github.com/MetaCubeX/metacubexd/commit/d4e8a89cc05a732acaffab2973a6db9a08cc37bf)), closes [#2006](https://github.com/MetaCubeX/metacubexd/issues/2006)
+
 ## [1.251.1](https://github.com/MetaCubeX/metacubexd/compare/v1.251.0...v1.251.1) (2026-06-04)
 
 
