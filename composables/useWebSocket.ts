@@ -1,6 +1,10 @@
 import type { Log, MemoryData, TrafficData, WsMsg } from '~/types'
+import { getCurrentScope, onScopeDispose } from 'vue'
 import { useMockMode } from './useApi'
 import { useMockData } from './useMockData'
+
+// Delay before retrying after an unexpected socket close (e.g. "Restart Core").
+const RECONNECT_DELAY = 3000
 
 export function useBackendWebSocket() {
   const endpointStore = useEndpointStore()
@@ -17,6 +21,31 @@ export function useBackendWebSocket() {
 
   // Mock mode intervals
   let mockInterval: ReturnType<typeof setInterval> | null = null
+
+  // Auto-reconnect bookkeeping
+  let reconnectTimer: ReturnType<typeof setTimeout> | null = null
+
+  // Close a socket WITHOUT triggering its auto-reconnect handler. Used for
+  // intentional teardown (reconnect, unmount), so we don't reconnect a socket
+  // we closed on purpose.
+  const closeWs = (ws: WebSocket | null) => {
+    if (!ws) return
+    ws.onclose = null
+    ws.close()
+  }
+
+  // Debounced reconnect. A backend restart ("Restart Core") drops every socket
+  // at once, so coalesce into a single attempt; each failed attempt's socket
+  // fires onclose again, so this keeps retrying until the backend is back.
+  const scheduleReconnect = () => {
+    if (useMockMode()) return
+    if (reconnectTimer) return
+    if (!endpointStore.currentEndpoint) return
+    reconnectTimer = setTimeout(() => {
+      reconnectTimer = null
+      connect()
+    }, RECONNECT_DELAY)
+  }
 
   const createWebSocket = (
     path: string,
@@ -46,11 +75,17 @@ export function useBackendWebSocket() {
       console.error(`WebSocket error for ${path}:`, error)
     }
 
+    ws.onclose = () => {
+      scheduleReconnect()
+    }
+
     return ws
   }
 
   // Connect to all WebSocket endpoints
   const connect = () => {
+    disconnect()
+
     // In mock mode, use mock data instead of WebSocket
     if (useMockMode()) {
       const mockData = useMockData()
@@ -163,37 +198,27 @@ export function useBackendWebSocket() {
     })
 
     // Logs WebSocket
-    const endpoint = endpointStore.currentEndpoint
-    if (endpoint) {
-      const wsUrl = endpointStore.wsEndpointURL
-      const params = new URLSearchParams()
-      if (endpoint.secret) params.set('token', endpoint.secret)
-      params.set('level', configStore.logLevel)
-
-      logsWs = new WebSocket(`${wsUrl}/logs?${params.toString()}`)
-      logsWs.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data) as Log
-          logsStore.addLog(data)
-        } catch {
-          // Ignore parse errors
-        }
-      }
-    }
+    logsWs = createLogsWebSocket()
   }
 
   // Disconnect all WebSockets
   const disconnect = () => {
+    // Cancel any pending reconnect — this is an intentional teardown.
+    if (reconnectTimer) {
+      clearTimeout(reconnectTimer)
+      reconnectTimer = null
+    }
+
     // Clear mock interval if in mock mode
     if (mockInterval) {
       clearInterval(mockInterval)
       mockInterval = null
     }
 
-    connectionsWs?.close()
-    trafficWs?.close()
-    memoryWs?.close()
-    logsWs?.close()
+    closeWs(connectionsWs)
+    closeWs(trafficWs)
+    closeWs(memoryWs)
+    closeWs(logsWs)
 
     connectionsWs = null
     trafficWs = null
@@ -201,27 +226,41 @@ export function useBackendWebSocket() {
     logsWs = null
   }
 
-  // Reconnect (e.g., when log level changes)
-  const reconnectLogs = () => {
-    logsWs?.close()
-
+  // Helper: create logs WebSocket
+  const createLogsWebSocket = (): WebSocket | null => {
     const endpoint = endpointStore.currentEndpoint
-    if (endpoint) {
-      const wsUrl = endpointStore.wsEndpointURL
-      const params = new URLSearchParams()
-      if (endpoint.secret) params.set('token', endpoint.secret)
-      params.set('level', configStore.logLevel)
+    if (!endpoint) return null
 
-      logsWs = new WebSocket(`${wsUrl}/logs?${params.toString()}`)
-      logsWs.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data) as Log
-          logsStore.addLog(data)
-        } catch {
-          // Ignore parse errors
-        }
+    const wsUrl = endpointStore.wsEndpointURL
+    const params = new URLSearchParams()
+    if (endpoint.secret) params.set('token', endpoint.secret)
+    params.set('level', configStore.logLevel)
+
+    const ws = new WebSocket(`${wsUrl}/logs?${params.toString()}`)
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data) as Log
+        logsStore.addLog(data)
+      } catch {
+        // Ignore parse errors
       }
     }
+
+    ws.onclose = () => {
+      scheduleReconnect()
+    }
+
+    return ws
+  }
+
+  // Reconnect (e.g., when log level changes)
+  const reconnectLogs = () => {
+    closeWs(logsWs)
+    logsWs = useMockMode() ? null : createLogsWebSocket()
+  }
+
+  if (getCurrentScope()) {
+    onScopeDispose(disconnect)
   }
 
   return {

@@ -1,6 +1,6 @@
 import type { Config, Proxy, ProxyProvider, Rule, RuleProvider } from '~/types'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { useRequest } from './useApi'
+import { toggleRuleDisabledAPI, useRequest } from './useApi'
 
 // ============== Request Helpers ==============
 
@@ -19,11 +19,22 @@ export const queryKeys = {
   version: ['version'] as const,
 }
 
+// Scope a query to the current endpoint. Switching endpoints uses SPA
+// navigation (no page reload), so without this the proxies/config/etc. queries
+// would keep serving the previous backend's cached data during the staleTime
+// window. Returning a computed key makes vue-query refetch under a new key when
+// the endpoint changes; invalidateQueries keeps using the bare key, which still
+// matches by prefix.
+export function useEndpointScopedKey(base: readonly string[]) {
+  const endpointStore = useEndpointStore()
+  return computed(() => [...base, endpointStore.selectedEndpoint])
+}
+
 // ============== Proxies ==============
 
 export function useProxiesQuery() {
   return useQuery({
-    queryKey: queryKeys.proxies,
+    queryKey: useEndpointScopedKey(queryKeys.proxies),
     queryFn: async () => {
       const request = createRequest()
       const { proxies } = await request
@@ -36,7 +47,7 @@ export function useProxiesQuery() {
 
 export function useProxyProvidersQuery() {
   return useQuery({
-    queryKey: queryKeys.proxyProviders,
+    queryKey: useEndpointScopedKey(queryKeys.proxyProviders),
     queryFn: async () => {
       const request = createRequest()
       const { providers } = await request
@@ -163,20 +174,42 @@ export function useProxyProviderHealthCheckMutation() {
 
 export function useRulesQuery() {
   return useQuery({
-    queryKey: queryKeys.rules,
+    queryKey: useEndpointScopedKey(queryKeys.rules),
     queryFn: async () => {
       const request = createRequest()
       const { rules } = await request
-        .get('rules', { timeout: false })
-        .json<{ rules: Record<string, Rule> }>()
-      return Object.values(rules)
+        .get('rules')
+        .json<{ rules: Record<string, Omit<Rule, 'index'>> }>()
+      return Object.entries(rules).map(([index, rule]) => ({
+        ...rule,
+        index: Number(index),
+      }))
+    },
+  })
+}
+
+export function useToggleRuleDisabledMutation() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({
+      index,
+      disabled,
+    }: {
+      index: number
+      disabled: boolean
+    }) => {
+      await toggleRuleDisabledAPI(index, disabled)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.rules })
     },
   })
 }
 
 export function useRuleProvidersQuery() {
   return useQuery({
-    queryKey: queryKeys.ruleProviders,
+    queryKey: useEndpointScopedKey(queryKeys.ruleProviders),
     queryFn: async () => {
       const request = createRequest()
       const { providers } = await request
@@ -206,7 +239,7 @@ export function useUpdateRuleProviderMutation() {
 
 export function useConfigQuery() {
   return useQuery({
-    queryKey: queryKeys.config,
+    queryKey: useEndpointScopedKey(queryKeys.config),
     queryFn: async () => {
       const request = createRequest()
       return request.get('configs').json<Config>()
@@ -238,7 +271,7 @@ export function useUpdateConfigMutation() {
 
 export function useVersionQuery() {
   return useQuery({
-    queryKey: queryKeys.version,
+    queryKey: useEndpointScopedKey(queryKeys.version),
     queryFn: async () => {
       const request = createRequest()
       const { version } = await request

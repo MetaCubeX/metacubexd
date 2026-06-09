@@ -1,26 +1,40 @@
 import type { LatencyResult } from '~/types/network'
 
-// Default latency test targets
+// Abort a probe that takes too long so it surfaces as an error (the UI shows
+// "timeout") instead of spinning on 'pending' forever.
+const LATENCY_TEST_TIMEOUT = 5000
+
+// Default latency test targets.
+// Use connectivity-check endpoints that answer a bare HEAD request with 204.
+// Cloudflare's `cdn-cgi/trace` is a GET-only text endpoint (it 404s on HEAD and
+// sits behind bot management), which made the Cloudflare probe report a false
+// "timeout"; `cp.cloudflare.com/generate_204` is the captive-portal endpoint
+// designed for exactly this kind of probe.
 const DEFAULT_LATENCY_TARGETS = [
   { name: 'Google', url: 'https://www.google.com/generate_204' },
-  { name: 'Cloudflare', url: 'https://www.cloudflare.com/cdn-cgi/trace' },
+  { name: 'Cloudflare', url: 'https://cp.cloudflare.com/generate_204' },
   { name: 'GitHub', url: 'https://github.com' },
 ]
 
 // Measure latency to a URL using fetch timing
 async function measureLatency(url: string): Promise<number | null> {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), LATENCY_TEST_TIMEOUT)
   try {
     const startTime = performance.now()
     await fetch(url, {
       method: 'HEAD',
       mode: 'no-cors',
       cache: 'no-store',
+      signal: controller.signal,
     })
     const endTime = performance.now()
 
     return Math.round(endTime - startTime)
   } catch {
     return null
+  } finally {
+    clearTimeout(timeoutId)
   }
 }
 

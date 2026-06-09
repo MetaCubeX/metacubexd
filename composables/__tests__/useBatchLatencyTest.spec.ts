@@ -30,8 +30,25 @@ const mockNodeRecommendationStore = {
   recordBatchResults: vi.fn(),
 }
 
+const mockProxiesStore: {
+  clearLatencyTestStateForGroup: ReturnType<typeof vi.fn>
+  clearLatencyTestStateForNodes: ReturnType<typeof vi.fn>
+  fetchProxies: ReturnType<typeof vi.fn>
+  recordLatencyTestResult: ReturnType<typeof vi.fn>
+  recordLatencyTestResults: ReturnType<typeof vi.fn>
+  proxies: { name: string; all: string[] }[]
+} = {
+  clearLatencyTestStateForGroup: vi.fn(),
+  clearLatencyTestStateForNodes: vi.fn(),
+  fetchProxies: vi.fn(),
+  recordLatencyTestResult: vi.fn(),
+  recordLatencyTestResults: vi.fn(),
+  proxies: [],
+}
+
 vi.stubGlobal('useConfigStore', () => mockConfigStore)
 vi.stubGlobal('useNodeRecommendationStore', () => mockNodeRecommendationStore)
+vi.stubGlobal('useProxiesStore', () => mockProxiesStore)
 
 describe('composables/useBatchLatencyTest', () => {
   beforeEach(() => {
@@ -127,6 +144,26 @@ describe('composables/useBatchLatencyTest', () => {
         150,
         true,
       )
+      expect(mockProxiesStore.recordLatencyTestResult).toHaveBeenCalledWith(
+        'node1',
+        'https://test.com',
+        150,
+      )
+    })
+
+    it('clears old node latency state before batch testing starts', async () => {
+      mockJson.mockResolvedValue({ delay: 100 })
+
+      const { batchTestNodes } = useBatchLatencyTest()
+
+      await batchTestNodes(['node1', 'node2'], {
+        url: 'https://test.com',
+        timeout: 5000,
+      })
+
+      expect(
+        mockProxiesStore.clearLatencyTestStateForNodes,
+      ).toHaveBeenCalledWith(['node1', 'node2'], 'https://test.com')
     })
 
     it('handles failed tests with delay 0', async () => {
@@ -224,6 +261,33 @@ describe('composables/useBatchLatencyTest', () => {
       // Should not throw
       expect(() => abortTest()).not.toThrow()
     })
+
+    it('stops before the next batch when aborted during batch delay', async () => {
+      vi.useFakeTimers()
+      mockJson.mockResolvedValue({ delay: 100 })
+
+      const { abortTest, batchTestNodes } = useBatchLatencyTest()
+      const nodes = Array.from({ length: 11 }, (_, i) => `node${i + 1}`)
+
+      const testPromise = batchTestNodes(nodes, {
+        url: 'https://test.com',
+        timeout: 5000,
+      })
+
+      await vi.waitFor(() => {
+        expect(
+          mockNodeRecommendationStore.recordTestResult,
+        ).toHaveBeenCalledTimes(10)
+      })
+
+      abortTest()
+      await testPromise
+
+      expect(
+        mockNodeRecommendationStore.recordTestResult,
+      ).toHaveBeenCalledTimes(10)
+      vi.useRealTimers()
+    })
   })
 
   describe('testGroupNodes', () => {
@@ -256,6 +320,109 @@ describe('composables/useBatchLatencyTest', () => {
       expect(
         mockNodeRecommendationStore.recordBatchResults,
       ).toHaveBeenCalledWith(groupResults)
+      expect(mockProxiesStore.recordLatencyTestResults).toHaveBeenCalledWith(
+        groupResults,
+        mockConfigStore.urlForLatencyTest,
+      )
+    })
+
+    it('does not clear the existing latency state before group testing starts', async () => {
+      mockJson.mockResolvedValue({ node1: 100 })
+
+      const { testGroupNodes } = useBatchLatencyTest()
+
+      await testGroupNodes('group1')
+
+      // Pre-clearing was the root cause of "Test All -> all pills become ---"
+      // when the request didn't return every member. The spinner provided by
+      // isTesting already hides the value during the in-flight phase, so we
+      // leave latencyMap alone here.
+      expect(
+        mockProxiesStore.clearLatencyTestStateForGroup,
+      ).not.toHaveBeenCalled()
+    })
+
+    it('resolves with an empty map and leaves latencyMap untouched when the request times out', async () => {
+      mockJson.mockRejectedValue(new Error('Request timed out'))
+      mockProxiesStore.proxies = [{ name: 'group1', all: ['node-a', 'node-b'] }]
+
+      const { testGroupNodes, isRunning } = useBatchLatencyTest()
+
+      // testProxyGroup swallows the error into {} — testGroupNodes shouldn't
+      // synthesize failures into latencyMap (would leave pills stuck at "---");
+      // recordLatencyTestResults still runs with the empty map so callers can
+      // observe "no fresh data" without us clobbering existing values.
+      await expect(testGroupNodes('group1')).resolves.toEqual({})
+      expect(isRunning.value).toBe(false)
+      expect(
+        mockNodeRecommendationStore.recordBatchResults,
+      ).toHaveBeenCalledWith({})
+      expect(mockProxiesStore.recordLatencyTestResults).toHaveBeenCalledWith(
+        {},
+        mockConfigStore.urlForLatencyTest,
+      )
+      expect(
+        mockProxiesStore.clearLatencyTestStateForGroup,
+      ).not.toHaveBeenCalled()
+    })
+
+    it('does not crash when fetchProxies itself fails after the group test', async () => {
+      mockJson.mockResolvedValue({ 'node-a': 80 })
+      mockProxiesStore.proxies = [{ name: 'group1', all: ['node-a'] }]
+      mockProxiesStore.fetchProxies.mockRejectedValueOnce(
+        new Error('network down'),
+      )
+
+      const { testGroupNodes, isRunning } = useBatchLatencyTest()
+
+      await expect(testGroupNodes('group1')).resolves.toEqual({
+        'node-a': 80,
+      })
+      expect(isRunning.value).toBe(false)
+      expect(mockProxiesStore.recordLatencyTestResults).toHaveBeenCalledWith(
+        { 'node-a': 80 },
+        mockConfigStore.urlForLatencyTest,
+      )
+    })
+  })
+
+  describe('testMultipleGroups', () => {
+    it('keeps global progress owned by the outer loop while each group runs', async () => {
+      vi.useRealTimers()
+      mockJson.mockResolvedValue({ node1: 100 })
+
+      const { testMultipleGroups, isRunning } = useBatchLatencyTest()
+
+      // Capture the shared state at the moment each group refreshes proxies
+      // (mid-run, inside testGroupNodes). The inner call must NOT reset total
+      // back to 1 (it previously did, corrupting the multi-group progress bar).
+      const seen: { total: number; running: boolean; storeRunning: boolean }[] =
+        []
+      mockProxiesStore.fetchProxies.mockImplementation(async () => {
+        seen.push({
+          total: mockNodeRecommendationStore.batchTestProgress.total,
+          running: isRunning.value,
+          storeRunning: mockNodeRecommendationStore.batchTestProgress.isRunning,
+        })
+      })
+
+      await testMultipleGroups(['group1', 'group2'])
+
+      expect(seen).toHaveLength(2)
+      for (const snapshot of seen) {
+        expect(snapshot.total).toBe(2)
+        expect(snapshot.running).toBe(true)
+        expect(snapshot.storeRunning).toBe(true)
+      }
+
+      // After completion the outer loop resets everything.
+      expect(isRunning.value).toBe(false)
+      expect(mockNodeRecommendationStore.batchTestProgress).toEqual({
+        total: 2,
+        completed: 2,
+        current: null,
+        isRunning: false,
+      })
     })
   })
 })

@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
-@plugin 'daisyui' {
+@plugin 'daisyui/index.js' {
   themes: all;
 }
 
@@ -9,7 +9,42 @@
   src: url('~/assets/fonts/TwemojiMozilla-flags.woff2') format('woff2');
 }
 
+/* ============================================================
+   Motion Design System
+   - Easing curves model the project's "elastic physics" voice
+   - Durations tuned to <300ms for responsive perceived performance
+   - Lift/press tokens encode dimensional state changes
+   ============================================================ */
 :root {
+  /* Easing curves */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* gentle overshoot */
+  --ease-spring-soft: cubic-bezier(0.5, 1.25, 0.5, 1); /* subtle bounce */
+  --ease-snappy: cubic-bezier(0.16, 1, 0.3, 1); /* expo-out, decisive */
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1); /* material standard */
+  --ease-press: cubic-bezier(0.4, 0, 0.6, 1); /* tactile down-press */
+
+  /* Durations */
+  --dur-instant: 80ms;
+  --dur-fast: 160ms;
+  --dur-base: 220ms;
+  --dur-slow: 320ms;
+  --dur-page: 380ms;
+
+  /* Lift shadows — unify hover dimensionality across surfaces */
+  --lift-1:
+    0 2px 6px color-mix(in oklch, var(--color-base-content) 8%, transparent),
+    0 1px 2px color-mix(in oklch, var(--color-base-content) 4%, transparent);
+  --lift-2:
+    0 6px 18px color-mix(in oklch, var(--color-base-content) 12%, transparent),
+    0 2px 6px color-mix(in oklch, var(--color-base-content) 6%, transparent);
+  --lift-3:
+    0 14px 32px color-mix(in oklch, var(--color-base-content) 16%, transparent),
+    0 4px 10px color-mix(in oklch, var(--color-base-content) 8%, transparent);
+
+  /* Inner highlight ("light catch") for cards and pressables */
+  --inner-highlight: inset 0 1px 0 0
+    color-mix(in oklch, var(--color-base-content) 6%, transparent);
+
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
 }
@@ -43,6 +78,8 @@
 
 option {
   font-family: system-ui;
+  background-color: var(--color-base-200);
+  color: var(--color-base-content);
 }
 
 /* Default font - Ubuntu from @nuxt/fonts */
@@ -89,9 +126,160 @@ body {
   animation: glow-pulse 2s ease-in-out infinite;
 }
 
+/* ============================================================
+   Reusable motion utilities
+   ============================================================ */
+
+/* Tactile press: scale down on active, sized for touch + cursor */
+.press-tactile {
+  transition:
+    transform var(--dur-fast) var(--ease-spring-soft),
+    box-shadow var(--dur-base) var(--ease-soft),
+    background-color var(--dur-fast) var(--ease-soft),
+    color var(--dur-fast) var(--ease-soft);
+}
+.press-tactile:active {
+  transform: scale(0.94);
+  transition-timing-function: var(--ease-press);
+  transition-duration: var(--dur-instant);
+}
+
+/* Hover lift: elevation + 2px translate, springy settle */
+.lift-hover {
+  transition:
+    transform var(--dur-base) var(--ease-spring),
+    box-shadow var(--dur-base) var(--ease-soft),
+    border-color var(--dur-base) var(--ease-soft);
+}
+.lift-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--lift-2);
+}
+
+/* Top-edge light catch: 1px gradient mimicking ambient light */
+.light-catch {
+  position: relative;
+  isolation: isolate;
+}
+.light-catch::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklch, var(--color-base-content) 7%, transparent) 0%,
+    transparent 22%,
+    transparent 78%,
+    color-mix(in oklch, var(--color-base-content) 3%, transparent) 100%
+  );
+  opacity: 0.7;
+  z-index: 1;
+}
+
+/* Page enter: combined fade + slide + scale, staggered via animation-delay */
+@keyframes spring-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.animate-spring-up {
+  animation: spring-up var(--dur-page) var(--ease-snappy) backwards;
+}
+
+/* Pop-in for modals / tooltips */
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(8px);
+  }
+  60% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+.animate-pop-in {
+  animation: pop-in var(--dur-slow) var(--ease-spring) both;
+}
+
+/* Shimmer for loading or "fresh data" highlight */
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+/* Subtle attention shake — used for errors / invalid input */
+@keyframes shake-soft {
+  10%,
+  90% {
+    transform: translateX(-1px);
+  }
+  20%,
+  80% {
+    transform: translateX(2px);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translateX(-3px);
+  }
+  40%,
+  60% {
+    transform: translateX(3px);
+  }
+}
+.animate-shake-soft {
+  animation: shake-soft 420ms var(--ease-soft);
+}
+
+/* Page transition for <Transition name="page"> — pure cross-fade */
+.page-enter-active,
+.page-leave-active {
+  transition: opacity var(--dur-base) var(--ease-soft);
+}
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+}
+
+/* Reduced-motion respect */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* Fix drawer height chain for proper scrolling */
 .drawer,
 .drawer-content {
   height: 100%;
   min-height: 0;
+}
+
+/* ============================================================
+   ConnectionsTable — tabular numerics
+   Required for column-width stability as live download/upload
+   numbers refresh; pairs with composite cell typography in
+   components/connections/ConnectionsTable.vue.
+   ============================================================ */
+.conn-table-container {
+  font-variant-numeric: tabular-nums;
 }

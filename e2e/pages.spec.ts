@@ -3,6 +3,8 @@ import type { BrowserContext, Page } from 'playwright'
 // Page-based e2e tests for metacubexd dashboard
 // Usage: pnpm test:e2e
 import { spawn } from 'node:child_process'
+import { existsSync, readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { chromium } from 'playwright'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
@@ -19,10 +21,64 @@ function validatePort(port: string): string {
 
 const PORT = validatePort(process.env.PORT || '4199')
 const BASE_URL = `http://localhost:${PORT}`
+const NITRO_CONFIG_PATH = resolve(process.cwd(), '.output/nitro.json')
+const NITRO_CHUNK_PATH = resolve(
+  process.cwd(),
+  '.output/server/chunks/nitro/nitro.mjs',
+)
+const SERVER_ENTRY_PATH = resolve(process.cwd(), '.output/server/index.mjs')
+const PAGE_LOAD_TIMEOUT = 30000
+const ELEMENT_TIMEOUT = 10000
+const SERVER_READY_TIMEOUT = 30000
+const SERVER_STOP_TIMEOUT = 5000
 
-// Check if server is ready
-async function waitForServer(maxAttempts = 30): Promise<void> {
-  for (let i = 0; i < maxAttempts; i++) {
+async function runCommand(command: string, args: string[], env = process.env) {
+  await new Promise<void>((resolve, reject) => {
+    const child = spawn(command, args, {
+      stdio: 'inherit',
+      env,
+    })
+
+    child.on('error', reject)
+
+    child.on('exit', (code, signal) => {
+      if (code === 0) {
+        resolve()
+
+        return
+      }
+
+      reject(
+        new Error(
+          `${command} ${args.join(' ')} failed with ${signal || `exit code ${code}`}`,
+        ),
+      )
+    })
+  })
+}
+
+async function ensurePreviewBuild() {
+  const hasMockBuild =
+    existsSync(NITRO_CONFIG_PATH) &&
+    existsSync(SERVER_ENTRY_PATH) &&
+    existsSync(NITRO_CHUNK_PATH) &&
+    readFileSync(NITRO_CHUNK_PATH, 'utf8').includes('"mockMode": true')
+
+  if (hasMockBuild) {
+    return
+  }
+
+  console.log('Mock preview build not found. Building Nuxt app for e2e...')
+  await runCommand('pnpm', ['exec', 'nuxt', 'build'], {
+    ...process.env,
+    MOCK_MODE: 'true',
+  })
+}
+
+async function waitForServer(timeout = SERVER_READY_TIMEOUT): Promise<void> {
+  const deadline = Date.now() + timeout
+
+  while (Date.now() < deadline) {
     try {
       const response = await fetch(BASE_URL)
 
@@ -35,10 +91,65 @@ async function waitForServer(maxAttempts = 30): Promise<void> {
       // Server not ready yet
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 500))
   }
 
-  throw new Error('Server failed to start within timeout')
+  throw new Error(`Server failed to start within ${timeout}ms`)
+}
+
+function getPage(page: Page | null): Page {
+  if (!page) {
+    throw new Error('Playwright page was not initialized')
+  }
+
+  return page
+}
+
+async function gotoAppPath(page: Page | null, path: string): Promise<Page> {
+  const currentPage = getPage(page)
+
+  if (currentPage.url().startsWith(BASE_URL)) {
+    await currentPage.evaluate((nextPath) => {
+      window.location.hash = nextPath
+    }, path)
+  } else {
+    await currentPage.goto(`${BASE_URL}/#${path}`, {
+      waitUntil: 'domcontentloaded',
+      timeout: PAGE_LOAD_TIMEOUT,
+    })
+  }
+
+  await expectHashPath(currentPage, path)
+  await currentPage.waitForLoadState('networkidle')
+
+  return currentPage
+}
+
+async function expectHashPath(page: Page | null, path: string): Promise<void> {
+  await expect
+    .poll(() => getPage(page).url(), { timeout: ELEMENT_TIMEOUT })
+    .toContain(`#${path}`)
+}
+
+async function stopServer(server: ChildProcess): Promise<void> {
+  if (server.exitCode !== null || server.signalCode !== null) {
+    return
+  }
+
+  await new Promise<void>((resolve) => {
+    const timeout = setTimeout(() => {
+      if (server.exitCode === null && server.signalCode === null) {
+        server.kill('SIGKILL')
+      }
+    }, SERVER_STOP_TIMEOUT)
+
+    server.once('exit', () => {
+      clearTimeout(timeout)
+      resolve()
+    })
+
+    server.kill('SIGTERM')
+  })
 }
 
 describe('e2E Page Tests', () => {
@@ -48,13 +159,16 @@ describe('e2E Page Tests', () => {
   let page: Page | null = null
 
   beforeAll(async () => {
+    await ensurePreviewBuild()
+
     // Start the preview server
     console.log(`Starting preview server on port ${PORT}...`)
-    server = spawn('npx', ['nuxt', 'preview'], {
+    server = spawn(process.execPath, [SERVER_ENTRY_PATH], {
       stdio: 'inherit',
       env: {
         ...process.env,
         PORT,
+        MOCK_MODE: 'true',
       },
     })
 
@@ -89,312 +203,279 @@ describe('e2E Page Tests', () => {
     })
     // Reload to apply localStorage changes to Pinia store
     await page.reload({ waitUntil: 'domcontentloaded' })
-  })
+  }, 120000)
 
   afterAll(async () => {
-    if (context) {
-      await context.close()
-    }
+    try {
+      if (context) {
+        await context.close()
+      }
 
-    if (browser) {
-      await browser.close()
-    }
-
-    if (server) {
-      console.log('Stopping preview server...')
-      server.kill('SIGTERM')
-      // Force kill after 5 seconds if still running
-      await new Promise<void>((resolve) => {
-        const timeout = setTimeout(() => {
-          if (server && !server.killed) {
-            server.kill('SIGKILL')
-          }
-
-          resolve()
-        }, 5000)
-
-        server!.on('exit', () => {
-          clearTimeout(timeout)
-          resolve()
-        })
-      })
+      if (browser) {
+        await browser.close()
+      }
+    } finally {
+      if (server) {
+        console.log('Stopping preview server...')
+        await stopServer(server)
+      }
     }
   })
 
   describe('overview Page', () => {
     it('should display stats container and charts', async () => {
-      await page!.goto(`${BASE_URL}/#/overview`, {
-        waitUntil: 'domcontentloaded',
-        timeout: 30000,
-      })
-      await page!.waitForLoadState('networkidle')
+      const currentPage = await gotoAppPath(page, '/overview')
 
       // Wait for expected element - overview stat cards
-      await page!.waitForSelector('.overview-stat-card', { timeout: 10000 })
+      await currentPage.waitForSelector('.overview-stat-card', {
+        timeout: ELEMENT_TIMEOUT,
+      })
 
       // Check for stat cards
-      const statCards = page!.locator('.overview-stat-card')
-      await expect(statCards.count()).resolves.toBeGreaterThan(0)
+      const statCards = currentPage.locator('.overview-stat-card')
+      await expect(statCards.count()).resolves.toBe(6)
+      await expect(
+        statCards.filter({ hasText: 'Upload' }).count(),
+      ).resolves.toBeGreaterThan(0)
+      await expect(
+        statCards.filter({ hasText: 'Download' }).count(),
+      ).resolves.toBeGreaterThan(0)
+      await expect(
+        statCards.filter({ hasText: 'Active Connections' }).count(),
+      ).resolves.toBe(1)
 
-      // Check for charts container (rounded-xl divs)
-      const chartsContainer = page!.locator('.rounded-xl')
-      await expect(chartsContainer.count()).resolves.toBeGreaterThan(0)
+      await expect(currentPage.getByText('Traffic').count()).resolves.toBe(1)
+      await expect(
+        currentPage.getByText('Memory').count(),
+      ).resolves.toBeGreaterThan(0)
     })
   })
 
   describe('proxies Page', () => {
     it('should display tabs and proxy cards', async () => {
-      await page!.goto(`${BASE_URL}/#/proxies`, {
-        waitUntil: 'domcontentloaded',
-        timeout: 30000,
+      const currentPage = await gotoAppPath(page, '/proxies')
+
+      await currentPage.waitForSelector('text=Proxy Providers', {
+        timeout: ELEMENT_TIMEOUT,
       })
-      await page!.waitForLoadState('networkidle')
-
-      // Wait for page container to be present
-      await page!.waitForSelector('div', { state: 'attached', timeout: 10000 })
-
-      // Check for buttons in the page (header buttons, etc.)
-      const buttons = page!.locator('button')
-      await expect(buttons.count()).resolves.toBeGreaterThan(0)
-
-      // Note: Without a real backend, there may be no proxy cards
-      // Just verify the page structure is correct
+      await expect(
+        currentPage.locator('button').filter({ hasText: 'Proxies' }).count(),
+      ).resolves.toBeGreaterThan(0)
+      await expect(
+        currentPage
+          .locator('button')
+          .filter({ hasText: 'Proxy Providers' })
+          .count(),
+      ).resolves.toBeGreaterThan(0)
+      await expect(
+        currentPage.getByRole('button', { name: 'Test All' }).isVisible(),
+      ).resolves.toBe(true)
     })
   })
 
   describe('connections Page', () => {
     it('should display connections table', async () => {
-      await page!.goto(`${BASE_URL}/#/connections`, {
-        waitUntil: 'domcontentloaded',
-        timeout: 30000,
-      })
-      await page!.waitForLoadState('networkidle')
+      const currentPage = await gotoAppPath(page, '/connections')
 
       // Wait for table
-      await page!.waitForSelector('table', { timeout: 10000 })
+      await currentPage.waitForSelector('table', { timeout: ELEMENT_TIMEOUT })
 
       // Check for connections table
-      const table = page!.locator('table').first()
+      const table = currentPage.locator('table').first()
       await expect(table.isVisible()).resolves.toBe(true)
 
       // Check for table header
-      const thead = page!.locator('thead')
-      await expect(thead.count()).resolves.toBeGreaterThan(0)
+      await expect(table.locator('thead').count()).resolves.toBe(1)
+      await expect(table.locator('thead').innerText()).resolves.toContain(
+        'HOST',
+      )
     })
   })
 
   describe('rules Page', () => {
     it('should display rules tabs', async () => {
-      await page!.goto(`${BASE_URL}/#/rules`, {
-        waitUntil: 'domcontentloaded',
-        timeout: 30000,
+      const currentPage = await gotoAppPath(page, '/rules')
+
+      await currentPage.waitForSelector('text=Rule Providers', {
+        timeout: ELEMENT_TIMEOUT,
       })
-      await page!.waitForLoadState('networkidle')
-
-      // Wait for page container to be present
-      await page!.waitForSelector('div', { state: 'attached', timeout: 10000 })
-
-      // Check for buttons in the page
-      const buttons = page!.locator('button')
-      await expect(buttons.count()).resolves.toBeGreaterThan(0)
+      await expect(
+        currentPage.locator('button').filter({ hasText: 'Rules' }).count(),
+      ).resolves.toBeGreaterThan(0)
+      await expect(
+        currentPage
+          .locator('button')
+          .filter({ hasText: 'Rule Providers' })
+          .count(),
+      ).resolves.toBeGreaterThan(0)
+      await expect(
+        currentPage.getByPlaceholder('Search').isVisible(),
+      ).resolves.toBe(true)
     })
   })
 
   describe('logs Page', () => {
     it('should display logs table', async () => {
-      await page!.goto(`${BASE_URL}/#/logs`, {
-        waitUntil: 'domcontentloaded',
-        timeout: 30000,
-      })
-      await page!.waitForLoadState('networkidle')
+      const currentPage = await gotoAppPath(page, '/logs')
 
       // Wait for table
-      await page!.waitForSelector('table', { timeout: 10000 })
+      await currentPage.waitForSelector('table', { timeout: ELEMENT_TIMEOUT })
 
       // Check for logs table
-      const table = page!.locator('table').first()
+      const table = currentPage.locator('table').first()
       await expect(table.isVisible()).resolves.toBe(true)
+      await expect(table.locator('thead').innerText()).resolves.toContain(
+        'Level',
+      )
+      await expect(table.locator('thead').innerText()).resolves.toContain(
+        'Payload',
+      )
     })
   })
 
   describe('config Page', () => {
     it('should display config fieldsets', async () => {
-      await page!.goto(`${BASE_URL}/#/config`, {
-        waitUntil: 'domcontentloaded',
-        timeout: 30000,
-      })
-      await page!.waitForLoadState('networkidle')
+      const currentPage = await gotoAppPath(page, '/config')
 
-      // Wait for config cards or loading state (mock mode may show loading)
-      // Try to wait for config-card, but also accept the page loaded without error
-      try {
-        await page!.waitForSelector('.config-card', { timeout: 5000 })
-        const configCard = page!.locator('.config-card').first()
-        await expect(configCard.isVisible()).resolves.toBe(true)
-      } catch {
-        // In mock mode without actual backend, config page may show loading
-        // Just verify the page loaded without error
-        const body = page!.locator('body')
-        await expect(body.isVisible()).resolves.toBe(true)
-      }
+      await currentPage.waitForSelector('.config-card', {
+        timeout: ELEMENT_TIMEOUT,
+      })
+      await expect(
+        currentPage.locator('.config-card').count(),
+      ).resolves.toBeGreaterThan(0)
+      await expect(
+        currentPage.getByText('Keyboard Shortcuts').first().isVisible(),
+      ).resolves.toBe(true)
     })
   })
 
   describe('setup Page', () => {
     it('should display setup form with inputs', async () => {
-      await page!.goto(`${BASE_URL}/#/setup`, {
-        waitUntil: 'domcontentloaded',
-        timeout: 30000,
-      })
-      await page!.waitForLoadState('networkidle')
+      const currentPage = await gotoAppPath(page, '/setup')
 
-      // Wait for form
-      await page!.waitForSelector('form', { timeout: 10000 })
+      // Wait for setup form
+      await currentPage.waitForSelector('#url', {
+        state: 'visible',
+        timeout: ELEMENT_TIMEOUT,
+      })
 
       // Check for setup form
-      const form = page!.locator('form').first()
+      const form = currentPage.locator('form').first()
       await expect(form.isVisible()).resolves.toBe(true)
 
       // Check for input fields
-      const inputs = page!.locator('input')
-      await expect(inputs.count()).resolves.toBeGreaterThanOrEqual(1)
+      await expect(currentPage.locator('#url').isVisible()).resolves.toBe(true)
+      await expect(currentPage.locator('#secret').isVisible()).resolves.toBe(
+        true,
+      )
 
       // Check for submit button
-      const submitButton = page!.locator('button[type="submit"]')
-      await expect(submitButton.count()).resolves.toBeGreaterThan(0)
+      await expect(
+        currentPage.getByRole('button', { name: 'Add' }).isVisible(),
+      ).resolves.toBe(true)
     })
   })
 
   describe('navigation', () => {
     it('should have header/navigation present', async () => {
-      await page!.goto(`${BASE_URL}/#/setup`, {
-        waitUntil: 'domcontentloaded',
-        timeout: 30000,
-      })
-      await page!.waitForLoadState('networkidle')
+      const currentPage = await gotoAppPath(page, '/overview')
 
-      // Verify we can navigate using the header
-      const headerNav = page!.locator('header, nav')
-      await expect(headerNav.count()).resolves.toBeGreaterThan(0)
+      await currentPage.waitForSelector('a[href="#/overview"]', {
+        state: 'visible',
+        timeout: ELEMENT_TIMEOUT,
+      })
+      await expect(
+        currentPage.locator('a[href="#/overview"]').first().isVisible(),
+      ).resolves.toBe(true)
+      await expect(
+        currentPage.locator('a[href="#/proxies"]').first().isVisible(),
+      ).resolves.toBe(true)
     })
   })
 
   describe('keyboard Shortcuts', () => {
     it('should open help modal when pressing ?', async () => {
-      await page!.goto(`${BASE_URL}/#/overview`, {
-        waitUntil: 'domcontentloaded',
-        timeout: 30000,
-      })
-      await page!.waitForLoadState('networkidle')
+      const currentPage = await gotoAppPath(page, '/overview')
 
       // Press ? key (Shift + /)
-      await page!.keyboard.press('Shift+/')
+      await currentPage.keyboard.press('Shift+/')
 
       // Wait for modal to appear
-      await page!.waitForSelector('.modal-open', { timeout: 5000 })
+      await currentPage.waitForSelector('.modal-open', {
+        timeout: ELEMENT_TIMEOUT,
+      })
 
       // Check modal is visible
-      const modal = page!.locator('.modal-open')
+      const modal = currentPage.locator('.modal-open')
       await expect(modal.isVisible()).resolves.toBe(true)
 
       // Check modal contains shortcuts content
-      const modalContent = page!.locator('.modal-box')
+      const modalContent = currentPage.locator('.modal-box')
       await expect(modalContent.isVisible()).resolves.toBe(true)
+      await expect(modalContent.innerText()).resolves.toContain(
+        'Keyboard Shortcuts',
+      )
 
       // Close with Escape
-      await page!.keyboard.press('Escape')
+      await currentPage.keyboard.press('Escape')
 
       // Modal should be closed
-      await page!.waitForSelector('.modal-open', {
+      await currentPage.waitForSelector('.modal-open', {
         state: 'hidden',
-        timeout: 5000,
+        timeout: ELEMENT_TIMEOUT,
       })
     })
 
     it('should navigate to proxies page with g+p', async () => {
-      await page!.goto(`${BASE_URL}/#/overview`, {
-        waitUntil: 'domcontentloaded',
-        timeout: 30000,
-      })
-      await page!.waitForLoadState('networkidle')
+      const currentPage = await gotoAppPath(page, '/overview')
 
       // Press g then p
-      await page!.keyboard.press('g')
-      await page!.waitForTimeout(100)
-      await page!.keyboard.press('p')
+      await currentPage.keyboard.press('g')
+      await currentPage.keyboard.press('p')
 
-      // Wait for navigation
-      await page!.waitForTimeout(500)
-
-      // Check URL changed to proxies
-      const url = page!.url()
-      expect(url).toContain('/proxies')
+      await expectHashPath(page, '/proxies')
     })
 
     it('should navigate to connections page with g+c', async () => {
-      await page!.goto(`${BASE_URL}/#/overview`, {
-        waitUntil: 'domcontentloaded',
-        timeout: 30000,
-      })
-      await page!.waitForLoadState('networkidle')
+      const currentPage = await gotoAppPath(page, '/overview')
 
       // Press g then c
-      await page!.keyboard.press('g')
-      await page!.waitForTimeout(100)
-      await page!.keyboard.press('c')
+      await currentPage.keyboard.press('g')
+      await currentPage.keyboard.press('c')
 
-      // Wait for navigation
-      await page!.waitForTimeout(500)
-
-      // Check URL changed to connections
-      const url = page!.url()
-      expect(url).toContain('/connections')
+      await expectHashPath(page, '/connections')
     })
 
     it('should not trigger shortcuts when typing in input', async () => {
-      await page!.goto(`${BASE_URL}/#/setup`, {
-        waitUntil: 'domcontentloaded',
-        timeout: 30000,
-      })
-      await page!.waitForLoadState('networkidle')
+      const currentPage = await gotoAppPath(page, '/setup')
 
       // Find an input field on setup page
-      const input = page!
-        .locator('input[type="text"], input[type="url"]')
-        .first()
-      await input.waitFor({ state: 'visible', timeout: 10000 })
+      const input = currentPage.locator('#url')
+      await input.waitFor({ state: 'visible', timeout: ELEMENT_TIMEOUT })
       await input.click()
 
       // Type 'g' and 'p' in input - should not navigate
       await input.type('gp')
 
-      // Wait a bit
-      await page!.waitForTimeout(500)
-
-      // Should still be on setup page
-      const url = page!.url()
-      expect(url).toContain('/setup')
+      await expectHashPath(page, '/setup')
     })
   })
 
   describe('mobile Viewport', () => {
     it('should render correctly on mobile viewport', async () => {
-      await page!.setViewportSize({ width: 390, height: 844 })
-      await page!.goto(`${BASE_URL}/#/overview`, {
-        waitUntil: 'domcontentloaded',
-        timeout: 30000,
-      })
-      await page!.waitForLoadState('networkidle')
-
-      // Wait a bit for the page to fully render
-      await page!.waitForTimeout(1000)
+      const currentPage = getPage(page)
+      await currentPage.setViewportSize({ width: 390, height: 844 })
+      await gotoAppPath(currentPage, '/overview')
 
       // Check that page still renders - look for main content (stat cards or rounded elements)
-      const mainContent = page!.locator('.overview-stat-card, .rounded-xl')
+      await currentPage.waitForSelector('.overview-stat-card', {
+        timeout: ELEMENT_TIMEOUT,
+      })
+      const mainContent = currentPage.locator('.overview-stat-card')
       await expect(mainContent.count()).resolves.toBeGreaterThan(0)
 
       // Reset viewport for other tests
-      await page!.setViewportSize({ width: 1920, height: 1080 })
+      await currentPage.setViewportSize({ width: 1920, height: 1080 })
     })
   })
 })

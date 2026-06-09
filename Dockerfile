@@ -1,4 +1,4 @@
-FROM docker.io/node:alpine AS builder
+FROM --platform=$BUILDPLATFORM docker.io/node:alpine AS builder
 
 USER root
 ENV PNPM_HOME=/pnpm

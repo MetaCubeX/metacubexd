@@ -1,12 +1,4 @@
 <script setup lang="ts">
-import {
-  arrow,
-  autoUpdate,
-  flip,
-  offset,
-  shift,
-  useFloating,
-} from '@floating-ui/vue'
 import { IconCircleCheckFilled } from '@tabler/icons-vue'
 import dayjs from 'dayjs'
 import {
@@ -20,10 +12,12 @@ interface Props {
   testUrl: string | null
   timeout: number | null
   isSelected?: boolean
+  providerName?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   isSelected: false,
+  providerName: '',
 })
 
 const emit = defineEmits<{
@@ -39,8 +33,15 @@ const proxyType = computed(() =>
   formatProxyType(proxyNode.value?.type || '', t),
 )
 const isUDP = computed(() => proxyNode.value?.xudp || proxyNode.value?.udp)
+const isProviderTesting = computed(() =>
+  props.providerName
+    ? proxiesStore.proxyProviderLatencyTestingMap[props.providerName] || false
+    : false,
+)
 const isTesting = computed(
-  () => proxiesStore.proxyLatencyTestingMap[props.proxyName] || false,
+  () =>
+    proxiesStore.proxyLatencyTestingMap[props.proxyName] ||
+    isProviderTesting.value,
 )
 
 const specialTypes = computed(() => {
@@ -62,48 +63,22 @@ const latencyTestHistory = computed(() =>
     .toReversed(),
 )
 
-// Floating UI for tooltip
-const reference = ref<HTMLElement | null>(null)
-const floating = ref<HTMLElement | null>(null)
-const floatingArrow = ref<HTMLElement | null>(null)
-const isTooltipOpen = ref(false)
-
-const { floatingStyles, middlewareData, placement } = useFloating(
-  reference,
-  floating,
-  {
-    placement: 'top',
-    strategy: 'fixed',
-    middleware: [
-      offset(10),
-      flip(),
-      shift({ padding: 8 }),
-      arrow({ element: floatingArrow }),
-    ],
-    whileElementsMounted: autoUpdate,
-  },
-)
-
-// Arrow positioning based on placement
-const arrowStyles = computed(() => {
-  const arrowData = middlewareData.value.arrow
-  const side = placement.value.split('-')[0] || 'top'
-
-  const staticSide: Record<string, string> = {
-    top: 'bottom',
-    right: 'left',
-    bottom: 'top',
-    left: 'right',
-  }
-
-  const sideKey = staticSide[side] || 'bottom'
-
-  return {
-    left: arrowData?.x != null ? `${arrowData.x}px` : '',
-    top: arrowData?.y != null ? `${arrowData.y}px` : '',
-    [sideKey]: '-4px',
-  }
+// Stability bar: chronological order, each segment colored by latency quality
+const latencyStabilityBar = computed(() => {
+  const history = proxiesStore.getLatencyHistoryByName(
+    props.proxyName,
+    props.testUrl,
+  )
+  return history.map((result) => ({
+    colorClass: result.delay
+      ? getLatencyClassName(result.delay, configStore.latencyQualityMap)
+      : 'text-neutral-content/30',
+  }))
 })
+
+// Anchor element for the lazily-mounted tooltip
+const reference = ref<HTMLElement | null>(null)
+const isTooltipOpen = ref(false)
 
 let openTimeout: ReturnType<typeof setTimeout> | null = null
 let closeTimeout: ReturnType<typeof setTimeout> | null = null
@@ -119,10 +94,20 @@ function clearTimeouts() {
   }
 }
 
+function openTooltip() {
+  acquireSingletonPopover(closeTooltip)
+  isTooltipOpen.value = true
+}
+
+function closeTooltip() {
+  isTooltipOpen.value = false
+  releaseSingletonPopover(closeTooltip)
+}
+
 function onMouseEnter() {
   clearTimeouts()
   openTimeout = setTimeout(() => {
-    isTooltipOpen.value = true
+    openTooltip()
   }, 300)
 }
 
@@ -130,7 +115,7 @@ function onMouseLeave() {
   clearTimeouts()
   // Delay closing to allow mouse to move to tooltip
   closeTimeout = setTimeout(() => {
-    isTooltipOpen.value = false
+    closeTooltip()
   }, 100)
 }
 
@@ -140,7 +125,7 @@ function onTooltipMouseEnter() {
 
 function onTooltipMouseLeave() {
   clearTimeouts()
-  isTooltipOpen.value = false
+  closeTooltip()
 }
 
 function onClick() {
@@ -148,6 +133,8 @@ function onClick() {
 }
 
 function handleLatencyTest() {
+  clearTimeouts()
+  openTooltip()
   proxiesStore.proxyLatencyTest(
     props.proxyName,
     proxyNode.value?.provider || '',
@@ -155,6 +142,11 @@ function handleLatencyTest() {
     props.timeout,
   )
 }
+
+onBeforeUnmount(() => {
+  clearTimeouts()
+  releaseSingletonPopover(closeTooltip)
+})
 </script>
 
 <template>
@@ -205,75 +197,76 @@ function handleLatencyTest() {
         </span>
 
         <!-- Latency -->
-        <Latency
-          :proxy-name="proxyName"
-          :test-url="testUrl"
-          class="shrink-0"
-          :class="{ 'animate-pulse': isTesting }"
-          @click.stop="handleLatencyTest"
-        />
+        <div class="flex shrink-0 flex-col items-end gap-1">
+          <Latency
+            :proxy-name="proxyName"
+            :test-url="testUrl"
+            :provider-name="providerName"
+            :class="{ 'animate-pulse': isTesting }"
+            @click.stop="handleLatencyTest"
+          />
+          <!-- Latency stability bar -->
+          <div
+            v-if="latencyStabilityBar.length > 0"
+            class="flex h-[3px] w-full max-w-[44px] gap-px overflow-hidden rounded-full"
+          >
+            <div
+              v-for="(result, index) in latencyStabilityBar"
+              :key="index"
+              class="h-full flex-1 bg-current first:rounded-l-full last:rounded-r-full"
+              :class="result.colorClass"
+            />
+          </div>
+        </div>
       </div>
 
-      <!-- Tooltip for latency history -->
-      <Teleport to="body">
-        <div
-          v-if="isTooltipOpen"
-          ref="floating"
-          :style="floatingStyles"
-          class="z-50 w-max max-w-80 rounded-xl bg-primary p-2.5 text-primary-content shadow-lg"
-          @mouseenter="onTooltipMouseEnter"
-          @mouseleave="onTooltipMouseLeave"
-        >
-          <!-- Arrow -->
-          <div
-            ref="floatingArrow"
-            class="absolute size-2 rotate-45 bg-primary"
-            :style="arrowStyles"
-          />
+      <!-- Tooltip for latency history (mounted lazily while open) -->
+      <ProxyNodeTooltip
+        v-if="isTooltipOpen"
+        :reference="reference"
+        @mouse-enter="onTooltipMouseEnter"
+        @mouse-leave="onTooltipMouseLeave"
+      >
+        <div class="flex flex-col items-center gap-2">
+          <h2 class="text-lg font-bold">{{ proxyName }}</h2>
 
-          <div class="flex flex-col items-center gap-2">
-            <h2 class="text-lg font-bold">{{ proxyName }}</h2>
+          <div v-if="specialTypes" class="w-full text-xs uppercase">
+            ({{ specialTypes }})
+          </div>
 
-            <div v-if="specialTypes" class="w-full text-xs uppercase">
-              ({{ specialTypes }})
-            </div>
-
-            <template v-if="latencyTestHistory.length > 0">
-              <div class="flex max-h-60 w-full flex-col gap-2 overflow-y-auto">
-                <div
-                  v-for="(result, index) in latencyTestHistory"
-                  :key="index"
-                  class="flex items-start gap-2"
-                >
+          <template v-if="latencyTestHistory.length > 0">
+            <div class="flex max-h-60 w-full flex-col gap-2 overflow-y-auto">
+              <div
+                v-for="(result, index) in latencyTestHistory"
+                :key="index"
+                class="flex items-start gap-2"
+              >
+                <div class="mt-1.5 size-2 rounded-full bg-current opacity-50" />
+                <div class="flex flex-col gap-1">
+                  <time class="text-sm italic">
+                    {{ dayjs(result.time).format('YYYY-MM-DD HH:mm:ss') }}
+                  </time>
                   <div
-                    class="mt-1.5 size-2 rounded-full bg-current opacity-50"
-                  />
-                  <div class="flex flex-col gap-1">
-                    <time class="text-sm italic">
-                      {{ dayjs(result.time).format('YYYY-MM-DD HH:mm:ss') }}
-                    </time>
-                    <div
-                      class="inline-block rounded px-2 py-0.5 text-xs"
-                      :class="
-                        getLatencyClassName(
-                          result.delay,
-                          configStore.latencyQualityMap,
-                        )
-                      "
-                    >
-                      {{ result.delay || '---' }}
-                    </div>
+                    class="inline-block rounded px-2 py-0.5 text-xs"
+                    :class="
+                      getLatencyClassName(
+                        result.delay,
+                        configStore.latencyQualityMap,
+                      )
+                    "
+                  >
+                    {{ result.delay || '---' }}
                   </div>
                 </div>
               </div>
-            </template>
-
-            <div v-else class="text-sm opacity-75">
-              {{ t('noLatencyHistory') }}
             </div>
+          </template>
+
+          <div v-else class="text-sm opacity-75">
+            {{ t('noLatencyHistory') }}
           </div>
         </div>
-      </Teleport>
+      </ProxyNodeTooltip>
     </div>
   </div>
 </template>

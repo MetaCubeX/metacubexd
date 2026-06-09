@@ -23,7 +23,7 @@ export const useRulesStore = defineStore('rules', () => {
   }
 
   const updateAllRuleProvider = async () => {
-    await Promise.all(
+    await Promise.allSettled(
       ruleProviders.value.map((provider) =>
         updateRuleProviderAPI(provider.name),
       ),

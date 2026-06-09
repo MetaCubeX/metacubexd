@@ -380,13 +380,9 @@ watch(
 </script>
 
 <template>
-  <div
-    class="flex h-full flex-col gap-4 overflow-x-hidden overflow-y-auto p-1 pr-2 sm:pr-3"
-  >
+  <div class="flex h-full flex-col gap-4 overflow-x-hidden overflow-y-auto p-2">
     <!-- Stats Grid -->
-    <div
-      class="-m-1 grid min-w-0 grid-cols-2 gap-3 p-1 sm:grid-cols-3 xl:grid-cols-6"
-    >
+    <div class="grid min-w-0 grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
       <div
         class="overview-stat-card animate-fade-slide-in flex min-w-0 items-center gap-3 overflow-hidden rounded-xl border border-base-content/10 bg-base-200 p-4 transition-all duration-200 [animation-delay:0ms] hover:z-10 hover:-translate-y-0.5 hover:border-base-content/20"
       >
@@ -395,11 +391,10 @@ watch(
         >
           <IconArrowUpRight :size="20" />
         </div>
-        <div class="flex min-w-0 flex-col gap-0.5">
-          <span
-            class="overflow-hidden text-xs text-ellipsis whitespace-nowrap text-base-content/60"
-            >{{ t('upload') }}</span
-          >
+        <div class="flex w-full min-w-0 flex-col gap-0.5 overflow-hidden">
+          <span class="text-xs leading-tight break-words text-base-content/60">
+            {{ t('upload') }}
+          </span>
           <span
             class="text-base font-semibold whitespace-nowrap text-base-content tabular-nums"
           >
@@ -416,11 +411,10 @@ watch(
         >
           <IconArrowDownRight :size="20" />
         </div>
-        <div class="flex min-w-0 flex-col gap-0.5">
-          <span
-            class="overflow-hidden text-xs text-ellipsis whitespace-nowrap text-base-content/60"
-            >{{ t('download') }}</span
-          >
+        <div class="flex w-full min-w-0 flex-col gap-0.5 overflow-hidden">
+          <span class="text-xs leading-tight break-words text-base-content/60">
+            {{ t('download') }}
+          </span>
           <span
             class="text-base font-semibold whitespace-nowrap text-base-content tabular-nums"
           >
@@ -437,11 +431,10 @@ watch(
         >
           <IconCloud :size="20" />
         </div>
-        <div class="flex min-w-0 flex-col gap-0.5">
-          <span
-            class="overflow-hidden text-xs text-ellipsis whitespace-nowrap text-base-content/60"
-            >{{ t('uploadTotal') }}</span
-          >
+        <div class="flex w-full min-w-0 flex-col gap-0.5 overflow-hidden">
+          <span class="text-xs leading-tight break-words text-base-content/60">
+            {{ t('uploadTotal') }}
+          </span>
           <span
             class="text-base font-semibold whitespace-nowrap text-base-content tabular-nums"
           >
@@ -462,11 +455,10 @@ watch(
         >
           <IconCloud :size="20" />
         </div>
-        <div class="flex min-w-0 flex-col gap-0.5">
-          <span
-            class="overflow-hidden text-xs text-ellipsis whitespace-nowrap text-base-content/60"
-            >{{ t('downloadTotal') }}</span
-          >
+        <div class="flex w-full min-w-0 flex-col gap-0.5 overflow-hidden">
+          <span class="text-xs leading-tight break-words text-base-content/60">
+            {{ t('downloadTotal') }}
+          </span>
           <span
             class="text-base font-semibold whitespace-nowrap text-base-content tabular-nums"
           >
@@ -487,11 +479,10 @@ watch(
         >
           <IconPlugConnected :size="20" />
         </div>
-        <div class="flex min-w-0 flex-col gap-0.5">
-          <span
-            class="overflow-hidden text-xs text-ellipsis whitespace-nowrap text-base-content/60"
-            >{{ t('activeConnections') }}</span
-          >
+        <div class="flex w-full min-w-0 flex-col gap-0.5 overflow-hidden">
+          <span class="text-xs leading-tight break-words text-base-content/60">
+            {{ t('activeConnections') }}
+          </span>
           <span
             class="text-base font-semibold whitespace-nowrap text-base-content tabular-nums"
           >
@@ -508,11 +499,10 @@ watch(
         >
           <IconCpu :size="20" />
         </div>
-        <div class="flex min-w-0 flex-col gap-0.5">
-          <span
-            class="overflow-hidden text-xs text-ellipsis whitespace-nowrap text-base-content/60"
-            >{{ t('memoryUsage') }}</span
-          >
+        <div class="flex w-full min-w-0 flex-col gap-0.5 overflow-hidden">
+          <span class="text-xs leading-tight break-words text-base-content/60">
+            {{ t('memoryUsage') }}
+          </span>
           <span
             class="text-base font-semibold whitespace-nowrap text-base-content tabular-nums"
           >
@@ -620,7 +610,7 @@ watch(
           <h3>{{ t('networkTopology') }}</h3>
         </div>
         <button
-          class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-base-content transition-colors duration-200 hover:bg-base-content/10"
+          class="flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-base-content transition-colors duration-200 hover:bg-base-content/10"
         >
           <IconChevronDown
             :size="20"
@@ -631,9 +621,6 @@ watch(
       </div>
       <NetworkTopology v-if="configStore.showNetworkTopology" class="mt-4" />
     </div>
-
-    <!-- Data Usage Table -->
-    <DataUsageTable />
   </div>
 </template>
 
@@ -641,15 +628,42 @@ watch(
 @keyframes fade-slide-in {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(14px) scale(0.985);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
 .animate-fade-slide-in {
-  animation: fade-slide-in 0.4s ease-out backwards;
+  animation: fade-slide-in 380ms var(--ease-snappy) backwards;
+}
+
+/* Overview stat cards — unify with motion system */
+.overview-stat-card {
+  position: relative;
+  transition:
+    transform var(--dur-base) var(--ease-spring),
+    box-shadow var(--dur-base) var(--ease-soft),
+    border-color var(--dur-base) var(--ease-soft);
+  box-shadow: var(--inner-highlight);
+}
+.overview-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--lift-2), var(--inner-highlight);
+}
+.overview-stat-card:active {
+  transform: translateY(-1px) scale(0.99);
+  transition-duration: var(--dur-instant);
+  transition-timing-function: var(--ease-press);
+}
+
+/* Icon container inside stat cards lifts slightly on card hover */
+.overview-stat-card > div:first-child {
+  transition: transform var(--dur-base) var(--ease-spring);
+}
+.overview-stat-card:hover > div:first-child {
+  transform: scale(1.08) rotate(-3deg);
 }
 </style>

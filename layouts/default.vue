@@ -5,7 +5,6 @@ import { useKeyboardShortcuts } from '~/composables/useKeyboardShortcuts'
 const configStore = useConfigStore()
 const endpointStore = useEndpointStore()
 const globalStore = useGlobalStore()
-const shortcutsStore = useShortcutsStore()
 
 // Initialize keyboard shortcuts
 const { setupKeyboardListeners } = useKeyboardShortcuts()
@@ -62,6 +61,9 @@ const hasEndpoint = computed(
     <Sidebar>
       <slot />
     </Sidebar>
+
+    <!-- Connection error banner - shown when backend is unreachable -->
+    <ConnectionErrorBanner v-if="hasEndpoint" />
 
     <!-- WebSocket connections manager -->
     <ProtectedResources v-if="hasEndpoint" />

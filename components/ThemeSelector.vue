@@ -30,7 +30,7 @@ const sameWidth: Middleware = {
   name: 'sameWidth',
   fn({ rects, elements }) {
     Object.assign(elements.floating.style, {
-      minWidth: `${Math.max(rects.reference.width, 160)}px`,
+      minWidth: `${Math.max(rects.reference.width, 240)}px`,
     })
     return {}
   },
@@ -108,10 +108,11 @@ onUnmounted(() => {
           v-if="isOpen"
           ref="floating"
           :style="floatingStyles"
-          class="z-70 overflow-hidden shadow-lg"
+          class="z-70 overflow-visible rounded-xl shadow-lg"
         >
           <ThemeList
             :model-value="props.modelValue"
+            :max-height="420"
             @update:model-value="onThemeSelect"
           />
         </div>

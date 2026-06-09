@@ -1,33 +1,68 @@
 import type {
   Connection,
   ConnectionRawMessage,
-  DataUsageEntry,
   DataUsageType,
   WsMsg,
 } from '~/types'
+import type { DataUsageLog } from '~/utils/db'
 import { isNumber } from 'lodash-es'
 import { defineStore } from 'pinia'
+
 import { CONNECTIONS_TABLE_MAX_CLOSED_ROWS } from '~/constants'
+import { db } from '~/utils/db'
 
 export const useConnectionsStore = defineStore('connections', () => {
   const globalStore = useGlobalStore()
+  const configStore = useConfigStore()
 
   // State
-  const allConnections = ref<Connection[]>([])
-  const activeConnections = ref<Connection[]>([])
-  const closedConnections = ref<Connection[]>([])
-  const latestConnectionMsg = ref<WsMsg>(null)
+  // shallowRef: these hold large arrays of connection objects replaced wholesale
+  // on every (per-second) WebSocket message. A deep `ref` would proxy every
+  // connection and every nested metadata field reactively on each update — a
+  // major per-second cost with hundreds/thousands of connections. We only ever
+  // reassign `.value`, so shallow reactivity is sufficient and far cheaper.
+  const allConnections = shallowRef<Connection[]>([])
+  const activeConnections = shallowRef<Connection[]>([])
+  const closedConnections = shallowRef<Connection[]>([])
+  const latestConnectionMsg = shallowRef<WsMsg>(null)
   const paused = ref(false)
 
-  // Data usage tracking
-  const dataUsageMap = useLocalStorage<
-    Record<DataUsageType, Record<string, DataUsageEntry>>
-  >('dataUsageMap', {
-    sourceIP: {},
-    host: {},
-    process: {},
-    outbound: {},
-  })
+  // Data usage tracking (IndexedDB buffer)
+  const dataRetention = useLocalStorage('traffic_data_retention', -1)
+  const logBuffer = new Map<string, DataUsageLog>()
+  let flushTimeout: ReturnType<typeof setTimeout> | null = null
+
+  // Cheap composite key: JSON.stringify ran once per active connection per
+  // second and showed up in profiles. A delimiter join over the same fields is
+  // an order of magnitude cheaper; \x1f (unit separator) can't appear in hosts,
+  // IPs or process names so collisions aren't a concern.
+  const getDataUsageBufferKey = (log: DataUsageLog) =>
+    `${log.timestamp}\x1F${log.sourceIP}\x1F${log.host}\x1F${log.outbound}\x1F${log.process}\x1F${log.inboundUser}`
+
+  const flushLogs = async () => {
+    if (logBuffer.size === 0) return
+    const logsToFlush = Array.from(logBuffer.values())
+    logBuffer.clear()
+    try {
+      await db.addLogs(logsToFlush)
+      if (dataRetention.value > 0) {
+        await db.cleanup(Date.now() - dataRetention.value)
+      }
+    } catch (e) {
+      console.error('[Data Usage] Failed to flush logs to IndexedDB', e)
+    }
+  }
+
+  const scheduleFlush = () => {
+    if (flushTimeout) return
+    const delay = 30000 - (Date.now() % 30000) || 30000
+    flushTimeout = setTimeout(async () => {
+      await flushLogs()
+      flushTimeout = null
+      if (logBuffer.size > 0) scheduleFlush()
+    }, delay)
+  }
+
   const baselineTotals = useLocalStorage<{ upload: number; download: number }>(
     'dataUsageBaseline',
     { upload: 0, download: 0 },
@@ -60,12 +95,10 @@ export const useConnectionsStore = defineStore('connections', () => {
         !isNumber(prevConn.download) ||
         !isNumber(prevConn.upload)
       ) {
-        // Preserve existing speed values if present (e.g., from mock data)
-        const conn = connection as Connection
         return {
           ...connection,
-          downloadSpeed: conn.downloadSpeed ?? 0,
-          uploadSpeed: conn.uploadSpeed ?? 0,
+          downloadSpeed: 0,
+          uploadSpeed: 0,
         }
       }
 
@@ -81,16 +114,16 @@ export const useConnectionsStore = defineStore('connections', () => {
     const seen = new Set<string>()
     const merged: Connection[] = []
 
-    // Keep existing order from previous list first
-    for (const c of allConnections.value) {
+    // Add new active connections first (fresh data)
+    for (const c of activeConns) {
       if (!seen.has(c.id)) {
         seen.add(c.id)
         merged.push(c)
       }
     }
 
-    // Append new active connections not yet seen
-    for (const c of activeConns) {
+    // Append previous connections not in the new active list
+    for (const c of allConnections.value) {
       if (!seen.has(c.id)) {
         seen.add(c.id)
         merged.push(c)
@@ -104,12 +137,9 @@ export const useConnectionsStore = defineStore('connections', () => {
   }
 
   const diffClosedConnections = (
-    activeConns: Connection[],
+    activeIds: Set<string>,
     allConns: Connection[],
-  ) => {
-    const activeIds = new Set(activeConns.map((c) => c.id))
-    return allConns.filter((c) => !activeIds.has(c.id))
-  }
+  ) => allConns.filter((c) => !activeIds.has(c.id))
 
   // Reset connection tracking data
   const resetConnectionTracking = () => {
@@ -120,33 +150,32 @@ export const useConnectionsStore = defineStore('connections', () => {
   }
 
   // Clear all data usage
-  const clearDataUsage = () => {
-    dataUsageMap.value = {
-      sourceIP: {},
-      host: {},
-      process: {},
-      outbound: {},
-    }
+  const clearDataUsage = async () => {
+    // Clear in-memory tracking synchronously BEFORE awaiting IndexedDB. On the
+    // service-restart path in updateFromWsMsg this is called without `await`,
+    // so deferring connectionLastData.clear() until after the await would wipe
+    // the fresh baseline that updateDataUsage rebuilds in the same tick —
+    // making the next message count each connection's cumulative total as a
+    // single delta.
+    logBuffer.clear()
     connectionLastData.clear()
+    await db.clearAll()
   }
 
-  // Remove specific entry
-  const removeDataUsageEntry = (type: DataUsageType, id: string) => {
-    const updates = { ...dataUsageMap.value }
-    const typeUpdates = { ...updates[type] }
-    delete typeUpdates[id]
-    updates[type] = typeUpdates
-    dataUsageMap.value = updates
+  // Remove specific entry (Note: In IndexedDB model, "removing" an entry might mean deleting all logs for that label in a timeframe, but usually we just clear all or let it expire)
+  const removeDataUsageEntry = async (_type: DataUsageType, _id: string) => {
+    // This is harder with the log-based model. We might want to just skip this or implement a more complex deletion
+    // For now, let's keep it as a placeholder or ignore since we are moving to a historical model
+    console.warn(
+      '[Data Usage] removeDataUsageEntry is not supported in the new log-based model',
+    )
   }
 
-  // Cleanup inactive connections
-  const cleanupInactiveConnections = (activeConns?: Connection[]) => {
-    const activeConnectionIds = activeConns
-      ? new Set(activeConns.map((conn) => conn.id))
-      : new Set(allConnections.value.map((conn) => conn.id))
-
+  // Cleanup inactive connections — drop per-connection tracking state for ids
+  // that are no longer active. Receives a prebuilt id set from the caller.
+  const cleanupInactiveConnections = (activeIds: Set<string>) => {
     connectionLastData.forEach((_, connId) => {
-      if (!activeConnectionIds.has(connId)) {
+      if (!activeIds.has(connId)) {
         connectionLastData.delete(connId)
       }
     })
@@ -180,20 +209,24 @@ export const useConnectionsStore = defineStore('connections', () => {
       activeConnections.value,
     )
 
-    // Update data usage tracking
-    updateDataUsage(activeConns)
+    // Build the active-id set once and reuse it for both cleanup and the
+    // closed-connection diff instead of rebuilding it in each helper.
+    const activeIds = new Set(activeConns.map((c) => c.id))
+
+    // Data usage tracking is opt-out: skip the per-connection diff + IndexedDB
+    // buffering entirely when the user has disabled it.
+    if (configStore.enableDataUsageTracking) {
+      updateDataUsage(activeConns)
+    }
 
     // Cleanup inactive connections
-    cleanupInactiveConnections(activeConns)
+    cleanupInactiveConnections(activeIds)
 
     // Merge all connections
     mergeAllConnections(activeConns)
 
     if (!paused.value) {
-      const closedConns = diffClosedConnections(
-        activeConns,
-        allConnections.value,
-      )
+      const closedConns = diffClosedConnections(activeIds, allConnections.value)
       activeConnections.value = activeConns
       closedConnections.value = closedConns.slice(
         -CONNECTIONS_TABLE_MAX_CLOSED_ROWS,
@@ -203,24 +236,13 @@ export const useConnectionsStore = defineStore('connections', () => {
 
   // Update data usage
   const updateDataUsage = (connections: Connection[]) => {
-    const msg = latestConnectionMsg.value
-    // These may be used for future global stats display
-    const _currentGlobalUpload = msg?.uploadTotal || 0
-    const _currentGlobalDownload = msg?.downloadTotal || 0
-
     if (!hasInitializedSession) {
       hasInitializedSession = true
     }
 
-    const updates = { ...dataUsageMap.value }
     const now = Date.now()
-
-    const deltaMap = {
-      sourceIP: new Map<string, { upload: number; download: number }>(),
-      host: new Map<string, { upload: number; download: number }>(),
-      process: new Map<string, { upload: number; download: number }>(),
-      outbound: new Map<string, { upload: number; download: number }>(),
-    }
+    const minuteStart = Math.floor(now / 60000) * 60000
+    let hasDeltas = false
 
     connections.forEach((conn) => {
       const currentUpload = conn.upload || 0
@@ -245,65 +267,35 @@ export const useConnectionsStore = defineStore('connections', () => {
 
       if (uploadDelta === 0 && downloadDelta === 0) return
 
-      const addToMap = (type: DataUsageType, id: string | undefined) => {
-        if (!id) return
-        if (!deltaMap[type].has(id)) {
-          deltaMap[type].set(id, { upload: 0, download: 0 })
-        }
-        const entry = deltaMap[type].get(id)!
-        entry.upload += uploadDelta
-        entry.download += downloadDelta
+      hasDeltas = true
+      const log: DataUsageLog = {
+        timestamp: minuteStart,
+        sourceIP: conn.metadata.sourceIP || 'Inner',
+        host: conn.metadata.host || conn.metadata.destinationIP,
+        process: conn.metadata.process || 'Unknown',
+        outbound: conn.chains[0] ?? 'DIRECT',
+        inboundUser:
+          conn.metadata.inboundUser ||
+          conn.metadata.inboundIP ||
+          conn.metadata.inboundName ||
+          conn.metadata.type ||
+          'Unknown',
+        upload: uploadDelta,
+        download: downloadDelta,
       }
-
-      addToMap('sourceIP', conn.metadata.sourceIP || 'Inner')
-      addToMap('host', conn.metadata.host || conn.metadata.destinationIP)
-      addToMap('process', conn.metadata.process || 'Unknown')
-
-      const outbound =
-        conn.chains && conn.chains.length > 0 ? conn.chains[0] : 'DIRECT'
-      addToMap('outbound', outbound)
-    })
-
-    // Update data usage map
-    ;(Object.keys(deltaMap) as DataUsageType[]).forEach((type) => {
-      const typeDeltas = deltaMap[type]
-      const typeStore = { ...updates[type] }
-      let hasUpdates = false
-
-      typeDeltas.forEach((data, id) => {
-        hasUpdates = true
-        const existing = typeStore[id]
-
-        if (existing) {
-          typeStore[id] = {
-            ...existing,
-            upload: existing.upload + data.upload,
-            download: existing.download + data.download,
-            total:
-              existing.upload +
-              data.upload +
-              (existing.download + data.download),
-            lastSeen: now,
-          }
-        } else {
-          typeStore[id] = {
-            type,
-            label: id,
-            upload: data.upload,
-            download: data.download,
-            total: data.upload + data.download,
-            firstSeen: now,
-            lastSeen: now,
-          }
-        }
-      })
-
-      if (hasUpdates) {
-        updates[type] = typeStore
+      const key = getDataUsageBufferKey(log)
+      const existing = logBuffer.get(key)
+      if (existing) {
+        existing.upload += uploadDelta
+        existing.download += downloadDelta
+      } else {
+        logBuffer.set(key, log)
       }
     })
 
-    dataUsageMap.value = updates
+    if (hasDeltas) {
+      scheduleFlush()
+    }
   }
 
   // Computed: speed grouped by proxy name
@@ -322,13 +314,29 @@ export const useConnectionsStore = defineStore('connections', () => {
     return returnMap
   })
 
+  // Switching endpoints uses SPA navigation (no page reload), so this store
+  // singleton keeps lastUpload/DownloadTotal from the previous backend. A new
+  // backend whose cumulative totals are lower would otherwise look like a
+  // kernel restart and trigger clearDataUsage() + clearChartHistory(),
+  // destroying the user's accumulated usage history. On endpoint change reset
+  // only the restart-detection baselines; the new backend's first message then
+  // establishes a fresh baseline without wiping history or the chart.
+  const endpointStore = useEndpointStore()
+  watch(
+    () => endpointStore.selectedEndpoint,
+    () => {
+      lastUploadTotal = 0
+      lastDownloadTotal = 0
+      connectionLastData.clear()
+    },
+  )
+
   return {
     allConnections,
     activeConnections,
     closedConnections,
     latestConnectionMsg,
     paused,
-    dataUsageMap,
     speedGroupByName,
     updateFromWsMsg,
     clearDataUsage,

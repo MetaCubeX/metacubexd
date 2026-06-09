@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type Highcharts from 'highcharts'
 import {
   IconArrowDown,
   IconArrowUp,
@@ -6,12 +7,18 @@ import {
   IconX,
 } from '@tabler/icons-vue'
 import byteSize from 'byte-size'
-import Highcharts from 'highcharts'
+import { loadHighcharts } from '~/composables/useHighcharts'
 import { getChartThemeColors } from '~/utils'
 
 const globalStore = useGlobalStore()
 const connectionsStore = useConnectionsStore()
 const configStore = useConfigStore()
+
+// When the tab is in the background there's nobody to see the sparkline, so
+// skip the per-second Highcharts redraw entirely. chartHistory keeps filling in
+// the background, so the next redraw after the tab is visible again paints the
+// full window in one setData — no data is lost.
+const documentVisibility = useDocumentVisibility()
 
 // Visibility and collapsed state
 const isVisible = useLocalStorage('globalTrafficIndicatorVisible', true)
@@ -31,6 +38,7 @@ const containerRef = ref<HTMLElement | null>(null)
 // Chart container ref
 const chartContainer = ref<HTMLDivElement | null>(null)
 let chart: Highcharts.Chart | undefined
+let hc: typeof Highcharts | undefined
 
 // Traffic data
 const downloadSpeed = computed(() => globalStore.latestTraffic?.down ?? 0)
@@ -134,7 +142,7 @@ function onDragEnd() {
 
 // Create sparkline chart
 function createChart() {
-  if (!chartContainer.value) return
+  if (!chartContainer.value || !hc) return
 
   // Destroy existing chart if any
   if (chart) {
@@ -145,7 +153,7 @@ function createChart() {
   const themeColors = getChartThemeColors()
   const containerWidth = chartContainer.value.offsetWidth || 200
 
-  chart = Highcharts.chart(chartContainer.value, {
+  chart = hc.chart(chartContainer.value, {
     chart: {
       type: 'areaspline',
       backgroundColor: 'transparent',
@@ -225,7 +233,7 @@ function updateSidebarChart() {
 
 // Create sidebar chart
 function createSidebarChart() {
-  if (!sidebarChartContainer.value) return
+  if (!sidebarChartContainer.value || !hc) return
 
   // Destroy existing chart if any
   if (sidebarChart) {
@@ -235,7 +243,7 @@ function createSidebarChart() {
 
   const themeColors = getChartThemeColors()
 
-  sidebarChart = Highcharts.chart(sidebarChartContainer.value, {
+  sidebarChart = hc.chart(sidebarChartContainer.value, {
     chart: {
       type: 'areaspline',
       backgroundColor: 'transparent',
@@ -295,6 +303,7 @@ watch(
   () => globalStore.latestTraffic,
   (traffic) => {
     if (!traffic) return
+    if (documentVisibility.value === 'hidden') return
 
     if (chart) {
       // Chart exists, just update it
@@ -387,8 +396,10 @@ const sidebarChartContainer = ref<HTMLDivElement | null>(null)
 let sidebarChart: Highcharts.Chart | undefined
 
 // Create chart on mount if conditions are met
-onMounted(() => {
-  // Check for header target after mount
+onMounted(async () => {
+  // Check for teleport targets after mount. Independent of Highcharts, so run
+  // it before awaiting the lazy chart bundle — the traffic numbers can show up
+  // without waiting for the chart library to download.
   nextTick(() => {
     headerTargetExists.value = !!document.getElementById(
       'header-traffic-indicator',
@@ -400,6 +411,8 @@ onMounted(() => {
       'sidebar-traffic-expanded',
     )
   })
+
+  hc = await loadHighcharts()
 
   // Create chart if visible and expanded
   if (isVisible.value && !isCollapsed.value && globalStore.latestTraffic) {
@@ -464,15 +477,21 @@ onBeforeUnmount(() => {
       class="w-full cursor-pointer rounded-lg bg-[color-mix(in_oklch,var(--color-base-100)_50%,transparent)] p-2 transition-[background] duration-200 ease-in-out hover:bg-[var(--color-base-100)]"
       @click="expandFromHeader"
     >
-      <div class="flex items-center justify-center gap-1">
-        <IconArrowDown class="size-3 shrink-0 text-[var(--color-success)]" />
-        <span class="font-mono text-xs"
-          >{{ formatBytes(downloadSpeed) }}/s</span
-        >
-      </div>
-      <div class="flex items-center justify-center gap-1">
-        <IconArrowUp class="size-3 shrink-0 text-[var(--color-info)]" />
-        <span class="font-mono text-xs">{{ formatBytes(uploadSpeed) }}/s</span>
+      <div class="flex w-full flex-col items-center gap-2 overflow-hidden py-1">
+        <div class="flex flex-col items-center gap-0.5">
+          <IconArrowDown class="size-3 shrink-0 text-[var(--color-success)]" />
+          <span
+            class="font-mono text-[9px] font-medium tracking-tighter whitespace-nowrap"
+            >{{ formatBytes(downloadSpeed).replace(' ', '') }}/s</span
+          >
+        </div>
+        <div class="flex flex-col items-center gap-0.5">
+          <IconArrowUp class="size-3 shrink-0 text-[var(--color-info)]" />
+          <span
+            class="font-mono text-[9px] font-medium tracking-tighter whitespace-nowrap"
+            >{{ formatBytes(uploadSpeed).replace(' ', '') }}/s</span
+          >
+        </div>
       </div>
     </div>
   </Teleport>

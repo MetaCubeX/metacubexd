@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { PROXIES_DISPLAY_MODE } from '~/constants'
+import {
+  PROXIES_CARD_SIZE_GAP,
+  PROXIES_CARD_SIZE_MIN_WIDTH,
+  PROXIES_DISPLAY_MODE,
+} from '~/constants'
 
 interface Props {
   isOpen?: boolean
@@ -18,11 +22,16 @@ const configStore = useConfigStore()
 const isListMode = computed(
   () => configStore.proxiesDisplayMode === PROXIES_DISPLAY_MODE.LIST,
 )
+
+const cardGridStyle = computed(() => ({
+  gridTemplateColumns: `repeat(auto-fill, minmax(${PROXIES_CARD_SIZE_MIN_WIDTH[configStore.proxiesCardSize]}px, 1fr))`,
+  gap: `${PROXIES_CARD_SIZE_GAP[configStore.proxiesCardSize]}px`,
+}))
 </script>
 
 <template>
   <div
-    class="overflow-hidden rounded-xl transition-[background,border-color] duration-200 ease-out select-none hover:border-[color-mix(in_oklch,var(--color-primary)_40%,transparent)] hover:bg-[color-mix(in_oklch,var(--color-base-200)_95%,transparent)]"
+    class="rounded-xl transition-[background,border-color] duration-200 ease-out select-none hover:border-[color-mix(in_oklch,var(--color-primary)_40%,transparent)] hover:bg-[color-mix(in_oklch,var(--color-base-200)_95%,transparent)]"
     style="
       background: color-mix(in oklch, var(--color-base-200) 80%, transparent);
       border: 1px solid
@@ -33,6 +42,19 @@ const isListMode = computed(
   >
     <div
       class="flex cursor-pointer items-center justify-between p-4 pr-3 text-xl font-medium text-[var(--color-base-content)]"
+      :class="
+        configStore.stickyGroupHeader && isOpen
+          ? 'sticky top-0 z-20 rounded-t-xl backdrop-blur-sm'
+          : ''
+      "
+      :style="
+        configStore.stickyGroupHeader && isOpen
+          ? {
+              background:
+                'color-mix(in oklch, var(--color-base-200) 80%, transparent)',
+            }
+          : undefined
+      "
       @click="emit('collapse', !isOpen)"
     >
       <slot name="title" />
@@ -56,13 +78,12 @@ const isListMode = computed(
     </div>
 
     <div
-      class="gap-3 px-4 pt-2 pb-4 transition-opacity duration-300 ease-out"
+      class="px-4 pt-2 pb-4 transition-opacity duration-300 ease-out"
       :class="[
         isOpen ? 'opacity-100' : 'hidden opacity-0',
-        isListMode
-          ? 'flex flex-col'
-          : 'grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))]',
+        isListMode ? 'flex flex-col gap-3' : 'grid',
       ]"
+      :style="isListMode ? undefined : cardGridStyle"
     >
       <template v-if="isOpen">
         <slot />

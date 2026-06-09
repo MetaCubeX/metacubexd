@@ -4,6 +4,25 @@ import { useRequest } from './useApi'
 const BATCH_SIZE = 10 // Max concurrent tests
 const BATCH_DELAY = 200 // Delay between batches in ms
 
+function waitForBatchDelay(signal?: AbortSignal): Promise<void> {
+  if (signal?.aborted) return Promise.resolve()
+
+  return new Promise((resolve) => {
+    const timeoutId = setTimeout(() => {
+      signal?.removeEventListener('abort', resolveDelay)
+      resolve()
+    }, BATCH_DELAY)
+
+    function resolveDelay() {
+      clearTimeout(timeoutId)
+      signal?.removeEventListener('abort', resolveDelay)
+      resolve()
+    }
+
+    signal?.addEventListener('abort', resolveDelay, { once: true })
+  })
+}
+
 export interface BatchTestOptions {
   url: string
   timeout: number
@@ -13,6 +32,7 @@ export interface BatchTestOptions {
 
 export function useBatchLatencyTest() {
   const configStore = useConfigStore()
+  const proxiesStore = useProxiesStore()
   const nodeRecommendationStore = useNodeRecommendationStore()
 
   const isRunning = ref(false)
@@ -24,12 +44,14 @@ export function useBatchLatencyTest() {
     proxyName: string,
     url: string,
     timeout: number,
+    signal?: AbortSignal,
   ): Promise<{ proxyName: string; delay: number }> => {
     try {
       const request = useRequest()
       const result = await request
         .get(`proxies/${encodeURIComponent(proxyName)}/delay`, {
           searchParams: { url, timeout },
+          signal,
         })
         .json<{ delay: number }>()
       return { proxyName, delay: result.delay }
@@ -49,6 +71,11 @@ export function useBatchLatencyTest() {
       const result = await request
         .get(`group/${encodeURIComponent(groupName)}/delay`, {
           searchParams: { url, timeout },
+          // The backend timeout is per-node; the group test fans out to every
+          // member, so the overall round trip easily exceeds ky's 5s default.
+          // Scale the client timeout generously, floored at 30s, plus 10s of
+          // headroom.
+          timeout: Math.max(30_000, timeout * 2 + 10_000),
         })
         .json<Record<string, number>>()
       return result
@@ -70,6 +97,7 @@ export function useBatchLatencyTest() {
     abortController.value = new AbortController()
 
     // Update store progress
+    proxiesStore.clearLatencyTestStateForNodes?.(nodeNames, url)
     nodeRecommendationStore.batchTestProgress = {
       total: nodeNames.length,
       completed: 0,
@@ -92,8 +120,14 @@ export function useBatchLatencyTest() {
           progress.value.current = nodeName
           nodeRecommendationStore.batchTestProgress.current = nodeName
 
-          const result = await testSingleNode(nodeName, url, timeout)
+          const result = await testSingleNode(
+            nodeName,
+            url,
+            timeout,
+            abortController.value?.signal,
+          )
           results[nodeName] = result.delay
+          proxiesStore.recordLatencyTestResult?.(nodeName, url, result.delay)
 
           progress.value.completed++
           nodeRecommendationStore.batchTestProgress.completed++
@@ -118,7 +152,7 @@ export function useBatchLatencyTest() {
           i + BATCH_SIZE < nodeNames.length &&
           !abortController.value?.signal.aborted
         ) {
-          await new Promise((resolve) => setTimeout(resolve, BATCH_DELAY))
+          await waitForBatchDelay(abortController.value?.signal)
         }
       }
     } finally {
@@ -131,6 +165,9 @@ export function useBatchLatencyTest() {
         isRunning: false,
       }
       abortController.value = null
+
+      // Refresh proxy data so UI shows latest latency
+      await proxiesStore.fetchProxies()
     }
 
     return results
@@ -140,32 +177,56 @@ export function useBatchLatencyTest() {
   const testGroupNodes = async (
     groupName: string,
     options?: Partial<BatchTestOptions>,
+    // When false, the caller (e.g. testMultipleGroups) owns the shared
+    // `isRunning` / `batchTestProgress` state; this call must not touch it,
+    // otherwise its finally-block would reset the global progress mid-run.
+    manageGlobalProgress = true,
   ): Promise<Record<string, number>> => {
     const url = options?.url ?? configStore.urlForLatencyTest
     const timeout = options?.timeout ?? configStore.latencyTestTimeoutDuration
 
-    isRunning.value = true
-    nodeRecommendationStore.batchTestProgress = {
-      total: 1,
-      completed: 0,
-      current: groupName,
-      isRunning: true,
+    // Don't pre-clear latencyMap — testProxyGroup swallows transport errors
+    // into `{}`, and any node not present in the response would otherwise be
+    // stuck displaying "---" forever. Preserving the previous values means
+    // failed/skipped tests just don't update.
+    if (manageGlobalProgress) {
+      isRunning.value = true
+      nodeRecommendationStore.batchTestProgress = {
+        total: 1,
+        completed: 0,
+        current: groupName,
+        isRunning: true,
+      }
     }
 
     try {
       const results = await testProxyGroup(groupName, url, timeout)
 
-      // Record all results
+      // Record whatever we got. recordBatchResults / recordLatencyTestResults
+      // are no-ops on empty input, so an empty `{}` cleanly means "preserve
+      // existing state".
       nodeRecommendationStore.recordBatchResults(results)
+
+      // Refresh proxy data so UI shows latest latency. Don't propagate a
+      // fetch failure — that would abort the surrounding `testMultipleGroups`
+      // loop and leave the global testing flag stuck.
+      try {
+        await proxiesStore.fetchProxies()
+      } catch {
+        /* best-effort refresh */
+      }
+      proxiesStore.recordLatencyTestResults?.(results, url)
 
       return results
     } finally {
-      isRunning.value = false
-      nodeRecommendationStore.batchTestProgress = {
-        total: 1,
-        completed: 1,
-        current: null,
-        isRunning: false,
+      if (manageGlobalProgress) {
+        isRunning.value = false
+        nodeRecommendationStore.batchTestProgress = {
+          total: 1,
+          completed: 1,
+          current: null,
+          isRunning: false,
+        }
       }
     }
   }
@@ -193,7 +254,7 @@ export function useBatchLatencyTest() {
         nodeRecommendationStore.batchTestProgress.current = groupName
         nodeRecommendationStore.batchTestProgress.completed = i
 
-        const results = await testGroupNodes(groupName, options)
+        const results = await testGroupNodes(groupName, options, false)
         allResults[groupName] = results
 
         // Delay between groups

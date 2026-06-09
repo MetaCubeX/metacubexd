@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Config, DNSQuery } from '~/types'
 import { useMutation } from '@tanstack/vue-query'
+import { Vue3Marquee } from 'vue3-marquee'
 import { useConfigActions, useRequest } from '~/composables/useApi'
 import {
   useConfigQuery,
@@ -22,8 +23,16 @@ const runtimeConfig = useRuntimeConfig()
 const frontendVersion = `v${runtimeConfig.public.appVersion || '0.0.0'}`
 
 // TanStack Query
-const { data: backendConfig, isLoading: isLoadingConfig } = useConfigQuery()
-const { data: backendVersion, isLoading: isLoadingVersion } = useVersionQuery()
+const {
+  data: backendConfig,
+  isLoading: isLoadingConfig,
+  isError: isErrorConfig,
+} = useConfigQuery()
+const {
+  data: backendVersion,
+  isLoading: isLoadingVersion,
+  isError: isErrorVersion,
+} = useVersionQuery()
 const updateConfigMutation = useUpdateConfigMutation()
 
 // Check if sing-box backend
@@ -165,17 +174,63 @@ const isLoading = computed(
   () => isLoadingConfig.value || isLoadingVersion.value,
 )
 
+const isError = computed(() => isErrorConfig.value || isErrorVersion.value)
+
 // Active section for mobile tabs
 const activeSection = ref<'core' | 'xd' | 'tools'>('core')
 </script>
 
 <template>
-  <div class="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-2">
+  <div class="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
     <!-- Loading State -->
-    <div v-if="isLoading" class="flex h-64 items-center justify-center">
+    <div
+      v-if="isLoading && !isError"
+      class="flex h-64 items-center justify-center"
+    >
       <div class="flex flex-col items-center gap-4">
         <span class="loading loading-lg loading-ring text-primary" />
         <span class="text-sm opacity-60">{{ t('config') }}</span>
+      </div>
+    </div>
+
+    <!-- Error State - Backend Unreachable -->
+    <div v-else-if="isError" class="flex h-64 items-center justify-center">
+      <div class="flex flex-col items-center gap-4 text-center">
+        <div
+          class="flex h-16 w-16 items-center justify-center rounded-full bg-error/10 text-error"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="size-8"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <path d="M15 9l-6 6M9 9l6 6" />
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-lg font-bold">{{ t('connectionError') }}</h2>
+          <p class="mt-1 max-w-sm text-sm opacity-60">
+            {{ t('connectionErrorDesc') }}
+          </p>
+          <p class="mt-1 text-xs opacity-40">
+            {{ endpointStore.currentEndpoint?.url }}
+          </p>
+        </div>
+        <div class="flex gap-2">
+          <button class="btn btn-sm btn-primary" @click="$router.go(0)">
+            {{ t('retry') }}
+          </button>
+          <button
+            class="btn btn-outline btn-sm btn-info"
+            @click="switchEndpoint"
+          >
+            {{ t('switchEndpoint') }}
+          </button>
+        </div>
       </div>
     </div>
 
@@ -494,6 +549,24 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                 />
               </div>
 
+              <div
+                class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 transition-colors hover:bg-base-content/5"
+              >
+                <div class="flex flex-col gap-0.5">
+                  <span class="text-sm">{{
+                    t('enableDataUsageTracking')
+                  }}</span>
+                  <span class="text-xs opacity-50">{{
+                    t('enableDataUsageTrackingDesc')
+                  }}</span>
+                </div>
+                <input
+                  v-model="configStore.enableDataUsageTracking"
+                  type="checkbox"
+                  class="toggle toggle-primary"
+                />
+              </div>
+
               <!-- Mobile Bottom Nav Toggle - only visible on mobile -->
               <div
                 class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 transition-colors hover:bg-base-content/5 lg:hidden"
@@ -506,6 +579,25 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                   type="checkbox"
                   class="toggle toggle-primary"
                 />
+              </div>
+
+              <div
+                class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 transition-colors hover:bg-base-content/5"
+              >
+                <div class="flex items-center gap-2 text-sm">
+                  <span>{{ t('defaultPage') }}</span>
+                </div>
+                <select
+                  v-model="configStore.defaultPage"
+                  class="select-bordered select select-sm"
+                >
+                  <option value="overview">{{ t('overview') }}</option>
+                  <option value="proxies">{{ t('proxies') }}</option>
+                  <option value="connections">{{ t('connections') }}</option>
+                  <option value="rules">{{ t('rules') }}</option>
+                  <option value="logs">{{ t('logs') }}</option>
+                  <option value="config">{{ t('config') }}</option>
+                </select>
               </div>
 
               <div
@@ -791,8 +883,9 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
             >
               <input
                 v-model="remoteConfigURL"
-                type="url"
-                class="input-bordered input flex-1"
+                type="text"
+                inputmode="url"
+                class="input-bordered input h-10 min-h-10 flex-1 appearance-none px-3"
                 :placeholder="t('remoteConfigURLPlaceholder')"
               />
               <Button
@@ -838,7 +931,16 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                     d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"
                   />
                 </svg>
-                {{ t('reloadConfig') }}
+                <Vue3Marquee
+                  :animate-on-overflow-only="true"
+                  :duration="10"
+                  :delay="2"
+                  :clone="false"
+                  :pause-on-hover="true"
+                  class="w-full flex-1 overflow-hidden"
+                >
+                  <span class="pr-6">{{ t('reloadConfig') }}</span>
+                </Vue3Marquee>
               </Button>
 
               <Button
@@ -856,7 +958,16 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                 >
                   <polygon points="5 3 19 12 5 21 5 3" />
                 </svg>
-                {{ t('restartCore') }}
+                <Vue3Marquee
+                  :animate-on-overflow-only="true"
+                  :duration="10"
+                  :delay="2"
+                  :clone="false"
+                  :pause-on-hover="true"
+                  class="w-full flex-1 overflow-hidden"
+                >
+                  <span class="pr-6">{{ t('restartCore') }}</span>
+                </Vue3Marquee>
               </Button>
 
               <Button
@@ -876,7 +987,16 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                     d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"
                   />
                 </svg>
-                {{ t('flushFakeIP') }}
+                <Vue3Marquee
+                  :animate-on-overflow-only="true"
+                  :duration="10"
+                  :delay="2"
+                  :clone="false"
+                  :pause-on-hover="true"
+                  class="w-full flex-1 overflow-hidden"
+                >
+                  <span class="pr-6">{{ t('flushFakeIP') }}</span>
+                </Vue3Marquee>
               </Button>
 
               <Button
@@ -896,7 +1016,16 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                   <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
                   <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
                 </svg>
-                {{ t('flushDNSCache') }}
+                <Vue3Marquee
+                  :animate-on-overflow-only="true"
+                  :duration="10"
+                  :delay="2"
+                  :clone="false"
+                  :pause-on-hover="true"
+                  class="w-full flex-1 overflow-hidden"
+                >
+                  <span class="pr-6">{{ t('flushDNSCache') }}</span>
+                </Vue3Marquee>
               </Button>
 
               <Button
@@ -918,7 +1047,16 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                     d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"
                   />
                 </svg>
-                {{ t('updateGEODatabases') }}
+                <Vue3Marquee
+                  :animate-on-overflow-only="true"
+                  :duration="10"
+                  :delay="2"
+                  :clone="false"
+                  :pause-on-hover="true"
+                  class="w-full flex-1 overflow-hidden"
+                >
+                  <span class="pr-6">{{ t('updateGEODatabases') }}</span>
+                </Vue3Marquee>
               </Button>
             </div>
           </div>
@@ -954,15 +1092,16 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
               >
                 <input
                   v-model="dnsQuery.name"
-                  type="search"
-                  class="input-bordered input flex-1 font-mono"
+                  type="text"
+                  enterkeyhint="search"
+                  class="input-bordered input h-10 min-h-10 flex-1 appearance-none px-3 font-mono"
                   placeholder="google.com"
                   @input="onDnsQueryInput"
                 />
 
                 <select
                   v-model="dnsQuery.type"
-                  class="select-bordered select w-full sm:w-auto"
+                  class="select-bordered select h-10 min-h-10 w-full appearance-none px-3 sm:w-auto"
                 >
                   <option>A</option>
                   <option>AAAA</option>

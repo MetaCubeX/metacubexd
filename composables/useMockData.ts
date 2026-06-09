@@ -30,7 +30,12 @@ export const mockConfig = {
 }
 
 // Helper to create metadata
-function createMetadata(host: string, destIP: string, process = '') {
+function createMetadata(
+  host: string,
+  destIP: string,
+  process = '',
+  inboundUser = '',
+) {
   return {
     network: 'tcp',
     type: 'HTTP Connect',
@@ -41,7 +46,7 @@ function createMetadata(host: string, destIP: string, process = '') {
     inboundIP: '127.0.0.1',
     inboundName: 'mixed-in',
     inboundPort: '7893',
-    inboundUser: '',
+    inboundUser,
     process,
     processPath: process ? `/Applications/${process}.app` : '',
     remoteDestination: '',
@@ -182,7 +187,19 @@ export const mockRules = generateMockRules()
 function generateMockRules() {
   const rules = [
     // Domain suffix rules
-    { type: 'DOMAIN-SUFFIX', payload: 'google.com', proxy: 'Proxy', size: 156 },
+    {
+      type: 'DOMAIN-SUFFIX',
+      payload: 'google.com',
+      proxy: 'Proxy',
+      size: 156,
+      extra: {
+        disabled: false,
+        hitCount: 128,
+        hitAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+        missCount: 3,
+        missAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+      },
+    },
     {
       type: 'DOMAIN-SUFFIX',
       payload: 'googleapis.com',
@@ -368,8 +385,36 @@ function generateMockRules() {
     { type: 'RULE-SET', payload: 'direct', proxy: 'DIRECT', size: 5678 },
     { type: 'RULE-SET', payload: 'proxy', proxy: 'Proxy', size: 2345 },
     // Match rule (final)
-    { type: 'MATCH', payload: '', proxy: 'Proxy', size: 1 },
+    {
+      type: 'MATCH',
+      payload: '',
+      proxy: 'Proxy',
+      size: 1,
+      extra: {
+        disabled: false,
+        hitCount: 2048,
+        hitAt: new Date(Date.now() - 30 * 1000).toISOString(),
+        missCount: 0,
+      },
+    },
   ]
+
+  for (const [index, rule] of rules.entries()) {
+    if (!('extra' in rule)) {
+      const hitCount = index % 4 === 0 ? 0 : (index + 1) * 7
+      ;(rule as { extra?: Record<string, unknown> }).extra = {
+        disabled: index % 9 === 0,
+        hitCount,
+        hitAt:
+          hitCount > 0
+            ? new Date(Date.now() - (index + 1) * 60 * 1000).toISOString()
+            : undefined,
+        missCount:
+          hitCount === 0 ? index + 2 : Math.max(0, Math.floor(hitCount / 6)),
+        missAt: new Date(Date.now() - (index + 3) * 90 * 1000).toISOString(),
+      }
+    }
+  }
 
   return rules
 }
@@ -628,12 +673,14 @@ function generateMockConnections() {
     ['AI Services', 'United States'],
     ['DIRECT'],
   ]
+  const inboundUsers = ['alice', 'bob', 'mobile-user', 'guest', '']
 
   const connections = []
 
   for (let i = 0; i < 60; i++) {
     const hostInfo = hosts[i % hosts.length]!
     const process = processes[Math.floor(Math.random() * processes.length)]
+    const inboundUser = inboundUsers[i % inboundUsers.length]
     const chain =
       hostInfo.proxy === 'DIRECT'
         ? ['DIRECT']
@@ -643,7 +690,7 @@ function generateMockConnections() {
     connections.push({
       id: `conn-${i + 1}`,
       metadata: {
-        ...createMetadata(hostInfo.host, hostInfo.ip, process),
+        ...createMetadata(hostInfo.host, hostInfo.ip, process, inboundUser),
         network: isUDP ? 'udp' : 'tcp',
         type: isUDP ? 'QUIC' : 'HTTP Connect',
         sourcePort: String(50000 + i),

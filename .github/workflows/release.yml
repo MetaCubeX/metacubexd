@@ -8,12 +8,16 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   release-please:
     permissions:
       contents: write
 
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
@@ -22,7 +26,7 @@ jobs:
     steps:
       - name: release-please
         id: release
-        uses: googleapis/release-please-action@v4
+        uses: googleapis/release-please-action@v5
         with:
           token: ${{ secrets.CI_TOKEN }}
           release-type: node
@@ -35,12 +39,12 @@ jobs:
       contents: read
       packages: write
 
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v6
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
 
       - uses: actions/setup-node@v6
         with:
@@ -66,7 +70,7 @@ jobs:
         run: tar czvf compressed-dist.tgz -C .output/public .
 
       - name: attach github release artifacts
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           token: ${{ secrets.CI_TOKEN }}
           files: compressed-dist.tgz
@@ -85,9 +89,9 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-qemu-action@v4
 
-      - uses: docker/setup-docker-action@v4
+      - uses: docker/setup-docker-action@v5
         with:
           daemon-config: |
             {
@@ -97,16 +101,16 @@ jobs:
               }
             }
 
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
         id: buildx
 
-      - uses: docker/login-action@v3
+      - uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.CI_TOKEN }}
 
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v7
         with:
           context: .
           builder: ${{ steps.buildx.outputs.name }}
@@ -133,7 +137,7 @@ jobs:
         with:
           token: ${{ secrets.CI_TOKEN }}
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
 
       - uses: actions/setup-node@v6
         with:

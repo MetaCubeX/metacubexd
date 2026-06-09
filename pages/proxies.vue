@@ -8,11 +8,13 @@ import {
   IconBrandSpeedtest,
   IconChevronRight,
   IconGlobe,
+  IconPinnedOff,
   IconReload,
   IconSettings,
   IconWand,
 } from '@tabler/icons-vue'
 import byteSize from 'byte-size'
+import { throttle } from 'lodash-es'
 import Button from '~/components/Button.vue'
 import ProxyNodeCard from '~/components/ProxyNodeCard.vue'
 import ProxyNodeListItem from '~/components/ProxyNodeListItem.vue'
@@ -43,6 +45,14 @@ const activeTab = ref<'proxies' | 'proxyProviders'>('proxies')
 const settingsModal = ref<{ open: () => void; close: () => void }>()
 const proxyGroupsWrapper = ref<{ isTwoColumns: boolean }>()
 const providersWrapper = ref<{ isTwoColumns: boolean }>()
+
+// Progressive rendering: only mount a window of nodes per group, growing as the
+// user scrolls near the bottom. Avoids mounting hundreds of cards in one frame
+// when a large group is expanded (the main cause of jank with many nodes).
+const PROXIES_INITIAL_RENDER_COUNT = 50
+const PROXIES_RENDER_STEP = 50
+const proxiesScrollEl = ref<HTMLElement | null>(null)
+const providersScrollEl = ref<HTMLElement | null>(null)
 
 const formatBytes = (bytes: number) => byteSize(bytes).toString()
 
@@ -89,13 +99,16 @@ const tabs = computed(() => [
 ])
 
 function getSortedProxyNames(proxyGroup: ProxyType) {
+  const orderingType = configStore.proxiesOrderingType
   const sorted = sortProxiesByOrderingType({
     proxyNames: proxyGroup.all ?? [],
-    orderingType: configStore.proxiesOrderingType,
+    orderingType,
     testUrl: proxyGroup.testUrl || null,
     getLatencyByName: proxiesStore.getLatencyByName,
+    isProxyGroup: proxiesStore.isProxyGroup,
     latencyQualityMap: configStore.latencyQualityMap,
     urlForLatencyTest: configStore.urlForLatencyTest,
+    performanceData: nodeRecommendationStore.performanceData,
   })
 
   return filterProxiesByAvailability({
@@ -117,15 +130,44 @@ function getProviderProxyNames(
     orderingType: configStore.proxiesOrderingType,
     testUrl: provider.testUrl,
     getLatencyByName: proxiesStore.getLatencyByName,
+    isProxyGroup: proxiesStore.isProxyGroup,
     latencyQualityMap: configStore.latencyQualityMap,
     urlForLatencyTest: configStore.urlForLatencyTest,
+    performanceData: nodeRecommendationStore.performanceData,
   })
 }
+
+// Cache sorted/filtered proxy names per group so each render reuses the result
+// instead of recomputing the sort + availability filter on every re-render
+// (previously called twice per group per frame from the template).
+const sortedNamesByGroup = computed(() => {
+  const map: Record<string, string[]> = {}
+  for (const proxyGroup of renderProxies.value) {
+    map[proxyGroup.name] = getSortedProxyNames(proxyGroup)
+  }
+  return map
+})
+
+const sortedNamesByProvider = computed(() => {
+  const map: Record<string, string[]> = {}
+  for (const provider of proxiesStore.proxyProviders) {
+    map[provider.name] = getProviderProxyNames(provider)
+  }
+  return map
+})
 
 // Fetch proxies on mount
 onMounted(() => {
   proxiesStore.fetchProxies()
 })
+
+// Enable window focus refetch for proxies data
+watch(
+  useWindowFocus(),
+  throttle((focused) => {
+    if (focused) proxiesStore.fetchProxies()
+  }, 30000),
+)
 
 // ProxyGroupTitle component
 const ProxyGroupTitle = defineComponent({
@@ -135,6 +177,13 @@ const ProxyGroupTitle = defineComponent({
   },
   setup(props) {
     const recommendedNode = computed(() => getRecommendedNode(props.proxyGroup))
+    const totalProxyCount = computed(() => props.proxyGroup.all?.length ?? 0)
+    const aliveProxyCount = computed(
+      () =>
+        props.proxyGroup.all?.filter(
+          (proxyName) => proxiesStore.proxyNodeMap[proxyName]?.alive === true,
+        ).length ?? 0,
+    )
     const hasRecommendation = computed(
       () =>
         recommendedNode.value !== null &&
@@ -188,7 +237,7 @@ const ProxyGroupTitle = defineComponent({
                     class:
                       'badge badge-sm text-[0.7rem] font-semibold px-2 py-1 rounded-md bg-primary/12 text-primary border border-primary/20',
                   },
-                  props.proxyGroup.all?.length,
+                  `${aliveProxyCount.value} / ${totalProxyCount.value}`,
                 ),
               ],
             ),
@@ -212,6 +261,24 @@ const ProxyGroupTitle = defineComponent({
                   },
                   {
                     default: () => h(IconWand, { size: 18 }),
+                  },
+                ),
+              // Unfix button — only shown when this automatic group has a manual
+              // pin (mihomo reports it via `fixed`). Clicking restores auto-select.
+              !!props.proxyGroup.fixed &&
+                h(
+                  Button,
+                  {
+                    class:
+                      'flex items-center justify-center w-9 h-9 rounded-lg bg-warning/10 border border-warning/20 text-warning transition-all duration-200 hover:bg-warning/20 hover:border-warning/40 hover:-translate-y-px hover:shadow-lg hover:shadow-warning/15 active:translate-y-0',
+                    title: t('unfixProxy'),
+                    onClick: (e: MouseEvent) => {
+                      e.stopPropagation()
+                      proxiesStore.unfixProxyInGroup(props.proxyGroup.name)
+                    },
+                  },
+                  {
+                    default: () => h(IconPinnedOff, { size: 18 }),
                   },
                 ),
               h(
@@ -289,9 +356,41 @@ const ProxyNodes = defineComponent({
   },
   setup(props) {
     const recommendedNode = computed(() => getRecommendedNode(props.proxyGroup))
+    const renderCount = ref(PROXIES_INITIAL_RENDER_COUNT)
+    const loadMoreSentinel = ref<HTMLElement | null>(null)
 
-    return () =>
-      props.sortedProxyNames.map((proxyName) =>
+    // Keep the currently selected node within the rendered window, otherwise
+    // it could be hidden below the fold after expanding the group.
+    watch(
+      () => [props.sortedProxyNames, props.proxyGroup.now] as const,
+      ([names, now]) => {
+        const index = names.indexOf(now)
+        if (index >= renderCount.value) {
+          renderCount.value = index + PROXIES_RENDER_STEP
+        }
+      },
+      { immediate: true },
+    )
+
+    useIntersectionObserver(
+      loadMoreSentinel,
+      (entries) => {
+        if (
+          entries[0]?.isIntersecting &&
+          renderCount.value < props.sortedProxyNames.length
+        ) {
+          renderCount.value = Math.min(
+            renderCount.value + PROXIES_RENDER_STEP,
+            props.sortedProxyNames.length,
+          )
+        }
+      },
+      { root: proxiesScrollEl, rootMargin: '600px' },
+    )
+
+    return () => {
+      const names = props.sortedProxyNames
+      const children = names.slice(0, renderCount.value).map((proxyName) =>
         configStore.proxiesDisplayMode === 'listMode'
           ? h(ProxyNodeListItem, {
               key: proxyName,
@@ -314,6 +413,21 @@ const ProxyNodes = defineComponent({
                 proxiesStore.selectProxyInGroup(props.proxyGroup, proxyName),
             }),
       )
+
+      if (renderCount.value < names.length) {
+        children.push(
+          h('div', {
+            ref: loadMoreSentinel,
+            key: '__load_more__',
+            'aria-hidden': 'true',
+            class: 'h-px w-full',
+            style: { gridColumn: '1 / -1' },
+          }),
+        )
+      }
+
+      return children
+    }
   },
 })
 
@@ -456,8 +570,28 @@ const ProviderProxyNodes = defineComponent({
     sortedProxyNames: { type: Array as () => string[], required: true },
   },
   setup(props) {
-    return () =>
-      props.sortedProxyNames.map((proxyName) =>
+    const renderCount = ref(PROXIES_INITIAL_RENDER_COUNT)
+    const loadMoreSentinel = ref<HTMLElement | null>(null)
+
+    useIntersectionObserver(
+      loadMoreSentinel,
+      (entries) => {
+        if (
+          entries[0]?.isIntersecting &&
+          renderCount.value < props.sortedProxyNames.length
+        ) {
+          renderCount.value = Math.min(
+            renderCount.value + PROXIES_RENDER_STEP,
+            props.sortedProxyNames.length,
+          )
+        }
+      },
+      { root: providersScrollEl, rootMargin: '600px' },
+    )
+
+    return () => {
+      const names = props.sortedProxyNames
+      const children = names.slice(0, renderCount.value).map((proxyName) =>
         configStore.proxiesDisplayMode === 'listMode'
           ? h(ProxyNodeListItem, {
               key: proxyName,
@@ -474,14 +608,31 @@ const ProviderProxyNodes = defineComponent({
               providerName: props.provider.name,
             }),
       )
+
+      if (renderCount.value < names.length) {
+        children.push(
+          h('div', {
+            ref: loadMoreSentinel,
+            key: '__load_more__',
+            'aria-hidden': 'true',
+            class: 'h-px w-full',
+            style: { gridColumn: '1 / -1' },
+          }),
+        )
+      }
+
+      return children
+    }
   },
 })
 </script>
 
 <template>
-  <div class="flex h-full flex-col gap-3 overflow-y-auto p-2">
+  <div class="flex h-full min-h-0 flex-col gap-3">
     <!-- Header with Tabs and Actions -->
-    <div class="animate-fade-slide-in flex flex-wrap items-center gap-3">
+    <div
+      class="animate-fade-slide-in flex shrink-0 flex-wrap items-center gap-3"
+    >
       <!-- Tabs -->
       <div
         class="flex gap-1 rounded-xl border border-base-content/8 bg-base-200/60 p-1 backdrop-blur-sm"
@@ -573,7 +724,11 @@ const ProviderProxyNodes = defineComponent({
     </div>
 
     <!-- Proxy Groups Content -->
-    <div v-if="activeTab === 'proxies'" class="flex-1 overflow-y-auto">
+    <div
+      v-if="activeTab === 'proxies'"
+      ref="proxiesScrollEl"
+      class="min-h-0 flex-1 overflow-y-auto"
+    >
       <ProxiesRenderWrapper ref="proxyGroupsWrapper">
         <template v-if="proxyGroupsWrapper?.isTwoColumns" #even>
           <Collapse
@@ -591,12 +746,12 @@ const ProviderProxyNodes = defineComponent({
             <template #title>
               <ProxyGroupTitle
                 :proxy-group="proxyGroup"
-                :sorted-proxy-names="getSortedProxyNames(proxyGroup)"
+                :sorted-proxy-names="sortedNamesByGroup[proxyGroup.name] || []"
               />
             </template>
             <ProxyNodes
               :proxy-group="proxyGroup"
-              :sorted-proxy-names="getSortedProxyNames(proxyGroup)"
+              :sorted-proxy-names="sortedNamesByGroup[proxyGroup.name] || []"
             />
           </Collapse>
         </template>
@@ -617,12 +772,12 @@ const ProviderProxyNodes = defineComponent({
             <template #title>
               <ProxyGroupTitle
                 :proxy-group="proxyGroup"
-                :sorted-proxy-names="getSortedProxyNames(proxyGroup)"
+                :sorted-proxy-names="sortedNamesByGroup[proxyGroup.name] || []"
               />
             </template>
             <ProxyNodes
               :proxy-group="proxyGroup"
-              :sorted-proxy-names="getSortedProxyNames(proxyGroup)"
+              :sorted-proxy-names="sortedNamesByGroup[proxyGroup.name] || []"
             />
           </Collapse>
         </template>
@@ -641,12 +796,12 @@ const ProviderProxyNodes = defineComponent({
             <template #title>
               <ProxyGroupTitle
                 :proxy-group="proxyGroup"
-                :sorted-proxy-names="getSortedProxyNames(proxyGroup)"
+                :sorted-proxy-names="sortedNamesByGroup[proxyGroup.name] || []"
               />
             </template>
             <ProxyNodes
               :proxy-group="proxyGroup"
-              :sorted-proxy-names="getSortedProxyNames(proxyGroup)"
+              :sorted-proxy-names="sortedNamesByGroup[proxyGroup.name] || []"
             />
           </Collapse>
         </template>
@@ -654,7 +809,7 @@ const ProviderProxyNodes = defineComponent({
     </div>
 
     <!-- Proxy Providers Content -->
-    <div v-else class="flex-1 overflow-y-auto">
+    <div v-else ref="providersScrollEl" class="min-h-0 flex-1 overflow-y-auto">
       <ProxiesRenderWrapper ref="providersWrapper">
         <template v-if="providersWrapper?.isTwoColumns" #even>
           <Collapse
@@ -672,12 +827,12 @@ const ProviderProxyNodes = defineComponent({
             <template #title>
               <ProxyProviderTitle
                 :provider="provider"
-                :sorted-proxy-names="getProviderProxyNames(provider)"
+                :sorted-proxy-names="sortedNamesByProvider[provider.name] || []"
               />
             </template>
             <ProviderProxyNodes
               :provider="provider"
-              :sorted-proxy-names="getProviderProxyNames(provider)"
+              :sorted-proxy-names="sortedNamesByProvider[provider.name] || []"
             />
           </Collapse>
         </template>
@@ -698,12 +853,12 @@ const ProviderProxyNodes = defineComponent({
             <template #title>
               <ProxyProviderTitle
                 :provider="provider"
-                :sorted-proxy-names="getProviderProxyNames(provider)"
+                :sorted-proxy-names="sortedNamesByProvider[provider.name] || []"
               />
             </template>
             <ProviderProxyNodes
               :provider="provider"
-              :sorted-proxy-names="getProviderProxyNames(provider)"
+              :sorted-proxy-names="sortedNamesByProvider[provider.name] || []"
             />
           </Collapse>
         </template>
@@ -722,12 +877,12 @@ const ProviderProxyNodes = defineComponent({
             <template #title>
               <ProxyProviderTitle
                 :provider="provider"
-                :sorted-proxy-names="getProviderProxyNames(provider)"
+                :sorted-proxy-names="sortedNamesByProvider[provider.name] || []"
               />
             </template>
             <ProviderProxyNodes
               :provider="provider"
-              :sorted-proxy-names="getProviderProxyNames(provider)"
+              :sorted-proxy-names="sortedNamesByProvider[provider.name] || []"
             />
           </Collapse>
         </template>
@@ -778,6 +933,32 @@ const ProviderProxyNodes = defineComponent({
 
         <div>
           <ConfigTitle with-divider>
+            {{ t('latencyMediumThreshold') }} ({{ t('ms') }})
+          </ConfigTitle>
+          <input
+            v-model.number="configStore.latencyMediumThreshold"
+            :placeholder="t('thresholdAutoPlaceholder')"
+            class="input-bordered input w-full"
+            type="number"
+            min="0"
+          />
+        </div>
+
+        <div>
+          <ConfigTitle with-divider>
+            {{ t('latencyHighThreshold') }} ({{ t('ms') }})
+          </ConfigTitle>
+          <input
+            v-model.number="configStore.latencyHighThreshold"
+            :placeholder="t('thresholdAutoPlaceholder')"
+            class="input-bordered input w-full"
+            type="number"
+            min="0"
+          />
+        </div>
+
+        <div>
+          <ConfigTitle with-divider>
             {{ t('proxiesSorting') }}
           </ConfigTitle>
           <select
@@ -792,6 +973,12 @@ const ProviderProxyNodes = defineComponent({
             </option>
             <option value="orderLatency_desc">
               {{ t('orderLatency_desc') }}
+            </option>
+            <option value="orderQuality_asc">
+              {{ t('orderQuality_asc') }}
+            </option>
+            <option value="orderQuality_desc">
+              {{ t('orderQuality_desc') }}
             </option>
             <option value="orderName_asc">
               {{ t('orderName_asc') }}
@@ -822,6 +1009,39 @@ const ProviderProxyNodes = defineComponent({
           <div class="flex w-full justify-center">
             <input
               v-model="configStore.renderProxiesInTwoColumns"
+              class="toggle toggle-primary"
+              type="checkbox"
+            />
+          </div>
+        </div>
+
+        <div>
+          <ConfigTitle with-divider>
+            {{ t('proxiesCardSize') }}
+          </ConfigTitle>
+          <select
+            v-model="configStore.proxiesCardSize"
+            class="select-bordered select w-full"
+          >
+            <option value="comfortable">
+              {{ t('cardSizeComfortable') }}
+            </option>
+            <option value="compact">
+              {{ t('cardSizeCompact') }}
+            </option>
+            <option value="tight">
+              {{ t('cardSizeTight') }}
+            </option>
+          </select>
+        </div>
+
+        <div>
+          <ConfigTitle with-divider>
+            {{ t('stickyGroupHeader') }}
+          </ConfigTitle>
+          <div class="flex w-full justify-center">
+            <input
+              v-model="configStore.stickyGroupHeader"
               class="toggle toggle-primary"
               type="checkbox"
             />

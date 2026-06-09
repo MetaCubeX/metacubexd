@@ -70,7 +70,7 @@ onUnmounted(() => {
           v-if="isOpen"
           ref="floating"
           :style="floatingStyles"
-          class="z-70 w-44 overflow-hidden rounded-xl shadow-lg"
+          class="z-70 w-60 overflow-visible rounded-xl shadow-lg"
         >
           <div
             class="flex items-center border-b border-gray-700 bg-gray-800/90 px-3 py-2"
@@ -83,6 +83,7 @@ onUnmounted(() => {
           </div>
           <ThemeList
             :model-value="configStore.curTheme"
+            :max-height="420"
             @update:model-value="setTheme"
           />
         </div>

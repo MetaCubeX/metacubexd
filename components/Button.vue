@@ -27,7 +27,12 @@ const needsBtnClass = computed(() => buttonClass.value.includes('btn-'))
 <template>
   <button
     :type="type"
-    :class="[needsBtnClass && 'btn', loading ? 'btn-disabled' : buttonClass]"
+    class="btn-press inline-flex items-center justify-center gap-2"
+    :class="[
+      needsBtnClass && 'btn',
+      buttonClass,
+      loading && 'btn-disabled cursor-wait',
+    ]"
     :disabled="disabled || loading"
     @click="$emit('click', $event)"
   >
@@ -40,3 +45,27 @@ const needsBtnClass = computed(() => buttonClass.value.includes('btn-'))
     </template>
   </button>
 </template>
+
+<style scoped>
+.btn-press {
+  transition:
+    transform var(--dur-base) var(--ease-spring),
+    box-shadow var(--dur-base) var(--ease-soft),
+    background-color var(--dur-fast) var(--ease-soft),
+    border-color var(--dur-fast) var(--ease-soft),
+    color var(--dur-fast) var(--ease-soft);
+  will-change: transform;
+}
+.btn-press:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+.btn-press:not(:disabled):active {
+  transform: translateY(0) scale(0.96);
+  transition-duration: var(--dur-instant);
+  transition-timing-function: var(--ease-press);
+}
+.btn-press:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+</style>

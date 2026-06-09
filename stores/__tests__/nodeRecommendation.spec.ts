@@ -36,9 +36,9 @@ describe('stores/nodeRecommendation', () => {
 
       const data = store.getNodePerformance('node1')
       expect(data).toBeDefined()
-      expect(data?.history).toHaveLength(1)
-      expect(data?.history[0].latency).toBe(100)
-      expect(data?.history[0].success).toBe(true)
+      expect(data!.history).toHaveLength(1)
+      expect(data!.history[0]!.latency).toBe(100)
+      expect(data!.history[0]!.success).toBe(true)
     })
 
     it('records a failed test result with null latency', () => {
@@ -47,8 +47,8 @@ describe('stores/nodeRecommendation', () => {
       store.recordTestResult('node1', null, false)
 
       const data = store.getNodePerformance('node1')
-      expect(data?.history[0].latency).toBeNull()
-      expect(data?.history[0].success).toBe(false)
+      expect(data!.history[0]!.latency).toBeNull()
+      expect(data!.history[0]!.success).toBe(false)
     })
 
     it('adds new entries to existing node history', () => {
@@ -58,10 +58,10 @@ describe('stores/nodeRecommendation', () => {
       store.recordTestResult('node1', 150, true)
 
       const data = store.getNodePerformance('node1')
-      expect(data?.history).toHaveLength(2)
+      expect(data!.history).toHaveLength(2)
       // Most recent entry should be first
-      expect(data?.history[0].latency).toBe(150)
-      expect(data?.history[1].latency).toBe(100)
+      expect(data!.history[0]!.latency).toBe(150)
+      expect(data!.history[1]!.latency).toBe(100)
     })
 
     it('limits history to max 20 entries', () => {
@@ -73,22 +73,22 @@ describe('stores/nodeRecommendation', () => {
       }
 
       const data = store.getNodePerformance('node1')
-      expect(data?.history).toHaveLength(20)
+      expect(data!.history).toHaveLength(20)
       // Most recent should be first (latency 124)
-      expect(data?.history[0].latency).toBe(124)
+      expect(data!.history[0]!.latency).toBe(124)
     })
 
     it('updates lastTestTime on each record', () => {
       const store = useNodeRecommendationStore()
 
       store.recordTestResult('node1', 100, true)
-      const firstTime = store.getNodePerformance('node1')?.lastTestTime
+      const firstTime = store.getNodePerformance('node1')!.lastTestTime
 
       // Wait a bit and record again
       store.recordTestResult('node1', 150, true)
-      const secondTime = store.getNodePerformance('node1')?.lastTestTime
+      const secondTime = store.getNodePerformance('node1')!.lastTestTime
 
-      expect(secondTime).toBeGreaterThanOrEqual(firstTime!)
+      expect(secondTime).toBeGreaterThanOrEqual(firstTime)
     })
 
     it('resets score to null when new result is recorded', () => {
@@ -97,7 +97,7 @@ describe('stores/nodeRecommendation', () => {
       store.recordTestResult('node1', 100, true)
 
       const data = store.getNodePerformance('node1')
-      expect(data?.score).toBeNull()
+      expect(data!.score).toBeNull()
     })
   })
 
@@ -111,9 +111,9 @@ describe('stores/nodeRecommendation', () => {
         node3: 150,
       })
 
-      expect(store.getNodePerformance('node1')?.history[0].latency).toBe(100)
-      expect(store.getNodePerformance('node2')?.history[0].latency).toBe(200)
-      expect(store.getNodePerformance('node3')?.history[0].latency).toBe(150)
+      expect(store.getNodePerformance('node1')!.history[0]!.latency).toBe(100)
+      expect(store.getNodePerformance('node2')!.history[0]!.latency).toBe(200)
+      expect(store.getNodePerformance('node3')!.history[0]!.latency).toBe(150)
     })
 
     it('treats latency <= 0 as failed test', () => {
@@ -124,9 +124,9 @@ describe('stores/nodeRecommendation', () => {
         node2: -1,
       })
 
-      expect(store.getNodePerformance('node1')?.history[0].success).toBe(false)
-      expect(store.getNodePerformance('node1')?.history[0].latency).toBeNull()
-      expect(store.getNodePerformance('node2')?.history[0].success).toBe(false)
+      expect(store.getNodePerformance('node1')!.history[0]!.success).toBe(false)
+      expect(store.getNodePerformance('node1')!.history[0]!.latency).toBeNull()
+      expect(store.getNodePerformance('node2')!.history[0]!.success).toBe(false)
     })
 
     it('treats latency > 0 as successful test', () => {
@@ -136,8 +136,8 @@ describe('stores/nodeRecommendation', () => {
         node1: 100,
       })
 
-      expect(store.getNodePerformance('node1')?.history[0].success).toBe(true)
-      expect(store.getNodePerformance('node1')?.history[0].latency).toBe(100)
+      expect(store.getNodePerformance('node1')!.history[0]!.success).toBe(true)
+      expect(store.getNodePerformance('node1')!.history[0]!.latency).toBe(100)
     })
 
     it('appends to existing history', () => {
@@ -147,8 +147,8 @@ describe('stores/nodeRecommendation', () => {
       store.recordBatchResults({ node1: 100 })
 
       const data = store.getNodePerformance('node1')
-      expect(data?.history).toHaveLength(2)
-      expect(data?.history[0].latency).toBe(100) // Most recent first
+      expect(data!.history).toHaveLength(2)
+      expect(data!.history[0]!.latency).toBe(100) // Most recent first
     })
   })
 

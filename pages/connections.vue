@@ -11,6 +11,7 @@ import {
 } from '~/composables/useApi'
 import { CONNECTIONS_TABLE_ACCESSOR_KEY } from '~/constants'
 import { formatIPv6, formatTimeFromNow } from '~/utils'
+import { renderTwoLineCell } from '~/utils/connectionCells'
 
 const { t, locale } = useI18n()
 
@@ -52,11 +53,13 @@ const isClosingConnections = ref(false)
 // Helpers
 const formatBytes = (bytes: number) => byteSize(bytes).toString()
 
+const PROCESS_PATH_REGEX = /^.*[/\\](.*)$/
+
 // Cell value helpers
 function getProcess(conn: Connection) {
   return (
     conn.metadata.process ||
-    conn.metadata.processPath?.replace(/^.*[/\\](.*)$/, '$1') ||
+    conn.metadata.processPath?.replace(PROCESS_PATH_REGEX, '$1') ||
     '-'
   )
 }
@@ -89,7 +92,7 @@ function getInboundUser(conn: Connection) {
     conn.metadata.inboundIP ||
     conn.metadata.inboundName ||
     conn.metadata.type ||
-    "-"
+    '-'
   )
 }
 
@@ -181,6 +184,8 @@ const allColumns: ConnectionColumn[] = [
       })
       return h('span', children)
     },
+    renderText: (conn: Connection) =>
+      conn.chains.length ? [...conn.chains].reverse().join(' → ') : '',
     groupValue: (conn: Connection) => conn.chains.join(' > '),
   },
   {
@@ -255,6 +260,81 @@ const allColumns: ConnectionColumn[] = [
     render: (conn: Connection) => getInboundUser(conn),
     groupValue: (conn: Connection) => getInboundUser(conn),
   },
+
+  // ===== Composite columns (default 6-column layout) =====
+  {
+    id: CONNECTIONS_TABLE_ACCESSOR_KEY.HostProcess,
+    key: 'hostProcess',
+    groupable: true,
+    sortable: true,
+    sortId: 'Host',
+    render: (conn: Connection) => {
+      const primary = getHost(conn)
+      const proc = getProcess(conn)
+      const aux = proc !== '-' ? proc : ''
+      return renderTwoLineCell(primary, aux)
+    },
+    renderText: (conn: Connection) => {
+      const proc = getProcess(conn)
+      const procText = proc !== '-' ? proc : ''
+      return procText ? `${getHost(conn)} (${procText})` : getHost(conn)
+    },
+    groupValue: (conn: Connection) => getHost(conn),
+  },
+  {
+    id: CONNECTIONS_TABLE_ACCESSOR_KEY.RuleChains,
+    key: 'ruleChains',
+    groupable: true,
+    sortable: false,
+    render: (conn: Connection) => {
+      const primary = getRule(conn)
+      const aux = conn.chains.length
+        ? [...conn.chains].reverse().join(' → ')
+        : ''
+      return renderTwoLineCell(primary, aux)
+    },
+    renderText: (conn: Connection) => {
+      const rule = getRule(conn)
+      const chains = conn.chains.length
+        ? [...conn.chains].reverse().join(' → ')
+        : ''
+      return chains ? `${rule} → ${chains}` : rule
+    },
+    groupValue: (conn: Connection) => getRule(conn),
+  },
+  {
+    id: CONNECTIONS_TABLE_ACCESSOR_KEY.Traffic,
+    key: 'traffic',
+    groupable: false,
+    sortable: true,
+    sortId: 'DlSpeed',
+    render: (conn: Connection) => {
+      const primary = `↓ ${formatBytes(conn.downloadSpeed)}/s · ↑ ${formatBytes(conn.uploadSpeed)}/s`
+      const aux = `∑ ↓${formatBytes(conn.download)} · ↑${formatBytes(conn.upload)}`
+      return renderTwoLineCell(primary, aux)
+    },
+    renderText: (conn: Connection) =>
+      `↓${formatBytes(conn.downloadSpeed)}/s · ↑${formatBytes(conn.uploadSpeed)}/s · ∑↓${formatBytes(conn.download)} ↑${formatBytes(conn.upload)}`,
+  },
+  {
+    id: CONNECTIONS_TABLE_ACCESSOR_KEY.Flow,
+    key: 'flowDirection',
+    groupable: true,
+    sortable: true,
+    sortId: 'SourceIP',
+    render: (conn: Connection) => {
+      const primary = `${getSourceIP(conn)}:${conn.metadata.sourcePort}`
+      const dest = getDestination(conn)
+      const aux = dest ? `→ ${dest}` : ''
+      return renderTwoLineCell(primary, aux)
+    },
+    renderText: (conn: Connection) => {
+      const dest = getDestination(conn)
+      const destText = dest ? ` → ${dest}` : ''
+      return `${getSourceIP(conn)}:${conn.metadata.sourcePort}${destText}`
+    },
+    groupValue: (conn: Connection) => getSourceIP(conn),
+  },
 ]
 
 const visibleColumns = computed(() => {
@@ -271,10 +351,14 @@ const visibleColumns = computed(() => {
       const bOrder = bIndex === -1 ? Infinity : bIndex
       return aOrder - bOrder
     })
-    .filter((col) => visibility[col.id] !== false)
+    .filter((col) => visibility[col.id] === true)
 })
 
 const sortableColumns = computed(() => allColumns.filter((col) => col.sortable))
+
+const groupableColumns = computed(() =>
+  allColumns.filter((col) => col.groupable),
+)
 
 // Tabs
 const tabs = computed(() => [
@@ -574,11 +658,17 @@ function showConnectionDetails(conn: Connection) {
       :global-filter="globalFilter"
       :paused="connectionsStore.paused"
       :is-closing-connections="isClosingConnections"
+      :display-mode="configStore.connectionsDisplayMode"
+      :groupable-columns="groupableColumns"
+      :grouping-column="groupingColumn"
       @update:active-tab="activeTab = $event"
       @update:enable-quick-filter="enableQuickFilter = $event"
       @update:source-i-p-filter="sourceIPFilter = $event"
       @update:sort-column="sortColumn = $event"
       @update:global-filter="globalFilter = $event"
+      @update:grouping-column="
+        (colId: string | null) => (groupingColumn = colId)
+      "
       @toggle-sort-order="toggleSortOrder"
       @toggle-paused="connectionsStore.paused = !connectionsStore.paused"
       @close-connections="handleCloseConnections"
@@ -677,5 +767,39 @@ function showConnectionDetails(conn: Connection) {
 .conn-close-btn:hover {
   background: color-mix(in oklch, var(--color-error) 20%, transparent);
   transform: scale(1.1);
+}
+
+/* Composite-cell two-line layout (HostProcess / RuleChains / Traffic / Flow).
+   Kept global because cells are rendered via renderTwoLineCell's h() and
+   would not receive scoped style attributes from ConnectionsTable.vue. */
+.conn-cell-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.conn-primary {
+  /* Inherit font-size from the table cell so daisyUI's table-xs/sm/md/lg
+     setting (configured by the user via Connections Settings → Table size)
+     is respected. */
+  font-size: 1em;
+  line-height: 1.4;
+  font-weight: 500;
+  color: var(--color-base-content);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conn-aux {
+  /* 85% of primary, scaling with the user's table size setting. */
+  font-size: 0.85em;
+  line-height: 1.35;
+  font-weight: 400;
+  color: color-mix(in oklch, var(--color-base-content) 58%, transparent);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>

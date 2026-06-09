@@ -1,30 +1,117 @@
-import type {
-  LATENCY_QUALITY_MAP_HTTP,
-  LATENCY_QUALITY_MAP_HTTPS,
-} from '~/constants'
+import type { NodePerformanceData } from '~/stores/nodeRecommendation'
+import byteSize from 'byte-size'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { PROXIES_ORDERING_TYPE } from '~/constants'
+import { calculateNodeScore } from './nodeScoring'
 import 'dayjs/locale/zh-cn'
 import 'dayjs/locale/ru'
 
-// Type for latency quality map (can be either HTTP or HTTPS)
-type LatencyQualityMap =
-  | typeof LATENCY_QUALITY_MAP_HTTP
-  | typeof LATENCY_QUALITY_MAP_HTTPS
+interface LatencyQualityMap {
+  NOT_CONNECTED: number
+  MEDIUM: number
+  HIGH: number
+}
 
 dayjs.extend(relativeTime)
 dayjs.extend(duration)
 
-// URL helpers
-export function transformEndpointURL(url: string) {
-  return /^https?:\/\//.test(url) ? url : `${window.location.protocol}//${url}`
+// Version comparison helper
+const VERSION_PREFIX_RE = /^v/
+const VERSION_BUILDMETA_RE = /\+.*$/
+const PRERELEASE_NUMERIC_RE = /^\d+$/
+
+// Compare two SemVer pre-release strings (the part after the first `-`) per the
+// SemVer precedence rules: identifiers are dot-separated and compared left to
+// right; purely numeric identifiers compare numerically, numeric identifiers
+// rank below non-numeric ones, and a longer set of identifiers wins when all
+// preceding ones are equal.
+function comparePrerelease(a: string, b: string): number {
+  const aIds = a.split('.')
+  const bIds = b.split('.')
+  const len = Math.max(aIds.length, bIds.length)
+
+  for (let i = 0; i < len; i++) {
+    const aId = aIds[i]
+    const bId = bIds[i]
+    if (aId === undefined) return -1
+    if (bId === undefined) return 1
+
+    const aIsNum = PRERELEASE_NUMERIC_RE.test(aId)
+    const bIsNum = PRERELEASE_NUMERIC_RE.test(bId)
+
+    if (aIsNum && bIsNum) {
+      const diff = Number(aId) - Number(bId)
+      if (diff !== 0) return diff > 0 ? 1 : -1
+    } else if (aIsNum !== bIsNum) {
+      // Numeric identifiers always have lower precedence than non-numeric.
+      return aIsNum ? -1 : 1
+    } else {
+      const cmp = aId.localeCompare(bId)
+      if (cmp !== 0) return cmp > 0 ? 1 : -1
+    }
+  }
+
+  return 0
 }
 
+export function compareVersions(v1: string, v2: string): number {
+  const parse = (v: string) => {
+    const cleaned = v
+      .replace(VERSION_PREFIX_RE, '')
+      .replace(VERSION_BUILDMETA_RE, '')
+    // Split on the FIRST `-` only — the whole remainder is the pre-release
+    // string, which may itself contain `-` (e.g. `1.0.0-beta-1`).
+    const dashIndex = cleaned.indexOf('-')
+    const main = dashIndex === -1 ? cleaned : cleaned.slice(0, dashIndex)
+    const prerelease = dashIndex === -1 ? null : cleaned.slice(dashIndex + 1)
+    return {
+      parts: main.split('.').map((n) => Number.parseInt(n, 10) || 0),
+      prerelease,
+    }
+  }
+
+  const v1Parsed = parse(v1)
+  const v2Parsed = parse(v2)
+  const len = Math.max(v1Parsed.parts.length, v2Parsed.parts.length)
+
+  for (let i = 0; i < len; i++) {
+    const p1 = v1Parsed.parts[i] || 0
+    const p2 = v2Parsed.parts[i] || 0
+    if (p1 > p2) return 1
+    if (p1 < p2) return -1
+  }
+
+  // If main version parts are equal, compare prerelease.
+  // No prerelease > any prerelease (stable is newer).
+  if (!v1Parsed.prerelease && v2Parsed.prerelease) return 1
+  if (v1Parsed.prerelease && !v2Parsed.prerelease) return -1
+  if (v1Parsed.prerelease && v2Parsed.prerelease) {
+    return comparePrerelease(v1Parsed.prerelease, v2Parsed.prerelease)
+  }
+
+  return 0
+}
+
+export function formatBytes(bytes: number) {
+  return byteSize(bytes).toString()
+}
+
+// URL helpers
+const URL_PROTOCOL_RE = /^https?:\/\//
+
+export function transformEndpointURL(url: string) {
+  return URL_PROTOCOL_RE.test(url)
+    ? url
+    : `${typeof window !== 'undefined' ? window.location.protocol : 'http:'}//${url}`
+}
+
+const IPV6_RE = /:.*:/
+const IPV4_RE = /\./
+
 export function formatIPv6(ip: string) {
-  const regexr = /:{1,2}/
-  if (regexr.test(ip)) {
+  if (IPV6_RE.test(ip) && !IPV4_RE.test(ip)) {
     return `[${ip}]`
   }
   return ip
@@ -76,9 +163,12 @@ export function formatDateRange(
 }
 
 // Proxy helpers
-export function formatProxyType(type: string = '', t: (key: string) => string) {
+export function formatProxyType(
+  type: string = '',
+  t: (key: string) => string,
+): string {
   const lt = type.toLowerCase()
-  const formatMap = new Map([
+  const formatMap = new Map<string, string>([
     ['shadowsocks', 'SS'],
     ['shadowsocksr', 'SSR'],
     ['hysteria', 'HY'],
@@ -96,7 +186,7 @@ export function formatProxyType(type: string = '', t: (key: string) => string) {
   ])
 
   if (formatMap.has(lt)) {
-    return formatMap.get(lt)
+    return formatMap.get(lt)!
   }
   return lt
 }
@@ -133,15 +223,19 @@ export function sortProxiesByOrderingType({
   orderingType,
   testUrl,
   getLatencyByName,
+  isProxyGroup,
   latencyQualityMap,
   urlForLatencyTest,
+  performanceData,
 }: {
   proxyNames: string[]
   orderingType: PROXIES_ORDERING_TYPE
   testUrl: string | null
   getLatencyByName: (name: string, testUrl: string | null) => number
+  isProxyGroup?: (name: string) => boolean
   latencyQualityMap: LatencyQualityMap
   urlForLatencyTest: string
+  performanceData?: Map<string, NodePerformanceData>
 }) {
   if (orderingType === PROXIES_ORDERING_TYPE.NATURAL) {
     return proxyNames
@@ -152,6 +246,15 @@ export function sortProxiesByOrderingType({
   return [...proxyNames].sort((a, b) => {
     const prevLatency = getLatencyByName(a, finalTestUrl)
     const nextLatency = getLatencyByName(b, finalTestUrl)
+
+    const prevIsProxyGroup = isProxyGroup?.(a) ?? false
+    const nextIsProxyGroup = isProxyGroup?.(b) ?? false
+    const proxyGroupPriority =
+      Number(nextIsProxyGroup) - Number(prevIsProxyGroup)
+
+    if (proxyGroupPriority !== 0) {
+      return proxyGroupPriority
+    }
 
     switch (orderingType) {
       case PROXIES_ORDERING_TYPE.LATENCY_ASC:
@@ -169,6 +272,40 @@ export function sortProxiesByOrderingType({
 
       case PROXIES_ORDERING_TYPE.NAME_DESC:
         return b.localeCompare(a)
+
+      case PROXIES_ORDERING_TYPE.QUALITY_ASC: {
+        // A node that is unreachable right now must sink to the bottom no matter
+        // how good its historical quality score is — a stale good run shouldn't
+        // outrank a node that actually connects.
+        if (prevLatency === latencyQualityMap.NOT_CONNECTED) return 1
+        if (nextLatency === latencyQualityMap.NOT_CONNECTED) return -1
+
+        const prevData = performanceData?.get(a)
+        const nextData = performanceData?.get(b)
+        const prevScore = prevData ? calculateNodeScore(prevData) : 0
+        const nextScore = nextData ? calculateNodeScore(nextData) : 0
+
+        if (prevScore === 0 && nextScore > 0) return 1
+        if (nextScore === 0 && prevScore > 0) return -1
+        return prevScore - nextScore
+      }
+
+      case PROXIES_ORDERING_TYPE.QUALITY_DESC: {
+        // A node that is unreachable right now must sink to the bottom no matter
+        // how good its historical quality score is — a stale good run shouldn't
+        // outrank a node that actually connects.
+        if (prevLatency === latencyQualityMap.NOT_CONNECTED) return 1
+        if (nextLatency === latencyQualityMap.NOT_CONNECTED) return -1
+
+        const prevData = performanceData?.get(a)
+        const nextData = performanceData?.get(b)
+        const prevScore = prevData ? calculateNodeScore(prevData) : 0
+        const nextScore = nextData ? calculateNodeScore(nextData) : 0
+
+        if (prevScore === 0 && nextScore > 0) return 1
+        if (nextScore === 0 && prevScore > 0) return -1
+        return nextScore - prevScore
+      }
 
       default:
         return 0
@@ -303,19 +440,27 @@ export function getChartThemeColors() {
 }
 
 // SVG encoder for proxy icons
+const SVG_QUOTE_RE = /"/g
+const SVG_PERCENT_RE = /%/g
+const SVG_HASH_RE = /#/g
+const SVG_LBRACE_RE = /\{/g
+const SVG_RBRACE_RE = /\}/g
+const SVG_LT_RE = /</g
+const SVG_GT_RE = />/g
+
 export function encodeSvg(svg: string) {
   return svg
     .replace(
       '<svg',
-      ~svg.indexOf('xmlns')
+      svg.includes('xmlns')
         ? '<svg'
         : '<svg xmlns="http://www.w3.org/2000/svg"',
     )
-    .replace(/"/g, "'")
-    .replace(/%/g, '%25')
-    .replace(/#/g, '%23')
-    .replace(/\{/g, '%7B')
-    .replace(/\}/g, '%7D')
-    .replace(/</g, '%3C')
-    .replace(/>/g, '%3E')
+    .replace(SVG_QUOTE_RE, "'")
+    .replace(SVG_PERCENT_RE, '%25')
+    .replace(SVG_HASH_RE, '%23')
+    .replace(SVG_LBRACE_RE, '%7B')
+    .replace(SVG_RBRACE_RE, '%7D')
+    .replace(SVG_LT_RE, '%3C')
+    .replace(SVG_GT_RE, '%3E')
 }

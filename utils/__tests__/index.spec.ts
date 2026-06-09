@@ -1,5 +1,7 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+import { PROXIES_ORDERING_TYPE } from '~/constants'
 import {
+  compareVersions,
   encodeSvg,
   filterSpecialProxyType,
   formatDuration,
@@ -7,6 +9,7 @@ import {
   formatProxyType,
   fuzzyFilter,
   getLatencyClassName,
+  sortProxiesByOrderingType,
   transformEndpointURL,
 } from '../index'
 
@@ -184,6 +187,64 @@ describe('utils/index', () => {
     })
   })
 
+  describe('compareVersions', () => {
+    it('returns positive when v1 is newer', () => {
+      expect(compareVersions('v1.243.0', 'v1.242.0')).toBeGreaterThan(0)
+      expect(compareVersions('1.243.0', '1.242.0')).toBeGreaterThan(0)
+      expect(compareVersions('v2.0.0', 'v1.999.999')).toBeGreaterThan(0)
+    })
+
+    it('returns negative when v1 is older', () => {
+      expect(compareVersions('v1.241.3', 'v1.242.0')).toBeLessThan(0)
+      expect(compareVersions('1.0.0', '1.0.1')).toBeLessThan(0)
+    })
+
+    it('returns zero for equal versions', () => {
+      expect(compareVersions('v1.242.0', 'v1.242.0')).toBe(0)
+      expect(compareVersions('1.242.0', 'v1.242.0')).toBe(0)
+    })
+
+    it('handles pre-release suffixes correctly per semver', () => {
+      // Pre-release versions are lower than stable versions
+      expect(compareVersions('1.243.0-beta.1', '1.243.0')).toBeLessThan(0)
+      expect(compareVersions('1.243.0', '1.243.0-beta.1')).toBeGreaterThan(0)
+      expect(compareVersions('1.244.0-rc.1', '1.243.0')).toBeGreaterThan(0)
+    })
+
+    it('compares numeric pre-release identifiers numerically, not lexically', () => {
+      // beta.2 is OLDER than beta.11 (2 < 11), even though "2" > "1" lexically.
+      expect(compareVersions('1.0.0-beta.2', '1.0.0-beta.11')).toBeLessThan(0)
+      expect(compareVersions('1.0.0-beta.11', '1.0.0-beta.2')).toBeGreaterThan(
+        0,
+      )
+      expect(compareVersions('1.0.0-beta.2', '1.0.0-beta.2')).toBe(0)
+    })
+
+    it('orders pre-release identifiers per semver precedence rules', () => {
+      // Alphabetic identifiers compare in ASCII order.
+      expect(compareVersions('1.0.0-alpha', '1.0.0-beta')).toBeLessThan(0)
+      // A larger set of fields wins when the preceding ones are equal.
+      expect(compareVersions('1.0.0-alpha.1', '1.0.0-alpha')).toBeGreaterThan(0)
+      // Numeric identifiers rank below non-numeric ones.
+      expect(compareVersions('1.0.0-1', '1.0.0-alpha')).toBeLessThan(0)
+    })
+
+    it('keeps the full pre-release string when it contains dashes', () => {
+      // `1.0.0-beta-1` vs `1.0.0-beta-2`: the trailing segment must not be
+      // dropped (both previously parsed to just "beta" and compared equal).
+      expect(compareVersions('1.0.0-beta-1', '1.0.0-beta-2')).toBeLessThan(0)
+    })
+
+    it('strips build metadata before comparing', () => {
+      expect(compareVersions('1.243.0+build123', '1.243.0')).toBe(0)
+    })
+
+    it('handles different segment counts', () => {
+      expect(compareVersions('1.243', '1.243.0')).toBe(0)
+      expect(compareVersions('1.243.1', '1.243')).toBeGreaterThan(0)
+    })
+  })
+
   describe('encodeSvg', () => {
     it('encodes special characters', () => {
       const svg = '<svg><path d="M0 0"/></svg>'
@@ -203,6 +264,110 @@ describe('utils/index', () => {
       const encoded = encodeSvg(svg)
       // Should not have duplicate xmlns
       expect(encoded.match(/xmlns/g)?.length).toBe(1)
+    })
+  })
+
+  describe('sortProxiesByOrderingType - quality', () => {
+    const buildHistory = (latencies: number[], success = true) =>
+      latencies.map((l) => ({ latency: l, success, timestamp: Date.now() }))
+
+    const buildPerformanceData = () => {
+      const map = new Map()
+      map.set('high', { history: buildHistory([50, 60]) })
+      map.set('mid', { history: buildHistory([200, 250]) })
+      map.set('low', { history: buildHistory([1000, 1200]) })
+      return map
+    }
+
+    const noopGetLatency = vi.fn(() => 0)
+    const noopIsProxyGroup = vi.fn(() => false)
+    const latencyQualityMap = { NOT_CONNECTED: -1, MEDIUM: 300, HIGH: 800 }
+
+    it('qUALITY_DESC: sorts by score descending, missing data sinks to the end', () => {
+      const result = sortProxiesByOrderingType({
+        proxyNames: ['mid', 'unknown', 'high', 'low'],
+        orderingType: PROXIES_ORDERING_TYPE.QUALITY_DESC,
+        testUrl: null,
+        getLatencyByName: noopGetLatency,
+        isProxyGroup: noopIsProxyGroup,
+        latencyQualityMap,
+        urlForLatencyTest: 'http://test',
+        performanceData: buildPerformanceData(),
+      })
+
+      expect(result).toEqual(['high', 'mid', 'low', 'unknown'])
+    })
+
+    it('qUALITY_ASC: sorts by score ascending, missing data sinks to the end', () => {
+      const result = sortProxiesByOrderingType({
+        proxyNames: ['high', 'unknown', 'low', 'mid'],
+        orderingType: PROXIES_ORDERING_TYPE.QUALITY_ASC,
+        testUrl: null,
+        getLatencyByName: noopGetLatency,
+        isProxyGroup: noopIsProxyGroup,
+        latencyQualityMap,
+        urlForLatencyTest: 'http://test',
+        performanceData: buildPerformanceData(),
+      })
+
+      expect(result).toEqual(['low', 'mid', 'high', 'unknown'])
+    })
+
+    it('qUALITY_DESC: tolerates undefined performanceData', () => {
+      const result = sortProxiesByOrderingType({
+        proxyNames: ['a', 'b'],
+        orderingType: PROXIES_ORDERING_TYPE.QUALITY_DESC,
+        testUrl: null,
+        getLatencyByName: noopGetLatency,
+        isProxyGroup: noopIsProxyGroup,
+        latencyQualityMap,
+        urlForLatencyTest: 'http://test',
+      })
+
+      // Both nodes have no performance data, so order is stable/arbitrary,
+      // but the function must not throw.
+      expect(result).toHaveLength(2)
+    })
+
+    it('qUALITY_DESC: a currently-disconnected node sinks below connected ones despite good history', () => {
+      // 'high' has a great historical score but is unreachable right now;
+      // 'alive' is connected but was never quality-tested (score 0). The live
+      // failure must outweigh the stale good history.
+      const getLatencyByName = vi.fn((name: string) =>
+        name === 'high' ? latencyQualityMap.NOT_CONNECTED : 100,
+      )
+
+      const result = sortProxiesByOrderingType({
+        proxyNames: ['high', 'alive'],
+        orderingType: PROXIES_ORDERING_TYPE.QUALITY_DESC,
+        testUrl: null,
+        getLatencyByName,
+        isProxyGroup: noopIsProxyGroup,
+        latencyQualityMap,
+        urlForLatencyTest: 'http://test',
+        performanceData: buildPerformanceData(),
+      })
+
+      expect(result).toEqual(['alive', 'high'])
+    })
+
+    it('qUALITY_ASC: a currently-disconnected node sinks below connected ones despite good history', () => {
+      const getLatencyByName = vi.fn((name: string) =>
+        name === 'high' ? latencyQualityMap.NOT_CONNECTED : 100,
+      )
+
+      const result = sortProxiesByOrderingType({
+        proxyNames: ['high', 'alive'],
+        orderingType: PROXIES_ORDERING_TYPE.QUALITY_ASC,
+        testUrl: null,
+        getLatencyByName,
+        isProxyGroup: noopIsProxyGroup,
+        latencyQualityMap,
+        urlForLatencyTest: 'http://test',
+        performanceData: buildPerformanceData(),
+      })
+
+      expect(result).toEqual(['alive', 'high'])
     })
   })
 })

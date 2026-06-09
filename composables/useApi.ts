@@ -8,7 +8,7 @@ import type {
   RuleProvider,
 } from '~/types'
 import ky from 'ky'
-import semver from 'semver'
+import { compareVersions } from '~/utils'
 import { useMockData } from './useMockData'
 
 // Mock mode support
@@ -16,6 +16,85 @@ export function useMockMode() {
   const config = useRuntimeConfig()
 
   return config.public.mockMode === true
+}
+
+interface MockHistory {
+  time: string
+  delay: number
+}
+interface MockProxyShape {
+  name?: string
+  all?: string[]
+  history?: MockHistory[]
+}
+interface MockProviderShape {
+  proxies?: MockProxyShape[]
+}
+
+const MOCK_HISTORY_CAP = 10
+
+function pickJitteredDelay(previous: number | undefined): number {
+  if (!previous || previous <= 0) {
+    // No prior datapoint: 90% chance of a "successful" test in the 40-300ms range
+    return Math.random() < 0.9 ? Math.round(40 + Math.random() * 260) : 0
+  }
+  // ±20% jitter around the previous value, never below 1ms
+  const variance = previous * 0.2
+  return Math.round(
+    Math.max(1, previous - variance) + Math.random() * variance * 2,
+  )
+}
+
+function appendMockHistory(proxy: MockProxyShape, delay: number) {
+  const entry: MockHistory = { time: new Date().toISOString(), delay }
+  proxy.history = [...(proxy.history ?? []), entry].slice(-MOCK_HISTORY_CAP)
+}
+
+function simulateProxyDelay(
+  proxies: Record<string, MockProxyShape>,
+  proxyName: string,
+): { delay: number } {
+  const proxy = proxies[proxyName]
+  if (!proxy) return { delay: 0 }
+  const previous = proxy.history?.at(-1)?.delay
+  const delay = pickJitteredDelay(previous)
+  appendMockHistory(proxy, delay)
+  return { delay }
+}
+
+function simulateGroupDelay(
+  proxies: Record<string, MockProxyShape>,
+  groupName: string,
+): Record<string, number> {
+  const group = proxies[groupName]
+  if (!group?.all) return {}
+  const results: Record<string, number> = {}
+  for (const child of group.all) {
+    results[child] = simulateProxyDelay(proxies, child).delay
+  }
+  return results
+}
+
+function simulateProviderHealthCheck(
+  providers: Record<string, MockProviderShape>,
+  proxies: Record<string, MockProxyShape>,
+  providerName: string,
+): Record<string, number> {
+  const provider = providers[providerName]
+  if (!provider?.proxies) return {}
+  const results: Record<string, number> = {}
+  for (const node of provider.proxies) {
+    if (!node.name) continue
+    const previous =
+      proxies[node.name]?.history?.at(-1)?.delay ?? node.history?.at(-1)?.delay
+    const delay = pickJitteredDelay(previous)
+    results[node.name] = delay
+    // Keep both the provider's copy and the top-level proxy in sync so a
+    // subsequent fetchProxies reflects the new history.
+    appendMockHistory(node, delay)
+    if (proxies[node.name]) appendMockHistory(proxies[node.name]!, delay)
+  }
+  return results
 }
 
 // Mock data resolver
@@ -39,13 +118,14 @@ function getMockData(url: string): unknown {
   if (path === 'rules') {
     const rulesObj: Record<string, (typeof mockData.mockRules)[0]> = {}
     mockData.mockRules.forEach((rule, idx) => {
-      rulesObj[`rule-${idx}`] = rule
+      rulesObj[String(idx)] = rule
     })
 
     return { rules: rulesObj }
   }
   if (path === 'providers/rules')
     return { providers: mockData.mockRuleProviders }
+  if (path === 'rules/disable') return {}
   if (path === 'connections')
     return {
       connections: mockData.mockConnections,
@@ -53,6 +133,47 @@ function getMockData(url: string): unknown {
       uploadTotal: 125000000,
     }
   if (path === 'group') return { groups: {} }
+
+  // Latency-test endpoints — must be matched before the generic `proxies/` catch-all
+  if (path.startsWith('proxies/') && path.endsWith('/delay')) {
+    const proxyName = decodeURIComponent(
+      path.slice('proxies/'.length, -'/delay'.length),
+    )
+    return simulateProxyDelay(
+      mockData.mockProxies as Record<string, MockProxyShape>,
+      proxyName,
+    )
+  }
+  if (path.startsWith('group/') && path.endsWith('/delay')) {
+    const groupName = decodeURIComponent(
+      path.slice('group/'.length, -'/delay'.length),
+    )
+    return simulateGroupDelay(
+      mockData.mockProxies as Record<string, MockProxyShape>,
+      groupName,
+    )
+  }
+  if (path.startsWith('providers/proxies/') && path.endsWith('/healthcheck')) {
+    const middle = path.slice(
+      'providers/proxies/'.length,
+      -'/healthcheck'.length,
+    )
+    // Two shapes share this prefix: `{provider}/healthcheck` triggers the whole
+    // provider (returns a name->delay map), while `{provider}/{node}/healthcheck`
+    // tests a single node (returns { delay }, like the per-node delay endpoint).
+    const segments = middle.split('/')
+    if (segments.length === 2) {
+      return simulateProxyDelay(
+        mockData.mockProxies as Record<string, MockProxyShape>,
+        decodeURIComponent(segments[1]!),
+      )
+    }
+    return simulateProviderHealthCheck(
+      mockData.mockProxyProviders as Record<string, MockProviderShape>,
+      mockData.mockProxies as Record<string, MockProxyShape>,
+      decodeURIComponent(middle),
+    )
+  }
 
   // Handle dynamic proxy endpoints
   if (path.startsWith('proxies/')) {
@@ -105,8 +226,9 @@ export function useRequest() {
   }
 
   return ky.create({
-    prefixUrl: endpoint.url,
+    prefix: endpoint.url,
     headers,
+    timeout: 5000,
   })
 }
 
@@ -118,22 +240,36 @@ export function useGithubAPI() {
   }
 
   return ky.create({
-    prefixUrl: 'https://api.github.com',
+    prefix: 'https://api.github.com',
     headers,
   })
 }
 
 // API Functions
-export function checkEndpointAPI(url: string, secret: string) {
+export type EndpointCheckError = 'mixed_content' | 'network_error' | null
+
+export function checkEndpointAPI(
+  url: string,
+  secret: string,
+): Promise<EndpointCheckError> {
   return ky
     .get(url.endsWith('/') ? `${url}version` : `${url}/version`, {
       headers: secret ? { Authorization: `Bearer ${secret}` } : {},
+      timeout: 5000,
     })
-    .then(({ ok }) => ok)
+    .then(() => null)
     .catch((err) => {
       console.error(err)
 
-      return false
+      if (
+        typeof window !== 'undefined' &&
+        window.location.protocol === 'https:' &&
+        url.startsWith('http://')
+      ) {
+        return 'mixed_content'
+      }
+
+      return 'network_error'
     })
 }
 
@@ -195,11 +331,13 @@ export function updateProxyProviderAPI(providerName: string) {
 export function proxyProviderHealthCheckAPI(providerName: string) {
   const request = useRequest()
 
-  return request
-    .get(`providers/proxies/${encodeURIComponent(providerName)}/healthcheck`, {
+  // Mihomo returns 204 No Content — this only triggers an async health check.
+  return request.get(
+    `providers/proxies/${encodeURIComponent(providerName)}/healthcheck`,
+    {
       timeout: 20 * 1000,
-    })
-    .json<Record<string, number>>()
+    },
+  )
 }
 
 export function selectProxyInGroupAPI(groupName: string, proxyName: string) {
@@ -210,6 +348,16 @@ export function selectProxyInGroupAPI(groupName: string, proxyName: string) {
   })
 }
 
+export function unfixProxyInGroupAPI(groupName: string) {
+  const request = useRequest()
+
+  // Clears a manual pin on an automatic group (url-test/fallback/load-balance),
+  // restoring automatic selection. Mihomo returns 400 for Selector groups,
+  // which have no "fixed" concept — callers should only offer this on groups
+  // that report a non-empty `fixed`.
+  return request.delete(`proxies/${encodeURIComponent(groupName)}`)
+}
+
 export function proxyLatencyTestAPI(
   proxyName: string,
   provider: string,
@@ -218,14 +366,16 @@ export function proxyLatencyTestAPI(
 ) {
   const request = useRequest()
 
-  if (provider !== '') {
-    return proxyProviderHealthCheckAPI(provider).then((latencyMap) => ({
-      delay: latencyMap[proxyName] ?? 0,
-    }))
-  }
+  // A provider node may not be present in the global /proxies map (or its name
+  // may collide with another provider's node), so when the provider is known we
+  // hit the provider-scoped health-check endpoint to test that exact node.
+  // Both endpoints share mihomo's getProxyDelay handler and return { delay }.
+  const path = provider
+    ? `providers/proxies/${encodeURIComponent(provider)}/${encodeURIComponent(proxyName)}/healthcheck`
+    : `proxies/${encodeURIComponent(proxyName)}/delay`
 
   return request
-    .get(`proxies/${encodeURIComponent(proxyName)}/delay`, {
+    .get(path, {
       searchParams: { url, timeout },
     })
     .json<{ delay: number }>()
@@ -238,9 +388,13 @@ export function proxyGroupLatencyTestAPI(
 ) {
   const request = useRequest()
 
+  // The backend's `timeout` is per-node; the group test fans out to every
+  // member, so the overall round trip easily exceeds ky's 5s default. Scale
+  // the client timeout generously, floored at 30s, plus 10s of headroom.
   return request
     .get(`group/${encodeURIComponent(groupName)}/delay`, {
       searchParams: { url, timeout },
+      timeout: Math.max(30_000, timeout * 2 + 10_000),
     })
     .json<Record<string, number>>()
 }
@@ -267,6 +421,14 @@ export function updateRuleProviderAPI(providerName: string) {
   return request.put(`providers/rules/${encodeURIComponent(providerName)}`)
 }
 
+export function toggleRuleDisabledAPI(index: number, disabled: boolean) {
+  const request = useRequest()
+
+  return request.patch('rules/disable', {
+    json: { [index]: disabled },
+  })
+}
+
 // Config Actions with loading states
 export function useConfigActions() {
   const reloadingConfigFile = ref(false)
@@ -287,8 +449,9 @@ export function useConfigActions() {
       })
     } catch {
       /* empty */
+    } finally {
+      reloadingConfigFile.value = false
     }
-    reloadingConfigFile.value = false
   }
 
   const fetchingRemoteConfig = ref(false)
@@ -320,8 +483,9 @@ export function useConfigActions() {
       await request.post('cache/fakeip/flush')
     } catch {
       /* empty */
+    } finally {
+      flushingFakeIPData.value = false
     }
-    flushingFakeIPData.value = false
   }
 
   const flushDNSCacheAPI = async () => {
@@ -331,8 +495,9 @@ export function useConfigActions() {
       await request.post('cache/dns/flush')
     } catch {
       /* empty */
+    } finally {
+      flushingDNSCache.value = false
     }
-    flushingDNSCache.value = false
   }
 
   const updateGEODatabasesAPI = async () => {
@@ -342,8 +507,9 @@ export function useConfigActions() {
       await request.post('configs/geo')
     } catch {
       /* empty */
+    } finally {
+      updatingGEODatabases.value = false
     }
-    updatingGEODatabases.value = false
   }
 
   const upgradeBackendAPI = async () => {
@@ -353,8 +519,9 @@ export function useConfigActions() {
       await request.post('upgrade')
     } catch {
       /* empty */
+    } finally {
+      upgradingBackend.value = false
     }
-    upgradingBackend.value = false
   }
 
   const upgradeUIAPI = async () => {
@@ -364,8 +531,9 @@ export function useConfigActions() {
       await request.post('upgrade/ui')
     } catch {
       /* empty */
+    } finally {
+      upgradingUI.value = false
     }
-    upgradingUI.value = false
   }
 
   const restartBackendAPI = async () => {
@@ -375,8 +543,9 @@ export function useConfigActions() {
       await request.post('restart')
     } catch {
       /* empty */
+    } finally {
+      restartingBackend.value = false
     }
-    restartingBackend.value = false
   }
 
   return {
@@ -400,6 +569,8 @@ export function useConfigActions() {
 }
 
 // Release API
+const BACKEND_VERSION_RE = /(alpha|beta|meta)-?(\w+)/
+
 interface ReleaseAPIResponse {
   tag_name: string
   body: string
@@ -414,10 +585,7 @@ export async function frontendReleaseAPI(currentVersion: string) {
     .json<ReleaseAPIResponse>()
 
   return {
-    isUpdateAvailable: semver.gt(
-      semver.coerce(tag_name) || '0.0.0',
-      semver.coerce(currentVersion) || '0.0.0',
-    ),
+    isUpdateAvailable: compareVersions(tag_name, currentVersion) > 0,
     changelog: body,
   }
 }
@@ -425,7 +593,7 @@ export async function frontendReleaseAPI(currentVersion: string) {
 export async function backendReleaseAPI(currentVersion: string) {
   const githubAPI = useGithubAPI()
   const repositoryURL = 'repos/MetaCubeX/mihomo'
-  const match = /(alpha|beta|meta)-?(\w+)/.exec(currentVersion)
+  const match = BACKEND_VERSION_RE.exec(currentVersion)
 
   const releaseByAssets = async (url: string, versionSuffix: string) => {
     const { assets, body } = await githubAPI
@@ -464,10 +632,7 @@ export async function backendReleaseAPI(currentVersion: string) {
     .json<ReleaseAPIResponse>()
 
   return {
-    isUpdateAvailable: semver.gt(
-      semver.coerce(tag_name) || '0.0.0',
-      semver.coerce(currentVersion) || '0.0.0',
-    ),
+    isUpdateAvailable: compareVersions(tag_name, currentVersion) > 0,
     changelog: body,
   }
 }
@@ -497,7 +662,7 @@ export async function fetchBackendReleasesAPI(
 ): Promise<ReleaseInfo[]> {
   const githubAPI = useGithubAPI()
   const repositoryURL = 'repos/MetaCubeX/mihomo'
-  const match = /(alpha|beta|meta)-?(\w+)/.exec(currentVersion)
+  const match = BACKEND_VERSION_RE.exec(currentVersion)
 
   if (!match) {
     // Stable version (e.g. "v1.19.9") - fetch stable releases

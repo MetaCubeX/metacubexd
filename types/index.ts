@@ -15,6 +15,9 @@ export interface Proxy {
   xudp: boolean
   tfo: boolean
   now: string
+  // Present on automatic groups (url-test/fallback/load-balance): the node the
+  // user manually pinned. Empty/absent means the group is auto-selecting.
+  fixed?: string
   testUrl?: string
   timeout?: number
 }
@@ -52,11 +55,21 @@ export interface ProxyProvider {
   vehicleType: string
 }
 
+export interface RuleExtra {
+  disabled?: boolean
+  hitCount?: number
+  hitAt?: string
+  missCount?: number
+  missAt?: string
+}
+
 export interface Rule {
+  index: number
   type: string
   payload: string
   proxy: string
   size: number
+  extra?: RuleExtra
 }
 
 export interface RuleProvider {
@@ -186,7 +199,12 @@ export type ConnectionsTableColumnVisibility = Partial<
 >
 export type ConnectionsTableColumnOrder = CONNECTIONS_TABLE_ACCESSOR_KEY[]
 
-export type DataUsageType = 'sourceIP' | 'host' | 'process' | 'outbound'
+export type DataUsageType =
+  | 'sourceIP'
+  | 'host'
+  | 'process'
+  | 'outbound'
+  | 'inboundUser'
 
 export interface DataUsageEntry {
   type: DataUsageType

@@ -5,12 +5,13 @@ const { t } = useI18n()
 
 useHead({ title: computed(() => t('home')) })
 const endpointStore = useEndpointStore()
+const configStore = useConfigStore()
 const router = useRouter()
 
-// Redirect to overview if already connected
+// Redirect to default page if already connected
 onMounted(() => {
   if (endpointStore.currentEndpoint) {
-    router.replace('/overview')
+    router.replace(`/${configStore.defaultPage || 'overview'}`)
   }
 })
 </script>

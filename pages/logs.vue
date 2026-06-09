@@ -23,9 +23,11 @@ const configStore = useConfigStore()
 const globalFilter = ref('')
 const settingsModal = ref<{ open: () => void; close: () => void }>()
 
+const LOG_TYPE_REGEX = /^\[([^\]]+)\]/
+
 // Extract type from payload, e.g. "[dns] xxx" -> "dns"
 function extractType(payload: string): string {
-  const match = payload.match(/^\[([^\]]+)\]/)
+  const match = payload.match(LOG_TYPE_REGEX)
   return match?.[1] ?? ''
 }
 
@@ -367,8 +369,9 @@ const tableSizeClass = computed(() =>
               :style="{ animationDelay: `${(index % 20) * 15}ms` }"
             >
               <td
-                v-for="col in columns"
+                v-for="(col, index) in columns"
                 :key="col.id"
+                :class="index === 0 ? 'py-1 leading-6' : ''"
                 class="border-b border-base-content/5"
               >
                 <component :is="() => col.render(row.original)" />

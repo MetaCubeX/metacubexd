@@ -3,10 +3,20 @@
 
 import { useLocalStorage, useSessionStorage } from '@vueuse/core'
 import { beforeEach, vi } from 'vitest'
-import { computed, reactive, ref, watch, watchEffect } from 'vue'
+import {
+  computed,
+  markRaw,
+  reactive,
+  ref,
+  shallowRef,
+  watch,
+  watchEffect,
+} from 'vue'
 
 // Provide Vue and VueUse auto-imports globally (Nuxt auto-import simulation)
 vi.stubGlobal('ref', ref)
+vi.stubGlobal('shallowRef', shallowRef)
+vi.stubGlobal('markRaw', markRaw)
 vi.stubGlobal('computed', computed)
 vi.stubGlobal('reactive', reactive)
 vi.stubGlobal('watch', watch)
@@ -14,9 +24,9 @@ vi.stubGlobal('watchEffect', watchEffect)
 vi.stubGlobal('useLocalStorage', useLocalStorage)
 vi.stubGlobal('useSessionStorage', useSessionStorage)
 
-// Mock localStorage
-const localStorageMock = (() => {
+function createStorageMock() {
   let store: Record<string, string> = {}
+
   return {
     getItem: (key: string) => store[key] ?? null,
     setItem: (key: string, value: string) => {
@@ -33,12 +43,14 @@ const localStorageMock = (() => {
     },
     key: (index: number) => Object.keys(store)[index] ?? null,
   }
-})()
+}
+
+// Mock localStorage and sessionStorage independently
+const localStorageMock = createStorageMock()
+const sessionStorageMock = createStorageMock()
 
 vi.stubGlobal('localStorage', localStorageMock)
-
-// Mock sessionStorage
-vi.stubGlobal('sessionStorage', localStorageMock)
+vi.stubGlobal('sessionStorage', sessionStorageMock)
 
 // Mock window.matchMedia
 vi.stubGlobal('matchMedia', (query: string) => ({
@@ -52,7 +64,8 @@ vi.stubGlobal('matchMedia', (query: string) => ({
   dispatchEvent: vi.fn(),
 }))
 
-// Reset localStorage before each test
+// Reset storage before each test
 beforeEach(() => {
   localStorage.clear()
+  sessionStorage.clear()
 })
