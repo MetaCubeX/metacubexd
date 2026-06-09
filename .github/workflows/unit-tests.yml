@@ -42,7 +42,7 @@ jobs:
         run: pnpm test:coverage
 
       - name: Upload coverage reports
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           files: ./coverage/lcov.info
           fail_ci_if_error: false
