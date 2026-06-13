@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import type { Component } from 'vue'
+import { autoUpdate, flip, offset, shift, useFloating } from '@floating-ui/vue'
 import {
+  IconBolt,
   IconChartAreaLine,
   IconChevronsLeft,
   IconChevronsRight,
@@ -8,9 +11,14 @@ import {
   IconHome,
   IconMenu2,
   IconNetwork,
+  IconRoute,
   IconRuler,
   IconSettings,
 } from '@tabler/icons-vue'
+import {
+  useConfigQuery,
+  useUpdateConfigMutation,
+} from '~/composables/useQueries'
 
 const route = useRoute()
 const { t } = useI18n()
@@ -27,6 +35,87 @@ const navItems = computed(() => [
 ])
 
 const isActive = (href: string) => route.path === href
+
+// Running mode switcher (visible on all pages)
+const { data: backendConfig } = useConfigQuery()
+const updateConfigMutation = useUpdateConfigMutation()
+
+const currentMode = ref('')
+const modes = ref<string[]>(['rule', 'direct', 'global'])
+
+watch(
+  backendConfig,
+  (config) => {
+    if (config) {
+      currentMode.value = config.mode || 'rule'
+      modes.value = config['mode-list'] ||
+        config.modes || ['rule', 'direct', 'global']
+    }
+  },
+  { immediate: true },
+)
+
+const modeIcons: Record<string, Component> = {
+  rule: IconRuler,
+  global: IconGlobe,
+  direct: IconRoute,
+}
+
+const getModeIcon = (mode: string) => modeIcons[mode] || IconBolt
+
+const getModeLabel = (mode: string) => {
+  const knownModes = ['rule', 'global', 'direct']
+  return knownModes.includes(mode)
+    ? t(mode as 'rule' | 'global' | 'direct')
+    : mode
+}
+
+function selectMode(mode: string) {
+  if (mode === currentMode.value) {
+    isModeMenuOpen.value = false
+    return
+  }
+  currentMode.value = mode
+  updateConfigMutation.mutate({ key: 'mode', value: mode })
+  isModeMenuOpen.value = false
+}
+
+// Floating dropdown for the collapsed sidebar
+const modeReference = ref<HTMLElement | null>(null)
+const modeFloating = ref<HTMLElement | null>(null)
+const isModeMenuOpen = ref(false)
+
+const { floatingStyles: modeFloatingStyles } = useFloating(
+  modeReference,
+  modeFloating,
+  {
+    placement: 'right',
+    middleware: [offset(10), flip(), shift({ padding: 8 })],
+    whileElementsMounted: autoUpdate,
+  },
+)
+
+function toggleModeMenu() {
+  isModeMenuOpen.value = !isModeMenuOpen.value
+}
+
+function onModeClickOutside(event: MouseEvent) {
+  const target = event.target as Node
+  if (
+    !modeReference.value?.contains(target) &&
+    !modeFloating.value?.contains(target)
+  ) {
+    isModeMenuOpen.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', onModeClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', onModeClickOutside)
+})
 
 // Close drawer when route changes (mobile only)
 const drawerCheckbox = ref<HTMLInputElement | null>(null)
@@ -147,6 +236,120 @@ const toggleSidebar = () => {
               {{ t('collapse') }}
             </span>
           </button>
+
+          <!-- Running mode switcher -->
+          <div
+            class="flex flex-col gap-1.5"
+            :class="configStore.sidebarExpanded ? '' : 'lg:hidden'"
+          >
+            <span
+              class="px-1 text-[0.6875rem] font-semibold tracking-[0.05em] text-base-content/40 uppercase"
+            >
+              {{ t('runningMode') }}
+            </span>
+            <div
+              class="flex gap-1 rounded-lg border border-[var(--sidebar-border)] bg-[var(--sidebar-hover)] p-1"
+            >
+              <button
+                v-for="mode in modes"
+                :key="mode"
+                class="press-tactile flex min-w-0 flex-1 cursor-pointer items-center justify-center rounded-md border-none bg-transparent px-1.5 py-1.5 text-xs font-medium text-[color-mix(in_oklch,var(--color-base-content)_70%,transparent)] transition-colors duration-200 hover:text-base-content"
+                :class="
+                  currentMode === mode
+                    ? 'bg-primary/15 text-primary hover:text-primary'
+                    : ''
+                "
+                :title="getModeLabel(mode)"
+                @click="selectMode(mode)"
+              >
+                <span class="truncate">{{ getModeLabel(mode) }}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Running mode switcher (collapsed desktop) -->
+          <div
+            class="relative hidden self-center"
+            :class="configStore.sidebarExpanded ? '' : 'lg:block'"
+          >
+            <button
+              ref="modeReference"
+              class="press-tactile flex aspect-square w-9 cursor-pointer items-center justify-center rounded-lg border border-[var(--sidebar-border)] bg-transparent text-base-content hover:border-[color-mix(in_oklch,var(--color-base-content)_20%,transparent)] hover:bg-[var(--sidebar-hover)]"
+              :class="{
+                'border-primary/40 bg-primary/15 text-primary': isModeMenuOpen,
+              }"
+              :title="`${t('runningMode')}: ${getModeLabel(currentMode)}`"
+              @click.stop="toggleModeMenu"
+            >
+              <component :is="getModeIcon(currentMode)" class="h-5 w-5" />
+            </button>
+
+            <Teleport to="body">
+              <Transition
+                enter-active-class="transition-opacity duration-150"
+                leave-active-class="transition-opacity duration-100"
+                enter-from-class="opacity-0"
+                leave-to-class="opacity-0"
+              >
+                <div
+                  v-if="isModeMenuOpen"
+                  ref="modeFloating"
+                  :style="modeFloatingStyles"
+                  class="z-70 w-40 overflow-hidden rounded-xl border border-base-content/10 bg-base-300/98 shadow-[0_10px_40px_var(--color-base-content)/20,0_0_0_1px_var(--color-base-content)/5] backdrop-blur-[12px]"
+                >
+                  <div
+                    class="flex items-center border-b border-base-content/8 bg-base-200/60 px-3 py-2.5"
+                  >
+                    <span
+                      class="text-[0.6875rem] font-semibold tracking-[0.05em] text-base-content/50 uppercase"
+                    >
+                      {{ t('runningMode') }}
+                    </span>
+                  </div>
+                  <ul class="m-0 list-none p-1.5">
+                    <li v-for="mode in modes" :key="mode">
+                      <button
+                        class="flex w-full cursor-pointer items-center justify-between rounded-lg border-none bg-transparent px-2.5 py-2 transition-all duration-150 ease-in-out hover:bg-base-content/8"
+                        :class="{
+                          'bg-primary/15 hover:bg-primary/20':
+                            currentMode === mode,
+                        }"
+                        @click="selectMode(mode)"
+                      >
+                        <span
+                          class="flex items-center gap-2 text-[0.8125rem] font-medium text-base-content"
+                          :class="{ 'text-primary': currentMode === mode }"
+                        >
+                          <component
+                            :is="getModeIcon(mode)"
+                            class="h-4 w-4 shrink-0"
+                          />
+                          {{ getModeLabel(mode) }}
+                        </span>
+                        <div
+                          v-if="currentMode === mode"
+                          class="flex h-4 w-4 items-center justify-center text-primary"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                            class="h-full w-full"
+                          >
+                            <path
+                              fill-rule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clip-rule="evenodd"
+                            />
+                          </svg>
+                        </div>
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              </Transition>
+            </Teleport>
+          </div>
         </div>
 
         <!-- Navigation menu -->

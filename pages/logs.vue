@@ -2,6 +2,9 @@
 import type { VNode } from 'vue'
 import type { LogWithSeq } from '~/types'
 import {
+  IconCheck,
+  IconCopy,
+  IconDownload,
   IconFileStack,
   IconPlayerPause,
   IconPlayerPlay,
@@ -242,6 +245,33 @@ function toggleGroupExpanded(key: string) {
 const tableSizeClass = computed(() =>
   configStore.tableSizeClassName(configStore.logsTableSize),
 )
+
+// Export logs as plain text, respecting the active filter & sort order
+function logsToText() {
+  return sortedLogs.value
+    .map((log) => `[${log.type}] ${log.payload}`)
+    .join('\n')
+}
+
+const copied = ref(false)
+
+async function copyLogs() {
+  await navigator.clipboard.writeText(logsToText())
+  copied.value = true
+  setTimeout(() => {
+    copied.value = false
+  }, 1000)
+}
+
+function downloadLogs() {
+  const blob = new Blob([logsToText()], { type: 'text/plain' })
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.download = `mihomo-logs-${new Date().toISOString()}.log`
+  anchor.click()
+  URL.revokeObjectURL(url)
+}
 </script>
 
 <template>
@@ -262,6 +292,25 @@ const tableSizeClass = computed(() =>
       </div>
 
       <div class="flex gap-2">
+        <button
+          class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-base-content/10 bg-base-200/60 text-base-content transition-all duration-200 hover:border-base-content/20 hover:bg-base-300 disabled:cursor-not-allowed disabled:opacity-40"
+          :disabled="sortedLogs.length === 0"
+          :title="t('copy')"
+          @click="copyLogs()"
+        >
+          <IconCheck v-if="copied" class="text-success" :size="18" />
+          <IconCopy v-else :size="18" />
+        </button>
+
+        <button
+          class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-base-content/10 bg-base-200/60 text-base-content transition-all duration-200 hover:border-base-content/20 hover:bg-base-300 disabled:cursor-not-allowed disabled:opacity-40"
+          :disabled="sortedLogs.length === 0"
+          :title="t('download')"
+          @click="downloadLogs()"
+        >
+          <IconDownload :size="18" />
+        </button>
+
         <button
           class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-base-content/10 bg-base-200/60 text-base-content transition-all duration-200 hover:border-base-content/20 hover:bg-base-300"
           :class="{

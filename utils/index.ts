@@ -343,6 +343,14 @@ export function filterProxiesByAvailability({
     : proxyNames
 }
 
+// Case-insensitive substring match on node name. An empty/whitespace-only
+// keyword keeps the list untouched so the common (unfiltered) path is free.
+export function filterProxiesByName(proxyNames: string[], keyword: string) {
+  const trimmed = keyword.trim().toLowerCase()
+  if (!trimmed) return proxyNames
+  return proxyNames.filter((name) => name.toLowerCase().includes(trimmed))
+}
+
 // String boolean map helper
 export function useStringBooleanMap() {
   const map = ref<Record<string, boolean>>({})

@@ -20,6 +20,56 @@ const endpointStore = useEndpointStore()
 const configActions = useConfigActions()
 const runtimeConfig = useRuntimeConfig()
 
+// Appearance & settings backup
+const appearance = useAppearance()
+const { downloadSettings, importSettings } = useSettingsBackup()
+
+const backgroundFileInput = ref<HTMLInputElement>()
+const settingsFileInput = ref<HTMLInputElement>()
+
+const themeColorTokens = CUSTOM_THEME_TOKENS
+
+const fontOptions = [
+  { label: 'System Default', value: '' },
+  { label: 'MiSans', value: "'MiSans'" },
+  { label: 'Sarasa UI SC', value: "'Sarasa UI SC'" },
+  { label: 'PingFang SC', value: "'PingFang SC'" },
+  { label: 'Fira Sans', value: "'Fira Sans'" },
+  { label: 'Noto Sans SC', value: "'Noto Sans SC'" },
+]
+
+async function onUploadBackground(event: Event) {
+  const file = (event.target as HTMLInputElement).files?.[0]
+  if (!file) return
+  await appearance.setCustomBackground(file)
+  if (backgroundFileInput.value) backgroundFileInput.value.value = ''
+}
+
+async function onClearBackground() {
+  await appearance.clearCustomBackground()
+  configStore.backgroundImageType = 'none'
+}
+
+function onThemeColorInput(token: string, event: Event) {
+  const value = (event.target as HTMLInputElement).value
+  configStore.customThemeColors = {
+    ...configStore.customThemeColors,
+    [token]: value,
+  }
+}
+
+async function onImportSettings(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+  try {
+    await importSettings(file)
+    window.location.reload()
+  } catch {
+    input.value = ''
+  }
+}
+
 const frontendVersion = `v${runtimeConfig.public.appVersion || '0.0.0'}`
 
 // TanStack Query
@@ -89,6 +139,7 @@ async function onFetchRemoteConfig() {
 const localConfig = reactive({
   allowLan: false,
   mode: 'rule',
+  unifiedDelay: false,
   interfaceName: '',
   tunEnable: false,
   tunStack: 'Mixed',
@@ -109,6 +160,7 @@ watch(
     if (config) {
       localConfig.allowLan = config['allow-lan'] || false
       localConfig.mode = config.mode || 'rule'
+      localConfig.unifiedDelay = config.UnifiedDelay || false
       localConfig.interfaceName = config['interface-name'] || ''
       localConfig.tunEnable = config.tun?.enable || false
       localConfig.tunStack = config.tun?.stack || 'Mixed'
@@ -377,6 +429,35 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                     {{ getModeLabel(mode) }}
                   </option>
                 </select>
+              </div>
+
+              <div
+                v-if="!isSingBox"
+                class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 transition-colors hover:bg-base-content/5"
+              >
+                <div class="flex items-center gap-2 text-sm">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="size-4 opacity-60"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 6v6l4 2" />
+                  </svg>
+                  <span>{{ t('unifiedDelay') }}</span>
+                </div>
+                <input
+                  id="unified-delay"
+                  v-model="localConfig.unifiedDelay"
+                  type="checkbox"
+                  class="toggle toggle-primary"
+                  @change="
+                    updateConfig('unified-delay', localConfig.unifiedDelay)
+                  "
+                />
               </div>
 
               <div
@@ -651,6 +732,167 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
             </div>
 
             <div class="divider my-2 text-xs opacity-40">
+              {{ t('appearance') }}
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <!-- Font Family -->
+              <div
+                class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 transition-colors hover:bg-base-content/5"
+              >
+                <div class="flex items-center gap-2 text-sm">
+                  <span>{{ t('fontFamily') }}</span>
+                </div>
+                <select
+                  v-model="configStore.fontFamily"
+                  class="select-bordered select select-sm"
+                >
+                  <option
+                    v-for="font in fontOptions"
+                    :key="font.value"
+                    :value="font.value"
+                  >
+                    {{ font.label }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- Background Type -->
+              <div
+                class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 transition-colors hover:bg-base-content/5"
+              >
+                <div class="flex items-center gap-2 text-sm">
+                  <span>{{ t('backgroundImage') }}</span>
+                </div>
+                <select
+                  v-model="configStore.backgroundImageType"
+                  class="select-bordered select select-sm"
+                >
+                  <option value="none">{{ t('none') }}</option>
+                  <option value="custom">
+                    {{ t('backgroundCustomImage') }}
+                  </option>
+                  <option value="url">
+                    {{ t('backgroundImageUrlOption') }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- Custom Upload -->
+              <div
+                v-if="configStore.backgroundImageType === 'custom'"
+                class="flex items-center gap-2 px-2"
+              >
+                <input
+                  ref="backgroundFileInput"
+                  type="file"
+                  accept="image/*"
+                  class="hidden"
+                  @change="onUploadBackground"
+                />
+                <Button
+                  class="flex-1 btn-outline btn-sm btn-primary"
+                  @click="backgroundFileInput?.click()"
+                >
+                  {{ t('uploadImage') }}
+                </Button>
+                <Button
+                  class="btn-outline btn-sm btn-error"
+                  @click="onClearBackground"
+                >
+                  {{ t('clearAll') }}
+                </Button>
+              </div>
+
+              <!-- Remote URL -->
+              <input
+                v-if="configStore.backgroundImageType === 'url'"
+                v-model="configStore.backgroundImageUrl"
+                type="text"
+                inputmode="url"
+                class="input-bordered input mx-2 input-sm"
+                :placeholder="t('backgroundImageUrlPlaceholder')"
+              />
+
+              <!-- Blur + Overlay Opacity -->
+              <template v-if="configStore.backgroundImageType !== 'none'">
+                <div
+                  class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 transition-colors hover:bg-base-content/5"
+                >
+                  <div class="flex items-center gap-2 text-sm">
+                    <span>{{ t('backgroundBlur') }}</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <input
+                      v-model.number="configStore.backgroundBlur"
+                      type="range"
+                      min="0"
+                      max="30"
+                      class="range w-24 range-primary range-xs"
+                    />
+                    <span class="w-10 text-right font-mono text-xs"
+                      >{{ configStore.backgroundBlur }}px</span
+                    >
+                  </div>
+                </div>
+                <div
+                  class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 transition-colors hover:bg-base-content/5"
+                >
+                  <div class="flex items-center gap-2 text-sm">
+                    <span>{{ t('backgroundOverlayOpacity') }}</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <input
+                      v-model.number="configStore.backgroundOverlayOpacity"
+                      type="range"
+                      min="0"
+                      max="100"
+                      class="range w-24 range-primary range-xs"
+                    />
+                    <span class="w-10 text-right font-mono text-xs"
+                      >{{ configStore.backgroundOverlayOpacity }}%</span
+                    >
+                  </div>
+                </div>
+              </template>
+
+              <!-- Custom Theme Colors -->
+              <div
+                class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 transition-colors hover:bg-base-content/5"
+              >
+                <div class="flex flex-col gap-0.5">
+                  <span class="text-sm">{{ t('customThemeColors') }}</span>
+                  <span class="text-xs opacity-50">{{
+                    t('customThemeColorsDesc')
+                  }}</span>
+                </div>
+                <input
+                  v-model="configStore.enableCustomThemeColors"
+                  type="checkbox"
+                  class="toggle toggle-primary"
+                />
+              </div>
+              <div
+                v-if="configStore.enableCustomThemeColors"
+                class="grid grid-cols-2 gap-2 px-2 sm:grid-cols-3"
+              >
+                <label
+                  v-for="token in themeColorTokens"
+                  :key="token"
+                  class="flex items-center gap-2 text-xs"
+                >
+                  <input
+                    type="color"
+                    :value="configStore.customThemeColors[token] || '#888888'"
+                    class="h-7 w-9 cursor-pointer rounded border border-base-content/10 bg-base-100"
+                    @input="onThemeColorInput(token, $event)"
+                  />
+                  <span class="truncate opacity-70">{{ token }}</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="divider my-2 text-xs opacity-40">
               {{ t('shortcuts.title', 'Keyboard Shortcuts') }}
             </div>
 
@@ -809,6 +1051,56 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                   />
                 </svg>
                 {{ t('recommendation.clearHistory') }}
+              </Button>
+            </div>
+
+            <div class="divider my-2 text-xs opacity-40">
+              {{ t('settingsBackup') }}
+            </div>
+
+            <input
+              ref="settingsFileInput"
+              type="file"
+              accept="application/json,.json"
+              class="hidden"
+              @change="onImportSettings"
+            />
+            <div class="grid grid-cols-2 gap-2">
+              <Button
+                class="btn-outline btn-secondary"
+                @click="downloadSettings"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="size-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"
+                  />
+                </svg>
+                {{ t('exportSettings') }}
+              </Button>
+              <Button
+                class="btn-outline btn-secondary"
+                @click="settingsFileInput?.click()"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="size-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"
+                  />
+                </svg>
+                {{ t('importSettings') }}
               </Button>
             </div>
 

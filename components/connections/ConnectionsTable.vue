@@ -3,6 +3,8 @@ import type { FunctionalComponent, VNode } from 'vue'
 import type { CONNECTIONS_TABLE_ACCESSOR_KEY } from '~/constants'
 import type { Connection } from '~/types'
 import {
+  IconCheck,
+  IconCopy,
   IconSortAscending,
   IconSortDescending,
   IconZoomInFilled,
@@ -159,6 +161,107 @@ function getCardProcessText(
   }
   return ''
 }
+
+// ===== Per-connection GeoIP (gated behind configStore.showConnectionGeoIP) =====
+const geo = useGeoLookup()
+
+// Columns whose primary value is the destination host — these get the leading
+// flag emoji once geo is resolved.
+const HOST_LIKE_COLUMN_IDS = new Set([
+  'host',
+  'hostProcess',
+  'destination',
+  'flowDirection',
+])
+
+function isHostLikeColumn(col: ConnectionColumn): boolean {
+  return HOST_LIKE_COLUMN_IDS.has(col.id)
+}
+
+function getDestinationIP(conn: Connection): string | undefined {
+  return conn.metadata.destinationIP || undefined
+}
+
+const showGeo = computed(() => configStore.showConnectionGeoIP)
+
+// Kick off lookups for every visible connection's destination IP whenever the
+// row model or the toggle changes. No-op when the toggle is off.
+watchEffect(() => {
+  if (!showGeo.value) return
+  for (const row of props.rowModel) {
+    if (row.type === 'data') geo.lookup(getDestinationIP(row.original))
+  }
+})
+
+function geoFlag(conn: Connection): string {
+  if (!showGeo.value) return ''
+  return geo.flagEmoji(getDestinationIP(conn))
+}
+
+function geoTooltip(conn: Connection): string {
+  if (!showGeo.value) return ''
+  return geo.tooltip(getDestinationIP(conn))
+}
+
+// ===== Copy cell value =====
+// Columns that expose a hover copy affordance, mapped to the value to copy.
+function getCopyValue(col: ConnectionColumn, conn: Connection): string {
+  switch (col.id) {
+    case 'host':
+    case 'hostProcess':
+      return getCardHostText(conn, props.columns)
+    case 'destination':
+      return getDestinationIP(conn) || ''
+    case 'process':
+      return getCardProcessText(conn, props.columns)
+    case 'chains':
+    case 'ruleChains':
+      return conn.chains.length ? [...conn.chains].reverse().join(' → ') : ''
+    default:
+      return ''
+  }
+}
+
+const COPYABLE_COLUMN_IDS = new Set([
+  'host',
+  'hostProcess',
+  'destination',
+  'process',
+  'chains',
+  'ruleChains',
+])
+
+function isCopyableColumn(col: ConnectionColumn): boolean {
+  return COPYABLE_COLUMN_IDS.has(col.id)
+}
+
+// Tracks which "<connId>:<colId>" cell most recently showed copy feedback.
+const copiedCellKey = ref<string | null>(null)
+let copiedTimer: ReturnType<typeof setTimeout> | undefined
+
+function cellKey(col: ConnectionColumn, conn: Connection): string {
+  return `${conn.id}:${col.id}`
+}
+
+async function copyCell(
+  col: ConnectionColumn,
+  conn: Connection,
+  event: Event,
+): Promise<void> {
+  event.stopPropagation()
+  const value = getCopyValue(col, conn)
+  if (!value) return
+  try {
+    await navigator.clipboard.writeText(value)
+  } catch {
+    return
+  }
+  copiedCellKey.value = cellKey(col, conn)
+  if (copiedTimer) clearTimeout(copiedTimer)
+  copiedTimer = setTimeout(() => {
+    copiedCellKey.value = null
+  }, 1000)
+}
 </script>
 
 <template>
@@ -256,6 +359,7 @@ function getCardProcessText(
               v-for="col in columns"
               :key="col.id"
               class="conn-td break-words"
+              :class="{ 'conn-td--copyable': isCopyableColumn(col) }"
             >
               <!-- Mobile label -->
               <span
@@ -264,10 +368,30 @@ function getCardProcessText(
               >
                 {{ t(col.key) }}
               </span>
-              <component
-                :is="CellRenderer"
-                :render="() => col.render(row.original)"
-              />
+              <div class="conn-cell-wrap">
+                <span
+                  v-if="isHostLikeColumn(col) && geoFlag(row.original)"
+                  class="conn-geo-flag"
+                  :title="geoTooltip(row.original)"
+                  >{{ geoFlag(row.original) }}</span
+                >
+                <component
+                  :is="CellRenderer"
+                  :render="() => col.render(row.original)"
+                />
+                <button
+                  v-if="isCopyableColumn(col)"
+                  class="conn-copy-btn"
+                  :title="t('copyValue')"
+                  @click="copyCell(col, row.original, $event)"
+                >
+                  <IconCheck
+                    v-if="copiedCellKey === cellKey(col, row.original)"
+                    :size="14"
+                  />
+                  <IconCopy v-else :size="14" />
+                </button>
+              </div>
             </td>
           </tr>
         </template>
@@ -301,9 +425,14 @@ function getCardProcessText(
           @click="emit('rowClick', row.original)"
         >
           <div class="conn-card__main">
-            <span class="conn-card__host">{{
-              getCardHostText(row.original, props.columns)
-            }}</span>
+            <span class="conn-card__host">
+              <span
+                v-if="geoFlag(row.original)"
+                class="conn-geo-flag"
+                :title="geoTooltip(row.original)"
+                >{{ geoFlag(row.original) }}</span
+              >{{ getCardHostText(row.original, props.columns) }}</span
+            >
             <span class="conn-card__process">{{
               getCardProcessText(row.original, props.columns)
             }}</span>
@@ -496,6 +625,61 @@ function getCardProcessText(
 
 .conn-empty {
   color: color-mix(in oklch, var(--color-base-content) 50%, transparent);
+}
+
+/* GeoIP flag rendered inline before the destination host text. */
+.conn-geo-flag {
+  margin-right: 0.3em;
+  font-size: 1.05em;
+  line-height: 1;
+  cursor: help;
+}
+
+/* Inline wrapper holding the cell value alongside the hover copy button.
+   The button is absolutely positioned so showing it never shifts the row. */
+.conn-cell-wrap {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.conn-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-left: 0.25rem;
+  padding: 0.125rem;
+  border: none;
+  border-radius: 0.25rem;
+  background: transparent;
+  color: color-mix(in oklch, var(--color-base-content) 45%, transparent);
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity var(--dur-fast, 160ms) ease,
+    color var(--dur-fast, 160ms) ease,
+    background var(--dur-fast, 160ms) ease;
+}
+
+.conn-copy-btn:hover {
+  color: var(--color-primary);
+  background: color-mix(in oklch, var(--color-primary) 10%, transparent);
+}
+
+/* Reveal the copy button only while hovering the cell (pointer devices). */
+@media (hover: hover) {
+  .conn-td--copyable:hover .conn-copy-btn {
+    opacity: 1;
+  }
+}
+
+/* Touch devices have no hover — keep the affordance always visible. */
+@media (hover: none) {
+  .conn-copy-btn {
+    opacity: 0.6;
+  }
 }
 
 /* ============================================================

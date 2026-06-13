@@ -4,13 +4,26 @@ import { IconNetwork } from '@tabler/icons-vue'
 import byteSize from 'byte-size'
 import dayjs from 'dayjs'
 
-defineProps<{
+const props = defineProps<{
   connection: Connection | null
 }>()
 
 const modalRef = ref<{ open: () => void; close: () => void }>()
 
 const { t } = useI18n()
+const geo = useGeoLookup()
+
+const destinationIP = computed(
+  () => props.connection?.metadata.destinationIP || undefined,
+)
+
+// Resolve the destination IP's geo whenever the modal shows a new connection.
+// No-op when the GeoIP toggle is off or the IP is private/reserved.
+watchEffect(() => {
+  geo.lookup(destinationIP.value)
+})
+
+const destinationGeo = computed(() => geo.get(destinationIP.value))
 
 defineExpose({
   open: () => modalRef.value?.open(),
@@ -131,6 +144,21 @@ defineExpose({
           <div class="min-w-0 font-mono break-all text-base-content">
             {{ connection.metadata.remoteDestination || '-' }}
           </div>
+          <template v-if="destinationGeo">
+            <div class="text-base-content/60">{{ t('geoLocation') }}</div>
+            <div class="min-w-0 break-all text-base-content">
+              {{ destinationGeo.country || '-'
+              }}{{ destinationGeo.city ? ` · ${destinationGeo.city}` : '' }}
+            </div>
+            <div class="text-base-content/60">{{ t('geoASN') }}</div>
+            <div class="min-w-0 break-all text-base-content">
+              {{
+                destinationGeo.asn
+                  ? `AS${destinationGeo.asn}${destinationGeo.org ? ` · ${destinationGeo.org}` : ''}`
+                  : '-'
+              }}
+            </div>
+          </template>
         </div>
       </div>
 

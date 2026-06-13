@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import type { EndpointCheckError } from '~/composables/useApi'
-import { IconLink, IconLock, IconServer, IconX } from '@tabler/icons-vue'
+import type { Endpoint } from '~/types'
+import {
+  IconGripVertical,
+  IconLink,
+  IconLock,
+  IconPencil,
+  IconServer,
+  IconX,
+} from '@tabler/icons-vue'
+import { useSortable } from '@vueuse/integrations/useSortable'
 import { v4 as uuid } from 'uuid'
 import { checkEndpointAPI } from '~/composables/useApi'
 import { FALLBACK_BACKEND_URL } from '~/constants'
@@ -110,6 +119,23 @@ async function onSubmit() {
 function onRemove(id: string) {
   endpointStore.removeEndpoint(id)
 }
+
+function onLabelInput(id: string, label: string) {
+  endpointStore.updateEndpoint(id, { label })
+}
+
+// Drag-to-reorder saved endpoints, persisting via the store
+const endpointListRef = ref<HTMLElement | null>(null)
+const endpointOrder = computed<Endpoint[]>({
+  get: () => endpointStore.endpointList,
+  set: (list) => endpointStore.setEndpointList(list),
+})
+
+useSortable(endpointListRef, endpointOrder, {
+  handle: '.drag-handle',
+  animation: 150,
+  watchElement: true,
+})
 
 // Auto-login logic
 onMounted(async () => {
@@ -287,25 +313,52 @@ onMounted(async () => {
         <h3
           class="mb-3 text-[0.8125rem] font-semibold tracking-widest text-base-content/50 uppercase"
         >
-          Saved Endpoints
+          {{ t('savedEndpoints') }}
         </h3>
-        <div class="flex flex-col gap-3">
+        <div ref="endpointListRef" class="flex flex-col gap-3">
           <div
             v-for="(endpoint, index) in endpointStore.endpointList"
             :key="endpoint.id"
-            class="animate-fade-slide-in flex cursor-pointer items-center gap-2 rounded-xl border border-info/20 bg-info/10 p-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-info/30 hover:bg-info/15"
+            class="animate-fade-slide-in group flex cursor-pointer items-center gap-2 rounded-xl border border-info/20 bg-info/10 p-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-info/30 hover:bg-info/15"
             :style="{ animationDelay: `${index * 50}ms` }"
             @click="onEndpointSelect(endpoint.id)"
           >
+            <IconGripVertical
+              class="drag-handle shrink-0 cursor-grab text-base-content/30 transition-colors duration-200 hover:text-base-content/60 active:cursor-grabbing"
+              :size="16"
+              @click.stop
+            />
             <div
               class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-info/20 text-info"
             >
               <IconServer :size="16" />
             </div>
-            <span
-              class="min-w-0 flex-1 overflow-hidden text-[0.8125rem] font-medium text-ellipsis whitespace-nowrap text-base-content"
-              >{{ endpoint.url }}</span
-            >
+            <div class="flex min-w-0 flex-1 flex-col gap-0.5">
+              <div class="flex items-center gap-1.5">
+                <IconPencil
+                  class="shrink-0 text-base-content/30 transition-colors duration-200 group-hover:text-base-content/50"
+                  :size="12"
+                />
+                <input
+                  :value="endpoint.label"
+                  type="text"
+                  class="min-w-0 flex-1 border-none bg-transparent p-0 text-[0.8125rem] font-medium text-base-content transition-colors duration-200 placeholder:text-base-content/40 focus:outline-none"
+                  :placeholder="endpoint.url"
+                  @click.stop
+                  @input="
+                    onLabelInput(
+                      endpoint.id,
+                      ($event.target as HTMLInputElement).value,
+                    )
+                  "
+                />
+              </div>
+              <span
+                v-if="endpoint.label"
+                class="overflow-hidden pl-[1.125rem] text-[0.6875rem] text-ellipsis whitespace-nowrap text-base-content/50"
+                >{{ endpoint.url }}</span
+              >
+            </div>
             <button
               class="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-base-content/50 transition-all duration-200 hover:bg-error/15 hover:text-error"
               @click.stop="onRemove(endpoint.id)"

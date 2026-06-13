@@ -6,11 +6,22 @@ const configStore = useConfigStore()
 const endpointStore = useEndpointStore()
 const globalStore = useGlobalStore()
 
+// Appearance: background image, custom theme colors, font
+const appearance = useAppearance()
+
 // Initialize keyboard shortcuts
 const { setupKeyboardListeners } = useKeyboardShortcuts()
 onMounted(() => {
   setupKeyboardListeners()
+  appearance.reloadCustomBackground()
 })
+
+// Custom UI font (overrides the font-default / font-twemoji stack when set)
+const rootStyle = computed(() =>
+  appearance.rootFontFamily.value
+    ? { fontFamily: appearance.rootFontFamily.value }
+    : undefined,
+)
 
 const rootElement = ref<HTMLElement | null>(null)
 
@@ -54,10 +65,26 @@ const hasEndpoint = computed(
 <template>
   <div
     ref="rootElement"
-    class="relative h-screen overscroll-y-none bg-base-100 antialiased"
-    :class="configStore.enableTwemoji ? 'font-twemoji' : 'font-default'"
+    class="relative h-screen overscroll-y-none antialiased"
+    :class="[
+      configStore.enableTwemoji ? 'font-twemoji' : 'font-default',
+      appearance.hasBackground.value ? '' : 'bg-base-100',
+    ]"
+    :style="rootStyle"
     :data-theme="configStore.curTheme"
   >
+    <!-- Custom background image layer + legibility overlay -->
+    <template v-if="appearance.hasBackground.value">
+      <div
+        class="pointer-events-none fixed inset-0 -z-10 scale-110 bg-cover bg-center bg-no-repeat"
+        :style="appearance.backgroundLayerStyle.value"
+      />
+      <div
+        class="pointer-events-none fixed inset-0 -z-10"
+        :style="appearance.backgroundOverlayStyle.value"
+      />
+    </template>
+
     <Sidebar>
       <slot />
     </Sidebar>

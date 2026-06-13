@@ -12,8 +12,10 @@ import {
   IconGlobe,
   IconPinnedOff,
   IconReload,
+  IconSearch,
   IconSettings,
   IconWand,
+  IconX,
 } from '@tabler/icons-vue'
 import byteSize from 'byte-size'
 import { throttle } from 'lodash-es'
@@ -29,6 +31,7 @@ import { PROXIES_DISPLAY_MODE } from '~/constants'
 import {
   encodeSvg,
   filterProxiesByAvailability,
+  filterProxiesByName,
   formatProxyType,
   formatTimeFromNow,
   sortProxiesByOrderingType,
@@ -130,7 +133,7 @@ function getSortedProxyNames(proxyGroup: ProxyType) {
     performanceData: nodeRecommendationStore.performanceData,
   })
 
-  return filterProxiesByAvailability({
+  const available = filterProxiesByAvailability({
     proxyNames: sorted,
     enabled: configStore.hideUnAvailableProxies,
     testUrl: proxyGroup.testUrl || null,
@@ -139,12 +142,14 @@ function getSortedProxyNames(proxyGroup: ProxyType) {
     latencyQualityMap: configStore.latencyQualityMap,
     urlForLatencyTest: configStore.urlForLatencyTest,
   })
+
+  return filterProxiesByName(available, configStore.proxiesGroupNameFilter)
 }
 
 function getProviderProxyNames(
   provider: ProxyProvider & { proxies: ProxyNodeWithProvider[] },
 ) {
-  return sortProxiesByOrderingType({
+  const sorted = sortProxiesByOrderingType({
     proxyNames: provider.proxies.map((p) => p.name),
     orderingType: configStore.proxiesOrderingType,
     testUrl: provider.testUrl,
@@ -154,6 +159,8 @@ function getProviderProxyNames(
     urlForLatencyTest: configStore.urlForLatencyTest,
     performanceData: nodeRecommendationStore.performanceData,
   })
+
+  return filterProxiesByName(sorted, configStore.proxiesGroupNameFilter)
 }
 
 // Cache sorted/filtered proxy names per group so each render reuses the result
@@ -768,8 +775,29 @@ const ProviderProxyNodes = defineComponent({
         </Button>
       </div>
 
+      <!-- Node Name Filter -->
+      <div
+        class="ml-auto flex h-9 min-w-40 flex-1 items-center gap-2 rounded-[0.625rem] border border-base-content/10 bg-base-200/80 px-3 transition-all duration-200 focus-within:border-primary/40 focus-within:shadow-[0_0_0_3px] focus-within:shadow-primary/10 sm:max-w-64"
+      >
+        <IconSearch :size="16" class="shrink-0 opacity-50" />
+        <input
+          v-model="configStore.proxiesGroupNameFilter"
+          class="w-full bg-transparent text-sm outline-none placeholder:opacity-50"
+          type="search"
+          :placeholder="t('filterNodesByName')"
+        />
+        <Button
+          v-if="configStore.proxiesGroupNameFilter"
+          class="flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-base-content/45 transition-colors duration-200 hover:bg-base-content/10 hover:text-base-content"
+          :title="t('clear')"
+          @click="configStore.proxiesGroupNameFilter = ''"
+        >
+          <IconX :size="14" />
+        </Button>
+      </div>
+
       <!-- Settings Button -->
-      <div class="ml-auto">
+      <div>
         <Button
           class="flex h-9 w-9 items-center justify-center rounded-[0.625rem] border border-base-content/10 bg-primary/10 text-primary transition-all duration-200 hover:border-primary/30 hover:bg-primary/15"
           @click="settingsModal?.open()"
