@@ -9,6 +9,7 @@ import {
   formatProxyType,
   fuzzyFilter,
   getLatencyClassName,
+  isSingBoxVersion,
   sortProxiesByOrderingType,
   transformEndpointURL,
 } from '../index'
@@ -242,6 +243,25 @@ describe('utils/index', () => {
     it('handles different segment counts', () => {
       expect(compareVersions('1.243', '1.243.0')).toBe(0)
       expect(compareVersions('1.243.1', '1.243')).toBeGreaterThan(0)
+    })
+  })
+
+  describe('isSingBoxVersion', () => {
+    it('detects sing-box version strings (case-insensitive)', () => {
+      expect(isSingBoxVersion('sing-box 1.10.0')).toBe(true)
+      expect(isSingBoxVersion('SING-BOX-1.10.0')).toBe(true)
+    })
+
+    it('returns false for mihomo / clash version strings', () => {
+      expect(isSingBoxVersion('alpha-g1234567')).toBe(false)
+      expect(isSingBoxVersion('v1.19.9')).toBe(false)
+      expect(isSingBoxVersion('meta')).toBe(false)
+    })
+
+    it('handles empty / nullish input', () => {
+      expect(isSingBoxVersion('')).toBe(false)
+      expect(isSingBoxVersion(undefined)).toBe(false)
+      expect(isSingBoxVersion(null)).toBe(false)
     })
   })
 

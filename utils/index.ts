@@ -94,6 +94,15 @@ export function compareVersions(v1: string, v2: string): number {
   return 0
 }
 
+// sing-box also serves the clash API, but reports its version as a string
+// containing "sing-box". Its releases live in a different repo with a
+// different cadence, so the dashboard cannot diff it against the mihomo
+// release feed — callers use this to skip the mihomo-based update check and
+// to hide mihomo-only settings (#1870).
+export function isSingBoxVersion(version: string | undefined | null): boolean {
+  return !!version && version.toLowerCase().includes('sing-box')
+}
+
 export function formatBytes(bytes: number) {
   return byteSize(bytes).toString()
 }
