@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.253.0](https://github.com/MetaCubeX/metacubexd/compare/v1.252.0...v1.253.0) (2026-06-13)
+
+
+### Features
+
+* **proxies:** add i18n for table/chips/master display modes ([249b2f8](https://github.com/MetaCubeX/metacubexd/commit/249b2f883a44f68e7b31e703505386f9ec6bffcf))
+* **proxies:** add ProxyMasterDetail master-detail layout component ([a2a1d40](https://github.com/MetaCubeX/metacubexd/commit/a2a1d4076127e7472ca298955c65c77e007818cf))
+* **proxies:** add ProxyNodeChip component for chips display mode ([e7237c9](https://github.com/MetaCubeX/metacubexd/commit/e7237c9078a50be19ab6264866f45f609302386e))
+* **proxies:** add ProxyNodeTableRow component for table display mode ([aa476c7](https://github.com/MetaCubeX/metacubexd/commit/aa476c7bbedad827fc012f86e7ac572118962814))
+* **proxies:** add resolveActiveGroup helper for master-detail ([055921d](https://github.com/MetaCubeX/metacubexd/commit/055921dc6ce72d71d80aa73a2e38ad304c0fc6b1))
+* **proxies:** extend display mode enum with table/chips/master ([60881b5](https://github.com/MetaCubeX/metacubexd/commit/60881b57aaacd964c40b01cb3066858900d0f16b))
+* **proxies:** master-detail layout on proxies tab, list fallback for providers ([1085a67](https://github.com/MetaCubeX/metacubexd/commit/1085a6740cbd27649c3fd074aa22b35145e219f0))
+* **proxies:** render chips mode in group panels ([5c08965](https://github.com/MetaCubeX/metacubexd/commit/5c08965c674d08f4ad34a5a409d8344fc43bfdea))
+* **proxies:** render table mode with per-group header row ([8b02fdc](https://github.com/MetaCubeX/metacubexd/commit/8b02fdc880811a9e5d59b1362a5c9173d442c6f4))
+* **proxies:** toolbar segmented display-mode switcher, drop settings select ([8be9dfd](https://github.com/MetaCubeX/metacubexd/commit/8be9dfd1b390ab4e8130ae2c917f2b508a6af6b2))
+
+
+### Bug Fixes
+
+* **proxies:** make table & master-detail modes mobile-friendly ([7ee86e4](https://github.com/MetaCubeX/metacubexd/commit/7ee86e432d899e0850da6595e7ddc50220048489))
+* **proxies:** use real i18n keys for table header to stop intlify warnings ([1e6ace8](https://github.com/MetaCubeX/metacubexd/commit/1e6ace8017ca3b22cb734659259bc0721c98c1d4))
+* **pwa:** skip manifest link tag under nuxt dev ([ed27509](https://github.com/MetaCubeX/metacubexd/commit/ed2750918110bb9c4d322c8acb7bb21a4477c319))
+
 ## [1.252.0](https://github.com/MetaCubeX/metacubexd/compare/v1.251.3...v1.252.0) (2026-06-13)
 
 
