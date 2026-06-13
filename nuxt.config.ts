@@ -154,7 +154,15 @@ export default defineNuxtConfig({
       meta: [{ name: 'theme-color', content: '#000000' }],
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: 'favicon.svg' },
-        { rel: 'apple-touch-icon', href: 'pwa-192x192.png' },
+        // iOS fills any transparent pixels of an apple-touch-icon with black,
+        // which gave the home-screen icon ugly black corners (#436). Point it
+        // at the opaque 180x180 PNG (the iOS-recommended size) instead of the
+        // 192x192 PWA icon, which has a transparent background.
+        {
+          rel: 'apple-touch-icon',
+          sizes: '180x180',
+          href: 'apple-touch-icon-180x180.png',
+        },
         // @vite-pwa/nuxt emits this file from the `pwa.manifest` config; we
         // link it here (instead of via <VitePwaManifest />) so it lands in the
         // static HTML shell. With ssr: false, component-injected head tags only
