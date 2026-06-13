@@ -146,6 +146,34 @@ pnpm generate
 pnpm preview
 ```
 
+## 🩺 Troubleshooting
+
+### "Unable to connect to backend" when self-hosting (CORS)
+
+If the dashboard loads but cannot connect to the Mihomo backend — even though
+the External Controller is reachable directly in your browser — the cause is
+usually **CORS**.
+
+When you host the dashboard on your own address (e.g. `http://192.168.1.2:8080`),
+the browser treats requests to the External Controller (e.g.
+`http://192.168.1.2:9090`) as cross-origin. Mihomo only answers cross-origin
+requests from origins listed in its `external-controller-cors` allow-list, so
+requests from your dashboard are rejected and the connection fails.
+
+Add your dashboard's origin to the allow-list in your Mihomo `config.yaml`:
+
+```yaml
+external-controller-cors:
+  allow-private-network: true
+  allow-origins:
+    - 'http://192.168.1.2:8080' # your dashboard's address
+    # or, for trusted local networks only:
+    # - '*'
+```
+
+> Tip: if you still cannot connect, open your browser's DevTools (F12) →
+> Console and look for CORS-related errors to confirm the cause.
+
 ## 🛠️ Development
 
 ```shell
