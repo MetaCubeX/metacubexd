@@ -376,6 +376,12 @@ function nodeComponentFor(mode: string) {
   return ProxyNodeCard
 }
 
+// Master-detail is a page-level layout (Proxies tab only), not a per-group
+// node renderer, so it gets its own branch in the template.
+const isMasterMode = computed(
+  () => configStore.proxiesDisplayMode === PROXIES_DISPLAY_MODE.MASTER,
+)
+
 // ProxyNodes component
 const ProxyNodes = defineComponent({
   props: {
@@ -611,7 +617,12 @@ const ProviderProxyNodes = defineComponent({
 
     return () => {
       const names = props.sortedProxyNames
-      const Comp = nodeComponentFor(configStore.proxiesDisplayMode)
+      // Provider tab does not support master-detail; degrade master → list.
+      const providerMode =
+        configStore.proxiesDisplayMode === PROXIES_DISPLAY_MODE.MASTER
+          ? PROXIES_DISPLAY_MODE.LIST
+          : configStore.proxiesDisplayMode
+      const Comp = nodeComponentFor(providerMode)
       const children = names.slice(0, renderCount.value).map((proxyName) =>
         h(Comp, {
           key: proxyName,
@@ -765,8 +776,14 @@ const ProviderProxyNodes = defineComponent({
       v-if="activeTab === 'proxies'"
       ref="proxiesScrollEl"
       class="min-h-0 flex-1 overflow-y-auto"
+      :class="isMasterMode ? 'overflow-hidden' : ''"
     >
-      <ProxiesRenderWrapper ref="proxyGroupsWrapper">
+      <ProxyMasterDetail
+        v-if="isMasterMode"
+        :groups="renderProxies"
+        :sorted-names-by-group="sortedNamesByGroup"
+      />
+      <ProxiesRenderWrapper v-else ref="proxyGroupsWrapper">
         <template v-if="proxyGroupsWrapper?.isTwoColumns" #even>
           <Collapse
             v-for="(proxyGroup, index) in renderProxies.filter(
