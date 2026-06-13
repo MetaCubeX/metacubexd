@@ -1,4 +1,4 @@
-import type { IPInfo, IPProvider } from '~/types/network'
+import type { IPProvider } from '~/types/network'
 import ky from 'ky'
 
 // Subset of IPInfo surfaced per-connection in the table / details modal.
@@ -272,5 +272,3 @@ export function useGeoLookup() {
 
   return { lookup, get, flagEmoji, tooltip }
 }
-
-export type { IPInfo }
