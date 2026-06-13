@@ -32,3 +32,6 @@ Thumbs.db
 dist
 
 /coverage
+
+# superpowers brainstorm visual companion
+.superpowers/
