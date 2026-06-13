@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.254.1](https://github.com/MetaCubeX/metacubexd/compare/v1.254.0...v1.254.1) (2026-06-13)
+
+
+### Bug Fixes
+
+* **connections:** restore searching by destination IP ([#2021](https://github.com/MetaCubeX/metacubexd/issues/2021)) ([eca2606](https://github.com/MetaCubeX/metacubexd/commit/eca2606fa8a924efaeea33d99c1adcccb47099bd)), closes [#2013](https://github.com/MetaCubeX/metacubexd/issues/2013)
+* **proxies:** apply Twemoji font to node detail tooltip ([#2026](https://github.com/MetaCubeX/metacubexd/issues/2026)) ([203b957](https://github.com/MetaCubeX/metacubexd/commit/203b957a056239cb68e45076aede5da9aa5e17c4)), closes [#2017](https://github.com/MetaCubeX/metacubexd/issues/2017)
+* **proxies:** make 'auto switch to recommended' setting work ([#2025](https://github.com/MetaCubeX/metacubexd/issues/2025)) ([13e6f18](https://github.com/MetaCubeX/metacubexd/commit/13e6f18dc1766bab9c6763991ce0f2c3554e4742)), closes [#1971](https://github.com/MetaCubeX/metacubexd/issues/1971)
+* use opaque apple-touch-icon to remove iOS black corners ([#2022](https://github.com/MetaCubeX/metacubexd/issues/2022)) ([be7aeb3](https://github.com/MetaCubeX/metacubexd/commit/be7aeb3780bee0666bd52b2c2c458b4e4039a143)), closes [#436](https://github.com/MetaCubeX/metacubexd/issues/436)
+* **versions:** stop showing bogus backend update for sing-box ([#2027](https://github.com/MetaCubeX/metacubexd/issues/2027)) ([4af41c4](https://github.com/MetaCubeX/metacubexd/commit/4af41c4554107603379de4b72bf5d554d1978dd7))
+
 ## [1.254.0](https://github.com/MetaCubeX/metacubexd/compare/v1.253.0...v1.254.0) (2026-06-13)
 
 
