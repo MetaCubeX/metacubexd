@@ -367,8 +367,9 @@ const ProxyGroupTitle = defineComponent({
   },
 })
 
-// Pick the node component for the current display mode (card is the default).
-// Table/master handled separately (master bypasses Collapse; table added in Phase 2).
+// Pick the per-group node component for the current display mode (card is the
+// default). Master-detail is not a per-group renderer — it bypasses Collapse and
+// gets its own page-level branch in the template (see isMasterMode below).
 function nodeComponentFor(mode: string) {
   if (mode === PROXIES_DISPLAY_MODE.LIST) return ProxyNodeListItem
   if (mode === PROXIES_DISPLAY_MODE.CHIPS) return ProxyNodeChip
@@ -425,6 +426,10 @@ const ProxyNodes = defineComponent({
     return () => {
       const names = props.sortedProxyNames
       const Comp = nodeComponentFor(configStore.proxiesDisplayMode)
+      // isRecommended/groupName are card-only props. ListItem/Chip/TableRow don't
+      // declare them, and Vue turns undeclared props into fallthrough DOM
+      // attributes — so only pass them to the card to keep other rows' markup clean.
+      const isCard = Comp === ProxyNodeCard
       const children = names.slice(0, renderCount.value).map((proxyName) =>
         h(Comp, {
           key: proxyName,
@@ -432,9 +437,12 @@ const ProxyNodes = defineComponent({
           testUrl: props.proxyGroup.testUrl || null,
           timeout: props.proxyGroup.timeout ?? null,
           isSelected: props.proxyGroup.now === proxyName,
-          // 仅 card 用到的额外 props,其它组件忽略多余 props(Vue 允许)
-          isRecommended: recommendedNode.value === proxyName,
-          groupName: props.proxyGroup.name,
+          ...(isCard
+            ? {
+                isRecommended: recommendedNode.value === proxyName,
+                groupName: props.proxyGroup.name,
+              }
+            : {}),
           onClick: () =>
             proxiesStore.selectProxyInGroup(props.proxyGroup, proxyName),
         }),

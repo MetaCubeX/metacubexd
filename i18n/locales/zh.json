@@ -72,7 +72,6 @@
   "off": "关闭",
   "proxiesPreviewType": "节点组预览样式",
   "proxiesPreviewAutoThreshold": "自适应切换阈值",
-  "proxiesDisplayMode": "节点显示模式",
   "cardMode": "卡片",
   "listMode": "列表",
   "displayMode": "显示模式",
