@@ -11,6 +11,8 @@
   "home": "Главная",
   "add": "Добавить",
   "collapse": "Свернуть",
+  "collapseAll": "Свернуть все",
+  "expandAll": "Развернуть все",
   "setup": "Настройка",
   "setupDescription": "Подключитесь к бэкенду Mihomo, чтобы начать",
   "overview": "Обзор",

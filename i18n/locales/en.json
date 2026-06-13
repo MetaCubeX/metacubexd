@@ -11,6 +11,8 @@
   "home": "Home",
   "add": "Add",
   "collapse": "Collapse",
+  "collapseAll": "Collapse All",
+  "expandAll": "Expand All",
   "setup": "Setup",
   "setupDescription": "Connect to your Mihomo backend to get started",
   "overview": "Overview",

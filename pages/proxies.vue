@@ -7,6 +7,8 @@ import type {
 import {
   IconBrandSpeedtest,
   IconChevronRight,
+  IconChevronsDown,
+  IconChevronsUp,
   IconGlobe,
   IconPinnedOff,
   IconReload,
@@ -84,6 +86,20 @@ const switchToRecommended = (proxyGroup: ProxyType) => {
 const renderProxies = computed(() =>
   proxiesStore.proxies.filter((proxy) => !proxy.hidden),
 )
+
+// Whether any rendered proxy group is currently expanded. Drives the
+// collapse/expand-all toggle: if any group is open we offer "collapse all",
+// otherwise "expand all". (collapsedMap[name] === true means expanded.)
+const anyGroupExpanded = computed(() =>
+  renderProxies.value.some((proxy) => proxiesStore.collapsedMap[proxy.name]),
+)
+
+const toggleAllGroups = () => {
+  const expand = !anyGroupExpanded.value
+  for (const proxyGroup of renderProxies.value) {
+    proxiesStore.collapsedMap[proxyGroup.name] = expand
+  }
+}
 
 const tabs = computed(() => [
   {
@@ -661,6 +677,28 @@ const ProviderProxyNodes = defineComponent({
 
       <!-- Action Buttons -->
       <div class="flex items-center gap-2">
+        <!-- Collapse / Expand All Groups Button -->
+        <Button
+          v-if="activeTab === 'proxies'"
+          class="flex h-9 items-center gap-1.5 rounded-[0.625rem] border border-base-content/10 bg-base-200/80 px-3 transition-all duration-200 hover:border-primary/30 hover:bg-primary/15 hover:text-primary"
+          :title="
+            anyGroupExpanded
+              ? t('collapseAll', 'Collapse All')
+              : t('expandAll', 'Expand All')
+          "
+          @click="toggleAllGroups"
+        >
+          <IconChevronsUp v-if="anyGroupExpanded" :size="18" />
+          <IconChevronsDown v-else :size="18" />
+          <span class="hidden text-sm font-medium sm:inline">
+            {{
+              anyGroupExpanded
+                ? t('collapseAll', 'Collapse All')
+                : t('expandAll', 'Expand All')
+            }}
+          </span>
+        </Button>
+
         <!-- Test All Groups Button -->
         <Button
           v-if="activeTab === 'proxies'"
