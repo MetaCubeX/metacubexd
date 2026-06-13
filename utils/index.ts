@@ -464,3 +464,13 @@ export function encodeSvg(svg: string) {
     .replace(SVG_LT_RE, '%3C')
     .replace(SVG_GT_RE, '%3E')
 }
+
+// Resolve the active group for master-detail: keep `current` if it still exists,
+// otherwise fall back to the first group (or null when there are none).
+export function resolveActiveGroup(
+  groupNames: string[],
+  current: string | null,
+): string | null {
+  if (current && groupNames.includes(current)) return current
+  return groupNames[0] ?? null
+}
