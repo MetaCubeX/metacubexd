@@ -77,6 +77,8 @@
   "listMode": "列表",
   "displayMode": "显示模式",
   "tableMode": "表格",
+  "chipsMode": "药丸",
+  "masterDetailMode": "主从",
   "none": "无",
   "urlForLatencyTest": "测速链接",
   "autoCloseConns": "自动断开连接",
