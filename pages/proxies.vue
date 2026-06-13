@@ -672,6 +672,8 @@ const ProviderProxyNodes = defineComponent({
 
       <!-- Action Buttons -->
       <div class="flex items-center gap-2">
+        <ProxiesDisplayModeSwitcher />
+
         <!-- Collapse / Expand All Groups Button -->
         <Button
           v-if="activeTab === 'proxies'"
@@ -1079,23 +1081,6 @@ const ProviderProxyNodes = defineComponent({
               type="checkbox"
             />
           </div>
-        </div>
-
-        <div>
-          <ConfigTitle with-divider>
-            {{ t('proxiesDisplayMode') }}
-          </ConfigTitle>
-          <select
-            v-model="configStore.proxiesDisplayMode"
-            class="select-bordered select w-full"
-          >
-            <option value="cardMode">
-              {{ t('cardMode') }}
-            </option>
-            <option value="listMode">
-              {{ t('listMode') }}
-            </option>
-          </select>
         </div>
 
         <div>
