@@ -51,7 +51,7 @@ function handleLatencyTest() {
     </span>
     <span class="min-w-0 flex-1 truncate font-medium">{{ proxyName }}</span>
     <span
-      class="w-16 shrink-0 truncate text-right text-xs uppercase opacity-60"
+      class="hidden w-16 shrink-0 truncate text-right text-xs uppercase opacity-60 sm:block"
     >
       {{ proxyType }}
     </span>

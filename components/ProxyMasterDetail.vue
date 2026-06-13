@@ -39,14 +39,16 @@ function aliveCount(group: ProxyType) {
 </script>
 
 <template>
-  <div class="flex h-full min-h-0 gap-3">
-    <!-- Left rail: group navigation -->
-    <div class="flex w-48 shrink-0 flex-col gap-1 overflow-y-auto">
+  <div class="flex h-full min-h-0 flex-col gap-3 sm:flex-row">
+    <!-- Group navigation: horizontal scroll strip on mobile, left rail on >=sm -->
+    <div
+      class="flex shrink-0 gap-1 overflow-x-auto pb-1 sm:w-48 sm:flex-col sm:overflow-x-visible sm:overflow-y-auto sm:pb-0"
+    >
       <button
         v-for="group in groups"
         :key="group.name"
         type="button"
-        class="flex flex-col gap-0.5 rounded-lg border px-3 py-2 text-left transition-all duration-200"
+        class="flex w-36 shrink-0 flex-col gap-0.5 rounded-lg border px-3 py-2 text-left transition-all duration-200 sm:w-auto sm:shrink"
         :class="
           group.name === activeName
             ? 'border-primary/55 bg-primary/12 text-base-content'
@@ -60,7 +62,7 @@ function aliveCount(group: ProxyType) {
             {{ aliveCount(group) }}/{{ group.all?.length ?? 0 }}
           </span>
         </span>
-        <span class="truncate text-xs text-base-content/45">{{
+        <span class="hidden truncate text-xs text-base-content/45 sm:block">{{
           group.now
         }}</span>
       </button>
@@ -69,7 +71,7 @@ function aliveCount(group: ProxyType) {
     <!-- Right detail: active group's nodes -->
     <div
       v-if="activeGroup"
-      class="flex min-w-0 flex-1 flex-col gap-2 overflow-y-auto rounded-xl border border-base-content/8 bg-base-200/40 p-3"
+      class="flex min-h-0 min-w-0 flex-1 flex-col gap-2 overflow-y-auto rounded-xl border border-base-content/8 bg-base-200/40 p-3"
     >
       <div class="flex items-center gap-2 px-1">
         <span class="text-lg font-semibold text-base-content">{{

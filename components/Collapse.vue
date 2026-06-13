@@ -111,7 +111,9 @@ const cardGridStyle = computed(() => ({
         >
           <span class="w-4 shrink-0" />
           <span class="min-w-0 flex-1">{{ t('name', 'Name') }}</span>
-          <span class="w-16 shrink-0 text-right">{{ t('type', 'Type') }}</span>
+          <span class="hidden w-16 shrink-0 text-right sm:block">{{
+            t('type', 'Type')
+          }}</span>
           <span class="w-8 shrink-0 text-center">{{ t('udp', 'UDP') }}</span>
           <span class="w-14 shrink-0 text-right">{{
             t('latency', 'Latency')
