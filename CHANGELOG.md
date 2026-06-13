@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.252.0](https://github.com/MetaCubeX/metacubexd/compare/v1.251.3...v1.252.0) (2026-06-13)
+
+
+### Features
+
+* **proxies:** add collapse/expand all proxy groups toggle ([12dbea7](https://github.com/MetaCubeX/metacubexd/commit/12dbea7bdf22eae7dd9819f2b4ef2c23c951dc6c))
+
 ## [1.251.3](https://github.com/MetaCubeX/metacubexd/compare/v1.251.2...v1.251.3) (2026-06-05)
 
 
