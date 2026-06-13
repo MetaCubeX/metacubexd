@@ -19,9 +19,24 @@ const emit = defineEmits<{
 
 const configStore = useConfigStore()
 
-const isListMode = computed(
-  () => configStore.proxiesDisplayMode === PROXIES_DISPLAY_MODE.LIST,
+const displayMode = computed(() => configStore.proxiesDisplayMode)
+
+const isCardMode = computed(
+  () => displayMode.value === PROXIES_DISPLAY_MODE.CARD,
 )
+
+// body 容器布局:card=grid,其余按 flex 变体
+const bodyLayoutClass = computed(() => {
+  switch (displayMode.value) {
+    case PROXIES_DISPLAY_MODE.CARD:
+      return 'grid'
+    case PROXIES_DISPLAY_MODE.CHIPS:
+      return 'flex flex-wrap gap-2'
+    default:
+      // List(现状)与后续 Table 都用纵向 flex
+      return 'flex flex-col gap-3'
+  }
+})
 
 const cardGridStyle = computed(() => ({
   gridTemplateColumns: `repeat(auto-fill, minmax(${PROXIES_CARD_SIZE_MIN_WIDTH[configStore.proxiesCardSize]}px, 1fr))`,
@@ -79,11 +94,8 @@ const cardGridStyle = computed(() => ({
 
     <div
       class="px-4 pt-2 pb-4 transition-opacity duration-300 ease-out"
-      :class="[
-        isOpen ? 'opacity-100' : 'hidden opacity-0',
-        isListMode ? 'flex flex-col gap-3' : 'grid',
-      ]"
-      :style="isListMode ? undefined : cardGridStyle"
+      :class="[isOpen ? 'opacity-100' : 'hidden opacity-0', bodyLayoutClass]"
+      :style="isCardMode ? cardGridStyle : undefined"
     >
       <template v-if="isOpen">
         <slot />

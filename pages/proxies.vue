@@ -19,10 +19,12 @@ import byteSize from 'byte-size'
 import { throttle } from 'lodash-es'
 import Button from '~/components/Button.vue'
 import ProxyNodeCard from '~/components/ProxyNodeCard.vue'
+import ProxyNodeChip from '~/components/ProxyNodeChip.vue'
 import ProxyNodeListItem from '~/components/ProxyNodeListItem.vue'
 import ProxyNodePreview from '~/components/ProxyNodePreview.vue'
 import SubscriptionInfo from '~/components/SubscriptionInfo.vue'
 import { useBatchLatencyTest } from '~/composables/useBatchLatencyTest'
+import { PROXIES_DISPLAY_MODE } from '~/constants'
 import {
   encodeSvg,
   filterProxiesByAvailability,
@@ -364,6 +366,14 @@ const ProxyGroupTitle = defineComponent({
   },
 })
 
+// Pick the node component for the current display mode (card is the default).
+// Table/master handled separately (master bypasses Collapse; table added in Phase 2).
+function nodeComponentFor(mode: string) {
+  if (mode === PROXIES_DISPLAY_MODE.LIST) return ProxyNodeListItem
+  if (mode === PROXIES_DISPLAY_MODE.CHIPS) return ProxyNodeChip
+  return ProxyNodeCard
+}
+
 // ProxyNodes component
 const ProxyNodes = defineComponent({
   props: {
@@ -406,28 +416,20 @@ const ProxyNodes = defineComponent({
 
     return () => {
       const names = props.sortedProxyNames
+      const Comp = nodeComponentFor(configStore.proxiesDisplayMode)
       const children = names.slice(0, renderCount.value).map((proxyName) =>
-        configStore.proxiesDisplayMode === 'listMode'
-          ? h(ProxyNodeListItem, {
-              key: proxyName,
-              proxyName,
-              testUrl: props.proxyGroup.testUrl || null,
-              timeout: props.proxyGroup.timeout ?? null,
-              isSelected: props.proxyGroup.now === proxyName,
-              onClick: () =>
-                proxiesStore.selectProxyInGroup(props.proxyGroup, proxyName),
-            })
-          : h(ProxyNodeCard, {
-              key: proxyName,
-              proxyName,
-              testUrl: props.proxyGroup.testUrl || null,
-              timeout: props.proxyGroup.timeout ?? null,
-              isSelected: props.proxyGroup.now === proxyName,
-              isRecommended: recommendedNode.value === proxyName,
-              groupName: props.proxyGroup.name,
-              onClick: () =>
-                proxiesStore.selectProxyInGroup(props.proxyGroup, proxyName),
-            }),
+        h(Comp, {
+          key: proxyName,
+          proxyName,
+          testUrl: props.proxyGroup.testUrl || null,
+          timeout: props.proxyGroup.timeout ?? null,
+          isSelected: props.proxyGroup.now === proxyName,
+          // 仅 card 用到的额外 props,其它组件忽略多余 props(Vue 允许)
+          isRecommended: recommendedNode.value === proxyName,
+          groupName: props.proxyGroup.name,
+          onClick: () =>
+            proxiesStore.selectProxyInGroup(props.proxyGroup, proxyName),
+        }),
       )
 
       if (renderCount.value < names.length) {
@@ -607,22 +609,15 @@ const ProviderProxyNodes = defineComponent({
 
     return () => {
       const names = props.sortedProxyNames
+      const Comp = nodeComponentFor(configStore.proxiesDisplayMode)
       const children = names.slice(0, renderCount.value).map((proxyName) =>
-        configStore.proxiesDisplayMode === 'listMode'
-          ? h(ProxyNodeListItem, {
-              key: proxyName,
-              proxyName,
-              testUrl: props.provider.testUrl,
-              timeout: props.provider.timeout ?? null,
-              providerName: props.provider.name,
-            })
-          : h(ProxyNodeCard, {
-              key: proxyName,
-              proxyName,
-              testUrl: props.provider.testUrl,
-              timeout: props.provider.timeout ?? null,
-              providerName: props.provider.name,
-            }),
+        h(Comp, {
+          key: proxyName,
+          proxyName,
+          testUrl: props.provider.testUrl,
+          timeout: props.provider.timeout ?? null,
+          providerName: props.provider.name,
+        }),
       )
 
       if (renderCount.value < names.length) {
