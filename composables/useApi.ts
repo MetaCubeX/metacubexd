@@ -8,7 +8,7 @@ import type {
   RuleProvider,
 } from '~/types'
 import ky from 'ky'
-import { compareVersions } from '~/utils'
+import { compareVersions, isSingBoxVersion } from '~/utils'
 import { useMockData } from './useMockData'
 
 // Mock mode support
@@ -587,6 +587,11 @@ export async function frontendReleaseAPI(currentVersion: string) {
 }
 
 export async function backendReleaseAPI(currentVersion: string) {
+  // sing-box serves the clash API but isn't mihomo; checking its version
+  // against the mihomo release feed would always report a bogus "update
+  // available". Skip the check entirely for sing-box (#1870).
+  if (isSingBoxVersion(currentVersion)) return { isUpdateAvailable: false }
+
   const githubAPI = useGithubAPI()
   const repositoryURL = 'repos/MetaCubeX/mihomo'
   const match = BACKEND_VERSION_RE.exec(currentVersion)

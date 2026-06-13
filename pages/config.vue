@@ -86,9 +86,7 @@ const {
 const updateConfigMutation = useUpdateConfigMutation()
 
 // Check if sing-box backend
-const isSingBox = computed(
-  () => backendVersion.value?.includes('sing-box') || false,
-)
+const isSingBox = computed(() => isSingBoxVersion(backendVersion.value))
 
 // TUN stack options
 const tunStacks = ['Mixed', 'gVisor', 'System', 'LWIP']
