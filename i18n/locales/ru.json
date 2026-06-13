@@ -223,6 +223,7 @@
   "topProxies": "Топ прокси",
   "tcp": "TCP",
   "udp": "UDP",
+  "latency": "Задержка",
   "other": "Другое",
   "showTrafficIndicator": "Показать индикатор трафика",
   "hideTrafficIndicator": "Скрыть индикатор трафика",

@@ -110,10 +110,8 @@ const cardGridStyle = computed(() => ({
           class="flex items-center gap-2 px-3 pb-1 text-[0.7rem] font-semibold tracking-wide text-base-content/40 uppercase"
         >
           <span class="w-4 shrink-0" />
-          <span class="min-w-0 flex-1">{{ t('proxyName', 'Name') }}</span>
-          <span class="w-16 shrink-0 text-right">{{
-            t('proxyType', 'Type')
-          }}</span>
+          <span class="min-w-0 flex-1">{{ t('name', 'Name') }}</span>
+          <span class="w-16 shrink-0 text-right">{{ t('type', 'Type') }}</span>
           <span class="w-8 shrink-0 text-center">{{ t('udp', 'UDP') }}</span>
           <span class="w-14 shrink-0 text-right">{{
             t('latency', 'Latency')
