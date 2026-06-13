@@ -79,13 +79,26 @@ const getRecommendedNode = (proxyGroup: ProxyType) => {
 const testAllGroups = async () => {
   const groupNames = renderProxies.value.map((p) => p.name)
   await testMultipleGroups(groupNames)
+  autoSwitchAfterTest(renderProxies.value)
 }
 
-// Switch to recommended node in a group
+// Switch to recommended node in a group. No-op when there is no better node
+// than the one already selected — avoids needlessly pinning an automatic
+// (url-test/fallback) group to its current node.
 const switchToRecommended = (proxyGroup: ProxyType) => {
   const recommended = getRecommendedNode(proxyGroup)
-  if (recommended) {
+  if (recommended && recommended !== proxyGroup.now) {
     proxiesStore.selectProxyInGroup(proxyGroup, recommended)
+  }
+}
+
+// Honor the "auto switch to recommended" setting (#1971): once a latency test
+// has refreshed the performance data, move the tested group(s) to their
+// recommended node. Does nothing unless the user enabled the toggle.
+const autoSwitchAfterTest = (proxyGroups: ProxyType[]) => {
+  if (!nodeRecommendationStore.autoSwitchEnabled) return
+  for (const proxyGroup of proxyGroups) {
+    switchToRecommended(proxyGroup)
   }
 }
 
@@ -316,9 +329,12 @@ const ProxyGroupTitle = defineComponent({
                     proxiesStore.proxyGroupLatencyTestingMap[
                       props.proxyGroup.name
                     ],
-                  onClick: (e: MouseEvent) => {
+                  onClick: async (e: MouseEvent) => {
                     e.stopPropagation()
-                    proxiesStore.proxyGroupLatencyTest(props.proxyGroup.name)
+                    await proxiesStore.proxyGroupLatencyTest(
+                      props.proxyGroup.name,
+                    )
+                    autoSwitchAfterTest([props.proxyGroup])
                   },
                 },
                 {
