@@ -5,6 +5,7 @@ import type { Connection } from '~/types'
 import { IconChevronRight, IconX } from '@tabler/icons-vue'
 import byteSize from 'byte-size'
 import { uniq } from 'lodash-es'
+import { connectionMatchesGlobalFilter } from '~/components/connections/globalFilter'
 import {
   closeAllConnectionsAPI,
   closeSingleConnectionAPI,
@@ -433,14 +434,8 @@ const filteredConnections = computed(() => {
 
   // Apply global filter
   if (globalFilter.value) {
-    const filter = globalFilter.value.toLowerCase()
-    connections = connections.filter(
-      (conn) =>
-        conn.metadata.host?.toLowerCase().includes(filter) ||
-        conn.metadata.process?.toLowerCase().includes(filter) ||
-        conn.metadata.sourceIP?.toLowerCase().includes(filter) ||
-        conn.rule?.toLowerCase().includes(filter) ||
-        conn.chains.some((c) => c.toLowerCase().includes(filter)),
+    connections = connections.filter((conn) =>
+      connectionMatchesGlobalFilter(conn, globalFilter.value),
     )
   }
 
