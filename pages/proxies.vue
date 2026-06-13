@@ -22,6 +22,7 @@ import ProxyNodeCard from '~/components/ProxyNodeCard.vue'
 import ProxyNodeChip from '~/components/ProxyNodeChip.vue'
 import ProxyNodeListItem from '~/components/ProxyNodeListItem.vue'
 import ProxyNodePreview from '~/components/ProxyNodePreview.vue'
+import ProxyNodeTableRow from '~/components/ProxyNodeTableRow.vue'
 import SubscriptionInfo from '~/components/SubscriptionInfo.vue'
 import { useBatchLatencyTest } from '~/composables/useBatchLatencyTest'
 import { PROXIES_DISPLAY_MODE } from '~/constants'
@@ -371,6 +372,7 @@ const ProxyGroupTitle = defineComponent({
 function nodeComponentFor(mode: string) {
   if (mode === PROXIES_DISPLAY_MODE.LIST) return ProxyNodeListItem
   if (mode === PROXIES_DISPLAY_MODE.CHIPS) return ProxyNodeChip
+  if (mode === PROXIES_DISPLAY_MODE.TABLE) return ProxyNodeTableRow
   return ProxyNodeCard
 }
 

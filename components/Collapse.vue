@@ -18,11 +18,16 @@ const emit = defineEmits<{
 }>()
 
 const configStore = useConfigStore()
+const { t } = useI18n()
 
 const displayMode = computed(() => configStore.proxiesDisplayMode)
 
 const isCardMode = computed(
   () => displayMode.value === PROXIES_DISPLAY_MODE.CARD,
+)
+
+const isTableMode = computed(
+  () => displayMode.value === PROXIES_DISPLAY_MODE.TABLE,
 )
 
 // body 容器布局:card=grid,其余按 flex 变体
@@ -32,8 +37,10 @@ const bodyLayoutClass = computed(() => {
       return 'grid'
     case PROXIES_DISPLAY_MODE.CHIPS:
       return 'flex flex-wrap gap-2'
+    case PROXIES_DISPLAY_MODE.TABLE:
+      return 'flex flex-col gap-1'
     default:
-      // List(现状)与后续 Table 都用纵向 flex
+      // List 用纵向 flex
       return 'flex flex-col gap-3'
   }
 })
@@ -98,6 +105,20 @@ const cardGridStyle = computed(() => ({
       :style="isCardMode ? cardGridStyle : undefined"
     >
       <template v-if="isOpen">
+        <div
+          v-if="isTableMode"
+          class="flex items-center gap-2 px-3 pb-1 text-[0.7rem] font-semibold tracking-wide text-base-content/40 uppercase"
+        >
+          <span class="w-4 shrink-0" />
+          <span class="min-w-0 flex-1">{{ t('proxyName', 'Name') }}</span>
+          <span class="w-16 shrink-0 text-right">{{
+            t('proxyType', 'Type')
+          }}</span>
+          <span class="w-8 shrink-0 text-center">{{ t('udp', 'UDP') }}</span>
+          <span class="w-14 shrink-0 text-right">{{
+            t('latency', 'Latency')
+          }}</span>
+        </div>
         <slot />
       </template>
     </div>
