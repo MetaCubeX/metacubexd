@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.254.0](https://github.com/MetaCubeX/metacubexd/compare/v1.253.0...v1.254.0) (2026-06-13)
+
+
+### Features
+
+* add competitor-parity features across proxies, connections, logs, config ([4d58a99](https://github.com/MetaCubeX/metacubexd/commit/4d58a990765a081c064af3b3181355f35fb31f0e))
+
+
+### Bug Fixes
+
+* **connections:** drop duplicate IPInfo re-export from useGeoLookup ([986600b](https://github.com/MetaCubeX/metacubexd/commit/986600bedb7cbbb3f2bc3373f0b2f7c594369d23))
+
 ## [1.253.0](https://github.com/MetaCubeX/metacubexd/compare/v1.252.0...v1.253.0) (2026-06-13)
 
 
