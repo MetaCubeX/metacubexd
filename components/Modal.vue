@@ -15,10 +15,30 @@ const dialogRef = ref<HTMLDialogElement>()
 const isOpen = ref(false)
 const isRendered = ref(false)
 
+// Longest exit transition is the shell transform (--dur-slow = 320ms); add a buffer.
+const EXIT_DURATION = 360
+let closeTimer: ReturnType<typeof setTimeout> | undefined
+
+function prefersReducedMotion() {
+  return (
+    import.meta.client &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  )
+}
+
+function cancelCloseTimer() {
+  if (closeTimer !== undefined) {
+    clearTimeout(closeTimer)
+    closeTimer = undefined
+  }
+}
+
 function open() {
+  // Cancel a pending teardown so a fast close -> re-open doesn't self-close.
+  cancelCloseTimer()
   dialogRef.value?.showModal()
   isRendered.value = true
-  // Small delay to allow the DOM to render before animating
+  // Next frame: flip to the open state so the entrance transition runs.
   requestAnimationFrame(() => {
     isOpen.value = true
   })
@@ -26,12 +46,17 @@ function open() {
 
 function close() {
   isOpen.value = false
-  // Wait for animation to complete (matches --dur-base + small buffer)
-  setTimeout(() => {
-    dialogRef.value?.close()
-    isRendered.value = false
-    emit('close')
-  }, 240)
+  cancelCloseTimer()
+  // Wait for the exit transition to finish before unmounting the dialog.
+  closeTimer = setTimeout(
+    () => {
+      closeTimer = undefined
+      dialogRef.value?.close()
+      isRendered.value = false
+      emit('close')
+    },
+    prefersReducedMotion() ? 0 : EXIT_DURATION,
+  )
 }
 
 defineExpose({ open, close })
@@ -86,14 +111,17 @@ defineExpose({ open, close })
       </div>
 
       <!-- Content -->
-      <div v-if="isRendered" class="flex-1 overflow-y-auto p-5">
+      <div
+        v-if="isRendered"
+        class="flex-1 overflow-y-auto p-5 max-sm:pb-[max(1.25rem,env(safe-area-inset-bottom))]"
+      >
         <slot />
       </div>
 
       <!-- Actions -->
       <div
         v-if="isRendered && $slots.actions"
-        class="sticky bottom-0 z-10 flex items-center justify-end px-5 py-4"
+        class="sticky bottom-0 z-10 flex items-center justify-end px-5 py-4 max-sm:pb-[max(1rem,env(safe-area-inset-bottom))]"
         :style="{
           background: 'var(--color-base-200)',
           borderTop: '1px solid var(--modal-border)',
@@ -108,10 +136,7 @@ defineExpose({ open, close })
     <form
       method="dialog"
       class="fixed inset-0 modal-backdrop -z-[1]"
-      :style="{
-        background:
-          'color-mix(in oklch, var(--color-base-content) 50%, transparent)',
-      }"
+      :class="isOpen ? 'is-open' : ''"
     >
       <button
         class="absolute inset-0 h-full w-full cursor-pointer border-none bg-transparent"
@@ -122,29 +147,44 @@ defineExpose({ open, close })
 </template>
 
 <style scoped>
-/* Modal shell: spring entrance with light blur, gentle exit */
+/* Neutralize daisyUI's built-in [open] dim (oklch(0% 0 0/.4)) so the custom
+   backdrop below is the single, coordinated scrim — no double-darkening and no
+   desynced fades between daisyUI's curve and ours. */
+.modal {
+  background-color: transparent !important;
+}
+
+/* Modal shell: spring entrance using only composited transform + opacity.
+   The previous filter: blur() animation forced an extra offscreen rasterization
+   pass every frame and is the reason opening felt janky — removed. */
 .modal-shell {
   opacity: 0;
   transform: translateY(16px) scale(0.94);
-  filter: blur(4px);
   transition:
     opacity var(--dur-base) var(--ease-soft),
-    transform var(--dur-slow) var(--ease-spring),
-    filter var(--dur-base) var(--ease-soft);
+    transform var(--dur-slow) var(--ease-spring);
+  will-change: transform, opacity;
 }
 .modal-shell.is-open {
   opacity: 1;
   transform: translateY(0) scale(1);
-  filter: blur(0);
 }
 
-/* Backdrop fade — pairs with shell timing */
+/* Backdrop: a single neutral scrim faded purely via opacity (GPU-composited,
+   cheap). Theme-independent dark so it dims correctly on every daisyUI theme.
+   It replaces the old animated backdrop-filter: blur(8px), which re-blurred the
+   entire page (hundreds of proxy cards) every frame — the dominant lag source —
+   and, by sampling over the fixed bottom nav's own backdrop-filter, produced the
+   bottom-content rendering artifact. A solid scrim in the top layer dims the nav
+   uniformly with no sampling, fixing both. */
 .modal-backdrop {
-  backdrop-filter: blur(0px);
-  transition: backdrop-filter var(--dur-slow) var(--ease-soft);
+  background: oklch(0% 0 0 / 0.5);
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-soft);
+  will-change: opacity;
 }
-dialog[open] .modal-backdrop {
-  backdrop-filter: blur(8px);
+.modal-backdrop.is-open {
+  opacity: 1;
 }
 
 /* Close button — rotate + tactile press, error tint on hover */
