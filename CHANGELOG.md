@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.254.2](https://github.com/MetaCubeX/metacubexd/compare/v1.254.1...v1.254.2) (2026-06-13)
+
+
+### Performance Improvements
+
+* **modal:** drop blur animations to fix open-lag and bottom-content artifact ([5a270eb](https://github.com/MetaCubeX/metacubexd/commit/5a270eb6835bf1f552844dbd40000baa26ea591e))
+
 ## [1.254.1](https://github.com/MetaCubeX/metacubexd/compare/v1.254.0...v1.254.1) (2026-06-13)
 
 
