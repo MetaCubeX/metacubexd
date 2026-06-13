@@ -79,7 +79,20 @@ export enum PROXIES_ORDERING_TYPE {
 export enum PROXIES_DISPLAY_MODE {
   CARD = 'cardMode',
   LIST = 'listMode',
+  TABLE = 'tableMode',
+  CHIPS = 'chipsMode',
+  MASTER = 'masterDetailMode',
 }
+
+// Order of modes in the toolbar segmented switcher. Single source of truth so a
+// new mode can never be silently missing from the switcher.
+export const PROXIES_DISPLAY_MODE_ORDER: PROXIES_DISPLAY_MODE[] = [
+  PROXIES_DISPLAY_MODE.CARD,
+  PROXIES_DISPLAY_MODE.LIST,
+  PROXIES_DISPLAY_MODE.TABLE,
+  PROXIES_DISPLAY_MODE.CHIPS,
+  PROXIES_DISPLAY_MODE.MASTER,
+]
 
 export enum PROXIES_CARD_SIZE {
   COMFORTABLE = 'comfortable',
