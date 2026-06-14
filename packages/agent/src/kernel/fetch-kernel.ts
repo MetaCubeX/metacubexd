@@ -10,6 +10,8 @@ const execFileAsync = promisify(execFile)
 
 export interface FetchKernelDeps {
   fetch?: typeof fetch
+  /** mihomo release tag to download; defaults to MIHOMO_VERSION. */
+  version?: string
   /**
    * Extract a single entry from a .zip buffer. Injected in tests; the default
    * shells out to the platform's unzip and is covered by MANUAL smoke testing.
@@ -45,7 +47,7 @@ export async function fetchKernel(
 ): Promise<{ binPath: string }> {
   const doFetch = deps.fetch ?? fetch
   const unzipEntry = deps.unzipEntry ?? defaultUnzipEntry
-  const asset = mihomoAsset(os, arch, MIHOMO_VERSION)
+  const asset = mihomoAsset(os, arch, deps.version ?? MIHOMO_VERSION)
 
   const res = await doFetch(asset.url)
   if (!res.ok) {
@@ -71,4 +73,60 @@ export async function fetchKernel(
     await chmod(binPath, 0o755)
   }
   return { binPath }
+}
+
+const RELEASES_URL = 'https://api.github.com/repos/MetaCubeX/mihomo/releases'
+// Keep `vX.Y...` tags; drop the rolling 'Prerelease-Alpha' and any non-version tags.
+const VERSION_TAG = /^v\d+\.\d+/
+
+interface GithubRelease {
+  tag_name?: string
+}
+
+/** Compare two `v\d+.\d+.\d+...` tags numerically, descending. */
+function compareTagsDesc(a: string, b: string): number {
+  const parse = (t: string) =>
+    t
+      .replace(/^v/, '')
+      .split(/[.-]/)
+      .map((p) => Number.parseInt(p, 10))
+  const pa = parse(a)
+  const pb = parse(b)
+  const len = Math.max(pa.length, pb.length)
+  for (let i = 0; i < len; i++) {
+    const x = pa[i] ?? 0
+    const y = pb[i] ?? 0
+    // Pre-release segments (NaN) sort below their release counterpart.
+    if (Number.isNaN(x) && Number.isNaN(y)) continue
+    if (Number.isNaN(x)) return 1
+    if (Number.isNaN(y)) return -1
+    if (x !== y) return y - x
+  }
+  return b.localeCompare(a)
+}
+
+/**
+ * List installable mihomo kernel versions from GitHub releases, newest first.
+ * Filters to semantic-version tags only. `fetch` is injectable for tests.
+ */
+export async function listMihomoVersions(
+  deps: { fetch?: typeof fetch } = {},
+): Promise<string[]> {
+  const doFetch = deps.fetch ?? fetch
+  const res = await doFetch(RELEASES_URL, {
+    headers: {
+      'User-Agent': 'metacubexd-agent',
+      Accept: 'application/vnd.github+json',
+    },
+  })
+  if (!res.ok) {
+    throw new Error(
+      `listMihomoVersions: failed ${res.status} for ${RELEASES_URL}`,
+    )
+  }
+  const releases = (await res.json()) as GithubRelease[]
+  return releases
+    .map((r) => r.tag_name)
+    .filter((t): t is string => typeof t === 'string' && VERSION_TAG.test(t))
+    .sort(compareTagsDesc)
 }
