@@ -356,3 +356,239 @@ describe('createSupervisor — stop / restart / tree-kill / mutex', () => {
     expect(r.message).toContain('parse error')
   })
 })
+
+describe('createSupervisor — crash auto-restart watchdog', () => {
+  function ready200() {
+    return (async () =>
+      new Response(JSON.stringify({ version: '1.19.27' }), {
+        status: 200,
+      })) as unknown as typeof fetch
+  }
+
+  // Captures the watchdog's timer callbacks (backoff restart + stability reset)
+  // so tests can fire them deterministically without waiting real milliseconds.
+  // Timers are identified by their ms value: restart-backoff vs stability window.
+  function makeTimerHarness() {
+    interface Pending { id: number; fn: () => void; ms: number }
+    let nextId = 1
+    const pending: Pending[] = []
+    async function flush() {
+      // Let the scheduled async run(doStart) settle: the mutex chain ->
+      // injectClashConfig (file I/O) -> spawn -> pollReady all need a few
+      // macrotask turns to flush before assertions.
+      for (let i = 0; i < 5; i++) await new Promise((r) => setTimeout(r, 0))
+    }
+    return {
+      pending,
+      setTimer: ((fn: () => void, ms: number) => {
+        const id = nextId++
+        pending.push({ id, fn, ms })
+        return id as unknown as ReturnType<typeof setTimeout>
+      }) as (fn: () => void, ms: number) => ReturnType<typeof setTimeout>,
+      clearTimer: ((h: ReturnType<typeof setTimeout>) => {
+        const idx = pending.findIndex((p) => p.id === (h as unknown as number))
+        if (idx >= 0) pending.splice(idx, 1)
+      }) as (h: ReturnType<typeof setTimeout>) => void,
+      // Fire the first pending timer matching ms (and remove it).
+      async fireMs(ms: number) {
+        const idx = pending.findIndex((p) => p.ms === ms)
+        if (idx < 0) throw new Error(`no pending timer with ms=${ms} to fire`)
+        const [t] = pending.splice(idx, 1)
+        t!.fn()
+        await flush()
+      },
+      msList() {
+        return pending.map((p) => p.ms)
+      },
+    }
+  }
+
+  // Distinct timer durations so fireMs() can target the right timer:
+  // BACKOFF = the restart backoff, STABLE = the post-running stability window.
+  const BACKOFF = 1000
+  const STABLE = 7000
+
+  it('auto-restarts after backoff when the process exits unexpectedly while running', async () => {
+    const opts = baseOpts()
+    const procs: FakeProc[] = []
+    const spawn = vi.fn(() => {
+      const p = new FakeProc()
+      p.pid = 2000 + procs.length
+      procs.push(p)
+      return p
+    })
+    const timers = makeTimerHarness()
+    const sup = createSupervisor(
+      { ...opts, restartBackoffMs: BACKOFF, stableRestartMs: STABLE },
+      {
+        spawn: spawn as never,
+        fetch: ready200(),
+        setTimer: timers.setTimer,
+        clearTimer: timers.clearTimer,
+      },
+    )
+    await sup.start()
+    expect(spawn).toHaveBeenCalledTimes(1)
+    expect(sup.getState().status).toBe('running')
+    // Reaching running armed a stability timer (not a restart).
+    expect(timers.msList()).toContain(STABLE)
+
+    // Simulate an unexpected crash while running.
+    procs[0]!.emitExit(137, null)
+    await new Promise((r) => setImmediate(r))
+    // Watchdog scheduled a backoff timer; the stability timer was cancelled.
+    expect(timers.msList()).toEqual([BACKOFF])
+    expect(spawn).toHaveBeenCalledTimes(1)
+
+    // Fire the backoff timer -> respawn.
+    await timers.fireMs(BACKOFF)
+    expect(spawn).toHaveBeenCalledTimes(2)
+    expect(sup.getState().status).toBe('running')
+    await sup.dispose()
+  })
+
+  it('does NOT restart when the user calls stop()', async () => {
+    const opts = baseOpts()
+    const proc = new FakeProc()
+    const spawn = vi.fn(() => proc)
+    const timers = makeTimerHarness()
+    const sup = createSupervisor(
+      { ...opts, stableRestartMs: STABLE },
+      {
+        spawn: spawn as never,
+        fetch: ready200(),
+        setTimer: timers.setTimer,
+        clearTimer: timers.clearTimer,
+      },
+    )
+    await sup.start()
+    const stopP = sup.stop()
+    setTimeout(() => proc.emitExit(0, 'SIGTERM'), 5)
+    const st = await stopP
+    await new Promise((r) => setImmediate(r))
+    expect(st.status).toBe('stopped')
+    // No watchdog restart scheduled for an intentional stop; stability timer cleared too.
+    expect(timers.pending).toHaveLength(0)
+    expect(spawn).toHaveBeenCalledTimes(1)
+    await sup.dispose()
+  })
+
+  it('stops at errored once maxRestarts is exceeded (crash loop, never stabilizes)', async () => {
+    const opts = baseOpts()
+    const procs: FakeProc[] = []
+    const spawn = vi.fn(() => {
+      const p = new FakeProc()
+      p.pid = 3000 + procs.length
+      procs.push(p)
+      return p
+    })
+    const timers = makeTimerHarness()
+    const sup = createSupervisor(
+      {
+        ...opts,
+        maxRestarts: 2,
+        restartBackoffMs: BACKOFF,
+        stableRestartMs: STABLE,
+      },
+      {
+        spawn: spawn as never,
+        fetch: ready200(),
+        setTimer: timers.setTimer,
+        clearTimer: timers.clearTimer,
+      },
+    )
+    await sup.start()
+    expect(spawn).toHaveBeenCalledTimes(1)
+
+    // Crash #1 -> restart #1 (count 1). It reaches running but we never let the
+    // stability window elapse, so the counter is NOT reset.
+    procs[procs.length - 1]!.emitExit(1, null)
+    await new Promise((r) => setImmediate(r))
+    await timers.fireMs(BACKOFF)
+    expect(spawn).toHaveBeenCalledTimes(2)
+
+    // Crash #2 -> restart #2 (count 2 == maxRestarts)
+    procs[procs.length - 1]!.emitExit(1, null)
+    await new Promise((r) => setImmediate(r))
+    await timers.fireMs(BACKOFF)
+    expect(spawn).toHaveBeenCalledTimes(3)
+
+    // Crash #3 -> exceeds maxRestarts -> no further restart, stay errored.
+    procs[procs.length - 1]!.emitExit(1, null)
+    await new Promise((r) => setImmediate(r))
+    expect(timers.msList()).not.toContain(BACKOFF)
+    expect(spawn).toHaveBeenCalledTimes(3)
+    expect(sup.getState().status).toBe('errored')
+    await sup.dispose()
+  })
+
+  it('resets the restart counter once a restart stays running for the stability window', async () => {
+    const opts = baseOpts()
+    const procs: FakeProc[] = []
+    const spawn = vi.fn(() => {
+      const p = new FakeProc()
+      p.pid = 4000 + procs.length
+      procs.push(p)
+      return p
+    })
+    const timers = makeTimerHarness()
+    const sup = createSupervisor(
+      {
+        ...opts,
+        maxRestarts: 1,
+        restartBackoffMs: BACKOFF,
+        stableRestartMs: STABLE,
+      },
+      {
+        spawn: spawn as never,
+        fetch: ready200(),
+        setTimer: timers.setTimer,
+        clearTimer: timers.clearTimer,
+      },
+    )
+    await sup.start()
+
+    // Crash #1 -> restart (count 1 == maxRestarts), reaches running.
+    procs[procs.length - 1]!.emitExit(1, null)
+    await new Promise((r) => setImmediate(r))
+    await timers.fireMs(BACKOFF)
+    expect(spawn).toHaveBeenCalledTimes(2)
+    expect(sup.getState().status).toBe('running')
+
+    // Let the stability window elapse -> counter resets to 0.
+    await timers.fireMs(STABLE)
+
+    // Because the counter reset, another crash is allowed to restart again.
+    procs[procs.length - 1]!.emitExit(1, null)
+    await new Promise((r) => setImmediate(r))
+    expect(timers.msList()).toEqual([BACKOFF])
+    await timers.fireMs(BACKOFF)
+    expect(spawn).toHaveBeenCalledTimes(3)
+    expect(sup.getState().status).toBe('running')
+    await sup.dispose()
+  })
+
+  it('autoRestart:false disables the watchdog entirely', async () => {
+    const opts = baseOpts()
+    const proc = new FakeProc()
+    const spawn = vi.fn(() => proc)
+    const timers = makeTimerHarness()
+    const sup = createSupervisor(
+      { ...opts, autoRestart: false, stableRestartMs: STABLE },
+      {
+        spawn: spawn as never,
+        fetch: ready200(),
+        setTimer: timers.setTimer,
+        clearTimer: timers.clearTimer,
+      },
+    )
+    await sup.start()
+    // A stability timer may be armed, but no restart backoff must ever appear.
+    proc.emitExit(1, null)
+    await new Promise((r) => setImmediate(r))
+    expect(timers.msList()).not.toContain(BACKOFF)
+    expect(spawn).toHaveBeenCalledTimes(1)
+    expect(sup.getState().status).toBe('errored')
+    await sup.dispose()
+  })
+})

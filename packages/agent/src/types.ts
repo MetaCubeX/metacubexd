@@ -22,6 +22,10 @@ export interface SupervisorOptions {
   activeConfigPath: string // mihomo -f target (managed by ProfileStore)
   startTimeoutMs?: number // default 10_000
   stopTimeoutMs?: number // default 5_000
+  autoRestart?: boolean // crash watchdog; default true
+  maxRestarts?: number // consecutive auto-restarts before giving up; default 3
+  restartBackoffMs?: number // delay before each auto-restart; default 1_000
+  stableRestartMs?: number // running this long resets the crash counter; default 30_000
 }
 
 export interface KernelLogLine {

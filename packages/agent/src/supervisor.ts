@@ -18,6 +18,9 @@ export interface SupervisorDeps {
   treeKill?: (pid: number, signal: string, cb?: (err?: Error) => void) => void
   now?: () => number
   platform?: NodeJS.Platform
+  // Injectable backoff timer for the crash watchdog (tests drive it deterministically).
+  setTimer?: (fn: () => void, ms: number) => ReturnType<typeof setTimeout>
+  clearTimer?: (handle: ReturnType<typeof setTimeout>) => void
 }
 
 export type CreateSupervisorOptions = SupervisorOptions & {
@@ -54,10 +57,16 @@ export function createSupervisor(
     (treeKillDefault as unknown as NonNullable<SupervisorDeps['treeKill']>)
   const now = deps.now ?? Date.now
   const platform = deps.platform ?? process.platform
+  const setTimer = deps.setTimer ?? ((fn, ms) => setTimeout(fn, ms))
+  const clearTimer = deps.clearTimer ?? ((h) => clearTimeout(h))
 
   const startTimeoutMs = opts.startTimeoutMs ?? 10_000
   const stopTimeoutMs = opts.stopTimeoutMs ?? 5_000
   const mixedPort = opts.mixedPort
+  const autoRestart = opts.autoRestart ?? true
+  const maxRestarts = opts.maxRestarts ?? 3
+  const restartBackoffMs = opts.restartBackoffMs ?? 1_000
+  const stableRestartMs = opts.stableRestartMs ?? 30_000
 
   const state: KernelState = {
     status: 'stopped',
@@ -69,6 +78,14 @@ export function createSupervisor(
   const stateCbs = new Set<(s: KernelState) => void>()
   let child: ChildProcess | undefined
   const run = createMutex()
+
+  // Crash watchdog: a user-initiated stop sets intentionalStop so proc 'exit'
+  // is not misread as a crash. restartCount counts consecutive auto-restarts and
+  // resets once a restart reaches 'running'. restartTimer holds the pending backoff.
+  let intentionalStop = false
+  let restartCount = 0
+  let restartTimer: ReturnType<typeof setTimeout> | undefined
+  let stableTimer: ReturnType<typeof setTimeout> | undefined
 
   function setState(patch: Partial<KernelState>): void {
     Object.assign(state, patch)
@@ -106,6 +123,12 @@ export function createSupervisor(
             version?: string
           }
           setState({ status: 'running', version: body.version })
+          // The kernel reached running: arm a stability window. Only if it stays
+          // running for stableRestartMs do we treat it as recovered and clear the
+          // consecutive-crash counter. A kernel that reaches running and then dies
+          // again immediately still counts toward maxRestarts (no reset), so a
+          // crash loop cannot restart forever.
+          armStabilityReset()
           return true
         }
       } catch {
@@ -148,9 +171,40 @@ export function createSupervisor(
     await writeFile(opts.activeConfigPath, header + kept)
   }
 
+  function cancelStabilityReset(): void {
+    if (stableTimer !== undefined) {
+      clearTimer(stableTimer)
+      stableTimer = undefined
+    }
+  }
+
+  // Once the kernel reaches running, wait stableRestartMs before declaring it
+  // recovered; only then reset the consecutive-crash counter. If it crashes
+  // before that, the counter stands so maxRestarts still bounds a crash loop.
+  function armStabilityReset(): void {
+    if (!autoRestart) return
+    cancelStabilityReset()
+    stableTimer = setTimer(() => {
+      stableTimer = undefined
+      if (state.status === 'running') restartCount = 0
+    }, stableRestartMs)
+  }
+
+  // Arm the backoff timer, then (re)spawn through the same mutex as start/stop
+  // so a respawn can't race a concurrent user lifecycle op.
+  function scheduleRestart(): void {
+    if (restartTimer !== undefined) clearTimer(restartTimer)
+    restartTimer = setTimer(() => {
+      restartTimer = undefined
+      void run(doStart)
+    }, restartBackoffMs)
+  }
+
   async function doStart(): Promise<KernelState> {
     if (state.status === 'running' || state.status === 'starting')
       return { ...state }
+    // A (re)start clears the intentional-stop flag so a later crash is detectable.
+    intentionalStop = false
     setState({
       status: 'starting',
       pid: undefined,
@@ -174,12 +228,22 @@ export function createSupervisor(
     proc.stderr?.on('data', (c: Buffer) => emitLines('stderr', c))
     proc.on('exit', (code: number | null) => {
       child = undefined
-      if (state.status === 'starting' || state.status === 'running') {
+      // This run is over; a stability reset armed for it must not fire later.
+      cancelStabilityReset()
+      const wasActive =
+        state.status === 'starting' || state.status === 'running'
+      if (wasActive) {
         setState({
           status: 'errored',
           lastExitCode: code,
           pid: undefined,
         })
+        // Unexpected crash (not a user stop/restart): auto-restart with backoff
+        // until maxRestarts is exhausted, then stay errored.
+        if (!intentionalStop && autoRestart && restartCount < maxRestarts) {
+          restartCount++
+          scheduleRestart()
+        }
       } else {
         setState({ status: 'stopped', lastExitCode: code, pid: undefined })
       }
@@ -197,6 +261,15 @@ export function createSupervisor(
   }
 
   async function doStop(): Promise<KernelState> {
+    // Mark this as user-initiated so the proc 'exit' handler does not auto-restart,
+    // and cancel any pending backoff restart that a prior crash may have armed.
+    intentionalStop = true
+    restartCount = 0
+    if (restartTimer !== undefined) {
+      clearTimer(restartTimer)
+      restartTimer = undefined
+    }
+    cancelStabilityReset()
     if (!child || state.status === 'stopped') {
       setState({ status: 'stopped' })
       return { ...state }
@@ -268,6 +341,13 @@ export function createSupervisor(
     async dispose() {
       logCbs.clear()
       stateCbs.clear()
+      // Tear down the watchdog so a pending backoff can't respawn after dispose.
+      intentionalStop = true
+      if (restartTimer !== undefined) {
+        clearTimer(restartTimer)
+        restartTimer = undefined
+      }
+      cancelStabilityReset()
       if (child) {
         try {
           await run(doStop)
