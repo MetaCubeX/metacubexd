@@ -83,7 +83,22 @@ export default defineNuxtConfig({
       //   their precache URLs to extension-less "/200" and "/404", which 404 on
       //   static hosts and make the SW install fail (so it never activates). The
       //   app shell is already covered by index.html via the navigation fallback.
-      globIgnores: ['**/config.js', '200.html', '404.html'],
+      globIgnores: [
+        '**/config.js',
+        '200.html',
+        '404.html',
+        // Monaco editor + language worker chunks: large, lazy-loaded only on
+        // the profile editor; never precache (would blow the 5MB SW cap and
+        // make the service worker install fail silently). Vite emits these as
+        // *.worker-*.js / monaco chunks named after their entry.
+        '**/*.worker-*.js',
+        '**/yaml.worker-*.js',
+        '**/json.worker-*.js',
+        '**/editor.worker-*.js',
+        // The monaco-editor core chunk itself (multi-MB) is lazy; keep it out
+        // of precache. Its chunk name contains "monaco".
+        '**/monaco-*.js',
+      ],
       maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       // Keep skipWaiting/clientsClaim off to prevent iOS Safari refresh loops (#1740).
       skipWaiting: false,
