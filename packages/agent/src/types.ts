@@ -36,7 +36,8 @@ export interface MihomoSupervisor {
   stop: () => Promise<KernelState>
   restart: () => Promise<KernelState>
   validate: (configPath: string) => Promise<{ valid: boolean; message: string }>
-  on: ((event: 'log', cb: (l: KernelLogLine) => void) => void) & ((event: 'state', cb: (s: KernelState) => void) => void)
+  on: ((event: 'log', cb: (l: KernelLogLine) => void) => void) &
+    ((event: 'state', cb: (s: KernelState) => void) => void)
   dispose: () => Promise<void>
 }
 
@@ -48,6 +49,7 @@ export interface ProfileMeta {
   type: ProfileType
   url?: string
   userAgent?: string
+  updateInterval?: number // minutes; only meaningful for remote profiles
   updatedAt: number
   subscriptionInfo?: {
     upload: number
@@ -68,6 +70,7 @@ export interface ProfileStore {
   delete: (id: string) => Promise<void>
   duplicate: (id: string, name?: string) => Promise<ProfileMeta>
   importFromUrl: (url: string, name?: string) => Promise<ProfileMeta> // UA 'clash.meta'
+  refresh: (id: string) => Promise<ProfileMeta> // re-fetch a remote profile in place
   getActiveId: () => Promise<string | undefined>
   setActive: (id: string) => Promise<void> // validate + write activeConfigPath
 }

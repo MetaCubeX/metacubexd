@@ -61,6 +61,19 @@ function makeDeps(token?: string) {
       type: 'remote' as const,
       updatedAt: 5,
     })),
+    refresh: vi.fn(async (id: string) => ({
+      id,
+      name: 'sub',
+      type: 'remote' as const,
+      url: 'https://sub',
+      updatedAt: 6,
+      subscriptionInfo: {
+        upload: 1,
+        download: 2,
+        total: 3,
+        expire: 4,
+      },
+    })),
     getActiveId: vi.fn(async () => undefined),
     setActive: vi.fn(async () => {}),
   }
@@ -244,6 +257,20 @@ describe('createControlRouter — profiles + SSE', () => {
       'https://sub',
       'sub',
     )
+  })
+
+  it('pOST /api/control/profiles/:id/refresh returns the updated meta', async () => {
+    const deps = makeDeps()
+    srv = await mount(deps)
+    const res = await fetch(`${srv.base}/api/control/profiles/p1/refresh`, {
+      method: 'POST',
+    })
+    expect(res.status).toBe(200)
+    expect(deps.profiles.refresh).toHaveBeenCalledWith('p1')
+    const body = (await res.json()) as Record<string, unknown>
+    expect(body.id).toBe('p1')
+    expect(body.type).toBe('remote')
+    expect(body.updatedAt).toBe(6)
   })
 
   it('pOST /api/control/profiles/:id/activate sets active then returns KernelState', async () => {

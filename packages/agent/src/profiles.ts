@@ -73,6 +73,26 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
     }
   }
 
+  // Shared fetch+parse used by both importFromUrl (mints a new id) and
+  // refresh (overwrites an existing id) so the two stay DRY.
+  async function fetchSubscription(
+    url: string,
+    userAgent: string,
+  ): Promise<{
+    content: string
+    subscriptionInfo: ProfileMeta['subscriptionInfo'] | undefined
+  }> {
+    const res = await doFetch(url, { headers: { 'User-Agent': userAgent } })
+    if (!res.ok) {
+      throw new Error(`fetch failed ${res.status} for ${url}`)
+    }
+    const content = await res.text()
+    const subscriptionInfo = parseSubscriptionUserinfo(
+      res.headers.get('subscription-userinfo'),
+    )
+    return { content, subscriptionInfo }
+  }
+
   const store: ProfileStore = {
     async list() {
       return readIndex()
@@ -137,13 +157,9 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
     async importFromUrl(url, name) {
       await ensureDir()
       const userAgent = 'clash.meta'
-      const res = await doFetch(url, { headers: { 'User-Agent': userAgent } })
-      if (!res.ok) {
-        throw new Error(`importFromUrl: fetch failed ${res.status} for ${url}`)
-      }
-      const content = await res.text()
-      const subscriptionInfo = parseSubscriptionUserinfo(
-        res.headers.get('subscription-userinfo'),
+      const { content, subscriptionInfo } = await fetchSubscription(
+        url,
+        userAgent,
       )
       const id = idGen()
       const meta: ProfileMeta = {
@@ -157,6 +173,26 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
       }
       await writeFile(profilePath(id), content)
       await writeIndex([...(await readIndex()), meta])
+      return meta
+    },
+
+    async refresh(id) {
+      const list = await readIndex()
+      const meta = list.find((m) => m.id === id)
+      if (!meta) throw new Error(`profile not found: ${id}`)
+      if (meta.type !== 'remote' || !meta.url) {
+        throw new Error(`refresh: profile ${id} is not a remote subscription`)
+      }
+      const userAgent = meta.userAgent ?? 'clash.meta'
+      const { content, subscriptionInfo } = await fetchSubscription(
+        meta.url,
+        userAgent,
+      )
+      // Overwrite the SAME file in place — keep the same id (no orphan).
+      await writeFile(profilePath(id), content)
+      meta.updatedAt = Date.now()
+      if (subscriptionInfo) meta.subscriptionInfo = subscriptionInfo
+      await writeIndex(list)
       return meta
     },
 

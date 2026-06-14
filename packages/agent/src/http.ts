@@ -167,6 +167,13 @@ export function createControlRouter(deps: ControlRouterDeps): App {
     }),
   )
   router.post(
+    `${PREFIX}/profiles/:id/refresh`,
+    defineEventHandler(async (event) => {
+      const id = getRouterParam(event, 'id')!
+      return profiles.refresh(id)
+    }),
+  )
+  router.post(
     `${PREFIX}/profiles/:id/activate`,
     defineEventHandler(async (event) => {
       const id = getRouterParam(event, 'id')!
