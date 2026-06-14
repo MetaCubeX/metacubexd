@@ -1,0 +1,6 @@
+out/
+dist/
+renderer/
+resources/mihomo
+resources/mihomo.exe
+node_modules/

@@ -1,0 +1,28 @@
+{
+  "name": "@metacubexd/desktop",
+  "version": "1.254.2",
+  "private": true,
+  "type": "module",
+  "main": "out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "package": "electron-builder",
+    "copy:renderer": "rm -rf renderer && cp -r ../../packages/ui/.output/public renderer",
+    "fetch:mihomo": "node scripts/fetch-mihomo.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@metacubexd/agent": "workspace:*"
+  },
+  "devDependencies": {
+    "electron": "catalog:",
+    "electron-vite": "catalog:",
+    "electron-builder": "catalog:",
+    "vitest": "catalog:",
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  }
+}
