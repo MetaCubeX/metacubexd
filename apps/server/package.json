@@ -7,6 +7,8 @@
     "build": "nitro build",
     "dev": "nitro dev",
     "preview": "node .output/server/index.mjs",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
     "typecheck": "nitro prepare && tsc --noEmit"
   },
   "dependencies": {
