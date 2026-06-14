@@ -146,6 +146,99 @@ sudo dpkg -i MetaCubeXD-*-linux-*.deb
 > **mixed proxy port** (no elevation). Enable TUN only if your OS lets the
 > unsigned binary acquire the required privileges.
 
+### 3. All-in-One Server (Docker)
+
+The `metacubexd-server` image bundles the dashboard UI, the control agent, and
+a per-arch mihomo kernel. One container serves the panel, supervises the
+kernel, and exposes the proxy.
+
+```yaml
+# compose.yaml — proxy-only by default; TUN is an advanced override
+services:
+  metacubexd:
+    image: ghcr.io/metacubex/metacubexd-server:latest
+    restart: unless-stopped
+    environment:
+      CONTROL_TOKEN: 'change-me-control'
+      CLASH_SECRET: 'change-me-clash'
+      CONTROL_PORT: '8080'
+      CLASH_API_PORT: '9090'
+      MIXED_PORT: '7890'
+      TZ: 'Asia/Shanghai'
+    ports:
+      - '8080:8080' # dashboard UI + /api/control agent API
+      - '9090:9090' # mihomo Clash API + WebSocket (UI endpoint target)
+      - '7890:7890' # mixed proxy port
+    volumes:
+      - 'metacubexd-data:/data'
+
+volumes:
+  metacubexd-data: {}
+```
+
+```shell
+docker compose up -d
+
+# Update
+docker compose pull && docker compose up -d
+```
+
+Open `http://<host>:8080` for the dashboard. The control agent unlocks the
+kernel/profile UI automatically (it probes `/api/control/info` on the same
+origin).
+
+**Point the UI endpoint at the kernel.** The dashboard talks to mihomo's Clash
+API directly (never proxied), so set the endpoint to:
+
+| Field  | Value                            |
+| :----- | :------------------------------- |
+| URL    | `http://<host>:9090`             |
+| Secret | the `CLASH_SECRET` you set above |
+
+#### Environment variables
+
+| Variable         | Default               | Purpose                                                                                                                             |
+| :--------------- | :-------------------- | :---------------------------------------------------------------------------------------------------------------------------------- |
+| `CONTROL_TOKEN`  | _(none)_              | Bearer token guarding the control agent (`/api/control/**`); also accepted as `?token=` for the SSE log stream. Set a strong value. |
+| `CLASH_SECRET`   | _(none)_              | Secret for mihomo's Clash API (`external-controller`). Use this as the UI endpoint's **Secret**.                                    |
+| `CONTROL_PORT`   | `8080`                | Port serving the dashboard UI + control agent API.                                                                                  |
+| `CLASH_API_PORT` | `9090`                | Port for mihomo's Clash API + WebSocket. The UI endpoint targets this port.                                                         |
+| `MIXED_PORT`     | `7890`                | mihomo mixed (HTTP + SOCKS) proxy port.                                                                                             |
+| `TZ`             | _(container default)_ | Timezone for logs/scheduling, e.g. `Asia/Shanghai`.                                                                                 |
+
+The named volume mounts `/data`, which holds your profiles, the active config,
+and the kernel's geo / fake-ip caches. It **must be writable** — a read-only
+data dir makes the kernel exit non-zero.
+
+#### TUN mode (advanced)
+
+TUN needs `NET_ADMIN`, the `/dev/net/tun` device, and host networking. Override
+the service:
+
+```yaml
+services:
+  metacubexd:
+    image: ghcr.io/metacubex/metacubexd-server:latest
+    restart: unless-stopped
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - '/dev/net/tun:/dev/net/tun'
+    environment:
+      CONTROL_TOKEN: 'change-me-control'
+      CLASH_SECRET: 'change-me-clash'
+    volumes:
+      - 'metacubexd-data:/data'
+
+volumes:
+  metacubexd-data: {}
+```
+
+With `network_mode: host` the `ports:` mapping is ignored — the container
+binds `8080`/`9090`/`7890` directly on the host. Enable a `tun:` block in your
+profile's mihomo config for the tunnel to come up.
+
 ## 🩺 Troubleshooting
 
 ### "Unable to connect to backend" when self-hosting (CORS)
