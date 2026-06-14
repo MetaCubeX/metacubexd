@@ -1,0 +1,16 @@
+# Minimal default mihomo config bootstrapped on first run.
+# The desktop agent overlays external-controller, secret, and ports at start;
+# do not hardcode credentials or controller addresses here.
+mixed-port: 7890
+allow-lan: false
+mode: rule
+log-level: info
+ipv6: false
+proxies: []
+proxy-groups:
+  - name: PROXY
+    type: select
+    proxies:
+      - DIRECT
+rules:
+  - MATCH,DIRECT
