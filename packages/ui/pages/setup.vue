@@ -179,6 +179,9 @@ onMounted(async () => {
     class="flex h-full items-center justify-center overflow-y-auto bg-linear-to-b from-base-100 to-base-200 p-4"
   >
     <div class="animate-fade-slide-in mx-auto w-full max-w-md">
+      <!-- Kernel control (capability-gated; hidden on plain remote setup) -->
+      <KernelControlPanel class="mb-6" />
+
       <!-- Logo Section -->
       <div class="animate-fade-slide-in-delay-1 mb-8 text-center">
         <div class="mb-4">
