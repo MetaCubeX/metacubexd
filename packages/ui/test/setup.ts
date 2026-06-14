@@ -64,6 +64,30 @@ vi.stubGlobal('matchMedia', (query: string) => ({
   dispatchEvent: vi.fn(),
 }))
 
+// Minimal EventSource mock for SSE log-stream tests. Specs that need to drive
+// events grab the latest instance via (globalThis as any).__lastEventSource.
+class MockEventSource {
+  url: string
+  readyState = 0
+  onmessage: ((ev: { data: string }) => void) | null = null
+  onerror: ((ev: unknown) => void) | null = null
+  onopen: ((ev: unknown) => void) | null = null
+  close = vi.fn(() => {
+    this.readyState = 2
+  })
+  constructor(url: string) {
+    this.url = url
+    this.readyState = 1
+    ;(globalThis as any).__lastEventSource = this
+  }
+
+  // Test helper: simulate a server-sent frame.
+  emit(data: string) {
+    this.onmessage?.({ data })
+  }
+}
+vi.stubGlobal('EventSource', MockEventSource)
+
 // Reset storage before each test
 beforeEach(() => {
   localStorage.clear()
