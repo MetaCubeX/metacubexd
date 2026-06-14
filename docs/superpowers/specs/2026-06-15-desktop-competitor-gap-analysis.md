@@ -13,14 +13,14 @@ metacubexd desktop 是 Electron 客户端:进程内 **control server** 在 `127.
 
 ## 2. 已验证的真实 Bug(调研顺手发现,应优先修)
 
-| Bug                            | 证据                                                                                        | 影响                                                  |
-| ------------------------------ | ------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| **托盘图标缺失**               | `tray.ts` 引用 `resources/tray.png`,但该文件不存在 → `nativeImage.createEmpty()` 空白图标   | 托盘常驻应用唯一的入口**不可见**                      |
-| **`boot()` 不注入 mixed-port** | `boot()` 调 `createAgent` 时未传 `mixedPort`,`injectClashConfig()` 因此跳过 mixed-port 注入 | 内核可能没有固定 mixed-port,系统代理无从指向          |
-| **订阅就地刷新缺失**           | 无 `profiles.refresh(id)`;`importFromUrl` 每次都 mint 新 id                                 | 重新拉订阅会产生**孤儿 profile**,而非更新原有         |
-| **macOS 未签名**               | electron-builder `identity:null`,无 Windows 签名                                            | Gatekeeper/SmartScreen 拦截;且阻塞自更新与 setuid TUN |
-| **崩溃不自愈**                 | `proc.on('exit')` 仅置 `errored`,无重启                                                     | 内核意外退出后代理静默失效                            |
-| **`fetchKernel` 未接线**       | `fetch-kernel.ts` 存在但没接到任何 control 路由                                             | 无法从 UI 管理/切换内核版本                           |
+| Bug                            | 证据                                                                                                                                         | 影响                                                  |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| ~~**托盘图标缺失**~~ (误报)    | 复核:`tray.png/@2x` + `trayTemplate.png/@2x` 四个资产**已在磁盘**,`tray.ts` 正确按 OS 选用;调研 agent 读文件竞态导致误报。已随基线提交跟踪。 | 无(已修正)                                            |
+| **`boot()` 不注入 mixed-port** | `boot()` 调 `createAgent` 时未传 `mixedPort`,`injectClashConfig()` 因此跳过 mixed-port 注入                                                  | 内核可能没有固定 mixed-port,系统代理无从指向          |
+| **订阅就地刷新缺失**           | 无 `profiles.refresh(id)`;`importFromUrl` 每次都 mint 新 id                                                                                  | 重新拉订阅会产生**孤儿 profile**,而非更新原有         |
+| **macOS 未签名**               | electron-builder `identity:null`,无 Windows 签名                                                                                             | Gatekeeper/SmartScreen 拦截;且阻塞自更新与 setuid TUN |
+| **崩溃不自愈**                 | `proc.on('exit')` 仅置 `errored`,无重启                                                                                                      | 内核意外退出后代理静默失效                            |
+| **`fetchKernel` 未接线**       | `fetch-kernel.ts` 存在但没接到任何 control 路由                                                                                              | 无法从 UI 管理/切换内核版本                           |
 
 ## 3. 优先级缺口清单
 
@@ -28,30 +28,29 @@ metacubexd desktop 是 Electron 客户端:进程内 **control server** 在 `127.
 
 ### P0(及格线 —— 全部 6 个竞品都有)
 
-| 功能                                  | 工作量 | 落地要点                                                                           | 备注                                |
-| ------------------------------------- | ------ | ---------------------------------------------------------------------------------- | ----------------------------------- |
-| **系统代理开关**                      | M      | `main/sysproxy.ts` 按 OS 实现(mac `networksetup` / win 注册表 / linux `gsettings`) | 需先修 `boot()` mixed-port bug      |
-| **订阅定时自动更新**                  | M      | `profiles.refresh(id)` + `updateInterval` + 调度器                                 |                                     |
-| **订阅就地刷新**                      | S      | `profiles.refresh(id)` 复用 doFetch,更新原 profile                                 | 修 bug                              |
-| **应用自更新**                        | M      | `electron-updater` + publish feed                                                  | **硬依赖代码签名**                  |
-| **代码签名 / 公证**                   | M      | macOS Developer ID + notarize;Windows Authenticode                                 | **需用户提供证书**;阻塞自更新与 TUN |
-| **托盘:模式切换(rule/global/direct)** | S      | PATCH Clash `/configs`(经 `MCXD_CLASH_URL/SECRET`)                                 | 日常高频路径                        |
-| **托盘图标资产**                      | S      | 加 `resources/tray.png` + macOS Template 图标                                      | 修 bug                              |
+| 功能                                      | 工作量 | 落地要点                                                                                                                               | 备注                           |
+| ----------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| **系统代理开关**                          | M      | `main/sysproxy.ts` 按 OS 实现(mac `networksetup` / win 注册表 / linux `gsettings`)                                                     | 需先修 `boot()` mixed-port bug |
+| **订阅定时自动更新**                      | M      | `profiles.refresh(id)` + `updateInterval` + 调度器                                                                                     |                                |
+| **订阅就地刷新**                          | S      | `profiles.refresh(id)` 复用 doFetch,更新原 profile                                                                                     | 修 bug                         |
+| ~~应用自更新 / 代码签名 / 公证~~ (范围外) | —      | 用户 2026-06-15 决定**不签名/公证,继续未签名分发**;mac 未签名无法自更新 → 真自更新一并搁置(可选:无需签名的"检查更新→打开下载页"通知器) | 已移出范围                     |
+| **托盘:模式切换(rule/global/direct)**     | S      | PATCH Clash `/configs`(经 `MCXD_CLASH_URL/SECRET`)                                                                                     | 日常高频路径                   |
+| **托盘图标资产**                          | S      | 加 `resources/tray.png` + macOS Template 图标                                                                                          | 修 bug                         |
 
 ### P1(强价值)
 
-| 功能                                                | 工作量 | 落地要点                                                                                       |
-| --------------------------------------------------- | ------ | ---------------------------------------------------------------------------------------------- |
-| **TUN / 虚拟网卡**                                  | L      | `config.vue` 已通过 Clash API 暴露开关(部分);缺特权管线:按需提权内核 + 路由/DNS;**硬依赖签名** |
-| 代理 bypass / LAN 白名单编辑器                      | S      | 配合系统代理,避免断 LAN                                                                        |
-| DNS 设置 UI(nameserver/fake-ip/hosts/enhanced-mode) | M      | 现仅有 DNS 查询工具,无编辑器                                                                   |
-| mihomo 内核版本管理(列出/切换/升级)                 | M      | 接线 `fetchKernel` 到 `kernel/versions`+`upgrade`;stable/alpha                                 |
-| GeoIP/GeoSite/MMDB 资产下载更新                     | M      | `fetchGeoAssets(homeDir)` + 首次引导 + 定时路由                                                |
-| 崩溃自动重启 / 看门狗                               | S      | 意外退出后带退避重启,可关                                                                      |
-| Deep-link 自定义 URL scheme 导入订阅                | S      | `setAsDefaultProtocolClient` + second-instance argv                                            |
-| Profile 合成:Merge(YAML 覆盖)                       | M      | Merge 类型 + setActive 前 enhance;复用 MonacoYamlEditor                                        |
-| 托盘:系统代理/TUN 开关 + 代理组选择器               | M      | 扩展 `tray.ts`;组子菜单经 Clash API;动态图标色                                                 |
-| 开机静默/最小化启动                                 | S      | 检测 login-launch(`--hidden`),跳过 `createWindow()`                                            |
+| 功能                                                | 工作量 | 落地要点                                                                                        |
+| --------------------------------------------------- | ------ | ----------------------------------------------------------------------------------------------- |
+| **TUN / 虚拟网卡**                                  | L      | `config.vue` 已通过 Clash API 暴露开关(部分);缺特权管线:按需提权内核 + 路由/DNS;**单独立 spec** |
+| 代理 bypass / LAN 白名单编辑器                      | S      | 配合系统代理,避免断 LAN                                                                         |
+| DNS 设置 UI(nameserver/fake-ip/hosts/enhanced-mode) | M      | 现仅有 DNS 查询工具,无编辑器                                                                    |
+| mihomo 内核版本管理(列出/切换/升级)                 | M      | 接线 `fetchKernel` 到 `kernel/versions`+`upgrade`;stable/alpha                                  |
+| GeoIP/GeoSite/MMDB 资产下载更新                     | M      | `fetchGeoAssets(homeDir)` + 首次引导 + 定时路由                                                 |
+| 崩溃自动重启 / 看门狗                               | S      | 意外退出后带退避重启,可关                                                                       |
+| Deep-link 自定义 URL scheme 导入订阅                | S      | `setAsDefaultProtocolClient` + second-instance argv                                             |
+| Profile 合成:Merge(YAML 覆盖)                       | M      | Merge 类型 + setActive 前 enhance;复用 MonacoYamlEditor                                         |
+| 托盘:系统代理/TUN 开关 + 代理组选择器               | M      | 扩展 `tray.ts`;组子菜单经 Clash API;动态图标色                                                  |
+| 开机静默/最小化启动                                 | S      | 检测 login-launch(`--hidden`),跳过 `createWindow()`                                             |
 
 ### P2(锦上添花,已分组归并)
 
@@ -63,21 +62,21 @@ metacubexd desktop 是 Electron 客户端:进程内 **control server** 在 `127.
 
 ## 4. 实现批次建议(波次)
 
-- **Wave 0 — Bug 修复(S,几乎零风险):** tray.png、`boot()` mixed-port、订阅就地刷新、崩溃看门狗。
-- **Wave 1 — P0 核心(M):** 系统代理(含 bypass)、订阅自动更新调度、托盘模式切换。
-- **Wave 2 — P1 内核/资产/配置(M):** 内核版本管理(接线 fetchKernel)、Geo 资产、DNS 设置 UI、Merge profile、deep-link、静默启动、托盘扩展。
-- **Wave 3 — 分发(M,需用户证书):** 代码签名/公证 + 自更新。
-- **Wave 4 — TUN(L):** 特权 helper 管线(逐 OS),依赖 Wave 3 的签名。
-- **Wave 5 — P2 长尾:** 按需挑选。
+- **Wave 1(进行中)— bug + P0/P1 纯软件项:** 订阅就地刷新+updateInterval、订阅定时自动更新、崩溃看门狗、`boot()` 受管 mixed-port、托盘模式切换、deep-link 导入、开机静默启动。
+- **Wave 2 — 原生系统代理:** 系统代理开关(逐 OS)+ bypass/LAN 白名单 + 托盘系统代理开关。
+- **Wave 3 — P1 内核/资产/配置:** 内核版本管理(接线 fetchKernel)、Geo 资产下载更新、DNS 设置 UI、Merge profile。
+- **(范围外)签名/公证/自更新:** 用户决定不做,继续未签名分发。
+- **(单独 spec)TUN:** 特权 helper 管线(逐 OS),后续单独设计。
+- **Wave 4+ — P2 长尾:** 按需挑选。
 
 ## 5. 阻塞 / 前置依赖(我无法独立完成)
 
-1. **代码签名:** 需用户提供 Apple Developer ID 证书 + Windows Authenticode 证书(及 CI secrets)。我可把配置与 CI 接好,但无法真正签名。
-2. **自更新:** macOS 未签名无法自更新;依赖 (1)。
-3. **TUN:** 需特权 helper(NT Service/systemd/launchd)、提权弹窗、逐 OS 路由管理 —— 是独立工程,且依赖 (1);建议单独 spec。
+1. ~~代码签名 / 自更新~~ — **用户 2026-06-15 决定不签名/公证,继续未签名分发**;真自更新随之搁置(mac 未签名不可自更新)。
+2. **TUN:** 需特权 helper(NT Service/systemd/launchd)、提权弹窗、逐 OS 路由管理 —— 独立工程,建议单独 spec(其 mac helper 通常也需签名,届时再评估)。
 
 ## 6. 风险
 
 - Electron(vs Verge 的 Tauri/Rust)拿不到原生 OS API,sysproxy/TUN 必须 shell-out 到系统命令或带原生 helper,体积/内存更大。
 - 系统代理在各 OS 行为差异大(尤其 Linux 桌面环境碎片化);需 per-OS 测试。
 - TUN 的路由/DNS 劫持若出错会断网,必须有可靠的回滚与 strict-route。
+- **未签名分发(用户决定):** macOS Gatekeeper / Windows SmartScreen 会拦截,用户需手动放行(右键打开 / "仍要运行")。README 已有未签名部署说明;首启文档应保留该指引。无真自更新,版本更新靠用户手动下载新包。
