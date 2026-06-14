@@ -187,6 +187,12 @@ if (!app.requestSingleInstanceLock()) {
       stopKernel: () => void agent?.supervisor.stop(),
       quit: () => app.quit(),
       iconPath: trayIconPath(),
+      // boot() (runs above) sets these from the bound kernel state; fall back
+      // to empty strings so createTray never sees undefined.
+      clash: {
+        url: process.env.MCXD_CLASH_URL ?? '',
+        secret: process.env.MCXD_CLASH_SECRET ?? '',
+      },
     })
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) createWindow()
