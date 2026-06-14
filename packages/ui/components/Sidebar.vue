@@ -6,6 +6,7 @@ import {
   IconChartAreaLine,
   IconChevronsLeft,
   IconChevronsRight,
+  IconFileCode,
   IconFileStack,
   IconGlobe,
   IconHome,
@@ -23,16 +24,23 @@ import {
 const route = useRoute()
 const { t } = useI18n()
 const configStore = useConfigStore()
+const { hasFeature } = useControlInfo()
 
-const navItems = computed(() => [
-  { href: '/overview', name: t('overview'), icon: IconHome },
-  { href: '/proxies', name: t('proxies'), icon: IconGlobe },
-  { href: '/rules', name: t('rules'), icon: IconRuler },
-  { href: '/connections', name: t('connections'), icon: IconNetwork },
-  { href: '/traffic', name: t('dataUsage'), icon: IconChartAreaLine },
-  { href: '/logs', name: t('logs'), icon: IconFileStack },
-  { href: '/config', name: t('config'), icon: IconSettings },
-])
+const navItems = computed(() => {
+  const items = [
+    { href: '/overview', name: t('overview'), icon: IconHome },
+    { href: '/proxies', name: t('proxies'), icon: IconGlobe },
+    { href: '/rules', name: t('rules'), icon: IconRuler },
+    { href: '/connections', name: t('connections'), icon: IconNetwork },
+    { href: '/traffic', name: t('dataUsage'), icon: IconChartAreaLine },
+    { href: '/logs', name: t('logs'), icon: IconFileStack },
+    { href: '/config', name: t('config'), icon: IconSettings },
+  ]
+  if (hasFeature('profiles')) {
+    items.push({ href: '/profiles', name: t('profiles'), icon: IconFileCode })
+  }
+  return items
+})
 
 const isActive = (href: string) => route.path === href
 
