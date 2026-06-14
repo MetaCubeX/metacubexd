@@ -239,6 +239,30 @@ With `network_mode: host` the `ports:` mapping is ignored — the container
 binds `8080`/`9090`/`7890` directly on the host. Enable a `tun:` block in your
 profile's mihomo config for the tunnel to come up.
 
+### Profiles & Config Editor (desktop / server)
+
+When connected to a bundled agent (desktop app or the server image), the
+dashboard gains a **profile manager**:
+
+- Create, duplicate, rename, and delete multiple profiles.
+- Import a subscription by URL (fetched with `User-Agent: clash.meta`); the
+  `upload / download / total / expire` usage from `Subscription-Userinfo` is
+  shown on a usage card.
+- Edit any profile in an in-browser **Monaco editor with mihomo YAML schema**
+  completion and validation.
+- **Activate** a profile to validate it and hot-reload the kernel.
+
+Schema diagnostics are advisory and never block saving — the kernel's reload
+is the final validation. A **"disable validation"** toggle is available for
+bleeding-edge mihomo keys the bundled schema doesn't know yet.
+
+### Custom Kernel Path
+
+Both the desktop app and the server bundle a pinned mihomo
+(`v1.19.27`). To use your own kernel build, set a custom path in
+**Settings** (desktop) or the `MIHOMO_BIN` environment variable (server) — a
+user-supplied path always takes precedence over the bundled binary.
+
 ## 🩺 Troubleshooting
 
 ### "Unable to connect to backend" when self-hosting (CORS)
@@ -269,16 +293,34 @@ external-controller-cors:
 
 ## 🛠️ Development
 
+This repo is a **pnpm 10 workspace** (`packages/ui`, `packages/agent`,
+`apps/server`, `apps/desktop`).
+
 ```shell
-# Start dev server
+# Install all workspace dependencies
+pnpm install
+
+# Run the dashboard UI dev server (pure-panel mode against a remote mihomo)
 pnpm dev
 
-# Start dev server with mock data
-pnpm dev:mock
+# Build the static UI for hosting (gh-pages, external-ui, etc.)
+pnpm build:ui
 
-# Lint & Format
+# Build the all-in-one Nitro server (UI + agent), output in apps/server/.output
+pnpm build:server
+
+# Build the Electron desktop app (electron-vite + electron-builder)
+pnpm build:desktop
+
+# Typecheck / lint every package
+pnpm typecheck
 pnpm lint
-pnpm format
+```
+
+To work on the desktop app with hot reload, run electron-vite from its package:
+
+```shell
+pnpm --filter @metacubexd/desktop dev
 ```
 
 ## 📄 License
