@@ -1,0 +1,51 @@
+{
+  "name": "@metacubexd/agent",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    },
+    "./types": {
+      "types": "./src/types.ts",
+      "import": "./src/types.ts"
+    },
+    "./http": {
+      "types": "./src/http.ts",
+      "import": "./src/http.ts"
+    },
+    "./supervisor": {
+      "types": "./src/supervisor.ts",
+      "import": "./src/supervisor.ts"
+    },
+    "./profiles": {
+      "types": "./src/profiles.ts",
+      "import": "./src/profiles.ts"
+    },
+    "./kernel/assets": {
+      "types": "./src/kernel/assets.ts",
+      "import": "./src/kernel/assets.ts"
+    },
+    "./kernel/fetch-kernel": {
+      "types": "./src/kernel/fetch-kernel.ts",
+      "import": "./src/kernel/fetch-kernel.ts"
+    }
+  },
+  "scripts": {
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "h3": "catalog:",
+    "tree-kill": "catalog:",
+    "yaml": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
