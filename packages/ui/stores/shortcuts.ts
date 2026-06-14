@@ -1,6 +1,6 @@
-import type {ShortcutConfig} from '~/constants/shortcuts';
+import type { ShortcutConfig } from '~/constants/shortcuts'
 import { defineStore } from 'pinia'
-import { DEFAULT_SHORTCUTS  } from '~/constants/shortcuts'
+import { DEFAULT_SHORTCUTS } from '~/constants/shortcuts'
 
 export const useShortcutsStore = defineStore('shortcuts', () => {
   // Custom shortcuts configuration (persisted to localStorage)

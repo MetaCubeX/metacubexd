@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import type {ShortcutAction} from '~/constants/shortcuts';
+import type { ShortcutAction } from '~/constants/shortcuts'
 import {
   formatShortcutKey,
   SHORTCUT_CATEGORIES,
-  SHORTCUT_LABELS
-  
+  SHORTCUT_LABELS,
 } from '~/constants/shortcuts'
 
 const shortcutsStore = useShortcutsStore()

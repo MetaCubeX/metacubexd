@@ -73,7 +73,7 @@ function parseGeoResponse(
 // indicator symbols. Returns '' for invalid input.
 export function countryCodeToFlagEmoji(code: string | undefined): string {
   if (!code || code.length !== 2 || !/^[a-z]{2}$/i.test(code)) return ''
-  const A = 0x1F1E6
+  const A = 0x1f1e6
   const base = 'A'.charCodeAt(0)
   const upper = code.toUpperCase()
   return (
@@ -101,7 +101,7 @@ function ipv4ToInt(ip: string): number | null {
 function inRange(value: number, cidrBase: string, prefix: number): boolean {
   const base = ipv4ToInt(cidrBase)
   if (base === null) return false
-  const mask = prefix === 0 ? 0 : (0xFFFFFFFF << (32 - prefix)) >>> 0
+  const mask = prefix === 0 ? 0 : (0xffffffff << (32 - prefix)) >>> 0
   return (value & mask) === (base & mask)
 }
 

@@ -7,6 +7,11 @@ import pkg from './package.json'
 const isDev = process.env.NODE_ENV === 'development'
 
 export default defineNuxtConfig({
+  // Workspace move: the Nuxt app is the package root. Pin srcDir explicitly
+  // so the legacy root layout (top-level pages/, components/, no app/ dir)
+  // never depends on Nuxt 4 auto-detection.
+  srcDir: '.',
+
   devtools: { enabled: true },
 
   css: ['~/assets/css/main.css'],

@@ -28,12 +28,12 @@ function dismiss() {
     >
       <div class="alert border-none bg-base-200 shadow-lg">
         <span class="text-sm">{{ t('pwaUpdateAvailable') }}</span>
-        <button class="btn btn-primary btn-sm gap-1" @click="reload">
+        <button class="btn gap-1 btn-sm btn-primary" @click="reload">
           <IconRefresh class="size-4" />
           {{ t('pwaUpdateReload') }}
         </button>
         <button
-          class="btn btn-ghost btn-circle btn-sm"
+          class="btn btn-circle btn-ghost btn-sm"
           :aria-label="t('close')"
           @click="dismiss"
         >
