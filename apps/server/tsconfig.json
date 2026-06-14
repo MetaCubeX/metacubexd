@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": ["node"],
+    "noEmit": true
+  },
+  "include": [
+    "nitro.config.ts",
+    "lib/**/*.ts",
+    "middleware/**/*.ts",
+    "routes/**/*.ts",
+    ".nitro/types/**/*.ts"
+  ],
+  "exclude": ["node_modules", ".output", ".nitro"]
+}
