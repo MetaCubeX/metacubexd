@@ -12,7 +12,7 @@
   "dependencies": {
     "@metacubexd/agent": "workspace:*",
     "h3": "catalog:",
-    "nitro": "catalog:"
+    "nitropack": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",
