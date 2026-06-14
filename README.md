@@ -291,6 +291,45 @@ external-controller-cors:
 > Tip: if you still cannot connect, open your browser's DevTools (F12) →
 > Console and look for CORS-related errors to confirm the cause.
 
+### Kernel won't start (desktop / server)
+
+When the bundled kernel fails to reach `running`:
+
+- **Port `9090` already in use.** Another mihomo (or a previous orphaned
+  instance) is holding the Clash API port. Stop it, or change `CLASH_API_PORT`
+  (server) — the app picks a free port and writes the real URL back to the UI.
+- **macOS quarantine kills the bundled binary.** An unsigned `.app` downloaded
+  from the internet has its bundled mihomo quarantined. Run
+  `xattr -dr com.apple.quarantine /Applications/MetaCubeXD.app` (the app also
+  strips quarantine + sets the executable bit on first run).
+- **`SIGILL` / "illegal instruction" on amd64.** Old or virtualized CPUs choke
+  on the generic amd64 build. metacubexd ships the **`-compatible`**
+  (`GOAMD64=v1`) asset specifically to avoid this; if you supplied a custom
+  kernel path, use the `-compatible` mihomo build.
+
+### Two log streams — which is which
+
+- **Clash logs** (the existing **Logs** page): mihomo's own log feed over the
+  Clash API WebSocket — proxy decisions, rule matches, DNS, etc.
+- **Kernel logs** (control agent, SSE): the mihomo **subprocess** stdout/stderr
+  captured by the supervisor — startup banners, crashes, config-parse errors.
+  Use these when the kernel won't start or exits unexpectedly.
+
+### Read-only data directory
+
+The kernel needs a **writable** home for `profiles/`, the active config, and
+geo / fake-ip caches. A read-only mount (server) or a read-only
+`resources/` path (desktop) makes the kernel exit non-zero. On the server,
+ensure the `/data` volume is writable; the desktop app uses the per-user
+`userData` directory automatically.
+
+### Health check (server)
+
+The container's health endpoint is `GET /api/control/health` on
+`CONTROL_PORT` (default `8080`). A `200` means the dashboard + control agent
+are up; it does **not** assert the kernel is running (check the kernel panel
+for that).
+
 ## 🛠️ Development
 
 This repo is a **pnpm 10 workspace** (`packages/ui`, `packages/agent`,
