@@ -85,8 +85,16 @@ const {
 } = useVersionQuery()
 const updateConfigMutation = useUpdateConfigMutation()
 
+// DNS settings editor (PATCH /configs { dns }) — works against any mihomo
+// backend. mutateAsync rejects on failure so save() can surface it via toast.
+const dnsSettings = useDnsSettings({
+  mutate: (vars) => updateConfigMutation.mutateAsync(vars as any),
+})
+
 // Check if sing-box backend
 const isSingBox = computed(() => isSingBoxVersion(backendVersion.value))
+
+const enhancedModes = ['fake-ip', 'redir-host']
 
 // TUN stack options
 const tunStacks = ['Mixed', 'gVisor', 'System', 'LWIP']
@@ -170,6 +178,7 @@ watch(
       localConfig.tproxyPort = config['tproxy-port'] || 0
       modes.value = config['mode-list'] ||
         config.modes || ['rule', 'direct', 'global']
+      dnsSettings.syncFromConfig(config)
     }
   },
   { immediate: true },
@@ -1351,6 +1360,141 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
             </div>
           </div>
         </div>
+
+        <!-- DNS Settings Card (hide for sing-box) -->
+        <template v-if="!isSingBox">
+          <div
+            class="config-card animate-fade-slide-in-4 col-span-1 hidden sm:block lg:col-span-2"
+            :class="{ '!block': activeSection === 'tools' }"
+          >
+            <div
+              class="flex items-center gap-2 border-b border-base-content/5 bg-base-300/30 px-4 py-3 text-sm font-semibold"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="size-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <ellipse cx="12" cy="5" rx="9" ry="3" />
+                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+              </svg>
+              <span>{{ t('dnsSettings') }}</span>
+            </div>
+
+            <div class="flex flex-col gap-3 p-4">
+              <p class="text-xs opacity-60">{{ t('dnsSettingsNote') }}</p>
+
+              <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <!-- Enhanced Mode -->
+                <fieldset class="fieldset">
+                  <label
+                    class="label text-xs opacity-70"
+                    for="dns-enhanced-mode"
+                  >
+                    {{ t('dnsEnhancedMode') }}
+                  </label>
+                  <select
+                    id="dns-enhanced-mode"
+                    v-model="dnsSettings.form.enhancedMode"
+                    class="select-bordered select w-full select-sm"
+                  >
+                    <option v-for="m in enhancedModes" :key="m" :value="m">
+                      {{ m }}
+                    </option>
+                  </select>
+                </fieldset>
+
+                <!-- Fake IP Range -->
+                <fieldset class="fieldset">
+                  <label
+                    class="label text-xs opacity-70"
+                    for="dns-fake-ip-range"
+                  >
+                    {{ t('dnsFakeIpRange') }}
+                  </label>
+                  <input
+                    id="dns-fake-ip-range"
+                    v-model="dnsSettings.form.fakeIpRange"
+                    type="text"
+                    class="input-bordered input input-sm w-full font-mono"
+                    placeholder="198.18.0.1/16"
+                  />
+                </fieldset>
+              </div>
+
+              <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <!-- Nameserver -->
+                <fieldset class="fieldset">
+                  <label class="label text-xs opacity-70" for="dns-nameserver">
+                    {{ t('dnsNameserver') }}
+                  </label>
+                  <textarea
+                    id="dns-nameserver"
+                    v-model="dnsSettings.form.nameserver"
+                    rows="4"
+                    class="textarea-bordered textarea w-full font-mono text-xs"
+                    :placeholder="t('dnsNameserverPlaceholder')"
+                  />
+                </fieldset>
+
+                <!-- Fallback -->
+                <fieldset class="fieldset">
+                  <label class="label text-xs opacity-70" for="dns-fallback">
+                    {{ t('dnsFallback') }}
+                  </label>
+                  <textarea
+                    id="dns-fallback"
+                    v-model="dnsSettings.form.fallback"
+                    rows="4"
+                    class="textarea-bordered textarea w-full font-mono text-xs"
+                    :placeholder="t('dnsFallbackPlaceholder')"
+                  />
+                </fieldset>
+              </div>
+
+              <!-- Use Hosts -->
+              <div
+                class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 transition-colors hover:bg-base-content/5"
+              >
+                <div class="flex items-center gap-2 text-sm">
+                  <span>{{ t('dnsUseHosts') }}</span>
+                </div>
+                <input
+                  id="dns-use-hosts"
+                  v-model="dnsSettings.form.useHosts"
+                  type="checkbox"
+                  class="toggle toggle-primary"
+                />
+              </div>
+
+              <Button
+                class="btn-primary"
+                :loading="dnsSettings.saving.value"
+                @click="dnsSettings.save()"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="size-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"
+                  />
+                  <polyline points="17 21 17 13 7 13 7 21" />
+                  <polyline points="7 3 7 8 15 8" />
+                </svg>
+                {{ t('save') }}
+              </Button>
+            </div>
+          </div>
+        </template>
 
         <!-- DNS Query Card (hide for sing-box) -->
         <template v-if="!isSingBox">

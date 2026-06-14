@@ -145,6 +145,14 @@ export interface Config {
     'auto-detect-interface': boolean
     'file-descriptor': number
   }
+  dns?: {
+    enable: boolean
+    'enhanced-mode': string
+    nameserver: string[]
+    fallback: string[]
+    'fake-ip-range': string
+    'use-hosts': boolean
+  }
   'tuic-server': {
     enable: boolean
     listen: string
