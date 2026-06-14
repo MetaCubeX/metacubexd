@@ -1,0 +1,14 @@
+**/node_modules
+**/.output
+**/.nitro
+**/.nuxt
+**/dist
+**/.git
+**/.github
+**/.husky
+**/docs
+**/*.log
+**/.DS_Store
+**/coverage
+**/.tmp-data
+apps/desktop
