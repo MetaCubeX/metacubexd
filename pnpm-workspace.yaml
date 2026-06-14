@@ -83,7 +83,7 @@ catalog:
   h3: ^1.15.11
   tree-kill: ^1.2.2
   yaml: ^2.9.0
-  nitro: ^2.12.6
+  nitro: ^3.0.0
   electron: ^42.0.0
   electron-vite: ^5.0.0
   electron-builder: ^26.0.0

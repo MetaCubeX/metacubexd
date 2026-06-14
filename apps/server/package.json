@@ -1,0 +1,22 @@
+{
+  "name": "@metacubexd/server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nitro build",
+    "dev": "nitro dev",
+    "preview": "node .output/server/index.mjs",
+    "typecheck": "nitro prepare && tsc --noEmit"
+  },
+  "dependencies": {
+    "@metacubexd/agent": "workspace:*",
+    "h3": "catalog:",
+    "nitro": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
