@@ -304,6 +304,10 @@ if (!app.requestSingleInstanceLock()) {
         url: process.env.MCXD_CLASH_URL ?? '',
         secret: process.env.MCXD_CLASH_SECRET ?? '',
       },
+      // boot() builds the OS proxy controller (anti-lockout disable() on quit
+      // lives in shutdownKernel). Passing it renders the tray "System proxy"
+      // checkbox; enable() applies the default bypass list (see boot()).
+      ...(systemProxy ? { systemProxy } : {}),
     })
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) createWindow()

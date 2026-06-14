@@ -182,6 +182,124 @@ describe('createTray proxy-mode submenu', () => {
   })
 })
 
+type FakeSystemProxy = NonNullable<TrayDeps['systemProxy']>
+
+describe('createTray system-proxy checkbox', () => {
+  beforeEach(() => {
+    builtTemplates.length = 0
+  })
+
+  const okFetch = () =>
+    vi.fn(async () => jsonResponse({ mode: 'rule' })) as unknown as typeof fetch
+
+  function depsWithSysProxy(sysProxy: FakeSystemProxy): TrayDeps {
+    return { ...baseDeps(okFetch()), systemProxy: sysProxy }
+  }
+
+  it('omits the System proxy item when no controller is injected', () => {
+    createTray(baseDeps(okFetch()))
+    expect(findItem(lastTemplate(), 'System proxy')).toBeUndefined()
+    // Wave-1 items remain intact.
+    expect(findItem(lastTemplate(), 'Proxy mode')).toBeTruthy()
+    expect(findItem(lastTemplate(), 'Quit')).toBeTruthy()
+  })
+
+  it('renders a checkbox System proxy item when a controller is injected', () => {
+    const sysProxy: FakeSystemProxy = {
+      isEnabled: vi.fn(async () => false),
+      enable: vi.fn(async () => {}),
+      disable: vi.fn(async () => {}),
+    }
+    createTray(depsWithSysProxy(sysProxy))
+    const item = findItem(lastTemplate(), 'System proxy')
+    expect(item).toBeTruthy()
+    expect(item?.type).toBe('checkbox')
+    // Existing items still present.
+    expect(findItem(lastTemplate(), 'Proxy mode')).toBeTruthy()
+  })
+
+  it('reflects isEnabled() === true as a checked box after rebuild', async () => {
+    const sysProxy: FakeSystemProxy = {
+      isEnabled: vi.fn(async () => true),
+      enable: vi.fn(async () => {}),
+      disable: vi.fn(async () => {}),
+    }
+    createTray(depsWithSysProxy(sysProxy))
+    expect(sysProxy.isEnabled).toHaveBeenCalled()
+    await vi.waitFor(() => {
+      const item = findItem(lastTemplate(), 'System proxy')
+      expect(item?.checked).toBe(true)
+    })
+  })
+
+  it('calls enable() then rebuilds checked when toggled from off', async () => {
+    let enabled = false
+    const sysProxy: FakeSystemProxy = {
+      isEnabled: vi.fn(async () => enabled),
+      enable: vi.fn(async () => {
+        enabled = true
+      }),
+      disable: vi.fn(async () => {
+        enabled = false
+      }),
+    }
+    createTray(depsWithSysProxy(sysProxy))
+
+    const item = findItem(lastTemplate(), 'System proxy')
+    expect(item?.click).toBeTypeOf('function')
+    await (item!.click as (i: unknown) => unknown)({})
+
+    expect(sysProxy.enable).toHaveBeenCalledTimes(1)
+    expect(sysProxy.disable).not.toHaveBeenCalled()
+    await vi.waitFor(() => {
+      const next = findItem(lastTemplate(), 'System proxy')
+      expect(next?.checked).toBe(true)
+    })
+  })
+
+  it('calls disable() then rebuilds unchecked when toggled from on', async () => {
+    let enabled = true
+    const sysProxy: FakeSystemProxy = {
+      isEnabled: vi.fn(async () => enabled),
+      enable: vi.fn(async () => {
+        enabled = true
+      }),
+      disable: vi.fn(async () => {
+        enabled = false
+      }),
+    }
+    createTray(depsWithSysProxy(sysProxy))
+    // Wait for the initial isEnabled() to settle so the cached value is "on".
+    await vi.waitFor(() => {
+      expect(findItem(lastTemplate(), 'System proxy')?.checked).toBe(true)
+    })
+
+    const item = findItem(lastTemplate(), 'System proxy')
+    await (item!.click as (i: unknown) => unknown)({})
+
+    expect(sysProxy.disable).toHaveBeenCalledTimes(1)
+    await vi.waitFor(() => {
+      const next = findItem(lastTemplate(), 'System proxy')
+      expect(next?.checked).toBe(false)
+    })
+  })
+
+  it('does not throw and keeps the menu when isEnabled() rejects', async () => {
+    const sysProxy: FakeSystemProxy = {
+      isEnabled: vi.fn(async () => {
+        throw new Error('boom')
+      }),
+      enable: vi.fn(async () => {}),
+      disable: vi.fn(async () => {}),
+    }
+    expect(() => createTray(depsWithSysProxy(sysProxy))).not.toThrow()
+    await vi.waitFor(() => {
+      expect(findItem(lastTemplate(), 'System proxy')).toBeTruthy()
+      expect(findItem(lastTemplate(), 'Proxy mode')).toBeTruthy()
+    })
+  })
+})
+
 function jsonResponse(body: unknown): Response {
   return {
     ok: true,

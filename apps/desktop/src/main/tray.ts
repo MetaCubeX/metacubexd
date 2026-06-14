@@ -20,6 +20,16 @@ export interface TrayDeps {
   iconPath: string
   /** Clash API endpoint used to read/switch the proxy mode. */
   clash: { url: string; secret: string }
+  /**
+   * OS system-proxy controller (injected from boot()). When absent the tray
+   * omits the "System proxy" checkbox entirely. Narrowed from the agent's
+   * SystemProxyController to just what the tray toggle needs.
+   */
+  systemProxy?: {
+    isEnabled: () => Promise<boolean>
+    enable: () => Promise<void>
+    disable: () => Promise<void>
+  }
   /** Injectable fetch for tests; defaults to the global fetch. */
   fetchImpl?: typeof fetch
 }
@@ -29,6 +39,9 @@ export function createTray(deps: TrayDeps): Tray {
   // Last known mode; cached so a failed/slow GET leaves the previous selection
   // instead of flickering to an unchecked state.
   let currentMode: ProxyMode | null = null
+  // Last known system-proxy enabled state; cached so a slow/failed isEnabled()
+  // leaves the previous checkbox state instead of flickering to unchecked.
+  let sysProxyEnabled = false
   const image = nativeImage.createFromPath(deps.iconPath)
   // On macOS the icon is a monochrome template the system tints to match the
   // light/dark menu bar; other platforms render the white wireframe as-is.
@@ -81,6 +94,43 @@ export function createTray(deps: TrayDeps): Tray {
     })()
   }
 
+  // Read the system-proxy state and rebuild if the cached value is stale, so the
+  // checkbox reflects reality without blocking the first paint. Best-effort.
+  const refreshSysProxy = () => {
+    if (!deps.systemProxy) return
+    const sysProxy = deps.systemProxy
+    void (async () => {
+      try {
+        const enabled = await sysProxy.isEnabled()
+        if (enabled !== sysProxyEnabled) {
+          sysProxyEnabled = enabled
+          rebuild()
+        }
+      } catch {
+        /* best-effort; keep cached/previous state */
+      }
+    })()
+  }
+
+  // Toggle the OS system proxy (enable when off, disable when on), then refresh
+  // the cached state + menu. Failures are swallowed (best-effort).
+  const toggleSysProxy = async () => {
+    const sysProxy = deps.systemProxy
+    if (!sysProxy) return
+    try {
+      if (sysProxyEnabled) {
+        await sysProxy.disable()
+        sysProxyEnabled = false
+      } else {
+        await sysProxy.enable()
+        sysProxyEnabled = true
+      }
+      rebuild()
+    } catch {
+      /* best-effort; leave previous state */
+    }
+  }
+
   const rebuild = () => {
     const loginItem = app.getLoginItemSettings()
     const menu = Menu.buildFromTemplate([
@@ -101,6 +151,17 @@ export function createTray(deps: TrayDeps): Tray {
           click: () => void switchMode(mode),
         })),
       },
+      // Only rendered when an OS system-proxy controller was injected.
+      ...(deps.systemProxy
+        ? ([
+            {
+              label: 'System proxy',
+              type: 'checkbox',
+              checked: sysProxyEnabled,
+              click: () => void toggleSysProxy(),
+            },
+          ] as const)
+        : []),
       { type: 'separator' },
       {
         label: 'Open at login',
@@ -120,8 +181,10 @@ export function createTray(deps: TrayDeps): Tray {
       { label: 'Quit', click: () => deps.quit() },
     ])
     tray.setContextMenu(menu)
-    // Re-sync the current mode in the background (don't block the first paint).
+    // Re-sync the current mode + system-proxy state in the background (don't
+    // block the first paint).
     refreshMode()
+    refreshSysProxy()
   }
 
   rebuild()
