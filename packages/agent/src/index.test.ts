@@ -1,0 +1,57 @@
+import { mkdtempSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { describe, expect, it } from 'vitest'
+import {
+  AGENT_VERSION,
+  createAgent,
+  createControlRouter,
+  createProfileStore,
+  createSupervisor,
+  MIHOMO_VERSION,
+  mihomoAsset,
+} from './index'
+
+function opts() {
+  const home = mkdtempSync(join(tmpdir(), 'mcxd-agent-'))
+  return {
+    binaryPath: '/fake/mihomo',
+    homeDir: home,
+    activeConfigPath: join(home, 'active.yaml'),
+    profilesDir: join(home, 'profiles'),
+    agentToken: 'tok',
+  }
+}
+
+describe('createAgent', () => {
+  it('returns supervisor + profiles + router + info', () => {
+    const agent = createAgent(opts())
+    expect(typeof agent.supervisor.start).toBe('function')
+    expect(typeof agent.profiles.list).toBe('function')
+    expect(agent.router).toBeDefined()
+    expect(typeof agent.info).toBe('function')
+  })
+
+  it('info() matches the §3 capability shape', () => {
+    const agent = createAgent(opts())
+    const info = agent.info()
+    expect(info).toMatchObject({
+      hasAgent: true,
+      version: AGENT_VERSION,
+      features: ['profiles', 'logs-sse', 'kernel-control'],
+    })
+    expect(info.platform).toMatchObject({
+      os: process.platform,
+      arch: process.arch,
+    })
+    expect(info.kernel).toMatchObject({ bundled: true, path: '/fake/mihomo' })
+  })
+
+  it('re-exports the public surface', () => {
+    expect(typeof createSupervisor).toBe('function')
+    expect(typeof createProfileStore).toBe('function')
+    expect(typeof createControlRouter).toBe('function')
+    expect(typeof mihomoAsset).toBe('function')
+    expect(MIHOMO_VERSION).toMatch(/^v\d/)
+  })
+})
