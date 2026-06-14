@@ -1,8 +1,9 @@
 import type { MenuItemConstructorOptions } from 'electron'
-import type {TrayDeps} from '../tray';
+import type { TrayDeps } from '../tray'
 
+import { app } from 'electron'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { createTray  } from '../tray'
+import { createTray } from '../tray'
 
 // --- electron mock -----------------------------------------------------------
 // Capture every menu template buildFromTemplate receives so we can inspect /
@@ -90,6 +91,26 @@ describe('createTray proxy-mode submenu', () => {
     expect(findItem(t, 'Open at login')).toBeTruthy()
     expect(findItem(t, 'Quit')).toBeTruthy()
     expect(findItem(t, 'Proxy mode')).toBeTruthy()
+  })
+
+  it('registers the login item with the --hidden arg so login-launch starts hidden', () => {
+    const fetchImpl = vi.fn(async () =>
+      jsonResponse({ mode: 'rule' }),
+    ) as unknown as typeof fetch
+    const setLoginItemSettings = vi.mocked(app.setLoginItemSettings)
+    setLoginItemSettings.mockClear()
+    createTray(baseDeps(fetchImpl))
+
+    const openAtLogin = findItem(lastTemplate(), 'Open at login')
+    expect(openAtLogin?.type).toBe('checkbox')
+    expect(openAtLogin?.click).toBeTypeOf('function')
+    // electron passes the toggled MenuItem; simulate checking the box.
+    ;(openAtLogin!.click as (i: unknown) => unknown)({ checked: true })
+
+    expect(setLoginItemSettings).toHaveBeenCalledWith({
+      openAtLogin: true,
+      args: ['--hidden'],
+    })
   })
 
   it('renders three radio mode items (Rule/Global/Direct)', () => {

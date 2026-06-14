@@ -18,6 +18,7 @@ import { parseSubscriptionDeepLink } from './deep-link'
 import { pickFreePorts } from './free-port'
 import { bootstrapDataDir } from './paths'
 import { makeToken } from './secrets'
+import { shouldStartHidden } from './startup'
 import { createTray, trayIconPath } from './tray'
 
 // Real fs adapter for bootstrapDataDir (recursive mkdir is idempotent).
@@ -131,7 +132,7 @@ async function boot(): Promise<void> {
   process.env.MCXD_MIXED_PORT = String(mixedPort)
 }
 
-function createWindow(): void {
+function createWindow(startHidden = false): void {
   const devIcon = devAppIcon()
   win = new BrowserWindow({
     width: 1280,
@@ -147,7 +148,10 @@ function createWindow(): void {
       sandbox: false,
     },
   })
-  win.once('ready-to-show', () => win?.show())
+  // On a hidden (login-launch) start, keep the window off-screen — the kernel
+  // still boots and the tray can summon it later. A normal launch shows it once
+  // the renderer is ready.
+  if (!startHidden) win.once('ready-to-show', () => win?.show())
   // Load over http from the same-origin control server (NOT file://) so web
   // workers (Monaco) and same-origin /api/control fetch/SSE work. boot() always
   // runs before createWindow(), so rendererUrl is set.
@@ -248,7 +252,13 @@ if (!app.requestSingleInstanceLock()) {
     const devIcon = devAppIcon()
     if (devIcon && process.platform === 'darwin') app.dock?.setIcon(devIcon)
     await boot()
-    createWindow()
+    // Silent start: a login-launch (--hidden arg or OS wasOpenedAtLogin) boots
+    // the kernel but keeps the window hidden until summoned from the tray.
+    const startHidden = shouldStartHidden(
+      process.argv,
+      app.getLoginItemSettings(),
+    )
+    createWindow(startHidden)
     tray = createTray({
       getWindow: () => win,
       startKernel: () => void agent?.supervisor.start(),

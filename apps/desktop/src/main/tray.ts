@@ -107,7 +107,12 @@ export function createTray(deps: TrayDeps): Tray {
         type: 'checkbox',
         checked: loginItem.openAtLogin,
         click: (item) => {
-          app.setLoginItemSettings({ openAtLogin: item.checked })
+          // Register the login item with `--hidden` so a login-launch starts
+          // minimized to the tray (see shouldStartHidden in startup.ts).
+          app.setLoginItemSettings({
+            openAtLogin: item.checked,
+            args: ['--hidden'],
+          })
           rebuild()
         },
       },
