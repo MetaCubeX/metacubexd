@@ -47,6 +47,24 @@ describe('createAgent', () => {
     expect(info.kernel).toMatchObject({ bundled: true, path: '/fake/mihomo' })
   })
 
+  it('info().features excludes system-proxy when no controller is injected', () => {
+    const agent = createAgent(opts())
+    expect(agent.info().features).not.toContain('system-proxy')
+    expect((agent as Record<string, unknown>).systemProxy).toBeUndefined()
+  })
+
+  it('info().features includes system-proxy when a controller is injected', () => {
+    const systemProxy = {
+      isEnabled: async () => false,
+      enable: async () => {},
+      disable: async () => {},
+      describe: () => ({ port: 7890, bypass: [] as string[] }),
+    }
+    const agent = createAgent({ ...opts(), systemProxy })
+    expect(agent.info().features).toContain('system-proxy')
+    expect(agent.systemProxy).toBe(systemProxy)
+  })
+
   it('re-exports the public surface', () => {
     expect(typeof createSupervisor).toBe('function')
     expect(typeof createProfileStore).toBe('function')

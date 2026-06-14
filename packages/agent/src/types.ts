@@ -45,6 +45,13 @@ export interface MihomoSupervisor {
   dispose: () => Promise<void>
 }
 
+export interface SystemProxyController {
+  isEnabled: () => Promise<boolean>
+  enable: (bypass?: string[]) => Promise<void> // uses host:port configured at construction
+  disable: () => Promise<void>
+  describe: () => { port: number; bypass: string[] }
+}
+
 export type ProfileType = 'local' | 'remote'
 
 export interface ProfileMeta {

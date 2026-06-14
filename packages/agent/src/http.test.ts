@@ -17,6 +17,15 @@ function fakeState(over: Partial<KernelState> = {}): KernelState {
   }
 }
 
+function makeSystemProxy(enabled = false) {
+  return {
+    isEnabled: vi.fn(async () => enabled),
+    enable: vi.fn(async () => {}),
+    disable: vi.fn(async () => {}),
+    describe: vi.fn(() => ({ port: 7890, bypass: ['localhost', '127.0.0.1'] })),
+  }
+}
+
 function makeDeps(token?: string) {
   const state = fakeState()
   const supervisor = {
@@ -330,5 +339,74 @@ describe('createControlRouter — profiles + SSE', () => {
     expect(dec.decode(next.value)).toContain('hello-from-kernel')
 
     await reader.cancel()
+  })
+})
+
+describe('createControlRouter — system proxy', () => {
+  let srv: Awaited<ReturnType<typeof mount>>
+  afterEach(async () => srv?.close())
+
+  it('gET /api/control/sysproxy reflects isEnabled() + describe()', async () => {
+    const deps = { ...makeDeps(), systemProxy: makeSystemProxy(true) }
+    srv = await mount(deps as never)
+    const res = await fetch(`${srv.base}/api/control/sysproxy`)
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({
+      enabled: true,
+      port: 7890,
+      bypass: ['localhost', '127.0.0.1'],
+    })
+    expect(deps.systemProxy.isEnabled).toHaveBeenCalledOnce()
+    expect(deps.systemProxy.describe).toHaveBeenCalled()
+  })
+
+  it('pOST /api/control/sysproxy {enabled:true, bypass} calls enable(bypass)', async () => {
+    const deps = { ...makeDeps(), systemProxy: makeSystemProxy(false) }
+    srv = await mount(deps as never)
+    const res = await fetch(`${srv.base}/api/control/sysproxy`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ enabled: true, bypass: ['example.com'] }),
+    })
+    expect(res.status).toBe(200)
+    expect(deps.systemProxy.enable).toHaveBeenCalledWith(['example.com'])
+    expect(deps.systemProxy.disable).not.toHaveBeenCalled()
+    // Response mirrors the GET shape (enabled + describe()).
+    expect(await res.json()).toEqual({
+      enabled: false,
+      port: 7890,
+      bypass: ['localhost', '127.0.0.1'],
+    })
+  })
+
+  it('pOST /api/control/sysproxy {enabled:false} calls disable()', async () => {
+    const deps = { ...makeDeps(), systemProxy: makeSystemProxy(true) }
+    srv = await mount(deps as never)
+    const res = await fetch(`${srv.base}/api/control/sysproxy`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ enabled: false }),
+    })
+    expect(res.status).toBe(200)
+    expect(deps.systemProxy.disable).toHaveBeenCalledOnce()
+    expect(deps.systemProxy.enable).not.toHaveBeenCalled()
+  })
+
+  it('gET /api/control/sysproxy is 404 JSON when no controller is injected', async () => {
+    srv = await mount(makeDeps())
+    const res = await fetch(`${srv.base}/api/control/sysproxy`)
+    expect(res.status).toBe(404)
+    expect(await res.json()).toEqual({ error: 'system-proxy unavailable' })
+  })
+
+  it('pOST /api/control/sysproxy is 404 JSON when no controller is injected', async () => {
+    srv = await mount(makeDeps())
+    const res = await fetch(`${srv.base}/api/control/sysproxy`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ enabled: true }),
+    })
+    expect(res.status).toBe(404)
+    expect(await res.json()).toEqual({ error: 'system-proxy unavailable' })
   })
 })

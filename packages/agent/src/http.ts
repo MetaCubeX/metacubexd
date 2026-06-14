@@ -4,6 +4,7 @@ import type {
   KernelState,
   MihomoSupervisor,
   ProfileStore,
+  SystemProxyController,
 } from './types'
 import { rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -27,6 +28,7 @@ export interface ControlRouterDeps {
   info: () => unknown
   homeDir: string // writable dir for materializing validate candidate files
   token?: string
+  systemProxy?: SystemProxyController // OS proxy controller; capability-gated
 }
 
 const PREFIX = '/api/control'
@@ -34,7 +36,7 @@ const PREFIX = '/api/control'
 export function createControlRouter(deps: ControlRouterDeps): App {
   const app = createApp()
   const router = createRouter()
-  const { supervisor, profiles, info, homeDir, token } = deps
+  const { supervisor, profiles, info, homeDir, token, systemProxy } = deps
 
   // ---- Auth middleware: applied to every route except public ones. ----
   function isPublic(path: string): boolean {
@@ -221,6 +223,41 @@ export function createControlRouter(deps: ControlRouterDeps): App {
       return supervisor.restart()
     }),
   )
+
+  // ---- System proxy (capability-gated) ----
+  if (systemProxy) {
+    router.get(
+      `${PREFIX}/sysproxy`,
+      defineEventHandler(async () => ({
+        enabled: await systemProxy.isEnabled(),
+        ...systemProxy.describe(),
+      })),
+    )
+    router.post(
+      `${PREFIX}/sysproxy`,
+      defineEventHandler(async (event) => {
+        const body = (await readBody(event)) as {
+          enabled: boolean
+          bypass?: string[]
+        }
+        if (body.enabled) await systemProxy.enable(body.bypass)
+        else await systemProxy.disable()
+        return {
+          enabled: await systemProxy.isEnabled(),
+          ...systemProxy.describe(),
+        }
+      }),
+    )
+  } else {
+    // No controller injected — respond with a clean 404 JSON for both verbs so the
+    // shared UI can detect the missing capability without a router-default 404 shape.
+    const unavailable = defineEventHandler((event) => {
+      setResponseStatus(event, 404)
+      return { error: 'system-proxy unavailable' }
+    })
+    router.get(`${PREFIX}/sysproxy`, unavailable)
+    router.post(`${PREFIX}/sysproxy`, unavailable)
+  }
 
   app.use(router)
   return app
