@@ -177,6 +177,73 @@ jobs:
             ghcr.io/metacubex/metacubexd-server:latest
             ghcr.io/metacubex/metacubexd-server:${{ needs.release-please.outputs.tag_name }}
 
+  release-desktop:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+
+    permissions:
+      contents: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: macos-14, ebargs: '--mac --arm64' }
+          - { os: macos-15-intel, ebargs: '--mac --x64' }
+          - { os: windows-latest, ebargs: '--win --x64 --arm64' }
+          - { os: ubuntu-latest, ebargs: '--linux --x64 --arm64' }
+
+    runs-on: ${{ matrix.os }}
+
+    env:
+      MIHOMO_VERSION: v1.19.27
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          cache: pnpm
+          node-version: latest
+
+      - name: install dependencies
+        run: pnpm install
+
+      - name: build ui (static, relative base for file://)
+        run: pnpm --filter @metacubexd/ui generate
+        env:
+          NUXT_APP_BASE_URL: './'
+
+      - name: copy ui into desktop renderer
+        run: rm -rf apps/desktop/renderer && cp -r packages/ui/.output/public apps/desktop/renderer
+        shell: bash
+
+      - name: prefetch bundled mihomo (per arch)
+        run: node apps/desktop/scripts/fetch-mihomo.mjs
+
+      - name: electron-vite build (main + preload)
+        run: pnpm --filter @metacubexd/desktop build
+
+      - name: electron-builder (unsigned)
+        run: pnpm --filter @metacubexd/desktop exec electron-builder ${{ matrix.ebargs }} -c.mac.identity=null --publish never
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: attach desktop installers to release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ needs.release-please.outputs.tag_name }}
+          files: |
+            apps/desktop/dist/*.dmg
+            apps/desktop/dist/*.zip
+            apps/desktop/dist/*.exe
+            apps/desktop/dist/*.AppImage
+            apps/desktop/dist/*.deb
+
   update-screenshots:
     needs: release-please
     if: ${{ needs.release-please.outputs.release_created }}
