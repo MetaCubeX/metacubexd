@@ -17,6 +17,8 @@ class FakeProc extends EventEmitter {
   kill(sig?: string) {
     this.killSignals.push(sig ?? 'SIGTERM')
     this.killed = true
+    // Simulate OS reaping the process shortly after kill (needed for doStop's await exited).
+    setImmediate(() => this.emitExit(null, sig ?? 'SIGTERM'))
     return true
   }
   // Test helper to simulate the OS reaping the process.

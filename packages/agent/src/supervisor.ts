@@ -270,9 +270,7 @@ export function createSupervisor(
       stateCbs.clear()
       if (child) {
         try {
-          // Best-effort kill without waiting for exit (avoids hanging in tests/shutdown).
-          killProc('SIGKILL')
-          child = undefined
+          await run(doStop)
         } catch {
           // best effort
         }
