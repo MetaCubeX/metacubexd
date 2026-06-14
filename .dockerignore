@@ -1,0 +1,10 @@
+**/node_modules
+**/.output
+**/.nitro
+**/.nuxt
+**/dist
+**/.git
+**/coverage
+**/.tmp-data
+**/.DS_Store
+apps/desktop
