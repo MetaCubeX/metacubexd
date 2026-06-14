@@ -13,6 +13,8 @@ export default defineNitroConfig({
   compatibilityDate: '2025-01-01',
   // Serve the prebuilt dashboard. maxAge: 1 year (hashed assets are immutable).
   publicAssets: [{ baseURL: '/', dir: uiDist, maxAge: 60 * 60 * 24 * 365 }],
+  // Exclude test files from Nitro's middleware/routes scanner.
+  ignore: ['**/__tests__/**', '**/*.spec.ts', '**/*.test.ts'],
   // NOTE: Intentionally NO Clash-API proxy here. Nitro routeRules `proxy`
   // cannot upgrade WebSocket connections (nitrojs/nitro#2886), and the
   // dashboard talks to mihomo's Clash API over native WebSocket (traffic,
