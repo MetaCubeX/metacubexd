@@ -100,7 +100,7 @@ describe('createControlRouter — info + kernel + auth', () => {
     srv = await mount(makeDeps())
     const res = await fetch(`${srv.base}/api/control/info`)
     expect(res.status).toBe(200)
-    const body = await res.json()
+    const body = (await res.json()) as Record<string, unknown>
     expect(body.hasAgent).toBe(true)
     expect(body.features).toContain('kernel-control')
     expect(body.platform).toMatchObject({ os: 'linux', arch: 'x64' })
@@ -118,7 +118,9 @@ describe('createControlRouter — info + kernel + auth', () => {
       headers: { Authorization: 'Bearer tok' },
     })
     expect(res.status).toBe(200)
-    expect((await res.json()).status).toBe('stopped')
+    expect(((await res.json()) as Record<string, unknown>).status).toBe(
+      'stopped',
+    )
   })
 
   it('wrong Bearer returns 401', async () => {
@@ -141,18 +143,24 @@ describe('createControlRouter — info + kernel + auth', () => {
     const start = await fetch(`${srv.base}/api/control/kernel/start`, {
       method: 'POST',
     })
-    expect((await start.json()).status).toBe('running')
+    expect(((await start.json()) as Record<string, unknown>).status).toBe(
+      'running',
+    )
     expect(deps.supervisor.start).toHaveBeenCalledOnce()
 
     const stop = await fetch(`${srv.base}/api/control/kernel/stop`, {
       method: 'POST',
     })
-    expect((await stop.json()).status).toBe('stopped')
+    expect(((await stop.json()) as Record<string, unknown>).status).toBe(
+      'stopped',
+    )
 
     const restart = await fetch(`${srv.base}/api/control/kernel/restart`, {
       method: 'POST',
     })
-    expect((await restart.json()).status).toBe('running')
+    expect(((await restart.json()) as Record<string, unknown>).status).toBe(
+      'running',
+    )
   })
 })
 
@@ -164,7 +172,7 @@ describe('createControlRouter — profiles + SSE', () => {
     srv = await mount(makeDeps())
     const res = await fetch(`${srv.base}/api/control/profiles`)
     expect(res.status).toBe(200)
-    const body = await res.json()
+    const body = (await res.json()) as unknown[]
     expect(Array.isArray(body)).toBe(true)
     expect(body[0]).toMatchObject({ id: 'p1', name: 'home' })
   })
@@ -182,13 +190,13 @@ describe('createControlRouter — profiles + SSE', () => {
       name: 'new',
       content: 'a: 1\n',
     })
-    expect((await res.json()).name).toBe('new')
+    expect(((await res.json()) as Record<string, unknown>).name).toBe('new')
   })
 
   it('gET /api/control/profiles/:id returns { meta, content }', async () => {
     srv = await mount(makeDeps())
     const res = await fetch(`${srv.base}/api/control/profiles/p1`)
-    const body = await res.json()
+    const body = (await res.json()) as Record<string, unknown>
     expect(body.meta).toMatchObject({ id: 'p1' })
     expect(body.content).toBe('mixed-port: 7890\n')
   })
@@ -220,7 +228,7 @@ describe('createControlRouter — profiles + SSE', () => {
     const res = await fetch(`${srv.base}/api/control/profiles/p1/duplicate`, {
       method: 'POST',
     })
-    expect((await res.json()).id).toBe('p3')
+    expect(((await res.json()) as Record<string, unknown>).id).toBe('p3')
   })
 
   it('pOST /api/control/profiles/import imports from { url, name? }', async () => {
@@ -231,7 +239,7 @@ describe('createControlRouter — profiles + SSE', () => {
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ url: 'https://sub', name: 'sub' }),
     })
-    expect((await res.json()).type).toBe('remote')
+    expect(((await res.json()) as Record<string, unknown>).type).toBe('remote')
     expect(deps.profiles.importFromUrl).toHaveBeenCalledWith(
       'https://sub',
       'sub',
@@ -246,7 +254,9 @@ describe('createControlRouter — profiles + SSE', () => {
     })
     expect(deps.profiles.setActive).toHaveBeenCalledWith('p1')
     expect(deps.supervisor.restart).toHaveBeenCalledOnce()
-    expect((await res.json()).status).toBe('running')
+    expect(((await res.json()) as Record<string, unknown>).status).toBe(
+      'running',
+    )
   })
 
   it('pOST /api/control/profiles/:id/validate materializes a temp candidate then returns { valid, message }', async () => {
@@ -259,7 +269,9 @@ describe('createControlRouter — profiles + SSE', () => {
     expect(body).toEqual({ valid: true, message: 'ok' })
     // It reads the profile by id and validates a real candidate PATH, never the bare id.
     expect(deps.profiles.read).toHaveBeenCalledWith('p1')
-    const validatedPath = deps.supervisor.validate.mock.calls[0]![0] as string
+    const validatedPath = (
+      deps.supervisor.validate.mock.calls as unknown as [string][][]
+    )[0]![0] as unknown as string
     expect(validatedPath).toBe(join(deps.homeDir, '.validate-p1.yaml'))
     expect(validatedPath).not.toBe('p1')
   })

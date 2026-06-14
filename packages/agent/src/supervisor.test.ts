@@ -84,7 +84,9 @@ describe('createSupervisor — initial state', () => {
 
     const result = await sup.start()
     expect(spawn).toHaveBeenCalledOnce()
-    const [bin, args] = spawn.mock.calls[0]!
+    const [bin, args] = (
+      spawn.mock.calls as unknown as [string, string[]][]
+    )[0]!
     expect(bin).toBe('/fake/mihomo')
     expect(args).toEqual(['-d', opts.homeDir, '-f', opts.activeConfigPath])
     expect(result.status).toBe('running')
@@ -321,7 +323,7 @@ describe('createSupervisor — stop / restart / tree-kill / mutex', () => {
       fetch: ready200(),
     })
     const p = sup.validate(opts.activeConfigPath)
-    const [, args] = spawn.mock.calls[0]!
+    const [, args] = (spawn.mock.calls as unknown as [string, string[]][])[0]!
     expect(args).toEqual([
       '-t',
       '-d',

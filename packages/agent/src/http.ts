@@ -52,7 +52,7 @@ export function createControlRouter(deps: ControlRouterDeps): App {
 
   app.use(
     defineEventHandler((event) => {
-      const path = (event.path ?? '').split('?')[0]
+      const path = (event.path ?? '').split('?')[0] ?? ''
       if (!path.startsWith(PREFIX)) return
       if (isPublic(path)) return
       if (!authorized(event)) {

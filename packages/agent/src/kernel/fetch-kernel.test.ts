@@ -43,9 +43,11 @@ describe('fetchKernel', () => {
     await fetchKernel('linux', 'amd64', dest, {
       fetch: fakeFetch as unknown as typeof fetch,
     })
-    expect(fakeFetch.mock.calls[0]![0] as string).toContain(
-      `mihomo-linux-amd64-compatible-${MIHOMO_VERSION}.gz`,
-    )
+    expect(
+      (
+        fakeFetch.mock.calls as unknown as [string][][]
+      )[0]![0] as unknown as string,
+    ).toContain(`mihomo-linux-amd64-compatible-${MIHOMO_VERSION}.gz`)
   })
 
   it('chmods the binary 0o755 on posix', async () => {
@@ -101,6 +103,10 @@ describe('fetchKernel', () => {
     await fetchKernel('linux', 'arm64', dest, {
       fetch: fakeFetch as unknown as typeof fetch,
     })
-    expect(fakeFetch.mock.calls[0]![0] as string).not.toMatch(/-go\d/)
+    expect(
+      (
+        fakeFetch.mock.calls as unknown as [string][][]
+      )[0]![0] as unknown as string,
+    ).not.toMatch(/-go\d/)
   })
 })
