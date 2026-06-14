@@ -269,13 +269,13 @@ jobs:
         run: pnpm install
 
       - name: install playwright browsers
-        run: pnpm playwright install chromium
+        run: pnpm --filter @metacubexd/ui exec playwright install chromium
 
       - name: build with mock mode
-        run: pnpm generate:mock
+        run: pnpm --filter @metacubexd/ui generate:mock
 
       - name: generate screenshots
-        run: pnpm screenshot
+        run: pnpm --filter @metacubexd/ui screenshot
 
       - name: commit and push screenshots
         run: |
