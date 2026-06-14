@@ -1,3 +1,4 @@
+import type { SystemProxyController } from '@metacubexd/agent/types'
 import type { Tray } from 'electron'
 import type { ControlServer } from './control-server'
 import type { FsLike } from './paths'
@@ -13,12 +14,15 @@ import { createAgent } from '@metacubexd/agent'
 import { app, BrowserWindow, nativeImage, Notification } from 'electron'
 import { resolveMihomoBinary } from './binary-path'
 import { resolveBootPorts } from './boot-ports'
+import { runShutdownCleanup } from './cleanup'
 import { startControlServer, stopControlServer } from './control-server'
 import { parseSubscriptionDeepLink } from './deep-link'
 import { pickFreePorts } from './free-port'
 import { bootstrapDataDir } from './paths'
 import { makeToken } from './secrets'
 import { shouldStartHidden } from './startup'
+import { createSystemProxyController } from './sysproxy'
+import { readSysProxyBypass } from './sysproxy-config'
 import { createTray, trayIconPath } from './tray'
 
 // Real fs adapter for bootstrapDataDir (recursive mkdir is idempotent).
@@ -33,6 +37,9 @@ let win: BrowserWindow | null = null
 let tray: Tray | null = null
 let agent: ReturnType<typeof createAgent> | null = null
 let controlServer: ControlServer | null = null
+// OS system-proxy controller, configured in boot() for the managed mixed port.
+// Kept module-level so the quit/cleanup path can disable() it (anti-lockout).
+let systemProxy: SystemProxyController | null = null
 // Same-origin renderer URL (the control server serves the dashboard too); set
 // in boot() and loaded by createWindow().
 let rendererUrl: string | null = null
@@ -91,6 +98,26 @@ async function boot(): Promise<void> {
   const controlToken = makeToken()
   const clashSecret = makeToken()
 
+  // System proxy points at the managed mixed (http+socks) port. The default
+  // bypass list is read from userData/sysproxy.json, falling back to the safe
+  // defaults, and applied whenever enable() is called without an explicit list.
+  // Module-level so the quit path can disable() it (anti-lockout).
+  const defaultBypass = readSysProxyBypass(
+    join(userData, 'sysproxy.json'),
+    fsAdapter,
+  )
+  const baseSystemProxy = createSystemProxyController({
+    host: '127.0.0.1',
+    port: mixedPort,
+  })
+  systemProxy = {
+    ...baseSystemProxy,
+    enable: (bypass) =>
+      baseSystemProxy.enable(
+        bypass && bypass.length > 0 ? bypass : defaultBypass,
+      ),
+  }
+
   agent = createAgent({
     binaryPath,
     homeDir: paths.homeDir,
@@ -108,6 +135,9 @@ async function boot(): Promise<void> {
     // Managed mixed (http+socks) proxy port; the supervisor injects this as
     // `mixed-port:` into the active YAML before spawn.
     mixedPort,
+    // Inject the OS proxy controller; enables the capability-gated
+    // /api/control/sysproxy routes + the 'system-proxy' feature flag.
+    systemProxy,
   })
 
   // The control server also serves the renderer (same origin as /api/control)
@@ -159,12 +189,15 @@ function createWindow(startHidden = false): void {
 }
 
 async function shutdownKernel(): Promise<void> {
-  try {
-    await agent?.supervisor.stop()
-  } catch {
-    /* ignore */
-  }
-  if (controlServer) await stopControlServer(controlServer)
+  // Anti-lockout: release the OS system proxy BEFORE the kernel goes away so we
+  // never leave the machine pointing at a dead loopback port. All steps are
+  // best-effort (see runShutdownCleanup).
+  await runShutdownCleanup({
+    systemProxy: systemProxy ?? undefined,
+    stopKernel: () => agent?.supervisor.stop() ?? Promise.resolve(),
+    stopControlServer: () =>
+      controlServer ? stopControlServer(controlServer) : Promise.resolve(),
+  })
 }
 
 function focusWindow(): void {
