@@ -107,3 +107,97 @@ describe('createProfileStore — disk CRUD', () => {
     expect(list[0]!.name).toBe('home')
   })
 })
+
+describe('createProfileStore — import + active', () => {
+  it('importFromUrl uses UA clash.meta, parses Subscription-Userinfo, stores raw content', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'mcxd-profiles-imp-'))
+    const activeConfigPath = join(dir, '..', 'active.yaml')
+    let seenUA: string | null = null
+    const fakeFetch = (async (_url: string, init?: RequestInit) => {
+      seenUA = new Headers(init?.headers).get('user-agent')
+      return new Response('proxies: []\n', {
+        status: 200,
+        headers: {
+          'subscription-userinfo':
+            'upload=100; download=200; total=1000; expire=1700000000',
+        },
+      })
+    }) as unknown as typeof fetch
+    let n = 0
+    const store = createProfileStore({
+      dir,
+      activeConfigPath,
+      fetch: fakeFetch,
+      idGen: () => `id${++n}`,
+    })
+
+    const meta = await store.importFromUrl('https://sub.example/clash', 'sub')
+    expect(seenUA).toBe('clash.meta')
+    expect(meta.type).toBe('remote')
+    expect(meta.url).toBe('https://sub.example/clash')
+    expect(meta.userAgent).toBe('clash.meta')
+    expect(meta.subscriptionInfo).toEqual({
+      upload: 100,
+      download: 200,
+      total: 1000,
+      expire: 1700000000,
+    })
+    expect(await store.read('id1')).toBe('proxies: []\n')
+  })
+
+  it('importFromUrl tolerates a missing Subscription-Userinfo header', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'mcxd-profiles-imp2-'))
+    const fakeFetch = (async () =>
+      new Response('proxies: []\n', { status: 200 })) as unknown as typeof fetch
+    const store = createProfileStore({
+      dir,
+      activeConfigPath: join(dir, '..', 'active.yaml'),
+      fetch: fakeFetch,
+      idGen: () => 'id1',
+    })
+    const meta = await store.importFromUrl('https://sub.example/clash')
+    expect(meta.subscriptionInfo).toBeUndefined()
+    expect(meta.name).toBe('https://sub.example/clash')
+  })
+
+  it('importFromUrl throws on non-200', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'mcxd-profiles-imp3-'))
+    const fakeFetch = (async () =>
+      new Response('nope', { status: 403 })) as unknown as typeof fetch
+    const store = createProfileStore({
+      dir,
+      activeConfigPath: join(dir, '..', 'active.yaml'),
+      fetch: fakeFetch,
+    })
+    await expect(store.importFromUrl('https://x')).rejects.toThrow(/403/)
+  })
+
+  it('getActiveId is undefined until setActive; setActive writes activeConfigPath', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'mcxd-profiles-act-'))
+    const activeConfigPath = join(dir, 'active', 'config.yaml')
+    let n = 0
+    const store = createProfileStore({
+      dir,
+      activeConfigPath,
+      idGen: () => `id${++n}`,
+    })
+    expect(await store.getActiveId()).toBeUndefined()
+    await store.create({ name: 'home', content: 'mixed-port: 7890\n' })
+    await store.setActive('id1')
+    expect(await store.getActiveId()).toBe('id1')
+    expect(readFileSync(activeConfigPath, 'utf8')).toBe('mixed-port: 7890\n')
+  })
+
+  it('deleting the active profile clears activeId', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'mcxd-profiles-act2-'))
+    const store = createProfileStore({
+      dir,
+      activeConfigPath: join(dir, 'active.yaml'),
+      idGen: () => 'id1',
+    })
+    await store.create({ name: 'home', content: 'a: 1\n' })
+    await store.setActive('id1')
+    await store.delete('id1')
+    expect(await store.getActiveId()).toBeUndefined()
+  })
+})
