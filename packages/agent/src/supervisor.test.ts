@@ -195,3 +195,162 @@ describe('createSupervisor — initial state', () => {
     expect(st.lastExitCode).toBe(1)
   })
 })
+
+describe('createSupervisor — stop / restart / tree-kill / mutex', () => {
+  function ready200() {
+    return (async () =>
+      new Response(JSON.stringify({ version: '1.19.27' }), {
+        status: 200,
+      })) as unknown as typeof fetch
+  }
+
+  it('stop sends SIGTERM then resolves stopped when the process exits in time', async () => {
+    const opts = baseOpts()
+    const proc = new FakeProc()
+    const sup = createSupervisor(opts, {
+      spawn: (() => proc) as never,
+      fetch: ready200(),
+    })
+    await sup.start()
+    const stopP = sup.stop()
+    // Process exits shortly after SIGTERM (before stopTimeoutMs).
+    setTimeout(() => proc.emitExit(0, 'SIGTERM'), 5)
+    const st = await stopP
+    expect(proc.killSignals[0]).toBe('SIGTERM')
+    expect(proc.killSignals).not.toContain('SIGKILL')
+    expect(st.status).toBe('stopped')
+    expect(st.pid).toBeUndefined()
+  })
+
+  it('stop escalates to SIGKILL after stopTimeoutMs if the process ignores SIGTERM', async () => {
+    const opts = { ...baseOpts(), stopTimeoutMs: 30 }
+    const proc = new FakeProc()
+    // Override kill so SIGTERM is ignored (no auto-exit) but SIGKILL exits the process.
+    proc.kill = (sig?: string) => {
+      const s = sig ?? 'SIGTERM'
+      proc.killSignals.push(s)
+      proc.killed = true
+      if (s === 'SIGKILL') {
+        // Only exit on SIGKILL, not SIGTERM — simulates a process that ignores SIGTERM.
+        setImmediate(() => proc.emitExit(null, 'SIGKILL'))
+      }
+      return true
+    }
+    const sup = createSupervisor(opts, {
+      spawn: (() => proc) as never,
+      fetch: ready200(),
+    })
+    await sup.start()
+    const st = await sup.stop()
+    expect(proc.killSignals[0]).toBe('SIGTERM')
+    expect(proc.killSignals).toContain('SIGKILL')
+    expect(st.status).toBe('stopped')
+  })
+
+  it('on win32 stop routes through tree-kill instead of child.kill', async () => {
+    const opts = baseOpts()
+    const proc = new FakeProc()
+    const treeKill = vi.fn(
+      (_pid: number, _sig: string, cb?: (e?: Error) => void) => cb?.(),
+    )
+    const sup = createSupervisor(opts, {
+      spawn: (() => proc) as never,
+      fetch: ready200(),
+      treeKill,
+      platform: 'win32',
+    })
+    await sup.start()
+    const stopP = sup.stop()
+    setTimeout(() => proc.emitExit(0, null), 5)
+    await stopP
+    expect(treeKill).toHaveBeenCalledWith(4242, 'SIGTERM')
+    expect(proc.killSignals).toEqual([]) // child.kill NOT used on win32
+  })
+
+  it('restart = stop then start through one mutex', async () => {
+    const opts = baseOpts()
+    const procs: FakeProc[] = []
+    const spawn = vi.fn(() => {
+      const p = new FakeProc()
+      p.pid = 1000 + procs.length
+      procs.push(p)
+      // Override kill so it emits exit exactly once (don't call the inherited auto-exit
+      // to avoid double-emission that corrupts the second doStart).
+      p.kill = (sig?: string) => {
+        p.killSignals.push(sig ?? 'SIGTERM')
+        p.killed = true
+        setImmediate(() => p.emitExit(0, sig ?? null))
+        return true
+      }
+      return p
+    })
+    const sup = createSupervisor(opts, {
+      spawn: spawn as never,
+      fetch: ready200(),
+    })
+    await sup.start()
+    const st = await sup.restart()
+    expect(spawn).toHaveBeenCalledTimes(2)
+    expect(st.status).toBe('running')
+    expect(st.pid).toBe(1001)
+    await sup.dispose()
+  })
+
+  it('mutex serializes concurrent start calls (single spawn)', async () => {
+    const opts = baseOpts()
+    const proc = new FakeProc()
+    const spawn = vi.fn(() => proc)
+    const sup = createSupervisor(opts, {
+      spawn: spawn as never,
+      fetch: ready200(),
+    })
+    // Fire two starts at once; the mutex must serialize so only one spawn happens.
+    const [a, b] = await Promise.all([sup.start(), sup.start()])
+    expect(spawn).toHaveBeenCalledTimes(1)
+    expect(a.status).toBe('running')
+    expect(b.status).toBe('running')
+    await sup.dispose()
+  })
+
+  it('validate resolves valid:true when mihomo -t exits 0', async () => {
+    const opts = baseOpts()
+    const proc = new FakeProc()
+    const spawn = vi.fn(() => proc)
+    const sup = createSupervisor(opts, {
+      spawn: spawn as never,
+      fetch: ready200(),
+    })
+    const p = sup.validate(opts.activeConfigPath)
+    const [, args] = spawn.mock.calls[0]!
+    expect(args).toEqual([
+      '-t',
+      '-d',
+      opts.homeDir,
+      '-f',
+      opts.activeConfigPath,
+    ])
+    proc.stdout.emit(
+      'data',
+      Buffer.from('configuration file test is successful'),
+    )
+    proc.emitExit(0, null)
+    const r = await p
+    expect(r.valid).toBe(true)
+    expect(r.message).toContain('successful')
+  })
+
+  it('validate resolves valid:false when mihomo -t exits non-zero', async () => {
+    const opts = baseOpts()
+    const proc = new FakeProc()
+    const sup = createSupervisor(opts, {
+      spawn: (() => proc) as never,
+      fetch: ready200(),
+    })
+    const p = sup.validate(opts.activeConfigPath)
+    proc.stderr.emit('data', Buffer.from('parse error near line 3'))
+    proc.emitExit(1, null)
+    const r = await p
+    expect(r.valid).toBe(false)
+    expect(r.message).toContain('parse error')
+  })
+})
