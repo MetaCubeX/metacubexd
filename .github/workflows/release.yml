@@ -55,19 +55,19 @@ jobs:
         run: pnpm install
 
       - name: build
-        run: NUXT_APP_BASE_URL='./' pnpm generate
+        run: NUXT_APP_BASE_URL='./' pnpm --filter @metacubexd/ui generate
 
       - name: publish gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.CI_TOKEN }}
-          publish_dir: ./.output/public
+          publish_dir: ./packages/ui/.output/public
           force_orphan: true
           cname: d.metacubex.one
           commit_message: ${{ needs.release-please.outputs.tag_name }}
 
       - name: compress dist
-        run: tar czvf compressed-dist.tgz -C .output/public .
+        run: tar czvf compressed-dist.tgz -C packages/ui/.output/public .
 
       - name: attach github release artifacts
         uses: softprops/action-gh-release@v3
