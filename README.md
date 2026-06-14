@@ -58,93 +58,93 @@
 | GitHub Pages     | https://metacubex.github.io/metacubexd |
 | Cloudflare Pages | https://metacubexd.pages.dev           |
 
-## 🚀 Quick Start
+## 🚀 Deployment
 
-### Prerequisites
+metacubexd ships in **three forms from one codebase**:
 
-Enable external-controller in your mihomo config:
+| Form                       | Who hosts the UI            | Who runs the kernel                 | Best for                                 |
+| :------------------------- | :-------------------------- | :---------------------------------- | :--------------------------------------- |
+| **Hosted panel** (classic) | gh-pages / your static host | your own remote mihomo              | pointing a browser at an existing mihomo |
+| **Desktop app**            | the app (bundled)           | the app supervises a bundled mihomo | a single machine, zero setup             |
+| **All-in-one server**      | the Docker image            | the container's bundled mihomo      | a router / NAS / VPS                     |
+
+> The classic **pure-panel mode still works against any remote mihomo** — the
+> kernel-control and profile features simply stay hidden when the dashboard
+> isn't talking to a bundled agent.
+
+### 1. Hosted Panel (point at your own mihomo)
+
+Enable the external-controller in your mihomo `config.yaml`:
 
 ```yaml
 external-controller: 0.0.0.0:9090
 ```
 
-### Option 1: Use Pre-built Assets
+Then either open the hosted dashboard and enter your mihomo `{url, secret}`:
+
+| Platform      | URL                                    |
+| :------------ | :------------------------------------- |
+| GitHub Pages  | https://metacubex.github.io/metacubexd |
+| Custom domain | https://d.metacubex.one                |
+
+…or self-host the static assets via `external-ui`:
 
 ```shell
-# Clone the gh-pages branch
+# Clone the prebuilt gh-pages branch
 git clone https://github.com/metacubex/metacubexd.git -b gh-pages /etc/mihomo/ui
 
-# Set external-ui in your config
-# external-ui: /etc/mihomo/ui
+# Set external-ui in your config:
+#   external-ui: /etc/mihomo/ui
 
-# Update to latest version
+# Update to the latest build later:
 git -C /etc/mihomo/ui pull -r
 ```
 
-### Option 2: Docker
+### 2. Desktop App
+
+Download the installer for your platform from the
+[latest release](https://github.com/metacubex/metacubexd/releases/latest):
+
+| OS                    | Arch        | File                                                   |
+| :-------------------- | :---------- | :----------------------------------------------------- |
+| macOS (Apple Silicon) | arm64       | `MetaCubeXD-<version>-mac-arm64.dmg`                   |
+| macOS (Intel)         | x64         | `MetaCubeXD-<version>-mac-x64.dmg`                     |
+| Windows               | x64 / arm64 | `MetaCubeXD-<version>-win-<arch>.exe`                  |
+| Linux                 | x64 / arm64 | `MetaCubeXD-<version>-linux-<arch>.AppImage` or `.deb` |
+
+The desktop app **bundles its own mihomo kernel and auto-configures the local
+endpoint** — you don't enter any address. Manage profiles, edit configs, and
+start/stop the kernel directly inside the app.
+
+> **These builds are unsigned.** Each OS warns about unidentified developers;
+> the steps below are expected and safe.
+
+**macOS** — Gatekeeper blocks unsigned apps ("MetaCubeXD is damaged and can't
+be opened"). After dragging the app to `/Applications`, strip the quarantine
+attribute:
 
 ```shell
-# Basic usage
-docker run -d --restart always -p 80:80 --name metacubexd ghcr.io/metacubex/metacubexd
-
-# With custom default backend URL
-docker run -d --restart always -p 80:80 --name metacubexd \
-  -e DEFAULT_BACKEND_URL=http://192.168.1.1:9090 \
-  ghcr.io/metacubex/metacubexd
-
-# Update
-docker pull ghcr.io/metacubex/metacubexd && docker restart metacubexd
+xattr -dr com.apple.quarantine /Applications/MetaCubeXD.app
 ```
 
-<details>
-<summary><b>Docker Compose</b></summary>
+…or right-click the app → **Open** → **Open** in the confirmation dialog.
 
-```yaml
-services:
-  metacubexd:
-    container_name: metacubexd
-    image: ghcr.io/metacubex/metacubexd
-    restart: always
-    ports:
-      - '80:80'
-    # environment:
-    #   - DEFAULT_BACKEND_URL=http://192.168.1.1:9090
+**Windows** — SmartScreen shows "Windows protected your PC". Click
+**More info** → **Run anyway**.
 
-  # Optional: mihomo instance
-  mihomo:
-    container_name: mihomo
-    image: docker.io/metacubex/mihomo:Alpha
-    restart: always
-    pid: host
-    network_mode: host
-    cap_add:
-      - ALL
-    volumes:
-      - ./config.yaml:/root/.config/mihomo/config.yaml
-      - /dev/net/tun:/dev/net/tun
-```
+**Linux** — make the AppImage executable, then run it:
 
 ```shell
-docker compose up -d
-
-# Update
-docker compose pull && docker compose up -d
+chmod +x MetaCubeXD-*-linux-*.AppImage
+./MetaCubeXD-*-linux-*.AppImage
+# or install the .deb:
+sudo dpkg -i MetaCubeXD-*-linux-*.deb
 ```
 
-</details>
-
-### Option 3: Build from Source
-
-```shell
-# Install dependencies
-pnpm install
-
-# Build for static hosting (gh-pages, etc.)
-pnpm generate
-
-# Preview
-pnpm preview
-```
+> **System proxy / TUN are advanced features.** TUN needs elevated privileges,
+> and unsigned builds can't ship a privileged helper — the app defaults to a
+> **mixed proxy port** (no elevation). Enable TUN only if your OS lets the
+> unsigned binary acquire the required privileges.
 
 ## 🩺 Troubleshooting
 
