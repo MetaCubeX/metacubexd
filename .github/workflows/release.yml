@@ -222,7 +222,7 @@ jobs:
         shell: bash
 
       - name: prefetch bundled mihomo (per arch)
-        run: node apps/desktop/scripts/fetch-mihomo.mjs
+        run: pnpm --filter @metacubexd/desktop fetch:mihomo
 
       - name: electron-vite build (main + preload)
         run: pnpm --filter @metacubexd/desktop build

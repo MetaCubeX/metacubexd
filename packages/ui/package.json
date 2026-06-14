@@ -12,6 +12,7 @@
     "format": "pnpm prettier --write --ignore-unknown .",
     "generate": "nuxt generate",
     "generate:mock": "MOCK_MODE=true nuxt generate",
+    "generate:desktop": "NUXT_APP_BASE_URL=./ MCXD_DISABLE_PWA=true nuxt generate",
     "postinstall": "nuxt prepare",
     "lint": "eslint --fix .",
     "preview": "nuxt preview --host",

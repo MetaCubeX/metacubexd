@@ -4,7 +4,11 @@
   "type": "module",
   "packageManager": "pnpm@10.34.1",
   "scripts": {
-    "dev": "pnpm --filter @metacubexd/ui dev",
+    "dev": "pnpm dev:ui",
+    "dev:ui": "pnpm --filter @metacubexd/ui dev",
+    "dev:server": "pnpm build:ui && pnpm --filter @metacubexd/server dev",
+    "dev:desktop": "pnpm setup:desktop && pnpm --filter @metacubexd/desktop dev",
+    "setup:desktop": "pnpm --filter @metacubexd/ui generate:desktop && pnpm --filter @metacubexd/desktop copy:renderer && pnpm --filter @metacubexd/desktop fetch:mihomo && pnpm --filter @metacubexd/desktop ensure:electron",
     "build:ui": "pnpm --filter @metacubexd/ui generate",
     "build:server": "pnpm --filter @metacubexd/server... build",
     "build:desktop": "pnpm --filter @metacubexd/desktop... build",

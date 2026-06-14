@@ -6,6 +6,12 @@ import pkg from './package.json'
 // production. Used to skip head tags that point at build-only PWA artifacts.
 const isDev = process.env.NODE_ENV === 'development'
 
+// Desktop (Electron) builds set MCXD_DISABLE_PWA=true (see ui `generate:desktop`).
+// A service worker is pointless in the packaged app (loaded from the in-process
+// loopback server, no offline benefit) and only adds stale-cache risk + console
+// noise, so the whole PWA/SW layer is disabled for that target.
+const pwaDisabled = process.env.MCXD_DISABLE_PWA === 'true'
+
 export default defineNuxtConfig({
   // Workspace move: the Nuxt app is the package root. Pin srcDir explicitly
   // so the legacy root layout (top-level pages/, components/, no app/ dir)
@@ -53,6 +59,7 @@ export default defineNuxtConfig({
   // setup that avoids the iOS Safari refresh loop (#1740). Only built static
   // assets are precached; the cross-origin Mihomo backend API is never cached.
   pwa: {
+    disable: pwaDisabled,
     registerType: 'prompt',
     includeAssets: ['favicon.svg'],
     manifest: {
@@ -192,7 +199,9 @@ export default defineNuxtConfig({
         // Build-only: @vite-pwa/nuxt does not serve manifest.webmanifest under
         // `nuxt dev`, so in dev the link would resolve to the SPA fallback HTML
         // and log "Manifest: Line 1, column 1, Syntax error" in the console.
-        ...(isDev ? [] : [{ rel: 'manifest', href: 'manifest.webmanifest' }]),
+        ...(isDev || pwaDisabled
+          ? []
+          : [{ rel: 'manifest', href: 'manifest.webmanifest' }]),
       ],
       script: [
         {

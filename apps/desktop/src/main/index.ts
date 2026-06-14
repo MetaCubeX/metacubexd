@@ -1,6 +1,6 @@
-import type {Tray} from 'electron';
-import type {ControlServer} from './control-server';
-import type {FsLike} from './paths';
+import type { Tray } from 'electron'
+import type { ControlServer } from './control-server'
+import type { FsLike } from './paths'
 import {
   chmodSync,
   existsSync,
@@ -10,15 +10,11 @@ import {
 } from 'node:fs'
 import { join } from 'node:path'
 import { createAgent } from '@metacubexd/agent'
-import { app, BrowserWindow  } from 'electron'
+import { app, BrowserWindow, nativeImage } from 'electron'
 import { resolveMihomoBinary } from './binary-path'
-import {
-  
-  startControlServer,
-  stopControlServer
-} from './control-server'
+import { startControlServer, stopControlServer } from './control-server'
 import { pickFreePorts } from './free-port'
-import { bootstrapDataDir  } from './paths'
+import { bootstrapDataDir } from './paths'
 import { makeToken } from './secrets'
 import { createTray, trayIconPath } from './tray'
 
@@ -34,12 +30,29 @@ let win: BrowserWindow | null = null
 let tray: Tray | null = null
 let agent: ReturnType<typeof createAgent> | null = null
 let controlServer: ControlServer | null = null
+// Same-origin renderer URL (the control server serves the dashboard too); set
+// in boot() and loaded by createWindow().
+let rendererUrl: string | null = null
 
 function defaultConfigSource(): string {
   // packaged -> process.resourcesPath/default-config.yaml ; dev -> repo resources
   return app.isPackaged
     ? join(process.resourcesPath, 'default-config.yaml')
     : join(app.getAppPath(), 'resources', 'default-config.yaml')
+}
+
+/**
+ * App icon for `electron-vite dev`. Packaged builds embed the icon via
+ * electron-builder (build/icon.icns|ico|png) so the OS shows it on the dock /
+ * task bar automatically — in dev there is no bundle, so without this Electron
+ * falls back to its default atom icon. Returns null when packaged or missing.
+ */
+function devAppIcon(): Electron.NativeImage | null {
+  if (app.isPackaged) return null
+  const img = nativeImage.createFromPath(
+    join(app.getAppPath(), 'build', 'icon.png'),
+  )
+  return img.isEmpty() ? null : img
 }
 
 async function boot(): Promise<void> {
@@ -88,7 +101,15 @@ async function boot(): Promise<void> {
     secret: clashSecret,
   })
 
-  controlServer = await startControlServer(agent.router, controlPort)
+  // The control server also serves the renderer (same origin as /api/control)
+  // from the dir where copy:renderer / electron-builder stage the nuxt output.
+  const rendererDir = join(__dirname, '..', '..', 'renderer')
+  controlServer = await startControlServer(
+    agent.router,
+    controlPort,
+    rendererDir,
+  )
+  rendererUrl = `http://127.0.0.1:${controlPort}/`
 
   // Start the kernel; capture the bound external-controller + secret.
   const state = await agent.supervisor.start()
@@ -101,10 +122,14 @@ async function boot(): Promise<void> {
 }
 
 function createWindow(): void {
+  const devIcon = devAppIcon()
   win = new BrowserWindow({
     width: 1280,
     height: 800,
     show: false,
+    // Window icon for the Windows/Linux task bar in dev (macOS ignores it and
+    // uses the dock icon set in whenReady). Packaged builds use the bundle icon.
+    ...(devIcon ? { icon: devIcon } : {}),
     webPreferences: {
       preload: join(__dirname, '..', 'preload', 'index.js'),
       contextIsolation: true,
@@ -113,8 +138,10 @@ function createWindow(): void {
     },
   })
   win.once('ready-to-show', () => win?.show())
-  // UI is CSR + hashMode + relative baseURL -> loadFile works over file://.
-  void win.loadFile(join(__dirname, '..', '..', 'renderer', 'index.html'))
+  // Load over http from the same-origin control server (NOT file://) so web
+  // workers (Monaco) and same-origin /api/control fetch/SSE work. boot() always
+  // runs before createWindow(), so rendererUrl is set.
+  void win.loadURL(rendererUrl ?? 'about:blank')
 }
 
 async function shutdownKernel(): Promise<void> {
@@ -139,6 +166,10 @@ if (!app.requestSingleInstanceLock()) {
   })
 
   app.whenReady().then(async () => {
+    // Show the real icon on the macOS dock in dev (packaged builds get it from
+    // the .app bundle's icns).
+    const devIcon = devAppIcon()
+    if (devIcon && process.platform === 'darwin') app.dock?.setIcon(devIcon)
     await boot()
     createWindow()
     tray = createTray({

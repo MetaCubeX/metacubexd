@@ -14,6 +14,13 @@ export default defineConfig({
         input: { index: resolve(__dirname, 'src/main/index.ts') },
       },
     },
+    // electron-vite forces `ssr.noExternal: true` (bundle everything) for the
+    // main process. Under rolldown-vite that pipeline resolves `electron` to
+    // the npm launcher stub (its index.js runs getElectronPath()/install.js at
+    // load time) and bundles it, ignoring rollupOptions.external — the bundled
+    // stub then crashes at startup ("Electron failed to install correctly").
+    // ssr.external explicitly keeps electron external, overriding noExternal.
+    ssr: { external: ['electron'] },
   },
   preload: {
     plugins: [externalizeDepsPlugin()],
@@ -22,5 +29,7 @@ export default defineConfig({
         input: { index: resolve(__dirname, 'src/preload/index.ts') },
       },
     },
+    // Same reason as main: keep electron (contextBridge/ipcRenderer) external.
+    ssr: { external: ['electron'] },
   },
 })

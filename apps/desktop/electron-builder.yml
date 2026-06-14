@@ -6,6 +6,10 @@ directories:
 files:
   - 'out/**/*'
   - 'renderer/**/*'
+  - 'resources/tray.png'
+  - 'resources/tray@2x.png'
+  - 'resources/trayTemplate.png'
+  - 'resources/trayTemplate@2x.png'
   - 'package.json'
 asar: true
 asarUnpack:
@@ -16,6 +20,7 @@ extraResources:
   - from: resources/default-config.yaml
     to: default-config.yaml
 mac:
+  icon: build/icon.icns
   identity: null
   hardenedRuntime: false
   category: public.app-category.utilities
@@ -24,6 +29,7 @@ mac:
     - zip
   artifactName: ${productName}-${version}-mac-${arch}.${ext}
 win:
+  icon: build/icon.ico
   target:
     - target: nsis
       arch:
@@ -35,6 +41,7 @@ nsis:
   allowToChangeInstallationDirectory: true
   perMachine: false
 linux:
+  icon: build/icon.png
   target:
     - target: AppImage
       arch:

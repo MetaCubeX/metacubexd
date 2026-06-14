@@ -9,7 +9,8 @@
     "build": "electron-vite build",
     "package": "electron-builder",
     "copy:renderer": "rm -rf renderer && cp -r ../../packages/ui/.output/public renderer",
-    "fetch:mihomo": "node scripts/fetch-mihomo.mjs",
+    "fetch:mihomo": "tsx scripts/fetch-mihomo.mjs",
+    "ensure:electron": "node -e \"require('electron')\"",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest"
@@ -23,6 +24,7 @@
     "electron-vite": "catalog:",
     "electron-builder": "catalog:",
     "vitest": "catalog:",
+    "tsx": "catalog:",
     "@types/node": "catalog:",
     "typescript": "catalog:"
   }

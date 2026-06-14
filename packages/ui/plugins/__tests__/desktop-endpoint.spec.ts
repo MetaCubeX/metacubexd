@@ -3,7 +3,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const addEndpoint = vi.fn()
 const setSelectedEndpoint = vi.fn()
-const store = { selectedEndpoint: '', addEndpoint, setSelectedEndpoint }
+const updateEndpoint = vi.fn()
+const store: any = {
+  selectedEndpoint: '',
+  endpointList: [] as any[],
+  addEndpoint,
+  setSelectedEndpoint,
+  updateEndpoint,
+}
 vi.mock('~/stores/endpoint', () => ({
   useEndpointStore: () => store,
 }))
@@ -22,6 +29,7 @@ describe('plugins/desktop-endpoint.client', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     store.selectedEndpoint = ''
+    store.endpointList = []
     delete (globalThis as any).window
   })
 
@@ -47,6 +55,35 @@ describe('plugins/desktop-endpoint.client', () => {
     await runPlugin()
     expect(addEndpoint).not.toHaveBeenCalled()
     expect(setSelectedEndpoint).not.toHaveBeenCalled()
+  })
+
+  it('refreshes the persisted local-mihomo url+secret on relaunch (rotating secret)', async () => {
+    // Control port is deterministic (21000) so the renderer origin is stable and
+    // localStorage persists the local endpoint across launches — but boot()
+    // regenerates the clash secret every launch. The stored secret goes stale and
+    // the kernel 401s ("Backend Unreachable") unless we refresh it here.
+    store.selectedEndpoint = 'local-mihomo'
+    store.endpointList = [
+      {
+        id: 'local-mihomo',
+        url: 'http://127.0.0.1:21001',
+        secret: 'stale-secret',
+        label: 'Local mihomo (desktop)',
+      },
+    ]
+    ;(globalThis as any).window = {
+      metacubexd: {
+        isDesktop: true,
+        endpoint: { url: 'http://127.0.0.1:21001', secret: 'fresh-secret' },
+      },
+    }
+    await runPlugin()
+    expect(updateEndpoint).toHaveBeenCalledWith('local-mihomo', {
+      url: 'http://127.0.0.1:21001',
+      secret: 'fresh-secret',
+    })
+    // It must not create a duplicate entry when one already exists.
+    expect(addEndpoint).not.toHaveBeenCalled()
   })
 
   it('does not override an already-selected endpoint', async () => {
