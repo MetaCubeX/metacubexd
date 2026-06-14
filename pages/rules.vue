@@ -1,18 +1,33 @@
 <script setup lang="ts">
 import type { Rule, RuleProvider } from '~/types'
-import { IconFilter, IconReload, IconSearch } from '@tabler/icons-vue'
+import {
+  IconFilter,
+  IconFilterOff,
+  IconReload,
+  IconSearch,
+  IconX,
+} from '@tabler/icons-vue'
 import { useVirtualizer } from '@tanstack/vue-virtual'
 import { matchSorter } from 'match-sorter'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import {
   useRuleProvidersQuery,
   useRulesQuery,
   useToggleRuleDisabledMutation,
   useUpdateRuleProviderMutation,
 } from '~/composables/useQueries'
-import { formatTimeFromNow, useStringBooleanMap } from '~/utils'
+import { RULES_ORDERING_TYPE_ORDER } from '~/constants'
+import {
+  filterRules,
+  formatTimeFromNow,
+  getRuleFacets,
+  sortRulesByOrderingType,
+  useStringBooleanMap,
+} from '~/utils'
 
 const { t, locale } = useI18n()
+
+const configStore = useConfigStore()
 
 useHead({ title: computed(() => t('rules')) })
 
@@ -46,12 +61,72 @@ const tabs = computed(() => [
   },
 ])
 
-const filteredRules = computed(() =>
-  globalFilter.value
-    ? matchSorter(rules.value ?? [], globalFilter.value, {
-        keys: ['type', 'payload', 'proxy'] as (keyof Rule)[],
-      })
-    : (rules.value ?? []),
+// Chip lists derived from the UNFILTERED rules so counts stay stable as the
+// user toggles filters.
+const ruleTypeFacets = computed(() => getRuleFacets(rules.value ?? [], 'type'))
+const rulePolicyFacets = computed(() =>
+  getRuleFacets(rules.value ?? [], 'proxy'),
+)
+
+const filteredRules = computed(() => {
+  // 1. structured filter (chips + status) — always applied first so the search
+  //    and sort below operate on the narrowed set.
+  const filtered = filterRules(rules.value ?? [], {
+    types: configStore.rulesTypeFilter,
+    policies: configStore.rulesPolicyFilter,
+    status: configStore.rulesStatusFilter,
+  })
+
+  // 2. global search owns ordering (relevance ranking) — short-circuit sort
+  //    while the user is hunting.
+  if (globalFilter.value) {
+    return matchSorter(filtered, globalFilter.value, {
+      keys: ['type', 'payload', 'proxy'] as (keyof Rule)[],
+    })
+  }
+
+  // 3. no search -> explicit sort
+  return sortRulesByOrderingType(filtered, configStore.rulesOrderingType)
+})
+
+const hasActiveRuleFilters = computed(
+  () =>
+    configStore.rulesTypeFilter.length > 0 ||
+    configStore.rulesPolicyFilter.length > 0 ||
+    configStore.rulesStatusFilter !== 'all' ||
+    !!globalFilter.value,
+)
+
+function toggleRuleTypeFilter(value: string) {
+  const arr = configStore.rulesTypeFilter
+  configStore.rulesTypeFilter = arr.includes(value)
+    ? arr.filter((v) => v !== value)
+    : [...arr, value]
+}
+
+function toggleRulePolicyFilter(value: string) {
+  const arr = configStore.rulesPolicyFilter
+  configStore.rulesPolicyFilter = arr.includes(value)
+    ? arr.filter((v) => v !== value)
+    : [...arr, value]
+}
+
+function clearRuleFilters() {
+  configStore.resetRulesFilters()
+  globalFilter.value = ''
+}
+
+// Reorder/shrink of the filtered list can leave the scroll offset past the new
+// end (blank viewport) — reset to top whenever the result set changes.
+watch(
+  () => [
+    configStore.rulesOrderingType,
+    configStore.rulesTypeFilter,
+    configStore.rulesPolicyFilter,
+    configStore.rulesStatusFilter,
+    globalFilter.value,
+  ],
+  () => rulesParentRef.value?.scrollTo({ top: 0 }),
 )
 
 const filteredRuleProviders = computed(() =>
@@ -197,6 +272,99 @@ const providersTotalSize = computed(() =>
         </div>
       </div>
 
+      <!-- Rules filter + sort toolbar (rules tab only) -->
+      <div
+        v-if="activeTab === 'rules'"
+        class="animate-fade-slide-in flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center"
+      >
+        <!-- Status segmented control (mutually exclusive) -->
+        <div
+          class="flex shrink-0 gap-1 rounded-xl border border-base-content/8 bg-base-200/60 p-1"
+        >
+          <button
+            v-for="opt in ['all', 'enabled', 'disabled'] as const"
+            :key="opt"
+            class="rounded-lg px-2.5 py-1 text-xs font-medium text-base-content/70 transition-all duration-200 hover:bg-base-content/5"
+            :class="{
+              'bg-primary text-primary-content shadow-[0_2px_8px] shadow-primary/30':
+                configStore.rulesStatusFilter === opt,
+            }"
+            @click="configStore.rulesStatusFilter = opt"
+          >
+            {{ t(opt) }}
+          </button>
+        </div>
+
+        <!-- Chip strip: type chips | divider | policy chips (horizontal scroll) -->
+        <div
+          class="flex min-w-0 flex-1 [scrollbar-width:none] items-center gap-1.5 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden"
+        >
+          <button
+            v-for="facet in ruleTypeFacets"
+            :key="`t-${facet.value}`"
+            class="shrink-0 rounded-lg border px-2.5 py-1 text-xs font-medium transition-all duration-200"
+            :class="
+              configStore.rulesTypeFilter.includes(facet.value)
+                ? 'border-primary/30 bg-primary/15 text-primary'
+                : 'border-base-content/8 bg-base-200/60 text-base-content/70 hover:border-primary/25 hover:text-base-content'
+            "
+            @click="toggleRuleTypeFilter(facet.value)"
+          >
+            {{ facet.value }}
+            <span class="ml-1 opacity-60">{{ facet.count }}</span>
+          </button>
+
+          <span
+            v-if="ruleTypeFacets.length && rulePolicyFacets.length"
+            class="mx-1 h-4 w-px shrink-0 bg-base-content/10"
+          />
+
+          <button
+            v-for="facet in rulePolicyFacets"
+            :key="`p-${facet.value}`"
+            class="shrink-0 rounded-lg border px-2.5 py-1 text-xs font-medium transition-all duration-200"
+            :class="
+              configStore.rulesPolicyFilter.includes(facet.value)
+                ? 'border-secondary/30 bg-secondary/15 text-secondary'
+                : 'border-base-content/8 bg-base-200/60 text-base-content/70 hover:border-secondary/25 hover:text-base-content'
+            "
+            @click="toggleRulePolicyFilter(facet.value)"
+          >
+            {{ facet.value }}
+            <span class="ml-1 opacity-60">{{ facet.count }}</span>
+          </button>
+        </div>
+
+        <!-- Clear (only when something is active) -->
+        <Button
+          v-if="hasActiveRuleFilters"
+          class="flex h-7 shrink-0 items-center gap-1 rounded-lg border border-base-content/8 bg-base-content/5 px-2 text-xs text-base-content/60 transition-colors duration-200 hover:border-error/30 hover:bg-error/10 hover:text-error"
+          :title="t('clearFilters')"
+          @click="clearRuleFilters"
+        >
+          <IconX :size="14" />
+          <span>{{ t('clear') }}</span>
+        </Button>
+
+        <!-- Sort dropdown (mirrors proxies <select>, sized down). Disabled
+             while searching, since match-sorter relevance owns the ordering
+             then — otherwise the control would silently no-op. -->
+        <select
+          v-model="configStore.rulesOrderingType"
+          class="select-bordered select w-auto min-w-36 shrink-0 rounded-lg border-base-content/8 bg-base-200/60 select-sm text-xs disabled:opacity-50"
+          :disabled="!!globalFilter"
+          :title="globalFilter ? t('sortOverriddenBySearch') : t('sortBy')"
+        >
+          <option
+            v-for="order in RULES_ORDERING_TYPE_ORDER"
+            :key="order"
+            :value="order"
+          >
+            {{ t(order) }}
+          </option>
+        </select>
+      </div>
+
       <!-- Rules List -->
       <template v-if="activeTab === 'rules'">
         <div ref="rulesParentRef" class="flex-1 overflow-y-auto">
@@ -204,8 +372,23 @@ const providersTotalSize = computed(() =>
             v-if="filteredRules.length === 0"
             class="animate-fade-in flex flex-col items-center justify-center py-16"
           >
-            <IconFilter :size="48" class="mb-4 opacity-20" />
-            <span class="text-base-content/50">{{ t('noRules') }}</span>
+            <template v-if="(rules?.length ?? 0) > 0">
+              <IconFilterOff :size="48" class="mb-4 opacity-20" />
+              <span class="text-base-content/50">
+                {{ t('noMatchingRules') }}
+              </span>
+              <Button
+                class="mt-4 flex items-center gap-1.5 rounded-lg border border-primary/20 bg-primary/10 px-3 py-1.5 text-sm text-primary transition-all duration-200 hover:bg-primary/20"
+                @click="clearRuleFilters"
+              >
+                <IconX :size="16" />
+                {{ t('clearFilters') }}
+              </Button>
+            </template>
+            <template v-else>
+              <IconFilter :size="48" class="mb-4 opacity-20" />
+              <span class="text-base-content/50">{{ t('noRules') }}</span>
+            </template>
           </div>
           <div
             v-else

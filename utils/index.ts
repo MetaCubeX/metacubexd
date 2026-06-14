@@ -1,9 +1,10 @@
 import type { NodePerformanceData } from '~/stores/nodeRecommendation'
+import type { Rule } from '~/types'
 import byteSize from 'byte-size'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { PROXIES_ORDERING_TYPE } from '~/constants'
+import { PROXIES_ORDERING_TYPE, RULES_ORDERING_TYPE } from '~/constants'
 import { calculateNodeScore } from './nodeScoring'
 import 'dayjs/locale/zh-cn'
 import 'dayjs/locale/ru'
@@ -358,6 +359,112 @@ export function filterProxiesByName(proxyNames: string[], keyword: string) {
   const trimmed = keyword.trim().toLowerCase()
   if (!trimmed) return proxyNames
   return proxyNames.filter((name) => name.toLowerCase().includes(trimmed))
+}
+
+export interface RuleFacet {
+  value: string
+  count: number
+}
+
+// Distinct values of a Rule field with occurrence counts, sorted by count desc
+// then value asc. Build the type / policy chip lists from the UNFILTERED rules
+// array so chip totals stay stable as the user toggles filters.
+export function getRuleFacets(
+  rules: Rule[],
+  key: 'type' | 'proxy',
+): RuleFacet[] {
+  const counts = new Map<string, number>()
+  for (const rule of rules) {
+    const v = rule[key]
+    counts.set(v, (counts.get(v) ?? 0) + 1)
+  }
+
+  return [...counts.entries()]
+    .map(([value, count]) => ({ value, count }))
+    .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value))
+}
+
+// Faceted filter for the rules page. Chips within one dimension OR together;
+// across dimensions they AND. Empty type/policy arrays + status 'all' impose no
+// constraint (fast-path returns the input reference untouched).
+export function filterRules(
+  rules: Rule[],
+  {
+    types,
+    policies,
+    status,
+  }: {
+    types: string[]
+    policies: string[]
+    status: 'all' | 'enabled' | 'disabled'
+  },
+): Rule[] {
+  if (types.length === 0 && policies.length === 0 && status === 'all') {
+    return rules
+  }
+
+  const typeSet = new Set(types)
+  const policySet = new Set(policies)
+
+  return rules.filter((rule) => {
+    if (typeSet.size > 0 && !typeSet.has(rule.type)) return false
+    if (policySet.size > 0 && !policySet.has(rule.proxy)) return false
+    if (status !== 'all') {
+      // Mihomo omits `disabled` for enabled rules, so missing extra = enabled.
+      const isDisabled = rule.extra?.disabled === true
+      if (status === 'enabled' && isDisabled) return false
+      if (status === 'disabled' && !isDisabled) return false
+    }
+
+    return true
+  })
+}
+
+// Non-mutating sort with a stable `index` tiebreak so equal keys keep config
+// order. Missing extra/hitCount/hitAt are coerced safely; never-matched rules
+// sink to the bottom for HIT_AT_DESC.
+export function sortRulesByOrderingType(
+  rules: Rule[],
+  orderingType: RULES_ORDERING_TYPE,
+): Rule[] {
+  // API yields index order, which rules.vue already relies on — no copy needed.
+  if (orderingType === RULES_ORDERING_TYPE.NATURAL) return rules
+
+  const byIndex = (a: Rule, b: Rule) => a.index - b.index
+  // Display falls back to `payload || type`; sort key must match what's shown.
+  const nameKey = (r: Rule) => r.payload || r.type
+
+  return [...rules].sort((a, b) => {
+    switch (orderingType) {
+      case RULES_ORDERING_TYPE.TYPE_ASC:
+        return a.type.localeCompare(b.type) || byIndex(a, b)
+      case RULES_ORDERING_TYPE.TYPE_DESC:
+        return b.type.localeCompare(a.type) || byIndex(a, b)
+      case RULES_ORDERING_TYPE.NAME_ASC:
+        return nameKey(a).localeCompare(nameKey(b)) || byIndex(a, b)
+      case RULES_ORDERING_TYPE.NAME_DESC:
+        return nameKey(b).localeCompare(nameKey(a)) || byIndex(a, b)
+      case RULES_ORDERING_TYPE.HIT_COUNT_DESC:
+        return (
+          (b.extra?.hitCount ?? 0) - (a.extra?.hitCount ?? 0) || byIndex(a, b)
+        )
+      case RULES_ORDERING_TYPE.HIT_COUNT_ASC:
+        return (
+          (a.extra?.hitCount ?? 0) - (b.extra?.hitCount ?? 0) || byIndex(a, b)
+        )
+      case RULES_ORDERING_TYPE.HIT_AT_DESC: {
+        const at = a.extra?.hitAt
+        const bt = b.extra?.hitAt
+        if (!at && !bt) return byIndex(a, b)
+        if (!at) return 1 // never-matched sinks to the bottom
+        if (!bt) return -1
+
+        return new Date(bt).getTime() - new Date(at).getTime() || byIndex(a, b)
+      }
+      default:
+        return 0 // defensive: unknown stored value -> input order
+    }
+  })
 }
 
 // String boolean map helper

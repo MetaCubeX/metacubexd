@@ -76,6 +76,30 @@ export enum PROXIES_ORDERING_TYPE {
   QUALITY_DESC = 'orderQuality_desc',
 }
 
+export enum RULES_ORDERING_TYPE {
+  NATURAL = 'orderNatural', // reuse existing key — config/index order (default)
+  TYPE_ASC = 'orderRuleType_asc',
+  TYPE_DESC = 'orderRuleType_desc',
+  NAME_ASC = 'orderName_asc', // reuse existing key — payload A-Z
+  NAME_DESC = 'orderName_desc', // reuse existing key — payload Z-A
+  HIT_COUNT_DESC = 'orderHitCount_desc',
+  HIT_COUNT_ASC = 'orderHitCount_asc',
+  HIT_AT_DESC = 'orderHitAt_desc', // recently matched first
+}
+
+// Order of options in the rules-page sort <select>. Single source of truth so
+// a new ordering can never be silently missing from the dropdown.
+export const RULES_ORDERING_TYPE_ORDER: RULES_ORDERING_TYPE[] = [
+  RULES_ORDERING_TYPE.NATURAL,
+  RULES_ORDERING_TYPE.TYPE_ASC,
+  RULES_ORDERING_TYPE.TYPE_DESC,
+  RULES_ORDERING_TYPE.NAME_ASC,
+  RULES_ORDERING_TYPE.NAME_DESC,
+  RULES_ORDERING_TYPE.HIT_COUNT_DESC,
+  RULES_ORDERING_TYPE.HIT_COUNT_ASC,
+  RULES_ORDERING_TYPE.HIT_AT_DESC,
+]
+
 export enum PROXIES_DISPLAY_MODE {
   CARD = 'cardMode',
   LIST = 'listMode',

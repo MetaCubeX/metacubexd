@@ -1,18 +1,33 @@
+import type { Rule } from '~/types'
 import { describe, expect, it, vi } from 'vitest'
-import { PROXIES_ORDERING_TYPE } from '~/constants'
+import { PROXIES_ORDERING_TYPE, RULES_ORDERING_TYPE } from '~/constants'
 import {
   compareVersions,
   encodeSvg,
+  filterRules,
   filterSpecialProxyType,
   formatDuration,
   formatIPv6,
   formatProxyType,
   fuzzyFilter,
   getLatencyClassName,
+  getRuleFacets,
   isSingBoxVersion,
   sortProxiesByOrderingType,
+  sortRulesByOrderingType,
   transformEndpointURL,
 } from '../index'
+
+function mkRule(partial: Partial<Rule> = {}): Rule {
+  return {
+    index: 0,
+    type: 'DOMAIN',
+    payload: 'example.com',
+    proxy: 'DIRECT',
+    size: -1,
+    ...partial,
+  }
+}
 
 describe('utils/index', () => {
   describe('transformEndpointURL', () => {
@@ -388,6 +403,281 @@ describe('utils/index', () => {
       })
 
       expect(result).toEqual(['alive', 'high'])
+    })
+  })
+
+  describe('getRuleFacets', () => {
+    it('counts distinct values for the given key', () => {
+      const rules = [
+        mkRule({ type: 'DOMAIN' }),
+        mkRule({ type: 'DOMAIN' }),
+        mkRule({ type: 'IP-CIDR' }),
+      ]
+
+      expect(getRuleFacets(rules, 'type')).toEqual([
+        { value: 'DOMAIN', count: 2 },
+        { value: 'IP-CIDR', count: 1 },
+      ])
+    })
+
+    it('counts the proxy (policy) field independently', () => {
+      const rules = [
+        mkRule({ proxy: 'DIRECT' }),
+        mkRule({ proxy: 'REJECT' }),
+        mkRule({ proxy: 'DIRECT' }),
+      ]
+
+      expect(getRuleFacets(rules, 'proxy')).toEqual([
+        { value: 'DIRECT', count: 2 },
+        { value: 'REJECT', count: 1 },
+      ])
+    })
+
+    it('sorts by count desc then value asc on a tie', () => {
+      const rules = [
+        mkRule({ type: 'ZEBRA' }),
+        mkRule({ type: 'ALPHA' }),
+        mkRule({ type: 'MATCH' }),
+        mkRule({ type: 'MATCH' }),
+      ]
+
+      expect(getRuleFacets(rules, 'type')).toEqual([
+        { value: 'MATCH', count: 2 },
+        { value: 'ALPHA', count: 1 },
+        { value: 'ZEBRA', count: 1 },
+      ])
+    })
+
+    it('returns an empty array for empty input', () => {
+      expect(getRuleFacets([], 'type')).toEqual([])
+    })
+  })
+
+  describe('filterRules', () => {
+    const noFilter = {
+      types: [] as string[],
+      policies: [] as string[],
+      status: 'all' as const,
+    }
+
+    it('returns the same reference when nothing is selected', () => {
+      const rules = [mkRule()]
+
+      expect(filterRules(rules, noFilter)).toBe(rules)
+    })
+
+    it('keeps only the selected type', () => {
+      const rules = [mkRule({ type: 'DOMAIN' }), mkRule({ type: 'IP-CIDR' })]
+
+      expect(filterRules(rules, { ...noFilter, types: ['DOMAIN'] })).toEqual([
+        rules[0],
+      ])
+    })
+
+    it('oRs multiple types within the type dimension', () => {
+      const rules = [
+        mkRule({ type: 'DOMAIN' }),
+        mkRule({ type: 'IP-CIDR' }),
+        mkRule({ type: 'MATCH' }),
+      ]
+
+      expect(
+        filterRules(rules, { ...noFilter, types: ['DOMAIN', 'MATCH'] }),
+      ).toEqual([rules[0], rules[2]])
+    })
+
+    it('matches the proxy (policy) value exactly', () => {
+      const rules = [
+        mkRule({ proxy: 'DIRECT' }),
+        mkRule({ proxy: 'REJECT' }),
+        mkRule({ proxy: 'My Group' }),
+      ]
+
+      expect(
+        filterRules(rules, { ...noFilter, policies: ['My Group'] }),
+      ).toEqual([rules[2]])
+    })
+
+    it('treats a rule with no extra as enabled', () => {
+      const rules = [
+        mkRule({ extra: undefined }),
+        mkRule({ extra: { disabled: true } }),
+      ]
+
+      expect(filterRules(rules, { ...noFilter, status: 'enabled' })).toEqual([
+        rules[0],
+      ])
+    })
+
+    it('returns only disabled rules for status disabled', () => {
+      const rules = [
+        mkRule({ extra: undefined }),
+        mkRule({ extra: { disabled: false } }),
+        mkRule({ extra: { disabled: true } }),
+      ]
+
+      expect(filterRules(rules, { ...noFilter, status: 'disabled' })).toEqual([
+        rules[2],
+      ])
+    })
+
+    it('aNDs across type, policy and status dimensions', () => {
+      const rules = [
+        mkRule({ type: 'DOMAIN', proxy: 'DIRECT', extra: { disabled: true } }),
+        mkRule({ type: 'DOMAIN', proxy: 'DIRECT' }),
+        mkRule({ type: 'DOMAIN', proxy: 'REJECT', extra: { disabled: true } }),
+      ]
+
+      expect(
+        filterRules(rules, {
+          types: ['DOMAIN'],
+          policies: ['DIRECT'],
+          status: 'disabled',
+        }),
+      ).toEqual([rules[0]])
+    })
+
+    it('returns an empty array when the selection matches nothing', () => {
+      const rules = [mkRule({ type: 'DOMAIN' })]
+
+      expect(filterRules(rules, { ...noFilter, types: ['GEOSITE'] })).toEqual(
+        [],
+      )
+    })
+
+    it('returns an empty array for empty input', () => {
+      expect(filterRules([], { ...noFilter, types: ['DOMAIN'] })).toEqual([])
+    })
+  })
+
+  describe('sortRulesByOrderingType', () => {
+    it('returns the input untouched for NATURAL order', () => {
+      const rules = [mkRule({ index: 2 }), mkRule({ index: 1 })]
+      const copy = [...rules]
+
+      const result = sortRulesByOrderingType(rules, RULES_ORDERING_TYPE.NATURAL)
+
+      expect(result).toBe(rules)
+      expect(rules).toEqual(copy) // not mutated
+    })
+
+    it('does not mutate the input array when sorting', () => {
+      const rules = [
+        mkRule({ index: 0, type: 'IP-CIDR' }),
+        mkRule({ index: 1, type: 'DOMAIN' }),
+      ]
+      const copy = [...rules]
+
+      sortRulesByOrderingType(rules, RULES_ORDERING_TYPE.TYPE_ASC)
+
+      expect(rules).toEqual(copy)
+    })
+
+    it('sorts by rule type ascending and descending', () => {
+      const rules = [
+        mkRule({ index: 0, type: 'IP-CIDR' }),
+        mkRule({ index: 1, type: 'DOMAIN' }),
+        mkRule({ index: 2, type: 'MATCH' }),
+      ]
+
+      expect(
+        sortRulesByOrderingType(rules, RULES_ORDERING_TYPE.TYPE_ASC).map(
+          (r) => r.type,
+        ),
+      ).toEqual(['DOMAIN', 'IP-CIDR', 'MATCH'])
+
+      expect(
+        sortRulesByOrderingType(rules, RULES_ORDERING_TYPE.TYPE_DESC).map(
+          (r) => r.type,
+        ),
+      ).toEqual(['MATCH', 'IP-CIDR', 'DOMAIN'])
+    })
+
+    it('falls back to type as the name key when payload is empty', () => {
+      const rules = [
+        mkRule({ index: 0, payload: 'a.com', type: 'DOMAIN' }),
+        mkRule({ index: 1, payload: '', type: 'MATCH' }),
+        mkRule({ index: 2, payload: 'z.com', type: 'DOMAIN' }),
+      ]
+
+      // '' || type -> 'MATCH' sorts under M, not first.
+      expect(
+        sortRulesByOrderingType(rules, RULES_ORDERING_TYPE.NAME_ASC).map(
+          (r) => r.payload || r.type,
+        ),
+      ).toEqual(['a.com', 'MATCH', 'z.com'])
+    })
+
+    it('sorts by hit count, coercing missing extra to 0', () => {
+      const rules = [
+        mkRule({ index: 0, extra: { hitCount: 5 } }),
+        mkRule({ index: 1, extra: undefined }),
+        mkRule({ index: 2, extra: { hitCount: 10 } }),
+        mkRule({ index: 3, extra: {} }),
+      ]
+
+      expect(
+        sortRulesByOrderingType(rules, RULES_ORDERING_TYPE.HIT_COUNT_DESC).map(
+          (r) => r.index,
+        ),
+      ).toEqual([2, 0, 1, 3])
+
+      expect(
+        sortRulesByOrderingType(rules, RULES_ORDERING_TYPE.HIT_COUNT_ASC).map(
+          (r) => r.index,
+        ),
+      ).toEqual([1, 3, 0, 2])
+    })
+
+    it('sorts by recency, sinking never-matched rules to the bottom', () => {
+      const rules = [
+        mkRule({ index: 0, extra: { hitAt: '2024-01-01T00:00:00Z' } }),
+        mkRule({ index: 1, extra: undefined }),
+        mkRule({ index: 2, extra: { hitAt: '2024-06-01T00:00:00Z' } }),
+        mkRule({ index: 3, extra: {} }),
+      ]
+
+      expect(
+        sortRulesByOrderingType(rules, RULES_ORDERING_TYPE.HIT_AT_DESC).map(
+          (r) => r.index,
+        ),
+      ).toEqual([2, 0, 1, 3])
+    })
+
+    it('keeps ascending index order on a tiebreak', () => {
+      const rules = [
+        mkRule({ index: 3, extra: { hitCount: 0 } }),
+        mkRule({ index: 1, extra: { hitCount: 0 } }),
+        mkRule({ index: 2, extra: { hitCount: 0 } }),
+      ]
+
+      expect(
+        sortRulesByOrderingType(rules, RULES_ORDERING_TYPE.HIT_COUNT_DESC).map(
+          (r) => r.index,
+        ),
+      ).toEqual([1, 2, 3])
+    })
+
+    it('handles empty and single-element input without throwing', () => {
+      expect(
+        sortRulesByOrderingType([], RULES_ORDERING_TYPE.HIT_AT_DESC),
+      ).toEqual([])
+
+      const one = [mkRule()]
+
+      expect(
+        sortRulesByOrderingType(one, RULES_ORDERING_TYPE.HIT_COUNT_DESC),
+      ).toEqual(one)
+    })
+
+    it('falls back to input order for an unknown ordering type', () => {
+      const rules = [mkRule({ index: 1 }), mkRule({ index: 0 })]
+
+      expect(
+        sortRulesByOrderingType(rules, 'bogus' as RULES_ORDERING_TYPE).map(
+          (r) => r.index,
+        ),
+      ).toEqual([1, 0])
     })
   })
 })

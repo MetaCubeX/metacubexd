@@ -16,6 +16,7 @@ import {
   PROXIES_DISPLAY_MODE,
   PROXIES_ORDERING_TYPE,
   PROXIES_PREVIEW_TYPE,
+  RULES_ORDERING_TYPE,
   TAILWINDCSS_SIZE,
 } from '~/constants'
 
@@ -174,6 +175,26 @@ export const useConfigStore = defineStore('config', () => {
     'enableProxiesAlphabetIndex',
     false,
   )
+
+  // Rules: sort order + quick-filter selections (persisted across reloads).
+  // Sort is a standalone preference; the filters reset together via
+  // resetRulesFilters. Empty type/policy arrays + 'all' status = no constraint.
+  const rulesOrderingType = useLocalStorage<RULES_ORDERING_TYPE>(
+    'rulesOrderingType',
+    RULES_ORDERING_TYPE.NATURAL,
+  )
+  const rulesTypeFilter = useLocalStorage<string[]>('rulesTypeFilter', [])
+  const rulesPolicyFilter = useLocalStorage<string[]>('rulesPolicyFilter', [])
+  const rulesStatusFilter = useLocalStorage<'all' | 'enabled' | 'disabled'>(
+    'rulesStatusFilter',
+    'all',
+  )
+
+  const resetRulesFilters = () => {
+    rulesTypeFilter.value = []
+    rulesPolicyFilter.value = []
+    rulesStatusFilter.value = 'all'
+  }
 
   // Connections: per-connection GeoIP enrichment (country flag / city / ASN).
   // Off by default because it issues outbound requests to a 3rd-party IP API.
@@ -336,6 +357,12 @@ export const useConfigStore = defineStore('config', () => {
     // Proxies in-group filter & alphabet index
     proxiesGroupNameFilter,
     enableProxiesAlphabetIndex,
+    // Rules
+    rulesOrderingType,
+    rulesTypeFilter,
+    rulesPolicyFilter,
+    rulesStatusFilter,
+    resetRulesFilters,
     // Connections GeoIP
     showConnectionGeoIP,
     connectionGeoIPProvider,
