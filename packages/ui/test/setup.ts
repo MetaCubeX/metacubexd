@@ -88,6 +88,9 @@ class MockEventSource {
 }
 vi.stubGlobal('EventSource', MockEventSource)
 
+// Nuxt auto-import stubs used by plugins under test.
+vi.stubGlobal('defineNuxtPlugin', (fn: any) => fn)
+
 // Reset storage before each test
 beforeEach(() => {
   localStorage.clear()
