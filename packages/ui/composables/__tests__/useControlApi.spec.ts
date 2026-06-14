@@ -55,3 +55,100 @@ describe('composables/useControlApi resolveControlConfig', () => {
     )
   })
 })
+
+describe('composables/useControlApi methods', () => {
+  const json = vi.fn()
+  const get = vi.fn(() => ({ json }))
+  const post = vi.fn(() => ({ json }))
+  const put = vi.fn(() => ({ json }))
+  const del = vi.fn(() => ({ json }))
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    json.mockResolvedValue({ ok: true })
+    ;(ky.create as any).mockReturnValue({ get, post, put, delete: del })
+    ;(globalThis as any).window = {
+      metacubexd: { control: { base: 'http://x/api/control', token: 't' } },
+      location: { origin: 'file://' },
+    }
+  })
+
+  it('getInfo() GETs info', async () => {
+    const api = useControlApi()
+    await api.getInfo()
+    expect(get).toHaveBeenCalledWith('info')
+  })
+
+  it('getKernelStatus() GETs kernel/status', async () => {
+    await useControlApi().getKernelStatus()
+    expect(get).toHaveBeenCalledWith('kernel/status')
+  })
+
+  it('startKernel/stopKernel/restartKernel POST the right paths', async () => {
+    const api = useControlApi()
+    await api.startKernel()
+    await api.stopKernel()
+    await api.restartKernel()
+    expect(post).toHaveBeenCalledWith('kernel/start')
+    expect(post).toHaveBeenCalledWith('kernel/stop')
+    expect(post).toHaveBeenCalledWith('kernel/restart')
+  })
+
+  it('listProfiles() GETs profiles', async () => {
+    await useControlApi().listProfiles()
+    expect(get).toHaveBeenCalledWith('profiles')
+  })
+
+  it('createProfile() POSTs profiles with json body', async () => {
+    await useControlApi().createProfile({ name: 'p1', content: 'a: 1' })
+    expect(post).toHaveBeenCalledWith('profiles', {
+      json: { name: 'p1', content: 'a: 1' },
+    })
+  })
+
+  it('getProfile() GETs profiles/:id', async () => {
+    await useControlApi().getProfile('id1')
+    expect(get).toHaveBeenCalledWith('profiles/id1')
+  })
+
+  it('updateProfile() PUTs profiles/:id with json body', async () => {
+    await useControlApi().updateProfile('id1', { content: 'b: 2' })
+    expect(put).toHaveBeenCalledWith('profiles/id1', {
+      json: { content: 'b: 2' },
+    })
+  })
+
+  it('deleteProfile() DELETEs profiles/:id', async () => {
+    await useControlApi().deleteProfile('id1')
+    expect(del).toHaveBeenCalledWith('profiles/id1')
+  })
+
+  it('duplicateProfile() POSTs profiles/:id/duplicate', async () => {
+    await useControlApi().duplicateProfile('id1', 'copy')
+    expect(post).toHaveBeenCalledWith('profiles/id1/duplicate', {
+      json: { name: 'copy' },
+    })
+  })
+
+  it('importProfile() POSTs profiles/import', async () => {
+    await useControlApi().importProfile('http://sub', 'subname')
+    expect(post).toHaveBeenCalledWith('profiles/import', {
+      json: { url: 'http://sub', name: 'subname' },
+    })
+  })
+
+  it('activateProfile() POSTs profiles/:id/activate', async () => {
+    await useControlApi().activateProfile('id1')
+    expect(post).toHaveBeenCalledWith('profiles/id1/activate')
+  })
+
+  it('validateProfile() POSTs profiles/:id/validate', async () => {
+    await useControlApi().validateProfile('id1')
+    expect(post).toHaveBeenCalledWith('profiles/id1/validate')
+  })
+
+  it('logsUrl() returns the SSE URL with ?token=', () => {
+    const url = useControlApi().logsUrl()
+    expect(url).toBe('http://x/api/control/kernel/logs?token=t')
+  })
+})
