@@ -155,3 +155,141 @@ describe('createControlRouter — info + kernel + auth', () => {
     expect((await restart.json()).status).toBe('running')
   })
 })
+
+describe('createControlRouter — profiles + SSE', () => {
+  let srv: Awaited<ReturnType<typeof mount>>
+  afterEach(async () => srv?.close())
+
+  it('gET /api/control/profiles returns ProfileMeta[]', async () => {
+    srv = await mount(makeDeps())
+    const res = await fetch(`${srv.base}/api/control/profiles`)
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(Array.isArray(body)).toBe(true)
+    expect(body[0]).toMatchObject({ id: 'p1', name: 'home' })
+  })
+
+  it('pOST /api/control/profiles creates from {name, content?}', async () => {
+    const deps = makeDeps()
+    srv = await mount(deps)
+    const res = await fetch(`${srv.base}/api/control/profiles`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ name: 'new', content: 'a: 1\n' }),
+    })
+    expect(res.status).toBe(200)
+    expect(deps.profiles.create).toHaveBeenCalledWith({
+      name: 'new',
+      content: 'a: 1\n',
+    })
+    expect((await res.json()).name).toBe('new')
+  })
+
+  it('gET /api/control/profiles/:id returns { meta, content }', async () => {
+    srv = await mount(makeDeps())
+    const res = await fetch(`${srv.base}/api/control/profiles/p1`)
+    const body = await res.json()
+    expect(body.meta).toMatchObject({ id: 'p1' })
+    expect(body.content).toBe('mixed-port: 7890\n')
+  })
+
+  it('pUT /api/control/profiles/:id updates', async () => {
+    const deps = makeDeps()
+    srv = await mount(deps)
+    const res = await fetch(`${srv.base}/api/control/profiles/p1`, {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ name: 'renamed' }),
+    })
+    expect(res.status).toBe(200)
+    expect(deps.profiles.update).toHaveBeenCalledWith('p1', { name: 'renamed' })
+  })
+
+  it('dELETE /api/control/profiles/:id returns 204', async () => {
+    const deps = makeDeps()
+    srv = await mount(deps)
+    const res = await fetch(`${srv.base}/api/control/profiles/p1`, {
+      method: 'DELETE',
+    })
+    expect(res.status).toBe(204)
+    expect(deps.profiles.delete).toHaveBeenCalledWith('p1')
+  })
+
+  it('pOST /api/control/profiles/:id/duplicate returns ProfileMeta', async () => {
+    srv = await mount(makeDeps())
+    const res = await fetch(`${srv.base}/api/control/profiles/p1/duplicate`, {
+      method: 'POST',
+    })
+    expect((await res.json()).id).toBe('p3')
+  })
+
+  it('pOST /api/control/profiles/import imports from { url, name? }', async () => {
+    const deps = makeDeps()
+    srv = await mount(deps)
+    const res = await fetch(`${srv.base}/api/control/profiles/import`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ url: 'https://sub', name: 'sub' }),
+    })
+    expect((await res.json()).type).toBe('remote')
+    expect(deps.profiles.importFromUrl).toHaveBeenCalledWith(
+      'https://sub',
+      'sub',
+    )
+  })
+
+  it('pOST /api/control/profiles/:id/activate sets active then returns KernelState', async () => {
+    const deps = makeDeps()
+    srv = await mount(deps)
+    const res = await fetch(`${srv.base}/api/control/profiles/p1/activate`, {
+      method: 'POST',
+    })
+    expect(deps.profiles.setActive).toHaveBeenCalledWith('p1')
+    expect(deps.supervisor.restart).toHaveBeenCalledOnce()
+    expect((await res.json()).status).toBe('running')
+  })
+
+  it('pOST /api/control/profiles/:id/validate materializes a temp candidate then returns { valid, message }', async () => {
+    const deps = makeDeps()
+    srv = await mount(deps)
+    const res = await fetch(`${srv.base}/api/control/profiles/p1/validate`, {
+      method: 'POST',
+    })
+    const body = await res.json()
+    expect(body).toEqual({ valid: true, message: 'ok' })
+    // It reads the profile by id and validates a real candidate PATH, never the bare id.
+    expect(deps.profiles.read).toHaveBeenCalledWith('p1')
+    const validatedPath = deps.supervisor.validate.mock.calls[0]![0] as string
+    expect(validatedPath).toBe(join(deps.homeDir, '.validate-p1.yaml'))
+    expect(validatedPath).not.toBe('p1')
+  })
+
+  it('gET /api/control/kernel/logs streams text/event-stream and pushes a state event', async () => {
+    const deps = makeDeps()
+    // Capture the registered 'log' callback so we can drive a fake log line.
+    let logCb:
+      | ((l: { stream: string; line: string; ts: number }) => void)
+      | undefined
+    deps.supervisor.on = vi.fn((event: string, cb: never) => {
+      if (event === 'log') logCb = cb as never
+    }) as never
+    srv = await mount(deps)
+
+    const res = await fetch(`${srv.base}/api/control/kernel/logs`)
+    expect(res.headers.get('content-type')).toContain('text/event-stream')
+
+    const reader = res.body!.getReader()
+    const dec = new TextDecoder()
+    // First chunk should be the seeded state event.
+    const first = await reader.read()
+    const seeded = dec.decode(first.value)
+    expect(seeded).toContain('"type":"state"')
+
+    // Drive a log line through the captured callback and read the next chunk.
+    logCb?.({ stream: 'stdout', line: 'hello-from-kernel', ts: 1 })
+    const next = await reader.read()
+    expect(dec.decode(next.value)).toContain('hello-from-kernel')
+
+    await reader.cancel()
+  })
+})
