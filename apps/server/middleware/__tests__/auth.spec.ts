@@ -41,7 +41,7 @@ describe('apps/server middleware/auth -> isAuthorized', () => {
       configuredToken: TOKEN,
     })
     expect(r.ok).toBe(false)
-    expect(r.status).toBe(401)
+    if (!r.ok) expect(r.status).toBe(401)
   })
 
   it('rejects a guarded control path with the wrong Bearer token', () => {
@@ -52,7 +52,7 @@ describe('apps/server middleware/auth -> isAuthorized', () => {
       configuredToken: TOKEN,
     })
     expect(r.ok).toBe(false)
-    expect(r.status).toBe(401)
+    if (!r.ok) expect(r.status).toBe(401)
   })
 
   it('accepts a guarded control path with the correct Bearer token', () => {
@@ -85,7 +85,7 @@ describe('apps/server middleware/auth -> isAuthorized', () => {
       configuredToken: TOKEN,
     })
     expect(r.ok).toBe(false)
-    expect(r.status).toBe(401)
+    if (!r.ok) expect(r.status).toBe(401)
   })
 
   it('is case-insensitive on the Bearer scheme', () => {
@@ -118,6 +118,6 @@ describe('apps/server middleware/auth -> isAuthorized', () => {
       configuredToken: '',
     })
     expect(r.ok).toBe(false)
-    expect(r.status).toBe(503)
+    if (!r.ok) expect(r.status).toBe(503)
   })
 })

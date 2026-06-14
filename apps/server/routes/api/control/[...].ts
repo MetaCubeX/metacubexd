@@ -9,7 +9,11 @@ import { getAgent } from '../../../lib/supervisor'
 const listener = toNodeListener(getAgent().router)
 
 export default defineEventHandler(
-  fromNodeMiddleware((req, res, next) => {
-    listener(req, res).catch(next)
+  fromNodeMiddleware((req, res, _next) => {
+    // toNodeListener fully handles the response (including 404s) and catches
+    // errors itself, returning void — the agent owns the entire /api/control
+    // namespace, so there is nothing to forward to `next`. (_next is kept only
+    // so h3 selects the typed NodeMiddleware overload for req/res.)
+    listener(req, res)
   }),
 )

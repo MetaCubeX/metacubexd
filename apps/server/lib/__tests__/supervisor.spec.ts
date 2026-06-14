@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock the agent so we can assert how the server wires env -> createAgent,
 // without spawning a real kernel.
-const createAgentMock = vi.fn(() => ({
+const createAgentMock = vi.fn((_opts: Record<string, unknown>) => ({
   supervisor: { getState: () => ({ status: 'stopped' }) },
   profiles: {},
   router: { __isRouter: true },
@@ -67,7 +67,7 @@ describe('apps/server lib/supervisor', () => {
     const b = getAgent()
     expect(a).toBe(b)
     expect(createAgentMock).toHaveBeenCalledTimes(1)
-    const opts = createAgentMock.mock.calls[0][0]
+    const opts = createAgentMock.mock.calls[0]![0]
     expect(opts.binaryPath).toBe('/usr/local/bin/mihomo')
     expect(opts.homeDir).toBe('/data')
     expect(opts.profilesDir).toBe('/data/profiles')

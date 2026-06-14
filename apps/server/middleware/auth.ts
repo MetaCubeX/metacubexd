@@ -53,7 +53,7 @@ function parseBearer(header: string | undefined): string | undefined {
 
 export default defineEventHandler((event) => {
   const result = isAuthorized({
-    path: event.path.split('?')[0],
+    path: event.path.split('?')[0] ?? event.path,
     authHeader: getRequestHeader(event, 'authorization'),
     queryToken: (getQuery(event).token as string | undefined) ?? undefined,
     configuredToken: serverEnv().controlToken,
