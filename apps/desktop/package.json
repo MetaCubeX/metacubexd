@@ -15,7 +15,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@metacubexd/agent": "workspace:*"
+    "@metacubexd/agent": "workspace:*",
+    "h3": "catalog:"
   },
   "devDependencies": {
     "electron": "catalog:",
