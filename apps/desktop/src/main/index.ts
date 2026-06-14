@@ -1,4 +1,7 @@
-import type { SystemProxyController } from '@metacubexd/agent/types'
+import type {
+  KernelManager,
+  SystemProxyController,
+} from '@metacubexd/agent/types'
 import type { Tray } from 'electron'
 import type { ControlServer } from './control-server'
 import type { FsLike } from './paths'
@@ -18,6 +21,7 @@ import { runShutdownCleanup } from './cleanup'
 import { startControlServer, stopControlServer } from './control-server'
 import { parseSubscriptionDeepLink } from './deep-link'
 import { pickFreePorts } from './free-port'
+import { createKernelManager } from './kernel-manager'
 import { bootstrapDataDir } from './paths'
 import { makeToken } from './secrets'
 import { shouldStartHidden } from './startup'
@@ -118,6 +122,24 @@ async function boot(): Promise<void> {
       ),
   }
 
+  // Kernel version management needs the supervisor that createAgent builds
+  // internally — chicken-and-egg. We hand createAgent a stable delegate (truthy
+  // so the 'kernel-version' feature + routes register) and back it with the real
+  // KernelManager once the agent (and its supervisor) exists. createAgent returns
+  // synchronously and no /api/control request fires before boot() completes, so
+  // realKernelManager is always set by request time.
+  let realKernelManager: KernelManager | null = null
+  const kernelManager: KernelManager = {
+    listVersions: () => {
+      if (!realKernelManager) throw new Error('kernel manager not ready')
+      return realKernelManager.listVersions()
+    },
+    switch: (version) => {
+      if (!realKernelManager) throw new Error('kernel manager not ready')
+      return realKernelManager.switch(version)
+    },
+  }
+
   agent = createAgent({
     binaryPath,
     homeDir: paths.homeDir,
@@ -138,6 +160,20 @@ async function boot(): Promise<void> {
     // Inject the OS proxy controller; enables the capability-gated
     // /api/control/sysproxy routes + the 'system-proxy' feature flag.
     systemProxy,
+    // Inject the kernel version manager (delegate); enables the capability-gated
+    // /api/control/kernel/* routes + the 'kernel-version' feature flag.
+    kernelManager,
+  })
+
+  // Now that the supervisor exists, build the real manager. Downloaded kernels
+  // land in <userData>/kernels/<version>; switching writes the override file
+  // (overridePath) for cold-start persistence then live-swaps the supervisor.
+  realKernelManager = createKernelManager({
+    supervisor: agent.supervisor,
+    os: process.platform,
+    arch: process.arch,
+    kernelsDir: join(userData, 'kernels'),
+    overridePath,
   })
 
   // The control server also serves the renderer (same origin as /api/control)
