@@ -45,6 +45,8 @@ export type ControlFeature =
   | 'logs-sse'
   | 'kernel-control'
   | 'system-proxy'
+  | 'kernel-version'
+  | 'geo-assets'
 export interface ControlInfo {
   hasAgent: boolean
   version: string
@@ -79,4 +81,19 @@ export interface SystemProxyState {
   enabled: boolean
   port: number
   bypass: string[]
+}
+
+// GET /api/control/kernel/versions (capability-gated 'kernel-version').
+// Mirror of @metacubexd/agent KernelManager.listVersions() (SHARED CONTRACTS).
+export interface KernelVersions {
+  versions: string[]
+  current?: string
+  bundled: string
+}
+
+// POST /api/control/geo/update (capability-gated 'geo-assets'). Downloads the
+// geoip/geosite/mmdb databases into the kernel home dir (SHARED CONTRACTS).
+export interface GeoUpdateResult {
+  ok: boolean
+  files: string[]
 }

@@ -166,4 +166,21 @@ describe('composables/useControlApi methods', () => {
       json: { enabled: true, bypass: ['localhost'] },
     })
   })
+
+  it('getKernelVersions() GETs kernel/versions', async () => {
+    await useControlApi().getKernelVersions()
+    expect(get).toHaveBeenCalledWith('kernel/versions')
+  })
+
+  it('switchKernel() POSTs kernel/switch with the version json body', async () => {
+    await useControlApi().switchKernel('v1.19.0')
+    expect(post).toHaveBeenCalledWith('kernel/switch', {
+      json: { version: 'v1.19.0' },
+    })
+  })
+
+  it('updateGeoAssets() POSTs geo/update', async () => {
+    await useControlApi().updateGeoAssets()
+    expect(post).toHaveBeenCalledWith('geo/update')
+  })
 })

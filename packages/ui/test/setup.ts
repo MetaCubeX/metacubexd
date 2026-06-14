@@ -91,6 +91,12 @@ vi.stubGlobal('EventSource', MockEventSource)
 // Nuxt auto-import stubs used by plugins under test.
 vi.stubGlobal('defineNuxtPlugin', (fn: any) => fn)
 
+// @nuxtjs/i18n auto-imports useI18n() globally. Composables under test call it
+// unqualified; return the key (and named params) so assertions stay stable.
+vi.stubGlobal('useI18n', () => ({
+  t: (key: string) => key,
+}))
+
 // Reset storage before each test
 beforeEach(() => {
   localStorage.clear()

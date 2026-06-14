@@ -383,6 +383,7 @@ watch(
   <div class="flex h-full flex-col gap-4 overflow-x-hidden overflow-y-auto p-2">
     <!-- Kernel control + logs (capability-gated: render nothing without an agent) -->
     <KernelControlPanel />
+    <KernelVersionPanel />
     <SystemProxyControlPanel />
     <KernelLogView />
 

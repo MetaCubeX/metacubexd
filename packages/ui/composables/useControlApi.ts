@@ -1,6 +1,8 @@
 import type {
   ControlInfo,
+  GeoUpdateResult,
   KernelState,
+  KernelVersions,
   ProfileDetail,
   ProfileMeta,
   SystemProxyState,
@@ -88,5 +90,17 @@ export function useControlApi() {
     getSysProxy: () => client.get('sysproxy').json<SystemProxyState>(),
     setSysProxy: (body: { enabled: boolean; bypass?: string[] }) =>
       client.post('sysproxy', { json: body }).json<SystemProxyState>(),
+
+    // Kernel version management (capability-gated 'kernel-version'). GET lists
+    // the downloaded + bundled versions and the active one; POST { version }
+    // downloads/persists/live-swaps it (the kernel restarts) and echoes { ok }.
+    getKernelVersions: () =>
+      client.get('kernel/versions').json<KernelVersions>(),
+    switchKernel: (version: string) =>
+      client.post('kernel/switch', { json: { version } }).json<{ ok: true }>(),
+
+    // Geo assets (capability-gated 'geo-assets'). POST downloads the geoip/
+    // geosite/mmdb databases into the kernel home dir and echoes { ok, files }.
+    updateGeoAssets: () => client.post('geo/update').json<GeoUpdateResult>(),
   }
 }
