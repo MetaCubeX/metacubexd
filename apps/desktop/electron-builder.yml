@@ -1,0 +1,48 @@
+appId: one.metacubex.desktop
+productName: MetaCubeXD
+directories:
+  output: dist
+  buildResources: build
+files:
+  - 'out/**/*'
+  - 'renderer/**/*'
+  - 'package.json'
+asar: true
+asarUnpack:
+  - 'resources/**'
+extraResources:
+  - from: resources/mihomo${ext}
+    to: mihomo${ext}
+  - from: resources/default-config.yaml
+    to: default-config.yaml
+mac:
+  identity: null
+  hardenedRuntime: false
+  category: public.app-category.utilities
+  target:
+    - dmg
+    - zip
+  artifactName: ${productName}-${version}-mac-${arch}.${ext}
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+        - arm64
+  artifactName: ${productName}-${version}-win-${arch}.${ext}
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  perMachine: false
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - x64
+        - arm64
+    - target: deb
+      arch:
+        - x64
+        - arm64
+  category: Network
+  artifactName: ${productName}-${version}-linux-${arch}.${ext}
