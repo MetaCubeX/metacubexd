@@ -12,6 +12,7 @@ import { join } from 'node:path'
 import { createAgent } from '@metacubexd/agent'
 import { app, BrowserWindow, nativeImage } from 'electron'
 import { resolveMihomoBinary } from './binary-path'
+import { resolveBootPorts } from './boot-ports'
 import { startControlServer, stopControlServer } from './control-server'
 import { pickFreePorts } from './free-port'
 import { bootstrapDataDir } from './paths'
@@ -80,8 +81,11 @@ async function boot(): Promise<void> {
     }
   }
 
-  // Pick two distinct free loopback ports: [controlPort, clashPort].
-  const [controlPort, clashPort] = (await pickFreePorts(2)) as [number, number]
+  // Pick three distinct free loopback ports: control server, Clash API, and the
+  // kernel's managed mixed proxy (prereq for Wave 2 system-proxy wiring).
+  const { controlPort, clashPort, mixedPort } = resolveBootPorts(
+    await pickFreePorts(3),
+  )
   const controlToken = makeToken()
   const clashSecret = makeToken()
 
@@ -99,6 +103,9 @@ async function boot(): Promise<void> {
     // these — state.externalController/state.secret echo them back.
     externalController: `127.0.0.1:${clashPort}`,
     secret: clashSecret,
+    // Managed mixed (http+socks) proxy port; the supervisor injects this as
+    // `mixed-port:` into the active YAML before spawn.
+    mixedPort,
   })
 
   // The control server also serves the renderer (same origin as /api/control)
@@ -119,6 +126,8 @@ async function boot(): Promise<void> {
   process.env.MCXD_CONTROL_TOKEN = controlToken
   process.env.MCXD_CLASH_URL = `http://${state.externalController}`
   process.env.MCXD_CLASH_SECRET = state.secret
+  // Loopback proxy port for Wave 2 system-proxy wiring.
+  process.env.MCXD_MIXED_PORT = String(mixedPort)
 }
 
 function createWindow(): void {
