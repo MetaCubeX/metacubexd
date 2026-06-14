@@ -40,7 +40,11 @@ export interface ProfileMeta {
 }
 
 // GET /api/control/info
-export type ControlFeature = 'profiles' | 'logs-sse' | 'kernel-control'
+export type ControlFeature =
+  | 'profiles'
+  | 'logs-sse'
+  | 'kernel-control'
+  | 'system-proxy'
 export interface ControlInfo {
   hasAgent: boolean
   version: string
@@ -66,4 +70,13 @@ export interface ProfileDetail {
 export interface ValidateResult {
   valid: boolean
   message: string
+}
+
+// GET/POST /api/control/sysproxy (capability-gated 'system-proxy').
+// The GET reflects the controller's isEnabled() + describe(); the POST body is
+// { enabled, bypass? } and the response echoes the same shape (SHARED CONTRACTS).
+export interface SystemProxyState {
+  enabled: boolean
+  port: number
+  bypass: string[]
 }

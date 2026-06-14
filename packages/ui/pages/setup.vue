@@ -181,6 +181,7 @@ onMounted(async () => {
     <div class="animate-fade-slide-in mx-auto w-full max-w-md">
       <!-- Kernel control (capability-gated; hidden on plain remote setup) -->
       <KernelControlPanel class="mb-6" />
+      <SystemProxyControlPanel class="mb-6" />
 
       <!-- Logo Section -->
       <div class="animate-fade-slide-in-delay-1 mb-8 text-center">

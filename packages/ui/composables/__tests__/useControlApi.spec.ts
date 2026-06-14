@@ -151,4 +151,19 @@ describe('composables/useControlApi methods', () => {
     const url = useControlApi().logsUrl()
     expect(url).toBe('http://x/api/control/kernel/logs?token=t')
   })
+
+  it('getSysProxy() GETs sysproxy', async () => {
+    await useControlApi().getSysProxy()
+    expect(get).toHaveBeenCalledWith('sysproxy')
+  })
+
+  it('setSysProxy() POSTs sysproxy with json body', async () => {
+    await useControlApi().setSysProxy({
+      enabled: true,
+      bypass: ['localhost'],
+    })
+    expect(post).toHaveBeenCalledWith('sysproxy', {
+      json: { enabled: true, bypass: ['localhost'] },
+    })
+  })
 })

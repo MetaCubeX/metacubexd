@@ -3,6 +3,7 @@ import type {
   KernelState,
   ProfileDetail,
   ProfileMeta,
+  SystemProxyState,
   ValidateResult,
 } from '~/types/control'
 // packages/ui/composables/useControlApi.ts
@@ -81,5 +82,11 @@ export function useControlApi() {
       client.post(`profiles/${id}/activate`).json<KernelState>(),
     validateProfile: (id: string) =>
       client.post(`profiles/${id}/validate`).json<ValidateResult>(),
+
+    // System proxy (capability-gated 'system-proxy'). GET reflects the current
+    // OS proxy state; POST { enabled, bypass? } toggles it and echoes the state.
+    getSysProxy: () => client.get('sysproxy').json<SystemProxyState>(),
+    setSysProxy: (body: { enabled: boolean; bypass?: string[] }) =>
+      client.post('sysproxy', { json: body }).json<SystemProxyState>(),
   }
 }
