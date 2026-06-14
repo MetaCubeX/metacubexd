@@ -17,6 +17,7 @@ export const mockConfig = {
   mode: 'rule',
   'log-level': 'info',
   'allow-lan': false,
+  'unified-delay': false,
   ipv6: false,
   tun: {
     enable: false,

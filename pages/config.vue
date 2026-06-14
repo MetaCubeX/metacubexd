@@ -158,7 +158,8 @@ watch(
     if (config) {
       localConfig.allowLan = config['allow-lan'] || false
       localConfig.mode = config.mode || 'rule'
-      localConfig.unifiedDelay = config.UnifiedDelay || false
+      localConfig.unifiedDelay =
+        config['unified-delay'] ?? config.UnifiedDelay ?? false
       localConfig.interfaceName = config['interface-name'] || ''
       localConfig.tunEnable = config.tun?.enable || false
       localConfig.tunStack = config.tun?.stack || 'Mixed'

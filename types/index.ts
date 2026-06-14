@@ -157,7 +157,8 @@ export interface Config {
   'allow-lan': boolean
   'bind-address': string
   'inbound-tfo': boolean
-  UnifiedDelay: boolean
+  'unified-delay'?: boolean
+  UnifiedDelay?: boolean
   'log-level': string
   ipv6: boolean
   'interface-name': string
