@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.255.0](https://github.com/MetaCubeX/metacubexd/compare/v1.254.2...v1.255.0) (2026-06-14)
+
+
+### Features
+
+* **rules:** add quick filters and sorting to the rules list page ([e9b5a3f](https://github.com/MetaCubeX/metacubexd/commit/e9b5a3fcf6e6aaf2a011fc1b64b8edb3d9cf4f57))
+
 ## [1.254.2](https://github.com/MetaCubeX/metacubexd/compare/v1.254.1...v1.254.2) (2026-06-13)
 
 
