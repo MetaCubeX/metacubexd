@@ -38,13 +38,18 @@ describe('createAgent', () => {
     expect(info).toMatchObject({
       hasAgent: true,
       version: AGENT_VERSION,
-      features: ['profiles', 'logs-sse', 'kernel-control'],
+      features: ['profiles', 'logs-sse', 'kernel-control', 'geo-assets'],
     })
     expect(info.platform).toMatchObject({
       os: process.platform,
       arch: process.arch,
     })
     expect(info.kernel).toMatchObject({ bundled: true, path: '/fake/mihomo' })
+  })
+
+  it('info().features always includes geo-assets (homeDir-backed, no controller)', () => {
+    const agent = createAgent(opts())
+    expect(agent.info().features).toContain('geo-assets')
   })
 
   it('info().features excludes system-proxy when no controller is injected', () => {

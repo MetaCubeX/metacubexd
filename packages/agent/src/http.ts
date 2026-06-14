@@ -22,6 +22,7 @@ import {
   setResponseHeader,
   setResponseStatus,
 } from 'h3'
+import { fetchGeoAssets } from './kernel/geo'
 
 export interface ControlRouterDeps {
   supervisor: MihomoSupervisor
@@ -31,6 +32,7 @@ export interface ControlRouterDeps {
   token?: string
   systemProxy?: SystemProxyController // OS proxy controller; capability-gated
   kernelManager?: KernelManager // kernel version mgmt; capability-gated
+  geoFetch?: typeof fetch // override for tests; defaults to global fetch
 }
 
 const PREFIX = '/api/control'
@@ -46,6 +48,7 @@ export function createControlRouter(deps: ControlRouterDeps): App {
     token,
     systemProxy,
     kernelManager,
+    geoFetch,
   } = deps
 
   // ---- Auth middleware: applied to every route except public ones. ----
@@ -231,6 +234,15 @@ export function createControlRouter(deps: ControlRouterDeps): App {
       await profiles.update(activeId, { content: body.content })
       await profiles.setActive(activeId)
       return supervisor.restart()
+    }),
+  )
+
+  // ---- Geo assets (always available — backed by homeDir + fetch) ----
+  router.post(
+    `${PREFIX}/geo/update`,
+    defineEventHandler(async () => {
+      const { files } = await fetchGeoAssets(homeDir, { fetch: geoFetch })
+      return { ok: true, files }
     }),
   )
 

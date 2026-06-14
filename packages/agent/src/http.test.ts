@@ -1,6 +1,7 @@
 import type { AddressInfo } from 'node:net'
 import type { KernelState, ProfileMeta } from './types'
-import { mkdtempSync } from 'node:fs'
+import { Buffer } from 'node:buffer'
+import { mkdtempSync, readdirSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -421,6 +422,38 @@ function makeKernelManager() {
     switch: vi.fn(async () => {}),
   }
 }
+
+describe('createControlRouter — geo assets', () => {
+  let srv: Awaited<ReturnType<typeof mount>>
+  afterEach(async () => srv?.close())
+
+  it('pOST /api/control/geo/update downloads the 3 files into homeDir and returns { ok, files }', async () => {
+    const requested: string[] = []
+    const geoFetch = vi.fn(async (url: string) => {
+      requested.push(url)
+      return new Response(Buffer.from(`bytes:${url}`), { status: 200 })
+    })
+    const deps = {
+      ...makeDeps(),
+      geoFetch: geoFetch as unknown as typeof fetch,
+    }
+    srv = await mount(deps as never)
+    const res = await fetch(`${srv.base}/api/control/geo/update`, {
+      method: 'POST',
+    })
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({
+      ok: true,
+      files: ['geoip.dat', 'geosite.dat', 'country.mmdb'],
+    })
+    // It fetched three assets and wrote them under homeDir.
+    expect(requested).toHaveLength(3)
+    const written = readdirSync(deps.homeDir)
+    expect(written).toEqual(
+      expect.arrayContaining(['geoip.dat', 'geosite.dat', 'country.mmdb']),
+    )
+  })
+})
 
 describe('createControlRouter — kernel version management', () => {
   let srv: Awaited<ReturnType<typeof mount>>

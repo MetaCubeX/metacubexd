@@ -11,6 +11,7 @@ export { createControlRouter } from './http'
 export type { ControlRouterDeps } from './http'
 export { MIHOMO_VERSION, mihomoAsset } from './kernel/assets'
 export { fetchKernel, listMihomoVersions } from './kernel/fetch-kernel'
+export { fetchGeoAssets, GEO_ASSET_URLS } from './kernel/geo'
 export { createProfileStore } from './profiles'
 export { createProfileScheduler } from './scheduler'
 export type { ProfileScheduler, ProfileSchedulerDeps } from './scheduler'
@@ -53,6 +54,8 @@ export function createAgent(opts: CreateAgentOptions) {
       'profiles',
       'logs-sse',
       'kernel-control',
+      // homeDir always exists, so geo-asset download is always available.
+      'geo-assets',
       ...(systemProxy ? ['system-proxy'] : []),
       ...(kernelManager ? ['kernel-version'] : []),
     ],
