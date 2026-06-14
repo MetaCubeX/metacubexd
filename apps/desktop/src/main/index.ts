@@ -10,10 +10,11 @@ import {
 } from 'node:fs'
 import { join } from 'node:path'
 import { createAgent } from '@metacubexd/agent'
-import { app, BrowserWindow, nativeImage } from 'electron'
+import { app, BrowserWindow, nativeImage, Notification } from 'electron'
 import { resolveMihomoBinary } from './binary-path'
 import { resolveBootPorts } from './boot-ports'
 import { startControlServer, stopControlServer } from './control-server'
+import { parseSubscriptionDeepLink } from './deep-link'
 import { pickFreePorts } from './free-port'
 import { bootstrapDataDir } from './paths'
 import { makeToken } from './secrets'
@@ -162,16 +163,83 @@ async function shutdownKernel(): Promise<void> {
   if (controlServer) await stopControlServer(controlServer)
 }
 
+function focusWindow(): void {
+  if (!win) return
+  if (win.isMinimized()) win.restore()
+  win.show()
+  win.focus()
+}
+
+// A deep link can arrive before boot() finishes (e.g. cold launch via the OS
+// handing us the URL in argv). Hold the most recent one until the agent exists,
+// then flush it.
+let pendingDeepLink: { url: string; name?: string } | null = null
+
+// Import a subscription from a deep link, make it active, restart the kernel,
+// then surface the window + a notification. Queues if the agent isn't ready.
+async function handleSubscriptionDeepLink(link: {
+  url: string
+  name?: string
+}): Promise<void> {
+  if (!agent) {
+    pendingDeepLink = link
+    return
+  }
+  try {
+    const meta = await agent.profiles.importFromUrl(link.url, link.name)
+    await agent.profiles.setActive(meta.id)
+    await agent.supervisor.restart()
+    focusWindow()
+    if (Notification.isSupported()) {
+      new Notification({
+        title: 'Subscription imported',
+        body: `${meta.name} is now active.`,
+      }).show()
+    }
+  } catch (err) {
+    if (Notification.isSupported()) {
+      new Notification({
+        title: 'Subscription import failed',
+        body: err instanceof Error ? err.message : String(err),
+      }).show()
+    }
+  }
+}
+
+// Scan an argv list (Windows/Linux deliver deep links as a process argument)
+// for the first recognized subscription link and handle it.
+function handleDeepLinkFromArgv(argv: readonly string[]): void {
+  for (const arg of argv) {
+    const link = parseSubscriptionDeepLink(arg)
+    if (link) {
+      void handleSubscriptionDeepLink(link)
+      return
+    }
+  }
+}
+
+// Register the custom URL schemes so the OS routes clash:// / clashmeta://
+// links to this app (deep-link subscription import).
+app.setAsDefaultProtocolClient('clash')
+app.setAsDefaultProtocolClient('clashmeta')
+
+// macOS delivers deep links via open-url (not argv) — both at cold launch and
+// while running. boot() may not have finished yet; handleSubscriptionDeepLink
+// queues until the agent exists.
+app.on('open-url', (event, url) => {
+  event.preventDefault()
+  const link = parseSubscriptionDeepLink(url)
+  if (link) void handleSubscriptionDeepLink(link)
+})
+
 // Single-instance lock: focus the existing window on a second launch.
 if (!app.requestSingleInstanceLock()) {
   app.quit()
 } else {
-  app.on('second-instance', () => {
-    if (win) {
-      if (win.isMinimized()) win.restore()
-      win.show()
-      win.focus()
-    }
+  app.on('second-instance', (_event, argv) => {
+    // Windows/Linux deliver a deep link in the second launch's argv.
+    handleDeepLinkFromArgv(argv)
+    focusWindow()
   })
 
   app.whenReady().then(async () => {
@@ -197,6 +265,15 @@ if (!app.requestSingleInstanceLock()) {
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) createWindow()
     })
+
+    // Flush a deep link that arrived (and was queued) before the agent existed.
+    if (pendingDeepLink) {
+      const link = pendingDeepLink
+      pendingDeepLink = null
+      void handleSubscriptionDeepLink(link)
+    }
+    // Windows/Linux: a cold launch via a deep link puts the URL in process.argv.
+    handleDeepLinkFromArgv(process.argv)
   })
 
   // Kill the kernel before quitting — orphaned kernel holding the clash port
