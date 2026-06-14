@@ -381,6 +381,10 @@ watch(
 
 <template>
   <div class="flex h-full flex-col gap-4 overflow-x-hidden overflow-y-auto p-2">
+    <!-- Kernel control + logs (capability-gated: render nothing without an agent) -->
+    <KernelControlPanel />
+    <KernelLogView />
+
     <!-- Stats Grid -->
     <div class="grid min-w-0 grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
       <div
