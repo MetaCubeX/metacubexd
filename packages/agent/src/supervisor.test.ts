@@ -298,6 +298,61 @@ describe('createSupervisor — stop / restart / tree-kill / mutex', () => {
     await sup.dispose()
   })
 
+  it('setBinaryPath makes the NEXT start spawn the new path', async () => {
+    const opts = baseOpts()
+    const procs: FakeProc[] = []
+    const spawn = vi.fn(() => {
+      const p = new FakeProc()
+      p.pid = 5000 + procs.length
+      procs.push(p)
+      p.kill = (sig?: string) => {
+        p.killSignals.push(sig ?? 'SIGTERM')
+        p.killed = true
+        setImmediate(() => p.emitExit(0, sig ?? null))
+        return true
+      }
+      return p
+    })
+    const sup = createSupervisor(opts, {
+      spawn: spawn as never,
+      fetch: ready200(),
+    })
+    await sup.start()
+    const [firstBin] = (spawn.mock.calls as unknown as [string, string[]][])[0]!
+    expect(firstBin).toBe(opts.binaryPath)
+
+    // Switch the binary; current run keeps the old path, the next start uses the new one.
+    sup.setBinaryPath('/new/mihomo')
+    await sup.restart()
+    const [secondBin, secondArgs] = (
+      spawn.mock.calls as unknown as [string, string[]][]
+    )[1]!
+    expect(secondBin).toBe('/new/mihomo')
+    expect(secondArgs).toEqual([
+      '-d',
+      opts.homeDir,
+      '-f',
+      opts.activeConfigPath,
+    ])
+    await sup.dispose()
+  })
+
+  it('setBinaryPath also changes the binary validate spawns', async () => {
+    const opts = baseOpts()
+    const proc = new FakeProc()
+    const spawn = vi.fn(() => proc)
+    const sup = createSupervisor(opts, {
+      spawn: spawn as never,
+      fetch: ready200(),
+    })
+    sup.setBinaryPath('/new/mihomo')
+    const p = sup.validate(opts.activeConfigPath)
+    const [bin] = (spawn.mock.calls as unknown as [string, string[]][])[0]!
+    expect(bin).toBe('/new/mihomo')
+    proc.emitExit(0, null)
+    await p
+  })
+
   it('mutex serializes concurrent start calls (single spawn)', async () => {
     const opts = baseOpts()
     const proc = new FakeProc()
@@ -369,7 +424,11 @@ describe('createSupervisor — crash auto-restart watchdog', () => {
   // so tests can fire them deterministically without waiting real milliseconds.
   // Timers are identified by their ms value: restart-backoff vs stability window.
   function makeTimerHarness() {
-    interface Pending { id: number; fn: () => void; ms: number }
+    interface Pending {
+      id: number
+      fn: () => void
+      ms: number
+    }
     let nextId = 1
     const pending: Pending[] = []
     async function flush() {

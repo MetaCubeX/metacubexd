@@ -77,6 +77,9 @@ export function createSupervisor(
   const logCbs = new Set<(l: KernelLogLine) => void>()
   const stateCbs = new Set<(s: KernelState) => void>()
   let child: ChildProcess | undefined
+  // Mutable so the kernel binary can be swapped at runtime (takes effect on the
+  // next start/validate spawn — the live process keeps the path it was started with).
+  let binaryPath = opts.binaryPath
   const run = createMutex()
 
   // Crash watchdog: a user-initiated stop sets intentionalStop so proc 'exit'
@@ -215,7 +218,7 @@ export function createSupervisor(
 
     await injectClashConfig()
 
-    const proc = spawn(opts.binaryPath, [
+    const proc = spawn(binaryPath, [
       '-d',
       opts.homeDir,
       '-f',
@@ -308,9 +311,12 @@ export function createSupervisor(
         return doStart()
       })
     },
+    setBinaryPath(path: string) {
+      binaryPath = path
+    },
     async validate(configPath) {
       return new Promise((resolve) => {
-        const proc = spawn(opts.binaryPath, [
+        const proc = spawn(binaryPath, [
           '-t',
           '-d',
           opts.homeDir,

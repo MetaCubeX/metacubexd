@@ -39,10 +39,22 @@ export interface MihomoSupervisor {
   start: () => Promise<KernelState>
   stop: () => Promise<KernelState>
   restart: () => Promise<KernelState>
+  setBinaryPath: (path: string) => void // takes effect on the NEXT start/validate
   validate: (configPath: string) => Promise<{ valid: boolean; message: string }>
   on: ((event: 'log', cb: (l: KernelLogLine) => void) => void) &
     ((event: 'state', cb: (s: KernelState) => void) => void)
   dispose: () => Promise<void>
+}
+
+// Manages the mihomo kernel binary: enumerate downloaded/bundled versions and
+// switch the active one (download + persist + live swap is the impl's concern).
+export interface KernelManager {
+  listVersions: () => Promise<{
+    versions: string[]
+    current?: string
+    bundled: string
+  }>
+  switch: (version: string) => Promise<void>
 }
 
 export interface SystemProxyController {

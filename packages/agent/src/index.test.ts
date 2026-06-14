@@ -65,6 +65,26 @@ describe('createAgent', () => {
     expect(agent.systemProxy).toBe(systemProxy)
   })
 
+  it('info().features excludes kernel-version when no kernelManager is injected', () => {
+    const agent = createAgent(opts())
+    expect(agent.info().features).not.toContain('kernel-version')
+    expect((agent as Record<string, unknown>).kernelManager).toBeUndefined()
+  })
+
+  it('info().features includes kernel-version when a kernelManager is injected', () => {
+    const kernelManager = {
+      listVersions: async () => ({
+        versions: ['v1.19.27'],
+        current: 'v1.19.27',
+        bundled: 'v1.19.27',
+      }),
+      switch: async () => {},
+    }
+    const agent = createAgent({ ...opts(), kernelManager })
+    expect(agent.info().features).toContain('kernel-version')
+    expect(agent.kernelManager).toBe(kernelManager)
+  })
+
   it('re-exports the public surface', () => {
     expect(typeof createSupervisor).toBe('function')
     expect(typeof createProfileStore).toBe('function')

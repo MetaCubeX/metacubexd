@@ -410,3 +410,63 @@ describe('createControlRouter — system proxy', () => {
     expect(await res.json()).toEqual({ error: 'system-proxy unavailable' })
   })
 })
+
+function makeKernelManager() {
+  return {
+    listVersions: vi.fn(async () => ({
+      versions: ['v1.19.27', 'v1.19.0'],
+      current: 'v1.19.27',
+      bundled: 'v1.19.27',
+    })),
+    switch: vi.fn(async () => {}),
+  }
+}
+
+describe('createControlRouter — kernel version management', () => {
+  let srv: Awaited<ReturnType<typeof mount>>
+  afterEach(async () => srv?.close())
+
+  it('gET /api/control/kernel/versions returns listVersions()', async () => {
+    const deps = { ...makeDeps(), kernelManager: makeKernelManager() }
+    srv = await mount(deps as never)
+    const res = await fetch(`${srv.base}/api/control/kernel/versions`)
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({
+      versions: ['v1.19.27', 'v1.19.0'],
+      current: 'v1.19.27',
+      bundled: 'v1.19.27',
+    })
+    expect(deps.kernelManager.listVersions).toHaveBeenCalledOnce()
+  })
+
+  it('pOST /api/control/kernel/switch { version } calls switch then returns { ok: true }', async () => {
+    const deps = { ...makeDeps(), kernelManager: makeKernelManager() }
+    srv = await mount(deps as never)
+    const res = await fetch(`${srv.base}/api/control/kernel/switch`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ version: 'v1.19.0' }),
+    })
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ ok: true })
+    expect(deps.kernelManager.switch).toHaveBeenCalledWith('v1.19.0')
+  })
+
+  it('gET /api/control/kernel/versions is 404 JSON when no kernelManager is injected', async () => {
+    srv = await mount(makeDeps())
+    const res = await fetch(`${srv.base}/api/control/kernel/versions`)
+    expect(res.status).toBe(404)
+    expect(await res.json()).toEqual({ error: 'kernel-version unavailable' })
+  })
+
+  it('pOST /api/control/kernel/switch is 404 JSON when no kernelManager is injected', async () => {
+    srv = await mount(makeDeps())
+    const res = await fetch(`${srv.base}/api/control/kernel/switch`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ version: 'v1.19.0' }),
+    })
+    expect(res.status).toBe(404)
+    expect(await res.json()).toEqual({ error: 'kernel-version unavailable' })
+  })
+})

@@ -1,5 +1,5 @@
 import type { CreateSupervisorOptions } from './supervisor'
-import type { SystemProxyController } from './types'
+import type { KernelManager, SystemProxyController } from './types'
 import { createControlRouter } from './http'
 import { createProfileStore } from './profiles'
 import { createProfileScheduler } from './scheduler'
@@ -22,6 +22,7 @@ export type CreateAgentOptions = CreateSupervisorOptions & {
   profilesDir: string
   agentToken?: string
   systemProxy?: SystemProxyController // OS proxy controller; enables 'system-proxy'
+  kernelManager?: KernelManager // kernel version mgmt; enables 'kernel-version'
 }
 
 export interface AgentInfo {
@@ -38,7 +39,7 @@ export function createAgent(opts: CreateAgentOptions) {
     activeConfigPath: opts.activeConfigPath,
   })
   const supervisor = createSupervisor(opts)
-  const { systemProxy } = opts
+  const { systemProxy, kernelManager } = opts
   const info = (): AgentInfo => ({
     hasAgent: true,
     version: AGENT_VERSION,
@@ -53,6 +54,7 @@ export function createAgent(opts: CreateAgentOptions) {
       'logs-sse',
       'kernel-control',
       ...(systemProxy ? ['system-proxy'] : []),
+      ...(kernelManager ? ['kernel-version'] : []),
     ],
   })
   const router = createControlRouter({
@@ -62,9 +64,18 @@ export function createAgent(opts: CreateAgentOptions) {
     homeDir: opts.homeDir,
     token: opts.agentToken,
     systemProxy,
+    kernelManager,
   })
   // Wire the auto-update scheduler to the same profiles store. NOT started here —
   // the desktop boot decides when to start ticking.
   const scheduler = createProfileScheduler({ profiles })
-  return { supervisor, profiles, router, info, scheduler, systemProxy }
+  return {
+    supervisor,
+    profiles,
+    router,
+    info,
+    scheduler,
+    systemProxy,
+    kernelManager,
+  }
 }

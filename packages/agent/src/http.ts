@@ -1,6 +1,7 @@
 import type { App, H3Event } from 'h3'
 import type {
   KernelLogLine,
+  KernelManager,
   KernelState,
   MihomoSupervisor,
   ProfileStore,
@@ -29,6 +30,7 @@ export interface ControlRouterDeps {
   homeDir: string // writable dir for materializing validate candidate files
   token?: string
   systemProxy?: SystemProxyController // OS proxy controller; capability-gated
+  kernelManager?: KernelManager // kernel version mgmt; capability-gated
 }
 
 const PREFIX = '/api/control'
@@ -36,7 +38,15 @@ const PREFIX = '/api/control'
 export function createControlRouter(deps: ControlRouterDeps): App {
   const app = createApp()
   const router = createRouter()
-  const { supervisor, profiles, info, homeDir, token, systemProxy } = deps
+  const {
+    supervisor,
+    profiles,
+    info,
+    homeDir,
+    token,
+    systemProxy,
+    kernelManager,
+  } = deps
 
   // ---- Auth middleware: applied to every route except public ones. ----
   function isPublic(path: string): boolean {
@@ -257,6 +267,31 @@ export function createControlRouter(deps: ControlRouterDeps): App {
     })
     router.get(`${PREFIX}/sysproxy`, unavailable)
     router.post(`${PREFIX}/sysproxy`, unavailable)
+  }
+
+  // ---- Kernel version management (capability-gated) ----
+  if (kernelManager) {
+    router.get(
+      `${PREFIX}/kernel/versions`,
+      defineEventHandler(() => kernelManager.listVersions()),
+    )
+    router.post(
+      `${PREFIX}/kernel/switch`,
+      defineEventHandler(async (event) => {
+        const body = (await readBody(event)) as { version: string }
+        await kernelManager.switch(body.version)
+        return { ok: true }
+      }),
+    )
+  } else {
+    // No manager injected — clean 404 JSON for both routes so the shared UI can
+    // detect the missing capability without a router-default 404 shape.
+    const unavailable = defineEventHandler((event) => {
+      setResponseStatus(event, 404)
+      return { error: 'kernel-version unavailable' }
+    })
+    router.get(`${PREFIX}/kernel/versions`, unavailable)
+    router.post(`${PREFIX}/kernel/switch`, unavailable)
   }
 
   app.use(router)
