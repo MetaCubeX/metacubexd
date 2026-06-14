@@ -1,6 +1,7 @@
 import type { CreateSupervisorOptions } from './supervisor'
 import { createControlRouter } from './http'
 import { createProfileStore } from './profiles'
+import { createProfileScheduler } from './scheduler'
 import { createSupervisor } from './supervisor'
 
 export const AGENT_VERSION = '0.0.0'
@@ -10,6 +11,8 @@ export type { ControlRouterDeps } from './http'
 export { MIHOMO_VERSION, mihomoAsset } from './kernel/assets'
 export { fetchKernel } from './kernel/fetch-kernel'
 export { createProfileStore } from './profiles'
+export { createProfileScheduler } from './scheduler'
+export type { ProfileScheduler, ProfileSchedulerDeps } from './scheduler'
 export { createSupervisor } from './supervisor'
 export type { CreateSupervisorOptions, SupervisorDeps } from './supervisor'
 export * from './types'
@@ -51,5 +54,8 @@ export function createAgent(opts: CreateAgentOptions) {
     homeDir: opts.homeDir,
     token: opts.agentToken,
   })
-  return { supervisor, profiles, router, info }
+  // Wire the auto-update scheduler to the same profiles store. NOT started here —
+  // the desktop boot decides when to start ticking.
+  const scheduler = createProfileScheduler({ profiles })
+  return { supervisor, profiles, router, info, scheduler }
 }
