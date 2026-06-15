@@ -18,11 +18,9 @@ const { isMaximized, minimize, toggleMaximize, close } = useWindowControls()
     style="-webkit-app-region: drag"
     @dblclick="!isMac && toggleMaximize()"
   >
-    <!-- Brand (left). macOS pads ~72px to clear the native traffic lights. -->
-    <div class="flex items-center" :class="isMac ? 'pl-[72px]' : 'pl-3'">
-      <LogoText />
-    </div>
-
+    <!-- No branding here — the logo lives in the sidebar. This bar is just the
+         draggable window strip: macOS shows its native traffic lights over the
+         left; Windows/Linux get the controls on the right. -->
     <div class="flex-1" />
 
     <!-- Window controls — Windows/Linux only. -->
