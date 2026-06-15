@@ -297,7 +297,7 @@ const providersTotalSize = computed(() =>
 
         <!-- Chip strip: type chips | divider | policy chips (horizontal scroll) -->
         <div
-          class="flex min-w-0 flex-1 [scrollbar-width:none] items-center gap-1.5 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden"
+          class="flex min-w-0 flex-1 [scrollbar-width:none] items-center gap-1.5 overflow-x-auto [&::-webkit-scrollbar]:hidden"
         >
           <button
             v-for="facet in ruleTypeFacets"
