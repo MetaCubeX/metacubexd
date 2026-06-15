@@ -7,12 +7,16 @@ import {
   IconPencil,
   IconPlayerPlay,
   IconPlus,
+  IconQrcode,
   IconTrash,
 } from '@tabler/icons-vue'
+import { toast } from 'vue-sonner'
 
 const { t } = useI18n()
 const { hasFeature, ready } = useControlInfo()
 const kernelStore = useKernelStore()
+const { isShareable, qrSvg } = useShareQr()
+const { copy: copyToClipboard } = useClipboard()
 
 useHead({ title: computed(() => t('profiles')) })
 
@@ -219,6 +223,26 @@ const onRemove = async (id: string) => {
     busy.value = false
   }
 }
+
+// Subscription QR sharing (remote profiles only). The dialog renders the
+// profile url as a scannable QR plus a copy-url affordance.
+const shareModalRef = ref<{ open: () => void; close: () => void } | null>(null)
+const shareUrl = ref('')
+const shareName = ref('')
+const shareSvg = computed(() => qrSvg(shareUrl.value))
+
+const onShare = (p: ProfileMeta) => {
+  if (!isShareable(p) || !p.url) return
+  shareUrl.value = p.url
+  shareName.value = p.name
+  shareModalRef.value?.open()
+}
+
+const onCopyShareUrl = async () => {
+  if (!shareUrl.value) return
+  await copyToClipboard(shareUrl.value)
+  toast.success(t('profilesShareCopied'))
+}
 </script>
 
 <template>
@@ -317,6 +341,14 @@ const onRemove = async (id: string) => {
               @click="onActivate(p.id)"
             >
               {{ t('profilesActivate') }}
+            </Button>
+            <Button
+              v-if="isShareable(p)"
+              class="btn-xs"
+              :icon="IconQrcode"
+              @click="onShare(p)"
+            >
+              {{ t('profilesShare') }}
             </Button>
             <Button
               class="btn-xs btn-error"
@@ -526,5 +558,40 @@ const onRemove = async (id: string) => {
         </div>
       </div>
     </template>
+
+    <!-- Subscription QR share dialog (remote profiles only). -->
+    <Modal ref="shareModalRef" :title="t('profilesShareTitle')">
+      <template #icon>
+        <IconQrcode />
+      </template>
+
+      <div class="flex flex-col items-center gap-4">
+        <p class="text-sm text-base-content/60">{{ shareName }}</p>
+
+        <!-- qrSvg is built locally from the url (uqr), not remote HTML. -->
+        <!-- eslint-disable-next-line vue/no-v-html -->
+        <div
+          class="w-56 max-w-full rounded-xl bg-white p-3 [&>svg]:h-full [&>svg]:w-full"
+          v-html="shareSvg"
+        />
+
+        <div class="flex w-full items-center gap-2">
+          <input
+            class="input-bordered input input-sm flex-1 font-mono text-xs"
+            :value="shareUrl"
+            readonly
+            :aria-label="t('profilesShareUrl')"
+          />
+          <Button
+            class="btn-sm"
+            :icon="IconCopy"
+            :aria-label="t('profilesShareCopy')"
+            @click="onCopyShareUrl"
+          >
+            {{ t('profilesShareCopy') }}
+          </Button>
+        </div>
+      </div>
+    </Modal>
   </div>
 </template>
