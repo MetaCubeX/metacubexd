@@ -10,7 +10,11 @@ const busy = ref(false)
 
 onMounted(() => {
   if (!hasFeature('kernel-control')) return
-  kernelStore.fetchStatus().catch(() => {})
+  kernelStore
+    .fetchStatus()
+    .catch((err) =>
+      console.error('[kernel-control] initial status failed', err),
+    )
 })
 
 const status = computed(() => kernelStore.state?.status ?? 'stopped')

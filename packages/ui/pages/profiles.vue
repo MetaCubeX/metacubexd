@@ -66,7 +66,10 @@ const validationOk = ref<boolean | null>(null)
 const busy = ref(false)
 
 onMounted(() => {
-  if (hasFeature('profiles')) refresh().catch(() => {})
+  if (hasFeature('profiles'))
+    refresh().catch((err) =>
+      console.error('[profiles] initial load failed', err),
+    )
 })
 
 const openEditor = async (
