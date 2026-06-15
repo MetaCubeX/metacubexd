@@ -161,4 +161,72 @@ describe('createProfileScheduler', () => {
     expect(timers.setTimer).toHaveBeenCalledWith(expect.any(Function), 60_000)
     sched.stop()
   })
+
+  it('invokes onResult with ok:true after a successful refresh', async () => {
+    const { store } = fakeProfiles([
+      meta({ id: 'a', type: 'remote', updateInterval: 60, updatedAt: 0 }),
+    ])
+    const onResult = vi.fn()
+    const timers = fakeTimers()
+    const sched = createProfileScheduler({
+      profiles: store,
+      now: () => 10_000_000,
+      setTimer: timers.setTimer,
+      clearTimer: timers.clearTimer,
+      onResult,
+    })
+    sched.start()
+    await timers.tick()
+    await new Promise((r) => setImmediate(r))
+    expect(onResult).toHaveBeenCalledWith({ id: 'a', ok: true })
+    sched.stop()
+  })
+
+  it('invokes onResult with ok:false and the error message when a refresh throws', async () => {
+    const list = [
+      meta({ id: 'bad', type: 'remote', updateInterval: 60, updatedAt: 0 }),
+      meta({ id: 'good', type: 'remote', updateInterval: 60, updatedAt: 0 }),
+    ]
+    const { store } = fakeProfiles(list, async (id: string) => {
+      if (id === 'bad') throw new Error('boom')
+      return list.find((x) => x.id === id)!
+    })
+    const onResult = vi.fn()
+    const timers = fakeTimers()
+    const sched = createProfileScheduler({
+      profiles: store,
+      now: () => 10_000_000,
+      setTimer: timers.setTimer,
+      clearTimer: timers.clearTimer,
+      onResult,
+    })
+    sched.start()
+    await timers.tick()
+    await new Promise((r) => setImmediate(r))
+    expect(onResult).toHaveBeenCalledWith({
+      id: 'bad',
+      ok: false,
+      error: 'boom',
+    })
+    expect(onResult).toHaveBeenCalledWith({ id: 'good', ok: true })
+    sched.stop()
+  })
+
+  it('works without an onResult callback (optional, no crash)', async () => {
+    const { store, refresh } = fakeProfiles([
+      meta({ id: 'a', type: 'remote', updateInterval: 60, updatedAt: 0 }),
+    ])
+    const timers = fakeTimers()
+    const sched = createProfileScheduler({
+      profiles: store,
+      now: () => 10_000_000,
+      setTimer: timers.setTimer,
+      clearTimer: timers.clearTimer,
+    })
+    sched.start()
+    await timers.tick()
+    await new Promise((r) => setImmediate(r))
+    expect(refresh).toHaveBeenCalledWith('a')
+    sched.stop()
+  })
 })

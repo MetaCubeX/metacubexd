@@ -15,7 +15,11 @@ export { fetchGeoAssets, GEO_ASSET_URLS } from './kernel/geo'
 export { mergeConfigs } from './merge'
 export { createProfileStore } from './profiles'
 export { createProfileScheduler } from './scheduler'
-export type { ProfileScheduler, ProfileSchedulerDeps } from './scheduler'
+export type {
+  ProfileRefreshResult,
+  ProfileScheduler,
+  ProfileSchedulerDeps,
+} from './scheduler'
 export { createSupervisor } from './supervisor'
 export type { CreateSupervisorOptions, SupervisorDeps } from './supervisor'
 export * from './types'

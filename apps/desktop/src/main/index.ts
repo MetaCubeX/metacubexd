@@ -13,7 +13,7 @@ import {
   writeFileSync,
 } from 'node:fs'
 import { join } from 'node:path'
-import { createAgent } from '@metacubexd/agent'
+import { createAgent, createProfileScheduler } from '@metacubexd/agent'
 import {
   app,
   BrowserWindow,
@@ -31,6 +31,7 @@ import { parseSubscriptionDeepLink } from './deep-link'
 import { pickFreePorts } from './free-port'
 import { loadHotkeyBindings, registerHotkeys } from './hotkeys'
 import { createKernelManager } from './kernel-manager'
+import { createKernelCrashWatcher, createNotifier } from './notifier'
 import { bootstrapDataDir } from './paths'
 import { makeToken } from './secrets'
 import { shouldStartHidden } from './startup'
@@ -55,6 +56,9 @@ let win: BrowserWindow | null = null
 let tray: Tray | null = null
 let agent: ReturnType<typeof createAgent> | null = null
 let controlServer: ControlServer | null = null
+// Subscription auto-update scheduler; created + started in boot() with an
+// onResult callback that notifies success/failure. Stopped on shutdown.
+let profileScheduler: ReturnType<typeof createProfileScheduler> | null = null
 // OS system-proxy controller, configured in boot() for the managed mixed port.
 // Kept module-level so the quit/cleanup path can disable() it (anti-lockout).
 let systemProxy: SystemProxyController | null = null
@@ -190,6 +194,24 @@ async function boot(): Promise<void> {
     overridePath,
   })
 
+  // Surface a desktop notification when the kernel crashes. The watcher de-dupes
+  // a sustained errored state so a single crash notifies once (it re-arms after
+  // a recovery). Subscribed before start() so we never miss the first event.
+  const crashWatcher = createKernelCrashWatcher(notify)
+  agent.supervisor.on('state', crashWatcher)
+
+  // Drive subscription auto-update against the agent's profile store, surfacing
+  // each refresh outcome as a notification. createAgent builds its own scheduler
+  // (without onResult) but never starts it; the desktop owns the ticking here.
+  profileScheduler = createProfileScheduler({
+    profiles: agent.profiles,
+    onResult: (r) => {
+      if (r.ok) notify('Subscription updated', `${r.id} refreshed.`)
+      else notify('Subscription update failed', r.error ?? r.id)
+    },
+  })
+  profileScheduler.start()
+
   // The control server also serves the renderer (same origin as /api/control)
   // from the dir where copy:renderer / electron-builder stage the nuxt output.
   const rendererDir = join(__dirname, '..', '..', 'renderer')
@@ -285,6 +307,8 @@ function createWindow(startHidden = false): void {
 }
 
 async function shutdownKernel(): Promise<void> {
+  // Halt subscription auto-update ticking so no refresh fires mid-shutdown.
+  profileScheduler?.stop()
   // Anti-lockout: release the OS system proxy BEFORE the kernel goes away so we
   // never leave the machine pointing at a dead loopback port. All steps are
   // best-effort (see runShutdownCleanup).
@@ -356,13 +380,14 @@ async function cycleProxyMode(): Promise<void> {
   }
 }
 
+// Wraps the Electron Notification constructor (dependency-injected in
+// notifier.ts so the crash/subscription notifications stay unit-testable).
+const notifier = createNotifier({ Notification })
+
 // Show a desktop notification when supported (no-op headless/CI).
 function notify(title: string, body: unknown): void {
   if (!Notification.isSupported()) return
-  new Notification({
-    title,
-    body: body instanceof Error ? body.message : String(body),
-  }).show()
+  notifier.notify(title, body instanceof Error ? body.message : String(body))
 }
 
 // A deep link can arrive before boot() finishes (e.g. cold launch via the OS

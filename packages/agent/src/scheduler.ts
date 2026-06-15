@@ -1,11 +1,22 @@
 import type { ProfileStore } from './types'
 
+// Outcome of a single subscription refresh attempt; surfaced to onResult so
+// consumers (e.g. the desktop) can notify success/failure.
+export interface ProfileRefreshResult {
+  id: string
+  ok: boolean
+  error?: string
+}
+
 export interface ProfileSchedulerDeps {
   profiles: ProfileStore
   tickMs?: number // default 60_000
   now?: () => number // default Date.now
   setTimer?: (fn: () => void, ms: number) => ReturnType<typeof setTimeout>
   clearTimer?: (handle: ReturnType<typeof setTimeout>) => void
+  // Optional: called after each refresh attempt with its outcome. Must not break
+  // existing consumers — absence simply skips the notification.
+  onResult?: (result: ProfileRefreshResult) => void
 }
 
 export interface ProfileScheduler {
@@ -19,7 +30,7 @@ export interface ProfileScheduler {
 export function createProfileScheduler(
   deps: ProfileSchedulerDeps,
 ): ProfileScheduler {
-  const { profiles } = deps
+  const { profiles, onResult } = deps
   const tickMs = deps.tickMs ?? 60_000
   const now = deps.now ?? Date.now
   const setTimer = deps.setTimer ?? ((fn, ms) => setTimeout(fn, ms))
@@ -36,11 +47,18 @@ export function createProfileScheduler(
       const interval = meta.updateInterval ?? 0
       if (interval <= 0) continue
       if (now() - meta.updatedAt < interval * 60_000) continue
-      // Best-effort: one failing refresh must not abort the rest.
+      // Best-effort: one failing refresh must not abort the rest. The outcome
+      // (success/failure) is surfaced to onResult when provided.
       try {
         await profiles.refresh(meta.id)
-      } catch {
-        // swallow — next tick will retry
+        onResult?.({ id: meta.id, ok: true })
+      } catch (err) {
+        // swallow — next tick will retry; report the failure to onResult.
+        onResult?.({
+          id: meta.id,
+          ok: false,
+          error: err instanceof Error ? err.message : String(err),
+        })
       }
     }
   }
