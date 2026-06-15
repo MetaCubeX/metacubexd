@@ -1,6 +1,7 @@
 import type {
   KernelManager,
   SystemProxyController,
+  TunController,
 } from '@metacubexd/agent/types'
 import type { Tray } from 'electron'
 import type { ControlServer } from './control-server'
@@ -39,6 +40,7 @@ import { createSystemProxyController } from './sysproxy'
 import { readSysProxyBypass } from './sysproxy-config'
 import { createSysproxyGuard } from './sysproxy-guard'
 import { createTray, trayIconPath } from './tray'
+import { createTunTeardown } from './tun-teardown'
 import {
   DEFAULT_WINDOW_BOUNDS,
   loadWindowState,
@@ -69,6 +71,15 @@ let sysproxyGuard: ReturnType<typeof createSysproxyGuard> | null = null
 // Same-origin renderer URL (the control server serves the dashboard too); set
 // in boot() and loaded by createWindow().
 let rendererUrl: string | null = null
+// TUN controller (Wave B-1, option B). B-1 only lands the pure-logic state
+// machine; the REAL elevation/helper-IPC injection arrives in B-2/B-3, so it
+// stays null here until then. Kept module-level so the quit/crash paths can
+// recover the network through tunTeardown (anti-lockout).
+const tunController: TunController | null = null
+// Safe-teardown helper: recoverNetwork() tears the TUN down (back to sidecar)
+// when active. Built in boot() once a tunController exists; backs both the UI
+// "recover network" action and the quit/crash paths.
+let tunTeardown: ReturnType<typeof createTunTeardown> | null = null
 
 function defaultConfigSource(): string {
   // packaged -> process.resourcesPath/default-config.yaml ; dev -> repo resources
@@ -228,11 +239,23 @@ async function boot(): Promise<void> {
     overridePath,
   })
 
+  // Build the TUN safe-teardown helper once a tunController exists (B-2/B-3 wire
+  // the real elevation/helper-IPC controller; B-1 only lands the skeleton, so
+  // tunController is still null here and tunTeardown stays null too). When set,
+  // recoverNetwork() backs the UI "recover network" action and the quit/crash
+  // paths — anti-lockout: a crashed/quit TUN kernel must fall back to sidecar.
+  tunTeardown = tunController ? createTunTeardown({ tunController }) : null
+
   // Surface a desktop notification when the kernel crashes. The watcher de-dupes
   // a sustained errored state so a single crash notifies once (it re-arms after
   // a recovery). Subscribed before start() so we never miss the first event.
+  // On a crash we also recover the network (tear down TUN -> sidecar) so a dead
+  // TUN kernel can't leave the machine routing into a nonexistent device.
   const crashWatcher = createKernelCrashWatcher(notify)
-  agent.supervisor.on('state', crashWatcher)
+  agent.supervisor.on('state', (state) => {
+    crashWatcher(state)
+    if (state.status === 'errored') void tunTeardown?.recoverNetwork()
+  })
 
   // Drive subscription auto-update against the agent's profile store, surfacing
   // each refresh outcome as a notification. createAgent builds its own scheduler
@@ -352,6 +375,12 @@ function createWindow(startHidden = false): void {
 async function shutdownKernel(): Promise<void> {
   // Halt subscription auto-update ticking so no refresh fires mid-shutdown.
   profileScheduler?.stop()
+  // Anti-lockout: if TUN mode is active, tear it down (back to sidecar) before
+  // the kernel stops so we never leave the machine routing into a dead TUN
+  // device. recoverNetwork() is a no-op in sidecar mode and never throws — the
+  // REAL helper-disconnect linkage arrives in B-3. tunTeardown is null until a
+  // tunController is wired (B-2/B-3), so this is a no-op in B-1.
+  await tunTeardown?.recoverNetwork()
   // Stop re-asserting the OS proxy so the guard can't race the disable() below
   // and flip it back on mid-shutdown (the disable() wrapper also stops it, but
   // be explicit so the quit-stop guarantee doesn't depend on that internal).
