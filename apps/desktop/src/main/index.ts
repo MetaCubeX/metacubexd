@@ -18,9 +18,11 @@ import {
   app,
   BrowserWindow,
   globalShortcut,
+  Menu,
   nativeImage,
   Notification,
 } from 'electron'
+import { buildAppMenu } from './app-menu'
 import { resolveMihomoBinary } from './binary-path'
 import { resolveBootPorts } from './boot-ports'
 import { runShutdownCleanup } from './cleanup'
@@ -455,6 +457,23 @@ if (!app.requestSingleInstanceLock()) {
       // checkbox; enable() applies the default bypass list (see boot()).
       ...(systemProxy ? { systemProxy } : {}),
     })
+    // Native application menu. Without it the OS never wires the standard
+    // Cmd/Ctrl+C / V / A accelerators, so copy/paste silently fail in inputs
+    // and the Monaco editor. The Edit submenu's roles fix that; macOS also gets
+    // the app/Window menus. Custom items reuse the focus/supervisor helpers.
+    Menu.setApplicationMenu(
+      Menu.buildFromTemplate(
+        buildAppMenu({
+          platform: process.platform,
+          actions: {
+            showWindow: () => focusWindow(),
+            startKernel: () => void agent?.supervisor.start(),
+            stopKernel: () => void agent?.supervisor.stop(),
+          },
+        }),
+      ),
+    )
+
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) createWindow()
     })
