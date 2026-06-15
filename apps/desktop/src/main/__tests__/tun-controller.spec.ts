@@ -1,0 +1,212 @@
+import { buildTunConfig } from '@metacubexd/agent'
+import { describe, expect, it, vi } from 'vitest'
+import { createTunController } from '../tun-controller'
+
+/**
+ * Build a set of recording stubs for every INJECTED dependency. None of these
+ * touch the real OS: no elevation, no TUN device, no privileged spawn. They only
+ * append to a shared `order` array so the test can assert the exact call
+ * sequence, then return resolved promises.
+ */
+function makeDeps() {
+  const order: string[] = []
+  const record =
+    (name: string) =>
+    (...args: unknown[]) => {
+      order.push(name)
+      void args
+      return Promise.resolve()
+    }
+  const injectTun = vi.fn(record('injectTun'))
+  const removeTun = vi.fn(record('removeTun'))
+  const startSidecar = vi.fn(record('startSidecar'))
+  const startPrivileged = vi.fn(record('startPrivileged'))
+  const stopKernel = vi.fn(record('stopKernel'))
+  const persist = vi.fn(record('persist'))
+  return {
+    order,
+    injectTun,
+    removeTun,
+    startSidecar,
+    startPrivileged,
+    stopKernel,
+    persist,
+  }
+}
+
+describe('createTunController', () => {
+  describe('enable()', () => {
+    it('stops the kernel, injects the tun block, then relaunches privileged — in order', async () => {
+      const deps = makeDeps()
+      const tun = createTunController(deps)
+
+      await tun.enable({ stack: 'gvisor' })
+
+      // strict order of the teardown + relaunch steps: stop -> inject ->
+      // privileged relaunch (persist is bookkeeping, asserted separately).
+      expect(deps.order.filter((n) => n !== 'persist')).toEqual([
+        'stopKernel',
+        'injectTun',
+        'startPrivileged',
+      ])
+      // the privileged launcher is used for enable, never the sidecar one
+      expect(deps.startPrivileged).toHaveBeenCalledTimes(1)
+      expect(deps.startSidecar).not.toHaveBeenCalled()
+      expect(deps.removeTun).not.toHaveBeenCalled()
+    })
+
+    it('injects exactly buildTunConfig({ stack }) — the pure agent builder output', async () => {
+      const deps = makeDeps()
+      const tun = createTunController(deps)
+
+      await tun.enable({ stack: 'mixed' })
+
+      expect(deps.injectTun).toHaveBeenCalledTimes(1)
+      expect(deps.injectTun).toHaveBeenCalledWith(
+        buildTunConfig({ stack: 'mixed' }),
+      )
+    })
+
+    it('sets state to enabled/tun and remembers the stack', async () => {
+      const deps = makeDeps()
+      const tun = createTunController(deps)
+
+      await tun.enable({ stack: 'system' })
+
+      expect(await tun.status()).toEqual({
+        enabled: true,
+        mode: 'tun',
+        stack: 'system',
+      })
+    })
+
+    it('calls persist when provided', async () => {
+      const deps = makeDeps()
+      const tun = createTunController(deps)
+
+      await tun.enable({ stack: 'gvisor' })
+
+      expect(deps.persist).toHaveBeenCalledTimes(1)
+    })
+
+    it('works without a persist dep (optional)', async () => {
+      const deps = makeDeps()
+      const { persist: _persist, ...rest } = deps
+      const tun = createTunController(rest)
+
+      await tun.enable({ stack: 'gvisor' })
+
+      expect(await tun.status()).toEqual({
+        enabled: true,
+        mode: 'tun',
+        stack: 'gvisor',
+      })
+    })
+
+    it('is idempotent: enabling again when already in tun does not re-stop/re-inject/re-launch', async () => {
+      const deps = makeDeps()
+      const tun = createTunController(deps)
+
+      await tun.enable({ stack: 'gvisor' })
+      deps.order.length = 0
+
+      await tun.enable({ stack: 'gvisor' })
+
+      expect(deps.order).toEqual([])
+      expect(deps.stopKernel).toHaveBeenCalledTimes(1)
+      expect(deps.injectTun).toHaveBeenCalledTimes(1)
+      expect(deps.startPrivileged).toHaveBeenCalledTimes(1)
+    })
+
+    it('does not swallow errors from the injected deps', async () => {
+      const deps = makeDeps()
+      deps.startPrivileged.mockRejectedValueOnce(new Error('elevation denied'))
+      const tun = createTunController(deps)
+
+      await expect(tun.enable({ stack: 'gvisor' })).rejects.toThrow(
+        /elevation denied/,
+      )
+    })
+  })
+
+  describe('disable()', () => {
+    it('stops the kernel, removes the tun block, then relaunches the sidecar — in order', async () => {
+      const deps = makeDeps()
+      const tun = createTunController(deps)
+
+      // first enable so we have something to disable
+      await tun.enable({ stack: 'gvisor' })
+      deps.order.length = 0
+
+      await tun.disable()
+
+      // teardown + relaunch order (persist is bookkeeping, filtered out)
+      expect(deps.order.filter((n) => n !== 'persist')).toEqual([
+        'stopKernel',
+        'removeTun',
+        'startSidecar',
+      ])
+      // the sidecar launcher is used for disable, never the privileged one
+      expect(deps.startSidecar).toHaveBeenCalledTimes(1)
+      // startPrivileged was only called by the earlier enable, not by disable
+      expect(deps.startPrivileged).toHaveBeenCalledTimes(1)
+    })
+
+    it('sets state to disabled/sidecar', async () => {
+      const deps = makeDeps()
+      const tun = createTunController(deps)
+
+      await tun.enable({ stack: 'gvisor' })
+      await tun.disable()
+
+      expect(await tun.status()).toEqual({ enabled: false, mode: 'sidecar' })
+    })
+
+    it('persists the disabled/sidecar state for cold-start restore', async () => {
+      const deps = makeDeps()
+      const tun = createTunController(deps)
+
+      await tun.enable({ stack: 'gvisor' })
+      deps.persist.mockClear()
+
+      await tun.disable()
+
+      expect(deps.persist).toHaveBeenCalledTimes(1)
+      expect(deps.persist).toHaveBeenCalledWith({
+        enabled: false,
+        mode: 'sidecar',
+      })
+    })
+
+    it('is idempotent: disabling when already sidecar does nothing', async () => {
+      const deps = makeDeps()
+      const tun = createTunController(deps)
+
+      await tun.disable()
+
+      expect(deps.order).toEqual([])
+      expect(deps.stopKernel).not.toHaveBeenCalled()
+      expect(deps.removeTun).not.toHaveBeenCalled()
+      expect(deps.startSidecar).not.toHaveBeenCalled()
+    })
+
+    it('does not swallow errors from the injected deps', async () => {
+      const deps = makeDeps()
+      deps.removeTun.mockRejectedValueOnce(new Error('section write failed'))
+      const tun = createTunController(deps)
+
+      await tun.enable({ stack: 'gvisor' })
+
+      await expect(tun.disable()).rejects.toThrow(/section write failed/)
+    })
+  })
+
+  describe('status()', () => {
+    it('defaults to disabled/sidecar before any call', async () => {
+      const deps = makeDeps()
+      const tun = createTunController(deps)
+
+      expect(await tun.status()).toEqual({ enabled: false, mode: 'sidecar' })
+    })
+  })
+})
