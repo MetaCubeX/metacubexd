@@ -49,6 +49,17 @@ const mergeMeta = (
   ...(over.enabled != null ? { enabled: over.enabled } : {}),
 })
 
+const scriptMeta = (
+  id: string,
+  over: { enabled?: boolean; name?: string } = {},
+) => ({
+  id,
+  name: over.name ?? id,
+  type: 'script' as const,
+  updatedAt: 1,
+  ...(over.enabled != null ? { enabled: over.enabled } : {}),
+})
+
 describe('composables/useProfiles', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -217,6 +228,88 @@ describe('composables/useProfiles', () => {
       api.updateProfile.mockRejectedValue(new Error('disk full'))
       const p = useProfiles()
       await p.setEnabled('m', false)
+      expect(toast.error).toHaveBeenCalled()
+    })
+  })
+
+  describe('script profiles', () => {
+    it('createScript() POSTs { name, type: "script" } then re-lists', async () => {
+      api.createProfile.mockResolvedValue(scriptMeta('s'))
+      const p = useProfiles()
+      await p.createScript('transform')
+      expect(api.createProfile).toHaveBeenCalledWith({
+        name: 'transform',
+        type: 'script',
+      })
+      expect(api.listProfiles).toHaveBeenCalled()
+    })
+
+    it('scriptProfiles splits out type "script" (baseProfiles excludes them)', async () => {
+      api.listProfiles.mockResolvedValue([
+        meta('a'),
+        mergeMeta('m1'),
+        scriptMeta('s1'),
+        meta('b'),
+        scriptMeta('s2'),
+      ])
+      const p = useProfiles()
+      await p.refresh()
+      expect(p.baseProfiles.value.map((m) => m.id)).toEqual(['a', 'b'])
+      expect(p.mergeProfiles.value.map((m) => m.id)).toEqual(['m1'])
+      expect(p.scriptProfiles.value.map((m) => m.id)).toEqual(['s1', 's2'])
+    })
+
+    it('setScriptEnabled() PUTs { enabled } then re-lists', async () => {
+      api.updateProfile.mockResolvedValue(scriptMeta('s', { enabled: false }))
+      const p = useProfiles()
+      await p.setScriptEnabled('s', false)
+      expect(api.updateProfile).toHaveBeenCalledWith('s', { enabled: false })
+      expect(api.listProfiles).toHaveBeenCalled()
+    })
+
+    it('setScriptEnabled() re-activates the active base so scripts recompose', async () => {
+      api.activateProfile.mockResolvedValue({
+        status: 'running',
+        externalController: '127.0.0.1:9090',
+        secret: 's',
+      })
+      api.updateProfile.mockResolvedValue(scriptMeta('s', { enabled: true }))
+      const p = useProfiles()
+      await p.activate('a')
+      api.activateProfile.mockClear()
+      await p.setScriptEnabled('s', true)
+      expect(api.activateProfile).toHaveBeenCalledWith('a')
+    })
+
+    it('setScriptEnabled() informs the user when there is no active base', async () => {
+      api.updateProfile.mockResolvedValue(scriptMeta('s', { enabled: true }))
+      const p = useProfiles()
+      await p.setScriptEnabled('s', true)
+      expect(api.activateProfile).not.toHaveBeenCalled()
+      expect(toast.info).toHaveBeenCalled()
+    })
+
+    it('saveScript() saves content then recomposes by re-activating the base', async () => {
+      api.updateProfile.mockResolvedValue(scriptMeta('s'))
+      api.activateProfile.mockResolvedValue({
+        status: 'running',
+        externalController: '127.0.0.1:9090',
+        secret: 's',
+      })
+      const p = useProfiles()
+      await p.activate('a')
+      api.activateProfile.mockClear()
+      await p.saveScript('s', 'export default (c) => c')
+      expect(api.updateProfile).toHaveBeenCalledWith('s', {
+        content: 'export default (c) => c',
+      })
+      expect(api.activateProfile).toHaveBeenCalledWith('a')
+    })
+
+    it('setScriptEnabled() surfaces failures via toast.error (no swallowing)', async () => {
+      api.updateProfile.mockRejectedValue(new Error('disk full'))
+      const p = useProfiles()
+      await p.setScriptEnabled('s', false)
       expect(toast.error).toHaveBeenCalled()
     })
   })

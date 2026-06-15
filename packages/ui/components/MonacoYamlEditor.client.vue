@@ -6,8 +6,14 @@
 import type * as MonacoNs from 'monaco-editor'
 
 const props = withDefaults(
-  defineProps<{ modelValue: string; readOnly?: boolean }>(),
-  { readOnly: false },
+  defineProps<{
+    modelValue: string
+    readOnly?: boolean
+    // 'yaml' (default) wires the meta-json-schema validation; 'javascript'
+    // edits script-profile transforms with JS syntax highlighting (no schema).
+    language?: 'yaml' | 'javascript'
+  }>(),
+  { readOnly: false, language: 'yaml' },
 )
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
 
@@ -37,10 +43,19 @@ onMounted(async () => {
   const setup = await import('~/utils/monaco-setup')
   monaco = setup.ensureMonacoYaml()
 
-  const uri = monaco.Uri.parse('inmemory://profile/config.yaml')
+  // Distinct per-language URI: the yaml schema only fileMatches *.yaml, so a JS
+  // model lives at a .js URI (no yaml worker / schema attached to it).
+  const isJs = props.language === 'javascript'
+  const uri = monaco.Uri.parse(
+    isJs ? 'inmemory://profile/script.js' : 'inmemory://profile/config.yaml',
+  )
   model =
     monaco.editor.getModel(uri) ??
-    monaco.editor.createModel(props.modelValue, 'yaml', uri)
+    monaco.editor.createModel(
+      props.modelValue,
+      isJs ? 'javascript' : 'yaml',
+      uri,
+    )
   model.setValue(props.modelValue)
 
   editor = monaco.editor.create(container.value!, {
@@ -89,8 +104,9 @@ watch([() => configStore.curTheme, preferredDark], async () => {
 // toggling the model's markers off. monaco-yaml validation is global; the
 // pragmatic switch is to set the model language to plaintext (no schema) and
 // back. We keep it simple: toggle the editor option that hides squiggles.
+// Only meaningful for yaml — a JS model has no yaml schema to detach.
 watch(disableValidation, (off) => {
-  if (!monaco || !model) return
+  if (!monaco || !model || props.language !== 'yaml') return
   // Setting the model language to 'plaintext' detaches the yaml worker
   // (no diagnostics); back to 'yaml' re-attaches schema validation.
   monaco.editor.setModelLanguage(model, off ? 'plaintext' : 'yaml')
@@ -100,7 +116,10 @@ watch(disableValidation, (off) => {
 <template>
   <div class="flex flex-col gap-2">
     <div class="flex items-center justify-end gap-3 text-xs">
-      <label class="flex cursor-pointer items-center gap-1">
+      <label
+        v-if="language === 'yaml'"
+        class="flex cursor-pointer items-center gap-1"
+      >
         <input
           v-model="disableValidation"
           type="checkbox"

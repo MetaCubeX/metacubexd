@@ -23,14 +23,18 @@ export function useProfiles() {
   const profiles = ref<ProfileMeta[]>([])
   const loading = ref(false)
 
-  // Base (local/remote) profiles drive the activate flow; merge overlays are
-  // composed onto whichever base is active. Keep them in separate lists so the
-  // page can render them in distinct sections.
+  // Base (local/remote) profiles drive the activate flow; merge overlays and
+  // script transforms are composed onto whichever base is active. Keep them in
+  // separate lists so the page can render them in distinct sections.
   const baseProfiles = computed(() =>
-    profiles.value.filter((p) => p.type !== 'merge'),
+    profiles.value.filter((p) => p.type !== 'merge' && p.type !== 'script'),
   )
   const mergeProfiles = computed(() =>
     profiles.value.filter((p) => p.type === 'merge'),
+  )
+  // Script transforms run after merges during composition (config -> config).
+  const scriptProfiles = computed(() =>
+    profiles.value.filter((p) => p.type === 'script'),
   )
 
   // The last activated non-merge base — needed to re-compose the active config
@@ -50,7 +54,7 @@ export function useProfiles() {
   const create = async (body: {
     name: string
     content?: string
-    type?: 'local' | 'merge'
+    type?: 'local' | 'merge' | 'script'
   }) => {
     await api.createProfile(body)
     await refresh()
@@ -58,6 +62,10 @@ export function useProfiles() {
   // Mint a new merge overlay (YAML composed onto the active base).
   const createMerge = async (name: string) => {
     await create({ name, type: 'merge' })
+  }
+  // Mint a new script transform (JS run after merges during composition).
+  const createScript = async (name: string) => {
+    await create({ name, type: 'script' })
   }
   const duplicate = async (id: string, name?: string) => {
     await api.duplicateProfile(id, name)
@@ -126,21 +134,52 @@ export function useProfiles() {
     }
   }
 
+  // Enable/disable a script transform, then re-compose the active config so the
+  // change takes effect. Failures surface via toast — never swallowed.
+  const setScriptEnabled = async (id: string, enabled: boolean) => {
+    try {
+      await api.updateProfile(id, { enabled })
+      await refresh()
+      await recompose()
+    } catch (e) {
+      toast.error(t('profilesScriptUpdateFailed'), {
+        description: e instanceof Error ? e.message : String(e),
+      })
+    }
+  }
+
+  // Save script transform content, then re-compose the active config.
+  const saveScript = async (id: string, content: string) => {
+    try {
+      await api.updateProfile(id, { content })
+      await refresh()
+      await recompose()
+    } catch (e) {
+      toast.error(t('profilesScriptUpdateFailed'), {
+        description: e instanceof Error ? e.message : String(e),
+      })
+    }
+  }
+
   return {
     profiles,
     baseProfiles,
     mergeProfiles,
+    scriptProfiles,
     activeBaseId,
     loading,
     refresh,
     create,
     createMerge,
+    createScript,
     duplicate,
     remove,
     importUrl,
     save,
     saveMerge,
+    saveScript,
     setEnabled,
+    setScriptEnabled,
     load,
     validate,
     activate,

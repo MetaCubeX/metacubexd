@@ -108,6 +108,13 @@ describe('composables/useControlApi methods', () => {
     })
   })
 
+  it('createProfile() accepts type "script" for a JS transform profile', async () => {
+    await useControlApi().createProfile({ name: 'js', type: 'script' })
+    expect(post).toHaveBeenCalledWith('profiles', {
+      json: { name: 'js', type: 'script' },
+    })
+  })
+
   it('getProfile() GETs profiles/:id', async () => {
     await useControlApi().getProfile('id1')
     expect(get).toHaveBeenCalledWith('profiles/id1')

@@ -20,7 +20,7 @@ export interface KernelState {
   lastError?: string
 }
 
-export type ProfileType = 'local' | 'remote' | 'merge'
+export type ProfileType = 'local' | 'remote' | 'merge' | 'script'
 
 export interface ProfileSubscriptionInfo {
   upload: number
@@ -33,8 +33,9 @@ export interface ProfileMeta {
   id: string
   name: string
   type: ProfileType
-  // merge-only: a disabled merge overlay is skipped when composing the active
-  // config. Treat undefined as enabled (the overlay is applied). SHARED CONTRACTS.
+  // merge/script-only: a disabled merge overlay (or script transform) is skipped
+  // when composing the active config. Treat undefined as enabled (the
+  // overlay/transform is applied). SHARED CONTRACTS.
   enabled?: boolean
   url?: string
   userAgent?: string

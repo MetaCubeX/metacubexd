@@ -25,16 +25,20 @@ const {
   profiles,
   baseProfiles,
   mergeProfiles,
+  scriptProfiles,
   loading,
   refresh,
   create,
   createMerge,
+  createScript,
   duplicate,
   remove,
   importUrl,
   save,
   saveMerge,
+  saveScript,
   setEnabled,
+  setScriptEnabled,
   load,
   validate,
   activate,
@@ -42,12 +46,16 @@ const {
 
 const newName = ref('')
 const newMergeName = ref('')
+const newScriptName = ref('')
 const importUrlValue = ref('')
 const importName = ref('')
 
 const editingId = ref<string | null>(null)
 // Whether the open editor targets a merge overlay — drives save-vs-recompose.
 const editingMerge = ref(false)
+// Whether the open editor targets a script transform — drives the JS editor
+// language and routes save through saveScript (which recomposes).
+const editingScript = ref(false)
 const editingText = ref('')
 const validationMessage = ref('')
 const validationOk = ref<boolean | null>(null)
@@ -57,13 +65,17 @@ onMounted(() => {
   if (hasFeature('profiles')) refresh().catch(() => {})
 })
 
-const openEditor = async (id: string, isMerge = false) => {
+const openEditor = async (
+  id: string,
+  kind: 'base' | 'merge' | 'script' = 'base',
+) => {
   busy.value = true
   try {
     const detail = await load(id)
     editingText.value = detail.content
     editingId.value = id
-    editingMerge.value = isMerge
+    editingMerge.value = kind === 'merge'
+    editingScript.value = kind === 'script'
     validationMessage.value = ''
     validationOk.value = null
   } finally {
@@ -74,6 +86,7 @@ const openEditor = async (id: string, isMerge = false) => {
 const closeEditor = () => {
   editingId.value = null
   editingMerge.value = false
+  editingScript.value = false
   editingText.value = ''
 }
 
@@ -81,8 +94,11 @@ const onSave = async () => {
   if (!editingId.value) return
   busy.value = true
   try {
-    // Editing a merge overlay re-composes the active base after saving.
-    if (editingMerge.value) {
+    // Editing a merge overlay or script transform re-composes the active base
+    // after saving; a plain base profile just saves its content.
+    if (editingScript.value) {
+      await saveScript(editingId.value, editingText.value)
+    } else if (editingMerge.value) {
       await saveMerge(editingId.value, editingText.value)
     } else {
       await save(editingId.value, editingText.value)
@@ -139,11 +155,32 @@ const onCreateMerge = async () => {
   }
 }
 
+const onCreateScript = async () => {
+  if (!newScriptName.value.trim()) return
+  busy.value = true
+  try {
+    await createScript(newScriptName.value.trim())
+    newScriptName.value = ''
+  } finally {
+    busy.value = false
+  }
+}
+
 const onToggleMerge = async (id: string, event: Event) => {
   const next = (event.target as HTMLInputElement).checked
   busy.value = true
   try {
     await setEnabled(id, next)
+  } finally {
+    busy.value = false
+  }
+}
+
+const onToggleScript = async (id: string, event: Event) => {
+  const next = (event.target as HTMLInputElement).checked
+  busy.value = true
+  try {
+    await setScriptEnabled(id, next)
   } finally {
     busy.value = false
   }
@@ -354,7 +391,7 @@ const onRemove = async (id: string) => {
               <Button
                 class="btn-xs"
                 :icon="IconPencil"
-                @click="openEditor(m.id, true)"
+                @click="openEditor(m.id, 'merge')"
               >
                 {{ t('profilesEdit') }}
               </Button>
@@ -371,20 +408,109 @@ const onRemove = async (id: string) => {
         </div>
       </section>
 
+      <!-- Script transforms: JS run after merges during composition. -->
+      <section class="flex flex-col gap-3">
+        <div class="flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <h2 class="font-semibold text-base-content">
+              {{ t('profilesScripts') }}
+            </h2>
+            <p class="max-w-prose text-sm text-base-content/60">
+              {{ t('profilesScriptsHelp') }}
+            </p>
+            <p class="mt-1 max-w-prose text-sm text-warning">
+              {{ t('profilesScriptsSafety') }}
+            </p>
+          </div>
+          <div class="flex items-end gap-2">
+            <label class="flex flex-col gap-1 text-sm">
+              <span class="text-base-content/60">{{ t('profilesName') }}</span>
+              <input
+                v-model="newScriptName"
+                class="input-bordered input input-sm"
+                :placeholder="t('profilesNewScript')"
+              />
+            </label>
+            <Button
+              class="btn-sm btn-primary"
+              :icon="IconPlus"
+              :loading="busy"
+              @click="onCreateScript"
+            >
+              {{ t('profilesNewScript') }}
+            </Button>
+          </div>
+        </div>
+
+        <div
+          v-if="scriptProfiles.length"
+          class="grid grid-cols-1 gap-3 md:grid-cols-2"
+        >
+          <div
+            v-for="s in scriptProfiles"
+            :key="s.id"
+            class="rounded-xl border border-base-content/10 bg-base-200 p-4"
+          >
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-semibold">{{ s.name }}</span>
+              <label class="flex items-center gap-2 text-sm">
+                <span class="text-base-content/60">{{
+                  t('profilesScriptEnabled')
+                }}</span>
+                <input
+                  type="checkbox"
+                  class="toggle toggle-primary toggle-sm"
+                  :checked="s.enabled !== false"
+                  :disabled="busy"
+                  :aria-label="t('profilesScriptEnabled')"
+                  @change="onToggleScript(s.id, $event)"
+                />
+              </label>
+            </div>
+
+            <div class="mt-3 flex flex-wrap gap-2">
+              <Button
+                class="btn-xs"
+                :icon="IconPencil"
+                @click="openEditor(s.id, 'script')"
+              >
+                {{ t('profilesEdit') }}
+              </Button>
+              <Button
+                class="btn-xs btn-error"
+                :icon="IconTrash"
+                :loading="busy"
+                @click="onRemove(s.id)"
+              >
+                {{ t('profilesDelete') }}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Editor -->
       <div
         v-if="editingId"
         class="rounded-xl border border-base-content/10 bg-base-200 p-4"
       >
         <ClientOnly>
-          <MonacoYamlEditor v-model="editingText" />
+          <MonacoYamlEditor
+            v-model="editingText"
+            :language="editingScript ? 'javascript' : 'yaml'"
+          />
         </ClientOnly>
 
         <div class="mt-3 flex flex-wrap items-center gap-2">
           <Button class="btn-sm btn-primary" :loading="busy" @click="onSave">
             {{ t('profilesSave') }}
           </Button>
-          <Button class="btn-sm" :loading="busy" @click="onValidate">
+          <Button
+            v-if="!editingScript"
+            class="btn-sm"
+            :loading="busy"
+            @click="onValidate"
+          >
             {{ t('profilesValidate') }}
           </Button>
           <Button class="btn-ghost btn-sm" @click="closeEditor">
