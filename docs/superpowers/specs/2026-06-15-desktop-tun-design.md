@@ -96,6 +96,59 @@ TUN 配错 = 全机断网。必须:
 
 ## 11. 待你拍板
 
-1. **提权策略**:A(按需提权,推荐)/ C(A + Linux setcap,推荐增强)/ B(特权 helper,重)?
-2. 是否接受**未签名下 TUN 的现实**(提权弹窗、OS 警告、mac 每会话再提权)?
-3. 本机无法运行时验证 win/linux(及 mac 真实建网),**只能命令级单测 + 留真机验证**,可接受?
+1. ~~提权策略~~ → **用户 2026-06-15 选定方案 B(特权 helper/daemon)**。详见 §12。
+2. 是否接受**未签名下 TUN 的现实**(提权弹窗、OS 警告;**未签名 helper 安装更易被拦**)?
+3. 本机无法运行时验证 win/linux(及 mac 真实建网/服务安装),**只能命令级 + IPC 协议 + 状态机单测,真机验证全部留给用户**,可接受?
+
+---
+
+## 12. 方案 B(已选)详细设计
+
+### 12.1 关键设计:helper 复用随包 Electron(避免新工具链)
+
+不引入 Go/Rust。**helper = 一段随 electron-vite 打包的 Node 脚本**(`out/helper/index.js`),由**随包的 Electron 二进制**以 `ELECTRON_RUN_AS_NODE=1` 运行(Electron 即 Node)。因此特权服务的命令形如 `<electron-bin> <out/helper/index.js>`(环境变量 `ELECTRON_RUN_AS_NODE=1`),以 root/admin 身份常驻。无需额外运行时、无需新编译链。
+
+### 12.2 helper 职责
+
+- 监听本地 IPC(见 12.3),鉴权后处理:`ping`、`startKernel({ configPath, homeDir, binaryPath })`、`stopKernel`、`status`、`getVersion`。
+- 以**特权**(它自身是 root/admin)spawn 随包 mihomo;mihomo 因继承特权而能建 TUN/配路由/劫持 DNS。
+- 进程监管 + 退出清理(随 mihomo 退出清路由;helper 退出/收到 stop 时确保 mihomo 终止、TUN 拆除)。
+- 只接受**本机 loopback / 本地 socket** + 共享密钥;拒绝任何远程。
+
+### 12.3 IPC 传输 + 鉴权
+
+- mac/linux:**unix domain socket**(root 拥有、限定权限);Windows:**named pipe**。
+- **per-install 共享密钥**:安装时由特权侧生成,写到一个 **root 拥有、app 可读**的路径(逐 OS 定);app 每条 IPC 带密钥;helper 校验。
+- 消息:JSON,带 `version` 字段做兼容握手。
+
+### 12.4 安装 / 卸载(一次性提权)
+
+- app 触发**一次性提权安装**:mac `osascript ... with administrator privileges`(写 LaunchDaemon plist + 密钥 + `launchctl bootstrap`)、Windows UAC(`sc create` / 服务安装 + 命名管道 ACL)、Linux `pkexec`(写 systemd unit + 密钥 + `systemctl enable --now`)。
+- 卸载对称(`launchctl bootout` / `sc delete` / `systemctl disable --now` + 删 plist/unit/密钥)。
+- **版本不匹配**:helper 上报版本,app 检测到旧版则提示重新安装。
+
+### 12.5 两种运行模式 + 内核归属
+
+- **Sidecar(默认,无 TUN)**:今天的路径——supervisor 在 app 进程内**普通态** spawn mihomo。
+- **TUN 模式**:**改由 helper 特权 spawn mihomo**(app 内 supervisor 不再直接持有进程,改为经 IPC 指挥 helper;Clash API 仍正常连)。切 TUN ↔ sidecar = 停一边、起另一边。
+- `tun:` 配置注入复用 Wave-7 setSection / supervisor 注入(enable/stack/auto-route/dns-hijack/strict-route)。
+
+### 12.6 安全 / 防断网(沿用 §6,强化)
+
+- helper 侧也实现拆除:收到 stop / 自身退出 / app 断连超时 → 终止 mihomo + 拆 TUN。
+- app 崩溃时 helper 检测 IPC 断连,按策略**自动 stopKernel + 拆 TUN**(防 app 没了还劫持全机)。
+- "恢复网络"按钮:经 IPC 强制 stop + 拆除。
+
+### 12.7 测试边界(必须如实标注)
+
+- 可单测:IPC 协议(消息/鉴权/版本)、helper 状态机(注入 spawn)、安装/卸载**命令拼装**(注入 exec)、app↔helper 客户端、模式切换状态机。
+- **完全无法在本机/CI 验证**:真实服务安装、特权运行、真实 TUN 建网、提权/UAC 弹窗、断网拆除——**全部留真机(mac/win/linux 各一)由用户冒烟**。这是方案 B 的固有代价。
+
+### 12.8 拟分波(B 版,批准后细化)
+
+- **B-1(agent/desktop)**:`tun:` 注入/移除 + tun 状态机 + 能力 `'tun'` + 安全拆除骨架(注入依赖,纯逻辑)。
+- **B-2(desktop helper)**:helper 脚本(ELECTRON_RUN_AS_NODE)+ IPC server(socket/pipe + 密钥 + 版本)+ 特权 spawn mihomo + 拆除;electron-vite 增 helper 入口打包。
+- **B-3(desktop app 侧)**:IPC client + 安装/卸载(逐 OS 提权命令)+ supervisor 模式切换(sidecar↔helper)+ 看门狗/断连联动。
+- **B-4(ui)**:TUN 开关接 tun + 安装引导 + 恢复网络按钮 + 状态/错误反馈 + 能力门控。
+- **B-5(打包/文档)**:wintun.dll 随包 + plist/unit 模板 + README TUN 章节。
+- 各阶段我只能交付**单测通过的骨架**;**真机验证由你在 mac/win/linux 分别冒烟**。
