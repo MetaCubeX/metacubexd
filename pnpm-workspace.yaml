@@ -88,7 +88,16 @@ catalog:
   electron: ^42.0.0
   electron-vite: ^5.0.0
   electron-builder: ^26.0.0
-  monaco-editor: ^0.55.1
+  # PINNED, do not bump past 0.52.x. monaco-yaml@5.5.1 (latest) pulls
+  # monaco-worker-manager@2.0.1 (latest), which calls the OLD
+  # editor.createWebWorker({ moduleId, label, createData }) API. monaco-editor
+  # 0.53.0 replaced that public signature with IInternalWebWorkerOptions
+  # ({ worker, host }); on 0.55 the old call yields `worker: undefined` →
+  # "Cannot use 'in' operator to search for 'then' in undefined" → the YAML
+  # language worker silently falls back to the main-thread editor worker, which
+  # has no YAML methods ("Missing requestHandler or method: doValidation/...").
+  # 0.52.2 is the last release with the old IWebWorkerOptions public API.
+  monaco-editor: 0.52.2
   monaco-yaml: ^5.5.1
   meta-json-schema: ^1.19.27
 
