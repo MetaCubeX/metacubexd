@@ -14,13 +14,20 @@ import {
 } from 'node:fs'
 import { join } from 'node:path'
 import { createAgent } from '@metacubexd/agent'
-import { app, BrowserWindow, nativeImage, Notification } from 'electron'
+import {
+  app,
+  BrowserWindow,
+  globalShortcut,
+  nativeImage,
+  Notification,
+} from 'electron'
 import { resolveMihomoBinary } from './binary-path'
 import { resolveBootPorts } from './boot-ports'
 import { runShutdownCleanup } from './cleanup'
 import { startControlServer, stopControlServer } from './control-server'
 import { parseSubscriptionDeepLink } from './deep-link'
 import { pickFreePorts } from './free-port'
+import { loadHotkeyBindings, registerHotkeys } from './hotkeys'
 import { createKernelManager } from './kernel-manager'
 import { bootstrapDataDir } from './paths'
 import { makeToken } from './secrets'
@@ -243,6 +250,68 @@ function focusWindow(): void {
   win.focus()
 }
 
+// Global-hotkey window toggle: hide when visible, otherwise summon + focus.
+function toggleWindowVisibility(): void {
+  if (!win) return
+  if (win.isVisible() && !win.isMinimized()) {
+    win.hide()
+  } else {
+    focusWindow()
+  }
+}
+
+// Global-hotkey system-proxy toggle: read the live OS state, then flip it.
+// Best-effort — surfaces failures as a notification rather than swallowing.
+async function toggleSystemProxy(): Promise<void> {
+  if (!systemProxy) return
+  try {
+    if (await systemProxy.isEnabled()) {
+      await systemProxy.disable()
+    } else {
+      await systemProxy.enable()
+    }
+  } catch (err) {
+    notify('System proxy toggle failed', err)
+  }
+}
+
+const PROXY_MODE_CYCLE = ['rule', 'global', 'direct'] as const
+type ProxyModeName = (typeof PROXY_MODE_CYCLE)[number]
+
+// Global-hotkey proxy-mode cycle: GET the current mode from the Clash API, then
+// PATCH the next one in rule -> global -> direct -> rule. Best-effort; failures
+// surface as a notification.
+async function cycleProxyMode(): Promise<void> {
+  const url = process.env.MCXD_CLASH_URL
+  const secret = process.env.MCXD_CLASH_SECRET
+  if (!url) return
+  const auth = secret ? { Authorization: `Bearer ${secret}` } : {}
+  try {
+    const res = await fetch(`${url}/configs`, { headers: auth })
+    if (!res.ok) return
+    const cfg = (await res.json()) as { mode?: string }
+    const current = cfg.mode?.toLowerCase() as ProxyModeName | undefined
+    const idx = current ? PROXY_MODE_CYCLE.indexOf(current) : -1
+    const next = PROXY_MODE_CYCLE[(idx + 1) % PROXY_MODE_CYCLE.length]
+    await fetch(`${url}/configs`, {
+      method: 'PATCH',
+      headers: { ...auth, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: next }),
+    })
+  } catch (err) {
+    notify('Proxy mode switch failed', err)
+  }
+}
+
+// Show a desktop notification when supported (no-op headless/CI).
+function notify(title: string, body: unknown): void {
+  if (!Notification.isSupported()) return
+  new Notification({
+    title,
+    body: body instanceof Error ? body.message : String(body),
+  }).show()
+}
+
 // A deep link can arrive before boot() finishes (e.g. cold launch via the OS
 // handing us the URL in argv). Hold the most recent one until the agent exists,
 // then flush it.
@@ -263,19 +332,9 @@ async function handleSubscriptionDeepLink(link: {
     await agent.profiles.setActive(meta.id)
     await agent.supervisor.restart()
     focusWindow()
-    if (Notification.isSupported()) {
-      new Notification({
-        title: 'Subscription imported',
-        body: `${meta.name} is now active.`,
-      }).show()
-    }
+    notify('Subscription imported', `${meta.name} is now active.`)
   } catch (err) {
-    if (Notification.isSupported()) {
-      new Notification({
-        title: 'Subscription import failed',
-        body: err instanceof Error ? err.message : String(err),
-      }).show()
-    }
+    notify('Subscription import failed', err)
   }
 }
 
@@ -349,6 +408,22 @@ if (!app.requestSingleInstanceLock()) {
       if (BrowserWindow.getAllWindows().length === 0) createWindow()
     })
 
+    // Register the global hotkeys (overridable via <userData>/hotkeys.json).
+    // toggleSystemProxy/cycleProxyMode are async; the action signature is void
+    // so we fire-and-forget here (each notifies on failure).
+    registerHotkeys({
+      globalShortcut,
+      bindings: loadHotkeyBindings(
+        join(app.getPath('userData'), 'hotkeys.json'),
+        fsAdapter,
+      ),
+      actions: {
+        toggleSystemProxy: () => void toggleSystemProxy(),
+        cycleProxyMode: () => void cycleProxyMode(),
+        toggleWindow: () => toggleWindowVisibility(),
+      },
+    })
+
     // Flush a deep link that arrived (and was queued) before the agent existed.
     if (pendingDeepLink) {
       const link = pendingDeepLink
@@ -370,6 +445,12 @@ if (!app.requestSingleInstanceLock()) {
       tray?.destroy()
       app.quit()
     })
+  })
+
+  // Release the OS-level global shortcuts on the final quit so they don't leak
+  // past the process (Electron also clears them, but be explicit).
+  app.on('will-quit', () => {
+    globalShortcut.unregisterAll()
   })
 
   app.on('window-all-closed', () => {
