@@ -86,6 +86,8 @@ function makeDeps(token?: string) {
     })),
     getActiveId: vi.fn(async (): Promise<string | undefined> => undefined),
     setActive: vi.fn(async () => {}),
+    getSection: vi.fn(async (): Promise<unknown> => null),
+    setSection: vi.fn(async () => {}),
   }
   const info = vi.fn(() => ({
     hasAgent: true,
@@ -769,5 +771,80 @@ describe('createControlRouter — runtime config viewer', () => {
     const res = await fetch(`${srv.base}/api/control/config`)
     expect(res.status).toBe(200)
     expect(await res.text()).toBe('mixed-port: 7890\n')
+  })
+})
+
+describe('createControlRouter — config sections', () => {
+  let srv: Awaited<ReturnType<typeof mount>>
+  afterEach(async () => srv?.close())
+
+  it('gET /api/control/config/section?key= returns the active profile section', async () => {
+    const deps = makeDeps()
+    deps.profiles.getActiveId = vi.fn(async () => 'p1')
+    deps.profiles.getSection = vi.fn(async () => ['MATCH,DIRECT'])
+    srv = await mount(deps)
+    const res = await fetch(`${srv.base}/api/control/config/section?key=rules`)
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual(['MATCH,DIRECT'])
+    expect(deps.profiles.getSection).toHaveBeenCalledWith('p1', 'rules')
+  })
+
+  it('gET /api/control/config/section returns null when there is no active profile', async () => {
+    const deps = makeDeps()
+    deps.profiles.getActiveId = vi.fn(async () => undefined)
+    srv = await mount(deps)
+    const res = await fetch(`${srv.base}/api/control/config/section?key=rules`)
+    expect(res.status).toBe(200)
+    expect(await res.json()).toBeNull()
+    expect(deps.profiles.getSection).not.toHaveBeenCalled()
+  })
+
+  it('pUT /api/control/config/section sets the section then re-activates + restarts', async () => {
+    const deps = makeDeps()
+    deps.profiles.getActiveId = vi.fn(async () => 'p1')
+    srv = await mount(deps)
+    const res = await fetch(`${srv.base}/api/control/config/section`, {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ key: 'rules', value: ['MATCH,REJECT'] }),
+    })
+    expect(res.status).toBe(200)
+    expect(deps.profiles.setSection).toHaveBeenCalledWith('p1', 'rules', [
+      'MATCH,REJECT',
+    ])
+    expect(deps.profiles.setActive).toHaveBeenCalledWith('p1')
+    expect(deps.supervisor.restart).toHaveBeenCalledOnce()
+    expect(((await res.json()) as Record<string, unknown>).status).toBe(
+      'running',
+    )
+  })
+
+  it('pUT /api/control/config/section passes a null value through (delete)', async () => {
+    const deps = makeDeps()
+    deps.profiles.getActiveId = vi.fn(async () => 'p1')
+    srv = await mount(deps)
+    const res = await fetch(`${srv.base}/api/control/config/section`, {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ key: 'dns', value: null }),
+    })
+    expect(res.status).toBe(200)
+    expect(deps.profiles.setSection).toHaveBeenCalledWith('p1', 'dns', null)
+    expect(deps.profiles.setActive).toHaveBeenCalledWith('p1')
+  })
+
+  it('pUT /api/control/config/section returns 409 when there is no active profile', async () => {
+    const deps = makeDeps()
+    deps.profiles.getActiveId = vi.fn(async () => undefined)
+    srv = await mount(deps)
+    const res = await fetch(`${srv.base}/api/control/config/section`, {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ key: 'rules', value: [] }),
+    })
+    expect(res.status).toBe(409)
+    expect(await res.json()).toEqual({ error: 'no active profile' })
+    expect(deps.profiles.setSection).not.toHaveBeenCalled()
+    expect(deps.supervisor.restart).not.toHaveBeenCalled()
   })
 })

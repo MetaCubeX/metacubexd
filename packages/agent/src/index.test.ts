@@ -45,6 +45,7 @@ describe('createAgent', () => {
         'geo-assets',
         'webdav-backup',
         'runtime-config',
+        'config-sections',
       ],
     })
     expect(info.platform).toMatchObject({
@@ -67,6 +68,11 @@ describe('createAgent', () => {
   it('info().features always includes runtime-config (reads activeConfigPath)', () => {
     const agent = createAgent(opts())
     expect(agent.info().features).toContain('runtime-config')
+  })
+
+  it('info().features always includes config-sections (active-profile YAML editing)', () => {
+    const agent = createAgent(opts())
+    expect(agent.info().features).toContain('config-sections')
   })
 
   it('info().features excludes system-proxy when no controller is injected', () => {

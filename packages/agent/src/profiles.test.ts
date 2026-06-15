@@ -3,6 +3,7 @@ import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { beforeEach, describe, expect, it } from 'vitest'
+import { parse } from 'yaml'
 import { createProfileStore } from './profiles'
 
 function tmpDir() {
@@ -431,5 +432,88 @@ describe('createProfileStore — refresh', () => {
       activeConfigPath: join(dir, '..', 'active.yaml'),
     })
     await expect(store.refresh('nope')).rejects.toThrow(/not found/i)
+  })
+})
+
+describe('createProfileStore — config sections', () => {
+  let dir: string
+  let activeConfigPath: string
+  let store: ProfileStore
+  let n: number
+
+  beforeEach(() => {
+    dir = tmpDir()
+    activeConfigPath = join(dir, 'active', 'config.yaml')
+    n = 0
+    store = createProfileStore({
+      dir,
+      activeConfigPath,
+      idGen: () => `id${++n}`,
+    })
+  })
+
+  const sample =
+    'mixed-port: 7890\nmode: rule\nrules:\n  - MATCH,DIRECT\ndns:\n  enable: true\n  nameserver:\n    - 1.1.1.1\n'
+
+  it('getSection returns the parsed value for a present top-level key', async () => {
+    await store.create({ name: 'home', content: sample })
+    expect(await store.getSection('id1', 'rules')).toEqual(['MATCH,DIRECT'])
+    expect(await store.getSection('id1', 'dns')).toEqual({
+      enable: true,
+      nameserver: ['1.1.1.1'],
+    })
+    expect(await store.getSection('id1', 'mode')).toBe('rule')
+  })
+
+  it('getSection returns null for an absent key', async () => {
+    await store.create({ name: 'home', content: sample })
+    expect(await store.getSection('id1', 'proxies')).toBeNull()
+  })
+
+  it('getSection returns null when the profile content is empty / not a mapping', async () => {
+    await store.create({ name: 'blank', content: '' })
+    expect(await store.getSection('id1', 'rules')).toBeNull()
+  })
+
+  it('setSection replaces only the target key and preserves the rest', async () => {
+    await store.create({ name: 'home', content: sample })
+    await store.setSection('id1', 'rules', ['MATCH,REJECT', 'MATCH,DIRECT'])
+    const after = parse(await store.read('id1')) as Record<string, unknown>
+    expect(after.rules).toEqual(['MATCH,REJECT', 'MATCH,DIRECT'])
+    // Everything else preserved.
+    expect(after['mixed-port']).toBe(7890)
+    expect(after.mode).toBe('rule')
+    expect(after.dns).toEqual({ enable: true, nameserver: ['1.1.1.1'] })
+  })
+
+  it('setSection adds a new top-level key when absent', async () => {
+    await store.create({ name: 'home', content: sample })
+    await store.setSection('id1', 'proxies', [{ name: 'a', type: 'http' }])
+    const after = parse(await store.read('id1')) as Record<string, unknown>
+    expect(after.proxies).toEqual([{ name: 'a', type: 'http' }])
+    expect(after.mode).toBe('rule')
+  })
+
+  it('setSection with a null value deletes the key', async () => {
+    await store.create({ name: 'home', content: sample })
+    await store.setSection('id1', 'dns', null)
+    const after = parse(await store.read('id1')) as Record<string, unknown>
+    expect('dns' in after).toBe(false)
+    expect(after.mode).toBe('rule')
+  })
+
+  it('setSection with an undefined value deletes the key', async () => {
+    await store.create({ name: 'home', content: sample })
+    await store.setSection('id1', 'mode', undefined)
+    const after = parse(await store.read('id1')) as Record<string, unknown>
+    expect('mode' in after).toBe(false)
+    expect(after['mixed-port']).toBe(7890)
+  })
+
+  it('setSection on empty content seeds a mapping with just the key', async () => {
+    await store.create({ name: 'blank', content: '' })
+    await store.setSection('id1', 'mode', 'global')
+    const after = parse(await store.read('id1')) as Record<string, unknown>
+    expect(after).toEqual({ mode: 'global' })
   })
 })

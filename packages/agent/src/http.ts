@@ -275,6 +275,37 @@ export function createControlRouter(deps: ControlRouterDeps): App {
     }),
   )
 
+  // ---- Config sections (top-level key read/write on the active profile) ----
+  // GET reads one parsed section (null when absent / no active profile). PUT
+  // replaces that section on the active profile content, then re-activates
+  // (re-composes + writes activeConfigPath) and restarts the kernel.
+  router.get(
+    `${PREFIX}/config/section`,
+    defineEventHandler(async (event) => {
+      const key = String(getQuery(event).key ?? '')
+      const activeId = await profiles.getActiveId()
+      const value = activeId ? await profiles.getSection(activeId, key) : null
+      // Serialize explicitly so an absent section / no-active-profile still
+      // yields a JSON `null` body (h3 would 204 a bare null return).
+      setResponseHeader(event, 'content-type', 'application/json')
+      return JSON.stringify(value ?? null)
+    }),
+  )
+  router.put(
+    `${PREFIX}/config/section`,
+    defineEventHandler(async (event) => {
+      const activeId = await profiles.getActiveId()
+      if (!activeId) {
+        setResponseStatus(event, 409)
+        return { error: 'no active profile' }
+      }
+      const body = (await readBody(event)) as { key: string; value: unknown }
+      await profiles.setSection(activeId, body.key, body.value)
+      await profiles.setActive(activeId)
+      return supervisor.restart()
+    }),
+  )
+
   // ---- Geo assets (always available — backed by homeDir + fetch) ----
   router.post(
     `${PREFIX}/geo/update`,

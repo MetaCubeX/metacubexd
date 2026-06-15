@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto'
 import { existsSync } from 'node:fs'
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { parse, stringify } from 'yaml'
 import { mergeConfigs } from './merge'
 
 export interface ProfileStoreOptions {
@@ -14,6 +15,10 @@ export interface ProfileStoreOptions {
 
 interface StateFile {
   activeId?: string
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
 export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
@@ -224,6 +229,27 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
       await mkdir(join(activeConfigPath, '..'), { recursive: true })
       await writeFile(activeConfigPath, content)
       await writeState({ activeId: id })
+    },
+
+    async getSection(id, key) {
+      await findMeta(id)
+      const parsed = parse(await readFile(profilePath(id), 'utf8')) as unknown
+      if (!isPlainObject(parsed)) return null
+      const value = parsed[key]
+      return value === undefined ? null : value
+    },
+
+    async setSection(id, key, value) {
+      await findMeta(id)
+      const parsed = parse(await readFile(profilePath(id), 'utf8')) as unknown
+      // Empty / non-mapping content seeds a fresh top-level mapping.
+      const doc: Record<string, unknown> = isPlainObject(parsed) ? parsed : {}
+      if (value == null) {
+        delete doc[key]
+      } else {
+        doc[key] = value
+      }
+      await store.update(id, { content: stringify(doc) })
     },
   }
 

@@ -67,6 +67,8 @@ export function createAgent(opts: CreateAgentOptions) {
       'webdav-backup',
       // Runtime config viewer reads the activeConfigPath file — always available.
       'runtime-config',
+      // Config-section editor reads/writes top-level keys of the active profile.
+      'config-sections',
       ...(systemProxy ? ['system-proxy'] : []),
       ...(kernelManager ? ['kernel-version'] : []),
     ],

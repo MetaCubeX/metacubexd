@@ -101,4 +101,10 @@ export interface ProfileStore {
   refresh: (id: string) => Promise<ProfileMeta> // re-fetch a remote profile in place
   getActiveId: () => Promise<string | undefined>
   setActive: (id: string) => Promise<void> // validate + write activeConfigPath
+  // Read a single top-level key from a profile's parsed YAML (null if absent /
+  // the content is not a mapping).
+  getSection: (id: string, key: string) => Promise<unknown>
+  // Replace a single top-level key in a profile's YAML and persist it back,
+  // preserving every other key. A null/undefined value deletes the key.
+  setSection: (id: string, key: string, value: unknown) => Promise<void>
 }
