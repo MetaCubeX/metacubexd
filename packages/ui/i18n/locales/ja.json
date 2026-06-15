@@ -434,5 +434,21 @@
   "rulesEditorSaved": "ルールを保存しました",
   "rulesEditorLoadFailed": "ルールの読み込みに失敗しました",
   "rulesEditorSaveFailed": "ルールの保存に失敗しました",
-  "rulesEditorInvalid": "各ルールには種類・ペイロード・ポリシーが必要です"
+  "rulesEditorInvalid": "各ルールには種類・ペイロード・ポリシーが必要です",
+  "networkConfig": "ネットワーク設定",
+  "networkConfigHint": "有効なプロファイルのネットワーク設定を編集します。保存するとカーネルが一度再起動します。",
+  "networkConfigSaved": "ネットワーク設定を保存しました",
+  "networkConfigLoadFailed": "ネットワーク設定の読み込みに失敗しました",
+  "networkConfigSaveFailed": "ネットワーク設定の保存に失敗しました",
+  "tunnels": "トンネル",
+  "tunnelsHint": "ローカルのリスナーをカーネル経由でリモートのターゲットへ転送します。",
+  "tunnelNetwork": "ネットワーク",
+  "tunnelAddress": "リッスンアドレス",
+  "tunnelTarget": "ターゲット",
+  "noTunnels": "トンネルなし",
+  "sniffer": "スニファー",
+  "snifferEnable": "スニファーを有効化",
+  "snifferOverrideDestination": "宛先を上書き",
+  "externalController": "外部コントローラー",
+  "externalControllerManaged": "デスクトップではアプリが管理します"
 }

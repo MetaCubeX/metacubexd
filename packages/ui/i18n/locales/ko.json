@@ -434,5 +434,21 @@
   "rulesEditorSaved": "규칙이 저장되었습니다",
   "rulesEditorLoadFailed": "규칙을 불러오지 못했습니다",
   "rulesEditorSaveFailed": "규칙을 저장하지 못했습니다",
-  "rulesEditorInvalid": "각 규칙에는 비어 있지 않은 유형, 페이로드, 정책이 필요합니다"
+  "rulesEditorInvalid": "각 규칙에는 비어 있지 않은 유형, 페이로드, 정책이 필요합니다",
+  "networkConfig": "네트워크 설정",
+  "networkConfigHint": "활성 프로필의 네트워크 섹션을 편집합니다. 저장하면 커널이 한 번 다시 시작됩니다.",
+  "networkConfigSaved": "네트워크 설정이 저장되었습니다",
+  "networkConfigLoadFailed": "네트워크 설정을 불러오지 못했습니다",
+  "networkConfigSaveFailed": "네트워크 설정을 저장하지 못했습니다",
+  "tunnels": "터널",
+  "tunnelsHint": "커널을 통해 로컬 리스너를 원격 대상으로 전달합니다.",
+  "tunnelNetwork": "네트워크",
+  "tunnelAddress": "수신 주소",
+  "tunnelTarget": "대상",
+  "noTunnels": "터널 없음",
+  "sniffer": "스니퍼",
+  "snifferEnable": "스니퍼 활성화",
+  "snifferOverrideDestination": "대상 덮어쓰기",
+  "externalController": "외부 컨트롤러",
+  "externalControllerManaged": "데스크톱에서는 앱이 관리합니다"
 }

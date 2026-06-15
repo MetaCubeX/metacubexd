@@ -434,5 +434,21 @@
   "rulesEditorSaved": "قوانین ذخیره شد",
   "rulesEditorLoadFailed": "بارگذاری قوانین ناموفق بود",
   "rulesEditorSaveFailed": "ذخیره قوانین ناموفق بود",
-  "rulesEditorInvalid": "هر قانون به نوع، محموله و سیاست غیرخالی نیاز دارد"
+  "rulesEditorInvalid": "هر قانون به نوع، محموله و سیاست غیرخالی نیاز دارد",
+  "networkConfig": "پیکربندی شبکه",
+  "networkConfigHint": "بخش‌های شبکه‌ی نمایه فعال را ویرایش کنید. ذخیره یک‌بار هسته را راه‌اندازی مجدد می‌کند.",
+  "networkConfigSaved": "پیکربندی شبکه ذخیره شد",
+  "networkConfigLoadFailed": "بارگذاری پیکربندی شبکه ناموفق بود",
+  "networkConfigSaveFailed": "ذخیره پیکربندی شبکه ناموفق بود",
+  "tunnels": "تونل‌ها",
+  "tunnelsHint": "یک شنونده محلی را از طریق هسته به مقصد راه دور هدایت کنید.",
+  "tunnelNetwork": "شبکه",
+  "tunnelAddress": "آدرس شنونده",
+  "tunnelTarget": "مقصد",
+  "noTunnels": "بدون تونل",
+  "sniffer": "اسنیفر",
+  "snifferEnable": "فعال‌سازی اسنیفر",
+  "snifferOverrideDestination": "بازنویسی مقصد",
+  "externalController": "کنترل‌کننده خارجی",
+  "externalControllerManaged": "در دسکتاپ توسط برنامه مدیریت می‌شود"
 }

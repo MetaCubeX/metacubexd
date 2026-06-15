@@ -434,5 +434,21 @@
   "rulesEditorSaved": "Règles enregistrées",
   "rulesEditorLoadFailed": "Échec du chargement des règles",
   "rulesEditorSaveFailed": "Échec de l'enregistrement des règles",
-  "rulesEditorInvalid": "Chaque règle nécessite un type, une charge utile et une politique non vides"
+  "rulesEditorInvalid": "Chaque règle nécessite un type, une charge utile et une politique non vides",
+  "networkConfig": "Configuration réseau",
+  "networkConfigHint": "Modifiez les sections réseau du profil actif. L'enregistrement redémarre le noyau une fois.",
+  "networkConfigSaved": "Configuration réseau enregistrée",
+  "networkConfigLoadFailed": "Échec du chargement de la configuration réseau",
+  "networkConfigSaveFailed": "Échec de l'enregistrement de la configuration réseau",
+  "tunnels": "Tunnels",
+  "tunnelsHint": "Transférez un écouteur local vers une cible distante via le noyau.",
+  "tunnelNetwork": "Réseau",
+  "tunnelAddress": "Adresse d'écoute",
+  "tunnelTarget": "Cible",
+  "noTunnels": "Aucun tunnel",
+  "sniffer": "Renifleur",
+  "snifferEnable": "Activer le renifleur",
+  "snifferOverrideDestination": "Remplacer la destination",
+  "externalController": "Contrôleur externe",
+  "externalControllerManaged": "Géré par l'application sur le bureau"
 }

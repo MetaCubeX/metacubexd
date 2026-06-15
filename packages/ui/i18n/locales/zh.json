@@ -434,5 +434,21 @@
   "rulesEditorSaved": "规则已保存",
   "rulesEditorLoadFailed": "加载规则失败",
   "rulesEditorSaveFailed": "保存规则失败",
-  "rulesEditorInvalid": "每条规则的类型、匹配内容和策略都不能为空"
+  "rulesEditorInvalid": "每条规则的类型、匹配内容和策略都不能为空",
+  "networkConfig": "网络配置",
+  "networkConfigHint": "编辑当前配置文件的网络部分。保存会重启一次内核。",
+  "networkConfigSaved": "网络配置已保存",
+  "networkConfigLoadFailed": "加载网络配置失败",
+  "networkConfigSaveFailed": "保存网络配置失败",
+  "tunnels": "隧道",
+  "tunnelsHint": "通过内核将本地监听转发到远程目标。",
+  "tunnelNetwork": "网络",
+  "tunnelAddress": "监听地址",
+  "tunnelTarget": "目标",
+  "noTunnels": "无隧道",
+  "sniffer": "嗅探器",
+  "snifferEnable": "启用嗅探器",
+  "snifferOverrideDestination": "覆盖目标地址",
+  "externalController": "外部控制器",
+  "externalControllerManaged": "桌面端由应用管理"
 }

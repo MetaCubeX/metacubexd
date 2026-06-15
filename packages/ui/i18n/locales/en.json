@@ -434,5 +434,21 @@
   "rulesEditorSaved": "Rules saved",
   "rulesEditorLoadFailed": "Failed to load rules",
   "rulesEditorSaveFailed": "Failed to save rules",
-  "rulesEditorInvalid": "Each rule needs a non-empty type, payload and policy"
+  "rulesEditorInvalid": "Each rule needs a non-empty type, payload and policy",
+  "networkConfig": "Network Config",
+  "networkConfigHint": "Edit the active profile's network sections. Saving restarts the kernel once.",
+  "networkConfigSaved": "Network config saved",
+  "networkConfigLoadFailed": "Failed to load network config",
+  "networkConfigSaveFailed": "Failed to save network config",
+  "tunnels": "Tunnels",
+  "tunnelsHint": "Forward a local listener to a remote target through the kernel.",
+  "tunnelNetwork": "Network",
+  "tunnelAddress": "Listen Address",
+  "tunnelTarget": "Target",
+  "noTunnels": "No tunnels",
+  "sniffer": "Sniffer",
+  "snifferEnable": "Enable Sniffer",
+  "snifferOverrideDestination": "Override Destination",
+  "externalController": "External Controller",
+  "externalControllerManaged": "Managed by the app on desktop"
 }

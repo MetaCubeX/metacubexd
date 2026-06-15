@@ -391,5 +391,21 @@
   "rulesEditorSaved": "Правила сохранены",
   "rulesEditorLoadFailed": "Не удалось загрузить правила",
   "rulesEditorSaveFailed": "Не удалось сохранить правила",
-  "rulesEditorInvalid": "У каждого правила должны быть тип, значение и политика"
+  "rulesEditorInvalid": "У каждого правила должны быть тип, значение и политика",
+  "networkConfig": "Сетевая конфигурация",
+  "networkConfigHint": "Измените сетевые разделы активного профиля. Сохранение перезапускает ядро один раз.",
+  "networkConfigSaved": "Сетевая конфигурация сохранена",
+  "networkConfigLoadFailed": "Не удалось загрузить сетевую конфигурацию",
+  "networkConfigSaveFailed": "Не удалось сохранить сетевую конфигурацию",
+  "tunnels": "Туннели",
+  "tunnelsHint": "Переадресуйте локальный слушатель на удалённую цель через ядро.",
+  "tunnelNetwork": "Сеть",
+  "tunnelAddress": "Адрес прослушивания",
+  "tunnelTarget": "Цель",
+  "noTunnels": "Нет туннелей",
+  "sniffer": "Сниффер",
+  "snifferEnable": "Включить сниффер",
+  "snifferOverrideDestination": "Переопределить назначение",
+  "externalController": "Внешний контроллер",
+  "externalControllerManaged": "Управляется приложением на десктопе"
 }
