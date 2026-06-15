@@ -20,6 +20,12 @@ export type {
   ProfileScheduler,
   ProfileSchedulerDeps,
 } from './scheduler'
+export { createScriptRunner } from './script'
+export type {
+  CreateScriptRunnerOptions,
+  ScriptRun,
+  ScriptRunner,
+} from './script'
 export { createSupervisor } from './supervisor'
 export type { CreateSupervisorOptions, SupervisorDeps } from './supervisor'
 export * from './types'

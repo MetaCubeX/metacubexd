@@ -312,6 +312,131 @@ describe('createProfileStore — merge profiles', () => {
   })
 })
 
+describe('createProfileStore — script profiles', () => {
+  let dir: string
+  let activeConfigPath: string
+
+  beforeEach(() => {
+    dir = tmpDir()
+    activeConfigPath = join(dir, 'active', 'config.yaml')
+  })
+
+  // A fake script runner: the "code" is JSON describing a key/value to set.
+  // This keeps the compose-pipeline test off the real worker.
+  function fakeRunner() {
+    const calls: Array<{ code: string; input: unknown }> = []
+    const runner = {
+      run: async (code: string, input: unknown) => {
+        calls.push({ code, input })
+        const { key, value } = JSON.parse(code) as {
+          key: string
+          value: unknown
+        }
+        return { ...(input as Record<string, unknown>), [key]: value }
+      },
+    }
+    return { runner, calls }
+  }
+
+  it('setActive runs enabled script profiles after merges, in index order', async () => {
+    const { runner, calls } = fakeRunner()
+    let n = 0
+    const store = createProfileStore({
+      dir,
+      activeConfigPath,
+      idGen: () => `id${++n}`,
+      scriptRunner: runner,
+    })
+    await store.create({ name: 'base', content: 'mode: rule\n' })
+    await store.create({
+      name: 'overlay',
+      content: 'mixed-port: 7890\n',
+      type: 'merge',
+    })
+    await store.create({
+      name: 'script1',
+      content: JSON.stringify({ key: 'log-level', value: 'debug' }),
+      type: 'script',
+    })
+    await store.create({
+      name: 'script2',
+      content: JSON.stringify({ key: 'mode', value: 'global' }),
+      type: 'script',
+    })
+    await store.setActive('id1')
+    const active = parse(readFileSync(activeConfigPath, 'utf8')) as Record<
+      string,
+      unknown
+    >
+    // merge applied
+    expect(active['mixed-port']).toBe(7890)
+    // both scripts applied
+    expect(active['log-level']).toBe('debug')
+    // later script ran after merge (overrode base mode rule -> global)
+    expect(active.mode).toBe('global')
+    // Two scripts ran, in index order; script2 saw script1's output.
+    expect(calls).toHaveLength(2)
+    expect((calls[1]!.input as Record<string, unknown>)['log-level']).toBe(
+      'debug',
+    )
+  })
+
+  it('setActive skips disabled script profiles', async () => {
+    const { runner, calls } = fakeRunner()
+    let n = 0
+    const store = createProfileStore({
+      dir,
+      activeConfigPath,
+      idGen: () => `id${++n}`,
+      scriptRunner: runner,
+    })
+    await store.create({ name: 'base', content: 'mode: rule\n' })
+    await store.create({
+      name: 'script1',
+      content: JSON.stringify({ key: 'mode', value: 'global' }),
+      type: 'script',
+    })
+    await store.update('id2', { enabled: false })
+    await store.setActive('id1')
+    const active = parse(readFileSync(activeConfigPath, 'utf8')) as Record<
+      string,
+      unknown
+    >
+    expect(active.mode).toBe('rule')
+    expect(calls).toHaveLength(0)
+  })
+
+  it('setActive writes the base byte-identical when there are no merges AND no scripts', async () => {
+    const { runner } = fakeRunner()
+    const store = createProfileStore({
+      dir,
+      activeConfigPath,
+      idGen: () => 'id1',
+      scriptRunner: runner,
+    })
+    const content = 'mixed-port: 7890\n# a comment\nmode:   rule\n'
+    await store.create({ name: 'base', content })
+    await store.setActive('id1')
+    expect(readFileSync(activeConfigPath, 'utf8')).toBe(content)
+  })
+
+  it('setActive cannot target a script profile as the base', async () => {
+    const { runner } = fakeRunner()
+    const store = createProfileStore({
+      dir,
+      activeConfigPath,
+      idGen: () => 'id1',
+      scriptRunner: runner,
+    })
+    await store.create({
+      name: 'script1',
+      content: JSON.stringify({ key: 'mode', value: 'global' }),
+      type: 'script',
+    })
+    await expect(store.setActive('id1')).rejects.toThrow(/script/i)
+  })
+})
+
 describe('createProfileStore — refresh', () => {
   it('refresh re-fetches in place: same id, overwritten content, new subscriptionInfo + updatedAt', async () => {
     const dir = mkdtempSync(join(tmpdir(), 'mcxd-profiles-ref-'))

@@ -67,13 +67,13 @@ export interface SystemProxyController {
   describe: () => { port: number; bypass: string[] }
 }
 
-export type ProfileType = 'local' | 'remote' | 'merge'
+export type ProfileType = 'local' | 'remote' | 'merge' | 'script'
 
 export interface ProfileMeta {
   id: string
   name: string
   type: ProfileType
-  enabled?: boolean // merge-only; treat undefined as true (overlay is applied)
+  enabled?: boolean // merge/script-only; treat undefined as true (overlay/transform is applied)
   url?: string
   userAgent?: string
   updateInterval?: number // minutes; only meaningful for remote profiles
@@ -92,7 +92,7 @@ export interface ProfileStore {
   create: (i: {
     name: string
     content?: string
-    type?: 'local' | 'merge'
+    type?: 'local' | 'merge' | 'script'
   }) => Promise<ProfileMeta>
   update: (
     id: string,

@@ -1,3 +1,4 @@
+import type { ScriptRunner } from './script'
 import type { ProfileMeta, ProfileStore } from './types'
 import { randomUUID } from 'node:crypto'
 import { existsSync } from 'node:fs'
@@ -11,6 +12,9 @@ export interface ProfileStoreOptions {
   activeConfigPath: string
   fetch?: typeof fetch
   idGen?: () => string
+  // Runs enabled 'script' profiles during setActive. Injected so tests use a
+  // fake (no real worker). Absent runner => script profiles are skipped.
+  scriptRunner?: ScriptRunner
 }
 
 interface StateFile {
@@ -22,7 +26,7 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 }
 
 export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
-  const { dir, activeConfigPath } = opts
+  const { dir, activeConfigPath, scriptRunner } = opts
   const doFetch = opts.fetch ?? fetch
   const idGen = opts.idGen ?? (() => randomUUID())
   const indexPath = join(dir, 'index.json')
@@ -209,23 +213,39 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
 
     async setActive(id) {
       const base = await findMeta(id)
-      if (base.type === 'merge') {
+      if (base.type === 'merge' || base.type === 'script') {
         throw new Error(
-          `setActive: profile ${id} is a merge overlay and cannot be the active base`,
+          `setActive: profile ${id} is a ${base.type} overlay and cannot be the active base`,
         )
       }
       const baseContent = await readFile(profilePath(id), 'utf8')
+      const index = await readIndex()
       // Collect enabled merge overlays in index order (undefined enabled == on).
       const overlays: string[] = []
-      for (const meta of await readIndex()) {
-        if (meta.type === 'merge' && meta.enabled !== false) {
+      // Collect enabled script profiles in index order (undefined enabled == on).
+      // A runner is required to apply them; without one, scripts are skipped.
+      const scripts: string[] = []
+      for (const meta of index) {
+        if (meta.enabled === false) continue
+        if (meta.type === 'merge') {
           overlays.push(await readFile(profilePath(meta.id), 'utf8'))
+        } else if (meta.type === 'script' && scriptRunner) {
+          scripts.push(await readFile(profilePath(meta.id), 'utf8'))
         }
       }
-      // No overlays -> write the base verbatim (preserve formatting byte-for-byte).
-      const content = overlays.length
+      // Compose pipeline: base -> merge overlays -> script transforms.
+      // No overlays AND no scripts -> write the base verbatim (preserve
+      // formatting byte-for-byte).
+      let content = overlays.length
         ? mergeConfigs(baseContent, overlays)
         : baseContent
+      if (scripts.length && scriptRunner) {
+        let obj = parse(content) as unknown
+        for (const code of scripts) {
+          obj = await scriptRunner.run(code, obj)
+        }
+        content = stringify(obj)
+      }
       await mkdir(join(activeConfigPath, '..'), { recursive: true })
       await writeFile(activeConfigPath, content)
       await writeState({ activeId: id })
