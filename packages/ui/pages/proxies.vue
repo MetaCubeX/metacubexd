@@ -47,7 +47,11 @@ const configStore = useConfigStore()
 const nodeRecommendationStore = useNodeRecommendationStore()
 
 // Batch latency test
-const { isRunning: isBatchTesting, testMultipleGroups } = useBatchLatencyTest()
+const {
+  isRunning: isBatchTesting,
+  testMultipleGroups,
+  healthCheckAllProviders,
+} = useBatchLatencyTest()
 
 const activeTab = ref<'proxies' | 'proxyProviders'>('proxies')
 const settingsModal = ref<{ open: () => void; close: () => void }>()
@@ -775,6 +779,23 @@ const ProviderProxyNodes = defineComponent({
             {{ nodeRecommendationStore.batchTestProgress.current }}
           </span>
         </div>
+
+        <!-- Health-check All Providers Button -->
+        <Button
+          v-if="activeTab === 'proxyProviders'"
+          class="flex h-9 items-center gap-1.5 rounded-[0.625rem] border border-base-content/10 bg-base-200/80 px-3 transition-all duration-200 hover:border-primary/30 hover:bg-primary/15 hover:text-primary"
+          :disabled="isBatchTesting"
+          :title="t('healthCheckAllProviders')"
+          @click="healthCheckAllProviders"
+        >
+          <IconBrandSpeedtest
+            :size="18"
+            :class="{ 'animate-pulse text-success': isBatchTesting }"
+          />
+          <span class="hidden text-sm font-medium sm:inline">
+            {{ t('healthCheckAllProviders') }}
+          </span>
+        </Button>
 
         <Button
           v-if="activeTab === 'proxyProviders'"

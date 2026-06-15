@@ -1,8 +1,17 @@
+import { toast } from 'vue-sonner'
 import { useRequest } from './useApi'
+
+// `useI18n` is auto-imported by @nuxtjs/i18n (no explicit import). In unit
+// tests it is provided as a global stub via test/setup.ts.
+declare function useI18n(): { t: (key: string, named?: object) => string }
 
 // Batch test configuration
 const BATCH_SIZE = 10 // Max concurrent tests
 const BATCH_DELAY = 200 // Delay between batches in ms
+// How many providers to health-check concurrently. Each provider already fans
+// out to its own member nodes (bounded inside proxyProviderLatencyTest), so we
+// keep the outer fan-out small to avoid flooding the kernel.
+const PROVIDER_HEALTHCHECK_CONCURRENCY = 3
 
 function waitForBatchDelay(signal?: AbortSignal): Promise<void> {
   if (signal?.aborted) return Promise.resolve()
@@ -34,6 +43,7 @@ export function useBatchLatencyTest() {
   const configStore = useConfigStore()
   const proxiesStore = useProxiesStore()
   const nodeRecommendationStore = useNodeRecommendationStore()
+  const { t } = useI18n()
 
   const isRunning = ref(false)
   const progress = ref({ completed: 0, total: 0, current: '' })
@@ -275,6 +285,82 @@ export function useBatchLatencyTest() {
     return allResults
   }
 
+  // Health-check every proxy provider. Distinct from "test all groups" (which
+  // walks proxy GROUPS) and "update all providers" (which re-downloads them):
+  // this fires a latency/health probe across every provider's member nodes.
+  //
+  // Each provider's own member fan-out is bounded inside
+  // proxyProviderLatencyTest; here we additionally bound how many providers run
+  // concurrently. Per-provider failures are surfaced via toast (never silently
+  // swallowed) and do not abort the remaining providers.
+  const healthCheckAllProviders = async (): Promise<void> => {
+    const providerNames = proxiesStore.proxyProviders.map(
+      (provider) => provider.name,
+    )
+    if (providerNames.length === 0) return
+
+    isRunning.value = true
+    nodeRecommendationStore.batchTestProgress = {
+      total: providerNames.length,
+      completed: 0,
+      current: null,
+      isRunning: true,
+    }
+
+    const failed: string[] = []
+
+    try {
+      for (
+        let i = 0;
+        i < providerNames.length;
+        i += PROVIDER_HEALTHCHECK_CONCURRENCY
+      ) {
+        const batch = providerNames.slice(
+          i,
+          i + PROVIDER_HEALTHCHECK_CONCURRENCY,
+        )
+
+        await Promise.all(
+          batch.map(async (providerName) => {
+            nodeRecommendationStore.batchTestProgress.current = providerName
+            try {
+              await proxiesStore.proxyProviderLatencyTest(providerName)
+            } catch (e) {
+              failed.push(providerName)
+              console.error(
+                `health-check failed for provider "${providerName}"`,
+                e,
+              )
+            } finally {
+              nodeRecommendationStore.batchTestProgress.completed++
+            }
+          }),
+        )
+
+        // Delay between batches (except for the last batch)
+        if (i + PROVIDER_HEALTHCHECK_CONCURRENCY < providerNames.length) {
+          await new Promise((resolve) => setTimeout(resolve, BATCH_DELAY))
+        }
+      }
+
+      if (failed.length > 0) {
+        toast.error(t('providerHealthCheckFailed'), {
+          description: failed.join(', '),
+        })
+      } else {
+        toast.success(t('providerHealthCheckSuccess'))
+      }
+    } finally {
+      isRunning.value = false
+      nodeRecommendationStore.batchTestProgress = {
+        total: providerNames.length,
+        completed: providerNames.length,
+        current: null,
+        isRunning: false,
+      }
+    }
+  }
+
   // Abort ongoing test
   const abortTest = () => {
     abortController.value?.abort()
@@ -286,6 +372,7 @@ export function useBatchLatencyTest() {
     batchTestNodes,
     testGroupNodes,
     testMultipleGroups,
+    healthCheckAllProviders,
     abortTest,
   }
 }

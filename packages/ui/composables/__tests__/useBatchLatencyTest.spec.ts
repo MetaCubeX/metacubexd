@@ -13,6 +13,13 @@ vi.mock('../useApi', () => ({
   }),
 }))
 
+// Hoisted so the mock factory (runs before the module body) can reference it.
+const { toast } = vi.hoisted(() => ({
+  toast: { success: vi.fn(), error: vi.fn() },
+}))
+vi.mock('vue-sonner', () => ({ toast }))
+// useI18n() is provided as a global stub via test/setup.ts (returns the key).
+
 // Mock stores
 const mockConfigStore = {
   urlForLatencyTest: 'https://www.gstatic.com/generate_204',
@@ -36,14 +43,18 @@ const mockProxiesStore: {
   fetchProxies: ReturnType<typeof vi.fn>
   recordLatencyTestResult: ReturnType<typeof vi.fn>
   recordLatencyTestResults: ReturnType<typeof vi.fn>
+  proxyProviderLatencyTest: ReturnType<typeof vi.fn>
   proxies: { name: string; all: string[] }[]
+  proxyProviders: { name: string }[]
 } = {
   clearLatencyTestStateForGroup: vi.fn(),
   clearLatencyTestStateForNodes: vi.fn(),
   fetchProxies: vi.fn(),
   recordLatencyTestResult: vi.fn(),
   recordLatencyTestResults: vi.fn(),
+  proxyProviderLatencyTest: vi.fn(),
   proxies: [],
+  proxyProviders: [],
 }
 
 vi.stubGlobal('useConfigStore', () => mockConfigStore)
@@ -60,6 +71,8 @@ describe('composables/useBatchLatencyTest', () => {
       current: null,
       isRunning: false,
     }
+    mockProxiesStore.proxyProviders = []
+    mockProxiesStore.proxyProviderLatencyTest.mockResolvedValue(undefined)
   })
 
   describe('initial state', () => {
@@ -423,6 +436,105 @@ describe('composables/useBatchLatencyTest', () => {
         current: null,
         isRunning: false,
       })
+    })
+  })
+
+  describe('healthCheckAllProviders', () => {
+    it('health-checks every proxy provider via the store action', async () => {
+      mockProxiesStore.proxyProviders = [
+        { name: 'provider-a' },
+        { name: 'provider-b' },
+        { name: 'provider-c' },
+      ]
+
+      const { healthCheckAllProviders } = useBatchLatencyTest()
+
+      await healthCheckAllProviders()
+
+      expect(mockProxiesStore.proxyProviderLatencyTest).toHaveBeenCalledTimes(3)
+      expect(mockProxiesStore.proxyProviderLatencyTest).toHaveBeenCalledWith(
+        'provider-a',
+      )
+      expect(mockProxiesStore.proxyProviderLatencyTest).toHaveBeenCalledWith(
+        'provider-b',
+      )
+      expect(mockProxiesStore.proxyProviderLatencyTest).toHaveBeenCalledWith(
+        'provider-c',
+      )
+    })
+
+    it('tracks shared progress and resets it after completion', async () => {
+      vi.useRealTimers()
+      mockProxiesStore.proxyProviders = [
+        { name: 'provider-a' },
+        { name: 'provider-b' },
+      ]
+
+      const seen: { total: number; running: boolean; storeRunning: boolean }[] =
+        []
+      mockProxiesStore.proxyProviderLatencyTest.mockImplementation(async () => {
+        seen.push({
+          total: mockNodeRecommendationStore.batchTestProgress.total,
+          running: isRunningRef.value,
+          storeRunning: mockNodeRecommendationStore.batchTestProgress.isRunning,
+        })
+      })
+
+      const composable = useBatchLatencyTest()
+      const isRunningRef = composable.isRunning
+      await composable.healthCheckAllProviders()
+
+      expect(seen).toHaveLength(2)
+      for (const snapshot of seen) {
+        expect(snapshot.total).toBe(2)
+        expect(snapshot.running).toBe(true)
+        expect(snapshot.storeRunning).toBe(true)
+      }
+
+      expect(composable.isRunning.value).toBe(false)
+      expect(mockNodeRecommendationStore.batchTestProgress).toEqual({
+        total: 2,
+        completed: 2,
+        current: null,
+        isRunning: false,
+      })
+    })
+
+    it('does nothing and does not toast when there are no providers', async () => {
+      mockProxiesStore.proxyProviders = []
+
+      const { healthCheckAllProviders } = useBatchLatencyTest()
+
+      await healthCheckAllProviders()
+
+      expect(mockProxiesStore.proxyProviderLatencyTest).not.toHaveBeenCalled()
+      expect(toast.success).not.toHaveBeenCalled()
+      expect(toast.error).not.toHaveBeenCalled()
+    })
+
+    it('surfaces failures via toast.error without aborting the remaining providers', async () => {
+      mockProxiesStore.proxyProviders = [
+        { name: 'provider-a' },
+        { name: 'provider-b' },
+      ]
+      mockProxiesStore.proxyProviderLatencyTest.mockImplementation(
+        async (name: string) => {
+          if (name === 'provider-a') throw new Error('provider boom')
+        },
+      )
+
+      const { healthCheckAllProviders, isRunning } = useBatchLatencyTest()
+
+      // Must not reject — the failure is surfaced via toast, not thrown.
+      await expect(healthCheckAllProviders()).resolves.toBeUndefined()
+
+      // The failing provider does not stop the others from being checked.
+      expect(mockProxiesStore.proxyProviderLatencyTest).toHaveBeenCalledTimes(2)
+      expect(toast.error).toHaveBeenCalled()
+      expect(isRunning.value).toBe(false)
+      expect(mockNodeRecommendationStore.batchTestProgress.isRunning).toBe(
+        false,
+      )
     })
   })
 })
