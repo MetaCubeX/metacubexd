@@ -14,7 +14,7 @@ const EXCLUDED_KEYS = new Set([
 ])
 const EXCLUDED_PREFIXES = ['bing', 'vue-query']
 
-interface SettingsBackup {
+export interface SettingsBackup {
   app: 'metacubexd'
   version: number
   exportedAt: string
@@ -62,19 +62,17 @@ export function useSettingsBackup() {
     URL.revokeObjectURL(url)
   }
 
-  // Parse + validate a backup file and write its settings back to localStorage.
-  // Returns the number of keys imported. Caller is expected to reload the app so
-  // every store re-reads localStorage.
-  async function importSettings(file: File): Promise<number> {
-    const text = await file.text()
-    let parsed: unknown
-    try {
-      parsed = JSON.parse(text)
-    } catch {
-      throw new Error('Invalid JSON file')
-    }
+  // Snapshot the (non-excluded) settings as a plain object — the same shape
+  // downloadSettings() serialises. Used by the WebDAV backup flow to ship the
+  // UI settings alongside the profile bundle (no File round-trip needed).
+  function exportSettings(): SettingsBackup {
+    return buildBackup()
+  }
 
-    const backup = parsed as Partial<SettingsBackup>
+  // Validate a backup bundle and write its settings back to localStorage.
+  // Returns the number of keys imported. Caller is expected to reload the app
+  // (or refresh the relevant stores) so every store re-reads localStorage.
+  function applySettings(backup: Partial<SettingsBackup>): number {
     if (
       !backup ||
       backup.app !== 'metacubexd' ||
@@ -93,5 +91,19 @@ export function useSettingsBackup() {
     return count
   }
 
-  return { downloadSettings, importSettings }
+  // Parse + validate a backup file and write its settings back to localStorage.
+  // Returns the number of keys imported. Caller is expected to reload the app so
+  // every store re-reads localStorage.
+  async function importSettings(file: File): Promise<number> {
+    const text = await file.text()
+    let parsed: unknown
+    try {
+      parsed = JSON.parse(text)
+    } catch {
+      throw new Error('Invalid JSON file')
+    }
+    return applySettings(parsed as Partial<SettingsBackup>)
+  }
+
+  return { downloadSettings, importSettings, exportSettings, applySettings }
 }

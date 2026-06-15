@@ -50,6 +50,7 @@ export type ControlFeature =
   | 'system-proxy'
   | 'kernel-version'
   | 'geo-assets'
+  | 'webdav-backup'
 export interface ControlInfo {
   hasAgent: boolean
   version: string
@@ -99,4 +100,29 @@ export interface KernelVersions {
 export interface GeoUpdateResult {
   ok: boolean
   files: string[]
+}
+
+// WebDAV backup/restore (capability-gated 'webdav-backup'). Credentials are
+// sent per-request — the agent never persists them (SHARED CONTRACTS).
+export interface WebdavCredentials {
+  url: string
+  username: string
+  password: string
+  dir?: string
+}
+
+// POST /api/control/backup { webdav, uiSettings? } -> { ok, path }. The agent
+// bundles every profile (meta + content) and the supplied uiSettings object.
+export interface WebdavBackupResult {
+  ok: boolean
+  path: string
+}
+
+// POST /api/control/restore { webdav } -> { ok, restored, uiSettings? }. The
+// agent recreates each backed-up profile and echoes the stored uiSettings so
+// the UI can re-apply its localStorage snapshot.
+export interface WebdavRestoreResult {
+  ok: boolean
+  restored: number
+  uiSettings?: unknown
 }

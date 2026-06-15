@@ -7,6 +7,9 @@ import type {
   ProfileMeta,
   SystemProxyState,
   ValidateResult,
+  WebdavBackupResult,
+  WebdavCredentials,
+  WebdavRestoreResult,
 } from '~/types/control'
 // packages/ui/composables/useControlApi.ts
 import ky from 'ky'
@@ -109,5 +112,14 @@ export function useControlApi() {
     // Geo assets (capability-gated 'geo-assets'). POST downloads the geoip/
     // geosite/mmdb databases into the kernel home dir and echoes { ok, files }.
     updateGeoAssets: () => client.post('geo/update').json<GeoUpdateResult>(),
+
+    // WebDAV backup/restore (capability-gated 'webdav-backup'). Credentials are
+    // sent per-request and never persisted by the agent. Backup ships every
+    // profile plus the UI settings snapshot; restore recreates the profiles and
+    // echoes the stored uiSettings for the UI to re-apply.
+    webdavBackup: (body: { webdav: WebdavCredentials; uiSettings?: unknown }) =>
+      client.post('backup', { json: body }).json<WebdavBackupResult>(),
+    webdavRestore: (body: { webdav: WebdavCredentials }) =>
+      client.post('restore', { json: body }).json<WebdavRestoreResult>(),
   }
 }

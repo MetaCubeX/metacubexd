@@ -385,6 +385,7 @@ watch(
     <KernelControlPanel />
     <KernelVersionPanel />
     <SystemProxyControlPanel />
+    <WebdavBackupPanel />
     <KernelLogView />
 
     <!-- Stats Grid -->

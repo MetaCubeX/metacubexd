@@ -183,4 +183,28 @@ describe('composables/useControlApi methods', () => {
     await useControlApi().updateGeoAssets()
     expect(post).toHaveBeenCalledWith('geo/update')
   })
+
+  it('webdavBackup() POSTs backup with { webdav, uiSettings } json body', async () => {
+    const webdav = {
+      url: 'https://dav.example.com',
+      username: 'u',
+      password: 'p',
+      dir: 'metacubexd',
+    }
+    const uiSettings = { app: 'metacubexd', settings: { theme: 'dark' } }
+    await useControlApi().webdavBackup({ webdav, uiSettings })
+    expect(post).toHaveBeenCalledWith('backup', {
+      json: { webdav, uiSettings },
+    })
+  })
+
+  it('webdavRestore() POSTs restore with { webdav } json body', async () => {
+    const webdav = {
+      url: 'https://dav.example.com',
+      username: 'u',
+      password: 'p',
+    }
+    await useControlApi().webdavRestore({ webdav })
+    expect(post).toHaveBeenCalledWith('restore', { json: { webdav } })
+  })
 })
