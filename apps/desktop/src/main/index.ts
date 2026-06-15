@@ -24,6 +24,7 @@ import {
   app,
   BrowserWindow,
   globalShortcut,
+  ipcMain,
   Menu,
   nativeImage,
   Notification,
@@ -49,6 +50,7 @@ import { readSysProxyBypass } from './sysproxy-config'
 import { createSysproxyGuard } from './sysproxy-guard'
 import { createTray, trayIconPath } from './tray'
 import { createTunRuntime } from './tun-runtime'
+import { registerWindowControls } from './window-controls'
 import {
   DEFAULT_WINDOW_BOUNDS,
   loadWindowState,
@@ -571,6 +573,14 @@ function createWindow(startHidden = false): void {
     windowStatePath(),
     DEFAULT_WINDOW_BOUNDS,
   )
+  // Custom title bar (see TitleBar.vue): macOS hides the title bar but keeps
+  // the native traffic lights (positioned to center in the 32px renderer bar);
+  // Windows/Linux go fully frameless and the renderer self-draws min/max/close.
+  const titleBarOptions: Electron.BrowserWindowConstructorOptions =
+    process.platform === 'darwin'
+      ? { titleBarStyle: 'hidden', trafficLightPosition: { x: 12, y: 9 } }
+      : { frame: false }
+
   win = new BrowserWindow({
     width: bounds.width,
     height: bounds.height,
@@ -580,6 +590,7 @@ function createWindow(startHidden = false): void {
       ? { x: bounds.x, y: bounds.y }
       : {}),
     show: false,
+    ...titleBarOptions,
     // Window icon for the Windows/Linux task bar in dev (macOS ignores it and
     // uses the dock icon set in whenReady). Packaged builds use the bundle icon.
     ...(devIcon ? { icon: devIcon } : {}),
@@ -590,6 +601,14 @@ function createWindow(startHidden = false): void {
       sandbox: false,
     },
   })
+
+  // Keep the renderer's maximize/restore button in sync with the real window
+  // state: forward every native maximize/unmaximize to the title bar. (macOS
+  // never renders that button but the events are harmless there.)
+  const sendMaximizeState = () =>
+    win?.webContents.send('window:maximize-changed', win.isMaximized())
+  win.on('maximize', sendMaximizeState)
+  win.on('unmaximize', sendMaximizeState)
   // On a hidden (login-launch) start, keep the window off-screen — the kernel
   // still boots and the tray can summon it later. A normal launch shows it once
   // the renderer is ready.
@@ -775,6 +794,10 @@ if (!app.requestSingleInstanceLock()) {
       app.getLoginItemSettings(),
     )
     createWindow(startHidden)
+    // Register the window-control IPC channels ONCE (the title bar on
+    // Windows/Linux drives minimize/maximize/close through them). getWindow is
+    // lazy so a later createWindow() (macOS reopen) is picked up automatically.
+    registerWindowControls({ ipcMain, getWindow: () => win })
     tray = createTray({
       getWindow: () => win,
       startKernel: () => void agent?.supervisor.start(),
