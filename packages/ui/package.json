@@ -82,6 +82,7 @@
     "tslib": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:",
+    "uqr": "catalog:",
     "uuid": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:",
