@@ -10,8 +10,20 @@ export default defineConfig({
     // electron + native node builtins external.
     plugins: [externalizeDepsPlugin({ exclude: ['@metacubexd/agent'] })],
     build: {
+      // Output to `out/` (not the default `out/main`) so the helper can be a
+      // sibling of main. Input keys carry the subdir: `main/index` ->
+      // out/main/index.js (keeps package.json "main": "out/main/index.js"),
+      // `helper/index` -> out/helper/index.js.
+      outDir: 'out',
       rollupOptions: {
-        input: { index: resolve(__dirname, 'src/main/index.ts') },
+        input: {
+          'main/index': resolve(__dirname, 'src/main/index.ts'),
+          // Third entry: the privileged helper (spec §12.1), bundled with the
+          // SAME main settings (node target + electron external) so the B-3
+          // installer can register `<electron-bin> out/helper/index.js`
+          // (ELECTRON_RUN_AS_NODE=1) as a privileged service.
+          'helper/index': resolve(__dirname, 'src/helper/index.ts'),
+        },
       },
     },
     // electron-vite forces `ssr.noExternal: true` (bundle everything) for the
