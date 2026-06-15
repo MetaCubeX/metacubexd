@@ -54,6 +54,7 @@ export type ControlFeature =
   | 'webdav-backup'
   | 'runtime-config'
   | 'config-sections'
+  | 'tun'
 export interface ControlInfo {
   hasAgent: boolean
   version: string
@@ -128,4 +129,16 @@ export interface WebdavRestoreResult {
   ok: boolean
   restored: number
   uiSettings?: unknown
+}
+
+// GET/POST /api/control/tun (capability-gated 'tun'). Mirror of @metacubexd/agent
+// TunController.status() (SHARED CONTRACTS). `mode` distinguishes the default
+// in-process sidecar (no TUN) from the privileged helper-spawned TUN runtime.
+// GET reflects the current state; POST body is { enabled, stack? } and the
+// response echoes this same shape. Toggling installs/elevates the helper +
+// (re)starts the kernel, so callers should treat it as a slow operation.
+export interface TunStatus {
+  enabled: boolean
+  mode: 'sidecar' | 'tun'
+  stack?: string
 }

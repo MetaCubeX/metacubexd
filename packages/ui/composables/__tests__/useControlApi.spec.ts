@@ -243,4 +243,21 @@ describe('composables/useControlApi methods', () => {
     await useControlApi().webdavRestore({ webdav })
     expect(post).toHaveBeenCalledWith('restore', { json: { webdav } })
   })
+
+  it('getTun() GETs tun', async () => {
+    await useControlApi().getTun()
+    expect(get).toHaveBeenCalledWith('tun')
+  })
+
+  it('setTun() POSTs tun with { enabled, stack } json body', async () => {
+    await useControlApi().setTun({ enabled: true, stack: 'gvisor' })
+    expect(post).toHaveBeenCalledWith('tun', {
+      json: { enabled: true, stack: 'gvisor' },
+    })
+  })
+
+  it('setTun() POSTs tun with just { enabled } when no stack given', async () => {
+    await useControlApi().setTun({ enabled: false })
+    expect(post).toHaveBeenCalledWith('tun', { json: { enabled: false } })
+  })
 })

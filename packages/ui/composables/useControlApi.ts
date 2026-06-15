@@ -6,6 +6,7 @@ import type {
   ProfileDetail,
   ProfileMeta,
   SystemProxyState,
+  TunStatus,
   ValidateResult,
   WebdavBackupResult,
   WebdavCredentials,
@@ -139,5 +140,14 @@ export function useControlApi() {
       client.post('backup', { json: body }).json<WebdavBackupResult>(),
     webdavRestore: (body: { webdav: WebdavCredentials }) =>
       client.post('restore', { json: body }).json<WebdavRestoreResult>(),
+
+    // TUN mode (capability-gated 'tun'). GET reflects the current sidecar/tun
+    // state; POST { enabled, stack? } toggles it and echoes the same TunStatus.
+    // Enabling installs/elevates the privileged helper and privileged-restarts
+    // mihomo (slow); disabling tears TUN down and returns to the sidecar — it
+    // doubles as the "recover network" escape hatch (SHARED CONTRACTS).
+    getTun: () => client.get('tun').json<TunStatus>(),
+    setTun: (body: { enabled: boolean; stack?: string }) =>
+      client.post('tun', { json: body }).json<TunStatus>(),
   }
 }
