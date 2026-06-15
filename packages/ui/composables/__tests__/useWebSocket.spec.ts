@@ -57,18 +57,36 @@ const mockConfigStore = {
   logLevel: 'info',
 }
 
+// Kernel-control gating (desktop). Defaults below (set in beforeEach) keep the
+// composable in "web dashboard" mode — no kernel-control feature — so the
+// existing always-connect/always-reconnect tests are unaffected.
+let mockHasFeature: (f: string) => boolean = () => false
+let mockKernelState: { status?: string } | null = null
+
 vi.stubGlobal('WebSocket', MockWebSocket)
 vi.stubGlobal('useEndpointStore', () => mockEndpointStore)
 vi.stubGlobal('useConnectionsStore', () => mockConnectionsStore)
 vi.stubGlobal('useGlobalStore', () => mockGlobalStore)
 vi.stubGlobal('useLogsStore', () => mockLogsStore)
 vi.stubGlobal('useConfigStore', () => mockConfigStore)
+vi.stubGlobal('useControlInfo', () => ({
+  hasFeature: (f: string) => mockHasFeature(f),
+}))
+// `state` is a getter so the composable reads the CURRENT kernel status each
+// time (mirrors pinia reactivity), letting a test flip status mid-run.
+vi.stubGlobal('useKernelStore', () => ({
+  get state() {
+    return mockKernelState
+  },
+}))
 
 describe('composables/useWebSocket', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     MockWebSocket.instances = []
     mockUseMockMode.mockReturnValue(false)
+    mockHasFeature = () => false
+    mockKernelState = null
   })
 
   it('closes existing sockets before reconnecting', () => {
@@ -151,5 +169,61 @@ describe('composables/useWebSocket', () => {
     expect(MockWebSocket.instances).toHaveLength(4)
 
     vi.useRealTimers()
+  })
+
+  describe('desktop kernel-control gating', () => {
+    it('opens no sockets when kernel-controlled and the kernel is not running', () => {
+      mockHasFeature = (f) => f === 'kernel-control'
+      mockKernelState = { status: 'stopped' }
+
+      const { connect } = useBackendWebSocket()
+      connect()
+
+      // Clash API port is closed while the kernel is down — stay silent instead
+      // of reconnect-looping on ERR_CONNECTION_REFUSED.
+      expect(MockWebSocket.instances).toHaveLength(0)
+    })
+
+    it('opens no logs socket via reconnectLogs while the kernel is stopped', () => {
+      mockHasFeature = (f) => f === 'kernel-control'
+      mockKernelState = { status: 'stopped' }
+
+      const { reconnectLogs } = useBackendWebSocket()
+      reconnectLogs()
+
+      expect(MockWebSocket.instances).toHaveLength(0)
+    })
+
+    it('opens sockets when kernel-controlled and the kernel is running', () => {
+      mockHasFeature = (f) => f === 'kernel-control'
+      mockKernelState = { status: 'running' }
+
+      const { connect } = useBackendWebSocket()
+      connect()
+
+      expect(MockWebSocket.instances).toHaveLength(4)
+    })
+
+    it('does not reconnect once the kernel has stopped', async () => {
+      vi.useFakeTimers()
+      mockHasFeature = (f) => f === 'kernel-control'
+      mockKernelState = { status: 'running' }
+
+      const { connect } = useBackendWebSocket()
+      connect()
+      expect(MockWebSocket.instances).toHaveLength(4)
+
+      // Kernel stops: its API port closes, dropping every socket.
+      mockKernelState = { status: 'stopped' }
+      for (const socket of [...MockWebSocket.instances]) {
+        socket.onclose?.(new Event('close'))
+      }
+      await vi.advanceTimersByTimeAsync(4000)
+
+      // No reconnect attempt while the kernel is down.
+      expect(MockWebSocket.instances).toHaveLength(4)
+
+      vi.useRealTimers()
+    })
   })
 })

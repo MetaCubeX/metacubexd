@@ -12,6 +12,16 @@ export function useBackendWebSocket() {
   const globalStore = useGlobalStore()
   const logsStore = useLogsStore()
   const configStore = useConfigStore()
+  const kernelStore = useKernelStore()
+  const { hasFeature } = useControlInfo()
+
+  // In the desktop app the Clash API is served by the managed kernel; when the
+  // kernel is stopped that port is closed, so opening (or reconnecting) any
+  // socket just loops on ERR_CONNECTION_REFUSED. Only talk to it while the
+  // kernel is running. The web dashboard has no kernel-control feature, so this
+  // is always true there — preserving the original always-connect behavior.
+  const kernelAllowsConnection = () =>
+    !hasFeature('kernel-control') || kernelStore.state?.status === 'running'
 
   // WebSocket connections
   let connectionsWs: WebSocket | null = null
@@ -41,6 +51,7 @@ export function useBackendWebSocket() {
     if (useMockMode()) return
     if (reconnectTimer) return
     if (!endpointStore.currentEndpoint) return
+    if (!kernelAllowsConnection()) return
     reconnectTimer = setTimeout(() => {
       reconnectTimer = null
       connect()
@@ -166,6 +177,10 @@ export function useBackendWebSocket() {
       return
     }
 
+    // Desktop: don't open sockets while the managed kernel is down (its Clash
+    // API port is closed). disconnect() above already cleared everything.
+    if (!kernelAllowsConnection()) return
+
     // Connections WebSocket
     connectionsWs = createWebSocket('connections', (data: unknown) => {
       const wsMsg = data as WsMsg
@@ -230,6 +245,8 @@ export function useBackendWebSocket() {
   const createLogsWebSocket = (): WebSocket | null => {
     const endpoint = endpointStore.currentEndpoint
     if (!endpoint) return null
+    // Same kernel gate as connect(): no logs socket while the kernel is down.
+    if (!kernelAllowsConnection()) return null
 
     const wsUrl = endpointStore.wsEndpointURL
     const params = new URLSearchParams()
