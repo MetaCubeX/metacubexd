@@ -102,6 +102,35 @@ const enhancedModes = ['fake-ip', 'redir-host']
 // TUN stack options
 const tunStacks = ['Mixed', 'gVisor', 'System', 'LWIP']
 
+// TUN section wiring. On desktop (capability 'tun') flipping TUN cannot go
+// through the unprivileged Clash-API PATCH — it must route through
+// /api/control/tun so the agent installs/elevates the privileged helper and
+// privileged-restarts mihomo. On a plain remote backend the capability is
+// absent and we keep the existing PATCH behaviour (the `patch` callback).
+const tunConfig = useTunConfig({
+  patch: (value) => updateConfig('tun', value),
+})
+onMounted(() => tunConfig.init())
+
+async function onTunToggle() {
+  // In desktop mode onToggle drives the privileged enable/disable and syncs its
+  // own status; keep the local checkbox in lock-step with the resolved state so
+  // a rejected/cancelled elevation does not leave the toggle stuck "on".
+  await tunConfig.onToggle(localConfig.tunEnable, localConfig.tunStack)
+  if (tunConfig.desktopMode.value) {
+    localConfig.tunEnable = tunConfig.enabled.value
+  }
+}
+
+function onTunStackChange() {
+  void tunConfig.onStackChange(localConfig.tunStack)
+}
+
+async function onRecoverNetwork() {
+  await tunConfig.onRecoverNetwork()
+  localConfig.tunEnable = tunConfig.enabled.value
+}
+
 // DNS Query
 const dnsQuery = reactive({
   name: '',
@@ -171,7 +200,11 @@ watch(
       localConfig.mode = config.mode || 'rule'
       localConfig.unifiedDelay = config.UnifiedDelay || false
       localConfig.interfaceName = config['interface-name'] || ''
-      localConfig.tunEnable = config.tun?.enable || false
+      // On desktop the live TUN state is owned by /api/control/tun (synced via
+      // the watch below); only seed from the Clash config on a remote backend.
+      if (!tunConfig.desktopMode.value) {
+        localConfig.tunEnable = config.tun?.enable || false
+      }
       localConfig.tunStack = config.tun?.stack || 'Mixed'
       localConfig.tunDevice = config.tun?.device || ''
       localConfig.mixedPort = config['mixed-port'] || 0
@@ -185,6 +218,17 @@ watch(
     }
   },
   { immediate: true },
+)
+
+// Desktop: mirror the live /api/control/tun status into the toggle + stack
+// select (the GET resolves after init(), and enable/disable update it).
+watch(
+  () => [tunConfig.enabled.value, tunConfig.stack.value] as const,
+  ([enabled, stack]) => {
+    if (!tunConfig.desktopMode.value) return
+    localConfig.tunEnable = enabled
+    if (stack) localConfig.tunStack = stack
+  },
 )
 
 const portList = computed(() => [
@@ -540,11 +584,67 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                     v-model="localConfig.tunEnable"
                     type="checkbox"
                     class="toggle toggle-primary"
-                    @change="
-                      updateConfig('tun', { enable: localConfig.tunEnable })
+                    :disabled="
+                      tunConfig.desktopMode.value && tunConfig.busy.value
                     "
+                    @change="onTunToggle"
                   />
                 </div>
+
+                <!-- Desktop (capability 'tun'): live status + install/elevation
+                     note + recover-network escape hatch. -->
+                <template v-if="tunConfig.desktopMode.value">
+                  <div
+                    class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5"
+                  >
+                    <span class="pl-5 text-sm opacity-70">{{
+                      t('tunStatusLabel')
+                    }}</span>
+                    <span
+                      class="badge badge-sm"
+                      :class="
+                        tunConfig.enabled.value
+                          ? 'badge-success'
+                          : 'badge-ghost'
+                      "
+                    >
+                      {{
+                        tunConfig.enabled.value
+                          ? t('tunStatusActive')
+                          : t('tunStatusSidecar')
+                      }}
+                    </span>
+                  </div>
+
+                  <p
+                    v-if="tunConfig.showInstallNote.value"
+                    class="px-2 text-xs leading-relaxed opacity-60"
+                  >
+                    {{ t('tunInstallNote') }}
+                  </p>
+
+                  <Button
+                    v-if="tunConfig.showRecoverButton.value"
+                    class="btn-outline btn-sm btn-error"
+                    :loading="tunConfig.busy.value"
+                    @click="onRecoverNetwork"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="size-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path
+                        d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"
+                      />
+                      <path d="M3 3v5h5" />
+                    </svg>
+                    {{ t('tunRecoverNetwork') }}
+                  </Button>
+                </template>
 
                 <div
                   class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 transition-colors hover:bg-base-content/5"
@@ -556,9 +656,10 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                     id="tun-ip-stack"
                     v-model="localConfig.tunStack"
                     class="select-bordered select w-32 select-sm"
-                    @change="
-                      updateConfig('tun', { stack: localConfig.tunStack })
+                    :disabled="
+                      tunConfig.desktopMode.value && tunConfig.busy.value
                     "
+                    @change="onTunStackChange"
                   >
                     <option
                       v-for="stack in tunStacks"
@@ -570,7 +671,10 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                   </select>
                 </div>
 
+                <!-- TUN device name is agent-managed on desktop; only editable
+                     against a plain remote backend (Clash-API PATCH). -->
                 <div
+                  v-if="!tunConfig.desktopMode.value"
                   class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 transition-colors hover:bg-base-content/5"
                 >
                   <div class="flex items-center gap-2 text-sm">
