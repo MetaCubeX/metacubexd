@@ -35,6 +35,11 @@ import { shouldStartHidden } from './startup'
 import { createSystemProxyController } from './sysproxy'
 import { readSysProxyBypass } from './sysproxy-config'
 import { createTray, trayIconPath } from './tray'
+import {
+  DEFAULT_WINDOW_BOUNDS,
+  loadWindowState,
+  saveWindowState,
+} from './window-state'
 
 // Real fs adapter for bootstrapDataDir (recursive mkdir is idempotent).
 const fsAdapter: FsLike = {
@@ -205,11 +210,52 @@ async function boot(): Promise<void> {
   process.env.MCXD_MIXED_PORT = String(mixedPort)
 }
 
+// Path to the persisted main-window geometry under userData.
+function windowStatePath(): string {
+  return join(app.getPath('userData'), 'window-state.json')
+}
+
+// Debounce the write-on-resize/move so a drag doesn't fan out to hundreds of
+// disk writes; the close handler flushes synchronously regardless.
+let saveWindowTimer: ReturnType<typeof setTimeout> | null = null
+
+function persistWindowBounds(immediate = false): void {
+  if (!win || win.isDestroyed()) return
+  const bounds = win.getBounds()
+  const write = (): void =>
+    saveWindowState(fsAdapter, windowStatePath(), bounds)
+  if (immediate) {
+    if (saveWindowTimer) {
+      clearTimeout(saveWindowTimer)
+      saveWindowTimer = null
+    }
+    write()
+    return
+  }
+  if (saveWindowTimer) clearTimeout(saveWindowTimer)
+  saveWindowTimer = setTimeout(() => {
+    saveWindowTimer = null
+    write()
+  }, 300)
+}
+
 function createWindow(startHidden = false): void {
   const devIcon = devAppIcon()
+  // Restore the persisted geometry (sanitized) so the window reopens where the
+  // user left it; first run / corrupt state falls back to the default size.
+  const bounds = loadWindowState(
+    fsAdapter,
+    windowStatePath(),
+    DEFAULT_WINDOW_BOUNDS,
+  )
   win = new BrowserWindow({
-    width: 1280,
-    height: 800,
+    width: bounds.width,
+    height: bounds.height,
+    // Only pass x/y when both survived sanitization — otherwise let Electron
+    // center the window on the primary display.
+    ...(bounds.x !== undefined && bounds.y !== undefined
+      ? { x: bounds.x, y: bounds.y }
+      : {}),
     show: false,
     // Window icon for the Windows/Linux task bar in dev (macOS ignores it and
     // uses the dock icon set in whenReady). Packaged builds use the bundle icon.
@@ -225,6 +271,11 @@ function createWindow(startHidden = false): void {
   // still boots and the tray can summon it later. A normal launch shows it once
   // the renderer is ready.
   if (!startHidden) win.once('ready-to-show', () => win?.show())
+  // Persist the geometry as the user resizes/moves; flush on close so the final
+  // position is saved even if the debounce timer hadn't fired yet.
+  win.on('resize', () => persistWindowBounds())
+  win.on('move', () => persistWindowBounds())
+  win.on('close', () => persistWindowBounds(true))
   // Load over http from the same-origin control server (NOT file://) so web
   // workers (Monaco) and same-origin /api/control fetch/SSE work. boot() always
   // runs before createWindow(), so rendererUrl is set.
