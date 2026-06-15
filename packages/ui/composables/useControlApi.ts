@@ -119,6 +119,17 @@ export function useControlApi() {
     // as text — not JSON. Missing file resolves to ''.
     getRuntimeConfig: () => client.get('config/runtime').text(),
 
+    // Config sections (capability-gated 'config-sections'). GET reads ONE parsed
+    // top-level key of the active profile (e.g. rules, dns, sniffer) — resolves
+    // to null when absent / no active profile. PUT { key, value } replaces that
+    // section, re-activates the profile and restarts the kernel ONCE (so a GUI
+    // editor batches every local edit into a single save). PUT echoes the
+    // restarted KernelState. SHARED CONTRACTS.
+    getConfigSection: <T = unknown>(key: string) =>
+      client.get('config/section', { searchParams: { key } }).json<T>(),
+    setConfigSection: (body: { key: string; value: unknown }) =>
+      client.put('config/section', { json: body }).json<KernelState>(),
+
     // WebDAV backup/restore (capability-gated 'webdav-backup'). Credentials are
     // sent per-request and never persisted by the agent. Backup ships every
     // profile plus the UI settings snapshot; restore recreates the profiles and

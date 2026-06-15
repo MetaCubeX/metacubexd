@@ -1,21 +1,28 @@
 <script setup lang="ts">
+import type { RuleEntry } from '~/composables/useRuleEditor'
 import type { Rule, RuleProvider } from '~/types'
 import {
+  IconEdit,
   IconFilter,
   IconFilterOff,
+  IconGripVertical,
+  IconPlus,
   IconReload,
   IconSearch,
+  IconTrash,
   IconX,
 } from '@tabler/icons-vue'
 import { useVirtualizer } from '@tanstack/vue-virtual'
 import { matchSorter } from 'match-sorter'
 import { computed, ref, watch } from 'vue'
+import { toast } from 'vue-sonner'
 import {
   useRuleProvidersQuery,
   useRulesQuery,
   useToggleRuleDisabledMutation,
   useUpdateRuleProviderMutation,
 } from '~/composables/useQueries'
+import { useRuleEditor } from '~/composables/useRuleEditor'
 import { RULES_ORDERING_TYPE_ORDER } from '~/constants'
 import {
   filterRules,
@@ -32,7 +39,11 @@ const configStore = useConfigStore()
 useHead({ title: computed(() => t('rules')) })
 
 // TanStack Query
-const { data: rules = ref([]), isLoading: isLoadingRules } = useRulesQuery()
+const {
+  data: rules = ref([]),
+  isLoading: isLoadingRules,
+  refetch: refetchRules,
+} = useRulesQuery()
 const { data: ruleProviders = ref([]), isLoading: isLoadingProviders } =
   useRuleProvidersQuery()
 const updateProviderMutation = useUpdateRuleProviderMutation()
@@ -203,6 +214,58 @@ const rulesTotalSize = computed(() => rulesVirtualizer.value.getTotalSize())
 const providersTotalSize = computed(() =>
   providersVirtualizer.value.getTotalSize(),
 )
+
+// ---- GUI rule editor (desktop, gated on the config-sections feature) -------
+// Additive: the read-only list above (hit counts etc.) is untouched. Local
+// edits are batched and persisted with a SINGLE PUT so the kernel restarts once.
+const ruleEditor = useRuleEditor()
+const editorModalRef = ref<{ open: () => void; close: () => void }>()
+const editorSaving = ref(false)
+const dragIndex = ref<number | null>(null)
+
+async function openRuleEditor() {
+  await ruleEditor.load()
+  editorModalRef.value?.open()
+}
+
+function addRuleEntry() {
+  ruleEditor.add({ type: '', payload: '', policy: '' })
+}
+
+function updateRuleField(
+  index: number,
+  field: keyof Pick<RuleEntry, 'type' | 'payload' | 'policy'>,
+  value: string,
+) {
+  const current = ruleEditor.rules.value[index]
+  if (!current) return
+  ruleEditor.update(index, { ...current, [field]: value })
+}
+
+function onRuleDragStart(index: number) {
+  dragIndex.value = index
+}
+
+function onRuleDrop(index: number) {
+  const from = dragIndex.value
+  dragIndex.value = null
+  if (from === null || from === index) return
+  ruleEditor.move(from, index)
+}
+
+async function saveRuleEditor() {
+  editorSaving.value = true
+  try {
+    const ok = await ruleEditor.save()
+    if (!ok) return
+    toast.success(t('rulesEditorSaved'))
+    editorModalRef.value?.close()
+    // Kernel restarted with the new rules — refresh the read-only view.
+    await refetchRules()
+  } finally {
+    editorSaving.value = false
+  }
+}
 </script>
 
 <template>
@@ -257,6 +320,16 @@ const providersTotalSize = computed(() =>
               :placeholder="t('search')"
             />
           </div>
+
+          <Button
+            v-if="activeTab === 'rules' && ruleEditor.available.value"
+            class="flex h-9 items-center gap-1.5 rounded-[0.625rem] border border-primary/20 bg-primary/10 px-3 text-sm font-medium text-primary transition-all duration-200 hover:bg-primary/20"
+            :title="t('editRules')"
+            @click="openRuleEditor"
+          >
+            <IconEdit :size="16" />
+            <span class="hidden sm:inline">{{ t('editRules') }}</span>
+          </Button>
 
           <Button
             v-if="activeTab === 'ruleProviders'"
@@ -584,6 +657,131 @@ const providersTotalSize = computed(() =>
         </div>
       </div>
     </template>
+
+    <!-- GUI rule editor modal (desktop, config-sections feature). Additive — the
+         read-only list above is unchanged. -->
+    <Modal
+      v-if="ruleEditor.available.value"
+      ref="editorModalRef"
+      :title="t('editRules')"
+    >
+      <template #icon>
+        <IconEdit :size="20" />
+      </template>
+
+      <div class="flex flex-col gap-2">
+        <p class="text-xs text-base-content/60">
+          {{ t('rulesEditorHint') }}
+        </p>
+
+        <!-- Column headers -->
+        <div
+          class="grid grid-cols-[auto_1fr_1.4fr_1fr_auto] items-center gap-2 px-1 text-xs font-medium text-base-content/50"
+        >
+          <span class="w-4" />
+          <span>{{ t('type') }}</span>
+          <span>{{ t('payload') }}</span>
+          <span>{{ t('policy') }}</span>
+          <span class="w-7" />
+        </div>
+
+        <!-- Editable rows (draggable to reorder) -->
+        <div
+          v-for="(entry, index) in ruleEditor.rules.value"
+          :key="index"
+          class="grid grid-cols-[auto_1fr_1.4fr_1fr_auto] items-center gap-2 rounded-lg border border-base-content/8 bg-base-200/50 p-1.5"
+          :class="{ 'opacity-50': dragIndex === index }"
+          draggable="true"
+          @dragstart="onRuleDragStart(index)"
+          @dragover.prevent
+          @drop="onRuleDrop(index)"
+          @dragend="dragIndex = null"
+        >
+          <span class="cursor-grab text-base-content/40" :title="t('reorder')">
+            <IconGripVertical :size="16" />
+          </span>
+          <input
+            :value="entry.type"
+            class="input-bordered input input-sm w-full rounded-md text-xs"
+            :placeholder="t('type')"
+            @input="
+              updateRuleField(
+                index,
+                'type',
+                ($event.target as HTMLInputElement).value,
+              )
+            "
+          />
+          <input
+            :value="entry.payload"
+            class="input-bordered input input-sm w-full rounded-md text-xs"
+            :placeholder="t('payload')"
+            @input="
+              updateRuleField(
+                index,
+                'payload',
+                ($event.target as HTMLInputElement).value,
+              )
+            "
+          />
+          <input
+            :value="entry.policy"
+            class="input-bordered input input-sm w-full rounded-md text-xs"
+            :placeholder="t('policy')"
+            @input="
+              updateRuleField(
+                index,
+                'policy',
+                ($event.target as HTMLInputElement).value,
+              )
+            "
+          />
+          <Button
+            class="flex h-7 w-7 items-center justify-center rounded-md text-base-content/50 transition-colors hover:bg-error/15 hover:text-error"
+            :title="t('delete')"
+            @click="ruleEditor.remove(index)"
+          >
+            <IconTrash :size="16" />
+          </Button>
+        </div>
+
+        <div
+          v-if="ruleEditor.rules.value.length === 0"
+          class="py-6 text-center text-sm text-base-content/40"
+        >
+          {{ t('noRules') }}
+        </div>
+
+        <Button
+          class="mt-1 flex items-center justify-center gap-1.5 rounded-lg border border-dashed border-primary/30 py-2 text-sm text-primary transition-colors hover:bg-primary/10"
+          @click="addRuleEntry"
+        >
+          <IconPlus :size="16" />
+          {{ t('add') }}
+        </Button>
+      </div>
+
+      <template #actions>
+        <Button
+          class="rounded-lg border border-base-content/10 px-4 py-1.5 text-sm text-base-content/70 transition-colors hover:bg-base-content/5"
+          :disabled="editorSaving"
+          @click="editorModalRef?.close()"
+        >
+          {{ t('cancel') }}
+        </Button>
+        <Button
+          class="rounded-lg bg-primary px-4 py-1.5 text-sm font-medium text-primary-content transition-colors hover:bg-primary/90 disabled:opacity-50"
+          :disabled="editorSaving"
+          @click="saveRuleEditor"
+        >
+          <span
+            v-if="editorSaving"
+            class="loading mr-1 loading-xs loading-spinner"
+          />
+          {{ t('save') }}
+        </Button>
+      </template>
+    </Modal>
   </div>
 </template>
 

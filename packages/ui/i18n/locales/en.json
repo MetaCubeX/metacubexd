@@ -424,5 +424,15 @@
   "profilesMergeNoActiveBase": "Activate a base profile to apply merge overlays.",
   "profilesMergeUpdateFailed": "Failed to update merge overlay",
   "editorReadOnly": "Read only",
-  "editorDisableValidation": "Disable validation"
+  "editorDisableValidation": "Disable validation",
+  "editRules": "Edit Rules",
+  "rulesEditorHint": "Add, edit, delete or drag to reorder rules. Saving restarts the kernel once.",
+  "policy": "Policy",
+  "reorder": "Drag to reorder",
+  "delete": "Delete",
+  "cancel": "Cancel",
+  "rulesEditorSaved": "Rules saved",
+  "rulesEditorLoadFailed": "Failed to load rules",
+  "rulesEditorSaveFailed": "Failed to save rules",
+  "rulesEditorInvalid": "Each rule needs a non-empty type, payload and policy"
 }

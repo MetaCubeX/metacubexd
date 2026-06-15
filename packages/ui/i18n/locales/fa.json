@@ -424,5 +424,15 @@
   "profilesMergeNoActiveBase": "برای اعمال همپوشانی‌های ادغام، یک پروفایل پایه را فعال کنید.",
   "profilesMergeUpdateFailed": "به‌روزرسانی همپوشانی ادغام ناموفق بود",
   "editorReadOnly": "فقط‌خواندنی",
-  "editorDisableValidation": "غیرفعال‌سازی اعتبارسنجی"
+  "editorDisableValidation": "غیرفعال‌سازی اعتبارسنجی",
+  "editRules": "ویرایش قوانین",
+  "rulesEditorHint": "قوانین را اضافه، ویرایش، حذف یا با کشیدن مرتب کنید. ذخیره یک‌بار هسته را راه‌اندازی مجدد می‌کند.",
+  "policy": "سیاست",
+  "reorder": "برای مرتب‌سازی بکشید",
+  "delete": "حذف",
+  "cancel": "لغو",
+  "rulesEditorSaved": "قوانین ذخیره شد",
+  "rulesEditorLoadFailed": "بارگذاری قوانین ناموفق بود",
+  "rulesEditorSaveFailed": "ذخیره قوانین ناموفق بود",
+  "rulesEditorInvalid": "هر قانون به نوع، محموله و سیاست غیرخالی نیاز دارد"
 }

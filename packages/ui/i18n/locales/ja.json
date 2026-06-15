@@ -424,5 +424,15 @@
   "profilesMergeNoActiveBase": "マージオーバーレイを適用するにはベースプロファイルを有効化してください。",
   "profilesMergeUpdateFailed": "マージオーバーレイの更新に失敗しました",
   "editorReadOnly": "読み取り専用",
-  "editorDisableValidation": "検証を無効化"
+  "editorDisableValidation": "検証を無効化",
+  "editRules": "ルールを編集",
+  "rulesEditorHint": "ルールの追加・編集・削除・ドラッグでの並べ替えができます。保存するとカーネルが一度再起動します。",
+  "policy": "ポリシー",
+  "reorder": "ドラッグで並べ替え",
+  "delete": "削除",
+  "cancel": "キャンセル",
+  "rulesEditorSaved": "ルールを保存しました",
+  "rulesEditorLoadFailed": "ルールの読み込みに失敗しました",
+  "rulesEditorSaveFailed": "ルールの保存に失敗しました",
+  "rulesEditorInvalid": "各ルールには種類・ペイロード・ポリシーが必要です"
 }

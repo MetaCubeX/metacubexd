@@ -194,6 +194,25 @@ describe('composables/useControlApi methods', () => {
     expect(out).toBe('a: 1')
   })
 
+  it('getConfigSection() GETs config/section with the key as a search param', async () => {
+    json.mockResolvedValue(['MATCH,DIRECT'])
+    const out = await useControlApi().getConfigSection('rules')
+    expect(get).toHaveBeenCalledWith('config/section', {
+      searchParams: { key: 'rules' },
+    })
+    expect(out).toEqual(['MATCH,DIRECT'])
+  })
+
+  it('setConfigSection() PUTs config/section with { key, value } json body', async () => {
+    await useControlApi().setConfigSection({
+      key: 'rules',
+      value: ['MATCH,REJECT'],
+    })
+    expect(put).toHaveBeenCalledWith('config/section', {
+      json: { key: 'rules', value: ['MATCH,REJECT'] },
+    })
+  })
+
   it('webdavBackup() POSTs backup with { webdav, uiSettings } json body', async () => {
     const webdav = {
       url: 'https://dav.example.com',

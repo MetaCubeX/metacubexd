@@ -381,5 +381,15 @@
   "profilesMergeNoActiveBase": "Активируйте базовый профиль, чтобы применить слои слияния.",
   "profilesMergeUpdateFailed": "Не удалось обновить слой слияния",
   "editorReadOnly": "Только чтение",
-  "editorDisableValidation": "Отключить проверку"
+  "editorDisableValidation": "Отключить проверку",
+  "editRules": "Редактировать правила",
+  "rulesEditorHint": "Добавляйте, изменяйте, удаляйте или перетаскивайте правила. Сохранение перезапускает ядро один раз.",
+  "policy": "Политика",
+  "reorder": "Перетащите для сортировки",
+  "delete": "Удалить",
+  "cancel": "Отмена",
+  "rulesEditorSaved": "Правила сохранены",
+  "rulesEditorLoadFailed": "Не удалось загрузить правила",
+  "rulesEditorSaveFailed": "Не удалось сохранить правила",
+  "rulesEditorInvalid": "У каждого правила должны быть тип, значение и политика"
 }

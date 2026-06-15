@@ -424,5 +424,15 @@
   "profilesMergeNoActiveBase": "请先激活一个基础配置以应用合并覆盖。",
   "profilesMergeUpdateFailed": "更新合并覆盖失败",
   "editorReadOnly": "只读",
-  "editorDisableValidation": "关闭校验"
+  "editorDisableValidation": "关闭校验",
+  "editRules": "编辑规则",
+  "rulesEditorHint": "添加、编辑、删除或拖动排序规则。保存会重启一次内核。",
+  "policy": "策略",
+  "reorder": "拖动排序",
+  "delete": "删除",
+  "cancel": "取消",
+  "rulesEditorSaved": "规则已保存",
+  "rulesEditorLoadFailed": "加载规则失败",
+  "rulesEditorSaveFailed": "保存规则失败",
+  "rulesEditorInvalid": "每条规则的类型、匹配内容和策略都不能为空"
 }

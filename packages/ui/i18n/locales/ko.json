@@ -424,5 +424,15 @@
   "profilesMergeNoActiveBase": "병합 오버레이를 적용하려면 베이스 프로필을 활성화하세요.",
   "profilesMergeUpdateFailed": "병합 오버레이 업데이트에 실패했습니다",
   "editorReadOnly": "읽기 전용",
-  "editorDisableValidation": "검증 비활성화"
+  "editorDisableValidation": "검증 비활성화",
+  "editRules": "규칙 편집",
+  "rulesEditorHint": "규칙을 추가, 편집, 삭제하거나 드래그하여 순서를 변경합니다. 저장하면 커널이 한 번 재시작됩니다.",
+  "policy": "정책",
+  "reorder": "드래그하여 순서 변경",
+  "delete": "삭제",
+  "cancel": "취소",
+  "rulesEditorSaved": "규칙이 저장되었습니다",
+  "rulesEditorLoadFailed": "규칙을 불러오지 못했습니다",
+  "rulesEditorSaveFailed": "규칙을 저장하지 못했습니다",
+  "rulesEditorInvalid": "각 규칙에는 비어 있지 않은 유형, 페이로드, 정책이 필요합니다"
 }

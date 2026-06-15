@@ -424,5 +424,15 @@
   "profilesMergeNoActiveBase": "Activez un profil de base pour appliquer les superpositions de fusion.",
   "profilesMergeUpdateFailed": "Échec de la mise à jour de la superposition de fusion",
   "editorReadOnly": "Lecture seule",
-  "editorDisableValidation": "Désactiver la validation"
+  "editorDisableValidation": "Désactiver la validation",
+  "editRules": "Modifier les règles",
+  "rulesEditorHint": "Ajoutez, modifiez, supprimez ou glissez pour réordonner les règles. L'enregistrement redémarre le noyau une fois.",
+  "policy": "Politique",
+  "reorder": "Glisser pour réordonner",
+  "delete": "Supprimer",
+  "cancel": "Annuler",
+  "rulesEditorSaved": "Règles enregistrées",
+  "rulesEditorLoadFailed": "Échec du chargement des règles",
+  "rulesEditorSaveFailed": "Échec de l'enregistrement des règles",
+  "rulesEditorInvalid": "Chaque règle nécessite un type, une charge utile et une politique non vides"
 }
