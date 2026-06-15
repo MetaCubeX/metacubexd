@@ -23,6 +23,8 @@ export type {
 export { createSupervisor } from './supervisor'
 export type { CreateSupervisorOptions, SupervisorDeps } from './supervisor'
 export * from './types'
+export { createWebdavClient } from './webdav'
+export type { WebdavClient, WebdavClientOptions } from './webdav'
 
 export type CreateAgentOptions = CreateSupervisorOptions & {
   profilesDir: string
@@ -61,6 +63,8 @@ export function createAgent(opts: CreateAgentOptions) {
       'kernel-control',
       // homeDir always exists, so geo-asset download is always available.
       'geo-assets',
+      // WebDAV backup/restore is always available — credentials arrive per-request.
+      'webdav-backup',
       ...(systemProxy ? ['system-proxy'] : []),
       ...(kernelManager ? ['kernel-version'] : []),
     ],

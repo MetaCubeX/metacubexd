@@ -23,6 +23,16 @@ import {
   setResponseStatus,
 } from 'h3'
 import { fetchGeoAssets } from './kernel/geo'
+import { createWebdavClient as defaultCreateWebdavClient } from './webdav'
+
+const BACKUP_FILENAME = 'metacubexd-backup.json'
+
+interface WebdavCredentials {
+  url: string
+  username: string
+  password: string
+  dir?: string
+}
 
 export interface ControlRouterDeps {
   supervisor: MihomoSupervisor
@@ -33,6 +43,7 @@ export interface ControlRouterDeps {
   systemProxy?: SystemProxyController // OS proxy controller; capability-gated
   kernelManager?: KernelManager // kernel version mgmt; capability-gated
   geoFetch?: typeof fetch // override for tests; defaults to global fetch
+  createWebdavClient?: typeof defaultCreateWebdavClient // override for tests
 }
 
 const PREFIX = '/api/control'
@@ -49,6 +60,7 @@ export function createControlRouter(deps: ControlRouterDeps): App {
     systemProxy,
     kernelManager,
     geoFetch,
+    createWebdavClient = defaultCreateWebdavClient,
   } = deps
 
   // ---- Auth middleware: applied to every route except public ones. ----
@@ -248,6 +260,83 @@ export function createControlRouter(deps: ControlRouterDeps): App {
     defineEventHandler(async () => {
       const { files } = await fetchGeoAssets(homeDir, { fetch: geoFetch })
       return { ok: true, files }
+    }),
+  )
+
+  // ---- WebDAV backup / restore (always available — credentials per-request) ----
+  function backupPath(dir?: string): string {
+    return dir
+      ? `${dir.replace(/\/+$/, '')}/${BACKUP_FILENAME}`
+      : BACKUP_FILENAME
+  }
+
+  router.post(
+    `${PREFIX}/backup`,
+    defineEventHandler(async (event) => {
+      const body = (await readBody(event)) as {
+        webdav: WebdavCredentials
+        uiSettings?: unknown
+      }
+      const { webdav } = body
+      const client = createWebdavClient({
+        url: webdav.url,
+        username: webdav.username,
+        password: webdav.password,
+      })
+      // Build a bundle of every profile (meta + raw content).
+      const metas = await profiles.list()
+      const bundleProfiles = await Promise.all(
+        metas.map(async (meta) => ({
+          meta,
+          content: await profiles.read(meta.id),
+        })),
+      )
+      const bundle = {
+        version: 1 as const,
+        profiles: bundleProfiles,
+        ...(body.uiSettings !== undefined
+          ? { uiSettings: body.uiSettings }
+          : {}),
+      }
+      // Best-effort directory creation — ignore "already exists" / transient errors
+      // so an existing collection doesn't fail the upload.
+      if (webdav.dir) {
+        await client.mkcol(webdav.dir).catch(() => {})
+      }
+      const path = backupPath(webdav.dir)
+      await client.put(path, JSON.stringify(bundle))
+      return { ok: true, path }
+    }),
+  )
+
+  router.post(
+    `${PREFIX}/restore`,
+    defineEventHandler(async (event) => {
+      const body = (await readBody(event)) as { webdav: WebdavCredentials }
+      const { webdav } = body
+      const client = createWebdavClient({
+        url: webdav.url,
+        username: webdav.username,
+        password: webdav.password,
+      })
+      const raw = await client.get(backupPath(webdav.dir))
+      const bundle = JSON.parse(raw) as {
+        version: number
+        profiles: Array<{
+          meta: { name: string; type?: string }
+          content: string
+        }>
+        uiSettings?: unknown
+      }
+      // Recreate via profiles.create so each restored profile gets a fresh id
+      // (avoids clashing with any existing local ids).
+      let restored = 0
+      for (const p of bundle.profiles ?? []) {
+        const type = p.meta.type === 'merge' ? 'merge' : 'local'
+        await profiles.create({ name: p.meta.name, content: p.content, type })
+        restored += 1
+      }
+      return { ok: true, restored, uiSettings: bundle.uiSettings }
     }),
   )
 

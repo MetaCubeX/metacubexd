@@ -535,3 +535,188 @@ describe('createControlRouter — kernel version management', () => {
     expect(await res.json()).toEqual({ error: 'kernel-version unavailable' })
   })
 })
+
+describe('createControlRouter — WebDAV backup/restore', () => {
+  let srv: Awaited<ReturnType<typeof mount>>
+  afterEach(async () => srv?.close())
+
+  function makeWebdav() {
+    const calls: { put: [string, string][]; get: string[]; mkcol: string[] } = {
+      put: [],
+      get: [],
+      mkcol: [],
+    }
+    let stored = ''
+    const client = {
+      put: vi.fn(async (path: string, body: string) => {
+        calls.put.push([path, body])
+        stored = body
+      }),
+      get: vi.fn(async (path: string) => {
+        calls.get.push(path)
+        return stored
+      }),
+      mkcol: vi.fn(async (dir: string) => {
+        calls.mkcol.push(dir)
+      }),
+    }
+    const opts: unknown[] = []
+    const createWebdavClient = vi.fn((o: unknown) => {
+      opts.push(o)
+      return client
+    })
+    return { client, calls, opts, createWebdavClient }
+  }
+
+  it('pOST /backup builds a bundle of all profiles and uploads it via webdav', async () => {
+    const dav = makeWebdav()
+    const deps = {
+      ...makeDeps(),
+      createWebdavClient: dav.createWebdavClient,
+    }
+    srv = await mount(deps as never)
+
+    const res = await fetch(`${srv.base}/api/control/backup`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        webdav: {
+          url: 'https://dav/',
+          username: 'u',
+          password: 'p',
+          dir: 'mcxd',
+        },
+        uiSettings: { theme: 'dark' },
+      }),
+    })
+    expect(res.status).toBe(200)
+    const body = (await res.json()) as Record<string, unknown>
+    expect(body.ok).toBe(true)
+    expect(body.path).toBe('mcxd/metacubexd-backup.json')
+
+    // Client constructed with the request credentials.
+    expect(dav.opts[0]).toMatchObject({
+      url: 'https://dav/',
+      username: 'u',
+      password: 'p',
+    })
+    // mkcol best-effort on the dir, then put the bundle.
+    expect(dav.calls.mkcol).toEqual(['mcxd'])
+    expect(dav.calls.put).toHaveLength(1)
+    const [putPath, putBody] = dav.calls.put[0]!
+    expect(putPath).toBe('mcxd/metacubexd-backup.json')
+    const bundle = JSON.parse(putBody) as Record<string, unknown>
+    expect(bundle.version).toBe(1)
+    expect(bundle.uiSettings).toEqual({ theme: 'dark' })
+    expect(bundle.profiles).toEqual([
+      {
+        meta: { id: 'p1', name: 'home', type: 'local', updatedAt: 1 },
+        content: 'mixed-port: 7890\n',
+      },
+    ])
+  })
+
+  it('pOST /backup tolerates a failing mkcol (best-effort) and still uploads', async () => {
+    const dav = makeWebdav()
+    dav.client.mkcol = vi.fn(async () => {
+      throw new Error('mkcol boom')
+    })
+    const deps = {
+      ...makeDeps(),
+      createWebdavClient: dav.createWebdavClient,
+    }
+    srv = await mount(deps as never)
+
+    const res = await fetch(`${srv.base}/api/control/backup`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        webdav: { url: 'https://dav/', username: 'u', password: 'p' },
+      }),
+    })
+    expect(res.status).toBe(200)
+    expect(dav.calls.put).toHaveLength(1)
+    // No dir provided -> bundle lands at the root.
+    expect(dav.calls.put[0]![0]).toBe('metacubexd-backup.json')
+  })
+
+  it('pOST /restore re-creates profiles from the bundle and returns uiSettings', async () => {
+    const dav = makeWebdav()
+    const bundle = {
+      version: 1,
+      profiles: [
+        {
+          meta: { id: 'x1', name: 'restored', type: 'local', updatedAt: 9 },
+          content: 'port: 1234\n',
+        },
+        {
+          meta: {
+            id: 'x2',
+            name: 'sub',
+            type: 'remote',
+            url: 'https://s',
+            updatedAt: 10,
+          },
+          content: 'proxies: []\n',
+        },
+      ],
+      uiSettings: { lang: 'zh' },
+    }
+    dav.client.get = vi.fn(async () => JSON.stringify(bundle))
+
+    const deps = {
+      ...makeDeps(),
+      createWebdavClient: dav.createWebdavClient,
+    }
+    srv = await mount(deps as never)
+
+    const res = await fetch(`${srv.base}/api/control/restore`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        webdav: {
+          url: 'https://dav/',
+          username: 'u',
+          password: 'p',
+          dir: 'mcxd',
+        },
+      }),
+    })
+    expect(res.status).toBe(200)
+    const body = (await res.json()) as Record<string, unknown>
+    expect(body.ok).toBe(true)
+    expect(body.restored).toBe(2)
+    expect(body.uiSettings).toEqual({ lang: 'zh' })
+
+    // Downloads the bundle from the same path the backup writes.
+    expect(dav.client.get).toHaveBeenCalledWith('mcxd/metacubexd-backup.json')
+    // Recreates via profiles.create (new ids — avoids clashes), passing name/content/type.
+    expect(deps.profiles.create).toHaveBeenCalledTimes(2)
+    expect(deps.profiles.create).toHaveBeenCalledWith({
+      name: 'restored',
+      content: 'port: 1234\n',
+      type: 'local',
+    })
+  })
+
+  it('pOST /backup surfaces a webdav put failure (no silent swallow)', async () => {
+    const dav = makeWebdav()
+    dav.client.put = vi.fn(async () => {
+      throw new Error('webdav PUT failed 403')
+    })
+    const deps = {
+      ...makeDeps(),
+      createWebdavClient: dav.createWebdavClient,
+    }
+    srv = await mount(deps as never)
+
+    const res = await fetch(`${srv.base}/api/control/backup`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        webdav: { url: 'https://dav/', username: 'u', password: 'p' },
+      }),
+    })
+    expect(res.status).toBeGreaterThanOrEqual(500)
+  })
+})

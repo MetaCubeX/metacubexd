@@ -38,7 +38,13 @@ describe('createAgent', () => {
     expect(info).toMatchObject({
       hasAgent: true,
       version: AGENT_VERSION,
-      features: ['profiles', 'logs-sse', 'kernel-control', 'geo-assets'],
+      features: [
+        'profiles',
+        'logs-sse',
+        'kernel-control',
+        'geo-assets',
+        'webdav-backup',
+      ],
     })
     expect(info.platform).toMatchObject({
       os: process.platform,
@@ -50,6 +56,11 @@ describe('createAgent', () => {
   it('info().features always includes geo-assets (homeDir-backed, no controller)', () => {
     const agent = createAgent(opts())
     expect(agent.info().features).toContain('geo-assets')
+  })
+
+  it('info().features always includes webdav-backup (request-scoped credentials)', () => {
+    const agent = createAgent(opts())
+    expect(agent.info().features).toContain('webdav-backup')
   })
 
   it('info().features excludes system-proxy when no controller is injected', () => {
