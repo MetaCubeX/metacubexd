@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { fetchKernel } from '@metacubexd/agent/kernel/fetch-kernel'
 import { mihomoAsset } from '@metacubexd/agent/kernel/assets'
+import { fetchWintun } from '@metacubexd/agent/kernel/fetch-wintun'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const resourcesDir = join(__dirname, '..', 'resources')
@@ -34,3 +35,19 @@ if (!force && existsSync(expectedBin)) {
 console.log(`[fetch-mihomo] os=${os} arch=${arch} -> ${resourcesDir}`)
 const { binPath } = await fetchKernel(os, arch, resourcesDir)
 console.log(`[fetch-mihomo] staged: ${binPath}`)
+
+// Windows TUN: mihomo's wintun backend needs wintun.dll alongside the kernel.
+// Stage it from the canonical wintun.net builds zip, idempotently (skip when
+// already present; --force re-downloads). Non-Windows targets are unaffected.
+if (os === 'win32' || os === 'windows') {
+  const wintunPath = join(resourcesDir, 'wintun.dll')
+  if (!force && existsSync(wintunPath)) {
+    console.log(
+      `[fetch-mihomo] wintun already staged: ${wintunPath} (pass --force to re-download)`,
+    )
+  } else {
+    console.log(`[fetch-mihomo] fetching wintun.dll (arch=${arch})`)
+    const { dllPath } = await fetchWintun(arch, resourcesDir)
+    console.log(`[fetch-mihomo] staged: ${dllPath}`)
+  }
+}

@@ -36,6 +36,7 @@ import { parseSubscriptionDeepLink } from './deep-link'
 import { pickFreePorts } from './free-port'
 import { createHelperClient } from './helper/client'
 import { createHelperInstaller } from './helper/installer'
+import { resolveHelperEntry } from './helper/paths'
 import { loadHotkeyBindings, registerHotkeys } from './hotkeys'
 import { createKernelManager } from './kernel-manager'
 import { createKernelCrashWatcher, createNotifier } from './notifier'
@@ -398,7 +399,14 @@ async function boot(): Promise<void> {
     }),
     installOptions: (): HelperInstallOptions => ({
       electronBin: process.execPath,
-      helperEntry: join(__dirname, '..', 'helper', 'index.js'),
+      // Where the privileged service finds the helper bundle to run. Packaged:
+      // the asar-UNPACKED copy under resourcesPath (a file inside app.asar can't
+      // be spawned by an external service); dev: <appPath>/out/helper/index.js.
+      helperEntry: resolveHelperEntry({
+        isPackaged: app.isPackaged,
+        resourcesPath: process.resourcesPath,
+        appPath: app.getAppPath(),
+      }),
       socketPath: tunPaths.socketPath,
       secret: helperSecret,
     }),

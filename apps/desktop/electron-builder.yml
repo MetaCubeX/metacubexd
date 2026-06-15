@@ -14,6 +14,11 @@ files:
 asar: true
 asarUnpack:
   - 'resources/**'
+  # The privileged TUN helper is run by an OS service as a real on-disk file
+  # (`<electron-bin> out/helper/index.js`, ELECTRON_RUN_AS_NODE=1). A file inside
+  # app.asar can't be spawned that way, so unpack it (mirrors mihomo above).
+  # resolveHelperEntry() points at <resourcesPath>/app.asar.unpacked/out/helper/index.js.
+  - 'out/helper/**'
 extraResources:
   - from: resources/mihomo${ext}
     to: mihomo${ext}
@@ -21,6 +26,11 @@ extraResources:
     to: default-config.yaml
 mac:
   icon: build/icon.icns
+  # Unsigned build: identity null + hardenedRuntime false. NOTE: a SIGNED app
+  # using TUN would normally need a network entitlement
+  # (com.apple.developer.networking.*); since this build is unsigned, no
+  # entitlement/provisioning config is added — TUN works via the separately
+  # installed root LaunchDaemon helper, not an app entitlement.
   identity: null
   hardenedRuntime: false
   category: public.app-category.utilities
@@ -36,6 +46,15 @@ win:
         - x64
         - arm64
   artifactName: ${productName}-${version}-win-${arch}.${ext}
+  # Windows TUN: mihomo's wintun backend loads wintun.dll. Ship it next to the
+  # kernel under Resources/ (Windows only). Staged into resources/wintun.dll by
+  # `pnpm fetch:mihomo --os win32` before packaging. asarUnpack so it lands as a
+  # real file (it's referenced via extraResources, kept out of app.asar anyway).
+  extraResources:
+    - from: resources/wintun.dll
+      to: wintun.dll
+  asarUnpack:
+    - 'resources/wintun.dll'
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true

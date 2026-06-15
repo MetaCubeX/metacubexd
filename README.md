@@ -141,10 +141,55 @@ chmod +x MetaCubeXD-*-linux-*.AppImage
 sudo dpkg -i MetaCubeXD-*-linux-*.deb
 ```
 
-> **System proxy / TUN are advanced features.** TUN needs elevated privileges,
-> and unsigned builds can't ship a privileged helper — the app defaults to a
-> **mixed proxy port** (no elevation). Enable TUN only if your OS lets the
-> unsigned binary acquire the required privileges.
+> **System proxy / TUN are advanced features.** The app defaults to a **mixed
+> proxy port** (no elevation). System proxy and TUN both require privileges; see
+> [TUN mode (desktop)](#tun-mode-desktop) for the one-time privileged-helper
+> install and what the unsigned build means for it.
+
+#### TUN mode (desktop)
+
+**TUN takes over all machine traffic at the network layer**, so every app is
+routed through mihomo without per-app proxy settings (unlike the mixed proxy
+port, which only catches apps you point at it). Because routing the whole system
+needs root/admin, the desktop app installs a small **privileged helper** the
+first time you enable TUN — a background service that performs the privileged
+network setup on the app's behalf. Enabling TUN therefore prompts for an
+**administrator authorization** the first time (the OS elevation dialog). The
+helper persists across sessions, so later enables don't re-prompt for install.
+
+> **These builds are unsigned**, so you hit the unidentified-developer warnings
+> twice: once launching the app (see above — macOS Gatekeeper / Windows
+> SmartScreen / Linux "unknown publisher"), and again when the helper install
+> asks for administrator authorization. Both are expected. Allow them the same
+> way you allowed the app itself.
+
+**Per-OS notes**
+
+- **macOS** — the helper is registered as a root **LaunchDaemon**; you approve
+  it through the standard `osascript` "wants to make changes" administrator
+  prompt. The kernel binds the system's `utun` interface.
+- **Windows** — the helper is registered as an auto-start **Windows service**
+  (UAC prompt). The build ships **`wintun.dll`** alongside the kernel, which
+  mihomo's wintun backend needs — no separate download.
+- **Linux** — the helper is registered as a root **systemd** unit; the elevation
+  prompt is **`pkexec`** (the GNOME/PolicyKit authorization dialog). On a headless
+  box without a Polkit agent you may need to install/enable one.
+
+**If TUN takes down your network**
+
+TUN reroutes default traffic, so a bad config or a stuck tunnel can drop
+connectivity. Two recoveries:
+
+- Click **"Recover network"** in the app — it tears down the TUN routing and
+  restores normal networking without quitting.
+- **Quit the app** — exiting automatically tears down TUN (the helper restores
+  routing), so a force-quit is a safe last resort.
+
+> **Status: TUN is new.** It's verified at the unit-test / command-generation /
+> packaging level, but the real install, elevation, and per-OS tunnel behavior
+> still need smoke testing on actual macOS / Windows / Linux machines. If you hit
+> a problem, please open an issue with your OS, the exact prompt you saw, and
+> whether "Recover network" restored connectivity.
 
 ### 3. All-in-One Server (Docker)
 

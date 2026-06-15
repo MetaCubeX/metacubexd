@@ -31,6 +31,10 @@
     "./kernel/fetch-kernel": {
       "types": "./src/kernel/fetch-kernel.ts",
       "import": "./src/kernel/fetch-kernel.ts"
+    },
+    "./kernel/fetch-wintun": {
+      "types": "./src/kernel/fetch-wintun.ts",
+      "import": "./src/kernel/fetch-wintun.ts"
     }
   },
   "scripts": {
