@@ -709,6 +709,14 @@ describe('createControlRouter — WebDAV backup/restore', () => {
           },
           content: 'proxies: []\n',
         },
+        {
+          meta: { id: 'x3', name: 'ov', type: 'merge', updatedAt: 11 },
+          content: 'append-rules:\n  - MATCH,DIRECT\n',
+        },
+        {
+          meta: { id: 'x4', name: 'tweak', type: 'script', updatedAt: 12 },
+          content: 'module.exports = (c) => c\n',
+        },
       ],
       uiSettings: { lang: 'zh' },
     }
@@ -735,17 +743,34 @@ describe('createControlRouter — WebDAV backup/restore', () => {
     expect(res.status).toBe(200)
     const body = (await res.json()) as Record<string, unknown>
     expect(body.ok).toBe(true)
-    expect(body.restored).toBe(2)
+    expect(body.restored).toBe(4)
     expect(body.uiSettings).toEqual({ lang: 'zh' })
 
     // Downloads the bundle from the same path the backup writes.
     expect(dav.client.get).toHaveBeenCalledWith('mcxd/metacubexd-backup.json')
     // Recreates via profiles.create (new ids — avoids clashes), passing name/content/type.
-    expect(deps.profiles.create).toHaveBeenCalledTimes(2)
+    expect(deps.profiles.create).toHaveBeenCalledTimes(4)
     expect(deps.profiles.create).toHaveBeenCalledWith({
       name: 'restored',
       content: 'port: 1234\n',
       type: 'local',
+    })
+    // 'remote' is restored as 'local' (keep content, no re-fetch)...
+    expect(deps.profiles.create).toHaveBeenCalledWith({
+      name: 'sub',
+      content: 'proxies: []\n',
+      type: 'local',
+    })
+    // ...but composition types (merge/script) are preserved so they still apply.
+    expect(deps.profiles.create).toHaveBeenCalledWith({
+      name: 'ov',
+      content: 'append-rules:\n  - MATCH,DIRECT\n',
+      type: 'merge',
+    })
+    expect(deps.profiles.create).toHaveBeenCalledWith({
+      name: 'tweak',
+      content: 'module.exports = (c) => c\n',
+      type: 'script',
     })
   })
 

@@ -149,7 +149,7 @@ export function createControlRouter(deps: ControlRouterDeps): App {
       const body = (await readBody(event)) as {
         name: string
         content?: string
-        type?: 'local' | 'merge'
+        type?: 'local' | 'merge' | 'script'
       }
       return profiles.create(body)
     }),
@@ -384,7 +384,13 @@ export function createControlRouter(deps: ControlRouterDeps): App {
       // (avoids clashing with any existing local ids).
       let restored = 0
       for (const p of bundle.profiles ?? []) {
-        const type = p.meta.type === 'merge' ? 'merge' : 'local'
+        // Preserve composition types (merge/script) so restored overlays/scripts
+        // still apply; 'remote' is intentionally restored as 'local' (keep the
+        // captured content, no network re-fetch).
+        const type =
+          p.meta.type === 'merge' || p.meta.type === 'script'
+            ? p.meta.type
+            : 'local'
         await profiles.create({ name: p.meta.name, content: p.content, type })
         restored += 1
       }
