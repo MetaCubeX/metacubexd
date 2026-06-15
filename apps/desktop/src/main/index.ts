@@ -37,6 +37,7 @@ import { makeToken } from './secrets'
 import { shouldStartHidden } from './startup'
 import { createSystemProxyController } from './sysproxy'
 import { readSysProxyBypass } from './sysproxy-config'
+import { createSysproxyGuard } from './sysproxy-guard'
 import { createTray, trayIconPath } from './tray'
 import {
   DEFAULT_WINDOW_BOUNDS,
@@ -62,6 +63,9 @@ let profileScheduler: ReturnType<typeof createProfileScheduler> | null = null
 // OS system-proxy controller, configured in boot() for the managed mixed port.
 // Kept module-level so the quit/cleanup path can disable() it (anti-lockout).
 let systemProxy: SystemProxyController | null = null
+// Re-asserts the OS proxy if an external actor turns it off while we own it.
+// Started when the proxy is enabled, stopped when disabled / on quit.
+let sysproxyGuard: ReturnType<typeof createSysproxyGuard> | null = null
 // Same-origin renderer URL (the control server serves the dashboard too); set
 // in boot() and loaded by createWindow().
 let rendererUrl: string | null = null
@@ -132,12 +136,32 @@ async function boot(): Promise<void> {
     host: '127.0.0.1',
     port: mixedPort,
   })
+  // enable() that always applies the default bypass list when the caller didn't
+  // pass an explicit one — used by enable() below AND by the guard's re-assert.
+  const enableWithBypass = (bypass?: string[]): Promise<void> =>
+    baseSystemProxy.enable(bypass && bypass.length > 0 ? bypass : defaultBypass)
+  // Guard against external changes (other apps / OS settings turning the proxy
+  // off while we own it); re-asserts with the default bypass. Started/stopped by
+  // the enable()/disable() wrappers below so every toggle (tray, hotkey, boot)
+  // drives it consistently.
+  sysproxyGuard = createSysproxyGuard({
+    controller: { ...baseSystemProxy, enable: enableWithBypass },
+  })
   systemProxy = {
     ...baseSystemProxy,
-    enable: (bypass) =>
-      baseSystemProxy.enable(
-        bypass && bypass.length > 0 ? bypass : defaultBypass,
-      ),
+    enable: async (bypass) => {
+      await enableWithBypass(bypass)
+      // Begin watching only after the proxy is actually on. start() is
+      // idempotent so the guard's own re-assert (which routes back through the
+      // base enable, not this wrapper) never double-arms.
+      sysproxyGuard?.start()
+    },
+    disable: async () => {
+      // Stop watching first so the guard can't race a re-assert against our own
+      // disable and flip the proxy back on.
+      sysproxyGuard?.stop()
+      await baseSystemProxy.disable()
+    },
   }
 
   // Kernel version management needs the supervisor that createAgent builds
@@ -232,6 +256,15 @@ async function boot(): Promise<void> {
   process.env.MCXD_CLASH_SECRET = state.secret
   // Loopback proxy port for Wave 2 system-proxy wiring.
   process.env.MCXD_MIXED_PORT = String(mixedPort)
+
+  // Resume the guard if the OS proxy was left enabled from a prior session — the
+  // OS state is the source of truth, so a persisted-enabled proxy must keep
+  // being defended on this launch. Best-effort: a failed read just skips it.
+  try {
+    if (await systemProxy.isEnabled()) sysproxyGuard.start()
+  } catch (err) {
+    notify('System proxy guard failed to start', err)
+  }
 }
 
 // Path to the persisted main-window geometry under userData.
@@ -309,6 +342,10 @@ function createWindow(startHidden = false): void {
 async function shutdownKernel(): Promise<void> {
   // Halt subscription auto-update ticking so no refresh fires mid-shutdown.
   profileScheduler?.stop()
+  // Stop re-asserting the OS proxy so the guard can't race the disable() below
+  // and flip it back on mid-shutdown (the disable() wrapper also stops it, but
+  // be explicit so the quit-stop guarantee doesn't depend on that internal).
+  sysproxyGuard?.stop()
   // Anti-lockout: release the OS system proxy BEFORE the kernel goes away so we
   // never leave the machine pointing at a dead loopback port. All steps are
   // best-effort (see runShutdownCleanup).
