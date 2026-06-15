@@ -361,6 +361,8 @@
   "systemProxyBypass": "绕过 / 局域网白名单",
   "systemProxyBypassPlaceholder": "每行一个主机或 CIDR，例如 localhost",
   "systemProxyApply": "应用",
+  "systemProxyLoadFailed": "加载系统代理状态失败",
+  "systemProxyApplyFailed": "应用系统代理设置失败",
   "kernelVersionManager": "内核版本",
   "kernelVersionCurrent": "当前",
   "kernelVersionBundled": "内置",
@@ -390,6 +392,12 @@
   "profilesCancel": "取消",
   "profilesValidationOk": "配置有效",
   "profilesEmpty": "暂无配置文件",
+  "profilesMerges": "合并覆盖",
+  "profilesMergesHelp": "合并覆盖是叠加到当前激活基础配置上的 YAML 片段。启用你希望叠加的覆盖项。",
+  "profilesNewMerge": "新建合并覆盖",
+  "profilesMergeEnabled": "已启用",
+  "profilesMergeNoActiveBase": "请先激活一个基础配置以应用合并覆盖。",
+  "profilesMergeUpdateFailed": "更新合并覆盖失败",
   "editorReadOnly": "只读",
   "editorDisableValidation": "关闭校验"
 }

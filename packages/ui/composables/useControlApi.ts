@@ -65,12 +65,19 @@ export function useControlApi() {
       token ? `${base}/kernel/logs?token=${token}` : `${base}/kernel/logs`,
 
     listProfiles: () => client.get('profiles').json<ProfileMeta[]>(),
-    createProfile: (body: { name: string; content?: string }) =>
-      client.post('profiles', { json: body }).json<ProfileMeta>(),
+    // `type: 'merge'` mints a YAML overlay profile (composed onto the active
+    // base); omitting type defaults to a plain local profile (SHARED CONTRACTS).
+    createProfile: (body: {
+      name: string
+      content?: string
+      type?: 'local' | 'merge'
+    }) => client.post('profiles', { json: body }).json<ProfileMeta>(),
     getProfile: (id: string) =>
       client.get(`profiles/${id}`).json<ProfileDetail>(),
-    updateProfile: (id: string, body: { name?: string; content?: string }) =>
-      client.put(`profiles/${id}`, { json: body }).json<ProfileMeta>(),
+    updateProfile: (
+      id: string,
+      body: { name?: string; content?: string; enabled?: boolean },
+    ) => client.put(`profiles/${id}`, { json: body }).json<ProfileMeta>(),
     deleteProfile: (id: string) => client.delete(`profiles/${id}`).json<void>(),
     duplicateProfile: (id: string, name?: string) =>
       client

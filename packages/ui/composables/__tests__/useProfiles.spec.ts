@@ -16,11 +16,30 @@ const api = {
 }
 vi.mock('../useControlApi', () => ({ useControlApi: () => api }))
 
+// Hoisted so the vue-sonner mock factory (runs before the module body) can
+// reference it — useProfiles now surfaces failures via toast (no swallowing).
+const { toast } = vi.hoisted(() => ({
+  toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
+}))
+vi.mock('vue-sonner', () => ({ toast }))
+// useI18n() is provided as a global stub via test/setup.ts (returns the key).
+
 const meta = (id: string, name = id) => ({
   id,
   name,
   type: 'local' as const,
   updatedAt: 1,
+})
+
+const mergeMeta = (
+  id: string,
+  over: { enabled?: boolean; name?: string } = {},
+) => ({
+  id,
+  name: over.name ?? id,
+  type: 'merge' as const,
+  updatedAt: 1,
+  ...(over.enabled != null ? { enabled: over.enabled } : {}),
 })
 
 describe('composables/useProfiles', () => {
@@ -101,5 +120,86 @@ describe('composables/useProfiles', () => {
     const p = useProfiles()
     const detail = await p.load('a')
     expect(detail.content).toBe('x: 1')
+  })
+
+  describe('merge profiles', () => {
+    it('createMerge() POSTs { name, type: "merge" } then re-lists', async () => {
+      api.createProfile.mockResolvedValue(mergeMeta('m'))
+      const p = useProfiles()
+      await p.createMerge('overlay')
+      expect(api.createProfile).toHaveBeenCalledWith({
+        name: 'overlay',
+        type: 'merge',
+      })
+      expect(api.listProfiles).toHaveBeenCalled()
+    })
+
+    it('baseProfiles / mergeProfiles split the list by type', async () => {
+      api.listProfiles.mockResolvedValue([
+        meta('a'),
+        mergeMeta('m1'),
+        meta('b'),
+        mergeMeta('m2'),
+      ])
+      const p = useProfiles()
+      await p.refresh()
+      expect(p.baseProfiles.value.map((m) => m.id)).toEqual(['a', 'b'])
+      expect(p.mergeProfiles.value.map((m) => m.id)).toEqual(['m1', 'm2'])
+    })
+
+    it('setEnabled() PUTs { enabled } then re-lists', async () => {
+      api.updateProfile.mockResolvedValue(mergeMeta('m', { enabled: false }))
+      const p = useProfiles()
+      await p.setEnabled('m', false)
+      expect(api.updateProfile).toHaveBeenCalledWith('m', { enabled: false })
+      expect(api.listProfiles).toHaveBeenCalled()
+    })
+
+    it('setEnabled() re-activates the active base so the overlay re-composes', async () => {
+      api.activateProfile.mockResolvedValue({
+        status: 'running',
+        externalController: '127.0.0.1:9090',
+        secret: 's',
+      })
+      api.updateProfile.mockResolvedValue(mergeMeta('m', { enabled: true }))
+      const p = useProfiles()
+      // Activating a base records it as the active base for re-composition.
+      await p.activate('a')
+      api.activateProfile.mockClear()
+      await p.setEnabled('m', true)
+      expect(api.activateProfile).toHaveBeenCalledWith('a')
+    })
+
+    it('setEnabled() informs the user when there is no active base (no activate call)', async () => {
+      api.updateProfile.mockResolvedValue(mergeMeta('m', { enabled: true }))
+      const p = useProfiles()
+      await p.setEnabled('m', true)
+      expect(api.activateProfile).not.toHaveBeenCalled()
+      expect(toast.info).toHaveBeenCalled()
+    })
+
+    it('saveMerge() re-composes by re-activating the active base', async () => {
+      api.updateProfile.mockResolvedValue(mergeMeta('m'))
+      api.activateProfile.mockResolvedValue({
+        status: 'running',
+        externalController: '127.0.0.1:9090',
+        secret: 's',
+      })
+      const p = useProfiles()
+      await p.activate('a')
+      api.activateProfile.mockClear()
+      await p.saveMerge('m', 'dns:\n  enable: true')
+      expect(api.updateProfile).toHaveBeenCalledWith('m', {
+        content: 'dns:\n  enable: true',
+      })
+      expect(api.activateProfile).toHaveBeenCalledWith('a')
+    })
+
+    it('setEnabled() surfaces failures via toast.error (no swallowing)', async () => {
+      api.updateProfile.mockRejectedValue(new Error('disk full'))
+      const p = useProfiles()
+      await p.setEnabled('m', false)
+      expect(toast.error).toHaveBeenCalled()
+    })
   })
 })

@@ -8,12 +8,13 @@ const { available, enabled, port, bypassText, loading } = sysProxy
 
 onMounted(() => {
   if (!available.value) return
-  sysProxy.load().catch(() => {})
+  // Errors surface via toast inside the composable — do not swallow here.
+  void sysProxy.load()
 })
 
 const onToggle = (event: Event) => {
   const next = (event.target as HTMLInputElement).checked
-  sysProxy.toggle(next).catch(() => {})
+  void sysProxy.toggle(next)
 }
 </script>
 
@@ -56,7 +57,7 @@ const onToggle = (event: Event) => {
       <Button
         class="btn-sm btn-primary"
         :loading="loading"
-        @click="sysProxy.save().catch(() => {})"
+        @click="sysProxy.save()"
       >
         {{ t('systemProxyApply') }}
       </Button>

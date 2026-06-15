@@ -23,23 +23,31 @@ const MonacoYamlEditor = defineAsyncComponent(
 
 const {
   profiles,
+  baseProfiles,
+  mergeProfiles,
   loading,
   refresh,
   create,
+  createMerge,
   duplicate,
   remove,
   importUrl,
   save,
+  saveMerge,
+  setEnabled,
   load,
   validate,
   activate,
 } = useProfiles()
 
 const newName = ref('')
+const newMergeName = ref('')
 const importUrlValue = ref('')
 const importName = ref('')
 
 const editingId = ref<string | null>(null)
+// Whether the open editor targets a merge overlay — drives save-vs-recompose.
+const editingMerge = ref(false)
 const editingText = ref('')
 const validationMessage = ref('')
 const validationOk = ref<boolean | null>(null)
@@ -49,12 +57,13 @@ onMounted(() => {
   if (hasFeature('profiles')) refresh().catch(() => {})
 })
 
-const openEditor = async (id: string) => {
+const openEditor = async (id: string, isMerge = false) => {
   busy.value = true
   try {
     const detail = await load(id)
     editingText.value = detail.content
     editingId.value = id
+    editingMerge.value = isMerge
     validationMessage.value = ''
     validationOk.value = null
   } finally {
@@ -64,6 +73,7 @@ const openEditor = async (id: string) => {
 
 const closeEditor = () => {
   editingId.value = null
+  editingMerge.value = false
   editingText.value = ''
 }
 
@@ -71,7 +81,12 @@ const onSave = async () => {
   if (!editingId.value) return
   busy.value = true
   try {
-    await save(editingId.value, editingText.value)
+    // Editing a merge overlay re-composes the active base after saving.
+    if (editingMerge.value) {
+      await saveMerge(editingId.value, editingText.value)
+    } else {
+      await save(editingId.value, editingText.value)
+    }
   } finally {
     busy.value = false
   }
@@ -108,6 +123,27 @@ const onCreate = async () => {
   try {
     await create({ name: newName.value.trim() })
     newName.value = ''
+  } finally {
+    busy.value = false
+  }
+}
+
+const onCreateMerge = async () => {
+  if (!newMergeName.value.trim()) return
+  busy.value = true
+  try {
+    await createMerge(newMergeName.value.trim())
+    newMergeName.value = ''
+  } finally {
+    busy.value = false
+  }
+}
+
+const onToggleMerge = async (id: string, event: Event) => {
+  const next = (event.target as HTMLInputElement).checked
+  busy.value = true
+  try {
+    await setEnabled(id, next)
   } finally {
     busy.value = false
   }
@@ -214,7 +250,7 @@ const onRemove = async (id: string) => {
       </div>
       <div v-else class="grid grid-cols-1 gap-3 md:grid-cols-2">
         <div
-          v-for="p in profiles"
+          v-for="p in baseProfiles"
           :key="p.id"
           class="rounded-xl border border-base-content/10 bg-base-200 p-4"
         >
@@ -256,6 +292,84 @@ const onRemove = async (id: string) => {
           </div>
         </div>
       </div>
+
+      <!-- Merge overlays: composed onto the active base when enabled. -->
+      <section class="flex flex-col gap-3">
+        <div class="flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <h2 class="font-semibold text-base-content">
+              {{ t('profilesMerges') }}
+            </h2>
+            <p class="max-w-prose text-sm text-base-content/60">
+              {{ t('profilesMergesHelp') }}
+            </p>
+          </div>
+          <div class="flex items-end gap-2">
+            <label class="flex flex-col gap-1 text-sm">
+              <span class="text-base-content/60">{{ t('profilesName') }}</span>
+              <input
+                v-model="newMergeName"
+                class="input-bordered input input-sm"
+                :placeholder="t('profilesNewMerge')"
+              />
+            </label>
+            <Button
+              class="btn-sm btn-primary"
+              :icon="IconPlus"
+              :loading="busy"
+              @click="onCreateMerge"
+            >
+              {{ t('profilesNewMerge') }}
+            </Button>
+          </div>
+        </div>
+
+        <div
+          v-if="mergeProfiles.length"
+          class="grid grid-cols-1 gap-3 md:grid-cols-2"
+        >
+          <div
+            v-for="m in mergeProfiles"
+            :key="m.id"
+            class="rounded-xl border border-base-content/10 bg-base-200 p-4"
+          >
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-semibold">{{ m.name }}</span>
+              <label class="flex items-center gap-2 text-sm">
+                <span class="text-base-content/60">{{
+                  t('profilesMergeEnabled')
+                }}</span>
+                <input
+                  type="checkbox"
+                  class="toggle toggle-primary toggle-sm"
+                  :checked="m.enabled !== false"
+                  :disabled="busy"
+                  :aria-label="t('profilesMergeEnabled')"
+                  @change="onToggleMerge(m.id, $event)"
+                />
+              </label>
+            </div>
+
+            <div class="mt-3 flex flex-wrap gap-2">
+              <Button
+                class="btn-xs"
+                :icon="IconPencil"
+                @click="openEditor(m.id, true)"
+              >
+                {{ t('profilesEdit') }}
+              </Button>
+              <Button
+                class="btn-xs btn-error"
+                :icon="IconTrash"
+                :loading="busy"
+                @click="onRemove(m.id)"
+              >
+                {{ t('profilesDelete') }}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <!-- Editor -->
       <div

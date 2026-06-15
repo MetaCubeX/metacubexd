@@ -361,6 +361,8 @@
   "systemProxyBypass": "Bypass / LAN whitelist",
   "systemProxyBypassPlaceholder": "One host or CIDR per line, e.g. localhost",
   "systemProxyApply": "Apply",
+  "systemProxyLoadFailed": "Failed to load system proxy state",
+  "systemProxyApplyFailed": "Failed to apply system proxy settings",
   "kernelVersionManager": "Kernel Version",
   "kernelVersionCurrent": "Current",
   "kernelVersionBundled": "Bundled",
@@ -390,6 +392,12 @@
   "profilesCancel": "Cancel",
   "profilesValidationOk": "Configuration is valid",
   "profilesEmpty": "No profiles yet",
+  "profilesMerges": "Merge overlays",
+  "profilesMergesHelp": "Merge overlays are YAML fragments composed onto the active base profile. Enable the ones you want layered on top.",
+  "profilesNewMerge": "New merge overlay",
+  "profilesMergeEnabled": "Enabled",
+  "profilesMergeNoActiveBase": "Activate a base profile to apply merge overlays.",
+  "profilesMergeUpdateFailed": "Failed to update merge overlay",
   "editorReadOnly": "Read only",
   "editorDisableValidation": "Disable validation"
 }

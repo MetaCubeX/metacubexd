@@ -5,12 +5,33 @@ import type {
   ProfileMeta,
   ValidateResult,
 } from '~/types/control'
+import { toast } from 'vue-sonner'
 import { useControlApi } from './useControlApi'
+
+// `useI18n` is auto-imported by @nuxtjs/i18n (no explicit import). In unit
+// tests it is provided as a global stub via test/setup.ts.
+declare function useI18n(): { t: (key: string, named?: object) => string }
 
 export function useProfiles() {
   const api = useControlApi()
+  const { t } = useI18n()
   const profiles = ref<ProfileMeta[]>([])
   const loading = ref(false)
+
+  // Base (local/remote) profiles drive the activate flow; merge overlays are
+  // composed onto whichever base is active. Keep them in separate lists so the
+  // page can render them in distinct sections.
+  const baseProfiles = computed(() =>
+    profiles.value.filter((p) => p.type !== 'merge'),
+  )
+  const mergeProfiles = computed(() =>
+    profiles.value.filter((p) => p.type === 'merge'),
+  )
+
+  // The last activated non-merge base — needed to re-compose the active config
+  // after a merge overlay is toggled or edited. Undefined until the user
+  // activates a base this session (the agent does not expose the active id).
+  const activeBaseId = ref<string | undefined>(undefined)
 
   const refresh = async () => {
     loading.value = true
@@ -21,9 +42,17 @@ export function useProfiles() {
     }
   }
 
-  const create = async (body: { name: string; content?: string }) => {
+  const create = async (body: {
+    name: string
+    content?: string
+    type?: 'local' | 'merge'
+  }) => {
     await api.createProfile(body)
     await refresh()
+  }
+  // Mint a new merge overlay (YAML composed onto the active base).
+  const createMerge = async (name: string) => {
+    await create({ name, type: 'merge' })
   }
   const duplicate = async (id: string, name?: string) => {
     await api.duplicateProfile(id, name)
@@ -46,19 +75,63 @@ export function useProfiles() {
     api.validateProfile(id)
   const activate = async (id: string): Promise<KernelState> => {
     const state = await api.activateProfile(id)
+    activeBaseId.value = id
     await refresh()
     return state
   }
 
+  // Re-run setActive on the current base so enabled merge overlays re-compose
+  // onto it. If no base is active this session, tell the user to activate one.
+  const recompose = async () => {
+    if (!activeBaseId.value) {
+      toast.info(t('profilesMergeNoActiveBase'))
+      return
+    }
+    await api.activateProfile(activeBaseId.value)
+  }
+
+  // Enable/disable a merge overlay, then re-compose the active config so the
+  // change takes effect. Failures surface via toast — never swallowed.
+  const setEnabled = async (id: string, enabled: boolean) => {
+    try {
+      await api.updateProfile(id, { enabled })
+      await refresh()
+      await recompose()
+    } catch (e) {
+      toast.error(t('profilesMergeUpdateFailed'), {
+        description: e instanceof Error ? e.message : String(e),
+      })
+    }
+  }
+
+  // Save merge overlay content, then re-compose the active config.
+  const saveMerge = async (id: string, content: string) => {
+    try {
+      await api.updateProfile(id, { content })
+      await refresh()
+      await recompose()
+    } catch (e) {
+      toast.error(t('profilesMergeUpdateFailed'), {
+        description: e instanceof Error ? e.message : String(e),
+      })
+    }
+  }
+
   return {
     profiles,
+    baseProfiles,
+    mergeProfiles,
+    activeBaseId,
     loading,
     refresh,
     create,
+    createMerge,
     duplicate,
     remove,
     importUrl,
     save,
+    saveMerge,
+    setEnabled,
     load,
     validate,
     activate,

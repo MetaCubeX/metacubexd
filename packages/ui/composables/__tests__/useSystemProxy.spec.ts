@@ -17,6 +17,12 @@ vi.mock('../useControlInfo', () => ({
   }),
 }))
 
+// Errors surface via toast (the panel no longer swallows them).
+const { toast } = vi.hoisted(() => ({
+  toast: { success: vi.fn(), error: vi.fn() },
+}))
+vi.mock('vue-sonner', () => ({ toast }))
+
 const state = (
   over: Partial<{ enabled: boolean; port: number; bypass: string[] }> = {},
 ) => ({
@@ -91,5 +97,21 @@ describe('composables/useSystemProxy', () => {
       expect.objectContaining({ enabled: false }),
     )
     expect(sp.enabled.value).toBe(false)
+  })
+
+  it('load() surfaces failures via toast.error (no swallowing) and clears busy', async () => {
+    api.getSysProxy.mockRejectedValue(new Error('access denied'))
+    const sp = useSystemProxy()
+    await sp.load()
+    expect(toast.error).toHaveBeenCalled()
+    expect(sp.loading.value).toBe(false)
+  })
+
+  it('save() surfaces failures via toast.error (no swallowing) and clears busy', async () => {
+    api.setSysProxy.mockRejectedValue(new Error('access denied'))
+    const sp = useSystemProxy()
+    await sp.save()
+    expect(toast.error).toHaveBeenCalled()
+    expect(sp.loading.value).toBe(false)
   })
 })
