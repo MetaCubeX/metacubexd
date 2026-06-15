@@ -9,6 +9,7 @@ import {
   reactive,
   ref,
   shallowRef,
+  toRef,
   watch,
   watchEffect,
 } from 'vue'
@@ -19,6 +20,7 @@ vi.stubGlobal('shallowRef', shallowRef)
 vi.stubGlobal('markRaw', markRaw)
 vi.stubGlobal('computed', computed)
 vi.stubGlobal('reactive', reactive)
+vi.stubGlobal('toRef', toRef)
 vi.stubGlobal('watch', watch)
 vi.stubGlobal('watchEffect', watchEffect)
 vi.stubGlobal('useLocalStorage', useLocalStorage)

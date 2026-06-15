@@ -232,6 +232,9 @@ export const useConfigStore = defineStore('config', () => {
   )
   // Appearance: UI font family ('' = default bundled stack)
   const fontFamily = useLocalStorage('fontFamily', '')
+  // Appearance: advanced custom CSS injected into <head> ('' = none). Lets power
+  // users restyle the dashboard arbitrarily; see useCustomCss for application.
+  const customCss = useLocalStorage('customCss', '')
 
   // Computed
   const isLatencyTestByHttps = computed(() =>
@@ -304,6 +307,7 @@ export const useConfigStore = defineStore('config', () => {
     enableCustomThemeColors.value = false
     customThemeColors.value = {}
     fontFamily.value = ''
+    customCss.value = ''
   }
 
   return {
@@ -374,6 +378,7 @@ export const useConfigStore = defineStore('config', () => {
     enableCustomThemeColors,
     customThemeColors,
     fontFamily,
+    customCss,
     // Computed
     isLatencyTestByHttps,
     latencyQualityMap,

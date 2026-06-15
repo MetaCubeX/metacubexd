@@ -23,6 +23,8 @@ const runtimeConfig = useRuntimeConfig()
 
 // Appearance & settings backup
 const appearance = useAppearance()
+// Advanced custom CSS injection (managed <style> in <head>); active on this page.
+useCustomCss()
 const { downloadSettings, importSettings } = useSettingsBackup()
 
 const backgroundFileInput = ref<HTMLInputElement>()
@@ -911,6 +913,26 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                   />
                   <span class="truncate opacity-70">{{ token }}</span>
                 </label>
+              </div>
+
+              <!-- Custom CSS (advanced) -->
+              <div class="flex flex-col gap-1.5 px-2">
+                <div class="flex flex-col gap-0.5">
+                  <span class="text-sm">{{ t('customCss') }}</span>
+                  <span class="text-xs opacity-50">{{
+                    t('customCssDesc')
+                  }}</span>
+                </div>
+                <textarea
+                  v-model="configStore.customCss"
+                  rows="6"
+                  spellcheck="false"
+                  autocapitalize="off"
+                  autocomplete="off"
+                  autocorrect="off"
+                  class="textarea-bordered textarea w-full font-mono text-xs leading-relaxed"
+                  :placeholder="t('customCssPlaceholder')"
+                />
               </div>
             </div>
 
