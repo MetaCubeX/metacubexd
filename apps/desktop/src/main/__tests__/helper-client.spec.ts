@@ -1,3 +1,4 @@
+import type { Socket } from 'node:net'
 import type { HelperKernel, HelperServer } from '../helper/server'
 import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
@@ -248,5 +249,84 @@ describe('createHelperClient', () => {
     } finally {
       await client.close()
     }
+  })
+
+  describe('onDisconnect', () => {
+    // Faithfully simulate a helper crash/kill: destroy the SERVER-side connection
+    // socket out from under the live client (server.close() alone leaves the
+    // established connection open, so it would not model a crash).
+    function captureServerSocket(srv: HelperServer): {
+      current: Socket | null
+    } {
+      const ref: { current: Socket | null } = { current: null }
+      srv.server.on('connection', (socket) => {
+        ref.current = socket
+      })
+      return ref
+    }
+
+    it('fires onDisconnect when the helper drops the connection unexpectedly', async () => {
+      const kernel = fakeKernel()
+      server = await createHelperServer({ socketPath, secret: SECRET, kernel })
+      const serverSocket = captureServerSocket(server)
+
+      const onDisconnect = vi.fn()
+      const client = createHelperClient({
+        socketPath,
+        secret: SECRET,
+        onDisconnect,
+      })
+      try {
+        // Establish the connection with a round-trip first.
+        await client.ping()
+        // Helper crash/kill: destroy the connection from the privileged side.
+        serverSocket.current?.destroy()
+        // The drop propagates asynchronously; wait for the socket event.
+        await vi.waitFor(() => expect(onDisconnect).toHaveBeenCalledTimes(1))
+      } finally {
+        await client.close()
+      }
+    })
+
+    it('does NOT fire onDisconnect for a deliberate close()', async () => {
+      const kernel = fakeKernel()
+      server = await createHelperServer({ socketPath, secret: SECRET, kernel })
+
+      const onDisconnect = vi.fn()
+      const client = createHelperClient({
+        socketPath,
+        secret: SECRET,
+        onDisconnect,
+      })
+      await client.ping()
+      // A deliberate teardown must not be misread as an unexpected drop.
+      await client.close()
+      // Give any stray socket event a chance to fire before asserting.
+      await new Promise((r) => setTimeout(r, 20))
+      expect(onDisconnect).not.toHaveBeenCalled()
+    })
+
+    it('fires onDisconnect at most once even if both error and close occur', async () => {
+      const kernel = fakeKernel()
+      server = await createHelperServer({ socketPath, secret: SECRET, kernel })
+      const serverSocket = captureServerSocket(server)
+
+      const onDisconnect = vi.fn()
+      const client = createHelperClient({
+        socketPath,
+        secret: SECRET,
+        onDisconnect,
+      })
+      try {
+        await client.ping()
+        serverSocket.current?.destroy()
+        await vi.waitFor(() => expect(onDisconnect).toHaveBeenCalledTimes(1))
+        // Settle: no second invocation arrives after the first.
+        await new Promise((r) => setTimeout(r, 20))
+        expect(onDisconnect).toHaveBeenCalledTimes(1)
+      } finally {
+        await client.close()
+      }
+    })
   })
 })

@@ -32,10 +32,19 @@ function makeDeps(opts?: { installed?: boolean }) {
     }),
   } as unknown as HelperClient
 
+  // The disconnect handler the runtime hands to connectClient; captured so a
+  // test can simulate an unexpected helper drop (helper crash/kill).
+  let onDisconnect: (() => void) | undefined
+  function dropHelper(): void {
+    onDisconnect?.()
+  }
+
   // connectClient builds + returns the (single) fake client; recorded so we can
-  // assert a privileged relaunch connects exactly once.
-  const connectClient = vi.fn(() => {
+  // assert a privileged relaunch connects exactly once. The runtime passes the
+  // disconnect handler it wants wired onto the real socket (B-3 linkage).
+  const connectClient = vi.fn((cb?: () => void) => {
     order.push('connectClient')
+    onDisconnect = cb
     return client
   })
 
@@ -72,6 +81,7 @@ function makeDeps(opts?: { installed?: boolean }) {
     order,
     client,
     connectClient,
+    dropHelper,
     installer,
     supervisor,
     setSection,
@@ -338,6 +348,108 @@ describe('createTunRuntime', () => {
       await runtime.teardown.recoverNetwork()
 
       expect(deps.order).toEqual([])
+    })
+  })
+
+  describe('isTunMode (watchdog-ownership predicate)', () => {
+    it('is false in the default sidecar backend', () => {
+      const deps = makeDeps()
+      const runtime = makeRuntime(deps)
+
+      expect(runtime.isTunMode()).toBe(false)
+    })
+
+    it('is true after a privileged relaunch (helper owns the kernel)', async () => {
+      const deps = makeDeps({ installed: true })
+      const runtime = makeRuntime(deps)
+
+      await runtime.controller.enable({ stack: 'gvisor' })
+
+      expect(runtime.isTunMode()).toBe(true)
+    })
+
+    it('is false again after disabling back to the sidecar', async () => {
+      const deps = makeDeps({ installed: true })
+      const runtime = makeRuntime(deps)
+
+      await runtime.controller.enable({ stack: 'gvisor' })
+      await runtime.controller.disable()
+
+      expect(runtime.isTunMode()).toBe(false)
+    })
+  })
+
+  describe('helper-disconnect linkage', () => {
+    function makeRuntimeWithDisconnect(
+      deps: ReturnType<typeof makeDeps>,
+      onHelperDisconnect: () => void,
+    ) {
+      return createTunRuntime({
+        installer: deps.installer,
+        connectClient: deps.connectClient,
+        supervisor: deps.supervisor,
+        setSection: deps.setSection,
+        kernelOptions: () => KERNEL_OPTS,
+        installOptions: () => ({
+          electronBin: '/app/electron',
+          helperEntry: '/app/out/helper/index.js',
+          socketPath: '/var/run/mcxd.sock',
+          secret: 'install-secret',
+        }),
+        onHelperDisconnect,
+      })
+    }
+
+    it('an unexpected helper drop in tun mode fires onHelperDisconnect', async () => {
+      const deps = makeDeps({ installed: true })
+      const onHelperDisconnect = vi.fn()
+      const runtime = makeRuntimeWithDisconnect(deps, onHelperDisconnect)
+
+      await runtime.controller.enable({ stack: 'gvisor' })
+
+      // The helper crashes / is killed under us.
+      deps.dropHelper()
+
+      expect(onHelperDisconnect).toHaveBeenCalledTimes(1)
+    })
+
+    it('a deliberate stop (disable) does NOT fire onHelperDisconnect', async () => {
+      const deps = makeDeps({ installed: true })
+      const onHelperDisconnect = vi.fn()
+      const runtime = makeRuntimeWithDisconnect(deps, onHelperDisconnect)
+
+      await runtime.controller.enable({ stack: 'gvisor' })
+      // disable() stops the helper kernel + closes the client deliberately. The
+      // client suppresses onDisconnect for a deliberate close(), so the runtime
+      // never gets a stray disconnect — but even if a late event arrived after
+      // we returned to the sidecar, the backend is no longer tun, so it's inert.
+      await runtime.controller.disable()
+      deps.dropHelper()
+
+      expect(onHelperDisconnect).not.toHaveBeenCalled()
+    })
+
+    it('a disconnect while in the sidecar backend is inert', async () => {
+      const deps = makeDeps({ installed: true })
+      const onHelperDisconnect = vi.fn()
+      // Construct the runtime (wires onHelperDisconnect) but never enter tun mode:
+      // connectClient is never called, so there is no live disconnect handler —
+      // a stray drop must never act while the sidecar owns the kernel.
+      void makeRuntimeWithDisconnect(deps, onHelperDisconnect)
+
+      deps.dropHelper()
+
+      expect(onHelperDisconnect).not.toHaveBeenCalled()
+    })
+
+    it('works without an onHelperDisconnect dep (a drop is a harmless no-op)', async () => {
+      const deps = makeDeps({ installed: true })
+      const runtime = makeRuntime(deps)
+
+      await runtime.controller.enable({ stack: 'gvisor' })
+
+      // No callback wired: dropping must not throw.
+      expect(() => deps.dropHelper()).not.toThrow()
     })
   })
 })

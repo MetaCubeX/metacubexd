@@ -23,8 +23,14 @@ export interface SidecarSupervisor {
  * relaunch — `createHelperClient` connects at construction, so building it
  * eagerly in boot() would dial a socket that the helper hasn't been installed on
  * yet. Tests hand back an in-memory fake; no real socket is ever opened here.
+ *
+ * The runtime passes an `onDisconnect` handler the factory must wire onto the
+ * client's socket (B-3 watchdog linkage): when the helper drops UNEXPECTEDLY
+ * (helper crash/kill — NOT a deliberate close()), the client invokes it so the
+ * runtime can recover the network. The real factory forwards it straight into
+ * `createHelperClient({ ..., onDisconnect })`.
  */
-export type ConnectHelperClient = () => HelperClient
+export type ConnectHelperClient = (onDisconnect: () => void) => HelperClient
 
 /**
  * Edit a top-level config section of the ACTIVE profile (the agent setSection
@@ -54,6 +60,16 @@ export interface CreateTunRuntimeOptions {
   persist?: PersistFn
   /** Optional teardown error logger (forwarded to createTunTeardown). */
   logError?: (err: unknown) => void
+  /**
+   * Optional: invoked when the helper connection drops UNEXPECTEDLY while in TUN
+   * mode (helper crash/kill). boot() wires this to recoverNetwork() (back to the
+   * sidecar / tear the TUN down) + a desktop notification so a dead helper can't
+   * leave the machine believing it's still routing through a vanished TUN. Only
+   * fires while the active backend is the helper — a deliberate disable()/quit
+   * closes the client cleanly (suppressed) and flips the backend, so neither
+   * path is misread as a crash.
+   */
+  onHelperDisconnect?: () => void
 }
 
 export interface TunRuntime {
@@ -73,6 +89,20 @@ export interface TunRuntime {
   controller: TunController
   /** Safe-teardown helper shared by the UI recover action + quit/crash paths. */
   teardown: TunTeardown
+  /**
+   * Synchronous watchdog-ownership predicate: true while the helper owns the
+   * kernel (TUN mode), false while the in-process supervisor owns it (sidecar).
+   *
+   * Watchdog ownership split (B-3): in TUN mode the kernel runs UNDER the helper,
+   * so the in-app supervisor crash watchdog (Wave 5) must NOT also try to restart
+   * it — that would fight the helper's own supervision (double-restart). The
+   * helper owns its mihomo's liveness (B-2: it stops the kernel + tears the TUN
+   * down on app disconnect / its own exit); the app instead monitors the HELPER
+   * connection health via onHelperDisconnect. The in-app supervisor watchdog is
+   * therefore inert while this returns true — index.ts gates the supervisor
+   * state reactions on it. Reads the live backend flag synchronously (no IPC).
+   */
+  isTunMode: () => boolean
 }
 
 /**
@@ -107,6 +137,7 @@ export function createTunRuntime(opts: CreateTunRuntimeOptions): TunRuntime {
     setSection,
     kernelOptions,
     installOptions,
+    onHelperDisconnect,
   } = opts
 
   // Which backend currently owns the running kernel. enable()/disable() relaunch
@@ -135,11 +166,26 @@ export function createTunRuntime(opts: CreateTunRuntimeOptions): TunRuntime {
     if (!(await installer.isInstalled())) {
       await installer.install(installOptions())
     }
-    // Connect the helper IPC client (real impl dials the local socket).
-    client = connectClient()
+    // Connect the helper IPC client (real impl dials the local socket), wiring
+    // the disconnect handler so an UNEXPECTED helper drop (crash/kill) recovers
+    // the network. We capture THIS client so a late disconnect from a since-
+    // replaced connection can't fire for the wrong session.
+    const thisClient = connectClient(() => handleHelperDisconnect(thisClient))
+    client = thisClient
     // The privileged service spawns mihomo with the TUN privilege.
     await client.startKernel(kernelOptions())
     backend = 'tun'
+  }
+
+  /**
+   * Handle an UNEXPECTED helper disconnect (the client's onDisconnect, suppressed
+   * for deliberate close()). Inert unless we're still in TUN mode AND this is the
+   * live connection — a deliberate disable()/quit closes the client and flips the
+   * backend to sidecar, so a stray late event never recovers the wrong session.
+   */
+  function handleHelperDisconnect(source: HelperClient): void {
+    if (backend !== 'tun' || client !== source) return
+    onHelperDisconnect?.()
   }
 
   async function stopKernel(): Promise<void> {
@@ -180,5 +226,6 @@ export function createTunRuntime(opts: CreateTunRuntimeOptions): TunRuntime {
     },
     controller,
     teardown,
+    isTunMode: () => backend === 'tun',
   }
 }

@@ -28,6 +28,15 @@ export interface CreateHelperClientOptions {
   secret: string
   /** Per-request response timeout in ms (defaults to 10s). */
   timeoutMs?: number
+  /**
+   * Fired exactly once when the connection to the helper drops UNEXPECTEDLY
+   * (helper crash/kill/socket error) — i.e. NOT from a deliberate `close()`.
+   * In TUN mode the app uses this to recover the network (tear the TUN down,
+   * fall back to the sidecar) rather than keep believing it's still routing
+   * through a dead helper. A deliberate `close()` (during a mode switch /
+   * shutdown) never triggers it. Optional: sidecar callers omit it.
+   */
+  onDisconnect?: (err?: Error) => void
 }
 
 /** A type-narrowed `startKernel` response (carries the running state). */
@@ -91,7 +100,7 @@ class HelperRequestError extends Error {
 export function createHelperClient(
   opts: CreateHelperClientOptions,
 ): HelperClient {
-  const { socketPath, secret } = opts
+  const { socketPath, secret, onDisconnect } = opts
   const timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS
 
   // FIFO queue of in-flight requests awaiting their response frame.
@@ -104,6 +113,21 @@ export function createHelperClient(
   let buffer = ''
   /** Set once the socket dies so later requests fail fast instead of hanging. */
   let fatal: Error | undefined
+  /** Set when WE end the socket so the close/error isn't read as a crash. */
+  let closing = false
+  /** Guards onDisconnect to fire at most once (error + close can both arrive). */
+  let disconnected = false
+
+  /**
+   * Notify the owner of an UNEXPECTED drop exactly once. A deliberate `close()`
+   * sets `closing` first, so the resulting close/error is never misreported as a
+   * helper crash. No-op when no callback was supplied (sidecar callers).
+   */
+  function reportDisconnect(err?: Error): void {
+    if (closing || disconnected) return
+    disconnected = true
+    onDisconnect?.(err)
+  }
 
   const socket: Socket = connect(socketPath)
   socket.setEncoding('utf8')
@@ -143,11 +167,17 @@ export function createHelperClient(
 
   socket.on('error', (err: Error) => {
     failAll(err)
+    // An unexpected socket error means the helper connection is gone — surface
+    // it so a TUN session can recover the network (suppressed for a deliberate
+    // close()).
+    reportDisconnect(err)
   })
   socket.on('close', () => {
     if (pending.length > 0) {
       failAll(fatal ?? new Error('helper: connection closed'))
     }
+    // The connection is gone; tell the owner unless we ended it ourselves.
+    reportDisconnect(fatal)
   })
 
   function request(
@@ -205,6 +235,9 @@ export function createHelperClient(
       return res as HelperStatusResponse
     },
     close() {
+      // Mark this teardown as deliberate so the resulting close/error event is
+      // not misreported as a helper crash via onDisconnect.
+      closing = true
       return new Promise<void>((resolve) => {
         if (socket.destroyed) {
           resolve()

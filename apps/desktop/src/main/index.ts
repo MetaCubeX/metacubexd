@@ -377,11 +377,13 @@ async function boot(): Promise<void> {
     }),
     // Lazily dial the helper IPC socket only on the privileged relaunch —
     // createHelperClient connects at construction, and the helper isn't listening
-    // until it's installed.
-    connectClient: () =>
+    // until it's installed. Forward the runtime's disconnect handler so an
+    // UNEXPECTED helper drop (crash/kill) reaches onHelperDisconnect below.
+    connectClient: (onDisconnect) =>
       createHelperClient({
         socketPath: tunPaths.socketPath,
         secret: helperSecret,
+        onDisconnect,
       }),
     supervisor: agent.supervisor,
     setSection: async (key, value) => {
@@ -411,6 +413,23 @@ async function boot(): Promise<void> {
       }
     },
     logError: (err) => notify('TUN network recovery failed', err),
+    // Helper-disconnect linkage (B-3): while in TUN mode the kernel runs UNDER
+    // the privileged helper, so the app does NOT supervise it directly — it
+    // monitors the HELPER CONNECTION instead. If that connection drops
+    // unexpectedly (helper crash/kill), recover the network (tear the TUN down,
+    // fall back to the sidecar) so the machine can't keep believing it's routing
+    // through a vanished TUN, and notify the user. recoverNetwork is a no-op once
+    // already back in sidecar, so a benign disconnect is harmless. The watchdog
+    // ownership split (helper supervises its own mihomo; app supervises the
+    // helper connection) is enforced below by gating the in-app supervisor
+    // watchdog on tunRuntime.isTunMode().
+    onHelperDisconnect: () => {
+      notify(
+        'TUN helper disconnected',
+        'Recovering the network — routing falls back to the sidecar.',
+      )
+      void tunTeardown?.recoverNetwork()
+    },
   })
   // Back the delegate handed to createAgent with the real runtime controller, and
   // wire the safe-teardown helper for the UI recover action + quit/crash paths.
@@ -438,15 +457,22 @@ async function boot(): Promise<void> {
     notify('Failed to read persisted TUN state', err)
   }
 
-  // Surface a desktop notification when the kernel crashes. The watcher de-dupes
-  // a sustained errored state so a single crash notifies once (it re-arms after
-  // a recovery). Subscribed before start() so we never miss the first event.
-  // On a crash we also recover the network (tear down TUN -> sidecar) so a dead
-  // TUN kernel can't leave the machine routing into a nonexistent device.
+  // In-app supervisor crash watchdog (Wave 5). Watchdog OWNERSHIP SPLIT (B-3):
+  // this watchdog supervises only the SIDECAR-mode kernel (the in-process
+  // supervisor's child). In TUN mode the kernel runs UNDER the privileged helper,
+  // which owns its own mihomo's liveness (B-2: it stops the kernel + tears the
+  // TUN down on app disconnect / its own exit); the app instead monitors the
+  // HELPER connection via onHelperDisconnect above. So while tunRuntime.isTunMode()
+  // is true this watchdog is INERT — reacting here would fight the helper's
+  // supervision (double-restart) and the supervisor's state is stale anyway (its
+  // child was stopped when we switched to the helper). The watcher de-dupes a
+  // sustained errored state so a single sidecar crash notifies once (it re-arms
+  // after a recovery). Subscribed before start() so we never miss the first event.
   const crashWatcher = createKernelCrashWatcher(notify)
   agent.supervisor.on('state', (state) => {
+    // Disarm in TUN mode: the helper (not this supervisor) owns the kernel.
+    if (tunRuntime.isTunMode()) return
     crashWatcher(state)
-    if (state.status === 'errored') void tunTeardown?.recoverNetwork()
   })
 
   // Drive subscription auto-update against the agent's profile store, surfacing
