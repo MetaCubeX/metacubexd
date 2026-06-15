@@ -17,6 +17,7 @@ import {
   writeFileSync,
 } from 'node:fs'
 import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
 import { createAgent, createProfileScheduler } from '@metacubexd/agent'
 import {
@@ -53,6 +54,12 @@ import {
   loadWindowState,
   saveWindowState,
 } from './window-state'
+
+// ESM has no CommonJS `__dirname`; electron-vite bundles main as ESM under
+// `"type": "module"`, so derive it from import.meta.url (the bundled
+// out/main/index.js location). All `join(__dirname, ...)` paths below resolve
+// exactly as the CJS equivalent did, in both dev and packaged (asar) layouts.
+const __dirname = fileURLToPath(new URL('.', import.meta.url))
 
 // Real fs adapter for bootstrapDataDir (recursive mkdir is idempotent).
 const fsAdapter: FsLike = {

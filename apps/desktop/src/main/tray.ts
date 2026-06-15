@@ -1,5 +1,6 @@
 import type { BrowserWindow } from 'electron'
 import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { app, Menu, nativeImage, Tray } from 'electron'
 
 /** mihomo proxy modes exposed by the tray "Proxy mode" submenu. */
@@ -200,5 +201,9 @@ export function createTray(deps: TrayDeps): Tray {
  */
 export function trayIconPath(): string {
   const file = process.platform === 'darwin' ? 'trayTemplate.png' : 'tray.png'
+  // ESM: no CJS __dirname. Derive from import.meta.url (bundled into
+  // out/main/index.js → ../../resources). Function-local so it never collides
+  // with the main module's own __dirname after bundling.
+  const __dirname = fileURLToPath(new URL('.', import.meta.url))
   return join(__dirname, '..', '..', 'resources', file)
 }
