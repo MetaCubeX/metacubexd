@@ -5,7 +5,10 @@ import type {
 } from '@metacubexd/agent/types'
 import type { Tray } from 'electron'
 import type { ControlServer } from './control-server'
+import type { HelperInstallOptions } from './helper/installer'
+import type { HelperKernelStartOptions } from './helper/server'
 import type { FsLike } from './paths'
+import { exec as nodeExec } from 'node:child_process'
 import {
   chmodSync,
   existsSync,
@@ -14,6 +17,7 @@ import {
   writeFileSync,
 } from 'node:fs'
 import { join } from 'node:path'
+import { promisify } from 'node:util'
 import { createAgent, createProfileScheduler } from '@metacubexd/agent'
 import {
   app,
@@ -30,6 +34,8 @@ import { runShutdownCleanup } from './cleanup'
 import { startControlServer, stopControlServer } from './control-server'
 import { parseSubscriptionDeepLink } from './deep-link'
 import { pickFreePorts } from './free-port'
+import { createHelperClient } from './helper/client'
+import { createHelperInstaller } from './helper/installer'
 import { loadHotkeyBindings, registerHotkeys } from './hotkeys'
 import { createKernelManager } from './kernel-manager'
 import { createKernelCrashWatcher, createNotifier } from './notifier'
@@ -40,7 +46,7 @@ import { createSystemProxyController } from './sysproxy'
 import { readSysProxyBypass } from './sysproxy-config'
 import { createSysproxyGuard } from './sysproxy-guard'
 import { createTray, trayIconPath } from './tray'
-import { createTunTeardown } from './tun-teardown'
+import { createTunRuntime } from './tun-runtime'
 import {
   DEFAULT_WINDOW_BOUNDS,
   loadWindowState,
@@ -53,6 +59,72 @@ const fsAdapter: FsLike = {
   mkdirSync: (p) => void mkdirSync(p, { recursive: true }),
   readFileSync: (p) => readFileSync(p, 'utf8'),
   writeFileSync: (p, data) => writeFileSync(p, data, 'utf8'),
+}
+
+// TUN privileged-helper service identifiers (LaunchDaemon label on macOS,
+// systemd unit / Windows service name on linux/win). Stable so install/uninstall
+// + isInstalled all address the same registered service.
+const HELPER_LABEL = 'io.github.metacubexd.helper'
+const HELPER_SERVICE_NAME = 'metacubexd-helper'
+
+const execAsync = promisify(nodeExec)
+
+/**
+ * Injected un-elevated command runner for the installer's cheap isInstalled
+ * probe (never needs privilege). Real shell-out — only ever invoked when the
+ * user enables TUN, never at boot and never in tests.
+ */
+const helperExec = (cmd: string): Promise<{ stdout: string; stderr: string }> =>
+  execAsync(cmd)
+
+/**
+ * Injected elevation runner: run the ONE privileged install/uninstall script
+ * with administrator privileges. macOS goes through osascript (`do shell script
+ * ... with administrator privileges`, ONE prompt); linux/win go through the
+ * installer's own pkexec/UAC commands, so a plain elevated shell suffices. Only
+ * ever invoked on an explicit user TUN enable — never at boot, never in tests.
+ */
+const helperElevate = (
+  script: string,
+): Promise<{ stdout: string; stderr: string }> => {
+  if (process.platform === 'darwin') {
+    // Escape for embedding inside an AppleScript string literal.
+    const escaped = script.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+    return execAsync(
+      `osascript -e 'do shell script "${escaped}" with administrator privileges'`,
+    )
+  }
+  // linux: the script already contains pkexec-eligible commands; win: runas/UAC.
+  // Run it through the platform shell; the script's own commands carry privilege.
+  return execAsync(script)
+}
+
+/**
+ * Per-OS local socket / named-pipe path + root-owned secret-file path for the
+ * privileged helper. mac/linux: a unix domain socket under a writable dir;
+ * Windows: a `\\.\pipe\...` named pipe. The secret file is the root-owned,
+ * app-readable path the installer writes the shared secret to.
+ */
+function resolveHelperPaths(userData: string): {
+  socketPath: string
+  secretFile: string
+} {
+  if (process.platform === 'win32') {
+    return {
+      socketPath: `\\\\.\\pipe\\${HELPER_SERVICE_NAME}`,
+      secretFile: join(userData, 'helper.secret'),
+    }
+  }
+  if (process.platform === 'darwin') {
+    return {
+      socketPath: `/tmp/${HELPER_SERVICE_NAME}.sock`,
+      secretFile: `/Library/Application Support/${HELPER_LABEL}/helper.secret`,
+    }
+  }
+  return {
+    socketPath: `/run/${HELPER_SERVICE_NAME}.sock`,
+    secretFile: `/etc/${HELPER_SERVICE_NAME}/helper.secret`,
+  }
 }
 
 let win: BrowserWindow | null = null
@@ -71,15 +143,16 @@ let sysproxyGuard: ReturnType<typeof createSysproxyGuard> | null = null
 // Same-origin renderer URL (the control server serves the dashboard too); set
 // in boot() and loaded by createWindow().
 let rendererUrl: string | null = null
-// TUN controller (Wave B-1, option B). B-1 only lands the pure-logic state
-// machine; the REAL elevation/helper-IPC injection arrives in B-2/B-3, so it
-// stays null here until then. Kept module-level so the quit/crash paths can
-// recover the network through tunTeardown (anti-lockout).
-const tunController: TunController | null = null
+// TUN controller (option B). The REAL elevation/helper-IPC injection is wired in
+// boot() via createTunRuntime (B-3): the B-1 state machine driving the B-2 helper
+// client + the B3-T1 installer + the agent setSection primitive. Kept
+// module-level so the quit/crash paths can recover the network through
+// tunTeardown (anti-lockout).
+let tunController: TunController | null = null
 // Safe-teardown helper: recoverNetwork() tears the TUN down (back to sidecar)
-// when active. Built in boot() once a tunController exists; backs both the UI
+// when active. Built in boot() from the tun-runtime; backs both the UI
 // "recover network" action and the quit/crash paths.
-let tunTeardown: ReturnType<typeof createTunTeardown> | null = null
+let tunTeardown: ReturnType<typeof createTunRuntime>['teardown'] | null = null
 
 function defaultConfigSource(): string {
   // packaged -> process.resourcesPath/default-config.yaml ; dev -> repo resources
@@ -203,6 +276,30 @@ async function boot(): Promise<void> {
     },
   }
 
+  // Same chicken-and-egg as kernelManager: the TUN runtime needs agent.supervisor
+  // + agent.profiles.setSection, but createAgent needs a tunController to register
+  // the 'tun' feature + /api/control/tun routes. Hand createAgent a stable
+  // delegate (truthy so 'tun' goes live) and back it with the real B-3 runtime
+  // controller once the agent (and its supervisor/profiles) exists. createAgent
+  // returns synchronously and no /api/control request fires before boot()
+  // completes, so realTunController is always set by request time.
+  let realTunController: TunController | null = null
+  const tunControllerDelegate: TunController = {
+    enable: (o) => {
+      if (!realTunController) throw new Error('tun controller not ready')
+      return realTunController.enable(o)
+    },
+    disable: () => {
+      if (!realTunController) throw new Error('tun controller not ready')
+      return realTunController.disable()
+    },
+    status: () => {
+      if (!realTunController) throw new Error('tun controller not ready')
+      return realTunController.status()
+    },
+  }
+  tunController = tunControllerDelegate
+
   agent = createAgent({
     binaryPath,
     homeDir: paths.homeDir,
@@ -226,6 +323,10 @@ async function boot(): Promise<void> {
     // Inject the kernel version manager (delegate); enables the capability-gated
     // /api/control/kernel/* routes + the 'kernel-version' feature flag.
     kernelManager,
+    // Inject the TUN controller (delegate); enables the capability-gated
+    // /api/control/tun routes + the 'tun' feature flag. Backed by the real B-3
+    // runtime controller built below once the supervisor/profiles exist.
+    tunController,
   })
 
   // Now that the supervisor exists, build the real manager. Downloaded kernels
@@ -239,12 +340,103 @@ async function boot(): Promise<void> {
     overridePath,
   })
 
-  // Build the TUN safe-teardown helper once a tunController exists (B-2/B-3 wire
-  // the real elevation/helper-IPC controller; B-1 only lands the skeleton, so
-  // tunController is still null here and tunTeardown stays null too). When set,
-  // recoverNetwork() backs the UI "recover network" action and the quit/crash
-  // paths — anti-lockout: a crashed/quit TUN kernel must fall back to sidecar.
-  tunTeardown = tunController ? createTunTeardown({ tunController }) : null
+  // Wire the REAL TUN runtime (B-3): the B-1 state machine driving the B-2 helper
+  // client + the B3-T1 installer + the agent setSection primitive + the
+  // in-process supervisor (the sidecar backend). Everything OS/privilege/install/
+  // spawn lives behind these injected deps — boot() never elevates, installs a
+  // service, or spawns a privileged process; the privileged spawn happens inside
+  // the already-installed root/admin helper, reached over a local socket.
+  const tunPaths = resolveHelperPaths(userData)
+  // Where the resolved TUN mode is persisted for the cold-start prompt.
+  const tunStatePath = join(userData, 'tun-state.json')
+  // Per-install shared secret stamped onto every helper IPC request. Persisted so
+  // it stays stable across sessions (the installer writes it root-owned; the
+  // client reads it back from here). Best-effort read; first run mints one.
+  const helperSecretPath = join(userData, 'helper-secret.txt')
+  const helperSecret = existsSync(helperSecretPath)
+    ? readFileSync(helperSecretPath, 'utf8').trim()
+    : (() => {
+        const s = makeToken()
+        try {
+          writeFileSync(helperSecretPath, s, 'utf8')
+        } catch {
+          /* best-effort; a failed persist just re-mints next launch */
+        }
+        return s
+      })()
+  const tunRuntime = createTunRuntime({
+    installer: createHelperInstaller({
+      platform: process.platform,
+      exec: helperExec,
+      elevate: helperElevate,
+      paths: {
+        label: HELPER_LABEL,
+        serviceName: HELPER_SERVICE_NAME,
+        secretPath: tunPaths.secretFile,
+      },
+    }),
+    // Lazily dial the helper IPC socket only on the privileged relaunch —
+    // createHelperClient connects at construction, and the helper isn't listening
+    // until it's installed.
+    connectClient: () =>
+      createHelperClient({
+        socketPath: tunPaths.socketPath,
+        secret: helperSecret,
+      }),
+    supervisor: agent.supervisor,
+    setSection: async (key, value) => {
+      const activeId = await agent!.profiles.getActiveId()
+      if (!activeId) throw new Error('tun: no active profile to edit')
+      await agent!.profiles.setSection(activeId, key, value)
+    },
+    kernelOptions: (): HelperKernelStartOptions => ({
+      binaryPath,
+      homeDir: paths.homeDir,
+      configPath: paths.activeConfigPath,
+    }),
+    installOptions: (): HelperInstallOptions => ({
+      electronBin: process.execPath,
+      helperEntry: join(__dirname, '..', 'helper', 'index.js'),
+      socketPath: tunPaths.socketPath,
+      secret: helperSecret,
+    }),
+    // Persist the resolved mode so a future session knows the last state. We do
+    // NOT auto-restore TUN at boot (that would silently elevate); the cold-start
+    // prompt is surfaced below + handled by the UI (B-4).
+    persist: async (state) => {
+      try {
+        writeFileSync(tunStatePath, JSON.stringify(state), 'utf8')
+      } catch (err) {
+        notify('Failed to persist TUN state', err)
+      }
+    },
+    logError: (err) => notify('TUN network recovery failed', err),
+  })
+  // Back the delegate handed to createAgent with the real runtime controller, and
+  // wire the safe-teardown helper for the UI recover action + quit/crash paths.
+  realTunController = tunRuntime.controller
+  tunTeardown = tunRuntime.teardown
+
+  // Cold-start restore prompt: if the last session ended in TUN mode, surface a
+  // notification rather than auto-elevating (an unattended boot must never pop a
+  // privilege prompt). The renderer re-enables TUN through /api/control/tun on
+  // the user's confirmation (B-4 UI). Best-effort read; a missing/corrupt file
+  // means "was sidecar", so nothing to prompt.
+  try {
+    if (existsSync(tunStatePath)) {
+      const last = JSON.parse(readFileSync(tunStatePath, 'utf8')) as {
+        mode?: string
+      }
+      if (last.mode === 'tun') {
+        notify(
+          'TUN mode was active',
+          'Re-enable TUN from the dashboard to resume routing all traffic.',
+        )
+      }
+    }
+  } catch (err) {
+    notify('Failed to read persisted TUN state', err)
+  }
 
   // Surface a desktop notification when the kernel crashes. The watcher de-dupes
   // a sustained errored state so a single crash notifies once (it re-arms after
@@ -377,9 +569,10 @@ async function shutdownKernel(): Promise<void> {
   profileScheduler?.stop()
   // Anti-lockout: if TUN mode is active, tear it down (back to sidecar) before
   // the kernel stops so we never leave the machine routing into a dead TUN
-  // device. recoverNetwork() is a no-op in sidecar mode and never throws — the
-  // REAL helper-disconnect linkage arrives in B-3. tunTeardown is null until a
-  // tunController is wired (B-2/B-3), so this is a no-op in B-1.
+  // device. recoverNetwork() is a no-op in sidecar mode and never throws; in TUN
+  // mode it stops the privileged helper kernel over IPC, removes the `tun:` block
+  // and relaunches the unprivileged sidecar (B-3 runtime). Then the sidecar stop
+  // below is a no-op since the supervisor is already stopped.
   await tunTeardown?.recoverNetwork()
   // Stop re-asserting the OS proxy so the guard can't race the disable() below
   // and flip it back on mid-shutdown (the disable() wrapper also stops it, but
