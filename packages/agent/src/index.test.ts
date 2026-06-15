@@ -44,6 +44,7 @@ describe('createAgent', () => {
         'kernel-control',
         'geo-assets',
         'webdav-backup',
+        'runtime-config',
       ],
     })
     expect(info.platform).toMatchObject({
@@ -61,6 +62,11 @@ describe('createAgent', () => {
   it('info().features always includes webdav-backup (request-scoped credentials)', () => {
     const agent = createAgent(opts())
     expect(agent.info().features).toContain('webdav-backup')
+  })
+
+  it('info().features always includes runtime-config (reads activeConfigPath)', () => {
+    const agent = createAgent(opts())
+    expect(agent.info().features).toContain('runtime-config')
   })
 
   it('info().features excludes system-proxy when no controller is injected', () => {

@@ -84,7 +84,7 @@ function makeDeps(token?: string) {
         expire: 4,
       },
     })),
-    getActiveId: vi.fn(async () => undefined),
+    getActiveId: vi.fn(async (): Promise<string | undefined> => undefined),
     setActive: vi.fn(async () => {}),
   }
   const info = vi.fn(() => ({
@@ -718,5 +718,56 @@ describe('createControlRouter — WebDAV backup/restore', () => {
       }),
     })
     expect(res.status).toBeGreaterThanOrEqual(500)
+  })
+})
+
+describe('createControlRouter — runtime config viewer', () => {
+  let srv: Awaited<ReturnType<typeof mount>>
+  afterEach(async () => srv?.close())
+
+  it('gET /api/control/config/runtime returns the activeConfigPath file as text/yaml', async () => {
+    const runtimeYaml =
+      'mixed-port: 7890\nexternal-controller: 127.0.0.1:9090\nsecret: sek\n'
+    const readFile = vi.fn(async () => runtimeYaml)
+    const deps = {
+      ...makeDeps(),
+      activeConfigPath: '/home/active.yaml',
+      readFile:
+        readFile as unknown as typeof import('node:fs/promises').readFile,
+    }
+    srv = await mount(deps as never)
+    const res = await fetch(`${srv.base}/api/control/config/runtime`)
+    expect(res.status).toBe(200)
+    expect(res.headers.get('content-type')).toContain('text/yaml')
+    expect(await res.text()).toBe(runtimeYaml)
+    // Reads the actual activeConfigPath file (not the active profile source).
+    expect(readFile).toHaveBeenCalledWith('/home/active.yaml', 'utf8')
+  })
+
+  it('gET /api/control/config/runtime returns empty string when the file does not exist', async () => {
+    const readFile = vi.fn(async () => {
+      const err = new Error('ENOENT') as NodeJS.ErrnoException
+      err.code = 'ENOENT'
+      throw err
+    })
+    const deps = {
+      ...makeDeps(),
+      activeConfigPath: '/home/missing.yaml',
+      readFile:
+        readFile as unknown as typeof import('node:fs/promises').readFile,
+    }
+    srv = await mount(deps as never)
+    const res = await fetch(`${srv.base}/api/control/config/runtime`)
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe('')
+  })
+
+  it('gET /api/control/config (active profile source) still works alongside runtime', async () => {
+    const deps = makeDeps()
+    deps.profiles.getActiveId = vi.fn(async () => 'p1')
+    srv = await mount(deps)
+    const res = await fetch(`${srv.base}/api/control/config`)
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe('mixed-port: 7890\n')
   })
 })

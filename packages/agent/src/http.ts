@@ -7,7 +7,7 @@ import type {
   ProfileStore,
   SystemProxyController,
 } from './types'
-import { rm, writeFile } from 'node:fs/promises'
+import { readFile as defaultReadFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import {
   createApp,
@@ -39,11 +39,13 @@ export interface ControlRouterDeps {
   profiles: ProfileStore
   info: () => unknown
   homeDir: string // writable dir for materializing validate candidate files
+  activeConfigPath: string // file the kernel runs with -f (supervisor-injected at spawn)
   token?: string
   systemProxy?: SystemProxyController // OS proxy controller; capability-gated
   kernelManager?: KernelManager // kernel version mgmt; capability-gated
   geoFetch?: typeof fetch // override for tests; defaults to global fetch
   createWebdavClient?: typeof defaultCreateWebdavClient // override for tests
+  readFile?: typeof defaultReadFile // override for tests; defaults to fs/promises readFile
 }
 
 const PREFIX = '/api/control'
@@ -56,11 +58,13 @@ export function createControlRouter(deps: ControlRouterDeps): App {
     profiles,
     info,
     homeDir,
+    activeConfigPath,
     token,
     systemProxy,
     kernelManager,
     geoFetch,
     createWebdavClient = defaultCreateWebdavClient,
+    readFile = defaultReadFile,
   } = deps
 
   // ---- Auth middleware: applied to every route except public ones. ----
@@ -251,6 +255,23 @@ export function createControlRouter(deps: ControlRouterDeps): App {
       await profiles.update(activeId, { content: body.content })
       await profiles.setActive(activeId)
       return supervisor.restart()
+    }),
+  )
+
+  // ---- Runtime config (read-only) ----
+  // Returns the actual file the kernel runs with -f. At runtime this holds the
+  // supervisor-injected external-controller/secret/mixed-port, so it differs from
+  // the active profile source served by GET /config. Missing file -> ''.
+  router.get(
+    `${PREFIX}/config/runtime`,
+    defineEventHandler(async (event) => {
+      setResponseHeader(event, 'content-type', 'text/yaml')
+      try {
+        return await readFile(activeConfigPath, 'utf8')
+      } catch (err) {
+        if ((err as NodeJS.ErrnoException).code === 'ENOENT') return ''
+        throw err
+      }
     }),
   )
 

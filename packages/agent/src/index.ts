@@ -65,6 +65,8 @@ export function createAgent(opts: CreateAgentOptions) {
       'geo-assets',
       // WebDAV backup/restore is always available — credentials arrive per-request.
       'webdav-backup',
+      // Runtime config viewer reads the activeConfigPath file — always available.
+      'runtime-config',
       ...(systemProxy ? ['system-proxy'] : []),
       ...(kernelManager ? ['kernel-version'] : []),
     ],
@@ -74,6 +76,7 @@ export function createAgent(opts: CreateAgentOptions) {
     profiles,
     info,
     homeDir: opts.homeDir,
+    activeConfigPath: opts.activeConfigPath,
     token: opts.agentToken,
     systemProxy,
     kernelManager,
