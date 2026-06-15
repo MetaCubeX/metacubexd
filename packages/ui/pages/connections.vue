@@ -2,9 +2,18 @@
 import type { VNode } from 'vue'
 import type { ConnectionColumn, TableRow } from '~/components/connections'
 import type { Connection } from '~/types'
-import { IconChevronRight, IconX } from '@tabler/icons-vue'
+import {
+  IconChevronRight,
+  IconFileTypeCsv,
+  IconJson,
+  IconX,
+} from '@tabler/icons-vue'
 import byteSize from 'byte-size'
 import { uniq } from 'lodash-es'
+import {
+  connectionsToCSV,
+  connectionsToJSON,
+} from '~/components/connections/connectionsExport'
 import { connectionMatchesGlobalFilter } from '~/components/connections/globalFilter'
 import {
   closeAllConnectionsAPI,
@@ -635,6 +644,31 @@ function showConnectionDetails(conn: Connection) {
   selectedConnection.value = conn
   detailsModal.value?.open()
 }
+
+// Export the CURRENT connections (filteredConnections already respects the
+// active tab, source-IP/quick/global filters and the sort order) as a file
+// download. Mirrors the logs page's Blob/anchor approach.
+function downloadBlob(text: string, mime: string, extension: string) {
+  const blob = new Blob([text], { type: mime })
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.download = `mihomo-connections-${new Date().toISOString()}.${extension}`
+  anchor.click()
+  URL.revokeObjectURL(url)
+}
+
+function exportConnectionsCSV() {
+  downloadBlob(connectionsToCSV(filteredConnections.value), 'text/csv', 'csv')
+}
+
+function exportConnectionsJSON() {
+  downloadBlob(
+    connectionsToJSON(filteredConnections.value),
+    'application/json',
+    'json',
+  )
+}
 </script>
 
 <template>
@@ -715,6 +749,27 @@ function showConnectionDetails(conn: Connection) {
         <span class="text-xs whitespace-nowrap text-base-content/60">
           {{ paginationInfo }}
         </span>
+
+        <div class="flex items-center gap-2">
+          <button
+            class="flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-base-content/10 bg-base-200/60 px-3 text-[0.8125rem] text-base-content transition-all duration-200 hover:border-base-content/20 hover:bg-base-300 disabled:cursor-not-allowed disabled:opacity-40"
+            :disabled="filteredConnections.length === 0"
+            :title="t('exportCSV')"
+            @click="exportConnectionsCSV()"
+          >
+            <IconFileTypeCsv :size="16" />
+            <span class="hidden lg:inline">{{ t('exportCSV') }}</span>
+          </button>
+          <button
+            class="flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-base-content/10 bg-base-200/60 px-3 text-[0.8125rem] text-base-content transition-all duration-200 hover:border-base-content/20 hover:bg-base-300 disabled:cursor-not-allowed disabled:opacity-40"
+            :disabled="filteredConnections.length === 0"
+            :title="t('exportJSON')"
+            @click="exportConnectionsJSON()"
+          >
+            <IconJson :size="16" />
+            <span class="hidden lg:inline">{{ t('exportJSON') }}</span>
+          </button>
+        </div>
       </div>
 
       <ConnectionsPagination

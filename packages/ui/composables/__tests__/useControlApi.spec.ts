@@ -58,14 +58,16 @@ describe('composables/useControlApi resolveControlConfig', () => {
 
 describe('composables/useControlApi methods', () => {
   const json = vi.fn()
-  const get = vi.fn(() => ({ json }))
-  const post = vi.fn(() => ({ json }))
-  const put = vi.fn(() => ({ json }))
-  const del = vi.fn(() => ({ json }))
+  const text = vi.fn()
+  const get = vi.fn(() => ({ json, text }))
+  const post = vi.fn(() => ({ json, text }))
+  const put = vi.fn(() => ({ json, text }))
+  const del = vi.fn(() => ({ json, text }))
 
   beforeEach(() => {
     vi.clearAllMocks()
     json.mockResolvedValue({ ok: true })
+    text.mockResolvedValue('a: 1')
     ;(ky.create as any).mockReturnValue({ get, post, put, delete: del })
     ;(globalThis as any).window = {
       metacubexd: { control: { base: 'http://x/api/control', token: 't' } },
@@ -182,6 +184,14 @@ describe('composables/useControlApi methods', () => {
   it('updateGeoAssets() POSTs geo/update', async () => {
     await useControlApi().updateGeoAssets()
     expect(post).toHaveBeenCalledWith('geo/update')
+  })
+
+  it('getRuntimeConfig() GETs config/runtime as text (text/yaml, not JSON)', async () => {
+    const out = await useControlApi().getRuntimeConfig()
+    expect(get).toHaveBeenCalledWith('config/runtime')
+    expect(text).toHaveBeenCalledOnce()
+    expect(json).not.toHaveBeenCalled()
+    expect(out).toBe('a: 1')
   })
 
   it('webdavBackup() POSTs backup with { webdav, uiSettings } json body', async () => {

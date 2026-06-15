@@ -51,6 +51,7 @@ export type ControlFeature =
   | 'kernel-version'
   | 'geo-assets'
   | 'webdav-backup'
+  | 'runtime-config'
 export interface ControlInfo {
   hasAgent: boolean
   version: string

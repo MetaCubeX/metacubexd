@@ -113,6 +113,12 @@ export function useControlApi() {
     // geosite/mmdb databases into the kernel home dir and echoes { ok, files }.
     updateGeoAssets: () => client.post('geo/update').json<GeoUpdateResult>(),
 
+    // Runtime config viewer (capability-gated 'runtime-config'). GET returns the
+    // ACTUAL config file the kernel runs with -f as text/yaml (it carries the
+    // supervisor-injected external-controller/secret/mixed-port), so it is read
+    // as text — not JSON. Missing file resolves to ''.
+    getRuntimeConfig: () => client.get('config/runtime').text(),
+
     // WebDAV backup/restore (capability-gated 'webdav-backup'). Credentials are
     // sent per-request and never persisted by the agent. Backup ships every
     // profile plus the UI settings snapshot; restore recreates the profiles and
