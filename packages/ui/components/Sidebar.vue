@@ -25,6 +25,7 @@ const route = useRoute()
 const { t } = useI18n()
 const configStore = useConfigStore()
 const { hasFeature } = useControlInfo()
+const { isDesktop } = useDesktop()
 
 const navItems = computed(() => {
   const items = [
@@ -169,8 +170,8 @@ const toggleSidebar = () => {
           <IconMenu2 class="h-5 w-5" />
         </label>
 
-        <!-- Logo -->
-        <div class="min-w-0 shrink">
+        <!-- Logo (hidden in the desktop shell — the title bar owns branding) -->
+        <div v-if="!isDesktop" class="min-w-0 shrink">
           <LogoText />
         </div>
 
@@ -214,8 +215,9 @@ const toggleSidebar = () => {
         <div
           class="flex shrink-0 flex-col gap-2 border-b border-[var(--sidebar-border)] p-3"
         >
-          <!-- Logo row -->
+          <!-- Logo row (hidden in the desktop shell — the title bar owns it) -->
           <div
+            v-if="!isDesktop"
             class="flex items-center lg:min-h-7"
             :class="configStore.sidebarExpanded ? '' : 'lg:justify-center'"
           >

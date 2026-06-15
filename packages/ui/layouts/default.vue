@@ -5,6 +5,7 @@ import { useKeyboardShortcuts } from '~/composables/useKeyboardShortcuts'
 const configStore = useConfigStore()
 const endpointStore = useEndpointStore()
 const globalStore = useGlobalStore()
+const { isDesktop } = useDesktop()
 
 // Appearance: background image, custom theme colors, font
 const appearance = useAppearance()
@@ -65,7 +66,7 @@ const hasEndpoint = computed(
 <template>
   <div
     ref="rootElement"
-    class="relative h-screen overscroll-y-none antialiased"
+    class="relative flex h-screen flex-col overscroll-y-none antialiased"
     :class="[
       configStore.enableTwemoji ? 'font-twemoji' : 'font-default',
       appearance.hasBackground.value ? '' : 'bg-base-100',
@@ -85,9 +86,15 @@ const hasEndpoint = computed(
       />
     </template>
 
-    <Sidebar>
-      <slot />
-    </Sidebar>
+    <!-- Custom desktop title bar (desktop shell only; web build skips it). -->
+    <TitleBar v-if="isDesktop" />
+
+    <!-- Sidebar + page content fill the height below the title bar. -->
+    <div class="relative flex min-h-0 flex-1 flex-col">
+      <Sidebar>
+        <slot />
+      </Sidebar>
+    </div>
 
     <!-- Connection error banner - shown when backend is unreachable -->
     <ConnectionErrorBanner v-if="hasEndpoint" />
