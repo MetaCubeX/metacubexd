@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.255.2](https://github.com/MetaCubeX/metacubexd/compare/v1.255.1...v1.255.2) (2026-06-15)
+
+
+### Bug Fixes
+
+* **rules:** align filter toolbar chips with adjacent controls ([160480e](https://github.com/MetaCubeX/metacubexd/commit/160480e59410888856bdd1c4887c7ce265d50ec1))
+
 ## [1.255.1](https://github.com/MetaCubeX/metacubexd/compare/v1.255.0...v1.255.1) (2026-06-15)
 
 
