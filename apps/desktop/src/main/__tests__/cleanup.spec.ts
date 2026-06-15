@@ -9,6 +9,8 @@ function fakeSysProxy(
     isEnabled: vi.fn(async () => false),
     enable: vi.fn(async () => {}),
     disable: vi.fn(async () => {}),
+    setAutoProxy: vi.fn(async () => {}),
+    disableAutoProxy: vi.fn(async () => {}),
     describe: vi.fn(() => ({ port: 7890, bypass: [] })),
     ...overrides,
   }

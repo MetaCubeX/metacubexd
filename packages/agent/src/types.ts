@@ -60,7 +60,10 @@ export interface KernelManager {
 export interface SystemProxyController {
   isEnabled: () => Promise<boolean>
   enable: (bypass?: string[]) => Promise<void> // uses host:port configured at construction
-  disable: () => Promise<void>
+  disable: () => Promise<void> // clears BOTH fixed and PAC/auto-config state (anti-lockout)
+  // PAC (auto-config) mode: point the OS at a proxy-auto-config URL.
+  setAutoProxy: (url: string) => Promise<void>
+  disableAutoProxy: () => Promise<void>
   describe: () => { port: number; bypass: string[] }
 }
 

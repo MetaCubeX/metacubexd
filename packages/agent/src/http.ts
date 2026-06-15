@@ -407,9 +407,25 @@ export function createControlRouter(deps: ControlRouterDeps): App {
         const body = (await readBody(event)) as {
           enabled: boolean
           bypass?: string[]
+          // 'fixed' (default) = manual host:port proxy; 'pac' = auto-config URL.
+          mode?: 'fixed' | 'pac'
+          pacUrl?: string
         }
-        if (body.enabled) await systemProxy.enable(body.bypass)
-        else await systemProxy.disable()
+        if (body.mode === 'pac') {
+          if (body.enabled) {
+            if (!body.pacUrl) {
+              setResponseStatus(event, 400)
+              return { error: 'pacUrl required for pac mode' }
+            }
+            await systemProxy.setAutoProxy(body.pacUrl)
+          } else {
+            await systemProxy.disableAutoProxy()
+          }
+        } else if (body.enabled) {
+          await systemProxy.enable(body.bypass)
+        } else {
+          await systemProxy.disable()
+        }
         return {
           enabled: await systemProxy.isEnabled(),
           ...systemProxy.describe(),

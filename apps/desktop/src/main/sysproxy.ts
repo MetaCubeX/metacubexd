@@ -79,6 +79,24 @@ export function createSystemProxyController(
       await exec(`networksetup -setwebproxystate "${svc}" off`)
       await exec(`networksetup -setsecurewebproxystate "${svc}" off`)
       await exec(`networksetup -setsocksfirewallproxystate "${svc}" off`)
+      // Anti-lockout: also clear any PAC/auto-config so quit/disable can never
+      // leave the machine pointing at a dead loopback PAC URL.
+      await exec(`networksetup -setautoproxystate "${svc}" off`)
+    }
+  }
+
+  async function darwinSetAutoProxy(url: string): Promise<void> {
+    const services = await darwinEnabledServices()
+    for (const svc of services) {
+      await exec(`networksetup -setautoproxyurl "${svc}" ${url}`)
+      await exec(`networksetup -setautoproxystate "${svc}" on`)
+    }
+  }
+
+  async function darwinDisableAutoProxy(): Promise<void> {
+    const services = await darwinEnabledServices()
+    for (const svc of services) {
+      await exec(`networksetup -setautoproxystate "${svc}" off`)
     }
   }
 
@@ -110,6 +128,19 @@ export function createSystemProxyController(
 
   async function winDisable(): Promise<void> {
     await exec(`reg add "${WIN_KEY}" /v ProxyEnable /t REG_DWORD /d 0 /f`)
+    // Anti-lockout: also clear any PAC/auto-config URL.
+    await winDisableAutoProxy()
+  }
+
+  async function winSetAutoProxy(url: string): Promise<void> {
+    // PAC and the fixed proxy are mutually exclusive in intent — point
+    // AutoConfigURL at the PAC file and turn the manual proxy off.
+    await exec(`reg add "${WIN_KEY}" /v AutoConfigURL /t REG_SZ /d ${url} /f`)
+    await exec(`reg add "${WIN_KEY}" /v ProxyEnable /t REG_DWORD /d 0 /f`)
+  }
+
+  async function winDisableAutoProxy(): Promise<void> {
+    await exec(`reg delete "${WIN_KEY}" /v AutoConfigURL /f`)
   }
 
   async function winIsEnabled(): Promise<boolean> {
@@ -138,6 +169,16 @@ export function createSystemProxyController(
   }
 
   async function linuxDisable(): Promise<void> {
+    // mode 'none' clears both manual and auto (PAC) proxy — anti-lockout safe.
+    await exec("gsettings set org.gnome.system.proxy mode 'none'")
+  }
+
+  async function linuxSetAutoProxy(url: string): Promise<void> {
+    await exec("gsettings set org.gnome.system.proxy mode 'auto'")
+    await exec(`gsettings set org.gnome.system.proxy autoconfig-url '${url}'`)
+  }
+
+  async function linuxDisableAutoProxy(): Promise<void> {
     await exec("gsettings set org.gnome.system.proxy mode 'none'")
   }
 
@@ -173,6 +214,30 @@ export function createSystemProxyController(
           return winDisable()
         case 'linux':
           return linuxDisable()
+        default:
+          return unsupported()
+      }
+    },
+    async setAutoProxy(url) {
+      switch (platform) {
+        case 'darwin':
+          return darwinSetAutoProxy(url)
+        case 'win32':
+          return winSetAutoProxy(url)
+        case 'linux':
+          return linuxSetAutoProxy(url)
+        default:
+          return unsupported()
+      }
+    },
+    async disableAutoProxy() {
+      switch (platform) {
+        case 'darwin':
+          return darwinDisableAutoProxy()
+        case 'win32':
+          return winDisableAutoProxy()
+        case 'linux':
+          return linuxDisableAutoProxy()
         default:
           return unsupported()
       }

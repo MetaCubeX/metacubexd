@@ -23,6 +23,8 @@ function makeSystemProxy(enabled = false) {
     isEnabled: vi.fn(async () => enabled),
     enable: vi.fn(async () => {}),
     disable: vi.fn(async () => {}),
+    setAutoProxy: vi.fn(async () => {}),
+    disableAutoProxy: vi.fn(async () => {}),
     describe: vi.fn(() => ({ port: 7890, bypass: ['localhost', '127.0.0.1'] })),
   }
 }
@@ -412,6 +414,52 @@ describe('createControlRouter — system proxy', () => {
       port: 7890,
       bypass: ['localhost', '127.0.0.1'],
     })
+  })
+
+  it('pOST /api/control/sysproxy {mode:pac, enabled:true, pacUrl} calls setAutoProxy', async () => {
+    const deps = { ...makeDeps(), systemProxy: makeSystemProxy(false) }
+    srv = await mount(deps as never)
+    const res = await fetch(`${srv.base}/api/control/sysproxy`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        mode: 'pac',
+        enabled: true,
+        pacUrl: 'http://127.0.0.1:7890/proxy.pac',
+      }),
+    })
+    expect(res.status).toBe(200)
+    expect(deps.systemProxy.setAutoProxy).toHaveBeenCalledWith(
+      'http://127.0.0.1:7890/proxy.pac',
+    )
+    expect(deps.systemProxy.enable).not.toHaveBeenCalled()
+    expect(deps.systemProxy.disableAutoProxy).not.toHaveBeenCalled()
+  })
+
+  it('pOST /api/control/sysproxy {mode:pac, enabled:false} calls disableAutoProxy', async () => {
+    const deps = { ...makeDeps(), systemProxy: makeSystemProxy(false) }
+    srv = await mount(deps as never)
+    const res = await fetch(`${srv.base}/api/control/sysproxy`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ mode: 'pac', enabled: false }),
+    })
+    expect(res.status).toBe(200)
+    expect(deps.systemProxy.disableAutoProxy).toHaveBeenCalledOnce()
+    expect(deps.systemProxy.disable).not.toHaveBeenCalled()
+    expect(deps.systemProxy.setAutoProxy).not.toHaveBeenCalled()
+  })
+
+  it('pOST /api/control/sysproxy {mode:pac, enabled:true} without pacUrl is a 400', async () => {
+    const deps = { ...makeDeps(), systemProxy: makeSystemProxy(false) }
+    srv = await mount(deps as never)
+    const res = await fetch(`${srv.base}/api/control/sysproxy`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ mode: 'pac', enabled: true }),
+    })
+    expect(res.status).toBe(400)
+    expect(deps.systemProxy.setAutoProxy).not.toHaveBeenCalled()
   })
 
   it('pOST /api/control/sysproxy {enabled:false} calls disable()', async () => {

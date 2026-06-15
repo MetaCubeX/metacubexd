@@ -86,6 +86,8 @@ describe('createAgent', () => {
       isEnabled: async () => false,
       enable: async () => {},
       disable: async () => {},
+      setAutoProxy: async () => {},
+      disableAutoProxy: async () => {},
       describe: () => ({ port: 7890, bypass: [] as string[] }),
     }
     const agent = createAgent({ ...opts(), systemProxy })

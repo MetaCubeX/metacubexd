@@ -36,6 +36,8 @@ function fakeController(isEnabledImpl: () => Promise<boolean>) {
     isEnabled,
     enable,
     disable,
+    setAutoProxy: vi.fn(async (_url: string) => {}),
+    disableAutoProxy: vi.fn(async () => {}),
     describe,
   }
   return { controller, isEnabled, enable, disable }

@@ -162,6 +162,16 @@ async function boot(): Promise<void> {
       sysproxyGuard?.stop()
       await baseSystemProxy.disable()
     },
+    setAutoProxy: async (url) => {
+      // PAC mode replaces the fixed proxy, so stop the fixed-proxy guard — it
+      // re-asserts the manual proxy and would fight the PAC URL otherwise.
+      sysproxyGuard?.stop()
+      await baseSystemProxy.setAutoProxy(url)
+    },
+    disableAutoProxy: async () => {
+      sysproxyGuard?.stop()
+      await baseSystemProxy.disableAutoProxy()
+    },
   }
 
   // Kernel version management needs the supervisor that createAgent builds
