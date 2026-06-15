@@ -352,7 +352,7 @@
   "customThemeColorsDesc": "テーマカラートークンを上書き",
   "customCss": "カスタム CSS",
   "customCssDesc": "上級者向け：独自の CSS を注入してダッシュボードを再スタイルします",
-  "customCssPlaceholder": "/* 例: .navbar { backdrop-filter: blur(8px); } */",
+  "customCssPlaceholder": "/* 例: .navbar {'{'} backdrop-filter: blur(8px); {'}'} */",
   "settingsBackup": "設定のバックアップ",
   "exportSettings": "エクスポート",
   "importSettings": "インポート",

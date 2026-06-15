@@ -352,7 +352,7 @@
   "customThemeColorsDesc": "Remplacer les jetons de couleur du thème",
   "customCss": "CSS personnalisé",
   "customCssDesc": "Avancé : injectez votre propre CSS pour restyliser le tableau de bord",
-  "customCssPlaceholder": "/* ex. .navbar { backdrop-filter: blur(8px); } */",
+  "customCssPlaceholder": "/* ex. .navbar {'{'} backdrop-filter: blur(8px); {'}'} */",
   "settingsBackup": "Sauvegarde des paramètres",
   "exportSettings": "Exporter",
   "importSettings": "Importer",

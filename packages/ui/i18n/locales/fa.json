@@ -352,7 +352,7 @@
   "customThemeColorsDesc": "بازنویسی توکن‌های رنگ پوسته",
   "customCss": "CSS سفارشی",
   "customCssDesc": "پیشرفته: CSS دلخواه خود را برای تغییر ظاهر داشبورد تزریق کنید",
-  "customCssPlaceholder": "/* مثلاً .navbar { backdrop-filter: blur(8px); } */",
+  "customCssPlaceholder": "/* مثلاً .navbar {'{'} backdrop-filter: blur(8px); {'}'} */",
   "settingsBackup": "پشتیبان‌گیری تنظیمات",
   "exportSettings": "خروجی",
   "importSettings": "ورودی",

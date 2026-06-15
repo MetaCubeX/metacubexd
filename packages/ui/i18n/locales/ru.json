@@ -309,7 +309,7 @@
   "customThemeColorsDesc": "Переопределить цвета темы",
   "customCss": "Свой CSS",
   "customCssDesc": "Для продвинутых: внедрите свой CSS для оформления панели",
-  "customCssPlaceholder": "/* напр. .navbar { backdrop-filter: blur(8px); } */",
+  "customCssPlaceholder": "/* напр. .navbar {'{'} backdrop-filter: blur(8px); {'}'} */",
   "settingsBackup": "Резервная копия настроек",
   "exportSettings": "Экспорт",
   "importSettings": "Импорт",
