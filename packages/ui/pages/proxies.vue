@@ -5,6 +5,7 @@ import type {
   Proxy as ProxyType,
 } from '~/types'
 import {
+  IconActivity,
   IconBrandSpeedtest,
   IconChevronRight,
   IconChevronsDown,
@@ -20,6 +21,7 @@ import {
 import byteSize from 'byte-size'
 import { throttle } from 'lodash-es'
 import Button from '~/components/Button.vue'
+import ConnectivityBoard from '~/components/ConnectivityBoard.vue'
 import ProxyNodeCard from '~/components/ProxyNodeCard.vue'
 import ProxyNodeChip from '~/components/ProxyNodeChip.vue'
 import ProxyNodeListItem from '~/components/ProxyNodeListItem.vue'
@@ -55,6 +57,7 @@ const {
 
 const activeTab = ref<'proxies' | 'proxyProviders'>('proxies')
 const settingsModal = ref<{ open: () => void; close: () => void }>()
+const connectivityModal = ref<{ open: () => void; close: () => void }>()
 const proxyGroupsWrapper = ref<{ isTwoColumns: boolean }>()
 const providersWrapper = ref<{ isTwoColumns: boolean }>()
 
@@ -833,6 +836,17 @@ const ProviderProxyNodes = defineComponent({
         </Button>
       </div>
 
+      <!-- Connectivity Board Button -->
+      <div>
+        <Button
+          class="flex h-9 w-9 items-center justify-center rounded-[0.625rem] border border-base-content/10 bg-base-200/80 text-base-content/70 transition-all duration-200 hover:border-primary/30 hover:bg-primary/15 hover:text-primary"
+          :title="t('connectivityBoard')"
+          @click="connectivityModal?.open()"
+        >
+          <IconActivity :size="18" />
+        </Button>
+      </div>
+
       <!-- Settings Button -->
       <div>
         <Button
@@ -1241,6 +1255,15 @@ const ProviderProxyNodes = defineComponent({
           </button>
         </div>
       </div>
+    </Modal>
+
+    <!-- Connectivity Board Modal -->
+    <Modal ref="connectivityModal" :title="t('connectivityBoard')">
+      <template #icon>
+        <IconActivity :size="24" />
+      </template>
+
+      <ConnectivityBoard />
     </Modal>
   </div>
 </template>
