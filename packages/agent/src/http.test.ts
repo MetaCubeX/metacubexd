@@ -505,6 +505,19 @@ function makeKernelManager() {
   }
 }
 
+function makeTunController(
+  status: { enabled: boolean; mode: 'sidecar' | 'tun'; stack?: string } = {
+    enabled: false,
+    mode: 'sidecar',
+  },
+) {
+  return {
+    enable: vi.fn(async () => {}),
+    disable: vi.fn(async () => {}),
+    status: vi.fn(async () => status),
+  }
+}
+
 describe('createControlRouter — geo assets', () => {
   let srv: Awaited<ReturnType<typeof mount>>
   afterEach(async () => srv?.close())
@@ -583,6 +596,92 @@ describe('createControlRouter — kernel version management', () => {
     })
     expect(res.status).toBe(404)
     expect(await res.json()).toEqual({ error: 'kernel-version unavailable' })
+  })
+})
+
+describe('createControlRouter — tun', () => {
+  let srv: Awaited<ReturnType<typeof mount>>
+  afterEach(async () => srv?.close())
+
+  it('gET /api/control/tun reflects tunController.status()', async () => {
+    const deps = {
+      ...makeDeps(),
+      tunController: makeTunController({
+        enabled: true,
+        mode: 'tun',
+        stack: 'gvisor',
+      }),
+    }
+    srv = await mount(deps as never)
+    const res = await fetch(`${srv.base}/api/control/tun`)
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({
+      enabled: true,
+      mode: 'tun',
+      stack: 'gvisor',
+    })
+    expect(deps.tunController.status).toHaveBeenCalledOnce()
+  })
+
+  it('pOST /api/control/tun {enabled:true, stack} calls enable({stack}) then returns status()', async () => {
+    const deps = {
+      ...makeDeps(),
+      tunController: makeTunController({
+        enabled: true,
+        mode: 'tun',
+        stack: 'mixed',
+      }),
+    }
+    srv = await mount(deps as never)
+    const res = await fetch(`${srv.base}/api/control/tun`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ enabled: true, stack: 'mixed' }),
+    })
+    expect(res.status).toBe(200)
+    expect(deps.tunController.enable).toHaveBeenCalledWith({ stack: 'mixed' })
+    expect(deps.tunController.disable).not.toHaveBeenCalled()
+    // Response mirrors the GET shape (status()).
+    expect(await res.json()).toEqual({
+      enabled: true,
+      mode: 'tun',
+      stack: 'mixed',
+    })
+  })
+
+  it('pOST /api/control/tun {enabled:false} calls disable() then returns status()', async () => {
+    const deps = {
+      ...makeDeps(),
+      tunController: makeTunController({ enabled: false, mode: 'sidecar' }),
+    }
+    srv = await mount(deps as never)
+    const res = await fetch(`${srv.base}/api/control/tun`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ enabled: false }),
+    })
+    expect(res.status).toBe(200)
+    expect(deps.tunController.disable).toHaveBeenCalledOnce()
+    expect(deps.tunController.enable).not.toHaveBeenCalled()
+    expect(await res.json()).toEqual({ enabled: false, mode: 'sidecar' })
+  })
+
+  it('gET /api/control/tun is 404 JSON when no controller is injected', async () => {
+    srv = await mount(makeDeps())
+    const res = await fetch(`${srv.base}/api/control/tun`)
+    expect(res.status).toBe(404)
+    expect(await res.json()).toEqual({ error: 'tun unavailable' })
+  })
+
+  it('pOST /api/control/tun is 404 JSON when no controller is injected', async () => {
+    srv = await mount(makeDeps())
+    const res = await fetch(`${srv.base}/api/control/tun`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ enabled: true, stack: 'gvisor' }),
+    })
+    expect(res.status).toBe(404)
+    expect(await res.json()).toEqual({ error: 'tun unavailable' })
   })
 })
 

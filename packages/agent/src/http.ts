@@ -6,6 +6,7 @@ import type {
   MihomoSupervisor,
   ProfileStore,
   SystemProxyController,
+  TunController,
 } from './types'
 import { readFile as defaultReadFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -43,6 +44,7 @@ export interface ControlRouterDeps {
   token?: string
   systemProxy?: SystemProxyController // OS proxy controller; capability-gated
   kernelManager?: KernelManager // kernel version mgmt; capability-gated
+  tunController?: TunController // TUN mode controller; capability-gated
   geoFetch?: typeof fetch // override for tests; defaults to global fetch
   createWebdavClient?: typeof defaultCreateWebdavClient // override for tests
   readFile?: typeof defaultReadFile // override for tests; defaults to fs/promises readFile
@@ -62,6 +64,7 @@ export function createControlRouter(deps: ControlRouterDeps): App {
     token,
     systemProxy,
     kernelManager,
+    tunController,
     geoFetch,
     createWebdavClient = defaultCreateWebdavClient,
     readFile = defaultReadFile,
@@ -472,6 +475,38 @@ export function createControlRouter(deps: ControlRouterDeps): App {
     })
     router.get(`${PREFIX}/kernel/versions`, unavailable)
     router.post(`${PREFIX}/kernel/switch`, unavailable)
+  }
+
+  // ---- TUN mode (capability-gated) ----
+  if (tunController) {
+    router.get(
+      `${PREFIX}/tun`,
+      defineEventHandler(() => tunController.status()),
+    )
+    router.post(
+      `${PREFIX}/tun`,
+      defineEventHandler(async (event) => {
+        const body = (await readBody(event)) as {
+          enabled: boolean
+          stack?: string
+        }
+        if (body.enabled) {
+          await tunController.enable({ stack: body.stack ?? '' })
+        } else {
+          await tunController.disable()
+        }
+        return tunController.status()
+      }),
+    )
+  } else {
+    // No controller injected — clean 404 JSON for both verbs so the shared UI can
+    // detect the missing capability without a router-default 404 shape.
+    const unavailable = defineEventHandler((event) => {
+      setResponseStatus(event, 404)
+      return { error: 'tun unavailable' }
+    })
+    router.get(`${PREFIX}/tun`, unavailable)
+    router.post(`${PREFIX}/tun`, unavailable)
   }
 
   app.use(router)

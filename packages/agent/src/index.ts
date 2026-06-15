@@ -1,5 +1,9 @@
 import type { CreateSupervisorOptions } from './supervisor'
-import type { KernelManager, SystemProxyController } from './types'
+import type {
+  KernelManager,
+  SystemProxyController,
+  TunController,
+} from './types'
 import { createControlRouter } from './http'
 import { createProfileStore } from './profiles'
 import { createProfileScheduler } from './scheduler'
@@ -28,6 +32,7 @@ export type {
 } from './script'
 export { createSupervisor } from './supervisor'
 export type { CreateSupervisorOptions, SupervisorDeps } from './supervisor'
+export { buildTunConfig } from './tun'
 export * from './types'
 export { createWebdavClient } from './webdav'
 export type { WebdavClient, WebdavClientOptions } from './webdav'
@@ -37,6 +42,7 @@ export type CreateAgentOptions = CreateSupervisorOptions & {
   agentToken?: string
   systemProxy?: SystemProxyController // OS proxy controller; enables 'system-proxy'
   kernelManager?: KernelManager // kernel version mgmt; enables 'kernel-version'
+  tunController?: TunController // TUN mode controller; enables 'tun'
 }
 
 export interface AgentInfo {
@@ -53,7 +59,7 @@ export function createAgent(opts: CreateAgentOptions) {
     activeConfigPath: opts.activeConfigPath,
   })
   const supervisor = createSupervisor(opts)
-  const { systemProxy, kernelManager } = opts
+  const { systemProxy, kernelManager, tunController } = opts
   const info = (): AgentInfo => ({
     hasAgent: true,
     version: AGENT_VERSION,
@@ -77,6 +83,7 @@ export function createAgent(opts: CreateAgentOptions) {
       'config-sections',
       ...(systemProxy ? ['system-proxy'] : []),
       ...(kernelManager ? ['kernel-version'] : []),
+      ...(tunController ? ['tun'] : []),
     ],
   })
   const router = createControlRouter({
@@ -88,6 +95,7 @@ export function createAgent(opts: CreateAgentOptions) {
     token: opts.agentToken,
     systemProxy,
     kernelManager,
+    tunController,
   })
   // Wire the auto-update scheduler to the same profiles store. NOT started here —
   // the desktop boot decides when to start ticking.
@@ -100,5 +108,6 @@ export function createAgent(opts: CreateAgentOptions) {
     scheduler,
     systemProxy,
     kernelManager,
+    tunController,
   }
 }

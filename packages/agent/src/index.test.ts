@@ -115,6 +115,23 @@ describe('createAgent', () => {
     expect(agent.kernelManager).toBe(kernelManager)
   })
 
+  it('info().features excludes tun when no controller is injected', () => {
+    const agent = createAgent(opts())
+    expect(agent.info().features).not.toContain('tun')
+    expect((agent as Record<string, unknown>).tunController).toBeUndefined()
+  })
+
+  it('info().features includes tun when a controller is injected', () => {
+    const tunController = {
+      enable: async () => {},
+      disable: async () => {},
+      status: async () => ({ enabled: false, mode: 'sidecar' as const }),
+    }
+    const agent = createAgent({ ...opts(), tunController })
+    expect(agent.info().features).toContain('tun')
+    expect(agent.tunController).toBe(tunController)
+  })
+
   it('re-exports the public surface', () => {
     expect(typeof createSupervisor).toBe('function')
     expect(typeof createProfileStore).toBe('function')

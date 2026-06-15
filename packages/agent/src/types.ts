@@ -57,6 +57,20 @@ export interface KernelManager {
   switch: (version: string) => Promise<void>
 }
 
+// Controls TUN mode: inject/remove the mihomo `tun:` block and (re)start the
+// kernel with the privilege needed to build the virtual device. Every OS /
+// privilege / process side effect lives behind this interface — the desktop
+// impl injects the real elevation/helper-IPC; tests use a fake.
+export interface TunController {
+  enable: (opts: { stack: string }) => Promise<void>
+  disable: () => Promise<void>
+  status: () => Promise<{
+    enabled: boolean
+    mode: 'sidecar' | 'tun'
+    stack?: string
+  }>
+}
+
 export interface SystemProxyController {
   isEnabled: () => Promise<boolean>
   enable: (bypass?: string[]) => Promise<void> // uses host:port configured at construction
