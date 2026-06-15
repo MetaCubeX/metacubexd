@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.255.1](https://github.com/MetaCubeX/metacubexd/compare/v1.255.0...v1.255.1) (2026-06-15)
+
+
+### Bug Fixes
+
+* **config:** read unified delay from backend key ([#2031](https://github.com/MetaCubeX/metacubexd/issues/2031)) ([e72d6f1](https://github.com/MetaCubeX/metacubexd/commit/e72d6f1f8fd2dba254a8e05a1a50eecc092c992a))
+
 ## [1.255.0](https://github.com/MetaCubeX/metacubexd/compare/v1.254.2...v1.255.0) (2026-06-14)
 
 
