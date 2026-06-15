@@ -114,4 +114,29 @@ describe('composables/useSystemProxy', () => {
     expect(toast.error).toHaveBeenCalled()
     expect(sp.loading.value).toBe(false)
   })
+
+  it('toggle() reverts the optimistic state when the save fails (no stuck toggle)', async () => {
+    // Backend is currently disabled; the user flips the toggle ON but the
+    // enable is rejected. The toggle must revert to the true backend state
+    // (false) rather than stay stuck in the optimistic ON position.
+    api.setSysProxy.mockRejectedValue(new Error('access denied'))
+    const sp = useSystemProxy()
+    sp.enabled.value = false
+    await sp.toggle(true)
+    expect(toast.error).toHaveBeenCalled()
+    expect(sp.enabled.value).toBe(false)
+    expect(sp.loading.value).toBe(false)
+  })
+
+  it('toggle() reverts to enabled when disabling fails', async () => {
+    // Backend is currently enabled; the user flips OFF but the disable is
+    // rejected — the toggle must revert back to ON.
+    api.setSysProxy.mockRejectedValue(new Error('access denied'))
+    const sp = useSystemProxy()
+    sp.enabled.value = true
+    await sp.toggle(false)
+    expect(toast.error).toHaveBeenCalled()
+    expect(sp.enabled.value).toBe(true)
+    expect(sp.loading.value).toBe(false)
+  })
 })
