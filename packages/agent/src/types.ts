@@ -64,12 +64,13 @@ export interface SystemProxyController {
   describe: () => { port: number; bypass: string[] }
 }
 
-export type ProfileType = 'local' | 'remote'
+export type ProfileType = 'local' | 'remote' | 'merge'
 
 export interface ProfileMeta {
   id: string
   name: string
   type: ProfileType
+  enabled?: boolean // merge-only; treat undefined as true (overlay is applied)
   url?: string
   userAgent?: string
   updateInterval?: number // minutes; only meaningful for remote profiles
@@ -85,10 +86,14 @@ export interface ProfileMeta {
 export interface ProfileStore {
   list: () => Promise<ProfileMeta[]>
   read: (id: string) => Promise<string> // raw YAML
-  create: (i: { name: string; content?: string }) => Promise<ProfileMeta>
+  create: (i: {
+    name: string
+    content?: string
+    type?: 'local' | 'merge'
+  }) => Promise<ProfileMeta>
   update: (
     id: string,
-    p: { name?: string; content?: string },
+    p: { name?: string; content?: string; enabled?: boolean },
   ) => Promise<ProfileMeta>
   delete: (id: string) => Promise<void>
   duplicate: (id: string, name?: string) => Promise<ProfileMeta>

@@ -202,6 +202,115 @@ describe('createProfileStore — import + active', () => {
   })
 })
 
+describe('createProfileStore — merge profiles', () => {
+  let dir: string
+  let activeConfigPath: string
+  let store: ProfileStore
+  let n: number
+
+  beforeEach(() => {
+    dir = tmpDir()
+    activeConfigPath = join(dir, 'active', 'config.yaml')
+    n = 0
+    store = createProfileStore({
+      dir,
+      activeConfigPath,
+      idGen: () => `id${++n}`,
+    })
+  })
+
+  it('create with type "merge" persists the type in meta', async () => {
+    const meta = await store.create({
+      name: 'overlay',
+      content: 'mode: rule\n',
+      type: 'merge',
+    })
+    expect(meta.type).toBe('merge')
+    const index = JSON.parse(readFileSync(join(dir, 'index.json'), 'utf8'))
+    expect(index[0]).toMatchObject({ id: 'id1', type: 'merge' })
+  })
+
+  it('create defaults type to "local" when omitted', async () => {
+    const meta = await store.create({ name: 'home', content: 'a: 1\n' })
+    expect(meta.type).toBe('local')
+  })
+
+  it('update can toggle the enabled flag', async () => {
+    await store.create({ name: 'overlay', content: 'a: 1\n', type: 'merge' })
+    const updated = await store.update('id1', { enabled: false })
+    expect(updated.enabled).toBe(false)
+    expect((await store.list())[0]!.enabled).toBe(false)
+    const reEnabled = await store.update('id1', { enabled: true })
+    expect(reEnabled.enabled).toBe(true)
+  })
+
+  it('setActive composes enabled merge overlays onto the base', async () => {
+    await store.create({
+      name: 'base',
+      content: 'mode: rule\nmixed-port: 7890\n',
+    })
+    await store.create({
+      name: 'overlay',
+      content: 'mode: global\n',
+      type: 'merge',
+    })
+    await store.setActive('id1')
+    const active = readFileSync(activeConfigPath, 'utf8')
+    expect(active).toContain('mode: global')
+    expect(active).toContain('mixed-port: 7890')
+  })
+
+  it('setActive excludes a disabled merge overlay', async () => {
+    await store.create({ name: 'base', content: 'mode: rule\n' })
+    await store.create({
+      name: 'overlay',
+      content: 'mode: global\n',
+      type: 'merge',
+    })
+    await store.update('id2', { enabled: false })
+    await store.setActive('id1')
+    const active = readFileSync(activeConfigPath, 'utf8')
+    expect(active).toContain('mode: rule')
+    expect(active).not.toContain('mode: global')
+  })
+
+  it('setActive composes multiple enabled merges in index order', async () => {
+    await store.create({ name: 'base', content: 'mode: rule\n' })
+    await store.create({
+      name: 'first',
+      content: 'mode: global\n',
+      type: 'merge',
+    })
+    await store.create({
+      name: 'second',
+      content: 'mode: direct\n',
+      type: 'merge',
+    })
+    await store.setActive('id1')
+    const active = readFileSync(activeConfigPath, 'utf8')
+    // Later overlay wins for the same key.
+    expect(active).toContain('mode: direct')
+    expect(active).not.toContain('mode: global')
+  })
+
+  it('setActive writes the base verbatim when there are NO merge overlays', async () => {
+    const content = 'mixed-port: 7890\n# a comment\nmode:   rule\n'
+    await store.create({ name: 'base', content })
+    await store.setActive('id1')
+    // Byte-identical: no reformatting / re-serialization.
+    expect(readFileSync(activeConfigPath, 'utf8')).toBe(content)
+  })
+
+  it('setActive throws when the target profile is a merge type', async () => {
+    await store.create({
+      name: 'overlay',
+      content: 'mode: global\n',
+      type: 'merge',
+    })
+    await expect(store.setActive('id1')).rejects.toThrow(/merge/i)
+  })
+})
+
 describe('createProfileStore — refresh', () => {
   it('refresh re-fetches in place: same id, overwritten content, new subscriptionInfo + updatedAt', async () => {
     const dir = mkdtempSync(join(tmpdir(), 'mcxd-profiles-ref-'))

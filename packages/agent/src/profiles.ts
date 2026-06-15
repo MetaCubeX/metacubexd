@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto'
 import { existsSync } from 'node:fs'
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { mergeConfigs } from './merge'
 
 export interface ProfileStoreOptions {
   dir: string
@@ -109,7 +110,7 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
       const meta: ProfileMeta = {
         id,
         name: i.name,
-        type: 'local',
+        type: i.type ?? 'local',
         updatedAt: Date.now(),
       }
       await writeFile(profilePath(id), i.content ?? '')
@@ -123,6 +124,7 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
       if (!meta) throw new Error(`profile not found: ${id}`)
       if (p.content != null) await writeFile(profilePath(id), p.content)
       if (p.name != null) meta.name = p.name
+      if (p.enabled != null) meta.enabled = p.enabled
       meta.updatedAt = Date.now()
       await writeIndex(list)
       return meta
@@ -201,8 +203,24 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
     },
 
     async setActive(id) {
-      await findMeta(id)
-      const content = await readFile(profilePath(id), 'utf8')
+      const base = await findMeta(id)
+      if (base.type === 'merge') {
+        throw new Error(
+          `setActive: profile ${id} is a merge overlay and cannot be the active base`,
+        )
+      }
+      const baseContent = await readFile(profilePath(id), 'utf8')
+      // Collect enabled merge overlays in index order (undefined enabled == on).
+      const overlays: string[] = []
+      for (const meta of await readIndex()) {
+        if (meta.type === 'merge' && meta.enabled !== false) {
+          overlays.push(await readFile(profilePath(meta.id), 'utf8'))
+        }
+      }
+      // No overlays -> write the base verbatim (preserve formatting byte-for-byte).
+      const content = overlays.length
+        ? mergeConfigs(baseContent, overlays)
+        : baseContent
       await mkdir(join(activeConfigPath, '..'), { recursive: true })
       await writeFile(activeConfigPath, content)
       await writeState({ activeId: id })

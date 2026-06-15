@@ -216,6 +216,38 @@ describe('createControlRouter — profiles + SSE', () => {
     expect(((await res.json()) as Record<string, unknown>).name).toBe('new')
   })
 
+  it('pOST /api/control/profiles passes through type for merge profiles', async () => {
+    const deps = makeDeps()
+    srv = await mount(deps)
+    const res = await fetch(`${srv.base}/api/control/profiles`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        name: 'overlay',
+        content: 'a: 1\n',
+        type: 'merge',
+      }),
+    })
+    expect(res.status).toBe(200)
+    expect(deps.profiles.create).toHaveBeenCalledWith({
+      name: 'overlay',
+      content: 'a: 1\n',
+      type: 'merge',
+    })
+  })
+
+  it('pUT /api/control/profiles/:id passes through enabled', async () => {
+    const deps = makeDeps()
+    srv = await mount(deps)
+    const res = await fetch(`${srv.base}/api/control/profiles/p1`, {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ enabled: false }),
+    })
+    expect(res.status).toBe(200)
+    expect(deps.profiles.update).toHaveBeenCalledWith('p1', { enabled: false })
+  })
+
   it('gET /api/control/profiles/:id returns { meta, content }', async () => {
     srv = await mount(makeDeps())
     const res = await fetch(`${srv.base}/api/control/profiles/p1`)

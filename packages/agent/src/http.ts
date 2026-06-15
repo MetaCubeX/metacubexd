@@ -130,7 +130,11 @@ export function createControlRouter(deps: ControlRouterDeps): App {
   router.post(
     `${PREFIX}/profiles`,
     defineEventHandler(async (event) => {
-      const body = (await readBody(event)) as { name: string; content?: string }
+      const body = (await readBody(event)) as {
+        name: string
+        content?: string
+        type?: 'local' | 'merge'
+      }
       return profiles.create(body)
     }),
   )
@@ -152,6 +156,7 @@ export function createControlRouter(deps: ControlRouterDeps): App {
       const body = (await readBody(event)) as {
         name?: string
         content?: string
+        enabled?: boolean
       }
       return profiles.update(id, body)
     }),
