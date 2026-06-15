@@ -9,9 +9,11 @@ const apiMocks = vi.hoisted(() => ({
   proxyLatencyTestAPI: vi.fn(),
   proxyGroupLatencyTestAPI: vi.fn(),
   unfixProxyInGroupAPI: vi.fn(),
+  closeAllConnectionsAPI: vi.fn(),
 }))
 
 vi.mock('~/composables/useApi', () => ({
+  closeAllConnectionsAPI: apiMocks.closeAllConnectionsAPI,
   closeSingleConnectionAPI: vi.fn(),
   fetchProxiesAPI: apiMocks.fetchProxiesAPI,
   fetchProxyProvidersAPI: apiMocks.fetchProxyProvidersAPI,
@@ -480,5 +482,31 @@ describe('stores/proxies latency state', () => {
     expect(store.getLatencyHistoryByName('node-a', null)).toEqual([
       { time: '2026-05-19T13:17:31.000Z', delay: 506 },
     ])
+  })
+})
+
+describe('stores/proxies closeAllConnections', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    vi.clearAllMocks()
+    mockConfigStore.autoCloseConns = false
+  })
+
+  it('closes every connection when autoCloseConns is enabled', async () => {
+    mockConfigStore.autoCloseConns = true
+
+    const store = useProxiesStore()
+    await store.closeAllConnections()
+
+    expect(apiMocks.closeAllConnectionsAPI).toHaveBeenCalledTimes(1)
+  })
+
+  it('does nothing when autoCloseConns is disabled', async () => {
+    mockConfigStore.autoCloseConns = false
+
+    const store = useProxiesStore()
+    await store.closeAllConnections()
+
+    expect(apiMocks.closeAllConnectionsAPI).not.toHaveBeenCalled()
   })
 })

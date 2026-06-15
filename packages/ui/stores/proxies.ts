@@ -6,6 +6,7 @@ import type {
 } from '~/types'
 import { defineStore } from 'pinia'
 import {
+  closeAllConnectionsAPI,
   closeSingleConnectionAPI,
   fetchProxiesAPI,
   fetchProxyProvidersAPI,
@@ -335,6 +336,19 @@ export const useProxiesStore = defineStore('proxies', () => {
     await Promise.allSettled(closePromises)
   }
 
+  // Close every active connection so a routing change that affects the whole
+  // session — switching running mode (rule/global/direct) or activating a
+  // different profile — takes effect immediately instead of waiting for the
+  // existing connections to die naturally. Unlike closeConnectionsThroughGroup,
+  // a mode/profile switch can re-route any connection regardless of which group
+  // it currently flows through, so we close all of them. No-op unless the user
+  // opted into autoCloseConns.
+  const closeAllConnections = async () => {
+    if (!configStore.autoCloseConns) return
+
+    await closeAllConnectionsAPI()
+  }
+
   // Select proxy in group
   const selectProxyInGroup = async (proxy: Proxy, proxyName: string) => {
     await selectProxyInGroupAPI(proxy.name, proxyName)
@@ -615,6 +629,7 @@ export const useProxiesStore = defineStore('proxies', () => {
     isAllProviderUpdating,
     collapsedMap,
     fetchProxies,
+    closeAllConnections,
     selectProxyInGroup,
     unfixProxyInGroup,
     getNowProxyNodeName,

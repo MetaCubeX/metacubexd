@@ -16,6 +16,7 @@ useHead({ title: computed(() => t('config')) })
 const router = useRouter()
 const configStore = useConfigStore()
 const endpointStore = useEndpointStore()
+const proxiesStore = useProxiesStore()
 
 const configActions = useConfigActions()
 const runtimeConfig = useRuntimeConfig()
@@ -221,7 +222,21 @@ function getModeLabel(mode: string) {
 }
 
 function updateConfig(key: keyof Config | string, value: unknown) {
-  updateConfigMutation.mutate({ key: key as keyof Config, value: value as any })
+  updateConfigMutation.mutate(
+    { key: key as keyof Config, value: value as any },
+    {
+      // Switching running mode (rule/global/direct) re-routes traffic, so drop
+      // the active connections (when the user opted into autoCloseConns) for the
+      // change to take effect immediately instead of waiting for live
+      // connections to die naturally.
+      onSuccess:
+        key === 'mode'
+          ? () => {
+              proxiesStore.closeAllConnections()
+            }
+          : undefined,
+    },
+  )
 }
 
 function switchEndpoint() {

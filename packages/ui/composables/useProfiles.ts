@@ -12,8 +12,13 @@ import { useControlApi } from './useControlApi'
 // tests it is provided as a global stub via test/setup.ts.
 declare function useI18n(): { t: (key: string, named?: object) => string }
 
+// `useProxiesStore` is auto-imported (Pinia store). In unit tests it is
+// provided as a global stub.
+declare function useProxiesStore(): { closeAllConnections: () => Promise<void> }
+
 export function useProfiles() {
   const api = useControlApi()
+  const proxiesStore = useProxiesStore()
   const { t } = useI18n()
   const profiles = ref<ProfileMeta[]>([])
   const loading = ref(false)
@@ -77,6 +82,10 @@ export function useProfiles() {
     const state = await api.activateProfile(id)
     activeBaseId.value = id
     await refresh()
+    // A profile switch can re-route any connection, so drop the existing ones
+    // (when the user opted into autoCloseConns) for the change to take effect
+    // immediately instead of waiting for live connections to die naturally.
+    await proxiesStore.closeAllConnections()
     return state
   }
 

@@ -24,6 +24,13 @@ const { toast } = vi.hoisted(() => ({
 vi.mock('vue-sonner', () => ({ toast }))
 // useI18n() is provided as a global stub via test/setup.ts (returns the key).
 
+// useProxiesStore is auto-imported in the app; stub it so activate() can drop
+// active connections (break-connections-on-change) without pinning pinia here.
+const closeAllConnectionsMock = vi.fn().mockResolvedValue(undefined)
+vi.stubGlobal('useProxiesStore', () => ({
+  closeAllConnections: closeAllConnectionsMock,
+}))
+
 const meta = (id: string, name = id) => ({
   id,
   name,
@@ -113,6 +120,17 @@ describe('composables/useProfiles', () => {
     const state = await p.activate('a')
     expect(state.status).toBe('running')
     expect(api.listProfiles).toHaveBeenCalled()
+  })
+
+  it('activate() drops active connections so the new profile takes effect immediately', async () => {
+    api.activateProfile.mockResolvedValue({
+      status: 'running',
+      externalController: '127.0.0.1:9090',
+      secret: 's',
+    })
+    const p = useProfiles()
+    await p.activate('a')
+    expect(closeAllConnectionsMock).toHaveBeenCalledTimes(1)
   })
 
   it('load() returns profile detail', async () => {
