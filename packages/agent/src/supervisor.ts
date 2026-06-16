@@ -344,6 +344,10 @@ export function createSupervisor(
       if (event === 'log') logCbs.add(cb as (l: KernelLogLine) => void)
       else stateCbs.add(cb as (s: KernelState) => void)
     },
+    off(event: 'log' | 'state', cb: (arg: never) => void) {
+      if (event === 'log') logCbs.delete(cb as (l: KernelLogLine) => void)
+      else stateCbs.delete(cb as (s: KernelState) => void)
+    },
     async dispose() {
       logCbs.clear()
       stateCbs.clear()

@@ -43,6 +43,11 @@ export interface MihomoSupervisor {
   validate: (configPath: string) => Promise<{ valid: boolean; message: string }>
   on: ((event: 'log', cb: (l: KernelLogLine) => void) => void) &
     ((event: 'state', cb: (s: KernelState) => void) => void)
+  // Unregister a callback previously passed to on(). Symmetric to on() so
+  // long-lived subscribers (the SSE /kernel/logs handler) can detach on
+  // disconnect instead of leaking a closure into the callback set per request.
+  off: ((event: 'log', cb: (l: KernelLogLine) => void) => void) &
+    ((event: 'state', cb: (s: KernelState) => void) => void)
   dispose: () => Promise<void>
 }
 
@@ -69,6 +74,14 @@ export interface TunController {
     mode: 'sidecar' | 'tun'
     stack?: string
   }>
+  /**
+   * Remove the privileged helper service entirely. Tears TUN down to the sidecar
+   * first if it is active (never unregister a service that's still owning the
+   * kernel), then unregisters the OS service. Optional: a controller built
+   * without the uninstall dependency omits it, and the control router exposes the
+   * `/tun/uninstall` route only when it is present (clean 404 otherwise).
+   */
+  uninstall?: () => Promise<void>
 }
 
 export interface SystemProxyController {

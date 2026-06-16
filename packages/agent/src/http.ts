@@ -135,6 +135,14 @@ export function createControlRouter(deps: ControlRouterDeps): App {
         stream.push(JSON.stringify({ type: 'state', ...s }))
       supervisor.on('log', onLog)
       supervisor.on('state', onState)
+      // Detach on disconnect. Without this, every EventSource reconnect
+      // (navigation, kernel restart, network blip, HMR) permanently adds two
+      // more closures to the supervisor's callback sets — an unbounded leak on
+      // the hottest path, fanning push() out to long-dead streams forever.
+      stream.onClosed(() => {
+        supervisor.off('log', onLog)
+        supervisor.off('state', onState)
+      })
       // Seed with current state so a late subscriber knows where things stand.
       stream.push(JSON.stringify({ type: 'state', ...supervisor.getState() }))
       return stream.send()
@@ -478,7 +486,15 @@ export function createControlRouter(deps: ControlRouterDeps): App {
   }
 
   // ---- TUN mode (capability-gated) ----
+  // Clean 404 JSON so the shared UI can detect a missing capability/route without
+  // a router-default 404 shape (used for an absent controller AND for an
+  // uninstall route the controller doesn't support).
+  const tunUnavailable = defineEventHandler((event) => {
+    setResponseStatus(event, 404)
+    return { error: 'tun unavailable' }
+  })
   if (tunController) {
+    const { uninstall } = tunController
     router.get(
       `${PREFIX}/tun`,
       defineEventHandler(() => tunController.status()),
@@ -498,15 +514,22 @@ export function createControlRouter(deps: ControlRouterDeps): App {
         return tunController.status()
       }),
     )
+    // Remove the privileged helper service entirely. Only registered when the
+    // controller supports it (desktop wires installer.uninstall); otherwise the
+    // route 404s so the UI can hide the action.
+    router.post(
+      `${PREFIX}/tun/uninstall`,
+      uninstall
+        ? defineEventHandler(async () => {
+            await uninstall()
+            return tunController.status()
+          })
+        : tunUnavailable,
+    )
   } else {
-    // No controller injected — clean 404 JSON for both verbs so the shared UI can
-    // detect the missing capability without a router-default 404 shape.
-    const unavailable = defineEventHandler((event) => {
-      setResponseStatus(event, 404)
-      return { error: 'tun unavailable' }
-    })
-    router.get(`${PREFIX}/tun`, unavailable)
-    router.post(`${PREFIX}/tun`, unavailable)
+    router.get(`${PREFIX}/tun`, tunUnavailable)
+    router.post(`${PREFIX}/tun`, tunUnavailable)
+    router.post(`${PREFIX}/tun/uninstall`, tunUnavailable)
   }
 
   app.use(router)

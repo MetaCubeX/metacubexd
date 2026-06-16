@@ -178,6 +178,30 @@ describe('createSupervisor — initial state', () => {
     await sup.dispose()
   })
 
+  it('off() stops delivering log/state events to an unregistered callback', async () => {
+    const opts = baseOpts()
+    const proc = new FakeProc()
+    const sup = createSupervisor(opts, {
+      spawn: (() => proc) as never,
+      fetch: (async () =>
+        new Response(JSON.stringify({ version: '1' }), {
+          status: 200,
+        })) as unknown as typeof fetch,
+    })
+    const logs: string[] = []
+    const onLog = (l: { stream: string; line: string }) =>
+      logs.push(`${l.stream}:${l.line}`)
+    sup.on('log', onLog)
+    await sup.start()
+    proc.stdout.emit('data', Buffer.from('first\n'))
+    expect(logs).toContain('stdout:first')
+    // After off(), further log lines must not reach the callback.
+    sup.off('log', onLog)
+    proc.stdout.emit('data', Buffer.from('second\n'))
+    expect(logs).not.toContain('stdout:second')
+    await sup.dispose()
+  })
+
   it('goes errored if the process exits before ready', async () => {
     const opts = baseOpts()
     const proc = new FakeProc()

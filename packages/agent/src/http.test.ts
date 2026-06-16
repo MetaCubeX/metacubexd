@@ -40,6 +40,7 @@ function makeDeps(token?: string) {
     restart: vi.fn(async () => fakeState({ status: 'running', pid: 2 })),
     validate: vi.fn(async () => ({ valid: true, message: 'ok' })),
     on: vi.fn(),
+    off: vi.fn(),
     dispose: vi.fn(),
   }
   const profileList: ProfileMeta[] = [
@@ -515,6 +516,7 @@ function makeTunController(
     enable: vi.fn(async () => {}),
     disable: vi.fn(async () => {}),
     status: vi.fn(async () => status),
+    uninstall: vi.fn(async () => {}),
   }
 }
 
@@ -666,9 +668,45 @@ describe('createControlRouter — tun', () => {
     expect(await res.json()).toEqual({ enabled: false, mode: 'sidecar' })
   })
 
+  it('pOST /api/control/tun/uninstall calls uninstall() then returns status()', async () => {
+    const deps = {
+      ...makeDeps(),
+      tunController: makeTunController({ enabled: false, mode: 'sidecar' }),
+    }
+    srv = await mount(deps as never)
+    const res = await fetch(`${srv.base}/api/control/tun/uninstall`, {
+      method: 'POST',
+    })
+    expect(res.status).toBe(200)
+    expect(deps.tunController.uninstall).toHaveBeenCalledOnce()
+    expect(await res.json()).toEqual({ enabled: false, mode: 'sidecar' })
+  })
+
+  it('pOST /api/control/tun/uninstall is 404 JSON when the controller lacks uninstall', async () => {
+    const controller = makeTunController({ enabled: false, mode: 'sidecar' })
+    // A controller WITHOUT the uninstall capability (older/partial impl).
+    delete (controller as { uninstall?: unknown }).uninstall
+    const deps = { ...makeDeps(), tunController: controller }
+    srv = await mount(deps as never)
+    const res = await fetch(`${srv.base}/api/control/tun/uninstall`, {
+      method: 'POST',
+    })
+    expect(res.status).toBe(404)
+    expect(await res.json()).toEqual({ error: 'tun unavailable' })
+  })
+
   it('gET /api/control/tun is 404 JSON when no controller is injected', async () => {
     srv = await mount(makeDeps())
     const res = await fetch(`${srv.base}/api/control/tun`)
+    expect(res.status).toBe(404)
+    expect(await res.json()).toEqual({ error: 'tun unavailable' })
+  })
+
+  it('pOST /api/control/tun/uninstall is 404 JSON when no controller is injected', async () => {
+    srv = await mount(makeDeps())
+    const res = await fetch(`${srv.base}/api/control/tun/uninstall`, {
+      method: 'POST',
+    })
     expect(res.status).toBe(404)
     expect(await res.json()).toEqual({ error: 'tun unavailable' })
   })
