@@ -283,9 +283,16 @@ body {
   }
 }
 
-/* Fix drawer height chain for proper scrolling */
+/* Fix drawer height chain for proper scrolling.
+   daisyUI sizes .drawer-side to 100dvh (the FULL viewport), while .drawer /
+   .drawer-content are pinned to their container below. On web the two match, but
+   the desktop title bar occupies the top 32px, so a 100dvh sidebar overshoots
+   its container by exactly that height and spills a second (native) scrollbar
+   past the window. Pin all three to 100% so the whole chain stays within the
+   layout regardless of the title bar. */
 .drawer,
-.drawer-content {
+.drawer-content,
+.drawer-side {
   height: 100%;
   min-height: 0;
 }
