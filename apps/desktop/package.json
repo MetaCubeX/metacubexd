@@ -20,6 +20,7 @@
     "h3": "catalog:"
   },
   "devDependencies": {
+    "@electron/fuses": "catalog:",
     "electron": "catalog:",
     "electron-vite": "catalog:",
     "electron-builder": "catalog:",

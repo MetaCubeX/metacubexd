@@ -1,5 +1,15 @@
 appId: one.metacubex.desktop
 productName: MetaCubeXD
+# Re-stage the arch-correct mihomo (+ wintun on Windows) before EACH arch is
+# packed. Required because the Windows/Linux legs build --x64 AND --arm64 from
+# one x64 host in a single invocation; without this the arm64 installer ships
+# the host-arch (x64) kernel. See scripts/before-pack.cjs.
+beforePack: scripts/before-pack.cjs
+# Flip Electron runtime fuses on each packed binary (RunAsNode kept ON for the
+# privileged helper; Node inspect/options OFF; OnlyLoadAppFromAsar ON). Runs
+# before signing so the code-sign covers the modified binary. See
+# scripts/after-pack.cjs.
+afterPack: scripts/after-pack.cjs
 directories:
   output: dist
   buildResources: build
@@ -13,11 +23,12 @@ files:
   - 'package.json'
 asar: true
 asarUnpack:
-  - 'resources/**'
   # The privileged TUN helper is run by an OS service as a real on-disk file
   # (`<electron-bin> out/helper/index.js`, ELECTRON_RUN_AS_NODE=1). A file inside
-  # app.asar can't be spawned that way, so unpack it (mirrors mihomo above).
+  # app.asar can't be spawned that way, so unpack it.
   # resolveHelperEntry() points at <resourcesPath>/app.asar.unpacked/out/helper/index.js.
+  # NOTE: mihomo + wintun.dll ship via extraResources (outside the asar
+  # entirely), so they need no asarUnpack entry here — only the helper does.
   - 'out/helper/**'
 extraResources:
   - from: resources/mihomo${ext}

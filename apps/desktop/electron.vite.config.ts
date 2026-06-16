@@ -15,6 +15,11 @@ export default defineConfig({
       // out/main/index.js (keeps package.json "main": "out/main/index.js"),
       // `helper/index` -> out/helper/index.js.
       outDir: 'out',
+      // Sibling .map files so a field crash stack maps back to src/main/*.ts
+      // (the bundle is ~11k concatenated lines). Prefer sibling over 'inline' so
+      // the maps don't bloat the privileged main/helper files; they ride along
+      // in the asar (out/**/*) and are never served by the control server.
+      sourcemap: true,
       rollupOptions: {
         input: {
           'main/index': resolve(__dirname, 'src/main/index.ts'),
@@ -37,6 +42,7 @@ export default defineConfig({
   preload: {
     plugins: [externalizeDepsPlugin()],
     build: {
+      sourcemap: true,
       rollupOptions: {
         input: { index: resolve(__dirname, 'src/preload/index.ts') },
       },

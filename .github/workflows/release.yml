@@ -221,7 +221,10 @@ jobs:
         run: rm -rf apps/desktop/renderer && cp -r packages/ui/.output/public apps/desktop/renderer
         shell: bash
 
-      - name: prefetch bundled mihomo (per arch)
+      # Host-arch warm-up only; the authoritative PER-ARCH staging happens in
+      # electron-builder's beforePack hook (scripts/before-pack.cjs), which
+      # re-stages the matching kernel before each --x64/--arm64 app is packed.
+      - name: prefetch bundled mihomo (host arch; per-arch staging in beforePack)
         run: pnpm --filter @metacubexd/desktop fetch:mihomo
 
       - name: electron-vite build (main + preload)

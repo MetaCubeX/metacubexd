@@ -88,6 +88,10 @@ catalog:
   electron: ^42.0.0
   electron-vite: ^5.0.0
   electron-builder: ^26.0.0
+  # Flips Electron's runtime fuses on the packaged binary via an afterPack hook
+  # (scripts/after-pack.cjs). Already present transitively under electron-builder;
+  # pinned here so the desktop package can require() it directly.
+  '@electron/fuses': ^1.8.0
   # PINNED, do not bump past 0.52.x. monaco-yaml@5.5.1 (latest) pulls
   # monaco-worker-manager@2.0.1 (latest), which calls the OLD
   # editor.createWebWorker({ moduleId, label, createData }) API. monaco-editor
@@ -128,6 +132,10 @@ overrides:
   srvx: '>=0.11.16'
   tar: '>=7.5.15'
   yaml: '>=2.9.0'
-  vite: 'npm:rolldown-vite@latest'
+  # Pin the exact rolldown-vite version (was '@latest'). @latest is a moving
+  # target — only the lockfile kept a fresh install from pulling a newer pre-1.0
+  # rolldown-vite that could silently change electron-vite's main/helper
+  # bundling. Bump deliberately, as a reviewed change.
+  vite: 'npm:rolldown-vite@7.3.1'
 
 neverBuiltDependencies: []

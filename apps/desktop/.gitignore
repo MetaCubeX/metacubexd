@@ -3,4 +3,6 @@ dist/
 renderer/
 resources/mihomo
 resources/mihomo.exe
+resources/wintun.dll
+resources/.mihomo-target
 node_modules/
