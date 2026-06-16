@@ -4,6 +4,7 @@ import type { HelperInstaller, HelperInstallOptions } from './helper/installer'
 import type { HelperKernelStartOptions } from './helper/server'
 import type { PersistFn } from './tun-controller'
 import type { TunTeardown } from './tun-teardown'
+import { HelperVersionMismatchError } from './helper/client'
 import { createTunController } from './tun-controller'
 import { createTunTeardown } from './tun-teardown'
 
@@ -160,17 +161,63 @@ export function createTunRuntime(opts: CreateTunRuntimeOptions): TunRuntime {
     backend = 'sidecar'
   }
 
+  /**
+   * Connect the helper IPC client (real impl dials the local socket), wiring the
+   * disconnect handler so an UNEXPECTED helper drop (crash/kill) recovers the
+   * network. The handler captures THIS connection so a late disconnect from a
+   * since-replaced client can't fire for the wrong session (handleHelperDisconnect
+   * also re-checks the live `client`/backend, so a handshake-phase client — not
+   * yet promoted to `client` — is inert).
+   */
+  function connectTracked(): HelperClient {
+    // Self-reference is safe: the disconnect closure only runs later (on a real
+    // drop), by which point `c` is assigned — same idiom the eager connect used.
+    const c = connectClient(() => handleHelperDisconnect(c))
+    return c
+  }
+
   async function startPrivileged(): Promise<void> {
     // One-time privileged install if the service isn't registered yet (ONE
-    // elevation prompt, inside the injected installer).
-    if (!(await installer.isInstalled())) {
+    // elevation prompt, inside the injected installer). A PRE-EXISTING install,
+    // however, may be a stale helper left by an older build that speaks a
+    // different IPC protocol version — track that so we only pay for the
+    // version handshake when there's something stale to catch.
+    const preInstalled = await installer.isInstalled()
+    if (!preInstalled) {
       await installer.install(installOptions())
     }
-    // Connect the helper IPC client (real impl dials the local socket), wiring
-    // the disconnect handler so an UNEXPECTED helper drop (crash/kill) recovers
-    // the network. We capture THIS client so a late disconnect from a since-
-    // replaced connection can't fire for the wrong session.
-    const thisClient = connectClient(() => handleHelperDisconnect(thisClient))
+    let thisClient = connectTracked()
+    // Self-healing version handshake: a fresh install is THIS build's helper and
+    // matches by construction, but a pre-existing one might be stale. Probe it,
+    // and on a protocol-version mismatch reinstall (uninstall the stale service +
+    // install this build's) and reconnect. Only a HelperVersionMismatchError is
+    // recovered this way — any other getVersion failure (timeout / dropped socket
+    // / secret mismatch) propagates untouched. A SECOND mismatch after a clean
+    // reinstall is unrecoverable and surfaces.
+    if (preInstalled) {
+      try {
+        await thisClient.getVersion()
+      } catch (err) {
+        // Close the connected socket before bailing on EITHER failure exit so a
+        // transient handshake error (or an unrecoverable second mismatch) can't
+        // leak an open helper FD + its listeners — `client` is still unassigned,
+        // so stopKernel() could never reach it. close() never rejects.
+        if (!(err instanceof HelperVersionMismatchError)) {
+          await thisClient.close()
+          throw err
+        }
+        await thisClient.close()
+        await installer.uninstall()
+        await installer.install(installOptions())
+        thisClient = connectTracked()
+        try {
+          await thisClient.getVersion()
+        } catch (err2) {
+          await thisClient.close()
+          throw err2
+        }
+      }
+    }
     client = thisClient
     // The privileged service spawns mihomo with the TUN privilege.
     await client.startKernel(kernelOptions())
@@ -208,6 +255,9 @@ export function createTunRuntime(opts: CreateTunRuntimeOptions): TunRuntime {
     startSidecar,
     startPrivileged,
     stopKernel,
+    // Wire the privileged-service removal so the controller exposes uninstall().
+    // It runs ONE elevation inside the installer (same as install).
+    uninstall: () => installer.uninstall(),
     ...(opts.persist ? { persist: opts.persist } : {}),
   })
 

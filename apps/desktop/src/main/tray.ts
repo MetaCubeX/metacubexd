@@ -1,10 +1,11 @@
 import type { BrowserWindow } from 'electron'
+import type { ProxyMode } from './clash-config'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { app, Menu, nativeImage, Tray } from 'electron'
+import { getProxyMode, setProxyMode } from './clash-config'
 
-/** mihomo proxy modes exposed by the tray "Proxy mode" submenu. */
-export type ProxyMode = 'rule' | 'global' | 'direct'
+export type { ProxyMode }
 
 const MODE_ITEMS: { label: string; mode: ProxyMode }[] = [
   { label: 'Rule', mode: 'rule' },
@@ -52,45 +53,26 @@ export function createTray(deps: TrayDeps): Tray {
   const tray = new Tray(image.isEmpty() ? nativeImage.createEmpty() : image)
   tray.setToolTip('MetaCubeXD')
 
-  // PATCH the kernel to switch the active proxy mode, then refresh the menu so
-  // the new selection is reflected. Failures are swallowed (best-effort).
+  // Switch the active proxy mode through the shared bounded `/configs` client,
+  // then refresh the menu so the new selection is reflected. Best-effort:
+  // setProxyMode resolves false (never throws) on a wedged kernel, leaving the
+  // previous selection.
   const switchMode = async (mode: ProxyMode) => {
-    try {
-      const res = await fetchImpl(`${deps.clash.url}/configs`, {
-        method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${deps.clash.secret}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ mode }),
-      })
-      if (res.ok) {
-        currentMode = mode
-        rebuild()
-      }
-    } catch {
-      /* best-effort; leave previous selection */
+    if (await setProxyMode(fetchImpl, deps.clash, mode)) {
+      currentMode = mode
+      rebuild()
     }
   }
 
-  // GET the current mode and rebuild so the matching radio item is checked.
+  // Read the current mode through the shared client and rebuild so the matching
+  // radio item is checked. getProxyMode resolves null on any failure, keeping
+  // the cached/previous selection.
   const refreshMode = () => {
     void (async () => {
-      try {
-        const res = await fetchImpl(`${deps.clash.url}/configs`, {
-          headers: { Authorization: `Bearer ${deps.clash.secret}` },
-        })
-        if (!res.ok) return
-        const cfg = (await res.json()) as { mode?: string }
-        const mode = cfg.mode?.toLowerCase()
-        if (mode === 'rule' || mode === 'global' || mode === 'direct') {
-          if (mode !== currentMode) {
-            currentMode = mode
-            rebuild()
-          }
-        }
-      } catch {
-        /* best-effort; keep cached/previous selection */
+      const mode = await getProxyMode(fetchImpl, deps.clash)
+      if (mode && mode !== currentMode) {
+        currentMode = mode
+        rebuild()
       }
     })()
   }

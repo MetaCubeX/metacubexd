@@ -23,6 +23,7 @@ function makeDeps() {
   const startPrivileged = vi.fn(record('startPrivileged'))
   const stopKernel = vi.fn(record('stopKernel'))
   const persist = vi.fn(record('persist'))
+  const uninstall = vi.fn(record('uninstall'))
   return {
     order,
     injectTun,
@@ -31,6 +32,7 @@ function makeDeps() {
     startPrivileged,
     stopKernel,
     persist,
+    uninstall,
   }
 }
 
@@ -207,6 +209,56 @@ describe('createTunController', () => {
       const tun = createTunController(deps)
 
       expect(await tun.status()).toEqual({ enabled: false, mode: 'sidecar' })
+    })
+  })
+
+  describe('uninstall()', () => {
+    it('drops TUN to the sidecar FIRST, then removes the service — in order', async () => {
+      const deps = makeDeps()
+      const tun = createTunController(deps)
+
+      await tun.enable({ stack: 'gvisor' })
+      deps.order.length = 0
+
+      await tun.uninstall!()
+
+      // Never unregister a service still owning the kernel: full disable teardown
+      // runs before the service removal.
+      expect(deps.order.filter((n) => n !== 'persist')).toEqual([
+        'stopKernel',
+        'removeTun',
+        'startSidecar',
+        'uninstall',
+      ])
+      expect(await tun.status()).toEqual({ enabled: false, mode: 'sidecar' })
+    })
+
+    it('removes the service directly when already in the sidecar (no teardown)', async () => {
+      const deps = makeDeps()
+      const tun = createTunController(deps)
+
+      await tun.uninstall!()
+
+      expect(deps.order).toEqual(['uninstall'])
+      expect(deps.stopKernel).not.toHaveBeenCalled()
+      expect(deps.removeTun).not.toHaveBeenCalled()
+      expect(deps.startSidecar).not.toHaveBeenCalled()
+    })
+
+    it('is absent when no uninstall dependency is wired (capability reflects reality)', () => {
+      const deps = makeDeps()
+      const { uninstall: _uninstall, ...rest } = deps
+      const tun = createTunController(rest)
+
+      expect(tun.uninstall).toBeUndefined()
+    })
+
+    it('does not swallow errors from the injected uninstall', async () => {
+      const deps = makeDeps()
+      deps.uninstall.mockRejectedValueOnce(new Error('pkexec denied'))
+      const tun = createTunController(deps)
+
+      await expect(tun.uninstall!()).rejects.toThrow(/pkexec denied/)
     })
   })
 })

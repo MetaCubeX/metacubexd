@@ -16,6 +16,13 @@ import {
 /** How long (ms) to wait for a single response before rejecting. */
 const DEFAULT_TIMEOUT_MS = 10_000
 
+/**
+ * How long (ms) close() waits for the socket's natural 'close' before forcing
+ * it down with destroy(). Bounds the shutdown path so a wedged helper (half-open
+ * socket whose FIN is never acked) can't hang quit forever.
+ */
+const DEFAULT_CLOSE_TIMEOUT_MS = 3_000
+
 export interface CreateHelperClientOptions {
   /**
    * Where to connect. mac/linux: the unix domain socket path; Windows: the
@@ -28,6 +35,11 @@ export interface CreateHelperClientOptions {
   secret: string
   /** Per-request response timeout in ms (defaults to 10s). */
   timeoutMs?: number
+  /**
+   * How long close() waits for the socket's natural 'close' before forcing it
+   * down (defaults to 3s). Injected small in tests to exercise the wedged path.
+   */
+  closeTimeoutMs?: number
   /**
    * Fired exactly once when the connection to the helper drops UNEXPECTEDLY
    * (helper crash/kill/socket error) — i.e. NOT from a deliberate `close()`.
@@ -85,6 +97,25 @@ class HelperRequestError extends Error {
 }
 
 /**
+ * getVersion() throws this when the helper reports a different protocol version
+ * than this client speaks (a stale install left over from an older build). It is
+ * a distinct type — not a generic Error — so the TUN runtime can catch EXACTLY
+ * this case and self-heal by reinstalling, while any other getVersion failure
+ * (timeout, socket drop, secret mismatch) propagates untouched.
+ */
+export class HelperVersionMismatchError extends Error {
+  constructor(
+    public readonly helperVersion: string,
+    public readonly clientVersion: string,
+  ) {
+    super(
+      `helper: protocol version mismatch (helper ${helperVersion}, client ${clientVersion})`,
+    )
+    this.name = 'HelperVersionMismatchError'
+  }
+}
+
+/**
  * Build the app-side IPC client. It holds ONE persistent connection for its
  * lifetime (the server's anti-residual teardown stops the kernel the moment we
  * disconnect, so we must keep the socket open across start/status/stop) and
@@ -102,6 +133,7 @@ export function createHelperClient(
 ): HelperClient {
   const { socketPath, secret, onDisconnect } = opts
   const timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS
+  const closeTimeoutMs = opts.closeTimeoutMs ?? DEFAULT_CLOSE_TIMEOUT_MS
 
   // FIFO queue of in-flight requests awaiting their response frame.
   interface Pending {
@@ -215,10 +247,13 @@ export function createHelperClient(
     async getVersion() {
       const res = await request({ type: 'getVersion' })
       // Stale-install detection: a helper speaking a different protocol version
-      // must surface a clear error so B-3 can prompt a re-install.
+      // throws the typed mismatch error so the TUN runtime can self-heal by
+      // reinstalling (a generic failure here would be indistinguishable from a
+      // timeout / dropped socket).
       if (res.version !== HELPER_PROTOCOL_VERSION) {
-        throw new Error(
-          `helper: protocol version mismatch (helper ${res.version}, client ${HELPER_PROTOCOL_VERSION})`,
+        throw new HelperVersionMismatchError(
+          res.version,
+          HELPER_PROTOCOL_VERSION,
         )
       }
       return res
@@ -243,7 +278,24 @@ export function createHelperClient(
           resolve()
           return
         }
-        socket.once('close', () => resolve())
+        // Bound the wait: a wedged helper (FIN never acked) may never emit
+        // 'close', which would hang the whole quit/shutdown path. After the
+        // grace period force the socket down (which still resolves) and also
+        // resolve on 'error' — a failed teardown is still teardown.
+        let settled = false
+        const done = (): void => {
+          if (settled) return
+          settled = true
+          clearTimeout(timer)
+          resolve()
+        }
+        const timer = setTimeout(() => {
+          socket.destroy()
+          done()
+        }, closeTimeoutMs)
+        timer.unref?.()
+        socket.once('close', done)
+        socket.once('error', done)
         socket.end()
       })
     },

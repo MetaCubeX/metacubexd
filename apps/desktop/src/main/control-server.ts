@@ -26,15 +26,51 @@ const CONTENT_TYPES: Record<string, string> = {
   '.map': 'application/json; charset=utf-8',
 }
 
+/**
+ * Restrictive-but-functional CSP for the dashboard document. The renderer is a
+ * Nuxt SPA that (a) drives Monaco through blob: web-workers, (b) talks to the
+ * Clash kernel on a DIFFERENT loopback port over http + ws, and (c) may pull
+ * provider/proxy icons over https. So scripts/styles stay 'self' (plus the
+ * inline/eval the bundler + Monaco emit), workers come from blob:, and connect/
+ * img are deliberately broad for the kernel endpoint + remote icons. object-src,
+ * base-uri and frame-ancestors are locked down. The chief win is script-src
+ * 'self': even if markup were injected, a remote `<script src>` can't load.
+ */
+export function buildContentSecurityPolicy(): string {
+  return [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+    "style-src 'self' 'unsafe-inline'",
+    // http: included (mirroring connect-src): proxy-group/provider icons in real
+    // mihomo configs are commonly plain-http URLs — omitting it silently breaks
+    // icons that rendered before any CSP existed.
+    "img-src 'self' data: blob: http: https:",
+    "font-src 'self' data:",
+    "worker-src 'self' blob:",
+    "connect-src 'self' http: https: ws: wss:",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "frame-ancestors 'none'",
+  ].join('; ')
+}
+
 async function sendFile(path: string, res: ServerResponse): Promise<boolean> {
   try {
     const s = await stat(path)
     if (!s.isFile()) return false
+    const ext = extname(path).toLowerCase()
     res.statusCode = 200
     res.setHeader(
       'content-type',
-      CONTENT_TYPES[extname(path).toLowerCase()] ?? 'application/octet-stream',
+      CONTENT_TYPES[ext] ?? 'application/octet-stream',
     )
+    // The CSP governs the document and every subresource it pulls, so it only
+    // needs to ride the HTML response (incl. the SPA fallback, which is also
+    // index.html). nosniff blocks content-type confusion on the served assets.
+    if (ext === '.html') {
+      res.setHeader('content-security-policy', buildContentSecurityPolicy())
+    }
+    res.setHeader('x-content-type-options', 'nosniff')
     createReadStream(path).pipe(res)
     return true
   } catch {
@@ -98,11 +134,24 @@ export function startControlServer(
     server.once('error', reject)
     server.listen(port, '127.0.0.1', () => {
       server.removeListener('error', reject)
-      resolve({ server, port })
+      // Resolve with the ACTUAL bound port. Normally this equals `port`, but a
+      // caller may pass 0 to let the OS assign one (used by tests); reading it
+      // back from address() makes that work and is correct either way.
+      const addr = server.address()
+      const boundPort = typeof addr === 'object' && addr ? addr.port : port
+      resolve({ server, port: boundPort })
     })
   })
 }
 
 export function stopControlServer(cs: ControlServer): Promise<void> {
-  return new Promise((resolve) => cs.server.close(() => resolve()))
+  return new Promise((resolve) => {
+    cs.server.close(() => resolve())
+    // server.close() only resolves once every connection drains, but the
+    // /kernel/logs SSE stream stays open as long as a renderer holds it — so on
+    // quit close() would hang forever. Force the sockets down.
+    // closeIdleConnections() is insufficient (the SSE socket is active, not
+    // idle); closeAllConnections() is required.
+    cs.server.closeAllConnections()
+  })
 }

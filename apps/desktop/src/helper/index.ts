@@ -16,8 +16,14 @@
  */
 
 import type { ChildProcess } from 'node:child_process'
-import type { HelperKernel, HelperKernelResult } from '../main/helper/server'
+import type {
+  HelperKernel,
+  HelperKernelResult,
+  HelperKernelStartOptions,
+} from '../main/helper/server'
 import { spawn as nodeSpawn } from 'node:child_process'
+import { readFileSync, statSync } from 'node:fs'
+import { isAbsolute } from 'node:path'
 import { HELPER_PROTOCOL_VERSION } from '../main/helper/protocol'
 import { createHelperServer } from '../main/helper/server'
 
@@ -28,11 +34,65 @@ export type SpawnFn = (
   opts?: object,
 ) => ChildProcess
 
+/** Minimal stat shape used to validate a path before spawning it as root. */
+export type StatPathFn = (p: string) => { isFile: boolean; mode: number }
+
 export interface PrivilegedKernelDeps {
   /** Injectable process spawn; defaults to node:child_process.spawn. Tests inject. */
   spawn?: SpawnFn
   /** Injectable logger; defaults to console.error. Never silently swallow. */
   logError?: (err: unknown) => void
+  /** Injectable stat for spawn-path validation; defaults to node:fs.statSync. */
+  statPath?: StatPathFn
+  /** Platform (gates the POSIX writable-bit check); defaults to process.platform. */
+  platform?: NodeJS.Platform
+}
+
+/**
+ * Defense-in-depth before a privileged spawn. The IPC is already secret-gated,
+ * but the helper runs AS ROOT, so refuse to spawn unless the inputs are sane:
+ * all three paths absolute, the binary an existing regular file, and (POSIX) not
+ * writable by group/other — an unprivileged user able to overwrite the binary
+ * could otherwise run arbitrary code as root. Throws on violation; the server's
+ * dispatch turns the throw into an ok:false response (no spawn, no leak).
+ */
+export function assertSafeKernelPaths(
+  opts: HelperKernelStartOptions,
+  statPath: StatPathFn,
+  platform: NodeJS.Platform,
+): void {
+  const entries: [string, string][] = [
+    ['binaryPath', opts.binaryPath],
+    ['homeDir', opts.homeDir],
+    ['configPath', opts.configPath],
+  ]
+  for (const [name, value] of entries) {
+    if (typeof value !== 'string' || value.length === 0 || !isAbsolute(value)) {
+      throw new Error(
+        `helper: refusing to spawn — ${name} must be an absolute path`,
+      )
+    }
+  }
+  let info: { isFile: boolean; mode: number }
+  try {
+    info = statPath(opts.binaryPath)
+  } catch {
+    throw new Error(
+      `helper: refusing to spawn — binaryPath does not exist: ${opts.binaryPath}`,
+    )
+  }
+  if (!info.isFile) {
+    throw new Error(
+      `helper: refusing to spawn — binaryPath is not a regular file: ${opts.binaryPath}`,
+    )
+  }
+  // POSIX only — on Windows statSync's mode bits are synthetic, so the named-pipe
+  // ACL + service registration govern access there instead.
+  if (platform !== 'win32' && (info.mode & 0o022) !== 0) {
+    throw new Error(
+      `helper: refusing to spawn — binaryPath is group/world-writable: ${opts.binaryPath}`,
+    )
+  }
 }
 
 /**
@@ -48,6 +108,13 @@ export function createPrivilegedKernel(
 ): HelperKernel {
   const spawn = deps.spawn ?? nodeSpawn
   const logError = deps.logError ?? ((err: unknown) => console.error(err))
+  const statPath: StatPathFn =
+    deps.statPath ??
+    ((p) => {
+      const s = statSync(p)
+      return { isFile: s.isFile(), mode: s.mode }
+    })
+  const platform = deps.platform ?? process.platform
 
   let child: ChildProcess | undefined
 
@@ -61,6 +128,13 @@ export function createPrivilegedKernel(
       homeDir,
       configPath,
     }): Promise<HelperKernelResult> {
+      // Validate BEFORE touching any running kernel so a bad request can't tear
+      // down a healthy one. Throws -> server returns ok:false (no spawn).
+      assertSafeKernelPaths(
+        { binaryPath, homeDir, configPath },
+        statPath,
+        platform,
+      )
       // Replace any prior process first so we never leak a privileged kernel.
       if (isRunning()) await this.stop()
 
@@ -91,23 +165,57 @@ export function createPrivilegedKernel(
 }
 
 /**
- * Read the parent-provided socket path + shared secret from the env, build the
- * real privileged kernel, and start the IPC server. The parent (B-3 installer)
- * sets these on the service definition; we fail loudly if they are missing
- * rather than listen on an unauthenticated socket.
+ * Resolve the shared secret. Prefer the secret FILE (0600, root-owned — written
+ * by the installer) so the secret never lives in the world-readable daemon plist
+ * / systemd unit / service registry env. Fall back to the inline
+ * MCXD_HELPER_SECRET env for backward compatibility with a service installed by
+ * an older build (until it is reinstalled). Throws (never returns empty) so we
+ * fail loud rather than authenticate against a blank secret.
+ */
+export function resolveHelperSecret(
+  env: NodeJS.ProcessEnv,
+  readSecretFile: (p: string) => string,
+): string {
+  const secretFile = env.MCXD_HELPER_SECRET_FILE
+  if (secretFile) {
+    let value: string
+    try {
+      value = readSecretFile(secretFile)
+    } catch {
+      throw new Error(
+        `helper: cannot read MCXD_HELPER_SECRET_FILE: ${secretFile}`,
+      )
+    }
+    if (!value) {
+      throw new Error(`helper: MCXD_HELPER_SECRET_FILE is empty: ${secretFile}`)
+    }
+    return value
+  }
+  const secret = env.MCXD_HELPER_SECRET
+  if (!secret) {
+    throw new Error(
+      'helper: no shared secret (set MCXD_HELPER_SECRET_FILE or MCXD_HELPER_SECRET)',
+    )
+  }
+  return secret
+}
+
+/**
+ * Read the parent-provided socket path from the env, resolve the shared secret
+ * (file-preferred, see resolveHelperSecret), build the real privileged kernel,
+ * and start the IPC server. The parent (B-3 installer) sets these on the service
+ * definition; we fail loudly if they are missing rather than listen on an
+ * unauthenticated socket.
  */
 export async function main(
   env: NodeJS.ProcessEnv = process.env,
+  readSecretFile: (p: string) => string = (p) => readFileSync(p, 'utf8').trim(),
 ): Promise<void> {
   const socketPath = env.MCXD_HELPER_SOCKET
-  const secret = env.MCXD_HELPER_SECRET
-
   if (!socketPath) {
     throw new Error('helper: MCXD_HELPER_SOCKET is not set')
   }
-  if (!secret) {
-    throw new Error('helper: MCXD_HELPER_SECRET is not set')
-  }
+  const secret = resolveHelperSecret(env, readSecretFile)
 
   const kernel = createPrivilegedKernel()
   await createHelperServer({ socketPath, secret, kernel })

@@ -19,6 +19,15 @@ export interface WindowBounds {
  */
 export const DEFAULT_WINDOW_BOUNDS: WindowBounds = { width: 1280, height: 800 }
 
+/**
+ * Minimum window size. Both platforms are frameless, so the OS enforces no
+ * floor of its own; without this a user could shrink the window until the
+ * caption controls and sidebar overlap. Fed to BrowserWindow's minWidth/
+ * minHeight, which also clamps a corrupt sub-minimum persisted size up to this
+ * — so sanitizeBounds stays untouched.
+ */
+export const MIN_WINDOW_BOUNDS = { width: 800, height: 600 } as const
+
 // Outer bounds for sanitization. A persisted size/position outside these is
 // treated as garbage (corrupt file, removed monitor, integer overflow) and
 // replaced with the default — never blindly trusted to position the window.

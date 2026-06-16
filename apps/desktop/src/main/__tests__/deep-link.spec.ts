@@ -56,4 +56,26 @@ describe('parseSubscriptionDeepLink', () => {
     const raw = `clash://something-else?url=${encodeURIComponent(url)}`
     expect(parseSubscriptionDeepLink(raw)).toBeNull()
   })
+
+  it('accepts a plain http import url', () => {
+    const url = 'http://example.com/sub'
+    const raw = `clash://install-config?url=${encodeURIComponent(url)}`
+    expect(parseSubscriptionDeepLink(raw)).toEqual({ url })
+  })
+
+  it('rejects a non-http(s) embedded url (data:, file:, javascript:)', () => {
+    for (const url of [
+      'data:text/yaml;base64,cHJveGllczogW10=',
+      'file:///etc/passwd',
+      'javascript:alert(1)',
+    ]) {
+      const raw = `clash://install-config?url=${encodeURIComponent(url)}`
+      expect(parseSubscriptionDeepLink(raw)).toBeNull()
+    }
+  })
+
+  it('rejects a non-absolute embedded url', () => {
+    const raw = `clash://install-config?url=${encodeURIComponent('/relative/path')}`
+    expect(parseSubscriptionDeepLink(raw)).toBeNull()
+  })
 })

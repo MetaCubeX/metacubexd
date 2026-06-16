@@ -46,6 +46,12 @@ export interface TunControllerOptions {
   stopKernel: StopKernelFn
   /** Optional: persist the resolved state for cold-start restore. */
   persist?: PersistFn
+  /**
+   * Optional: unregister the privileged helper service (the installer's
+   * uninstall). When provided, the controller exposes `uninstall()`; when
+   * omitted, the capability is absent (the control router 404s `/tun/uninstall`).
+   */
+  uninstall?: () => Promise<void>
   /** Optional clock; defaults to Date.now (reserved for future timing). */
   now?: () => number
 }
@@ -79,7 +85,18 @@ export function createTunController(opts: TunControllerOptions): TunController {
     mode: 'sidecar',
   }
 
-  return {
+  // Shared teardown so uninstall() can reuse the exact disable sequence without
+  // depending on `this` through the agent's controller delegate. Idempotent.
+  async function disableImpl(): Promise<void> {
+    if (state.mode === 'sidecar') return
+    await stopKernel()
+    await removeTun()
+    await startSidecar()
+    state = { enabled: false, mode: 'sidecar' }
+    if (persist) await persist(state)
+  }
+
+  const controller: TunController = {
     async enable({ stack }) {
       // Idempotent: already in TUN -> no redundant stop/inject/relaunch.
       if (state.mode === 'tun') return
@@ -91,19 +108,23 @@ export function createTunController(opts: TunControllerOptions): TunController {
       state = { enabled: true, mode: 'tun', stack }
       if (persist) await persist(state)
     },
-    async disable() {
-      // Idempotent: already in sidecar -> nothing to tear down.
-      if (state.mode === 'sidecar') return
-
-      await stopKernel()
-      await removeTun()
-      await startSidecar()
-
-      state = { enabled: false, mode: 'sidecar' }
-      if (persist) await persist(state)
-    },
+    disable: disableImpl,
     async status() {
       return { ...state }
     },
   }
+
+  // Expose uninstall ONLY when the dep is wired, so the capability accurately
+  // reflects whether the service can actually be removed. It first drops to the
+  // sidecar (disableImpl is a no-op when already there) so we never unregister a
+  // service that is still owning the kernel, then removes it.
+  if (opts.uninstall) {
+    const removeService = opts.uninstall
+    controller.uninstall = async () => {
+      await disableImpl()
+      await removeService()
+    }
+  }
+
+  return controller
 }

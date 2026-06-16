@@ -34,6 +34,18 @@ export function parseSubscriptionDeepLink(
   const url = parsed.searchParams.get('url')
   if (!url) return null
 
+  // Scheme allowlist on the EMBEDDED url. A deep link is fetched verbatim and
+  // can be triggered unattended by any web page (open-url / argv), so restrict
+  // the import target to http/https: this blocks data: (inline attacker config)
+  // and file:/other schemes before they ever reach fetch().
+  let target: URL
+  try {
+    target = new URL(url)
+  } catch {
+    return null
+  }
+  if (target.protocol !== 'http:' && target.protocol !== 'https:') return null
+
   const name = parsed.searchParams.get('name')
   return name ? { url, name } : { url }
 }

@@ -23,15 +23,18 @@ import { createAgent, createProfileScheduler } from '@metacubexd/agent'
 import {
   app,
   BrowserWindow,
+  dialog,
   globalShortcut,
   ipcMain,
   Menu,
   nativeImage,
   Notification,
+  shell,
 } from 'electron'
 import { buildAppMenu } from './app-menu'
 import { resolveMihomoBinary } from './binary-path'
 import { resolveBootPorts } from './boot-ports'
+import { getProxyMode, nextProxyMode, setProxyMode } from './clash-config'
 import { runShutdownCleanup } from './cleanup'
 import { startControlServer, stopControlServer } from './control-server'
 import { parseSubscriptionDeepLink } from './deep-link'
@@ -44,6 +47,7 @@ import { createKernelManager } from './kernel-manager'
 import { createKernelCrashWatcher, createNotifier } from './notifier'
 import { bootstrapDataDir } from './paths'
 import { makeToken } from './secrets'
+import { createShutdownOrchestrator } from './shutdown-orchestrator'
 import { shouldStartHidden } from './startup'
 import { createSystemProxyController } from './sysproxy'
 import { readSysProxyBypass } from './sysproxy-config'
@@ -51,9 +55,11 @@ import { createSysproxyGuard } from './sysproxy-guard'
 import { createTray, trayIconPath } from './tray'
 import { createTunRuntime } from './tun-runtime'
 import { registerWindowControls } from './window-controls'
+import { applyWindowSecurity } from './window-security'
 import {
   DEFAULT_WINDOW_BOUNDS,
   loadWindowState,
+  MIN_WINDOW_BOUNDS,
   saveWindowState,
 } from './window-state'
 
@@ -113,7 +119,9 @@ const helperElevate = (
  * Per-OS local socket / named-pipe path + root-owned secret-file path for the
  * privileged helper. mac/linux: a unix domain socket under a writable dir;
  * Windows: a `\\.\pipe\...` named pipe. The secret file is the root-owned,
- * app-readable path the installer writes the shared secret to.
+ * ROOT-ONLY (0600 / SYSTEM-ACL'd) path the installer writes the shared secret
+ * to and the helper reads as root — distinct from the app's own user-owned copy
+ * under userData (helper-secret.txt). It is never world-readable.
  */
 function resolveHelperPaths(userData: string): {
   socketPath: string
@@ -306,6 +314,15 @@ async function boot(): Promise<void> {
     status: () => {
       if (!realTunController) throw new Error('tun controller not ready')
       return realTunController.status()
+    },
+    // The real runtime controller always wires uninstall (installer.uninstall),
+    // so expose it through the delegate too — this is what registers the
+    // /api/control/tun/uninstall route. Throws if the real controller somehow
+    // lacks it (it never does in B-3).
+    uninstall: () => {
+      if (!realTunController?.uninstall)
+        throw new Error('tun controller not ready')
+      return realTunController.uninstall()
     },
   }
   tunController = tunControllerDelegate
@@ -514,25 +531,43 @@ async function boot(): Promise<void> {
   )
   rendererUrl = `http://127.0.0.1:${controlPort}/`
 
-  // Start the kernel; capture the bound external-controller + secret.
-  const state = await agent.supervisor.start()
-
-  // Inject the renderer bridge env (consumed by preload/index.ts).
+  // Inject the renderer bridge env (consumed by preload/index.ts) from the
+  // PRE-PICKED endpoint values rather than the started kernel state. The
+  // supervisor injects exactly these (external-controller/secret/mixed-port)
+  // into the active config before spawn, so the started state only ever echoes
+  // them back — we don't need to await start() to know them. Setting them
+  // up-front is what enables "秒开": createWindow() can paint the shell against
+  // the already-listening control server without waiting on the kernel.
   process.env.MCXD_CONTROL_BASE = `http://127.0.0.1:${controlPort}/api/control`
   process.env.MCXD_CONTROL_TOKEN = controlToken
-  process.env.MCXD_CLASH_URL = `http://${state.externalController}`
-  process.env.MCXD_CLASH_SECRET = state.secret
+  process.env.MCXD_CLASH_URL = `http://127.0.0.1:${clashPort}`
+  process.env.MCXD_CLASH_SECRET = clashSecret
   // Loopback proxy port for Wave 2 system-proxy wiring.
   process.env.MCXD_MIXED_PORT = String(mixedPort)
 
-  // Resume the guard if the OS proxy was left enabled from a prior session — the
-  // OS state is the source of truth, so a persisted-enabled proxy must keep
-  // being defended on this launch. Best-effort: a failed read just skips it.
-  try {
-    if (await systemProxy.isEnabled()) sysproxyGuard.start()
-  } catch (err) {
-    notify('System proxy guard failed to start', err)
-  }
+  // Start the kernel WITHOUT blocking boot()/window creation. The renderer
+  // already tolerates a not-yet-running kernel (its backend websockets retry
+  // once it comes up), so the window shows immediately while the kernel boots in
+  // the background. Only AFTER the kernel is actually up do we re-apply the OS
+  // system proxy if a prior session left it enabled — the OS state is the source
+  // of truth, and a force-kill last time would have left it pointing at the OLD
+  // session's mixed port; this launch picked a NEW free port, so re-enable()
+  // re-points the proxy at the fresh mixedPort AND re-arms the guard (idempotent)
+  // instead of entrenching a dead proxy. Doing it before the kernel binds the
+  // port would briefly route through nothing, so it waits on start(). All
+  // best-effort: a failed start can't strand the window (the crash watchdog +
+  // tray Start action cover recovery), and a failed resume just notifies.
+  const sp = systemProxy
+  void agent.supervisor
+    .start()
+    .then(async () => {
+      try {
+        if (await sp.isEnabled()) await sp.enable()
+      } catch (err) {
+        notify('System proxy failed to resume', err)
+      }
+    })
+    .catch((err) => notify('Kernel failed to start', err))
 }
 
 // Path to the persisted main-window geometry under userData.
@@ -584,12 +619,20 @@ function createWindow(startHidden = false): void {
   win = new BrowserWindow({
     width: bounds.width,
     height: bounds.height,
+    // Frameless on both platforms, so the OS enforces no minimum — clamp it
+    // ourselves to keep the caption controls + sidebar from overlapping.
+    minWidth: MIN_WINDOW_BOUNDS.width,
+    minHeight: MIN_WINDOW_BOUNDS.height,
     // Only pass x/y when both survived sanitization — otherwise let Electron
     // center the window on the primary display.
     ...(bounds.x !== undefined && bounds.y !== undefined
       ? { x: bounds.x, y: bounds.y }
       : {}),
     show: false,
+    // Paint the dark default-theme base immediately instead of Electron's
+    // opaque white, which otherwise flashes before the themed SPA paints and
+    // undercuts the fast first-paint work.
+    backgroundColor: '#11181f',
     ...titleBarOptions,
     // Window icon for the Windows/Linux task bar in dev (macOS ignores it and
     // uses the dock icon set in whenReady). Packaged builds use the bundle icon.
@@ -601,6 +644,21 @@ function createWindow(startHidden = false): void {
       sandbox: false,
     },
   })
+
+  // Renderer hardening (Electron security checklist): deny in-app popups, lock
+  // top-level navigation to the control-server origin, send foreign http/https
+  // links to the system browser, and deny every web permission request. The
+  // renderer origin is the control server (rendererUrl); SPA hash routing is
+  // same-document so it never trips the navigation guard.
+  if (rendererUrl) {
+    applyWindowSecurity({
+      webContents: win.webContents,
+      allowedOrigin: new URL(rendererUrl).origin,
+      openExternal: (url) => void shell.openExternal(url),
+      setPermissionRequestHandler: (handler) =>
+        win?.webContents.session.setPermissionRequestHandler(handler),
+    })
+  }
 
   // Keep the renderer's maximize/restore button in sync with the real window
   // state: forward every native maximize/unmaximize to the title bar. (macOS
@@ -633,7 +691,16 @@ async function shutdownKernel(): Promise<void> {
   // mode it stops the privileged helper kernel over IPC, removes the `tun:` block
   // and relaunches the unprivileged sidecar (B-3 runtime). Then the sidecar stop
   // below is a no-op since the supervisor is already stopped.
-  await tunTeardown?.recoverNetwork()
+  // Bound it: recoverNetwork talks to the privileged helper over IPC and runs
+  // BEFORE the OS proxy is released below, so a wedged helper socket here would
+  // delay (or prevent) the safety-critical proxy disable. recoverNetwork already
+  // swallows its own errors, so racing a 3s timeout is safe; an incomplete TUN
+  // teardown on quit is acceptable — the helper's on-disconnect teardown plus
+  // the OS reaping the sidecar cover the residual.
+  await Promise.race([
+    tunTeardown?.recoverNetwork() ?? Promise.resolve(),
+    new Promise<void>((resolve) => setTimeout(resolve, 3000)),
+  ])
   // Stop re-asserting the OS proxy so the guard can't race the disable() below
   // and flip it back on mid-shutdown (the disable() wrapper also stops it, but
   // be explicit so the quit-stop guarantee doesn't depend on that internal).
@@ -681,31 +748,18 @@ async function toggleSystemProxy(): Promise<void> {
   }
 }
 
-const PROXY_MODE_CYCLE = ['rule', 'global', 'direct'] as const
-type ProxyModeName = (typeof PROXY_MODE_CYCLE)[number]
-
-// Global-hotkey proxy-mode cycle: GET the current mode from the Clash API, then
-// PATCH the next one in rule -> global -> direct -> rule. Best-effort; failures
-// surface as a notification.
+// Global-hotkey proxy-mode cycle: read the current mode from the Clash API, then
+// switch to the next in rule -> global -> direct -> rule. Shares the bounded
+// `/configs` client with the tray submenu (clash-config.ts) — getProxyMode /
+// setProxyMode each carry the 3s timeout so a wedged kernel can't hang this
+// fire-and-forget hotkey. Best-effort; a kernel that rejects the switch notifies.
 async function cycleProxyMode(): Promise<void> {
   const url = process.env.MCXD_CLASH_URL
-  const secret = process.env.MCXD_CLASH_SECRET
   if (!url) return
-  const auth = secret ? { Authorization: `Bearer ${secret}` } : {}
-  try {
-    const res = await fetch(`${url}/configs`, { headers: auth })
-    if (!res.ok) return
-    const cfg = (await res.json()) as { mode?: string }
-    const current = cfg.mode?.toLowerCase() as ProxyModeName | undefined
-    const idx = current ? PROXY_MODE_CYCLE.indexOf(current) : -1
-    const next = PROXY_MODE_CYCLE[(idx + 1) % PROXY_MODE_CYCLE.length]
-    await fetch(`${url}/configs`, {
-      method: 'PATCH',
-      headers: { ...auth, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ mode: next }),
-    })
-  } catch (err) {
-    notify('Proxy mode switch failed', err)
+  const endpoint = { url, secret: process.env.MCXD_CLASH_SECRET ?? '' }
+  const next = nextProxyMode(await getProxyMode(fetch, endpoint))
+  if (!(await setProxyMode(fetch, endpoint, next))) {
+    notify('Proxy mode switch failed', 'the kernel did not accept the change')
   }
 }
 
@@ -786,7 +840,24 @@ if (!app.requestSingleInstanceLock()) {
     // the .app bundle's icns).
     const devIcon = devAppIcon()
     if (devIcon && process.platform === 'darwin') app.dock?.setIcon(devIcon)
-    await boot()
+    try {
+      await boot()
+    } catch (err) {
+      // boot() can reject (no free ports, control-server bind race,
+      // supervisor.start() on a bad kernel/config). There's no window or tray
+      // yet and the await sits in a .then() with no .catch, so a silent
+      // rejection would leave a headless process with the OS proxy possibly
+      // pointing at a dead port. Surface it (dialog works before any window
+      // exists; notify() no-ops when notifications are unsupported, exactly when
+      // we need it) and quit cleanly — before-quit -> shutdownKernel is fully
+      // null-guarded for partial-boot state.
+      dialog.showErrorBox(
+        'Failed to start MetaCubeXD',
+        err instanceof Error ? err.message : String(err),
+      )
+      app.quit()
+      return
+    }
     // Silent start: a login-launch (--hidden arg or OS wasOpenedAtLogin) boots
     // the kernel but keeps the window hidden until summoned from the tray.
     const startHidden = shouldStartHidden(
@@ -863,16 +934,49 @@ if (!app.requestSingleInstanceLock()) {
   })
 
   // Kill the kernel before quitting — orphaned kernel holding the clash port
-  // is the classic leak (spec §4).
-  let cleanedUp = false
+  // is the classic leak (spec §4). shutdownKernel() also runs the documented
+  // anti-lockout teardown (release OS proxy before the kernel dies). The
+  // orchestrator guarantees it runs exactly once across the overlapping exit
+  // paths below, with a 5s hard cap so a wedged helper/kernel can never hang the
+  // process on exit (the critical proxy-disable step normally settles well under
+  // it; recoverNetwork + the helper socket close are each independently bounded).
+  const shutdown = createShutdownOrchestrator({
+    shutdown: shutdownKernel,
+    hardCapMs: 5000,
+    onFinally: () => tray?.destroy(),
+    onError: (err) => notify('Shutdown failed', err),
+  })
+
   app.on('before-quit', (event) => {
-    if (cleanedUp) return
+    if (shutdown.hasRun()) return
     event.preventDefault()
-    cleanedUp = true
-    void shutdownKernel().finally(() => {
-      tray?.destroy()
-      app.quit()
-    })
+    void shutdown.runOnce().finally(() => app.quit())
+  })
+
+  // before-quit does NOT fire on SIGINT (Ctrl-C in dev), SIGTERM (OS shutdown /
+  // process-manager kill) or SIGHUP. Without these handlers any of those signals
+  // would skip the anti-lockout teardown and leave the OS system proxy pointing
+  // at the now-dead loopback port = whole-machine internet loss, plus an
+  // orphaned sidecar. Run the same shutdown, then exit. (SIGTERM is not
+  // delivered on Windows, so the packaged Windows path still relies on
+  // before-quit; registering is harmless there.)
+  const onSignal = (): void => {
+    void shutdown.runOnce().finally(() => process.exit(0))
+  }
+  process.on('SIGINT', onSignal)
+  process.on('SIGTERM', onSignal)
+  process.on('SIGHUP', onSignal)
+
+  // A hard uncaughtException can terminate the process WITHOUT running
+  // before-quit, re-introducing the dead-proxy lockout. Reuse the same
+  // anti-lockout shutdown, then exit non-zero. unhandledRejection does not
+  // terminate the process on Electron, so it is logged/notified only.
+  process.on('uncaughtException', (err) => {
+    notify('Unexpected error', err)
+    void shutdown.runOnce().finally(() => process.exit(1))
+  })
+  process.on('unhandledRejection', (reason) => {
+    notify('Unhandled rejection', reason)
   })
 
   // Release the OS-level global shortcuts on the final quit so they don't leak

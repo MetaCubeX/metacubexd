@@ -4,7 +4,10 @@ import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { createHelperClient } from '../helper/client'
+import {
+  createHelperClient,
+  HelperVersionMismatchError,
+} from '../helper/client'
 import { HELPER_PROTOCOL_VERSION } from '../helper/protocol'
 import { createHelperServer } from '../helper/server'
 
@@ -194,14 +197,21 @@ describe('createHelperClient', () => {
     }
   })
 
-  it('getVersion() throws a clear version-mismatch error when the helper is stale', async () => {
+  it('getVersion() throws a typed HelperVersionMismatchError when the helper is stale', async () => {
     // Helper reports a DIFFERENT protocol version than the client speaks.
     const kernel = fakeKernel({ version: () => 'stale-helper-999' })
     server = await createHelperServer({ socketPath, secret: SECRET, kernel })
 
     const client = createHelperClient({ socketPath, secret: SECRET })
     try {
-      await expect(client.getVersion()).rejects.toThrow(/version/i)
+      // Typed so the TUN runtime can catch EXACTLY this and self-heal by
+      // reinstalling; the error carries both versions for the message.
+      const err = await client.getVersion().catch((e: unknown) => e)
+      expect(err).toBeInstanceOf(HelperVersionMismatchError)
+      expect(err).toMatchObject({
+        helperVersion: 'stale-helper-999',
+        clientVersion: HELPER_PROTOCOL_VERSION,
+      })
     } finally {
       await client.close()
     }
@@ -249,6 +259,29 @@ describe('createHelperClient', () => {
     } finally {
       await client.close()
     }
+  })
+
+  it('close() resolves within the bounded timeout when the helper never closes its end', async () => {
+    // A wedged server: accepts + reads but never ends/destroys its side, so the
+    // client socket's natural 'close' never fires after end(). close() must
+    // still resolve via the timeout -> destroy fallback rather than hang quit.
+    server = await createHelperServer({
+      socketPath,
+      secret: SECRET,
+      kernel: fakeKernel(),
+    })
+    server.server.removeAllListeners('connection')
+    server.server.on('connection', (socket) => {
+      socket.on('data', () => {})
+      socket.on('error', () => {})
+    })
+
+    const client = createHelperClient({
+      socketPath,
+      secret: SECRET,
+      closeTimeoutMs: 50,
+    })
+    await expect(client.close()).resolves.toBeUndefined()
   })
 
   describe('onDisconnect', () => {
@@ -306,7 +339,15 @@ describe('createHelperClient', () => {
       expect(onDisconnect).not.toHaveBeenCalled()
     })
 
-    it('fires onDisconnect at most once even if both error and close occur', async () => {
+    it('fires onDisconnect exactly once for a single unexpected drop (no double-fire)', async () => {
+      // NOTE on coverage: reportDisconnect's once-guard also dedupes a paired
+      // 'error'+'close' (the `disconnected` flag). A unix-domain socket drop
+      // can't be made to deterministically emit BOTH from the test side
+      // (resetAndDestroy/RST is a TCP-only concept and throws on a unix socket;
+      // a peer destroy() yields only 'close'), so this test pins the realistic
+      // single-event path — onDisconnect must fire exactly once and never again
+      // as the socket fully settles. The `closing` half of the same guard is
+      // covered by the deliberate-close() test above.
       const kernel = fakeKernel()
       server = await createHelperServer({ socketPath, secret: SECRET, kernel })
       const serverSocket = captureServerSocket(server)
@@ -321,8 +362,8 @@ describe('createHelperClient', () => {
         await client.ping()
         serverSocket.current?.destroy()
         await vi.waitFor(() => expect(onDisconnect).toHaveBeenCalledTimes(1))
-        // Settle: no second invocation arrives after the first.
-        await new Promise((r) => setTimeout(r, 20))
+        // No second invocation arrives after the socket fully settles.
+        await new Promise((r) => setTimeout(r, 30))
         expect(onDisconnect).toHaveBeenCalledTimes(1)
       } finally {
         await client.close()

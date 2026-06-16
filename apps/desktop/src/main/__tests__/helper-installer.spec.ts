@@ -106,17 +106,21 @@ describe('createHelperInstaller', () => {
       expect(script).toContain('<key>ProgramArguments</key>')
       expect(script).toContain(`<string>${INSTALL_OPTS.electronBin}</string>`)
       expect(script).toContain(`<string>${INSTALL_OPTS.helperEntry}</string>`)
-      // Env: run electron as node + pass the socket + secret to the helper.
+      // Env: run electron as node + pass the socket + the secret-FILE PATH to
+      // the helper. The plist must NOT embed the raw secret value (it would be
+      // readable by other local users); only the path to the 0600 file.
       expect(script).toContain('<key>ELECTRON_RUN_AS_NODE</key>')
       expect(script).toContain('<key>MCXD_HELPER_SOCKET</key>')
       expect(script).toContain(`<string>${INSTALL_OPTS.socketPath}</string>`)
-      expect(script).toContain('<key>MCXD_HELPER_SECRET</key>')
+      expect(script).toContain('<key>MCXD_HELPER_SECRET_FILE</key>')
+      expect(script).toContain(`<string>${PATHS.secretPath}</string>`)
+      expect(script).not.toContain('<key>MCXD_HELPER_SECRET</key>')
       // Keep it alive as root.
       expect(script).toContain('<key>KeepAlive</key>')
       expect(script).toContain('<key>RunAtLoad</key>')
     })
 
-    it('install() writes a root-owned, app-readable secret file then bootstraps the daemon', async () => {
+    it('install() writes a root-owned 0600 (root-only) secret file then bootstraps the daemon', async () => {
       const { installer, elevateCalls } = darwinInstaller()
       await installer.install(INSTALL_OPTS)
 
@@ -124,10 +128,13 @@ describe('createHelperInstaller', () => {
       // Secret written to the configured root-owned path with the secret value.
       expect(script).toContain(PATHS.secretPath)
       expect(script).toContain(INSTALL_OPTS.secret)
-      // root-owned, app-readable: chown root + 0644 (or 0444) on the secret.
+      // Written under umask 077 so it is 0600 from the first byte (never briefly
+      // world-readable between the write and the chmod).
+      expect(script).toMatch(/umask\s+0?77;[^\n]*printf[^\n]*helper\.secret/)
+      // root-owned + 0600 (root-only): no other local user can read the secret.
       expect(script).toMatch(/chown\s+root[: ]/)
       expect(script).toMatch(
-        /chmod\s+0?644\s+\/etc\/metacubexd\/helper\.secret/,
+        /chmod\s+0?600\s+\/etc\/metacubexd\/helper\.secret/,
       )
       // Register the daemon with launchctl bootstrap system.
       expect(script).toContain(
@@ -201,12 +208,16 @@ describe('createHelperInstaller', () => {
       expect(script).toContain(
         `ExecStart=${INSTALL_OPTS.electronBin} ${INSTALL_OPTS.helperEntry}`,
       )
-      // Env passed via systemd Environment= directives.
+      // Env passed via systemd Environment= directives — the secret-FILE PATH,
+      // never the raw secret (the unit file is world-readable).
       expect(script).toContain('Environment=ELECTRON_RUN_AS_NODE=1')
       expect(script).toContain(
         `Environment=MCXD_HELPER_SOCKET=${INSTALL_OPTS.socketPath}`,
       )
       expect(script).toContain(
+        `Environment=MCXD_HELPER_SECRET_FILE=${PATHS.secretPath}`,
+      )
+      expect(script).not.toContain(
         `Environment=MCXD_HELPER_SECRET=${INSTALL_OPTS.secret}`,
       )
       // Runs as root.
@@ -220,9 +231,12 @@ describe('createHelperInstaller', () => {
       const script = elevateCalls[0] ?? ''
       expect(script).toContain(PATHS.secretPath)
       expect(script).toContain(INSTALL_OPTS.secret)
+      // umask 077 so the secret file is 0600 from the first byte (no brief
+      // world-readable window before the chmod).
+      expect(script).toMatch(/umask\s+0?77;[^\n]*printf[^\n]*helper\.secret/)
       expect(script).toMatch(/chown\s+root[: ]/)
       expect(script).toMatch(
-        /chmod\s+0?644\s+\/etc\/metacubexd\/helper\.secret/,
+        /chmod\s+0?600\s+\/etc\/metacubexd\/helper\.secret/,
       )
       expect(script).toContain('systemctl daemon-reload')
       expect(script).toContain('systemctl enable --now metacubexd-helper')
@@ -281,18 +295,27 @@ describe('createHelperInstaller', () => {
       expect(script).toContain('sc start metacubexd-helper')
     })
 
-    it('install() passes the helper env to the service and writes the secret', async () => {
+    it('install() delivers env via the per-service registry key + writes an ACL-locked secret file', async () => {
       const { installer, elevateCalls } = winInstaller()
       await installer.install(INSTALL_OPTS)
 
       const script = elevateCalls[0] ?? ''
-      // The service environment carries electron-as-node + socket + secret.
+      // Per-service registry env (NOT machine-wide setx, which leaked to every
+      // user and set the wrong var name). Carries the secret-FILE path, never
+      // the secret value.
+      expect(script).toContain(
+        'reg add "HKLM\\SYSTEM\\CurrentControlSet\\Services\\metacubexd-helper" /v Environment /t REG_MULTI_SZ',
+      )
       expect(script).toContain('ELECTRON_RUN_AS_NODE=1')
       expect(script).toContain(`MCXD_HELPER_SOCKET=${INSTALL_OPTS.socketPath}`)
-      expect(script).toContain(`MCXD_HELPER_SECRET=${INSTALL_OPTS.secret}`)
-      // Secret written to the configured root-owned (app-readable) path.
+      expect(script).toContain(`MCXD_HELPER_SECRET_FILE=${PATHS.secretPath}`)
+      // No machine-wide secret leak; the registry env never holds the value.
+      expect(script).not.toContain('setx /M')
+      expect(script).not.toContain(`MCXD_HELPER_SECRET=${INSTALL_OPTS.secret}`)
+      // Secret written to the configured path, then locked to SYSTEM + admins.
       expect(script).toContain(PATHS.secretPath)
       expect(script).toContain(INSTALL_OPTS.secret)
+      expect(script).toContain(`icacls "${PATHS.secretPath}" /inheritance:r`)
     })
 
     it('uninstall() stops + deletes the service through ONE elevate', async () => {

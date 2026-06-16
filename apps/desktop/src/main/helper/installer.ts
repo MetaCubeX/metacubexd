@@ -40,8 +40,10 @@ export interface HelperInstallerPaths {
   /** systemd unit / Windows service name (linux/win32). */
   serviceName: string
   /**
-   * Root-owned, app-readable path the per-install shared secret is written to
-   * during install (spec §12.3).
+   * Root-owned, ROOT-ONLY (0600 / SYSTEM-ACL'd) path the per-install shared
+   * secret is written to during install. The privileged helper reads it as root;
+   * no other local user can. The app uses its own user-owned copy under userData
+   * (it does not read this file). (spec §12.3)
    */
   secretPath: string
 }
@@ -99,7 +101,12 @@ function systemdUnitPath(serviceName: string): string {
 function buildLaunchDaemonPlist(
   label: string,
   opts: HelperInstallOptions,
+  secretPath: string,
 ): string {
+  // The env carries the PATH to the 0600 root-owned secret file, NOT the secret
+  // value — the plist itself is root-owned but readable enough that embedding the
+  // secret here would expose it to other local users (the cross-user privesc the
+  // helper auth is meant to prevent). The helper reads the file as root.
   return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -117,8 +124,8 @@ function buildLaunchDaemonPlist(
     <string>1</string>
     <key>MCXD_HELPER_SOCKET</key>
     <string>${opts.socketPath}</string>
-    <key>MCXD_HELPER_SECRET</key>
-    <string>${opts.secret}</string>
+    <key>MCXD_HELPER_SECRET_FILE</key>
+    <string>${secretPath}</string>
   </dict>
   <key>RunAtLoad</key>
   <true/>
@@ -132,7 +139,13 @@ function buildLaunchDaemonPlist(
  * Compose the systemd unit body: run the bundled Electron as Node against the
  * helper entry as root, with the helper env, enabled at boot.
  */
-function buildSystemdUnit(opts: HelperInstallOptions): string {
+function buildSystemdUnit(
+  opts: HelperInstallOptions,
+  secretPath: string,
+): string {
+  // Carry the PATH to the 0600 root-owned secret file, not the secret value —
+  // /etc/systemd/system unit files are world-readable, so an inline secret would
+  // leak to every local user. The helper reads the file as root.
   return `[Unit]
 Description=metacubexd privileged TUN helper
 After=network.target
@@ -142,7 +155,7 @@ Type=simple
 User=root
 Environment=ELECTRON_RUN_AS_NODE=1
 Environment=MCXD_HELPER_SOCKET=${opts.socketPath}
-Environment=MCXD_HELPER_SECRET=${opts.secret}
+Environment=MCXD_HELPER_SECRET_FILE=${secretPath}
 ExecStart=${opts.electronBin} ${opts.helperEntry}
 Restart=on-failure
 
@@ -176,14 +189,19 @@ export function createHelperInstaller(
 
   function darwinInstallScript(o: HelperInstallOptions): string {
     const plistPath = launchDaemonPlistPath(label)
-    const plist = buildLaunchDaemonPlist(label, o)
-    // ONE elevated script: write the secret (root-owned, app-readable 0644),
-    // write the plist, then bootstrap the daemon into the system domain.
+    const plist = buildLaunchDaemonPlist(label, o, secretPath)
+    // ONE elevated script: write the secret root-owned + 0600 (root-only — the
+    // helper reads it as root; no other local user may read it), write the
+    // plist, then bootstrap the daemon into the system domain.
     return [
       `mkdir -p $(dirname ${shQuote(secretPath)})`,
-      `printf '%s' ${shQuote(o.secret)} > ${secretPath}`,
+      // Create the secret already-restricted: under `umask 077` the redirection
+      // makes the file 0600 from the first byte, so the secret is NEVER briefly
+      // world-readable between the write and the chmod (the chmod below stays as
+      // an explicit belt-and-braces guarantee).
+      `(umask 077; printf '%s' ${shQuote(o.secret)} > ${secretPath})`,
       `chown root: ${secretPath}`,
-      `chmod 0644 ${secretPath}`,
+      `chmod 0600 ${secretPath}`,
       `cat > ${plistPath} <<'MCXD_PLIST_EOF'\n${plist}\nMCXD_PLIST_EOF`,
       `chown root:wheel ${plistPath}`,
       `chmod 0644 ${plistPath}`,
@@ -209,12 +227,16 @@ export function createHelperInstaller(
 
   function linuxInstallScript(o: HelperInstallOptions): string {
     const unitPath = systemdUnitPath(serviceName)
-    const unit = buildSystemdUnit(o)
+    const unit = buildSystemdUnit(o, secretPath)
     return [
       `mkdir -p $(dirname ${shQuote(secretPath)})`,
-      `printf '%s' ${shQuote(o.secret)} > ${secretPath}`,
+      // umask 077 -> the file is 0600 from the first byte, so the secret is never
+      // briefly world-readable between write and chmod (chmod stays explicit).
+      `(umask 077; printf '%s' ${shQuote(o.secret)} > ${secretPath})`,
       `chown root: ${secretPath}`,
-      `chmod 0644 ${secretPath}`,
+      // 0600: root-only. The helper reads it as root; the world-readable unit
+      // file carries only the PATH, never the secret value.
+      `chmod 0600 ${secretPath}`,
       `cat > ${unitPath} <<'MCXD_UNIT_EOF'\n${unit}\nMCXD_UNIT_EOF`,
       `chmod 0644 ${unitPath}`,
       `systemctl daemon-reload`,
@@ -244,13 +266,23 @@ export function createHelperInstaller(
   // auto-start service + its env. The Windows branch is logic-only here.
 
   function winInstallScript(o: HelperInstallOptions): string {
-    // sc create with the electron-as-node binPath + auto start; set the service
-    // environment (ELECTRON_RUN_AS_NODE + socket + secret); write the secret to
-    // the root-owned path; then start it. Multi-line so each command is asserted.
+    // sc create the auto-start service (runs as LocalSystem). Deliver its env via
+    // the PER-SERVICE registry key (visible only to the service + admins) — NOT a
+    // machine-wide `setx /M`, which was readable by every user AND set the wrong
+    // variable name (MCXD_HELPER_ENV), so the service never actually received its
+    // env. The secret lives ONLY in a SYSTEM-only ACL'd file; the registry env
+    // carries the file PATH (MCXD_HELPER_SECRET_FILE), never the secret value.
+    const serviceKey = `HKLM\\SYSTEM\\CurrentControlSet\\Services\\${serviceName}`
+    const envMultiSz = [
+      'ELECTRON_RUN_AS_NODE=1',
+      `MCXD_HELPER_SOCKET=${o.socketPath}`,
+      `MCXD_HELPER_SECRET_FILE=${secretPath}`,
+    ].join('\\0') // REG_MULTI_SZ separator for reg.exe
     return [
       `sc create ${serviceName} binPath= "${o.electronBin} ${o.helperEntry}" start= auto`,
-      `setx /M MCXD_HELPER_ENV "ELECTRON_RUN_AS_NODE=1;MCXD_HELPER_SOCKET=${o.socketPath};MCXD_HELPER_SECRET=${o.secret}"`,
-      `(echo ${o.secret}) > "${secretPath}"`,
+      `reg add "${serviceKey}" /v Environment /t REG_MULTI_SZ /d "${envMultiSz}" /f`,
+      `(echo ${o.secret})> "${secretPath}"`,
+      `icacls "${secretPath}" /inheritance:r /grant:r "SYSTEM:(R)" "Administrators:(R)"`,
       `sc start ${serviceName}`,
     ].join('\r\n')
   }

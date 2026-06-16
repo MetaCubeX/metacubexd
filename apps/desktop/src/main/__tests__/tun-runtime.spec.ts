@@ -2,6 +2,7 @@ import type { HelperClient } from '../helper/client'
 import type { HelperInstaller } from '../helper/installer'
 import { buildTunConfig } from '@metacubexd/agent'
 import { describe, expect, it, vi } from 'vitest'
+import { HelperVersionMismatchError } from '../helper/client'
 import { createTunRuntime } from '../tun-runtime'
 
 /**
@@ -17,7 +18,10 @@ function makeDeps(opts?: { installed?: boolean }) {
   // --- helper client (B-2): a single fake; connectClient hands it out ---
   const client = {
     ping: vi.fn(),
-    getVersion: vi.fn(),
+    getVersion: vi.fn(async () => {
+      order.push('client.getVersion')
+      return { type: 'getVersion', ok: true, version: '1' }
+    }),
     startKernel: vi.fn(async () => {
       order.push('client.startKernel')
       return { type: 'startKernel', ok: true, version: '1', running: true }
@@ -144,12 +148,15 @@ describe('createTunRuntime', () => {
   })
 
   describe('startPrivileged', () => {
-    it('installs the helper when not yet installed, then connects + startKernel — in order', async () => {
+    it('installs the helper when not yet installed, then connects + startKernel — in order (no handshake on a fresh install)', async () => {
       const deps = makeDeps({ installed: false })
       const runtime = makeRuntime(deps)
 
       await runtime.deps.startPrivileged()
 
+      // A fresh install is THIS build's helper, so it matches by construction —
+      // no version handshake round-trip is paid.
+      expect(deps.client.getVersion).not.toHaveBeenCalled()
       expect(deps.order).toEqual([
         'installer.install',
         'connectClient',
@@ -158,14 +165,18 @@ describe('createTunRuntime', () => {
       expect(deps.client.startKernel).toHaveBeenCalledWith(KERNEL_OPTS)
     })
 
-    it('skips install when the helper is already installed', async () => {
+    it('skips install but handshakes an already-installed (possibly stale) helper', async () => {
       const deps = makeDeps({ installed: true })
       const runtime = makeRuntime(deps)
 
       await runtime.deps.startPrivileged()
 
       expect(deps.installer.install).not.toHaveBeenCalled()
-      expect(deps.order).toEqual(['connectClient', 'client.startKernel'])
+      expect(deps.order).toEqual([
+        'connectClient',
+        'client.getVersion',
+        'client.startKernel',
+      ])
     })
 
     it('passes the install options to installer.install', async () => {
@@ -192,6 +203,75 @@ describe('createTunRuntime', () => {
       await expect(runtime.deps.startPrivileged()).rejects.toThrow(
         /privileged spawn failed/,
       )
+    })
+  })
+
+  describe('startPrivileged — stale-helper version handshake', () => {
+    it('reinstalls + reconnects when a pre-existing helper reports a stale protocol version', async () => {
+      const deps = makeDeps({ installed: true })
+      // The first handshake rejects with a version mismatch (a stale helper from
+      // an older build); after the clean reinstall the second handshake matches.
+      ;(
+        deps.client.getVersion as ReturnType<typeof vi.fn>
+      ).mockRejectedValueOnce(new HelperVersionMismatchError('stale-999', '1'))
+      const runtime = makeRuntime(deps)
+
+      await runtime.deps.startPrivileged()
+
+      // connect -> (mismatch) -> close stale -> uninstall -> install -> reconnect
+      // -> handshake ok -> startKernel. The rejected-once getVersion doesn't run
+      // the default impl, so only the SECOND (matching) handshake records order.
+      expect(deps.order).toEqual([
+        'connectClient',
+        'client.close',
+        'installer.uninstall',
+        'installer.install',
+        'connectClient',
+        'client.getVersion',
+        'client.startKernel',
+      ])
+      expect(deps.installer.install).toHaveBeenCalledWith({
+        electronBin: '/app/electron',
+        helperEntry: '/app/out/helper/index.js',
+        socketPath: '/var/run/mcxd.sock',
+        secret: 'install-secret',
+      })
+    })
+
+    it('surfaces a mismatch that persists after a clean reinstall (never starts the kernel)', async () => {
+      const deps = makeDeps({ installed: true })
+      ;(deps.client.getVersion as ReturnType<typeof vi.fn>).mockRejectedValue(
+        new HelperVersionMismatchError('stale-999', '1'),
+      )
+      const runtime = makeRuntime(deps)
+
+      await expect(runtime.deps.startPrivileged()).rejects.toBeInstanceOf(
+        HelperVersionMismatchError,
+      )
+      // Exactly one self-heal attempt, then it gives up rather than spawn against
+      // an incompatible helper.
+      expect(deps.installer.uninstall).toHaveBeenCalledTimes(1)
+      expect(deps.installer.install).toHaveBeenCalledTimes(1)
+      expect(deps.client.startKernel).not.toHaveBeenCalled()
+      // Both opened sockets (stale + post-reinstall) are closed — no leaked FD.
+      expect(deps.client.close).toHaveBeenCalledTimes(2)
+    })
+
+    it('propagates a non-mismatch handshake failure without reinstalling', async () => {
+      const deps = makeDeps({ installed: true })
+      ;(deps.client.getVersion as ReturnType<typeof vi.fn>).mockRejectedValue(
+        new Error('helper: request "getVersion" timed out after 10000ms'),
+      )
+      const runtime = makeRuntime(deps)
+
+      await expect(runtime.deps.startPrivileged()).rejects.toThrow(/timed out/)
+      // A timeout / dropped socket is NOT a stale install — don't tear a healthy
+      // service down on a transient blip.
+      expect(deps.installer.uninstall).not.toHaveBeenCalled()
+      expect(deps.installer.install).not.toHaveBeenCalled()
+      expect(deps.client.startKernel).not.toHaveBeenCalled()
+      // The connected socket is still closed before bailing — no leaked FD.
+      expect(deps.client.close).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -280,6 +360,31 @@ describe('createTunRuntime', () => {
         'supervisor.start',
       ])
       expect(deps.setSection).toHaveBeenLastCalledWith('tun', null)
+      expect(await runtime.controller.status()).toEqual({
+        enabled: false,
+        mode: 'sidecar',
+      })
+    })
+
+    it('uninstall() tears TUN down to the sidecar, then removes the privileged service', async () => {
+      const deps = makeDeps({ installed: true })
+      const runtime = makeRuntime(deps)
+
+      await runtime.controller.enable({ stack: 'gvisor' })
+      deps.order.length = 0
+
+      await runtime.controller.uninstall!()
+
+      // full disable teardown (helper stop+close -> remove tun -> sidecar) BEFORE
+      // the service is unregistered — never remove a service still owning the
+      // kernel.
+      expect(deps.order).toEqual([
+        'client.stopKernel',
+        'client.close',
+        'setSection.remove:tun',
+        'supervisor.start',
+        'installer.uninstall',
+      ])
       expect(await runtime.controller.status()).toEqual({
         enabled: false,
         mode: 'sidecar',
@@ -429,16 +534,19 @@ describe('createTunRuntime', () => {
       expect(onHelperDisconnect).not.toHaveBeenCalled()
     })
 
-    it('a disconnect while in the sidecar backend is inert', async () => {
+    it('does not dial the helper until tun mode is entered (lazy connect)', async () => {
       const deps = makeDeps({ installed: true })
       const onHelperDisconnect = vi.fn()
-      // Construct the runtime (wires onHelperDisconnect) but never enter tun mode:
-      // connectClient is never called, so there is no live disconnect handler —
-      // a stray drop must never act while the sidecar owns the kernel.
+      // Construct the runtime (wires onHelperDisconnect) but never enter tun mode.
       void makeRuntimeWithDisconnect(deps, onHelperDisconnect)
 
+      // The runtime must NOT eagerly dial the helper socket at construction — the
+      // helper isn't installed/listening until enable(). With no connection there
+      // is no live disconnect handler, so a stray drop can't act in sidecar mode.
+      // (The backend-flip guard itself is covered by the 'deliberate stop' test,
+      // which wires a real disconnect callback before firing it.)
+      expect(deps.connectClient).not.toHaveBeenCalled()
       deps.dropHelper()
-
       expect(onHelperDisconnect).not.toHaveBeenCalled()
     })
 
