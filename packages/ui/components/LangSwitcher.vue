@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { autoUpdate, flip, offset, shift, useFloating } from '@floating-ui/vue'
 import { IconLanguage } from '@tabler/icons-vue'
+import { useMenuKeyboard } from '~/composables/useMenuKeyboard'
 
 const { locale, locales, setLocale } = useI18n()
 
@@ -22,6 +23,16 @@ const { floatingStyles } = useFloating(reference, floating, {
 function toggleMenu() {
   isOpen.value = !isOpen.value
 }
+
+// Keyboard a11y for the language popup (mirrors the sidebar mode menu).
+const { onKeydown } = useMenuKeyboard({
+  isOpen,
+  triggerEl: reference,
+  menuEl: floating,
+  close: () => {
+    isOpen.value = false
+  },
+})
 
 function selectLocale(code: string) {
   setLocale(code as 'en' | 'zh' | 'ru')
@@ -52,6 +63,8 @@ onUnmounted(() => {
       class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-base-content/70 transition-all duration-200 ease-in-out hover:bg-base-content/10 hover:text-base-content"
       :class="{ 'bg-primary/15 text-primary': isOpen }"
       aria-label="Change language"
+      aria-haspopup="menu"
+      :aria-expanded="isOpen"
       @click.stop="toggleMenu"
     >
       <IconLanguage :size="18" />
@@ -68,7 +81,9 @@ onUnmounted(() => {
           v-if="isOpen"
           ref="floating"
           :style="floatingStyles"
+          role="menu"
           class="z-70 w-40 overflow-hidden rounded-xl border border-base-content/10 bg-base-300/98 shadow-[0_10px_40px_var(--color-base-content)/20,0_0_0_1px_var(--color-base-content)/5] backdrop-blur-[12px]"
+          @keydown="onKeydown"
         >
           <div
             class="flex items-center border-b border-base-content/8 bg-base-200/60 px-3 py-2.5"
@@ -81,6 +96,8 @@ onUnmounted(() => {
           <ul class="m-0 list-none p-1.5">
             <li v-for="lang in availableLocales" :key="lang.code">
               <button
+                role="menuitem"
+                :data-current="locale === lang.code"
                 class="flex w-full cursor-pointer items-center justify-between rounded-lg border-none bg-transparent px-2.5 py-2 transition-all duration-150 ease-in-out hover:bg-base-content/8"
                 :class="{
                   'bg-primary/15 hover:bg-primary/20': locale === lang.code,

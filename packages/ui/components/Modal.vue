@@ -15,6 +15,10 @@ const dialogRef = ref<HTMLDialogElement>()
 const isOpen = ref(false)
 const isRendered = ref(false)
 
+// SSR-safe unique id so aria-labelledby works even when several Modals mount
+// concurrently (e.g. connections.vue mounts two at once).
+const titleId = useId()
+
 // Longest exit transition is the shell transform (--dur-slow = 320ms); add a buffer.
 const EXIT_DURATION = 360
 let closeTimer: ReturnType<typeof setTimeout> | undefined
@@ -66,10 +70,13 @@ defineExpose({ open, close })
   <dialog
     ref="dialogRef"
     class="modal modal-bottom sm:modal-middle"
+    aria-modal="true"
+    :aria-labelledby="title ? titleId : undefined"
     :style="{
       '--modal-border':
         'color-mix(in oklch, var(--color-base-content) 10%, transparent)',
     }"
+    @cancel.prevent="close"
   >
     <div
       class="modal-shell flex max-h-[90vh] w-[95%] max-w-2xl flex-col overflow-hidden rounded-2xl p-0 sm:w-11/12"
@@ -94,7 +101,7 @@ defineExpose({ open, close })
           class="flex items-center gap-3 text-lg font-bold text-base-content [&>svg]:text-primary"
         >
           <slot name="icon" />
-          <span>{{ title }}</span>
+          <span :id="titleId">{{ title }}</span>
         </div>
 
         <button

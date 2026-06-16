@@ -138,6 +138,24 @@ describe('composables/useNetworkConfig', () => {
     expect(nc.saving.value).toBe(false)
   })
 
+  it('savingKey marks only the in-flight section (not a global flag)', async () => {
+    let resolveSet: (v: unknown) => void = () => {}
+    api.setConfigSection.mockReturnValue(
+      new Promise((res) => {
+        resolveSet = res
+      }),
+    )
+    const nc = useNetworkConfig()
+    await nc.load()
+    const p = nc.saveTunnels()
+    expect(nc.savingKey.value).toBe('tunnels')
+    expect(nc.saving.value).toBe(true)
+    resolveSet({ status: 'running' })
+    await p
+    expect(nc.savingKey.value).toBe(null)
+    expect(nc.saving.value).toBe(false)
+  })
+
   // ---- sniffer (object editor) --------------------------------------------
   it('load() parses sniffer enable / override-destination toggles', async () => {
     const nc = useNetworkConfig()

@@ -166,7 +166,13 @@ onBeforeUnmount(() => {
       <div
         class="flex items-center gap-2 px-3 py-1.5"
         :class="{ 'cursor-pointer hover:opacity-80': !!onClick }"
+        role="button"
+        tabindex="0"
+        :aria-pressed="isSelected"
+        :aria-label="proxyName"
         @click="onClick"
+        @keydown.enter.prevent="onClick"
+        @keydown.space.prevent="onClick"
       >
         <!-- Selected indicator -->
         <IconCircleCheckFilled v-if="isSelected" class="size-4 shrink-0" />
@@ -203,6 +209,7 @@ onBeforeUnmount(() => {
             :test-url="testUrl"
             :provider-name="providerName"
             :class="{ 'animate-pulse': isTesting }"
+            interactive
             @click.stop="handleLatencyTest"
           />
           <!-- Latency stability bar -->

@@ -44,7 +44,13 @@ function handleLatencyTest() {
         ? 'bg-primary/15 text-base-content shadow-[inset_2px_0_var(--color-primary)]'
         : 'hover:bg-base-content/5'
     "
+    role="button"
+    tabindex="0"
+    :aria-pressed="isSelected"
+    :aria-label="proxyName"
     @click="emit('click')"
+    @keydown.enter.prevent="emit('click')"
+    @keydown.space.prevent="emit('click')"
   >
     <span class="flex w-4 shrink-0 justify-center">
       <IconCircleCheckFilled v-if="isSelected" class="size-4 text-primary" />
@@ -67,6 +73,7 @@ function handleLatencyTest() {
         :proxy-name="proxyName"
         :test-url="testUrl"
         :provider-name="providerName"
+        interactive
         @click.stop="handleLatencyTest"
       />
     </span>

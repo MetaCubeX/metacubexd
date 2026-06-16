@@ -88,6 +88,20 @@ describe('composables/useSystemProxy', () => {
     expect(sp.bypassText.value).toBe('localhost')
   })
 
+  it('save() toasts success on the Apply path', async () => {
+    const sp = useSystemProxy()
+    await sp.save()
+    expect(toast.success).toHaveBeenCalled()
+    expect(toast.error).not.toHaveBeenCalled()
+  })
+
+  it('toggle() saves silently — no success toast (the switch already mirrors state)', async () => {
+    api.setSysProxy.mockResolvedValue(state({ enabled: true }))
+    const sp = useSystemProxy()
+    await sp.toggle(true)
+    expect(toast.success).not.toHaveBeenCalled()
+  })
+
   it('toggle(false) sets enabled then saves (disable path)', async () => {
     api.setSysProxy.mockResolvedValue(state({ enabled: false }))
     const sp = useSystemProxy()

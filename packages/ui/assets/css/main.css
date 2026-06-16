@@ -255,6 +255,22 @@ body {
   opacity: 0;
 }
 
+/* ============================================================
+   Global keyboard-focus ring (WCAG 2.4.7)
+   - :focus-visible so pointer users never see it; keyboard does
+   - Reuses --color-primary (resolves under every daisyUI theme),
+     matching Button.vue's .btn-press:focus-visible treatment
+   - No border-radius here: outline already follows element radius;
+     setting it would clobber real corner radii on focus
+   ============================================================ */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
 /* Reduced-motion respect */
 @media (prefers-reduced-motion: reduce) {
   *,

@@ -131,6 +131,15 @@ async function onRecoverNetwork() {
   localConfig.tunEnable = tunConfig.enabled.value
 }
 
+async function onUninstallHelper() {
+  // Removing the privileged helper revokes the elevation grant and is
+  // irreversible — confirm before the single-click destructive action.
+  if (!confirm(t('tunUninstallConfirm'))) return
+  await tunConfig.onUninstall()
+  // Uninstall tears TUN down to the sidecar, so reflect that in the toggle.
+  localConfig.tunEnable = tunConfig.enabled.value
+}
+
 // DNS Query
 const dnsQuery = reactive({
   name: '',
@@ -579,16 +588,23 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                     </svg>
                     <span>{{ t('enableTunDevice') }}</span>
                   </div>
-                  <input
-                    id="enable-tun-device"
-                    v-model="localConfig.tunEnable"
-                    type="checkbox"
-                    class="toggle toggle-primary"
-                    :disabled="
-                      tunConfig.desktopMode.value && tunConfig.busy.value
-                    "
-                    @change="onTunToggle"
-                  />
+                  <div class="flex items-center gap-2">
+                    <span
+                      v-if="tunConfig.desktopMode.value && tunConfig.busy.value"
+                      class="loading loading-xs loading-spinner text-primary"
+                      aria-hidden="true"
+                    />
+                    <input
+                      id="enable-tun-device"
+                      v-model="localConfig.tunEnable"
+                      type="checkbox"
+                      class="toggle toggle-primary"
+                      :disabled="
+                        tunConfig.desktopMode.value && tunConfig.busy.value
+                      "
+                      @change="onTunToggle"
+                    />
+                  </div>
                 </div>
 
                 <!-- Desktop (capability 'tun'): live status + install/elevation
@@ -643,6 +659,28 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                       <path d="M3 3v5h5" />
                     </svg>
                     {{ t('tunRecoverNetwork') }}
+                  </Button>
+
+                  <Button
+                    v-if="tunConfig.showUninstallButton.value"
+                    class="self-start text-error btn-ghost btn-xs"
+                    :loading="tunConfig.busy.value"
+                    @click="onUninstallHelper"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="size-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path d="M3 6h18" />
+                      <path
+                        d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"
+                      />
+                    </svg>
+                    {{ t('tunUninstallHelper') }}
                   </Button>
                 </template>
 

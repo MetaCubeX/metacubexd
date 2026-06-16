@@ -47,6 +47,10 @@ export const useProxiesStore = defineStore('proxies', () => {
   const proxyProviderLatencyTestingMap = ref<Record<string, boolean>>({})
   const updatingMap = ref<Record<string, boolean>>({})
   const isAllProviderUpdating = ref(false)
+  // True once the first fetchProxies has settled (success or failure) — gates
+  // the proxies page's skeleton / empty state so the toolbar no longer floats
+  // over a blank void before the first load resolves.
+  const proxiesLoaded = ref(false)
 
   // Collapsed map for UI state
   const collapsedMap = useLocalStorage<Record<string, boolean>>(
@@ -276,7 +280,7 @@ export const useProxiesStore = defineStore('proxies', () => {
   }
 
   // Fetch proxies
-  const fetchProxies = async () => {
+  const fetchProxiesImpl = async () => {
     const [{ providers }, { proxies: proxiesData }] = await Promise.all([
       fetchProxyProvidersAPI(),
       fetchProxiesAPI(),
@@ -315,6 +319,17 @@ export const useProxiesStore = defineStore('proxies', () => {
     proxies.value = sortedProxies
     proxyProviders.value = sortedProviders as typeof proxyProviders.value
     setProxiesInfo(allProxies)
+  }
+
+  // Flip the loaded flag once the first attempt settles (success OR failure) so
+  // the page can show a skeleton / empty state instead of a blank void. The
+  // rejection still propagates to callers exactly as before.
+  const fetchProxies = async () => {
+    try {
+      await fetchProxiesImpl()
+    } finally {
+      proxiesLoaded.value = true
+    }
   }
 
   // Close active connections currently routed through a group so a selection
@@ -620,6 +635,7 @@ export const useProxiesStore = defineStore('proxies', () => {
   return {
     proxies,
     proxyProviders,
+    proxiesLoaded,
     latencyMap,
     proxyNodeMap,
     proxyLatencyTestingMap,

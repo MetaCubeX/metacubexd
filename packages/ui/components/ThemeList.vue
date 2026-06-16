@@ -78,14 +78,14 @@ function selectTheme(theme: (typeof themes)[number]) {
 <template>
   <ul
     ref="listRef"
-    class="m-0 flex list-none flex-col gap-0.5 overflow-y-auto rounded-xl bg-gray-800 p-2"
+    class="m-0 flex list-none flex-col gap-0.5 overflow-y-auto rounded-xl bg-base-200 p-2"
     :style="{ maxHeight: props.maxHeight ? `${props.maxHeight}px` : '20rem' }"
   >
     <li v-for="theme in themes" :key="theme" class="rounded-lg">
       <button
         :data-theme-name="theme"
-        class="flex w-full cursor-pointer items-center gap-2 rounded-md border-none bg-transparent px-2 py-1.5 text-[0.8125rem] font-medium text-gray-200 transition-colors duration-150 hover:bg-white/10"
-        :class="{ '!bg-indigo-500 !text-white': props.modelValue === theme }"
+        class="flex w-full cursor-pointer items-center gap-2 rounded-md border-none bg-transparent px-2 py-1.5 text-[0.8125rem] font-medium text-base-content/80 transition-colors duration-150 hover:bg-base-content/10"
+        :class="{ 'bg-primary/15': props.modelValue === theme }"
         @click="selectTheme(theme)"
       >
         <span
@@ -105,7 +105,11 @@ function selectTheme(theme: (typeof themes)[number]) {
             :style="{ backgroundColor: getThemeColors(theme).content }"
           />
         </span>
-        <span class="flex-1 text-left text-white capitalize">{{ theme }}</span>
+        <span
+          class="flex-1 text-left text-base-content capitalize"
+          :class="{ 'text-primary': props.modelValue === theme }"
+          >{{ theme }}</span
+        >
         <IconCheck
           v-if="props.modelValue === theme"
           class="size-4 shrink-0"

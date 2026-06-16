@@ -339,7 +339,13 @@ function handleLatencyTest() {
       <div
         class="flex h-full flex-col gap-2 p-[0.625rem]"
         :class="{ 'cursor-pointer': !!onClick }"
+        role="button"
+        tabindex="0"
+        :aria-pressed="isSelected"
+        :aria-label="proxyName"
         @click="onClick"
+        @keydown.enter.prevent="onClick"
+        @keydown.space.prevent="onClick"
       >
         <h2
           class="m-0 line-clamp-1 text-start text-sm leading-tight font-semibold break-all"
@@ -372,6 +378,7 @@ function handleLatencyTest() {
             :provider-name="providerName"
             :group-name="groupName"
             :class="{ 'animate-pulse': isTesting }"
+            interactive
             @click.stop="handleLatencyTest"
           />
         </div>

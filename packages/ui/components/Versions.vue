@@ -8,6 +8,7 @@ import {
   shift,
   useFloating,
 } from '@floating-ui/vue'
+import { IconInfoCircle } from '@tabler/icons-vue'
 import {
   backendReleaseAPI,
   fetchBackendReleasesAPI,
@@ -270,6 +271,27 @@ async function handleBackendUpgrade() {
   window.location.reload()
 }
 
+// Collapsed sidebar rail: the default-collapsed sidebar previously rendered
+// nothing here, hiding both the versions and the update-available ping. Surface
+// them on one compact button (title/aria for the versions, ping for an update).
+const { t } = useI18n()
+
+const hasUpdate = computed(
+  () =>
+    !!frontendRelease.value?.isUpdateAvailable ||
+    !!backendRelease.value?.isUpdateAvailable,
+)
+
+const versionsTitle = computed(() => {
+  const base = `UI ${actualFrontendVersion.value} · Core ${actualBackendVersion.value}`
+  return hasUpdate.value ? `${base} — ${t('pwaUpdateAvailable')}` : base
+})
+
+function onCollapsedClick() {
+  if (frontendRelease.value?.isUpdateAvailable) return handleFrontendUpgrade()
+  if (backendRelease.value?.isUpdateAvailable) handleBackendUpgrade()
+}
+
 // Watch for backend version changes
 watch(
   actualBackendVersion,
@@ -286,9 +308,9 @@ watch(
 <template>
   <div v-if="!collapsed" class="mx-2 grid grid-cols-1 gap-2 pt-1 md:mx-0">
     <!-- Frontend Version -->
-    <div
+    <button
       ref="frontendReference"
-      role="button"
+      type="button"
       class="btn relative btn-sm"
       @click="handleFrontendUpgrade"
       @mouseenter="onFrontendMouseEnter"
@@ -305,14 +327,14 @@ watch(
         <span class="col-start-1 row-start-1 h-2 w-2 rounded-full bg-info" />
       </span>
 
-      <div class="flex w-full items-center justify-center gap-2 text-xs">
+      <span class="flex w-full items-center justify-center gap-2 text-xs">
         {{ actualFrontendVersion }}
         <span
           v-if="upgradingUI"
           class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent"
         />
-      </div>
-    </div>
+      </span>
+    </button>
 
     <!-- Frontend Changelog Tooltip -->
     <Teleport to="body">
@@ -345,9 +367,9 @@ watch(
     </Teleport>
 
     <!-- Backend Version -->
-    <div
+    <button
       ref="backendReference"
-      role="button"
+      type="button"
       class="btn relative btn-sm"
       @click="handleBackendUpgrade"
       @mouseenter="onBackendMouseEnter"
@@ -364,14 +386,14 @@ watch(
         <span class="col-start-1 row-start-1 h-2 w-2 rounded-full bg-info" />
       </span>
 
-      <div class="flex w-full items-center justify-center gap-2 text-xs">
+      <span class="flex w-full items-center justify-center gap-2 text-xs">
         {{ actualBackendVersion }}
         <span
           v-if="upgradingBackend"
           class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent"
         />
-      </div>
-    </div>
+      </span>
+    </button>
 
     <!-- Backend Changelog Tooltip -->
     <Teleport to="body">
@@ -402,6 +424,31 @@ watch(
         </div>
       </Transition>
     </Teleport>
+  </div>
+
+  <!-- Collapsed sidebar rail: one compact button keeps the versions reachable
+       (title/aria-label) and the update ping visible, instead of rendering
+       nothing in the default-collapsed sidebar. -->
+  <div v-else class="flex justify-center pt-1">
+    <button
+      type="button"
+      class="press-tactile relative flex aspect-square w-9 items-center justify-center rounded-lg border border-[color-mix(in_oklch,var(--color-base-content)_10%,transparent)] bg-transparent text-base-content/70 hover:border-[color-mix(in_oklch,var(--color-base-content)_20%,transparent)] hover:bg-[color-mix(in_oklch,var(--color-base-content)_5%,transparent)] hover:text-base-content"
+      :title="versionsTitle"
+      :aria-label="versionsTitle"
+      @click="onCollapsedClick"
+    >
+      <IconInfoCircle class="h-5 w-5" />
+      <span
+        v-if="hasUpdate"
+        aria-hidden="true"
+        class="absolute -top-0.5 -right-0.5 inline-grid"
+      >
+        <span
+          class="col-start-1 row-start-1 h-2 w-2 animate-ping rounded-full bg-info"
+        />
+        <span class="col-start-1 row-start-1 h-2 w-2 rounded-full bg-info" />
+      </span>
+    </button>
   </div>
 </template>
 

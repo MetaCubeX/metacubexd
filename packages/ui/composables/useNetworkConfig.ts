@@ -69,7 +69,11 @@ export function useNetworkConfig() {
   const available = computed(() => hasFeature('config-sections'))
 
   const loading = ref(false)
-  const saving = ref(false)
+  // Per-section busy key so saving one section no longer spins all three
+  // buttons. `saving` is kept as a derived aggregate for backward compatibility
+  // (existing callers/tests read it).
+  const savingKey = ref<'tunnels' | 'sniffer' | 'interface-name' | null>(null)
+  const saving = computed(() => savingKey.value !== null)
 
   // tunnels (array editor)
   const tunnels = ref<TunnelEntry[]>([])
@@ -153,7 +157,7 @@ export function useNetworkConfig() {
   }
 
   const saveTunnels = async (): Promise<boolean> => {
-    saving.value = true
+    savingKey.value = 'tunnels'
     try {
       await api.setConfigSection({
         key: 'tunnels',
@@ -167,13 +171,13 @@ export function useNetworkConfig() {
       })
       return false
     } finally {
-      saving.value = false
+      savingKey.value = null
     }
   }
 
   // ---- sniffer -------------------------------------------------------------
   const saveSniffer = async (): Promise<boolean> => {
-    saving.value = true
+    savingKey.value = 'sniffer'
     try {
       await api.setConfigSection({
         key: 'sniffer',
@@ -191,14 +195,14 @@ export function useNetworkConfig() {
       })
       return false
     } finally {
-      saving.value = false
+      savingKey.value = null
     }
   }
 
   // ---- interface-name ------------------------------------------------------
   // Empty input clears the section (null deletes the key on the agent side).
   const saveInterfaceName = async (): Promise<boolean> => {
-    saving.value = true
+    savingKey.value = 'interface-name'
     try {
       const trimmed = interfaceName.value.trim()
       await api.setConfigSection({
@@ -213,7 +217,7 @@ export function useNetworkConfig() {
       })
       return false
     } finally {
-      saving.value = false
+      savingKey.value = null
     }
   }
 
@@ -221,6 +225,7 @@ export function useNetworkConfig() {
     available,
     loading,
     saving,
+    savingKey,
     load,
     // tunnels
     tunnels,

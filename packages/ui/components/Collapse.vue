@@ -58,8 +58,7 @@ const cardGridStyle = computed(() => ({
       background: color-mix(in oklch, var(--color-base-200) 80%, transparent);
       border: 1px solid
         color-mix(in oklch, var(--color-secondary) 30%, transparent);
-      box-shadow: 0 2px 8px
-        color-mix(in oklch, var(--color-base-content) 5%, transparent);
+      box-shadow: var(--lift-1);
     "
   >
     <div
@@ -81,7 +80,7 @@ const cardGridStyle = computed(() => ({
     >
       <slot name="title" />
       <div
-        class="flex h-6 w-6 items-center justify-center text-[color-mix(in_oklch,var(--color-base-content)_50%,transparent)] transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
+        class="flex h-6 w-6 items-center justify-center text-[color-mix(in_oklch,var(--color-base-content)_50%,transparent)] transition-transform duration-[var(--dur-slow)] ease-[var(--ease-soft)]"
         :class="isOpen ? 'rotate-180' : ''"
       >
         <svg

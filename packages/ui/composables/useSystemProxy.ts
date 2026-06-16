@@ -56,8 +56,10 @@ export function useSystemProxy() {
   }
 
   // Returns whether the POST succeeded so callers (e.g. toggle) can revert
-  // optimistic UI state on failure.
-  const save = async (): Promise<boolean> => {
+  // optimistic UI state on failure. The Apply button calls save() and gets a
+  // success toast; toggle() passes { silent: true } since the switch already
+  // mirrors state and would otherwise double-toast on every flip.
+  const save = async (opts?: { silent?: boolean }): Promise<boolean> => {
     loading.value = true
     try {
       sync(
@@ -66,6 +68,7 @@ export function useSystemProxy() {
           bypass: parseBypass(bypassText.value),
         }),
       )
+      if (!opts?.silent) toast.success(t('systemProxyApplied'))
       return true
     } catch (e) {
       toast.error(t('systemProxyApplyFailed'), {
@@ -83,7 +86,7 @@ export function useSystemProxy() {
   const toggle = async (next: boolean) => {
     const prev = enabled.value
     enabled.value = next
-    if (!(await save())) {
+    if (!(await save({ silent: true }))) {
       enabled.value = prev
     }
   }

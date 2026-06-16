@@ -7,19 +7,26 @@ interface Props {
   providerName?: string
   groupName?: string
   class?: string | Record<string, boolean>
+  // When true the pill is a real keyboard-operable control (own tab stop +
+  // Enter/Space). Left false for the display-only call sites (ProxyPreviewBar)
+  // and where it sits inside another button (ProxyNodeChip) to avoid a stray
+  // tab stop / nested interactive.
+  interactive?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   providerName: '',
   groupName: '',
+  interactive: false,
 })
 
 defineEmits<{
-  click: [event: MouseEvent]
+  click: [event: Event]
 }>()
 
 const proxiesStore = useProxiesStore()
 const configStore = useConfigStore()
+const { t } = useI18n()
 
 const extraClass = computed(() => props.class || '')
 
@@ -50,16 +57,32 @@ const latencyClass = computed(() =>
 )
 
 const latencyText = computed(() => latency.value || '---')
+
+// Screen-reader label: the bare number alone reads e.g. "88" with no unit or
+// purpose, and the spinner announces nothing. Give it a unit, a "testing"
+// state, and — only when interactive — the action verb.
+const ariaLabel = computed(() => {
+  if (isTesting.value) return t('recommendation.testing')
+  const value = latency.value ? `${latency.value} ms` : '---'
+  return props.interactive ? `${t('testLatency')}, ${value}` : value
+})
 </script>
 
 <template>
   <span
     class="latency-pill flex w-11 cursor-pointer items-center justify-center rounded-md px-1.5 py-1 text-xs font-semibold whitespace-nowrap tabular-nums"
     :class="[latencyClass, extraClass]"
+    :role="interactive ? 'button' : undefined"
+    :tabindex="interactive ? 0 : undefined"
+    :aria-label="ariaLabel"
+    :aria-busy="isTesting || undefined"
     @click="$emit('click', $event)"
+    @keydown.enter.prevent.stop="interactive && $emit('click', $event)"
+    @keydown.space.prevent.stop="interactive && $emit('click', $event)"
   >
     <span
       v-if="isTesting"
+      aria-hidden="true"
       class="h-4 w-4 animate-spin rounded-full border-2 border-current/30 border-t-current"
     />
     <Transition v-else name="latency-flip" mode="out-in">

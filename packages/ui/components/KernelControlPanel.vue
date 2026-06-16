@@ -33,10 +33,24 @@ const statusClass = computed(() => {
   }
 })
 
+// Tick once a second while the kernel runs so uptime stays live instead of
+// freezing at the single value computed on mount (Date.now() is not reactive).
+const now = ref(Date.now())
+const { pause: pauseUptime, resume: resumeUptime } = useIntervalFn(
+  () => {
+    now.value = Date.now()
+  },
+  1000,
+  { immediate: false },
+)
+watch(status, (s) => (s === 'running' ? resumeUptime() : pauseUptime()), {
+  immediate: true,
+})
+
 const uptime = computed(() => {
   const startedAt = kernelStore.state?.startedAt
   if (!startedAt || status.value !== 'running') return '-'
-  const sec = Math.floor((Date.now() - startedAt) / 1000)
+  const sec = Math.floor((now.value - startedAt) / 1000)
   const h = Math.floor(sec / 3600)
   const m = Math.floor((sec % 3600) / 60)
   const s = sec % 60

@@ -12,7 +12,7 @@ const nc = useNetworkConfig()
 const {
   available,
   loading,
-  saving,
+  savingKey,
   load,
   tunnels,
   addTunnel,
@@ -109,7 +109,7 @@ function setTunnelNetwork(index: number, optionValue: string) {
         />
         <Button
           class="btn-sm btn-primary"
-          :loading="saving"
+          :loading="savingKey === 'interface-name'"
           @click="saveInterfaceName()"
         >
           {{ t('save') }}
@@ -140,7 +140,7 @@ function setTunnelNetwork(index: number, optionValue: string) {
       </label>
       <Button
         class="mt-1 w-fit btn-sm btn-primary"
-        :loading="saving"
+        :loading="savingKey === 'sniffer'"
         @click="saveSniffer()"
       >
         {{ t('save') }}
@@ -226,7 +226,7 @@ function setTunnelNetwork(index: number, optionValue: string) {
         </Button>
         <Button
           class="btn-sm btn-primary"
-          :loading="saving"
+          :loading="savingKey === 'tunnels'"
           @click="saveTunnels()"
         >
           {{ t('save') }}

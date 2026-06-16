@@ -509,4 +509,21 @@ describe('stores/proxies closeAllConnections', () => {
 
     expect(apiMocks.closeAllConnectionsAPI).not.toHaveBeenCalled()
   })
+
+  it('proxiesLoaded flips true after a successful fetch (drives the empty/loading state)', async () => {
+    apiMocks.fetchProxiesAPI.mockResolvedValue({ proxies: {} })
+
+    const store = useProxiesStore()
+    expect(store.proxiesLoaded).toBe(false)
+    await store.fetchProxies()
+    expect(store.proxiesLoaded).toBe(true)
+  })
+
+  it('proxiesLoaded stays true even when the fetch rejects (no permanent skeleton)', async () => {
+    apiMocks.fetchProxiesAPI.mockRejectedValue(new Error('boom'))
+
+    const store = useProxiesStore()
+    await expect(store.fetchProxies()).rejects.toThrow('boom')
+    expect(store.proxiesLoaded).toBe(true)
+  })
 })

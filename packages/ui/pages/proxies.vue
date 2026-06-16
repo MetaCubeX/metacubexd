@@ -865,93 +865,140 @@ const ProviderProxyNodes = defineComponent({
       class="min-h-0 flex-1 overflow-y-auto"
       :class="isMasterMode ? 'overflow-hidden' : ''"
     >
-      <ProxyMasterDetail
-        v-if="isMasterMode"
-        :groups="renderProxies"
-        :sorted-names-by-group="sortedNamesByGroup"
-      />
-      <ProxiesRenderWrapper v-else ref="proxyGroupsWrapper">
-        <template v-if="proxyGroupsWrapper?.isTwoColumns" #even>
-          <Collapse
-            v-for="(proxyGroup, index) in renderProxies.filter(
-              (_, i) => i % 2 === 0,
-            )"
-            :key="proxyGroup.name"
-            class="animate-fade-slide-in"
-            :style="{ animationDelay: `${index * 50}ms` }"
-            :is-open="proxiesStore.collapsedMap[proxyGroup.name] || false"
-            @collapse="
-              (val) => (proxiesStore.collapsedMap[proxyGroup.name] = val)
-            "
-          >
-            <template #title>
-              <ProxyGroupTitle
+      <!-- Loading skeleton: first load / refetch before anything resolves -->
+      <div
+        v-if="!proxiesStore.proxiesLoaded && renderProxies.length === 0"
+        class="flex flex-col gap-3 p-1"
+      >
+        <div
+          v-for="i in 4"
+          :key="i"
+          class="h-20 animate-pulse rounded-xl bg-base-content/5"
+        />
+      </div>
+      <!-- Empty state: loaded but no proxy groups to show -->
+      <div
+        v-else-if="renderProxies.length === 0"
+        class="flex h-full flex-col items-center justify-center gap-2 py-12 text-center text-base-content/40"
+      >
+        <span class="text-sm">{{ t('noData') }}</span>
+      </div>
+      <template v-else>
+        <ProxyMasterDetail
+          v-if="isMasterMode"
+          :groups="renderProxies"
+          :sorted-names-by-group="sortedNamesByGroup"
+        />
+        <ProxiesRenderWrapper v-else ref="proxyGroupsWrapper">
+          <template v-if="proxyGroupsWrapper?.isTwoColumns" #even>
+            <Collapse
+              v-for="(proxyGroup, index) in renderProxies.filter(
+                (_, i) => i % 2 === 0,
+              )"
+              :key="proxyGroup.name"
+              class="animate-fade-slide-in"
+              :style="{ animationDelay: `${index * 50}ms` }"
+              :is-open="proxiesStore.collapsedMap[proxyGroup.name] || false"
+              @collapse="
+                (val) => (proxiesStore.collapsedMap[proxyGroup.name] = val)
+              "
+            >
+              <template #title>
+                <ProxyGroupTitle
+                  :proxy-group="proxyGroup"
+                  :sorted-proxy-names="
+                    sortedNamesByGroup[proxyGroup.name] || []
+                  "
+                />
+              </template>
+              <ProxyNodes
                 :proxy-group="proxyGroup"
                 :sorted-proxy-names="sortedNamesByGroup[proxyGroup.name] || []"
               />
-            </template>
-            <ProxyNodes
-              :proxy-group="proxyGroup"
-              :sorted-proxy-names="sortedNamesByGroup[proxyGroup.name] || []"
-            />
-          </Collapse>
-        </template>
+            </Collapse>
+          </template>
 
-        <template v-if="proxyGroupsWrapper?.isTwoColumns" #odd>
-          <Collapse
-            v-for="(proxyGroup, index) in renderProxies.filter(
-              (_, i) => i % 2 === 1,
-            )"
-            :key="proxyGroup.name"
-            class="animate-fade-slide-in"
-            :style="{ animationDelay: `${index * 50 + 25}ms` }"
-            :is-open="proxiesStore.collapsedMap[proxyGroup.name] || false"
-            @collapse="
-              (val) => (proxiesStore.collapsedMap[proxyGroup.name] = val)
-            "
-          >
-            <template #title>
-              <ProxyGroupTitle
+          <template v-if="proxyGroupsWrapper?.isTwoColumns" #odd>
+            <Collapse
+              v-for="(proxyGroup, index) in renderProxies.filter(
+                (_, i) => i % 2 === 1,
+              )"
+              :key="proxyGroup.name"
+              class="animate-fade-slide-in"
+              :style="{ animationDelay: `${index * 50 + 25}ms` }"
+              :is-open="proxiesStore.collapsedMap[proxyGroup.name] || false"
+              @collapse="
+                (val) => (proxiesStore.collapsedMap[proxyGroup.name] = val)
+              "
+            >
+              <template #title>
+                <ProxyGroupTitle
+                  :proxy-group="proxyGroup"
+                  :sorted-proxy-names="
+                    sortedNamesByGroup[proxyGroup.name] || []
+                  "
+                />
+              </template>
+              <ProxyNodes
                 :proxy-group="proxyGroup"
                 :sorted-proxy-names="sortedNamesByGroup[proxyGroup.name] || []"
               />
-            </template>
-            <ProxyNodes
-              :proxy-group="proxyGroup"
-              :sorted-proxy-names="sortedNamesByGroup[proxyGroup.name] || []"
-            />
-          </Collapse>
-        </template>
+            </Collapse>
+          </template>
 
-        <template v-if="!proxyGroupsWrapper?.isTwoColumns" #default>
-          <Collapse
-            v-for="(proxyGroup, index) in renderProxies"
-            :key="proxyGroup.name"
-            class="animate-fade-slide-in"
-            :style="{ animationDelay: `${index * 40}ms` }"
-            :is-open="proxiesStore.collapsedMap[proxyGroup.name] || false"
-            @collapse="
-              (val) => (proxiesStore.collapsedMap[proxyGroup.name] = val)
-            "
-          >
-            <template #title>
-              <ProxyGroupTitle
+          <template v-if="!proxyGroupsWrapper?.isTwoColumns" #default>
+            <Collapse
+              v-for="(proxyGroup, index) in renderProxies"
+              :key="proxyGroup.name"
+              class="animate-fade-slide-in"
+              :style="{ animationDelay: `${index * 40}ms` }"
+              :is-open="proxiesStore.collapsedMap[proxyGroup.name] || false"
+              @collapse="
+                (val) => (proxiesStore.collapsedMap[proxyGroup.name] = val)
+              "
+            >
+              <template #title>
+                <ProxyGroupTitle
+                  :proxy-group="proxyGroup"
+                  :sorted-proxy-names="
+                    sortedNamesByGroup[proxyGroup.name] || []
+                  "
+                />
+              </template>
+              <ProxyNodes
                 :proxy-group="proxyGroup"
                 :sorted-proxy-names="sortedNamesByGroup[proxyGroup.name] || []"
               />
-            </template>
-            <ProxyNodes
-              :proxy-group="proxyGroup"
-              :sorted-proxy-names="sortedNamesByGroup[proxyGroup.name] || []"
-            />
-          </Collapse>
-        </template>
-      </ProxiesRenderWrapper>
+            </Collapse>
+          </template>
+        </ProxiesRenderWrapper>
+      </template>
     </div>
 
     <!-- Proxy Providers Content -->
     <div v-else ref="providersScrollEl" class="min-h-0 flex-1 overflow-y-auto">
-      <ProxiesRenderWrapper ref="providersWrapper">
+      <!-- Loading skeleton: first load before providers resolve -->
+      <div
+        v-if="
+          !proxiesStore.proxiesLoaded &&
+          proxiesStore.proxyProviders.length === 0
+        "
+        class="flex flex-col gap-3 p-1"
+      >
+        <div
+          v-for="i in 3"
+          :key="i"
+          class="h-20 animate-pulse rounded-xl bg-base-content/5"
+        />
+      </div>
+      <!-- Empty state: loaded but no providers -->
+      <div
+        v-else-if="proxiesStore.proxyProviders.length === 0"
+        class="flex h-full flex-col items-center justify-center gap-2 py-12 text-center text-base-content/40"
+      >
+        <span class="text-sm">{{ t('noData') }}</span>
+      </div>
+      <ProxiesRenderWrapper v-else ref="providersWrapper">
         <template v-if="providersWrapper?.isTwoColumns" #even>
           <Collapse
             v-for="(provider, index) in proxiesStore.proxyProviders.filter(

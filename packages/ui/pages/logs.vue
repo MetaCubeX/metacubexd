@@ -452,7 +452,7 @@ function downloadLogs() {
           }}</label>
           <select
             v-model="configStore.logsTableSize"
-            class="w-full cursor-pointer rounded-lg border border-base-content/10 bg-base-100 px-3.5 py-2.5 text-sm text-base-content transition-colors duration-200 focus:border-primary focus:outline-none"
+            class="w-full cursor-pointer rounded-lg border border-base-content/10 bg-base-100 px-3.5 py-2.5 text-sm text-base-content transition-colors duration-200 focus:border-primary"
           >
             <option value="xs">{{ t('xs') }}</option>
             <option value="sm">{{ t('sm') }}</option>
@@ -467,7 +467,7 @@ function downloadLogs() {
           }}</label>
           <select
             v-model="configStore.logLevel"
-            class="w-full cursor-pointer rounded-lg border border-base-content/10 bg-base-100 px-3.5 py-2.5 text-sm text-base-content transition-colors duration-200 focus:border-primary focus:outline-none"
+            class="w-full cursor-pointer rounded-lg border border-base-content/10 bg-base-100 px-3.5 py-2.5 text-sm text-base-content transition-colors duration-200 focus:border-primary"
           >
             <option value="info">{{ t('info') }}</option>
             <option value="error">{{ t('error') }}</option>
@@ -483,7 +483,7 @@ function downloadLogs() {
           }}</label>
           <select
             v-model="configStore.logMaxRows"
-            class="w-full cursor-pointer rounded-lg border border-base-content/10 bg-base-100 px-3.5 py-2.5 text-sm text-base-content transition-colors duration-200 focus:border-primary focus:outline-none"
+            class="w-full cursor-pointer rounded-lg border border-base-content/10 bg-base-100 px-3.5 py-2.5 text-sm text-base-content transition-colors duration-200 focus:border-primary"
           >
             <option :value="200">200</option>
             <option :value="300">300</option>

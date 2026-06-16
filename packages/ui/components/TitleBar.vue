@@ -30,14 +30,14 @@ const { isMaximized, minimize, toggleMaximize, close } = useWindowControls()
       style="-webkit-app-region: no-drag"
     >
       <button
-        class="flex h-full w-12 items-center justify-center text-base-content/70 transition-colors hover:bg-[color-mix(in_oklch,var(--color-base-content)_8%,transparent)] hover:text-base-content"
+        class="flex h-full w-12 items-center justify-center text-base-content/70 transition-colors hover:bg-[color-mix(in_oklch,var(--color-base-content)_8%,transparent)] hover:text-base-content focus-visible:-outline-offset-2 active:bg-[color-mix(in_oklch,var(--color-base-content)_14%,transparent)]"
         aria-label="minimize"
         @click="minimize"
       >
         <IconMinus class="h-4 w-4" />
       </button>
       <button
-        class="flex h-full w-12 items-center justify-center text-base-content/70 transition-colors hover:bg-[color-mix(in_oklch,var(--color-base-content)_8%,transparent)] hover:text-base-content"
+        class="flex h-full w-12 items-center justify-center text-base-content/70 transition-colors hover:bg-[color-mix(in_oklch,var(--color-base-content)_8%,transparent)] hover:text-base-content focus-visible:-outline-offset-2 active:bg-[color-mix(in_oklch,var(--color-base-content)_14%,transparent)]"
         :aria-label="isMaximized ? 'restore' : 'maximize'"
         @click="toggleMaximize"
       >
@@ -45,7 +45,7 @@ const { isMaximized, minimize, toggleMaximize, close } = useWindowControls()
         <IconSquare v-else class="h-4 w-4" />
       </button>
       <button
-        class="flex h-full w-12 items-center justify-center text-base-content/70 transition-colors hover:bg-error hover:text-error-content"
+        class="flex h-full w-12 items-center justify-center text-base-content/70 transition-colors hover:bg-error hover:text-error-content focus-visible:-outline-offset-2 active:brightness-90"
         aria-label="close"
         @click="close"
       >

@@ -16,6 +16,8 @@ import {
   IconRuler,
   IconSettings,
 } from '@tabler/icons-vue'
+import { toast } from 'vue-sonner'
+import { useMenuKeyboard } from '~/composables/useMenuKeyboard'
 import {
   useConfigQuery,
   useUpdateConfigMutation,
@@ -83,8 +85,20 @@ function selectMode(mode: string) {
     isModeMenuOpen.value = false
     return
   }
+  // Optimistically reflect the new mode, but roll back + surface a toast if the
+  // PATCH fails — otherwise the segmented control desyncs from the backend with
+  // no feedback.
+  const previous = currentMode.value
   currentMode.value = mode
-  updateConfigMutation.mutate({ key: 'mode', value: mode })
+  updateConfigMutation.mutate(
+    { key: 'mode', value: mode },
+    {
+      onError: () => {
+        currentMode.value = previous
+        toast.error(t('modeSwitchFailed'))
+      },
+    },
+  )
   isModeMenuOpen.value = false
 }
 
@@ -106,6 +120,17 @@ const { floatingStyles: modeFloatingStyles } = useFloating(
 function toggleModeMenu() {
   isModeMenuOpen.value = !isModeMenuOpen.value
 }
+
+// Keyboard a11y for the collapsed-sidebar mode menu: focus into it on open,
+// restore focus to the trigger on Esc/selection, and arrow/Home/End roving.
+const { onKeydown: onModeMenuKeydown } = useMenuKeyboard({
+  isOpen: isModeMenuOpen,
+  triggerEl: modeReference,
+  menuEl: modeFloating,
+  close: () => {
+    isModeMenuOpen.value = false
+  },
+})
 
 function onModeClickOutside(event: MouseEvent) {
   const target = event.target as Node
@@ -287,6 +312,8 @@ const toggleSidebar = () => {
                 'border-primary/40 bg-primary/15 text-primary': isModeMenuOpen,
               }"
               :title="`${t('runningMode')}: ${getModeLabel(currentMode)}`"
+              aria-haspopup="menu"
+              :aria-expanded="isModeMenuOpen"
               @click.stop="toggleModeMenu"
             >
               <component :is="getModeIcon(currentMode)" class="h-5 w-5" />
@@ -303,7 +330,9 @@ const toggleSidebar = () => {
                   v-if="isModeMenuOpen"
                   ref="modeFloating"
                   :style="modeFloatingStyles"
+                  role="menu"
                   class="z-70 w-40 overflow-hidden rounded-xl border border-base-content/10 bg-base-300/98 shadow-[0_10px_40px_var(--color-base-content)/20,0_0_0_1px_var(--color-base-content)/5] backdrop-blur-[12px]"
+                  @keydown="onModeMenuKeydown"
                 >
                   <div
                     class="flex items-center border-b border-base-content/8 bg-base-200/60 px-3 py-2.5"
@@ -317,6 +346,8 @@ const toggleSidebar = () => {
                   <ul class="m-0 list-none p-1.5">
                     <li v-for="mode in modes" :key="mode">
                       <button
+                        role="menuitem"
+                        :data-current="currentMode === mode"
                         class="flex w-full cursor-pointer items-center justify-between rounded-lg border-none bg-transparent px-2.5 py-2 transition-all duration-150 ease-in-out hover:bg-base-content/8"
                         :class="{
                           'bg-primary/15 hover:bg-primary/20':

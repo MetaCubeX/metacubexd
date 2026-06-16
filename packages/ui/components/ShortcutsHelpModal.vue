@@ -12,24 +12,50 @@ const { t } = useI18n()
 // Mobile detection - don't show on mobile
 const isMobile = useMediaQuery('(max-width: 768px)')
 
+const dialogRef = ref<HTMLDialogElement>()
+
 const close = () => {
   shortcutsStore.closeHelpModal()
 }
+
+// Focus management: capture the focused element on open and restore it on close
+// (this modal opens only via the global '?' shortcut, so there is no on-screen
+// trigger to return focus to). Moving focus into the dialog also lets Esc act on
+// it and lets screen readers announce the dialog.
+let lastFocused: HTMLElement | null = null
+watch(
+  () => shortcutsStore.isHelpModalOpen,
+  (open) => {
+    if (!import.meta.client) return
+    if (open) {
+      lastFocused = document.activeElement as HTMLElement | null
+      nextTick(() => dialogRef.value?.focus())
+    } else {
+      lastFocused?.focus?.()
+      lastFocused = null
+    }
+  },
+)
 </script>
 
 <template>
   <!-- Don't show on mobile devices -->
   <dialog
     v-if="!isMobile"
+    ref="dialogRef"
     class="modal"
     :class="{ 'modal-open': shortcutsStore.isHelpModalOpen }"
+    tabindex="-1"
+    aria-modal="true"
+    aria-labelledby="shortcuts-help-title"
     @click.self="close"
+    @keydown.esc.prevent="close"
   >
     <div class="modal-box max-w-lg">
       <div
         class="flex items-center justify-between border-b border-base-300 pb-3"
       >
-        <h3 class="text-lg font-bold">
+        <h3 id="shortcuts-help-title" class="text-lg font-bold">
           {{ t('shortcuts.title', 'Keyboard Shortcuts') }}
         </h3>
         <button class="btn btn-circle btn-ghost btn-sm" @click="close">

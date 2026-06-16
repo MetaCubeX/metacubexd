@@ -92,7 +92,7 @@ onUnmounted(() => {
         props.modelValue
       }}</span>
       <IconChevronDown
-        class="size-4 transition-transform duration-200 ease-in-out"
+        class="size-4 transition-transform duration-[var(--dur-fast)] ease-[var(--ease-soft)]"
         :class="{ 'rotate-180': isOpen }"
       />
     </button>

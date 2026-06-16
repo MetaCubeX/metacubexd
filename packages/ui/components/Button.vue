@@ -36,13 +36,9 @@ const needsBtnClass = computed(() => buttonClass.value.includes('btn-'))
     :disabled="disabled || loading"
     @click="$emit('click', $event)"
   >
-    <div v-if="loading" class="loading loading-spinner" />
-    <template v-else-if="icon">
-      <component :is="icon" />
-    </template>
-    <template v-else>
-      <slot />
-    </template>
+    <span v-if="loading" class="loading loading-sm loading-spinner" />
+    <component :is="icon" v-if="icon" />
+    <slot v-else />
   </button>
 </template>
 

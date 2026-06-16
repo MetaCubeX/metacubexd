@@ -73,10 +73,10 @@ onUnmounted(() => {
           class="z-70 w-60 overflow-visible rounded-xl shadow-lg"
         >
           <div
-            class="flex items-center border-b border-gray-700 bg-gray-800/90 px-3 py-2"
+            class="flex items-center border-b border-base-content/8 bg-base-200/60 px-3 py-2"
           >
             <span
-              class="text-[0.6875rem] font-semibold tracking-[0.05em] text-gray-400 uppercase"
+              class="text-[0.6875rem] font-semibold tracking-[0.05em] text-base-content/50 uppercase"
             >
               Theme
             </span>
