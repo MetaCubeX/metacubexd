@@ -33,19 +33,18 @@ const statusClass = computed(() => {
   }
 })
 
-// Tick once a second while the kernel runs so uptime stays live instead of
-// freezing at the single value computed on mount (Date.now() is not reactive).
+// Tick once a second so uptime stays live instead of freezing at the value
+// computed on mount (Date.now() is not reactive). Runs UNCONDITIONALLY: gating
+// resume()/pause() on `watch(status)` left `now` frozen — and uptime stuck at
+// "0h 0m 0s" — whenever the managed kernel was ALREADY running at mount, which
+// is the normal desktop case (the main process starts the kernel before the
+// renderer even loads, so the panel never witnesses a stopped→running edge). A
+// 1s timer is negligible and the `uptime` computed already returns '-' when the
+// kernel is not running.
 const now = ref(Date.now())
-const { pause: pauseUptime, resume: resumeUptime } = useIntervalFn(
-  () => {
-    now.value = Date.now()
-  },
-  1000,
-  { immediate: false },
-)
-watch(status, (s) => (s === 'running' ? resumeUptime() : pauseUptime()), {
-  immediate: true,
-})
+useIntervalFn(() => {
+  now.value = Date.now()
+}, 1000)
 
 const uptime = computed(() => {
   const startedAt = kernelStore.state?.startedAt
