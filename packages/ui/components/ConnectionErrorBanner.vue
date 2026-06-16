@@ -4,8 +4,32 @@ import { useVersionQuery } from '~/composables/useQueries'
 const { t } = useI18n()
 const router = useRouter()
 const endpointStore = useEndpointStore()
+const kernelStore = useKernelStore()
+const { isDesktop, isMac } = useDesktop()
+const { hasFeature, ready: controlReady } = useControlInfo()
 
 const { isError, refetch, isFetching } = useVersionQuery()
+
+// The desktop app serves the Clash API from the managed kernel, so a stopped
+// kernel makes the version probe fail by design — that's an expected state, not
+// a fault to alarm about. Only surface the banner while the kernel is actually
+// running. The web dashboard has no kernel-control feature, so it keeps the
+// original "show on any backend error" behavior. Gate on the control-info
+// probe's `ready` flag (as ProtectedResources does) so we don't flash the
+// web-fallback banner during the brief window before we know whether a managed
+// kernel is in play.
+const showBanner = computed(() => {
+  if (!isError.value) return false
+  if (!controlReady.value) return false
+  if (!hasFeature('kernel-control')) return true
+  return kernelStore.state?.status === 'running'
+})
+
+// macOS frameless window keeps the native traffic lights in the top-left
+// (trafficLightPosition x:12, a ~66px-wide cluster). The banner is fixed at
+// top-0 over the title bar, so its content must clear that zone or the lights
+// overlap the icon/text — pad the left only on macOS desktop.
+const isMacDesktop = isDesktop && isMac
 
 function switchEndpoint() {
   endpointStore.setSelectedEndpoint('')
@@ -21,8 +45,9 @@ function switchEndpoint() {
     leave-to-class="-translate-y-full opacity-0"
   >
     <div
-      v-if="isError"
-      class="animate-shake-soft fixed top-0 right-0 left-0 z-[100] flex items-center justify-between gap-2 bg-error/90 px-4 py-2 text-error-content backdrop-blur-sm"
+      v-if="showBanner"
+      class="animate-shake-soft fixed top-0 right-0 left-0 z-[100] flex items-center justify-between gap-2 bg-error/90 py-2 text-error-content backdrop-blur-sm"
+      :class="isMacDesktop ? 'pr-4 pl-20' : 'px-4'"
     >
       <div class="flex min-w-0 items-center gap-2">
         <svg
