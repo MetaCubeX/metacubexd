@@ -30,13 +30,20 @@ asarUnpack:
   # NOTE: mihomo + wintun.dll ship via extraResources (outside the asar
   # entirely), so they need no asarUnpack entry here — only the helper does.
   - 'out/helper/**'
+# NOTE: mihomo is staged per-platform below (mac/linux: `mihomo`, win:
+# `mihomo.exe`) because electron-builder does NOT define the `${ext}` macro in
+# extraResources `from`/`to` (it only exists in artifact-name context), so a
+# shared `mihomo${ext}` entry fails to pack with "macro ext is not defined".
+# Platform-level extraResources MERGE with this common list. Runtime resolution
+# (src/main/binary-path.ts) expects <resourcesPath>/mihomo[.exe] accordingly.
 extraResources:
-  - from: resources/mihomo${ext}
-    to: mihomo${ext}
   - from: resources/default-config.yaml
     to: default-config.yaml
 mac:
   icon: build/icon.icns
+  extraResources:
+    - from: resources/mihomo
+      to: mihomo
   # Unsigned build: identity null + hardenedRuntime false. NOTE: a SIGNED app
   # using TUN would normally need a network entitlement
   # (com.apple.developer.networking.*); since this build is unsigned, no
@@ -62,6 +69,8 @@ win:
   # `pnpm fetch:mihomo --os win32` before packaging. asarUnpack so it lands as a
   # real file (it's referenced via extraResources, kept out of app.asar anyway).
   extraResources:
+    - from: resources/mihomo.exe
+      to: mihomo.exe
     - from: resources/wintun.dll
       to: wintun.dll
   asarUnpack:
@@ -72,6 +81,9 @@ nsis:
   perMachine: false
 linux:
   icon: build/icon.png
+  extraResources:
+    - from: resources/mihomo
+      to: mihomo
   target:
     - target: AppImage
       arch:
