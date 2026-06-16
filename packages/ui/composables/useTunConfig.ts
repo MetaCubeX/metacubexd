@@ -39,6 +39,10 @@ export function useTunConfig(options: TunConfigOptions) {
   const showInstallNote = computed(
     () => desktopMode.value && tun.status.value.mode !== 'tun',
   )
+  // The helper may have been installed in any prior session, so offer removal
+  // whenever we're on the desktop backend (uninstall is a safe no-op if nothing
+  // is registered — the install scripts' uninstall tolerates a missing service).
+  const showUninstallButton = computed(() => desktopMode.value)
 
   // Probe the current TUN status once (desktop only — there is no agent on a
   // plain remote backend). Failures surface via toast inside useTun.
@@ -73,6 +77,11 @@ export function useTunConfig(options: TunConfigOptions) {
     await tun.disable()
   }
 
+  // Remove the privileged helper service entirely (revoke the elevation grant).
+  const onUninstall = async () => {
+    await tun.uninstall()
+  }
+
   return {
     desktopMode,
     enabled,
@@ -80,9 +89,11 @@ export function useTunConfig(options: TunConfigOptions) {
     busy,
     showRecoverButton,
     showInstallNote,
+    showUninstallButton,
     init,
     onToggle,
     onStackChange,
     onRecoverNetwork,
+    onUninstall,
   }
 }

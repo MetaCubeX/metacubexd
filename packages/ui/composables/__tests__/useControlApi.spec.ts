@@ -260,4 +260,9 @@ describe('composables/useControlApi methods', () => {
     await useControlApi().setTun({ enabled: false })
     expect(post).toHaveBeenCalledWith('tun', { json: { enabled: false } })
   })
+
+  it('uninstallTun() POSTs tun/uninstall (no body)', async () => {
+    await useControlApi().uninstallTun()
+    expect(post).toHaveBeenCalledWith('tun/uninstall')
+  })
 })

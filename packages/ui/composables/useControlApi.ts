@@ -149,5 +149,8 @@ export function useControlApi() {
     getTun: () => client.get('tun').json<TunStatus>(),
     setTun: (body: { enabled: boolean; stack?: string }) =>
       client.post('tun', { json: body }).json<TunStatus>(),
+    // Remove the privileged helper service entirely (tears TUN down to the
+    // sidecar first if active). Echoes the post-uninstall TunStatus.
+    uninstallTun: () => client.post('tun/uninstall').json<TunStatus>(),
   }
 }

@@ -16,6 +16,7 @@ const tun = {
   enable: vi.fn(),
   disable: vi.fn(),
   load: vi.fn(),
+  uninstall: vi.fn(),
 }
 vi.mock('../useTun', () => ({
   useTun: () => ({
@@ -25,6 +26,7 @@ vi.mock('../useTun', () => ({
     load: tun.load,
     enable: tun.enable,
     disable: tun.disable,
+    uninstall: tun.uninstall,
   }),
 }))
 
@@ -93,6 +95,19 @@ describe('composables/useTunConfig', () => {
     expect(c.showRecoverButton.value).toBe(true)
   })
 
+  it('desktop: uninstall forces useTun.uninstall() (remove the helper service)', async () => {
+    const c = useTunConfig({ patch: vi.fn() })
+    await c.onUninstall()
+    expect(tun.uninstall).toHaveBeenCalledOnce()
+  })
+
+  it('desktop: the uninstall button shows regardless of mode (helper may be installed)', () => {
+    const c = useTunConfig({ patch: vi.fn() })
+    expect(c.showUninstallButton.value).toBe(true)
+    status.value = { enabled: true, mode: 'tun', stack: 'gVisor' }
+    expect(c.showUninstallButton.value).toBe(true)
+  })
+
   it('desktop: the install/elevation note shows before first enable (sidecar mode)', () => {
     const c = useTunConfig({ patch: vi.fn() })
     expect(c.showInstallNote.value).toBe(true)
@@ -136,11 +151,12 @@ describe('composables/useTunConfig', () => {
     expect(tun.enable).not.toHaveBeenCalled()
   })
 
-  it('remote: never shows the recover-network button or the install note', () => {
+  it('remote: never shows the recover-network/uninstall buttons or the install note', () => {
     available = false
     const c = useTunConfig({ patch: vi.fn() })
     expect(c.showRecoverButton.value).toBe(false)
     expect(c.showInstallNote.value).toBe(false)
+    expect(c.showUninstallButton.value).toBe(false)
   })
 
   it('remote: init() does not load tun status (no agent)', () => {

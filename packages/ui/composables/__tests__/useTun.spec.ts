@@ -6,6 +6,7 @@ import { useTun } from '../useTun'
 const api = {
   getTun: vi.fn(),
   setTun: vi.fn(),
+  uninstallTun: vi.fn(),
 }
 vi.mock('../useControlApi', () => ({ useControlApi: () => api }))
 
@@ -42,6 +43,9 @@ describe('composables/useTun', () => {
     featurePresent = true
     api.getTun.mockResolvedValue(status())
     api.setTun.mockResolvedValue(status())
+    api.uninstallTun.mockResolvedValue(
+      status({ enabled: false, mode: 'sidecar' }),
+    )
   })
 
   it('available reflects hasFeature(tun) — true when the feature is present', () => {
@@ -97,6 +101,26 @@ describe('composables/useTun', () => {
     expect(tun.status.value).toEqual({ enabled: false, mode: 'sidecar' })
     expect(toast.success).toHaveBeenCalled()
     expect(toast.error).not.toHaveBeenCalled()
+  })
+
+  it('uninstall() POSTs tun/uninstall and syncs the post-uninstall (sidecar) status', async () => {
+    api.uninstallTun.mockResolvedValue(
+      status({ enabled: false, mode: 'sidecar' }),
+    )
+    const tun = useTun()
+    await tun.uninstall()
+    expect(api.uninstallTun).toHaveBeenCalledOnce()
+    expect(tun.status.value).toEqual({ enabled: false, mode: 'sidecar' })
+    expect(toast.success).toHaveBeenCalled()
+    expect(toast.error).not.toHaveBeenCalled()
+  })
+
+  it('uninstall() surfaces failures via toast.error (no swallowing) and clears busy', async () => {
+    api.uninstallTun.mockRejectedValue(new Error('pkexec denied'))
+    const tun = useTun()
+    await tun.uninstall()
+    expect(toast.error).toHaveBeenCalled()
+    expect(tun.busy.value).toBe(false)
   })
 
   it('busy is true while enable() is in flight (install/elevation takes time)', async () => {

@@ -76,5 +76,23 @@ export function useTun() {
     }
   }
 
-  return { available, status, busy, load, enable, disable }
+  // Remove the privileged helper service entirely. The agent tears TUN down to
+  // the sidecar first, then unregisters the OS service — useful to revoke the
+  // elevation grant or recover from a wedged/stale install. Echoes the
+  // post-uninstall status (sidecar).
+  const uninstall = async () => {
+    busy.value = true
+    try {
+      status.value = await api.uninstallTun()
+      toast.success(t('tunUninstallSuccess'))
+    } catch (e) {
+      toast.error(t('tunUninstallFailed'), {
+        description: e instanceof Error ? e.message : String(e),
+      })
+    } finally {
+      busy.value = false
+    }
+  }
+
+  return { available, status, busy, load, enable, disable, uninstall }
 }
