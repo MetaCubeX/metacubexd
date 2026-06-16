@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.255.2](https://github.com/MetaCubeX/metacubexd/compare/v1.255.1...v1.255.2) (2026-06-15)
+
+
+### Bug Fixes
+
+* **rules:** align filter toolbar chips with adjacent controls ([160480e](https://github.com/MetaCubeX/metacubexd/commit/160480e59410888856bdd1c4887c7ce265d50ec1))
+
+## [1.255.1](https://github.com/MetaCubeX/metacubexd/compare/v1.255.0...v1.255.1) (2026-06-15)
+
+
+### Bug Fixes
+
+* **config:** read unified delay from backend key ([#2031](https://github.com/MetaCubeX/metacubexd/issues/2031)) ([e72d6f1](https://github.com/MetaCubeX/metacubexd/commit/e72d6f1f8fd2dba254a8e05a1a50eecc092c992a))
+
+## [1.255.0](https://github.com/MetaCubeX/metacubexd/compare/v1.254.2...v1.255.0) (2026-06-14)
+
+
+### Features
+
+* **rules:** add quick filters and sorting to the rules list page ([e9b5a3f](https://github.com/MetaCubeX/metacubexd/commit/e9b5a3fcf6e6aaf2a011fc1b64b8edb3d9cf4f57))
+
 ## [1.254.2](https://github.com/MetaCubeX/metacubexd/compare/v1.254.1...v1.254.2) (2026-06-13)
 
 

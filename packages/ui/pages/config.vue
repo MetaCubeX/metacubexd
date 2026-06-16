@@ -207,7 +207,8 @@ watch(
     if (config) {
       localConfig.allowLan = config['allow-lan'] || false
       localConfig.mode = config.mode || 'rule'
-      localConfig.unifiedDelay = config.UnifiedDelay || false
+      localConfig.unifiedDelay =
+        config['unified-delay'] ?? config.UnifiedDelay ?? false
       localConfig.interfaceName = config['interface-name'] || ''
       // On desktop the live TUN state is owned by /api/control/tun (synced via
       // the watch below); only seed from the Clash config on a remote backend.
