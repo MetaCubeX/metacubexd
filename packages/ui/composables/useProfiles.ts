@@ -79,6 +79,24 @@ export function useProfiles() {
     await api.importProfile(url, name)
     await refresh()
   }
+  // Re-fetch a remote subscription in place: the agent overwrites the stored
+  // content + subscriptionInfo + updatedAt under the same id, so a re-list shows
+  // the fresh traffic/expiry numbers. The agent throws for non-remote profiles
+  // (or on a network failure) — surface it via toast and return whether it
+  // succeeded so the caller can react, never swallow it silently.
+  const refreshRemote = async (id: string): Promise<boolean> => {
+    try {
+      await api.refreshProfile(id)
+      await refresh()
+      toast.success(t('profilesRefreshed'))
+      return true
+    } catch (e) {
+      toast.error(t('profilesRefreshFailed'), {
+        description: e instanceof Error ? e.message : String(e),
+      })
+      return false
+    }
+  }
   const save = async (id: string, content: string) => {
     await api.updateProfile(id, { content })
     await refresh()
@@ -175,6 +193,7 @@ export function useProfiles() {
     duplicate,
     remove,
     importUrl,
+    refreshRemote,
     save,
     saveMerge,
     saveScript,

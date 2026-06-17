@@ -12,6 +12,7 @@ const api = {
   duplicateProfile: vi.fn(),
   importProfile: vi.fn(),
   activateProfile: vi.fn(),
+  refreshProfile: vi.fn(),
   validateProfile: vi.fn(),
 }
 vi.mock('../useControlApi', () => ({ useControlApi: () => api }))
@@ -311,6 +312,29 @@ describe('composables/useProfiles', () => {
       const p = useProfiles()
       await p.setScriptEnabled('s', false)
       expect(toast.error).toHaveBeenCalled()
+    })
+  })
+
+  describe('refreshRemote', () => {
+    it('re-fetches the subscription, re-lists, toasts success, returns true', async () => {
+      api.refreshProfile.mockResolvedValue(meta('a'))
+      api.listProfiles.mockResolvedValue([meta('a')])
+      const p = useProfiles()
+      const ok = await p.refreshRemote('a')
+      expect(api.refreshProfile).toHaveBeenCalledWith('a')
+      expect(api.listProfiles).toHaveBeenCalled()
+      expect(toast.success).toHaveBeenCalled()
+      expect(ok).toBe(true)
+    })
+
+    it('surfaces a failure (e.g. non-remote / network) via toast.error, returns false, never throws', async () => {
+      api.refreshProfile.mockRejectedValue(
+        new Error('not a remote subscription'),
+      )
+      const p = useProfiles()
+      const ok = await p.refreshRemote('local1')
+      expect(toast.error).toHaveBeenCalled()
+      expect(ok).toBe(false)
     })
   })
 })

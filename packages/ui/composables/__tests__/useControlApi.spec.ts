@@ -151,6 +151,11 @@ describe('composables/useControlApi methods', () => {
     expect(post).toHaveBeenCalledWith('profiles/id1/activate')
   })
 
+  it('refreshProfile() POSTs profiles/:id/refresh', async () => {
+    await useControlApi().refreshProfile('id1')
+    expect(post).toHaveBeenCalledWith('profiles/id1/refresh')
+  })
+
   it('validateProfile() POSTs profiles/:id/validate', async () => {
     await useControlApi().validateProfile('id1')
     expect(post).toHaveBeenCalledWith('profiles/id1/validate')

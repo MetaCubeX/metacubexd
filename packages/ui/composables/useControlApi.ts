@@ -94,6 +94,11 @@ export function useControlApi() {
         .json<ProfileMeta>(),
     activateProfile: (id: string) =>
       client.post(`profiles/${id}/activate`).json<KernelState>(),
+    // Re-fetch a REMOTE subscription in place (agent overwrites content +
+    // subscriptionInfo + updatedAt, keeping the same id). The agent rejects this
+    // for non-remote profiles.
+    refreshProfile: (id: string) =>
+      client.post(`profiles/${id}/refresh`).json<ProfileMeta>(),
     validateProfile: (id: string) =>
       client.post(`profiles/${id}/validate`).json<ValidateResult>(),
 
