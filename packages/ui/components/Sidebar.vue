@@ -14,6 +14,7 @@ import {
   IconNetwork,
   IconRoute,
   IconRuler,
+  IconServerCog,
   IconSettings,
 } from '@tabler/icons-vue'
 import { toast } from 'vue-sonner'
@@ -26,7 +27,7 @@ import {
 const route = useRoute()
 const { t } = useI18n()
 const configStore = useConfigStore()
-const { hasFeature } = useControlInfo()
+const { hasAgent, hasFeature } = useControlInfo()
 
 const navItems = computed(() => {
   const items = [
@@ -40,6 +41,16 @@ const navItems = computed(() => {
   ]
   if (hasFeature('profiles')) {
     items.push({ href: '/profiles', name: t('profiles'), icon: IconFileCode })
+  }
+  // Desktop/server only: one entry point for everything the bundled agent
+  // manages (kernel lifecycle, version/geo, system proxy, network sections,
+  // runtime config, WebDAV backup). Hidden in the plain web dashboard.
+  if (hasAgent.value) {
+    items.push({
+      href: '/control',
+      name: t('controlCenter'),
+      icon: IconServerCog,
+    })
   }
   return items
 })

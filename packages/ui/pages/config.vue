@@ -1541,10 +1541,6 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
           </div>
         </div>
 
-        <!-- Network Config editors (desktop, capability-gated 'config-sections').
-             Self-contained: the whole card is v-if'd off without an agent. -->
-        <NetworkConfigPanel class="col-span-1 lg:col-span-2" />
-
         <!-- DNS Settings Card (hide for sing-box) -->
         <template v-if="!isSingBox">
           <div

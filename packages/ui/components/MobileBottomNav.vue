@@ -7,12 +7,14 @@ import {
   IconNetwork,
   IconPlus,
   IconRuler,
+  IconServerCog,
   IconSettings,
   IconX,
 } from '@tabler/icons-vue'
 
 const { t } = useI18n()
 const route = useRoute()
+const { hasAgent } = useControlInfo()
 
 // Primary 4 nav items (around the FAB)
 const primaryItems = computed(() => [
@@ -26,11 +28,24 @@ const leftPrimaryItems = computed(() => primaryItems.value.slice(0, 2))
 const rightPrimaryItems = computed(() => primaryItems.value.slice(2, 4))
 
 // Secondary items in the FAB popup
-const secondaryItems = computed(() => [
-  { href: '/traffic', name: t('dataUsage'), icon: IconChartAreaLine },
-  { href: '/logs', name: t('logs'), icon: IconFileStack },
-  { href: '/config', name: t('config'), icon: IconSettings },
-])
+const secondaryItems = computed(() => {
+  const items = [
+    { href: '/traffic', name: t('dataUsage'), icon: IconChartAreaLine },
+    { href: '/logs', name: t('logs'), icon: IconFileStack },
+    { href: '/config', name: t('config'), icon: IconSettings },
+  ]
+  // Desktop/server only: keep the Control Center reachable on narrow viewports
+  // (e.g. a phone hitting the server-mode dashboard). Hidden in the plain web
+  // dashboard, mirroring the desktop Sidebar gate.
+  if (hasAgent.value) {
+    items.push({
+      href: '/control',
+      name: t('controlCenter'),
+      icon: IconServerCog,
+    })
+  }
+  return items
+})
 
 const isActive = (href: string) => route.path === href
 
