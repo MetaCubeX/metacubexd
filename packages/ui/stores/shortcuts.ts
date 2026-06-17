@@ -18,6 +18,13 @@ export const useShortcutsStore = defineStore('shortcuts', () => {
   // Help modal visibility
   const isHelpModalOpen = ref(false)
 
+  // First-run onboarding wizard visibility. While true, the global keyboard
+  // shortcuts (r = reload, g-nav) are suppressed so a stray keystroke cannot
+  // fire behind the full-screen wizard overlay — which is a div[role=dialog],
+  // not a native <dialog>, so it does not make the page inert. The wizard
+  // handles its own Escape-to-skip.
+  const isOnboardingOpen = ref(false)
+
   // Open help modal
   const openHelpModal = () => {
     isHelpModalOpen.value = true
@@ -76,6 +83,7 @@ export const useShortcutsStore = defineStore('shortcuts', () => {
     shortcuts,
     customShortcuts,
     isHelpModalOpen,
+    isOnboardingOpen,
     // Actions
     openHelpModal,
     closeHelpModal,

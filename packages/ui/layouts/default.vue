@@ -107,5 +107,9 @@ const hasEndpoint = computed(
 
     <!-- Keyboard shortcuts help modal -->
     <ShortcutsHelpModal />
+
+    <!-- First-run onboarding wizard (self-gating; desktop/server agent mode
+         only — renders nothing in plain web mode or while probes resolve). -->
+    <OnboardingWizard />
   </div>
 </template>

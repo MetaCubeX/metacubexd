@@ -691,6 +691,10 @@ const ProviderProxyNodes = defineComponent({
 
 <template>
   <div class="flex h-full min-h-0 flex-col gap-3">
+    <!-- First-run nudge: shown only when the agent is present and no base
+         profile exists yet (self-gating; nothing in web mode). -->
+    <OnboardingEmptyState context="proxies" />
+
     <!-- Header with Tabs and Actions -->
     <div
       class="animate-fade-slide-in flex shrink-0 flex-wrap items-center gap-3"

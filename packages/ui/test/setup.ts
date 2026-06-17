@@ -5,6 +5,7 @@ import { useLocalStorage, useSessionStorage } from '@vueuse/core'
 import { beforeEach, vi } from 'vitest'
 import {
   computed,
+  effectScope,
   markRaw,
   reactive,
   ref,
@@ -23,6 +24,7 @@ vi.stubGlobal('reactive', reactive)
 vi.stubGlobal('toRef', toRef)
 vi.stubGlobal('watch', watch)
 vi.stubGlobal('watchEffect', watchEffect)
+vi.stubGlobal('effectScope', effectScope)
 vi.stubGlobal('useLocalStorage', useLocalStorage)
 vi.stubGlobal('useSessionStorage', useSessionStorage)
 
@@ -97,6 +99,18 @@ vi.stubGlobal('defineNuxtPlugin', (fn: any) => fn)
 // unqualified; return the key (and named params) so assertions stay stable.
 vi.stubGlobal('useI18n', () => ({
   t: (key: string) => key,
+}))
+
+// Defensive stub for the onboarding shared-state composable. No component-mount
+// spec uses it today, but stubbing it shields any future overview/proxies/
+// profiles component spec from the "useProfileStatus is not defined" auto-import
+// failure mode. The composable's OWN unit test bypasses this via vi.resetModules
+// + dynamic import of the real module.
+vi.stubGlobal('useProfileStatus', () => ({
+  ready: ref(true),
+  hasBaseProfile: computed(() => false),
+  baseProfileCount: ref(0),
+  refresh: vi.fn(),
 }))
 
 // Reset storage before each test

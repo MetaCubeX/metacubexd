@@ -94,6 +94,12 @@ export function useKeyboardShortcuts() {
     // Skip if in input field
     if (isInputFocused.value) return
 
+    // Suppress all global shortcuts while the first-run wizard owns the screen.
+    // Its overlay is a div[role=dialog], not a native <dialog>, so this window
+    // listener still fires otherwise — a stray `r` would reload the page and a
+    // `g`+key would navigate behind the overlay. The wizard handles Escape.
+    if (shortcutsStore.isOnboardingOpen) return
+
     const key = event.key.toLowerCase()
 
     // Handle Escape

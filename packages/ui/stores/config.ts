@@ -95,6 +95,12 @@ export const useConfigStore = defineStore('config', () => {
   // Default start page
   const defaultPage = useLocalStorage('defaultPage', 'overview')
 
+  // First-run onboarding (desktop/server agent mode only). Set true once the
+  // user completes OR skips the welcome wizard so it never reappears. The
+  // persistent empty-state banners deliberately ignore this flag — they keep
+  // nudging until a base profile actually exists.
+  const onboardingDismissed = useLocalStorage('onboardingDismissed', false)
+
   // Connections table settings
   const connectionsTableSize = useLocalStorage<TAILWINDCSS_SIZE>(
     'connectionsTableSize',
@@ -299,6 +305,7 @@ export const useConfigStore = defineStore('config', () => {
     favNightTheme.value = 'sunset'
     curTheme.value = 'sunset'
     defaultPage.value = 'overview'
+    onboardingDismissed.value = false
     enableDataUsageTracking.value = true
     backgroundImageType.value = 'none'
     backgroundImageUrl.value = ''
@@ -342,6 +349,8 @@ export const useConfigStore = defineStore('config', () => {
     useMobileBottomNav,
     // Default page
     defaultPage,
+    // First-run onboarding
+    onboardingDismissed,
     // Connections
     connectionsTableSize,
     connectionsTableColumnVisibility,

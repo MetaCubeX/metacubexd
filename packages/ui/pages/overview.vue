@@ -381,13 +381,9 @@ watch(
 
 <template>
   <div class="flex h-full flex-col gap-4 overflow-x-hidden overflow-y-auto p-2">
-    <!-- Kernel control + logs (capability-gated: render nothing without an agent) -->
-    <KernelControlPanel />
-    <KernelVersionPanel />
-    <SystemProxyControlPanel />
-    <WebdavBackupPanel />
-    <RuntimeConfigPanel />
-    <KernelLogView />
+    <!-- First-run nudge: shown only when the agent is present and no base
+         profile exists yet (self-gating; nothing in web mode). -->
+    <OnboardingEmptyState context="overview" />
 
     <!-- Stats Grid -->
     <div class="grid min-w-0 grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">

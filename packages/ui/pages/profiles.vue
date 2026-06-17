@@ -3,7 +3,6 @@
 import type { ProfileMeta } from '~/types/control'
 import {
   IconCopy,
-  IconDownload,
   IconPencil,
   IconPlayerPlay,
   IconPlus,
@@ -37,7 +36,6 @@ const {
   createScript,
   duplicate,
   remove,
-  importUrl,
   save,
   saveMerge,
   saveScript,
@@ -51,8 +49,6 @@ const {
 const newName = ref('')
 const newMergeName = ref('')
 const newScriptName = ref('')
-const importUrlValue = ref('')
-const importName = ref('')
 
 const editingId = ref<string | null>(null)
 // Whether the open editor targets a merge overlay — drives save-vs-recompose.
@@ -146,6 +142,9 @@ const onCreate = async () => {
   try {
     await create({ name: newName.value.trim() })
     newName.value = ''
+    // A new base profile changes the onboarding "do we have a subscription?"
+    // signal consumed by the wizard gate + empty-state banners.
+    await useProfileStatus().refresh()
   } finally {
     busy.value = false
   }
@@ -193,19 +192,11 @@ const onToggleScript = async (id: string, event: Event) => {
   }
 }
 
-const onImport = async () => {
-  if (!importUrlValue.value.trim()) return
-  busy.value = true
-  try {
-    await importUrl(
-      importUrlValue.value.trim(),
-      importName.value.trim() || undefined,
-    )
-    importUrlValue.value = ''
-    importName.value = ''
-  } finally {
-    busy.value = false
-  }
+// The prominent import hero (ProfileImportHero) owns the actual import; it runs
+// its own useProfiles + refreshes the shared profile-status singleton. Refresh
+// THIS page's per-instance list too so the base-profile grid below updates.
+const onHeroImported = async () => {
+  await refresh()
 }
 
 const onDuplicate = async (p: ProfileMeta) => {
@@ -222,6 +213,8 @@ const onRemove = async (id: string) => {
   try {
     await remove(id)
     if (editingId.value === id) closeEditor()
+    // Deleting the LAST base profile must re-surface the onboarding banners/wizard.
+    await useProfileStatus().refresh()
   } finally {
     busy.value = false
   }
@@ -259,50 +252,8 @@ const onCopyShareUrl = async () => {
     </div>
 
     <template v-else>
-      <!-- Create + import row -->
-      <div class="flex flex-wrap gap-4">
-        <div class="flex items-end gap-2">
-          <label class="flex flex-col gap-1 text-sm">
-            <span class="text-base-content/60">{{ t('profilesName') }}</span>
-            <input
-              v-model="newName"
-              class="input-bordered input input-sm"
-              :placeholder="t('profilesNew')"
-            />
-          </label>
-          <Button
-            class="btn-sm btn-primary"
-            :icon="IconPlus"
-            :loading="busy"
-            @click="onCreate"
-          >
-            {{ t('profilesNew') }}
-          </Button>
-        </div>
-
-        <div class="flex items-end gap-2">
-          <label class="flex flex-col gap-1 text-sm">
-            <span class="text-base-content/60">{{ t('profilesUrl') }}</span>
-            <input
-              v-model="importUrlValue"
-              class="input-bordered input input-sm"
-              placeholder="https://..."
-            />
-          </label>
-          <label class="flex flex-col gap-1 text-sm">
-            <span class="text-base-content/60">{{ t('profilesName') }}</span>
-            <input v-model="importName" class="input-bordered input input-sm" />
-          </label>
-          <Button
-            class="btn-sm btn-secondary"
-            :icon="IconDownload"
-            :loading="busy"
-            @click="onImport"
-          >
-            {{ t('profilesImport') }}
-          </Button>
-        </div>
-      </div>
+      <!-- Prominent subscription import (shared with the first-run wizard) -->
+      <ProfileImportHero @imported="onHeroImported" />
 
       <!-- Profile list -->
       <div v-if="loading" class="loading mx-auto loading-spinner" />
@@ -365,164 +316,202 @@ const onCopyShareUrl = async () => {
         </div>
       </div>
 
-      <!-- Merge overlays: composed onto the active base when enabled. -->
-      <section class="flex flex-col gap-3">
-        <div class="flex flex-wrap items-end justify-between gap-2">
-          <div>
-            <h2 class="font-semibold text-base-content">
-              {{ t('profilesMerges') }}
-            </h2>
-            <p class="max-w-prose text-sm text-base-content/60">
-              {{ t('profilesMergesHelp') }}
-            </p>
-          </div>
+      <!-- Advanced: blank profiles, merge overlays, script transforms.
+           Demoted into a collapsed disclosure so the import hero stays the
+           primary action on a fresh install. -->
+      <details
+        class="rounded-xl border border-base-content/10 bg-base-200/40 p-3"
+      >
+        <summary
+          class="cursor-pointer text-sm font-semibold text-base-content/70"
+        >
+          {{ t('profilesAdvanced') }}
+        </summary>
+        <div class="mt-4 flex flex-col gap-6">
+          <!-- New blank (local) profile -->
           <div class="flex items-end gap-2">
             <label class="flex flex-col gap-1 text-sm">
               <span class="text-base-content/60">{{ t('profilesName') }}</span>
               <input
-                v-model="newMergeName"
+                v-model="newName"
                 class="input-bordered input input-sm"
-                :placeholder="t('profilesNewMerge')"
+                :placeholder="t('profilesNew')"
               />
             </label>
             <Button
               class="btn-sm btn-primary"
               :icon="IconPlus"
               :loading="busy"
-              @click="onCreateMerge"
+              @click="onCreate"
             >
-              {{ t('profilesNewMerge') }}
+              {{ t('profilesNew') }}
             </Button>
           </div>
-        </div>
 
-        <div
-          v-if="mergeProfiles.length"
-          class="grid grid-cols-1 gap-3 md:grid-cols-2"
-        >
-          <div
-            v-for="m in mergeProfiles"
-            :key="m.id"
-            class="rounded-xl border border-base-content/10 bg-base-200 p-4"
-          >
-            <div class="flex items-center justify-between gap-2">
-              <span class="font-semibold">{{ m.name }}</span>
-              <label class="flex items-center gap-2 text-sm">
-                <span class="text-base-content/60">{{
-                  t('profilesMergeEnabled')
-                }}</span>
-                <input
-                  type="checkbox"
-                  class="toggle toggle-primary toggle-sm"
-                  :checked="m.enabled !== false"
-                  :disabled="busy"
-                  :aria-label="t('profilesMergeEnabled')"
-                  @change="onToggleMerge(m.id, $event)"
-                />
-              </label>
+          <!-- Merge overlays: composed onto the active base when enabled. -->
+          <section class="flex flex-col gap-3">
+            <div class="flex flex-wrap items-end justify-between gap-2">
+              <div>
+                <h2 class="font-semibold text-base-content">
+                  {{ t('profilesMerges') }}
+                </h2>
+                <p class="max-w-prose text-sm text-base-content/60">
+                  {{ t('profilesMergesHelp') }}
+                </p>
+              </div>
+              <div class="flex items-end gap-2">
+                <label class="flex flex-col gap-1 text-sm">
+                  <span class="text-base-content/60">{{
+                    t('profilesName')
+                  }}</span>
+                  <input
+                    v-model="newMergeName"
+                    class="input-bordered input input-sm"
+                    :placeholder="t('profilesNewMerge')"
+                  />
+                </label>
+                <Button
+                  class="btn-sm btn-primary"
+                  :icon="IconPlus"
+                  :loading="busy"
+                  @click="onCreateMerge"
+                >
+                  {{ t('profilesNewMerge') }}
+                </Button>
+              </div>
             </div>
 
-            <div class="mt-3 flex flex-wrap gap-2">
-              <Button
-                class="btn-xs"
-                :icon="IconPencil"
-                @click="openEditor(m.id, 'merge')"
-              >
-                {{ t('profilesEdit') }}
-              </Button>
-              <Button
-                class="btn-xs btn-error"
-                :icon="IconTrash"
-                :loading="busy"
-                @click="onRemove(m.id)"
-              >
-                {{ t('profilesDelete') }}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Script transforms: JS run after merges during composition. -->
-      <section class="flex flex-col gap-3">
-        <div class="flex flex-wrap items-end justify-between gap-2">
-          <div>
-            <h2 class="font-semibold text-base-content">
-              {{ t('profilesScripts') }}
-            </h2>
-            <p class="max-w-prose text-sm text-base-content/60">
-              {{ t('profilesScriptsHelp') }}
-            </p>
-            <p class="mt-1 max-w-prose text-sm text-warning">
-              {{ t('profilesScriptsSafety') }}
-            </p>
-          </div>
-          <div class="flex items-end gap-2">
-            <label class="flex flex-col gap-1 text-sm">
-              <span class="text-base-content/60">{{ t('profilesName') }}</span>
-              <input
-                v-model="newScriptName"
-                class="input-bordered input input-sm"
-                :placeholder="t('profilesNewScript')"
-              />
-            </label>
-            <Button
-              class="btn-sm btn-primary"
-              :icon="IconPlus"
-              :loading="busy"
-              @click="onCreateScript"
+            <div
+              v-if="mergeProfiles.length"
+              class="grid grid-cols-1 gap-3 md:grid-cols-2"
             >
-              {{ t('profilesNewScript') }}
-            </Button>
-          </div>
-        </div>
+              <div
+                v-for="m in mergeProfiles"
+                :key="m.id"
+                class="rounded-xl border border-base-content/10 bg-base-200 p-4"
+              >
+                <div class="flex items-center justify-between gap-2">
+                  <span class="font-semibold">{{ m.name }}</span>
+                  <label class="flex items-center gap-2 text-sm">
+                    <span class="text-base-content/60">{{
+                      t('profilesMergeEnabled')
+                    }}</span>
+                    <input
+                      type="checkbox"
+                      class="toggle toggle-primary toggle-sm"
+                      :checked="m.enabled !== false"
+                      :disabled="busy"
+                      :aria-label="t('profilesMergeEnabled')"
+                      @change="onToggleMerge(m.id, $event)"
+                    />
+                  </label>
+                </div>
 
-        <div
-          v-if="scriptProfiles.length"
-          class="grid grid-cols-1 gap-3 md:grid-cols-2"
-        >
-          <div
-            v-for="s in scriptProfiles"
-            :key="s.id"
-            class="rounded-xl border border-base-content/10 bg-base-200 p-4"
-          >
-            <div class="flex items-center justify-between gap-2">
-              <span class="font-semibold">{{ s.name }}</span>
-              <label class="flex items-center gap-2 text-sm">
-                <span class="text-base-content/60">{{
-                  t('profilesScriptEnabled')
-                }}</span>
-                <input
-                  type="checkbox"
-                  class="toggle toggle-primary toggle-sm"
-                  :checked="s.enabled !== false"
-                  :disabled="busy"
-                  :aria-label="t('profilesScriptEnabled')"
-                  @change="onToggleScript(s.id, $event)"
-                />
-              </label>
+                <div class="mt-3 flex flex-wrap gap-2">
+                  <Button
+                    class="btn-xs"
+                    :icon="IconPencil"
+                    @click="openEditor(m.id, 'merge')"
+                  >
+                    {{ t('profilesEdit') }}
+                  </Button>
+                  <Button
+                    class="btn-xs btn-error"
+                    :icon="IconTrash"
+                    :loading="busy"
+                    @click="onRemove(m.id)"
+                  >
+                    {{ t('profilesDelete') }}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Script transforms: JS run after merges during composition. -->
+          <section class="flex flex-col gap-3">
+            <div class="flex flex-wrap items-end justify-between gap-2">
+              <div>
+                <h2 class="font-semibold text-base-content">
+                  {{ t('profilesScripts') }}
+                </h2>
+                <p class="max-w-prose text-sm text-base-content/60">
+                  {{ t('profilesScriptsHelp') }}
+                </p>
+                <p class="mt-1 max-w-prose text-sm text-warning">
+                  {{ t('profilesScriptsSafety') }}
+                </p>
+              </div>
+              <div class="flex items-end gap-2">
+                <label class="flex flex-col gap-1 text-sm">
+                  <span class="text-base-content/60">{{
+                    t('profilesName')
+                  }}</span>
+                  <input
+                    v-model="newScriptName"
+                    class="input-bordered input input-sm"
+                    :placeholder="t('profilesNewScript')"
+                  />
+                </label>
+                <Button
+                  class="btn-sm btn-primary"
+                  :icon="IconPlus"
+                  :loading="busy"
+                  @click="onCreateScript"
+                >
+                  {{ t('profilesNewScript') }}
+                </Button>
+              </div>
             </div>
 
-            <div class="mt-3 flex flex-wrap gap-2">
-              <Button
-                class="btn-xs"
-                :icon="IconPencil"
-                @click="openEditor(s.id, 'script')"
+            <div
+              v-if="scriptProfiles.length"
+              class="grid grid-cols-1 gap-3 md:grid-cols-2"
+            >
+              <div
+                v-for="s in scriptProfiles"
+                :key="s.id"
+                class="rounded-xl border border-base-content/10 bg-base-200 p-4"
               >
-                {{ t('profilesEdit') }}
-              </Button>
-              <Button
-                class="btn-xs btn-error"
-                :icon="IconTrash"
-                :loading="busy"
-                @click="onRemove(s.id)"
-              >
-                {{ t('profilesDelete') }}
-              </Button>
+                <div class="flex items-center justify-between gap-2">
+                  <span class="font-semibold">{{ s.name }}</span>
+                  <label class="flex items-center gap-2 text-sm">
+                    <span class="text-base-content/60">{{
+                      t('profilesScriptEnabled')
+                    }}</span>
+                    <input
+                      type="checkbox"
+                      class="toggle toggle-primary toggle-sm"
+                      :checked="s.enabled !== false"
+                      :disabled="busy"
+                      :aria-label="t('profilesScriptEnabled')"
+                      @change="onToggleScript(s.id, $event)"
+                    />
+                  </label>
+                </div>
+
+                <div class="mt-3 flex flex-wrap gap-2">
+                  <Button
+                    class="btn-xs"
+                    :icon="IconPencil"
+                    @click="openEditor(s.id, 'script')"
+                  >
+                    {{ t('profilesEdit') }}
+                  </Button>
+                  <Button
+                    class="btn-xs btn-error"
+                    :icon="IconTrash"
+                    :loading="busy"
+                    @click="onRemove(s.id)"
+                  >
+                    {{ t('profilesDelete') }}
+                  </Button>
+                </div>
+              </div>
             </div>
-          </div>
+          </section>
         </div>
-      </section>
+      </details>
 
       <!-- Editor -->
       <div
