@@ -107,20 +107,56 @@ async function serveStatic(
   res.end('Not Found')
 }
 
+// Loopback dev-server origins (any port) the dev-CORS shim will reflect. Used
+// ONLY when allowDevCors is on, which the main process enables exclusively for
+// the unpackaged `dev:desktop` HMR flow — never in a packaged build.
+const LOOPBACK_ORIGIN =
+  /^https?:\/\/(?:localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/
+
 /**
  * Bind the agent's h3 control router AND the static dashboard onto one Node http
  * server on 127.0.0.1:<port>. Requests under /api/control go to the agent; all
  * other GETs serve the renderer. Loopback-only by design (spec §4: environ
  * binding + per-launch token guard the surface).
+ *
+ * `allowDevCors` (default off) opts into a dev-only CORS shim: when the renderer
+ * is served by the Nuxt dev server (HMR) it lives on a DIFFERENT loopback origin
+ * than this control API, so the UI's fetch()/EventSource would be cross-origin.
+ * With the flag on we reflect CORS headers for loopback Origins (and answer the
+ * preflight). The main process turns this on ONLY for the unpackaged HMR flow.
  */
 export function startControlServer(
   router: App,
   port: number,
   rendererDir: string,
+  allowDevCors = false,
 ): Promise<ControlServer> {
   const agentListener = toNodeListener(router)
   const server = createServer((req, res) => {
     const url = req.url ?? '/'
+    // Dev-only CORS for a cross-origin Nuxt dev renderer. Reflect the loopback
+    // Origin and short-circuit the preflight; no credentials (the control token
+    // rides the Authorization header / a query param, never a cookie).
+    if (allowDevCors) {
+      const origin = req.headers.origin
+      if (origin && LOOPBACK_ORIGIN.test(origin)) {
+        res.setHeader('access-control-allow-origin', origin)
+        res.setHeader('vary', 'origin')
+        res.setHeader(
+          'access-control-allow-methods',
+          'GET,POST,PUT,DELETE,PATCH,OPTIONS,HEAD',
+        )
+        res.setHeader(
+          'access-control-allow-headers',
+          'authorization,content-type',
+        )
+        if (req.method === 'OPTIONS') {
+          res.statusCode = 204
+          res.end()
+          return
+        }
+      }
+    }
     if (url.startsWith('/api/control')) {
       agentListener(req, res)
     } else if (req.method === 'GET' || req.method === 'HEAD') {

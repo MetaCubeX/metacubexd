@@ -1,5 +1,6 @@
 import type { App } from 'h3'
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { request } from 'node:http'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { createApp, eventHandler } from 'h3'
@@ -9,6 +10,39 @@ import {
   startControlServer,
   stopControlServer,
 } from '../control-server'
+
+// Raw http request so we can set the Origin header (undici's fetch treats it as
+// a forbidden header and drops it).
+function rawRequest(
+  port: number,
+  path: string,
+  opts: { method?: string; origin?: string } = {},
+): Promise<{
+  status: number
+  headers: Record<string, string | string[] | undefined>
+  body: string
+}> {
+  return new Promise((resolve, reject) => {
+    const req = request(
+      {
+        host: '127.0.0.1',
+        port,
+        path,
+        method: opts.method ?? 'GET',
+        headers: opts.origin ? { origin: opts.origin } : {},
+      },
+      (res) => {
+        let body = ''
+        res.on('data', (c) => (body += c))
+        res.on('end', () =>
+          resolve({ status: res.statusCode ?? 0, headers: res.headers, body }),
+        )
+      },
+    )
+    req.on('error', reject)
+    req.end()
+  })
+}
 
 describe('buildContentSecurityPolicy', () => {
   const csp = buildContentSecurityPolicy()
@@ -85,5 +119,51 @@ describe('startControlServer security headers', () => {
     server = await startControlServer(router, 0, dir)
     const res = await fetch(`http://127.0.0.1:${server.port}/api/control/ping`)
     expect(await res.json()).toEqual({ ok: true })
+  })
+
+  describe('dev CORS shim (allowDevCors)', () => {
+    it('is OFF by default: no CORS header even for a loopback Origin', async () => {
+      server = await startControlServer(router, 0, dir)
+      const res = await rawRequest(server.port, '/api/control/ping', {
+        origin: 'http://localhost:3000',
+      })
+      expect(res.status).toBe(200)
+      expect(res.headers['access-control-allow-origin']).toBeUndefined()
+    })
+
+    it('reflects a loopback Origin when enabled and still routes the request', async () => {
+      server = await startControlServer(router, 0, dir, true)
+      const res = await rawRequest(server.port, '/api/control/ping', {
+        origin: 'http://localhost:3000',
+      })
+      expect(res.status).toBe(200)
+      expect(res.headers['access-control-allow-origin']).toBe(
+        'http://localhost:3000',
+      )
+      expect(JSON.parse(res.body)).toEqual({ ok: true })
+    })
+
+    it('answers the preflight OPTIONS with 204 + allowed headers', async () => {
+      server = await startControlServer(router, 0, dir, true)
+      const res = await rawRequest(server.port, '/api/control/ping', {
+        method: 'OPTIONS',
+        origin: 'http://127.0.0.1:5173',
+      })
+      expect(res.status).toBe(204)
+      expect(res.headers['access-control-allow-origin']).toBe(
+        'http://127.0.0.1:5173',
+      )
+      expect(res.headers['access-control-allow-headers']).toContain(
+        'authorization',
+      )
+    })
+
+    it('does NOT reflect a non-loopback Origin even when enabled', async () => {
+      server = await startControlServer(router, 0, dir, true)
+      const res = await rawRequest(server.port, '/api/control/ping', {
+        origin: 'https://evil.example.com',
+      })
+      expect(res.headers['access-control-allow-origin']).toBeUndefined()
+    })
   })
 })

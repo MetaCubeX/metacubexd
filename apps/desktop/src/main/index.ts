@@ -521,6 +521,17 @@ async function boot(): Promise<void> {
   })
   profileScheduler.start()
 
+  // Dev HMR: when running unpackaged AND the `dev:desktop` launcher points us at
+  // the live Nuxt dev server, load THAT (full HMR) instead of the static copy
+  // the control server serves. The renderer then reaches /api/control + the
+  // kernel cross-origin, so flip on the control server's dev-only CORS shim.
+  // `MCXD_RENDERER_DEV_URL` is never set in packaged builds, so this is inert
+  // there and the renderer stays same-origin with the control API.
+  const rendererDevUrl =
+    !app.isPackaged && process.env.MCXD_RENDERER_DEV_URL
+      ? process.env.MCXD_RENDERER_DEV_URL
+      : null
+
   // The control server also serves the renderer (same origin as /api/control)
   // from the dir where copy:renderer / electron-builder stage the nuxt output.
   const rendererDir = join(__dirname, '..', '..', 'renderer')
@@ -528,8 +539,9 @@ async function boot(): Promise<void> {
     agent.router,
     controlPort,
     rendererDir,
+    !!rendererDevUrl,
   )
-  rendererUrl = `http://127.0.0.1:${controlPort}/`
+  rendererUrl = rendererDevUrl ?? `http://127.0.0.1:${controlPort}/`
 
   // Inject the renderer bridge env (consumed by preload/index.ts) from the
   // PRE-PICKED endpoint values rather than the started kernel state. The
