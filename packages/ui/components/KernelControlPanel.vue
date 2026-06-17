@@ -3,8 +3,16 @@
 import { IconPlayerPlay, IconPlayerStop, IconRefresh } from '@tabler/icons-vue'
 
 const { t } = useI18n()
-const { hasFeature } = useControlInfo()
+const { hasFeature, info } = useControlInfo()
 const kernelStore = useKernelStore()
+
+// The running kernel reports its own version, but that is empty until it has
+// started at least once. Fall back to the control-info kernel version (the
+// agent now seeds it with the bundled version) so a stopped/never-started
+// kernel still shows which version is installed instead of "-".
+const kernelVersion = computed(
+  () => kernelStore.state?.version || info.value?.kernel?.version || '-',
+)
 
 const busy = ref(false)
 
@@ -84,9 +92,7 @@ const run = async (fn: () => Promise<unknown>) => {
     <div class="grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
       <div class="flex flex-col">
         <span class="text-base-content/60">{{ t('kernelVersion') }}</span>
-        <span class="tabular-nums">{{
-          kernelStore.state?.version ?? '-'
-        }}</span>
+        <span class="tabular-nums">{{ kernelVersion }}</span>
       </div>
       <div class="flex flex-col">
         <span class="text-base-content/60">{{ t('kernelUptime') }}</span>

@@ -5,6 +5,7 @@ import type {
   TunController,
 } from './types'
 import { createControlRouter } from './http'
+import { MIHOMO_VERSION } from './kernel/assets'
 import { createProfileStore } from './profiles'
 import { createProfileScheduler } from './scheduler'
 import { createSupervisor } from './supervisor'
@@ -67,7 +68,11 @@ export function createAgent(opts: CreateAgentOptions) {
     kernel: {
       bundled: true,
       path: opts.binaryPath,
-      version: supervisor.getState().version,
+      // Fall back to the bundled kernel's version when the supervisor has not
+      // observed a running kernel yet (fresh launch / stopped without ever
+      // starting). Otherwise the dashboard shows "-" for the kernel version
+      // until the kernel runs once, even though the bundled version is known.
+      version: supervisor.getState().version ?? MIHOMO_VERSION,
     },
     features: [
       'profiles',
