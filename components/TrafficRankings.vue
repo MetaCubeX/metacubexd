@@ -1,20 +1,15 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
+import type { AggregatedData } from '~/composables/useDataUsage'
 import { formatBytes } from '~/utils'
-
-interface AggregatedData {
-  label: string
-  upload: number
-  download: number
-  total: number
-  count: number
-}
 
 defineProps<{
   title: string
   icon?: Component
   data: AggregatedData[]
   selectedRow: string | null
+  labelFormatter?: (label: string) => string
+  labelTitle?: (label: string) => string
 }>()
 
 const emit = defineEmits<{
@@ -49,7 +44,14 @@ const { t } = useI18n()
             :class="
               selectedRow === row.label ? 'text-primary' : 'text-base-content'
             "
-            >{{ row.label }}</span
+            :title="
+              (row.kind === 'sourceIP' && labelTitle?.(row.label)) || undefined
+            "
+            >{{
+              row.kind === 'sourceIP' && labelFormatter
+                ? labelFormatter(row.label)
+                : row.label
+            }}</span
           >
           <span
             class="shrink-0 text-xs font-black"

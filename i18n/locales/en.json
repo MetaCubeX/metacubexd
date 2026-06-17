@@ -160,6 +160,8 @@
   "flushFakeIP": "Flush Fake-IP",
   "flushDNSCache": "Flush DNS Cache",
   "tagClientSourceIPWithName": "Tag Client Source IP With Name",
+  "resolveClientHostname": "Resolve Hostnames (Reverse DNS)",
+  "resolveClientHostnameDesc": "Show device names for LAN clients and names for raw-IP destinations via reverse DNS. Requires mihomo's DNS to resolve the relevant reverse zones.",
   "tag": "Tag",
   "coreConfig": "Core Config",
   "xdConfig": "XD Config",
