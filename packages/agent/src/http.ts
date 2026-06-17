@@ -12,6 +12,7 @@ import { readFile as defaultReadFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import {
   createApp,
+  createError,
   createEventStream,
   createRouter,
   defineEventHandler,
@@ -24,6 +25,7 @@ import {
   setResponseStatus,
 } from 'h3'
 import { fetchGeoAssets } from './kernel/geo'
+import { TunPreconditionError } from './tun'
 import { createWebdavClient as defaultCreateWebdavClient } from './webdav'
 
 const BACKUP_FILENAME = 'metacubexd-backup.json'
@@ -506,10 +508,26 @@ export function createControlRouter(deps: ControlRouterDeps): App {
           enabled: boolean
           stack?: string
         }
-        if (body.enabled) {
-          await tunController.enable({ stack: body.stack ?? '' })
-        } else {
-          await tunController.disable()
+        try {
+          if (body.enabled) {
+            await tunController.enable({ stack: body.stack ?? '' })
+          } else {
+            await tunController.disable()
+          }
+        } catch (err) {
+          // A precondition failure (e.g. enabling TUN with no active profile) is
+          // user-actionable, not a server fault — return a clean, HANDLED 4xx
+          // carrying the reason instead of letting H3 log it as an [unhandled]
+          // 500. Genuine failures (elevation denied, kernel crash) keep
+          // propagating untouched so they stay loud.
+          if (err instanceof TunPreconditionError) {
+            throw createError({
+              statusCode: err.statusCode,
+              statusMessage: err.message,
+              data: { error: err.message },
+            })
+          }
+          throw err
         }
         return tunController.status()
       }),

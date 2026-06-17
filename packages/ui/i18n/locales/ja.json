@@ -196,6 +196,7 @@
   "tunDisableFailed": "TUN モードの無効化に失敗しました",
   "tunRecoverNetwork": "ネットワークを復旧",
   "tunInstallNote": "TUN を有効にすると特権ヘルパーがインストールされ、管理者の承認を求められます。未署名のビルドでは「不明な発行元」の警告が表示されます — これは正常です。",
+  "tunNeedsProfile": "TUN モードを有効にする前にサブスクリプションをインポートしてください。",
   "tunStatusLabel": "状態",
   "tunStatusActive": "TUN 有効",
   "tunStatusSidecar": "Sidecar（システムネットワークに影響なし）",
@@ -528,5 +529,14 @@
   "profilesImportClipboard": "クリップボードから貼り付け",
   "profilesImportSuccess": "サブスクリプションをインポートしました",
   "profilesImportFailed": "サブスクリプションのインポートに失敗しました",
-  "profilesAdvanced": "詳細設定"
+  "profilesAdvanced": "詳細設定",
+  "profilesRefresh": "更新",
+  "profilesRefreshed": "サブスクリプションを更新しました",
+  "profilesRefreshFailed": "サブスクリプションの更新に失敗しました",
+  "profilesUpdated": "{time}に更新",
+  "profilesActivated": "プロファイルを有効化しました",
+  "profilesActionFailed": "操作に失敗しました",
+  "profilesDeleteConfirm": "「{name}」を削除しますか？この操作は元に戻せません。",
+  "profilesDeleteActiveConfirm": "「{name}」は現在有効なプロファイルです。削除すると実行中の設定が破棄されます。続行しますか？",
+  "profilesEditing": "{name}を編集中"
 }

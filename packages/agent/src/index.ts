@@ -33,7 +33,7 @@ export type {
 } from './script'
 export { createSupervisor } from './supervisor'
 export type { CreateSupervisorOptions, SupervisorDeps } from './supervisor'
-export { buildTunConfig } from './tun'
+export { buildTunConfig, TunPreconditionError } from './tun'
 export * from './types'
 export { createWebdavClient } from './webdav'
 export type { WebdavClient, WebdavClientOptions } from './webdav'

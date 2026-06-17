@@ -196,6 +196,7 @@
   "tunDisableFailed": "Failed to disable TUN mode",
   "tunRecoverNetwork": "Recover Network",
   "tunInstallNote": "Enabling TUN installs a privileged helper and prompts for administrator authorization. An unsigned build will show an \"unknown publisher\" warning — this is expected.",
+  "tunNeedsProfile": "Import a subscription before enabling TUN mode.",
   "tunStatusLabel": "Status",
   "tunStatusActive": "TUN active",
   "tunStatusSidecar": "Sidecar (system network unaffected)",
@@ -528,5 +529,14 @@
   "profilesImportClipboard": "Paste from clipboard",
   "profilesImportSuccess": "Subscription imported",
   "profilesImportFailed": "Failed to import subscription",
-  "profilesAdvanced": "Advanced"
+  "profilesAdvanced": "Advanced",
+  "profilesRefresh": "Refresh",
+  "profilesRefreshed": "Subscription refreshed",
+  "profilesRefreshFailed": "Failed to refresh subscription",
+  "profilesUpdated": "Updated {time}",
+  "profilesActivated": "Profile activated",
+  "profilesActionFailed": "Action failed",
+  "profilesDeleteConfirm": "Delete \"{name}\"? This cannot be undone.",
+  "profilesDeleteActiveConfirm": "\"{name}\" is the active profile. Deleting it tears down the running config. Continue?",
+  "profilesEditing": "Editing {name}"
 }

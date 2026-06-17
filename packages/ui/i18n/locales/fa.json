@@ -196,6 +196,7 @@
   "tunDisableFailed": "غیرفعال‌سازی حالت TUN ناموفق بود",
   "tunRecoverNetwork": "بازیابی شبکه",
   "tunInstallNote": "فعال‌سازی TUN یک کمک‌یار با دسترسی ویژه نصب می‌کند و درخواست مجوز مدیر را نمایش می‌دهد. نسخه‌ی امضانشده هشدار «ناشر ناشناس» را نشان می‌دهد — این طبیعی است.",
+  "tunNeedsProfile": "پیش از فعال‌سازی حالت TUN یک اشتراک وارد کنید.",
   "tunStatusLabel": "وضعیت",
   "tunStatusActive": "TUN فعال",
   "tunStatusSidecar": "Sidecar (شبکه‌ی سیستم تحت تأثیر قرار نمی‌گیرد)",
@@ -528,5 +529,14 @@
   "profilesImportClipboard": "چسباندن از کلیپ‌بورد",
   "profilesImportSuccess": "اشتراک وارد شد",
   "profilesImportFailed": "ورود اشتراک ناموفق بود",
-  "profilesAdvanced": "پیشرفته"
+  "profilesAdvanced": "پیشرفته",
+  "profilesRefresh": "به‌روزرسانی",
+  "profilesRefreshed": "اشتراک به‌روزرسانی شد",
+  "profilesRefreshFailed": "به‌روزرسانی اشتراک ناموفق بود",
+  "profilesUpdated": "به‌روزرسانی {time}",
+  "profilesActivated": "نمایه فعال شد",
+  "profilesActionFailed": "عملیات ناموفق بود",
+  "profilesDeleteConfirm": "«{name}» حذف شود؟ این عمل قابل بازگشت نیست.",
+  "profilesDeleteActiveConfirm": "«{name}» نمایه فعال است. حذف آن پیکربندی در حال اجرا را از کار می‌اندازد. ادامه می‌دهید؟",
+  "profilesEditing": "در حال ویرایش {name}"
 }

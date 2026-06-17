@@ -19,7 +19,11 @@ import {
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
-import { createAgent, createProfileScheduler } from '@metacubexd/agent'
+import {
+  createAgent,
+  createProfileScheduler,
+  TunPreconditionError,
+} from '@metacubexd/agent'
 import {
   app,
   BrowserWindow,
@@ -415,8 +419,19 @@ async function boot(): Promise<void> {
     supervisor: agent.supervisor,
     setSection: async (key, value) => {
       const activeId = await agent!.profiles.getActiveId()
-      if (!activeId) throw new Error('tun: no active profile to edit')
+      if (!activeId)
+        throw new TunPreconditionError('tun: no active profile to edit')
       await agent!.profiles.setSection(activeId, key, value)
+    },
+    // Gate enable() on an active profile BEFORE the controller tears the kernel
+    // down. injectTun (setSection above) needs an active profile to write the
+    // `tun:` block into; without it the enable used to fail mid-sequence (after
+    // stopKernel), leaving the network half torn-down + an [unhandled] 500. This
+    // rejects up front so a profile-less enable is a clean, recoverable no-op
+    // that the control router reports as a 409.
+    precheck: async () => {
+      if (!(await agent!.profiles.getActiveId()))
+        throw new TunPreconditionError('tun: no active profile to edit')
     },
     kernelOptions: (): HelperKernelStartOptions => ({
       binaryPath,

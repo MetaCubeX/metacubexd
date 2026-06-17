@@ -8,6 +8,7 @@ import { join } from 'node:path'
 import { toNodeListener } from 'h3'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createControlRouter } from './http'
+import { TunPreconditionError } from './tun'
 
 function fakeState(over: Partial<KernelState> = {}): KernelState {
   return {
@@ -649,6 +650,41 @@ describe('createControlRouter — tun', () => {
       mode: 'tun',
       stack: 'mixed',
     })
+  })
+
+  it('pOST /api/control/tun maps a TunPreconditionError to a clean handled 4xx (not an unhandled 500)', async () => {
+    const controller = makeTunController({ enabled: false, mode: 'sidecar' })
+    controller.enable = vi.fn(async () => {
+      throw new TunPreconditionError('tun: no active profile to edit')
+    })
+    const deps = { ...makeDeps(), tunController: controller }
+    srv = await mount(deps as never)
+    const res = await fetch(`${srv.base}/api/control/tun`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ enabled: true, stack: 'mixed' }),
+    })
+    // 409 Conflict (the default precondition status), carrying the reason — NOT
+    // a 500 H3 [unhandled] error.
+    expect(res.status).toBe(409)
+    expect((await res.json()) as Record<string, unknown>).toMatchObject({
+      data: { error: 'tun: no active profile to edit' },
+    })
+  })
+
+  it('pOST /api/control/tun lets a genuine enable failure propagate as a 500', async () => {
+    const controller = makeTunController({ enabled: false, mode: 'sidecar' })
+    controller.enable = vi.fn(async () => {
+      throw new Error('elevation denied')
+    })
+    const deps = { ...makeDeps(), tunController: controller }
+    srv = await mount(deps as never)
+    const res = await fetch(`${srv.base}/api/control/tun`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ enabled: true, stack: 'mixed' }),
+    })
+    expect(res.status).toBe(500)
   })
 
   it('pOST /api/control/tun {enabled:false} calls disable() then returns status()', async () => {

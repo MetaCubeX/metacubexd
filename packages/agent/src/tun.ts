@@ -24,3 +24,20 @@ export function buildTunConfig({
     ...(device !== undefined ? { device } : {}),
   }
 }
+
+/**
+ * A user-actionable precondition for a TUN transition was not met — e.g. enabling
+ * TUN with no active profile to write the `tun:` block into. This is NOT a server
+ * fault: the control router maps it to a clean, HANDLED HTTP status (default 409)
+ * carrying the reason, instead of letting H3 log an `[unhandled]` 500. The
+ * desktop TunController's `precheck` throws it so the failure surfaces BEFORE any
+ * destructive kernel teardown.
+ */
+export class TunPreconditionError extends Error {
+  readonly statusCode: number
+  constructor(message: string, statusCode = 409) {
+    super(message)
+    this.name = 'TunPreconditionError'
+    this.statusCode = statusCode
+  }
+}

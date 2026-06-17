@@ -196,6 +196,7 @@
   "tunDisableFailed": "关闭 TUN 模式失败",
   "tunRecoverNetwork": "恢复网络",
   "tunInstallNote": "开启 TUN 会安装特权 helper 并弹出管理员授权请求。未签名的构建会显示“未知发布者”警告——这是正常现象。",
+  "tunNeedsProfile": "启用 TUN 模式前请先导入订阅。",
   "tunStatusLabel": "状态",
   "tunStatusActive": "TUN 已启用",
   "tunStatusSidecar": "Sidecar（不影响系统网络）",
@@ -528,5 +529,14 @@
   "profilesImportClipboard": "从剪贴板粘贴",
   "profilesImportSuccess": "订阅已导入",
   "profilesImportFailed": "导入订阅失败",
-  "profilesAdvanced": "高级"
+  "profilesAdvanced": "高级",
+  "profilesRefresh": "刷新",
+  "profilesRefreshed": "订阅已刷新",
+  "profilesRefreshFailed": "刷新订阅失败",
+  "profilesUpdated": "更新于 {time}",
+  "profilesActivated": "配置已激活",
+  "profilesActionFailed": "操作失败",
+  "profilesDeleteConfirm": "删除「{name}」？此操作无法撤销。",
+  "profilesDeleteActiveConfirm": "「{name}」是当前激活的配置，删除它会拆除正在运行的配置。是否继续？",
+  "profilesEditing": "正在编辑 {name}"
 }

@@ -129,6 +129,52 @@ describe('createTunController', () => {
         /elevation denied/,
       )
     })
+
+    it('runs precheck BEFORE any teardown — a rejecting precheck aborts the enable without touching the kernel', async () => {
+      const deps = makeDeps()
+      const precheck = vi.fn(async () => {
+        throw new Error('no active profile')
+      })
+      const tun = createTunController({ ...deps, precheck })
+
+      await expect(tun.enable({ stack: 'gvisor' })).rejects.toThrow(
+        /no active profile/,
+      )
+      // The precondition failed before the destructive sequence ran — the
+      // sidecar is never stopped, so the user is left in a recoverable state.
+      expect(precheck).toHaveBeenCalledOnce()
+      expect(deps.stopKernel).not.toHaveBeenCalled()
+      expect(deps.injectTun).not.toHaveBeenCalled()
+      expect(deps.startPrivileged).not.toHaveBeenCalled()
+      expect(await tun.status()).toEqual({ enabled: false, mode: 'sidecar' })
+    })
+
+    it('runs precheck then the normal sequence when it passes', async () => {
+      const deps = makeDeps()
+      const precheck = vi.fn(async () => {})
+      const tun = createTunController({ ...deps, precheck })
+
+      await tun.enable({ stack: 'gvisor' })
+
+      expect(precheck).toHaveBeenCalledOnce()
+      expect(deps.order.filter((n) => n !== 'persist')).toEqual([
+        'stopKernel',
+        'injectTun',
+        'startPrivileged',
+      ])
+    })
+
+    it('skips precheck when already in TUN mode (idempotent no-op runs nothing)', async () => {
+      const deps = makeDeps()
+      const precheck = vi.fn(async () => {})
+      const tun = createTunController({ ...deps, precheck })
+
+      await tun.enable({ stack: 'gvisor' })
+      precheck.mockClear()
+      await tun.enable({ stack: 'gvisor' })
+
+      expect(precheck).not.toHaveBeenCalled()
+    })
   })
 
   describe('disable()', () => {

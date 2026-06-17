@@ -196,6 +196,7 @@
   "tunDisableFailed": "Не удалось отключить режим TUN",
   "tunRecoverNetwork": "Восстановить сеть",
   "tunInstallNote": "Включение TUN устанавливает привилегированный помощник и запрашивает права администратора. Неподписанная сборка покажет предупреждение «неизвестный издатель» — это ожидаемо.",
+  "tunNeedsProfile": "Импортируйте подписку перед включением режима TUN.",
   "tunStatusLabel": "Состояние",
   "tunStatusActive": "TUN активен",
   "tunStatusSidecar": "Sidecar (системная сеть не затронута)",
@@ -485,5 +486,14 @@
   "profilesImportClipboard": "Вставить из буфера обмена",
   "profilesImportSuccess": "Подписка импортирована",
   "profilesImportFailed": "Не удалось импортировать подписку",
-  "profilesAdvanced": "Дополнительно"
+  "profilesAdvanced": "Дополнительно",
+  "profilesRefresh": "Обновить",
+  "profilesRefreshed": "Подписка обновлена",
+  "profilesRefreshFailed": "Не удалось обновить подписку",
+  "profilesUpdated": "Обновлено {time}",
+  "profilesActivated": "Профиль активирован",
+  "profilesActionFailed": "Не удалось выполнить действие",
+  "profilesDeleteConfirm": "Удалить «{name}»? Это действие нельзя отменить.",
+  "profilesDeleteActiveConfirm": "«{name}» — это активный профиль. Его удаление остановит работающую конфигурацию. Продолжить?",
+  "profilesEditing": "Редактирование {name}"
 }

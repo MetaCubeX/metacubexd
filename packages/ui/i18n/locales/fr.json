@@ -196,6 +196,7 @@
   "tunDisableFailed": "Échec de la désactivation du mode TUN",
   "tunRecoverNetwork": "Restaurer le réseau",
   "tunInstallNote": "L'activation de TUN installe un assistant privilégié et demande une autorisation administrateur. Une version non signée affichera un avertissement « éditeur inconnu » — c'est normal.",
+  "tunNeedsProfile": "Importez un abonnement avant d'activer le mode TUN.",
   "tunStatusLabel": "État",
   "tunStatusActive": "TUN actif",
   "tunStatusSidecar": "Sidecar (réseau système non affecté)",
@@ -528,5 +529,14 @@
   "profilesImportClipboard": "Coller depuis le presse-papiers",
   "profilesImportSuccess": "Abonnement importé",
   "profilesImportFailed": "Échec de l'importation de l'abonnement",
-  "profilesAdvanced": "Avancé"
+  "profilesAdvanced": "Avancé",
+  "profilesRefresh": "Actualiser",
+  "profilesRefreshed": "Abonnement actualisé",
+  "profilesRefreshFailed": "Échec de l'actualisation de l'abonnement",
+  "profilesUpdated": "Mis à jour {time}",
+  "profilesActivated": "Profil activé",
+  "profilesActionFailed": "Échec de l'opération",
+  "profilesDeleteConfirm": "Supprimer « {name} » ? Cette action est irréversible.",
+  "profilesDeleteActiveConfirm": "« {name} » est le profil actif. Le supprimer démantèle la configuration en cours. Continuer ?",
+  "profilesEditing": "Modification de {name}"
 }

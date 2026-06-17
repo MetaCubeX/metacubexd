@@ -30,12 +30,25 @@ vi.mock('../useTun', () => ({
   }),
 }))
 
+// useProfileStatus gates enabling TUN: with no base profile there is nothing to
+// inject the `tun:` block into. Stub it so we can drive ready/hasBaseProfile.
+const profileReady = ref(true)
+const profileHasBase = ref(true)
+vi.mock('../useProfileStatus', () => ({
+  useProfileStatus: () => ({
+    ready: profileReady,
+    hasBaseProfile: profileHasBase,
+  }),
+}))
+
 describe('composables/useTunConfig', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     available = true
     status.value = { enabled: false, mode: 'sidecar' }
     busy.value = false
+    profileReady.value = true
+    profileHasBase.value = true
   })
 
   it('desktopMode reflects the tun capability (present -> true)', () => {
@@ -128,6 +141,50 @@ describe('composables/useTunConfig', () => {
     const c = useTunConfig({ patch: vi.fn() })
     c.init()
     expect(tun.load).toHaveBeenCalledOnce()
+  })
+
+  // --- ENABLE GATE: no base profile -> nothing to inject the tun block into ---
+
+  it('desktop: needsProfile is true once the probe settles with zero base profiles', () => {
+    profileHasBase.value = false
+    const c = useTunConfig({ patch: vi.fn() })
+    expect(c.needsProfile.value).toBe(true)
+  })
+
+  it('desktop: needsProfile stays false while the profile probe is still settling (optimistic)', () => {
+    profileReady.value = false
+    profileHasBase.value = false
+    const c = useTunConfig({ patch: vi.fn() })
+    expect(c.needsProfile.value).toBe(false)
+  })
+
+  it('desktop: needsProfile is false when a base profile exists', () => {
+    profileHasBase.value = true
+    const c = useTunConfig({ patch: vi.fn() })
+    expect(c.needsProfile.value).toBe(false)
+  })
+
+  it('desktop: toggling ON is a no-op (no enable call) when no base profile exists', async () => {
+    profileHasBase.value = false
+    const c = useTunConfig({ patch: vi.fn() })
+    await c.onToggle(true, 'gVisor')
+    expect(tun.enable).not.toHaveBeenCalled()
+  })
+
+  it('desktop: toggling OFF still disables even with no base profile (recover escape)', async () => {
+    profileHasBase.value = false
+    status.value = { enabled: true, mode: 'tun', stack: 'gVisor' }
+    const c = useTunConfig({ patch: vi.fn() })
+    await c.onToggle(false)
+    expect(tun.disable).toHaveBeenCalledOnce()
+  })
+
+  it('remote: never gates on a profile (no agent profiles concept)', () => {
+    available = false
+    profileReady.value = true
+    profileHasBase.value = false
+    const c = useTunConfig({ patch: vi.fn() })
+    expect(c.needsProfile.value).toBe(false)
   })
 
   // --- REMOTE BACKEND (capability absent): keep the Clash-API PATCH path ---

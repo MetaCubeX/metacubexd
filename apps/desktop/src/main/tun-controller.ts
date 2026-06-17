@@ -47,6 +47,14 @@ export interface TunControllerOptions {
   /** Optional: persist the resolved state for cold-start restore. */
   persist?: PersistFn
   /**
+   * Optional precondition gate for enable(), run BEFORE any destructive teardown.
+   * Throwing here aborts the enable atomically — nothing is stopped or injected —
+   * so a failed precondition (e.g. no active profile to write the `tun:` block
+   * into) can never leave the kernel half torn-down. Reject with a
+   * `TunPreconditionError` so the control router surfaces it as a clean 4xx.
+   */
+  precheck?: () => Promise<void>
+  /**
    * Optional: unregister the privileged helper service (the installer's
    * uninstall). When provided, the controller exposes `uninstall()`; when
    * omitted, the capability is absent (the control router 404s `/tun/uninstall`).
@@ -78,6 +86,7 @@ export function createTunController(opts: TunControllerOptions): TunController {
     startPrivileged,
     stopKernel,
     persist,
+    precheck,
   } = opts
 
   let state: { enabled: boolean; mode: 'sidecar' | 'tun'; stack?: string } = {
@@ -100,6 +109,13 @@ export function createTunController(opts: TunControllerOptions): TunController {
     async enable({ stack }) {
       // Idempotent: already in TUN -> no redundant stop/inject/relaunch.
       if (state.mode === 'tun') return
+
+      // Validate preconditions BEFORE the destructive teardown. injectTun writes
+      // the `tun:` block into the ACTIVE profile, so without one the enable was
+      // doomed — but it used to fail mid-sequence (after stopKernel), leaving the
+      // kernel down and TUN never up. Gate it up front so a failed enable is a
+      // clean no-op the user can recover from.
+      if (precheck) await precheck()
 
       await stopKernel()
       await injectTun(buildTunConfig({ stack }))

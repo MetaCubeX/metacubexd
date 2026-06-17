@@ -1,4 +1,5 @@
 // packages/ui/composables/useTunConfig.ts
+import { useProfileStatus } from './useProfileStatus'
 import { useTun } from './useTun'
 
 // Decision logic for the config-page TUN section. There are two backends:
@@ -21,10 +22,25 @@ export interface TunConfigOptions {
 
 export function useTunConfig(options: TunConfigOptions) {
   const tun = useTun()
+  const profileStatus = useProfileStatus()
 
   // Desktop (capability present) routes through /api/control/tun; otherwise we
   // fall back to the plain remote Clash-API PATCH behaviour (no regression).
   const desktopMode = computed(() => tun.available.value)
+
+  // Enabling TUN writes the `tun:` block into the ACTIVE profile, so with no base
+  // profile imported yet the enable is doomed — it would stop the sidecar then
+  // throw mid-sequence (the no-active-profile 409). Gate the toggle on a base
+  // profile existing so a first-run user is nudged to import instead of hitting
+  // that error. Only blocks while we're SURE (probe settled + zero profiles);
+  // until `ready`, stay optimistic so a real profile never flashes as missing.
+  // Web/remote backends have no agent profiles concept here — never block them.
+  const needsProfile = computed(
+    () =>
+      desktopMode.value &&
+      profileStatus.ready.value &&
+      !profileStatus.hasBaseProfile.value,
+  )
 
   const enabled = computed(() => tun.status.value.enabled)
   const stack = computed(() => tun.status.value.stack)
@@ -52,6 +68,10 @@ export function useTunConfig(options: TunConfigOptions) {
 
   const onToggle = async (next: boolean, currentStack?: string) => {
     if (desktopMode.value) {
+      // Defense in depth: the UI also disables the toggle, but never start a
+      // doomed enable (no active profile to inject the `tun:` block into).
+      // Turning TUN OFF is always allowed (it doubles as the recover escape).
+      if (next && needsProfile.value) return
       // enable()/disable() install/elevate + privileged-restart the kernel.
       if (next) await tun.enable(currentStack)
       else await tun.disable()
@@ -87,6 +107,7 @@ export function useTunConfig(options: TunConfigOptions) {
     enabled,
     stack,
     busy,
+    needsProfile,
     showRecoverButton,
     showInstallNote,
     showUninstallButton,

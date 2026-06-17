@@ -59,6 +59,13 @@ export interface CreateTunRuntimeOptions {
    * to createTunController.
    */
   persist?: PersistFn
+  /**
+   * Optional enable() precondition gate, run BEFORE any teardown (forwarded to
+   * createTunController). boot() wires this to assert an active profile exists so
+   * enabling TUN with none rejects atomically instead of half-tearing the kernel
+   * down. Throw a `TunPreconditionError` for a clean control-router 4xx.
+   */
+  precheck?: () => Promise<void>
   /** Optional teardown error logger (forwarded to createTunTeardown). */
   logError?: (err: unknown) => void
   /**
@@ -259,6 +266,7 @@ export function createTunRuntime(opts: CreateTunRuntimeOptions): TunRuntime {
     // It runs ONE elevation inside the installer (same as install).
     uninstall: () => installer.uninstall(),
     ...(opts.persist ? { persist: opts.persist } : {}),
+    ...(opts.precheck ? { precheck: opts.precheck } : {}),
   })
 
   const teardown = createTunTeardown({

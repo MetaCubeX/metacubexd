@@ -601,7 +601,10 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                       type="checkbox"
                       class="toggle toggle-primary"
                       :disabled="
-                        tunConfig.desktopMode.value && tunConfig.busy.value
+                        tunConfig.desktopMode.value &&
+                        (tunConfig.busy.value ||
+                          (tunConfig.needsProfile.value &&
+                            !tunConfig.enabled.value))
                       "
                       @change="onTunToggle"
                     />
@@ -632,6 +635,13 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                       }}
                     </span>
                   </div>
+
+                  <p
+                    v-if="tunConfig.needsProfile.value"
+                    class="px-2 text-xs leading-relaxed text-warning"
+                  >
+                    {{ t('tunNeedsProfile') }}
+                  </p>
 
                   <p
                     v-if="tunConfig.showInstallNote.value"
