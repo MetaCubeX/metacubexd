@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.256.0](https://github.com/MetaCubeX/metacubexd/compare/v1.255.2...v1.256.0) (2026-06-18)
+
+
+### Features
+
+* **connections:** resolve client & destination hostnames via reverse DNS ([#2036](https://github.com/MetaCubeX/metacubexd/issues/2036)) ([1caa048](https://github.com/MetaCubeX/metacubexd/commit/1caa048a97635f25b02a5a2a98312382a5152ac4))
+
 ## [1.255.2](https://github.com/MetaCubeX/metacubexd/compare/v1.255.1...v1.255.2) (2026-06-15)
 
 
