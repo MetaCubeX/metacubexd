@@ -20,6 +20,7 @@ import { formatBytes, formatDuration } from '~/utils'
 
 const { t } = useI18n()
 const connectionsStore = useConnectionsStore()
+const reverseDns = useReverseDns()
 const {
   getAggregatedData,
   getSubStatsByHost,
@@ -28,6 +29,12 @@ const {
   getDevicesByHost,
   getDevicesByProxyAndHost,
 } = useDataUsage()
+
+const formatClientLabel = (ip: string) => reverseDns.label(ip)
+const clientLabelTitle = (ip: string) => {
+  const name = reverseDns.label(ip)
+  return name !== ip ? ip : ''
+}
 
 useHead({ title: computed(() => t('dataUsage')) })
 type SortField = 'label' | 'upload' | 'download' | 'total' | 'count'
@@ -473,6 +480,8 @@ const currentViewLabel = computed(
               :icon="currentViewOption?.icon"
               :data="sortedDataUsageEntries"
               :selected-row="selectedRow"
+              :label-formatter="formatClientLabel"
+              :label-title="clientLabelTitle"
               @select="handleRowClick"
             />
           </div>
@@ -498,6 +507,8 @@ const currentViewLabel = computed(
             :sub-stats="subStatsMap[selectedRow] || []"
             :proxy-stats-map="proxyStatsMap"
             :selected-sub-row="selectedSubRow"
+            :label-formatter="formatClientLabel"
+            :label-title="clientLabelTitle"
             @sub-row-click="handleSubRowClick"
           />
         </div>

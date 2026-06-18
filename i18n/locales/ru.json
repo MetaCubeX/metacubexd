@@ -160,6 +160,8 @@
   "flushFakeIP": "Очистить Fake-IP",
   "flushDNSCache": "Очистить кэш DNS",
   "tagClientSourceIPWithName": "Пометить IP клиента именем",
+  "resolveClientHostname": "Определять имена по reverse DNS",
+  "resolveClientHostnameDesc": "Показывать имена устройств LAN-клиентов и имена для destination без host через обратный DNS. Требует, чтобы DNS mihomo резолвил соответствующие обратные зоны.",
   "tag": "Метка",
   "coreConfig": "Конфиг ядра",
   "xdConfig": "Конфиг XD",

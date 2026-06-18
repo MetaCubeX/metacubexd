@@ -17,6 +17,7 @@ const { t } = useI18n()
 
 const connectionsStore = useConnectionsStore()
 const configStore = useConfigStore()
+const reverseDns = useReverseDns()
 const svgRef = ref<SVGSVGElement | null>(null)
 const containerRef = ref<HTMLDivElement | null>(null)
 
@@ -80,6 +81,7 @@ interface TopologyNodeData {
   children?: TopologyNodeData[]
   _children?: TopologyNodeData[] // Store children when collapsed
   collapsed?: boolean
+  subtitle?: string // Raw value behind a friendly name (e.g. client IP)
 }
 
 // Build hierarchy data from active connections
@@ -183,7 +185,8 @@ const hierarchyData = computed<TopologyNodeData>(() => {
       ruleEntry.clients.set(clientIP, {
         data: {
           id: `client-${group}-${proxy}-${fullRule}-${clientIP}`,
-          name: clientIP,
+          name: reverseDns.label(clientIP),
+          subtitle: clientIP,
           type: 'client',
           connections: 0,
           traffic: 0,
@@ -673,12 +676,13 @@ function renderTree() {
     .text((d) => d.data.name)
 
   // Tooltips using title
-  nodes
-    .append('title')
-    .text(
-      (d) =>
-        `${d.data.name}\n${d.data.connections} connections\n${byteSize(d.data.traffic).toString()}`,
-    )
+  nodes.append('title').text((d) => {
+    const head =
+      d.data.subtitle && d.data.subtitle !== d.data.name
+        ? `${d.data.name} (${d.data.subtitle})`
+        : d.data.name
+    return `${head}\n${d.data.connections} connections\n${byteSize(d.data.traffic).toString()}`
+  })
 }
 
 // Toggle pause state

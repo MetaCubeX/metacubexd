@@ -7,6 +7,9 @@ export interface AggregatedData {
   download: number
   total: number
   count: number
+  // What the label represents (e.g. 'sourceIP', 'host'), used by renderers for
+  // kind-specific display transforms.
+  kind?: DataUsageType
 }
 
 export const useDataUsage = () => {
@@ -47,6 +50,7 @@ export const useDataUsage = () => {
       } else {
         map.set(label, {
           label,
+          kind: type,
           upload: log.upload,
           download: log.download,
           total: log.upload + log.download,
@@ -91,6 +95,7 @@ export const useDataUsage = () => {
       } else {
         map.set(host, {
           label: host,
+          kind: 'host',
           upload: log.upload,
           download: log.download,
           total: log.upload + log.download,
@@ -137,6 +142,7 @@ export const useDataUsage = () => {
       } else {
         map.set(proxy, {
           label: proxy,
+          kind: 'outbound',
           upload: log.upload,
           download: log.download,
           total: log.upload + log.download,
@@ -168,6 +174,7 @@ export const useDataUsage = () => {
       } else {
         map.set(label, {
           label,
+          kind: 'sourceIP',
           upload: log.upload,
           download: log.download,
           total: log.upload + log.download,
@@ -202,6 +209,7 @@ export const useDataUsage = () => {
       } else {
         map.set(label, {
           label,
+          kind: 'sourceIP',
           upload: log.upload,
           download: log.download,
           total: log.upload + log.download,

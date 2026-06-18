@@ -204,6 +204,10 @@ export const useConfigStore = defineStore('config', () => {
     'ipwho.is',
   )
 
+  // Resolve IPs to hostnames via reverse DNS (PTR) through mihomo's dns/query
+  // endpoint. Off by default; needs mihomo's DNS configured for reverse zones.
+  const resolveClientHostname = useLocalStorage('resolveClientHostname', false)
+
   // Appearance: custom background. 'custom' = user-uploaded image (IndexedDB),
   // 'url' = remote image URL (e.g. a Bing daily-wallpaper endpoint).
   const backgroundImageType = useLocalStorage<'none' | 'custom' | 'url'>(
@@ -366,6 +370,8 @@ export const useConfigStore = defineStore('config', () => {
     // Connections GeoIP
     showConnectionGeoIP,
     connectionGeoIPProvider,
+    // Reverse-DNS hostname resolution
+    resolveClientHostname,
     // Appearance
     backgroundImageType,
     backgroundImageUrl,
