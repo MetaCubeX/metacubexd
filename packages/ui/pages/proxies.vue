@@ -103,8 +103,17 @@ const switchToRecommended = (proxyGroup: ProxyType) => {
 // recommended node. Does nothing unless the user enabled the toggle.
 const autoSwitchAfterTest = (proxyGroups: ProxyType[]) => {
   if (!nodeRecommendationStore.autoSwitchEnabled) return
+  // A member that is itself a group (selector/url-test/…) must never be
+  // auto-selected: picking a nested group by its transitive latency silently
+  // overrides the user's manual select-group choice (#2040 — a `select` group
+  // jumping to a sub-group on test). Matches clash-verge-rev: a test never
+  // reselects. The explicit "Switch to Recommended" button still allows it.
+  const groupNames = new Set(proxiesStore.proxies.map((group) => group.name))
   for (const proxyGroup of proxyGroups) {
-    switchToRecommended(proxyGroup)
+    const recommended = getRecommendedNode(proxyGroup)
+    if (!recommended || recommended === proxyGroup.now) continue
+    if (groupNames.has(recommended)) continue
+    proxiesStore.selectProxyInGroup(proxyGroup, recommended)
   }
 }
 
