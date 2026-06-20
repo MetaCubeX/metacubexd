@@ -6,6 +6,7 @@ import {
   IconFilter,
   IconPlayerPause,
   IconPlayerPlay,
+  IconSearch,
   IconSettings,
   IconSortAscending,
   IconSortDescending,
@@ -137,18 +138,23 @@ const groupOptions = computed(() => [
       </div>
 
       <div class="flex min-w-56 flex-1 items-center gap-1">
-        <input
-          type="search"
-          class="min-w-0 flex-1 rounded-lg border border-base-content/12 bg-base-200/60 px-3 py-2 text-[0.8125rem] text-base-content transition-all duration-200 placeholder:text-base-content/40 focus:border-primary focus:bg-base-100 focus:shadow-[0_0_0_2px_var(--color-primary)/20] focus:outline-none"
-          :placeholder="t('search')"
-          :value="globalFilter"
-          @input="
-            emit(
-              'update:globalFilter',
-              ($event.target as HTMLInputElement).value,
-            )
-          "
-        />
+        <div
+          class="flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-base-content/12 bg-base-200/60 px-3 py-2 transition-all duration-200 focus-within:border-primary focus-within:bg-base-100 focus-within:shadow-[0_0_0_2px_var(--color-primary)/20]"
+        >
+          <IconSearch :size="16" class="shrink-0 opacity-50" />
+          <input
+            type="search"
+            class="min-w-0 flex-1 bg-transparent text-[0.8125rem] text-base-content outline-none placeholder:text-base-content/40"
+            :placeholder="t('search')"
+            :value="globalFilter"
+            @input="
+              emit(
+                'update:globalFilter',
+                ($event.target as HTMLInputElement).value,
+              )
+            "
+          />
+        </div>
 
         <button
           class="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-base-content/12 bg-base-200/60 text-base-content transition-all duration-200 hover:border-base-content/20 hover:bg-base-300"
