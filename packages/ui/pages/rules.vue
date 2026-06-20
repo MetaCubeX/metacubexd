@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { RuleEntry } from '~/composables/useRuleEditor'
+import type { RULES_ORDERING_TYPE } from '~/constants'
 import type { Rule, RuleProvider } from '~/types'
 import {
+  IconArrowsSort,
   IconEdit,
   IconFilter,
   IconFilterOff,
@@ -37,6 +39,10 @@ const { t, locale } = useI18n()
 const configStore = useConfigStore()
 
 useHead({ title: computed(() => t('rules')) })
+
+const sortOptions = computed(() =>
+  RULES_ORDERING_TYPE_ORDER.map((order) => ({ value: order, label: t(order) })),
+)
 
 // TanStack Query
 const {
@@ -323,12 +329,11 @@ async function saveRuleEditor() {
 
           <Button
             v-if="activeTab === 'rules' && ruleEditor.available.value"
-            class="flex h-9 items-center gap-1.5 rounded-[0.625rem] border border-primary/20 bg-primary/10 px-3 text-sm font-medium text-primary transition-all duration-200 hover:bg-primary/20"
+            class="flex h-9 w-9 items-center justify-center rounded-[0.625rem] border border-primary/20 bg-primary/10 text-primary transition-all duration-200 hover:bg-primary/20"
             :title="t('editRules')"
             @click="openRuleEditor"
           >
             <IconEdit :size="16" />
-            <span class="hidden sm:inline">{{ t('editRules') }}</span>
           </Button>
 
           <Button
@@ -411,31 +416,27 @@ async function saveRuleEditor() {
         <!-- Clear (only when something is active) -->
         <Button
           v-if="hasActiveRuleFilters"
-          class="flex h-7 shrink-0 items-center gap-1 rounded-lg border border-base-content/8 bg-base-content/5 px-2 text-xs text-base-content/60 transition-colors duration-200 hover:border-error/30 hover:bg-error/10 hover:text-error"
+          class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-base-content/8 bg-base-content/5 text-base-content/60 transition-colors duration-200 hover:border-error/30 hover:bg-error/10 hover:text-error"
           :title="t('clearFilters')"
           @click="clearRuleFilters"
         >
           <IconX :size="14" />
-          <span>{{ t('clear') }}</span>
         </Button>
 
-        <!-- Sort dropdown (mirrors proxies <select>, sized down). Disabled
+        <!-- Sort dropdown (icon-only, mirrors the proxies toolbar). Disabled
              while searching, since match-sorter relevance owns the ordering
              then — otherwise the control would silently no-op. -->
-        <select
-          v-model="configStore.rulesOrderingType"
-          class="select-bordered select w-auto min-w-36 shrink-0 rounded-lg border-base-content/8 bg-base-200/60 select-sm text-xs disabled:opacity-50"
-          :disabled="!!globalFilter"
+        <IconMenuSelect
+          :icon="IconArrowsSort"
           :title="globalFilter ? t('sortOverriddenBySearch') : t('sortBy')"
-        >
-          <option
-            v-for="order in RULES_ORDERING_TYPE_ORDER"
-            :key="order"
-            :value="order"
-          >
-            {{ t(order) }}
-          </option>
-        </select>
+          :options="sortOptions"
+          :model-value="configStore.rulesOrderingType"
+          :disabled="!!globalFilter"
+          @update:model-value="
+            (v: string) =>
+              (configStore.rulesOrderingType = v as RULES_ORDERING_TYPE)
+          "
+        />
       </div>
 
       <!-- Rules List -->

@@ -12,6 +12,7 @@ const props = defineProps<{
   title: string
   options: { value: string; label: string }[]
   modelValue: string
+  disabled?: boolean
 }>()
 
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
@@ -56,10 +57,11 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside))
     <button
       ref="reference"
       type="button"
-      class="flex h-9 w-9 items-center justify-center rounded-[0.625rem] border border-base-content/10 bg-base-200/80 text-base-content/70 transition-all duration-200 hover:border-primary/30 hover:bg-primary/15 hover:text-primary"
+      class="flex h-9 w-9 items-center justify-center rounded-[0.625rem] border border-base-content/10 bg-base-200/80 text-base-content/70 transition-all duration-200 hover:border-primary/30 hover:bg-primary/15 hover:text-primary disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-base-content/10 disabled:hover:bg-base-200/80 disabled:hover:text-base-content/70"
       :class="{ 'border-primary/30 bg-primary/15 text-primary': isOpen }"
       :title="props.title"
       :aria-label="props.title"
+      :disabled="props.disabled"
       aria-haspopup="menu"
       :aria-expanded="isOpen"
       @click.stop="isOpen = !isOpen"
