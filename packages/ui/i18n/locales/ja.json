@@ -179,6 +179,8 @@
   "flushFakeIP": "Fake-IP をフラッシュ",
   "flushDNSCache": "DNS キャッシュをフラッシュ",
   "tagClientSourceIPWithName": "クライアント送信元 IP に名前をタグ付け",
+  "resolveClientHostname": "ホスト名を解決（逆引き DNS）",
+  "resolveClientHostnameDesc": "逆引き DNS により、LAN クライアントのデバイス名やホストのない宛先 IP の名前を表示します。mihomo の DNS が該当する逆引きゾーンを解決できる必要があります。",
   "tag": "タグ",
   "coreConfig": "コア設定",
   "xdConfig": "XD 設定",

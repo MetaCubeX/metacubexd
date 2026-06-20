@@ -12,9 +12,15 @@ const modalRef = ref<{ open: () => void; close: () => void }>()
 
 const { t } = useI18n()
 const geo = useGeoLookup()
+const configStore = useConfigStore()
+const reverseDns = useReverseDns()
 
 const destinationIP = computed(
   () => props.connection?.metadata.destinationIP || undefined,
+)
+
+const sourceIP = computed(
+  () => props.connection?.metadata.sourceIP || undefined,
 )
 
 // Resolve the destination IP's geo whenever the modal shows a new connection.
@@ -24,6 +30,12 @@ watchEffect(() => {
 })
 
 const destinationGeo = computed(() => geo.get(destinationIP.value))
+
+const sourceHostname = computed(() =>
+  configStore.resolveClientHostname
+    ? reverseDns.get(sourceIP.value)
+    : undefined,
+)
 
 defineExpose({
   open: () => modalRef.value?.open(),
@@ -130,7 +142,9 @@ defineExpose({
           <div class="min-w-0 font-mono break-all text-base-content">
             {{
               `${connection.metadata.sourceIP}:${connection.metadata.sourcePort}`
-            }}
+            }}<span v-if="sourceHostname" class="text-base-content/60">
+              ({{ sourceHostname }})</span
+            >
           </div>
           <div class="text-base-content/60">{{ t('destination') }}</div>
           <div class="min-w-0 font-mono break-all text-base-content">

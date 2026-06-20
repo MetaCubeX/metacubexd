@@ -19,6 +19,8 @@ const props = defineProps<{
   subStats: AggregatedData[]
   proxyStatsMap: Record<string, AggregatedData[]>
   selectedSubRow: string | null
+  labelFormatter?: (label: string) => string
+  labelTitle?: (label: string) => string
 }>()
 
 const emit = defineEmits<{
@@ -247,7 +249,18 @@ watch(
                       />
                       <IconChevronRight v-else :size="14" />
                     </div>
-                    <span class="truncate">{{ sub.label }}</span>
+                    <span
+                      class="truncate"
+                      :title="
+                        (sub.kind === 'sourceIP' && labelTitle?.(sub.label)) ||
+                        undefined
+                      "
+                      >{{
+                        sub.kind === 'sourceIP' && labelFormatter
+                          ? labelFormatter(sub.label)
+                          : sub.label
+                      }}</span
+                    >
                   </div>
 
                   <!-- Mobile-only compact stats -->
@@ -299,8 +312,16 @@ watch(
                   >
                     <span
                       class="mb-1 truncate border-b border-base-content/5 pb-1 font-mono text-[9px] font-bold text-secondary sm:text-[10px]"
-                      :title="item.label"
-                      >{{ item.label }}</span
+                      :title="
+                        (item.kind === 'sourceIP' &&
+                          labelTitle?.(item.label)) ||
+                        item.label
+                      "
+                      >{{
+                        item.kind === 'sourceIP' && labelFormatter
+                          ? labelFormatter(item.label)
+                          : item.label
+                      }}</span
                     >
                     <div
                       class="flex flex-col gap-1 text-[9px] font-bold sm:text-[10px]"

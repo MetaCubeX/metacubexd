@@ -824,6 +824,22 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                 />
               </div>
 
+              <div
+                class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 transition-colors hover:bg-base-content/5"
+              >
+                <div class="flex flex-col gap-0.5">
+                  <span class="text-sm">{{ t('resolveClientHostname') }}</span>
+                  <span class="text-xs opacity-50">{{
+                    t('resolveClientHostnameDesc')
+                  }}</span>
+                </div>
+                <input
+                  v-model="configStore.resolveClientHostname"
+                  type="checkbox"
+                  class="toggle toggle-primary"
+                />
+              </div>
+
               <!-- Mobile Bottom Nav Toggle - only visible on mobile -->
               <div
                 class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 transition-colors hover:bg-base-content/5 lg:hidden"

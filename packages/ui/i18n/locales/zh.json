@@ -179,6 +179,8 @@
   "flushFakeIP": "清空 Fake-IP",
   "flushDNSCache": "清空 DNS 缓存",
   "tagClientSourceIPWithName": "为客户端源 IP 地址添加名称标记",
+  "resolveClientHostname": "通过反向 DNS 解析主机名",
+  "resolveClientHostnameDesc": "通过反向 DNS 为局域网客户端和无 host 的目标 IP 显示名称。需要 mihomo 的 DNS 能解析相应的反向区域。",
   "tag": "标记",
   "coreConfig": "核心配置",
   "xdConfig": "XD 配置",

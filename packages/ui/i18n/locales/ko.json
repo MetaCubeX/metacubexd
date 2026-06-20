@@ -179,6 +179,8 @@
   "flushFakeIP": "Fake-IP 비우기",
   "flushDNSCache": "DNS 캐시 비우기",
   "tagClientSourceIPWithName": "클라이언트 소스 IP에 이름 태그 지정",
+  "resolveClientHostname": "호스트 이름 확인 (역방향 DNS)",
+  "resolveClientHostnameDesc": "역방향 DNS를 통해 LAN 클라이언트의 기기 이름과 호스트가 없는 대상 IP의 이름을 표시합니다. mihomo의 DNS가 해당 역방향 영역을 확인할 수 있어야 합니다.",
   "tag": "태그",
   "coreConfig": "코어 구성",
   "xdConfig": "XD 구성",

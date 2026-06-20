@@ -179,6 +179,8 @@
   "flushFakeIP": "پاک‌سازی Fake-IP",
   "flushDNSCache": "پاک‌سازی حافظه پنهان DNS",
   "tagClientSourceIPWithName": "برچسب‌گذاری IP مبدأ کلاینت با نام",
+  "resolveClientHostname": "تفکیک نام میزبان (DNS معکوس)",
+  "resolveClientHostnameDesc": "نمایش نام دستگاه‌های کلاینت‌های LAN و نام مقصدهای با IP خام از طریق DNS معکوس. نیازمند آن است که DNS مربوط به mihomo بتواند زون‌های معکوس مربوطه را تفکیک کند.",
   "tag": "برچسب",
   "coreConfig": "پیکربندی هسته",
   "xdConfig": "پیکربندی XD",

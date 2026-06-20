@@ -27,6 +27,7 @@ const { t, locale } = useI18n()
 useHead({ title: computed(() => t('connections')) })
 const connectionsStore = useConnectionsStore()
 const configStore = useConfigStore()
+const reverseDns = useReverseDns()
 
 // Modals
 const settingsModal = ref<{ open: () => void; close: () => void }>()
@@ -81,10 +82,23 @@ function getRule(conn: Connection) {
   return !conn.rulePayload ? conn.rule : `${conn.rule} : ${conn.rulePayload}`
 }
 
+// Group/sort key (manual tag or raw IP).
 function getSourceIP(conn: Connection) {
   const src = conn.metadata.sourceIP || t('inner')
   const tag = configStore.clientSourceIPTags.find((tag) => tag.sourceIP === src)
   return tag?.tagName || src
+}
+
+// Display label: manual tag -> resolved hostname -> raw IP.
+function getSourceLabel(conn: Connection) {
+  const src = conn.metadata.sourceIP || t('inner')
+  const tag = configStore.clientSourceIPTags.find((tag) => tag.sourceIP === src)
+  if (tag?.tagName) return tag.tagName
+  if (configStore.resolveClientHostname) {
+    const name = reverseDns.get(conn.metadata.sourceIP)
+    if (name) return name
+  }
+  return src
 }
 
 function getDestination(conn: Connection) {
@@ -93,6 +107,29 @@ function getDestination(conn: Connection) {
     conn.metadata.destinationIP ||
     conn.metadata.host
   )
+}
+
+// Bare-IP destination with no host — the only case worth a reverse lookup.
+function destinationNeedsReverseDns(conn: Connection) {
+  return !conn.metadata.host && !!conn.metadata.destinationIP
+}
+
+function getHostLabel(conn: Connection) {
+  if (destinationNeedsReverseDns(conn)) {
+    const ip = conn.metadata.destinationIP
+    const name = reverseDns.label(ip)
+    if (name && name !== ip) return `${name}:${conn.metadata.destinationPort}`
+  }
+  return getHost(conn)
+}
+
+function getDestinationLabel(conn: Connection) {
+  if (destinationNeedsReverseDns(conn)) {
+    const ip = conn.metadata.destinationIP
+    const name = reverseDns.label(ip)
+    if (name && name !== ip) return name
+  }
+  return getDestination(conn)
 }
 
 function getInboundUser(conn: Connection) {
@@ -156,7 +193,11 @@ const allColumns: ConnectionColumn[] = [
     groupable: true,
     sortable: true,
     sortId: 'Host',
-    render: (conn: Connection) => getHost(conn),
+    render: (conn: Connection) => {
+      const label = getHostLabel(conn)
+      const raw = getHost(conn)
+      return h('span', { title: label !== raw ? raw : undefined }, label)
+    },
     groupValue: (conn: Connection) => getHost(conn),
   },
   {
@@ -243,7 +284,11 @@ const allColumns: ConnectionColumn[] = [
     groupable: true,
     sortable: true,
     sortId: 'SourceIP',
-    render: (conn: Connection) => getSourceIP(conn),
+    render: (conn: Connection) => {
+      const label = getSourceLabel(conn)
+      const raw = conn.metadata.sourceIP || t('inner')
+      return h('span', { title: label !== raw ? raw : undefined }, label)
+    },
     groupValue: (conn: Connection) => getSourceIP(conn),
   },
   {
@@ -258,7 +303,11 @@ const allColumns: ConnectionColumn[] = [
     key: 'destination',
     groupable: true,
     sortable: false,
-    render: (conn: Connection) => getDestination(conn),
+    render: (conn: Connection) => {
+      const label = getDestinationLabel(conn)
+      const raw = getDestination(conn)
+      return h('span', { title: label !== raw ? raw : undefined }, label)
+    },
     groupValue: (conn: Connection) => getDestination(conn),
   },
   {
@@ -278,10 +327,11 @@ const allColumns: ConnectionColumn[] = [
     sortable: true,
     sortId: 'Host',
     render: (conn: Connection) => {
-      const primary = getHost(conn)
+      const primary = getHostLabel(conn)
       const proc = getProcess(conn)
       const aux = proc !== '-' ? proc : ''
-      return renderTwoLineCell(primary, aux)
+      const raw = getHost(conn)
+      return renderTwoLineCell(primary, aux, primary !== raw ? raw : undefined)
     },
     renderText: (conn: Connection) => {
       const proc = getProcess(conn)
@@ -332,10 +382,17 @@ const allColumns: ConnectionColumn[] = [
     sortable: true,
     sortId: 'SourceIP',
     render: (conn: Connection) => {
-      const primary = `${getSourceIP(conn)}:${conn.metadata.sourcePort}`
-      const dest = getDestination(conn)
+      const primary = `${getSourceLabel(conn)}:${conn.metadata.sourcePort}`
+      const dest = getDestinationLabel(conn)
       const aux = dest ? `→ ${dest}` : ''
-      return renderTwoLineCell(primary, aux)
+      const rawDest = getDestination(conn)
+      const rawSource = `${conn.metadata.sourceIP || t('inner')}:${conn.metadata.sourcePort}`
+      return renderTwoLineCell(
+        primary,
+        aux,
+        primary !== rawSource ? rawSource : undefined,
+        dest && dest !== rawDest ? `→ ${rawDest}` : undefined,
+      )
     },
     renderText: (conn: Connection) => {
       const dest = getDestination(conn)

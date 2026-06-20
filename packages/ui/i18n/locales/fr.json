@@ -179,6 +179,8 @@
   "flushFakeIP": "Vider Fake-IP",
   "flushDNSCache": "Vider le cache DNS",
   "tagClientSourceIPWithName": "Étiqueter l'IP source du client avec un nom",
+  "resolveClientHostname": "Résoudre les noms d'hôte (DNS inversé)",
+  "resolveClientHostnameDesc": "Afficher les noms d'appareils des clients LAN et les noms des destinations en IP brute via le DNS inversé. Nécessite que le DNS de mihomo résolve les zones inversées concernées.",
   "tag": "Étiquette",
   "coreConfig": "Configuration du noyau",
   "xdConfig": "Configuration XD",
