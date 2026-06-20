@@ -1,5 +1,35 @@
 # Changelog
 
+## [1.258.0](https://github.com/MetaCubeX/metacubexd/compare/v1.257.1...v1.258.0) (2026-06-20)
+
+
+### Features
+
+* **connections:** add a leading search icon to the filter input ([7f6f063](https://github.com/MetaCubeX/metacubexd/commit/7f6f063d7b33ffad58fd1876472b6d0f039a9d49))
+* **connections:** make toolbar controls icon-only ([51a3094](https://github.com/MetaCubeX/metacubexd/commit/51a309497184767a999cf46f58131851affff942))
+* **proxies:** add aria-pressed/aria-label to workbench controls ([2a92076](https://github.com/MetaCubeX/metacubexd/commit/2a92076f54de8998000d18c6b6ce5bc38567f060))
+* **proxies:** add gap between leading flag emoji and node name ([cdae7ad](https://github.com/MetaCubeX/metacubexd/commit/cdae7ad42678c5b1c134daedd0760cb6101d7d21))
+* **proxies:** add heuristic node-region parsing utils ([0710d59](https://github.com/MetaCubeX/metacubexd/commit/0710d59791ae723278025157414224d6abb5480a))
+* **proxies:** add PROXIES_ORDERING_TYPE_ORDER constant ([c18fc45](https://github.com/MetaCubeX/metacubexd/commit/c18fc4541bf37b5ec6ca22047871f515f13792af))
+* **proxies:** add region/search/jump workbench to master-detail ([f095883](https://github.com/MetaCubeX/metacubexd/commit/f09588368d64195a5afb325acaf75a281ef1c733))
+* **proxies:** make toolbar controls icon-only ([3a96211](https://github.com/MetaCubeX/metacubexd/commit/3a962119ce477c3b13c4c98934b79ee2a020f279))
+* **proxies:** surface quick sort control in the toolbar ([4915911](https://github.com/MetaCubeX/metacubexd/commit/4915911825ab4f2b8788df3d1adc0eb0543b6c4f))
+* **rules:** make toolbar controls icon-only ([84c0423](https://github.com/MetaCubeX/metacubexd/commit/84c04238a88e15a35ae8042c70f75771f227503a))
+
+
+### Bug Fixes
+
+* **config:** keep setting-card accent ring from being clipped left/right ([97bd14c](https://github.com/MetaCubeX/metacubexd/commit/97bd14c6c00620d0786d51c00710f2103c95ccef))
+* **config:** pad the scroll container on all sides so card rings aren't clipped ([46c96f7](https://github.com/MetaCubeX/metacubexd/commit/46c96f716a85868c15be1ff47162713d2d4993a9))
+* **connections:** gap leading flag in the rule/chains cell too ([1f85076](https://github.com/MetaCubeX/metacubexd/commit/1f85076738672717143f6f783863ae62ce00b66c))
+* **proxies:** drop non-standard UK from region ISO allowlist ([ad6b996](https://github.com/MetaCubeX/metacubexd/commit/ad6b996a3c35d9abfeac157aacefa4e9cbb9a6dd))
+* **proxies:** hide collapse/expand-all toggle in master-detail mode ([7056558](https://github.com/MetaCubeX/metacubexd/commit/70565583673d84261bc50d482f0aea5511d0da80))
+* **proxies:** keep master-detail sticky bar above selected node glow ([2a3d7c3](https://github.com/MetaCubeX/metacubexd/commit/2a3d7c3aaaf3ef06c3e79a68d460df7c9eda92a7))
+* **proxies:** make master-detail workbench bar stick flush to the top ([b01d2c6](https://github.com/MetaCubeX/metacubexd/commit/b01d2c6d178344632a3d88c17a15b8d6f0fd0c7f))
+* **proxies:** normalize leading-flag spacing in names and connection chains ([0428d51](https://github.com/MetaCubeX/metacubexd/commit/0428d51dc9f52fb08803d20bcb24f0ebb359b686))
+* **proxies:** satisfy noUncheckedIndexedAccess in region utils ([feebaaf](https://github.com/MetaCubeX/metacubexd/commit/feebaafc01d135710150205f79a55ac72184be5b))
+* **ui:** stop icon search fields from showing a doubled focus ring ([3ea1ddc](https://github.com/MetaCubeX/metacubexd/commit/3ea1ddc57ce2baeca8c0392eaa1412c46852c4a0))
+
 ## [1.257.1](https://github.com/MetaCubeX/metacubexd/compare/v1.257.0...v1.257.1) (2026-06-20)
 
 
