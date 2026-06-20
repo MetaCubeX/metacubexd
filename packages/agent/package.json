@@ -12,18 +12,6 @@
       "types": "./src/types.ts",
       "import": "./src/types.ts"
     },
-    "./http": {
-      "types": "./src/http.ts",
-      "import": "./src/http.ts"
-    },
-    "./supervisor": {
-      "types": "./src/supervisor.ts",
-      "import": "./src/supervisor.ts"
-    },
-    "./profiles": {
-      "types": "./src/profiles.ts",
-      "import": "./src/profiles.ts"
-    },
     "./kernel/assets": {
       "types": "./src/kernel/assets.ts",
       "import": "./src/kernel/assets.ts"

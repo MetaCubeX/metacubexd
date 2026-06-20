@@ -5,7 +5,7 @@ import { existsSync } from 'node:fs'
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { parse, stringify } from 'yaml'
-import { mergeConfigs } from './merge'
+import { isPlainObject, mergeConfigs } from './merge'
 
 export interface ProfileStoreOptions {
   dir: string
@@ -19,10 +19,6 @@ export interface ProfileStoreOptions {
 
 interface StateFile {
   activeId?: string
-}
-
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
 export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {

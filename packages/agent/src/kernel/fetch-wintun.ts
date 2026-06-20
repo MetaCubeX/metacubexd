@@ -1,10 +1,7 @@
 import { Buffer } from 'node:buffer'
-import { execFile } from 'node:child_process'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { promisify } from 'node:util'
-
-const execFileAsync = promisify(execFile)
+import { unzipEntry as defaultUnzipEntry } from './unzip-entry'
 
 /**
  * Pinned wintun.dll release. mihomo's Windows TUN backend needs wintun.dll next
@@ -48,26 +45,6 @@ export interface FetchWintunDeps {
    * shells out to the platform's unzip and is covered by MANUAL smoke testing.
    */
   unzipEntry?: (buf: Buffer, entry: string) => Promise<Buffer>
-}
-
-async function defaultUnzipEntry(buf: Buffer, entry: string): Promise<Buffer> {
-  const {
-    mkdtemp,
-    readFile,
-    rm,
-    writeFile: wf,
-  } = await import('node:fs/promises')
-  const { tmpdir } = await import('node:os')
-  const dir = await mkdtemp(join(tmpdir(), 'mcxd-wintun-unzip-'))
-  const zipPath = join(dir, 'wintun.zip')
-  try {
-    await wf(zipPath, buf)
-    // `unzip` ships on macOS/Linux runners; Windows runners have `tar` (bsdtar) which reads zip.
-    await execFileAsync('unzip', ['-o', zipPath, entry, '-d', dir])
-    return await readFile(join(dir, entry))
-  } finally {
-    await rm(dir, { recursive: true, force: true })
-  }
 }
 
 /**

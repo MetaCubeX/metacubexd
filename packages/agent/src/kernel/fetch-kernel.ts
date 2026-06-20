@@ -1,12 +1,9 @@
 import { Buffer } from 'node:buffer'
-import { execFile } from 'node:child_process'
 import { chmod, mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { promisify } from 'node:util'
 import { gunzipSync } from 'node:zlib'
 import { MIHOMO_VERSION, mihomoAsset } from './assets'
-
-const execFileAsync = promisify(execFile)
+import { unzipEntry as defaultUnzipEntry } from './unzip-entry'
 
 export interface FetchKernelDeps {
   fetch?: typeof fetch
@@ -17,26 +14,6 @@ export interface FetchKernelDeps {
    * shells out to the platform's unzip and is covered by MANUAL smoke testing.
    */
   unzipEntry?: (buf: Buffer, entry: string) => Promise<Buffer>
-}
-
-async function defaultUnzipEntry(buf: Buffer, entry: string): Promise<Buffer> {
-  const {
-    mkdtemp,
-    readFile,
-    rm,
-    writeFile: wf,
-  } = await import('node:fs/promises')
-  const { tmpdir } = await import('node:os')
-  const dir = await mkdtemp(join(tmpdir(), 'mcxd-unzip-'))
-  const zipPath = join(dir, 'kernel.zip')
-  try {
-    await wf(zipPath, buf)
-    // `unzip` ships on macOS/Linux runners; Windows runners have `tar` (bsdtar) which reads zip.
-    await execFileAsync('unzip', ['-o', zipPath, entry, '-d', dir])
-    return await readFile(join(dir, entry))
-  } finally {
-    await rm(dir, { recursive: true, force: true })
-  }
 }
 
 export async function fetchKernel(

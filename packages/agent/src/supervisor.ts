@@ -376,9 +376,3 @@ export function createSupervisor(
 
   return supervisor
 }
-
-export function createSupervisorDefault(
-  opts: CreateSupervisorOptions,
-): MihomoSupervisor {
-  return createSupervisor(opts)
-}
