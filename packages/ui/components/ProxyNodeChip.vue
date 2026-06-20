@@ -57,7 +57,9 @@ function handleLatencyTest() {
       class="size-2 shrink-0 rounded-full bg-current"
       :class="isSelected ? '' : dotColorClass"
     />
-    <span class="max-w-[12rem] truncate font-medium">{{ proxyName }}</span>
+    <span class="max-w-[12rem] truncate font-medium">
+      <ProxyNodeName :name="proxyName" />
+    </span>
     <span v-if="isUDP" class="text-[0.625rem] font-semibold opacity-70">U</span>
     <Latency
       :proxy-name="proxyName"

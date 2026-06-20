@@ -179,7 +179,7 @@ onBeforeUnmount(() => {
 
         <!-- Proxy name -->
         <span class="line-clamp-1 min-w-0 flex-1 text-sm font-medium break-all">
-          {{ proxyName }}
+          <ProxyNodeName :name="proxyName" />
         </span>
 
         <!-- UDP indicator -->
@@ -235,7 +235,7 @@ onBeforeUnmount(() => {
         @mouse-leave="onTooltipMouseLeave"
       >
         <div class="flex flex-col items-center gap-2">
-          <h2 class="text-lg font-bold">{{ proxyName }}</h2>
+          <h2 class="text-lg font-bold"><ProxyNodeName :name="proxyName" /></h2>
 
           <div v-if="specialTypes" class="w-full text-xs uppercase">
             ({{ specialTypes }})

@@ -20,6 +20,7 @@ import {
   REGION_OTHER,
   sortProxiesByOrderingType,
   sortRulesByOrderingType,
+  splitLeadingFlag,
   transformEndpointURL,
 } from '../index'
 
@@ -743,6 +744,23 @@ describe('utils/index', () => {
       expect(filterNodesByRegion(names, new Set([REGION_OTHER]))).toEqual([
         'sg01-reality',
       ])
+    })
+  })
+
+  describe('splitLeadingFlag', () => {
+    it('splits a leading flag emoji off the name', () => {
+      expect(splitLeadingFlag('🇭🇰HK_香港|🟡44')).toEqual({
+        flag: '🇭🇰',
+        rest: 'HK_香港|🟡44',
+      })
+    })
+
+    it('returns empty flag when none leads', () => {
+      expect(splitLeadingFlag('SG-Singapore-09')).toEqual({
+        flag: '',
+        rest: 'SG-Singapore-09',
+      })
+      expect(splitLeadingFlag('日本 05')).toEqual({ flag: '', rest: '日本 05' })
     })
   })
 })

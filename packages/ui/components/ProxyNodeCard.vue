@@ -350,7 +350,7 @@ function handleLatencyTest() {
         <h2
           class="m-0 line-clamp-1 text-start text-sm leading-tight font-semibold break-all"
         >
-          {{ proxyName }}
+          <ProxyNodeName :name="proxyName" />
         </h2>
 
         <div class="flex items-end justify-between gap-1">
@@ -412,7 +412,9 @@ function handleLatencyTest() {
         @mouse-leave="onTooltipMouseLeave"
       >
         <div class="flex flex-col items-center gap-2">
-          <h2 class="m-0 text-lg font-bold">{{ proxyName }}</h2>
+          <h2 class="m-0 text-lg font-bold">
+            <ProxyNodeName :name="proxyName" />
+          </h2>
 
           <div
             v-if="specialTypes"

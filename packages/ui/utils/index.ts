@@ -484,6 +484,23 @@ export function filterNodesByRegion(
   return names.filter((n) => selected.has(parseNodeRegion(n) ?? REGION_OTHER))
 }
 
+// Split a leading flag emoji (two regional-indicator code points) off a node
+// name so the UI can render a gap between flag and text. `flag` is '' when the
+// name doesn't start with one (then `rest` is the whole name).
+export function splitLeadingFlag(name: string): { flag: string; rest: string } {
+  const cps = [...name]
+  const first = cps[0] ?? ''
+  const second = cps[1] ?? ''
+  const isRegionalIndicator = (ch: string) => {
+    const cp = ch.codePointAt(0) ?? 0
+    return cp >= FLAG_OFFSET && cp <= FLAG_OFFSET + 25
+  }
+  if (isRegionalIndicator(first) && isRegionalIndicator(second)) {
+    return { flag: first + second, rest: cps.slice(2).join('') }
+  }
+  return { flag: '', rest: name }
+}
+
 export interface RuleFacet {
   value: string
   count: number

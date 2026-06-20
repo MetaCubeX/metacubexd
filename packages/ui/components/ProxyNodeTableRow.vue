@@ -55,7 +55,9 @@ function handleLatencyTest() {
     <span class="flex w-4 shrink-0 justify-center">
       <IconCircleCheckFilled v-if="isSelected" class="size-4 text-primary" />
     </span>
-    <span class="min-w-0 flex-1 truncate font-medium">{{ proxyName }}</span>
+    <span class="min-w-0 flex-1 truncate font-medium">
+      <ProxyNodeName :name="proxyName" />
+    </span>
     <span
       class="hidden w-16 shrink-0 truncate text-right text-xs uppercase opacity-60 sm:block"
     >
