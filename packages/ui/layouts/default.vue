@@ -17,12 +17,20 @@ onMounted(() => {
   appearance.reloadCustomBackground()
 })
 
-// Custom UI font (overrides the font-default / font-twemoji stack when set)
-const rootStyle = computed(() =>
-  appearance.rootFontFamily.value
-    ? { fontFamily: appearance.rootFontFamily.value }
-    : undefined,
-)
+// Custom UI font (overrides the font-default / font-twemoji stack when set) +
+// background reset. daisyUI sets an opaque `background` on every [data-theme]
+// element, and this root div carries data-theme — so without an explicit reset
+// the theme colour paints over the fixed -z-10 background-image layer below and
+// the custom background never shows (#2035). An inline style beats the daisyUI
+// selector, so force the root transparent whenever a background image is active.
+const rootStyle = computed(() => {
+  const style: Record<string, string> = {}
+  if (appearance.rootFontFamily.value)
+    style.fontFamily = appearance.rootFontFamily.value
+  if (appearance.hasBackground.value) style.background = 'transparent'
+
+  return Object.keys(style).length ? style : undefined
+})
 
 const rootElement = ref<HTMLElement | null>(null)
 
