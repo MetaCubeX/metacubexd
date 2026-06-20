@@ -490,15 +490,13 @@ function onRestartCore() {
           />
           <!-- Quick kernel actions (#2048): reload config / restart core -->
           <div
-            class="mb-2 hidden gap-1 lg:flex"
-            :class="
-              configStore.sidebarExpanded ? 'flex-row' : 'flex-col items-center'
-            "
+            class="mb-2 hidden flex-col gap-1 lg:flex"
+            :class="configStore.sidebarExpanded ? '' : 'items-center'"
           >
             <button
               class="press-tactile flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-[var(--sidebar-border)] bg-transparent text-xs font-medium text-base-content hover:border-[color-mix(in_oklch,var(--color-base-content)_20%,transparent)] hover:bg-[var(--sidebar-hover)] disabled:cursor-not-allowed disabled:opacity-50"
               :class="
-                configStore.sidebarExpanded ? 'flex-1' : 'aspect-square w-9'
+                configStore.sidebarExpanded ? 'w-full' : 'aspect-square w-9'
               "
               :title="t('reloadConfig')"
               :disabled="configActions.reloadingConfigFile.value"
@@ -517,7 +515,7 @@ function onRestartCore() {
             <button
               class="press-tactile flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-[var(--sidebar-border)] bg-transparent text-xs font-medium text-base-content hover:border-[color-mix(in_oklch,var(--color-warning)_40%,transparent)] hover:bg-[color-mix(in_oklch,var(--color-warning)_12%,transparent)] hover:text-warning disabled:cursor-not-allowed disabled:opacity-50"
               :class="
-                configStore.sidebarExpanded ? 'flex-1' : 'aspect-square w-9'
+                configStore.sidebarExpanded ? 'w-full' : 'aspect-square w-9'
               "
               :title="t('restartCore')"
               :disabled="configActions.restartingBackend.value"
