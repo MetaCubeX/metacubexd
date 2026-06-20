@@ -161,6 +161,7 @@ function aliveCount(group: ProxyType) {
               type="search"
               class="w-full bg-transparent text-sm outline-none placeholder:opacity-50"
               :placeholder="t('search')"
+              :aria-label="t('search')"
             />
             <span class="shrink-0 text-xs text-base-content/45">
               {{ displayNodes.length }}/{{ activeNodes.length }}
@@ -180,6 +181,7 @@ function aliveCount(group: ProxyType) {
             class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-base-content/10 bg-base-100/60 text-base-content/70 transition-all duration-200 hover:border-primary/30 hover:bg-primary/15 hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
             :disabled="!selectedVisible"
             :title="t('jumpToCurrent')"
+            :aria-label="t('jumpToCurrent')"
             @click="scrollSelectedIntoView()"
           >
             <IconTarget :size="18" />
@@ -196,6 +198,7 @@ function aliveCount(group: ProxyType) {
                 ? 'border-primary/50 bg-primary/15 text-primary'
                 : 'border-base-content/10 bg-base-100/60 text-base-content/60 hover:border-primary/30'
             "
+            :aria-pressed="selectedRegions.size === 0"
             @click="selectedRegions = new Set()"
           >
             {{ t('all') }}
@@ -211,6 +214,7 @@ function aliveCount(group: ProxyType) {
                 ? 'border-primary/50 bg-primary/15 text-primary'
                 : 'border-base-content/10 bg-base-100/60 text-base-content/60 hover:border-primary/30'
             "
+            :aria-pressed="selectedRegions.has(facet.code)"
             @click="toggleRegion(facet.code)"
           >
             <span>{{ facet.flag || t('regionOther') }}</span>
