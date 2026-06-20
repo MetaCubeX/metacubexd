@@ -361,6 +361,133 @@ export function filterProxiesByName(proxyNames: string[], keyword: string) {
   return proxyNames.filter((name) => name.toLowerCase().includes(trimmed))
 }
 
+// ponytail: heuristic region detection — a leading flag emoji or a leading
+// ISO-3166 alpha-2 code token. Names with neither fall to REGION_OTHER.
+// Upgrade path: extend ISO_CODES / add a provider-prefix map if real configs
+// use non-standard region tokens.
+export const REGION_OTHER = '__other__'
+
+const FLAG_OFFSET = 0x1F1E6 // regional indicator 'A'
+const A_CHARCODE = 0x41 // 'A'
+
+// Common proxy-region ISO codes accepted as a *leading text token* (e.g.
+// "JP-Narita…"). Gating the text path to a known set avoids matching random
+// two-letter prefixes ("AI-…"). Flag emoji are decoded unconditionally.
+const ISO_CODES = new Set([
+  'US',
+  'JP',
+  'SG',
+  'HK',
+  'TW',
+  'KR',
+  'DE',
+  'GB',
+  'UK',
+  'FR',
+  'NL',
+  'CA',
+  'AU',
+  'RU',
+  'IN',
+  'BR',
+  'IT',
+  'ES',
+  'CH',
+  'SE',
+  'TR',
+  'VN',
+  'TH',
+  'MY',
+  'PH',
+  'ID',
+  'AR',
+  'MX',
+  'ZA',
+  'AE',
+  'IE',
+  'PL',
+  'FI',
+  'NO',
+  'DK',
+  'AT',
+])
+
+// Two leading regional-indicator code points → alpha-2 code, else null.
+function leadingFlagToCode(name: string): string | null {
+  const cps = [...name]
+  const first = cps[0]?.codePointAt(0) ?? 0
+  const second = cps[1]?.codePointAt(0) ?? 0
+  const inRange = (c: number) => c >= FLAG_OFFSET && c <= FLAG_OFFSET + 25
+  if (inRange(first) && inRange(second)) {
+    return (
+      String.fromCharCode(A_CHARCODE + (first - FLAG_OFFSET)) +
+      String.fromCharCode(A_CHARCODE + (second - FLAG_OFFSET))
+    )
+  }
+  return null
+}
+
+// alpha-2 code → flag emoji (always renderable in a chip).
+export function codeToFlag(code: string): string {
+  if (code.length !== 2) return ''
+  return [...code.toUpperCase()]
+    .map((c) =>
+      String.fromCodePoint(FLAG_OFFSET + (c.charCodeAt(0) - A_CHARCODE)),
+    )
+    .join('')
+}
+
+// Region of a node name (alpha-2 code), or null when unrecognized.
+export function parseNodeRegion(name: string): string | null {
+  const flagCode = leadingFlagToCode(name)
+  if (flagCode) return flagCode
+
+  const match = name.match(/^([A-Z]{2})[_\-\s]/i)
+  if (match) {
+    const code = match[1].toUpperCase()
+    if (ISO_CODES.has(code)) return code
+  }
+  return null
+}
+
+export interface RegionFacet {
+  code: string // alpha-2 code, or REGION_OTHER
+  flag: string // emoji for real codes, '' for REGION_OTHER
+  count: number
+}
+
+// Region facets for a node-name list, sorted by count desc then code asc.
+// Unrecognized names collapse into a single REGION_OTHER facet, kept last.
+export function getRegionFacets(names: string[]): RegionFacet[] {
+  const counts = new Map<string, number>()
+  for (const name of names) {
+    const code = parseNodeRegion(name) ?? REGION_OTHER
+    counts.set(code, (counts.get(code) ?? 0) + 1)
+  }
+
+  return [...counts.entries()]
+    .map(([code, count]) => ({
+      code,
+      flag: code === REGION_OTHER ? '' : codeToFlag(code),
+      count,
+    }))
+    .sort((a, b) => {
+      if (a.code === REGION_OTHER) return 1
+      if (b.code === REGION_OTHER) return -1
+      return b.count - a.count || a.code.localeCompare(b.code)
+    })
+}
+
+// Keep only nodes whose region is in `selected` (alpha-2 codes and/or
+// REGION_OTHER). Empty set imposes no constraint (returns the input ref).
+export function filterNodesByRegion(
+  names: string[],
+  selected: Set<string>,
+): string[] {
+  if (selected.size === 0) return names
+  return names.filter((n) => selected.has(parseNodeRegion(n) ?? REGION_OTHER))
+}
+
 export interface RuleFacet {
   value: string
   count: number

@@ -2,8 +2,10 @@ import type { Rule } from '~/types'
 import { describe, expect, it, vi } from 'vitest'
 import { PROXIES_ORDERING_TYPE, RULES_ORDERING_TYPE } from '~/constants'
 import {
+  codeToFlag,
   compareVersions,
   encodeSvg,
+  filterNodesByRegion,
   filterRules,
   filterSpecialProxyType,
   formatDuration,
@@ -11,8 +13,11 @@ import {
   formatProxyType,
   fuzzyFilter,
   getLatencyClassName,
+  getRegionFacets,
   getRuleFacets,
   isSingBoxVersion,
+  parseNodeRegion,
+  REGION_OTHER,
   sortProxiesByOrderingType,
   sortRulesByOrderingType,
   transformEndpointURL,
@@ -678,6 +683,66 @@ describe('utils/index', () => {
           (r) => r.index,
         ),
       ).toEqual([1, 0])
+    })
+  })
+
+  describe('parseNodeRegion', () => {
+    it('decodes a leading flag emoji', () => {
+      expect(parseNodeRegion('🇸🇬SG_新加坡|🟡42|机房IP 4')).toBe('SG')
+      expect(parseNodeRegion('🇯🇵 日本 05')).toBe('JP')
+    })
+
+    it('reads a leading ISO alpha-2 token', () => {
+      expect(parseNodeRegion('JP-Narita-09bac5443211911c07-czyc')).toBe('JP')
+      expect(parseNodeRegion('US_美国|🟢24|原生IP')).toBe('US')
+      expect(parseNodeRegion('DE-Dreieich-09bac52a921b4b2b87-cvfw')).toBe('DE')
+      expect(parseNodeRegion('HK-Lai Tak Tsuen-h-15211021-czzm')).toBe('HK')
+    })
+
+    it('returns null for unrecognized names', () => {
+      expect(parseNodeRegion('sg01-reality')).toBeNull()
+      expect(parseNodeRegion('claw1-reality')).toBeNull()
+      expect(parseNodeRegion('日本 05')).toBeNull()
+    })
+  })
+
+  describe('codeToFlag', () => {
+    it('maps alpha-2 to flag emoji', () => {
+      expect(codeToFlag('JP')).toBe('🇯🇵')
+      expect(codeToFlag('SG')).toBe('🇸🇬')
+    })
+  })
+
+  describe('getRegionFacets', () => {
+    it('counts regions, sorts by count desc, Other last', () => {
+      const facets = getRegionFacets([
+        '🇸🇬SG a',
+        '🇸🇬SG b',
+        'JP-x',
+        'sg01-reality',
+      ])
+      expect(facets.map((f) => [f.code, f.count])).toEqual([
+        ['SG', 2],
+        ['JP', 1],
+        [REGION_OTHER, 1],
+      ])
+      expect(facets[0].flag).toBe('🇸🇬')
+      expect(facets[2].flag).toBe('')
+    })
+  })
+
+  describe('filterNodesByRegion', () => {
+    const names = ['🇸🇬SG a', 'JP-x', 'sg01-reality']
+
+    it('passes through on an empty set', () => {
+      expect(filterNodesByRegion(names, new Set())).toBe(names)
+    })
+
+    it('keeps only selected regions', () => {
+      expect(filterNodesByRegion(names, new Set(['JP']))).toEqual(['JP-x'])
+      expect(filterNodesByRegion(names, new Set([REGION_OTHER]))).toEqual([
+        'sg01-reality',
+      ])
     })
   })
 })
