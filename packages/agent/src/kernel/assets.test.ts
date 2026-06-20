@@ -43,6 +43,8 @@ describe('mihomoAsset — all 6 (os,arch) combos', () => {
     expect(a.name).toBe(`mihomo-windows-amd64-compatible-${V}.zip`)
     expect(a.ext).toBe('zip')
     expect(a.binName).toBe('mihomo.exe')
+    // the entry inside the zip is the un-versioned full name, not binName
+    expect(a.zipEntry).toBe('mihomo-windows-amd64-compatible.exe')
   })
 
   it('windows/arm64 -> windows plain .zip', () => {
@@ -50,6 +52,7 @@ describe('mihomoAsset — all 6 (os,arch) combos', () => {
     expect(a.name).toBe(`mihomo-windows-arm64-${V}.zip`)
     expect(a.ext).toBe('zip')
     expect(a.binName).toBe('mihomo.exe')
+    expect(a.zipEntry).toBe('mihomo-windows-arm64.exe')
   })
 
   it('maps node arch alias x64 -> amd64', () => {

@@ -18,6 +18,12 @@ export interface MihomoAsset {
   url: string
   ext: 'gz' | 'zip'
   binName: 'mihomo' | 'mihomo.exe'
+  /**
+   * The entry to extract from a `.zip` (Windows). It is the UN-versioned full
+   * name inside the archive (e.g. `mihomo-windows-amd64-compatible.exe`), which
+   * differs from the output `binName` (`mihomo.exe`). Undefined for `.gz`.
+   */
+  zipEntry?: string
 }
 
 export function mihomoAsset(
@@ -38,5 +44,6 @@ export function mihomoAsset(
     url: `https://github.com/MetaCubeX/mihomo/releases/download/${version}/${name}`,
     ext,
     binName: o === 'windows' ? 'mihomo.exe' : 'mihomo',
+    zipEntry: ext === 'zip' ? `mihomo-${o}-${a}${variant}.exe` : undefined,
   }
 }

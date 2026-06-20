@@ -71,7 +71,8 @@ describe('fetchKernel', () => {
         new Response(Buffer.from('zip-archive-bytes'), { status: 200 }),
     )
     const unzipEntry = vi.fn(async (_buf: Buffer, entry: string) => {
-      expect(entry).toBe('mihomo.exe')
+      // the zip entry is the un-versioned full name, not the output binName
+      expect(entry).toBe('mihomo-windows-amd64-compatible.exe')
       return exeBytes
     })
     const { binPath } = await fetchKernel('win32', 'amd64', dest, {

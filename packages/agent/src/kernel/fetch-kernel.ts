@@ -39,8 +39,8 @@ export async function fetchKernel(
     // .gz is a RAW single-file binary — gunzip, NEVER tar.
     binary = gunzipSync(downloaded)
   } else {
-    // .zip — extract the single binName entry.
-    binary = await unzipEntry(downloaded, asset.binName)
+    // .zip — extract the archive's binary entry (its name differs from binName).
+    binary = await unzipEntry(downloaded, asset.zipEntry ?? asset.binName)
   }
 
   await mkdir(destDir, { recursive: true })
