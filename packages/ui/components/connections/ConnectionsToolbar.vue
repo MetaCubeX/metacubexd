@@ -1,15 +1,19 @@
 <script setup lang="ts">
 import type { ConnectionColumn } from './ConnectionsTable.vue'
 import {
+  IconArrowsSort,
+  IconDeviceDesktop,
+  IconFilter,
   IconPlayerPause,
   IconPlayerPlay,
   IconSettings,
   IconSortAscending,
   IconSortDescending,
+  IconStack2,
   IconX,
 } from '@tabler/icons-vue'
 
-defineProps<{
+const props = defineProps<{
   tabs: Array<{
     type: 'active' | 'closed'
     name: string
@@ -45,6 +49,25 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+
+const sourceIPOptions = computed(() => [
+  { value: '', label: t('all') },
+  ...props.uniqueSourceIPs.map((ip) => ({ value: ip, label: ip })),
+])
+
+const sortOptions = computed(() =>
+  props.sortableColumns.flatMap((col) =>
+    col.sortId ? [{ value: col.sortId, label: t(col.key) }] : [],
+  ),
+)
+
+const groupOptions = computed(() => [
+  { value: '', label: t('none') },
+  ...props.groupableColumns.map((col) => ({
+    value: col.id,
+    label: t(col.key),
+  })),
+])
 </script>
 
 <template>
@@ -73,82 +96,39 @@ const { t } = useI18n()
         </button>
       </div>
 
-      <div class="flex items-center gap-2">
-        <span
-          class="hidden text-[0.8125rem] text-base-content/60 sm:inline-block"
-        >
-          {{ t('quickFilter') }}
-        </span>
-        <label class="relative inline-block h-5 w-9 cursor-pointer">
-          <input
-            type="checkbox"
-            class="peer h-0 w-0 opacity-0"
-            :checked="enableQuickFilter"
-            @change="
-              emit(
-                'update:enableQuickFilter',
-                ($event.target as HTMLInputElement).checked,
-              )
-            "
-          />
-          <span
-            class="absolute inset-0 rounded-full bg-base-content/20 transition-all duration-200 peer-checked:bg-primary before:absolute before:top-1/2 before:left-0.5 before:h-3.5 before:w-3.5 before:-translate-y-1/2 before:rounded-full before:bg-base-100 before:shadow-sm before:transition-all before:duration-200 before:content-[''] peer-checked:before:left-[calc(100%-2px)] peer-checked:before:-translate-x-full"
-          />
-        </label>
-      </div>
+      <button
+        type="button"
+        class="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-base-content/12 bg-base-200/60 text-base-content transition-all duration-200 hover:border-base-content/20 hover:bg-base-300"
+        :class="{
+          'border-primary/40! bg-primary/15! text-primary!': enableQuickFilter,
+        }"
+        :title="t('quickFilter')"
+        :aria-label="t('quickFilter')"
+        :aria-pressed="enableQuickFilter"
+        @click="emit('update:enableQuickFilter', !enableQuickFilter)"
+      >
+        <IconFilter :size="18" />
+      </button>
 
-      <div class="max-w-40 flex-1">
-        <select
-          class="w-full cursor-pointer appearance-none rounded-lg border border-base-content/12 bg-base-200/60 bg-[length:1rem] bg-[right_0.5rem_center] bg-no-repeat py-1.5 pr-7 pl-3 text-[0.8125rem] text-base-content transition-all duration-200 focus:border-primary focus:shadow-[0_0_0_2px_var(--color-primary)/20] focus:outline-none"
-          style="
-            background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E&quot;);
-          "
-          :value="sourceIPFilter"
-          @change="
-            emit(
-              'update:sourceIPFilter',
-              ($event.target as HTMLSelectElement).value,
-            )
-          "
-        >
-          <option value="">
-            {{ t('all') }}
-          </option>
-          <option v-for="ip in uniqueSourceIPs" :key="ip" :value="ip">
-            {{ ip }}
-          </option>
-        </select>
-      </div>
+      <IconMenuSelect
+        :icon="IconDeviceDesktop"
+        :title="t('sourceIP')"
+        :options="sourceIPOptions"
+        :model-value="sourceIPFilter"
+        @update:model-value="(v: string) => emit('update:sourceIPFilter', v)"
+      />
 
       <div class="flex shrink-0 items-center gap-1.5">
-        <span
-          class="hidden text-[0.8125rem] whitespace-nowrap text-base-content/60 sm:inline-block"
-        >
-          {{ t('sortBy') }}
-        </span>
-        <select
-          class="w-full max-w-32 cursor-pointer appearance-none rounded-lg border border-base-content/12 bg-base-200/60 bg-[length:1rem] bg-[right_0.5rem_center] bg-no-repeat py-1.5 pr-7 pl-3 text-[0.8125rem] text-base-content transition-all duration-200 focus:border-primary focus:shadow-[0_0_0_2px_var(--color-primary)/20] focus:outline-none"
-          style="
-            background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E&quot;);
-          "
-          :value="sortColumn"
-          @change="
-            emit(
-              'update:sortColumn',
-              ($event.target as HTMLSelectElement).value,
-            )
-          "
-        >
-          <option
-            v-for="col in sortableColumns"
-            :key="col.id"
-            :value="col.sortId"
-          >
-            {{ t(col.key) }}
-          </option>
-        </select>
+        <IconMenuSelect
+          :icon="IconArrowsSort"
+          :title="t('sortBy')"
+          :options="sortOptions"
+          :model-value="sortColumn"
+          @update:model-value="(v: string) => emit('update:sortColumn', v)"
+        />
         <button
-          class="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-base-content/12 bg-base-200/60 text-base-content transition-all duration-200 hover:border-base-content/20 hover:bg-base-300"
+          class="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-base-content/12 bg-base-200/60 text-base-content transition-all duration-200 hover:border-base-content/20 hover:bg-base-300"
+          :title="t('sortBy')"
           @click="emit('toggleSortOrder')"
         >
           <IconSortDescending v-if="sortDesc" :size="18" />
@@ -156,7 +136,7 @@ const { t } = useI18n()
         </button>
       </div>
 
-      <div class="flex min-w-0 flex-1 items-center gap-1">
+      <div class="flex min-w-56 flex-1 items-center gap-1">
         <input
           type="search"
           class="min-w-0 flex-1 rounded-lg border border-base-content/12 bg-base-200/60 px-3 py-2 text-[0.8125rem] text-base-content transition-all duration-200 placeholder:text-base-content/40 focus:border-primary focus:bg-base-100 focus:shadow-[0_0_0_2px_var(--color-primary)/20] focus:outline-none"
@@ -209,29 +189,15 @@ const { t } = useI18n()
       v-if="displayMode === 'card'"
       class="flex flex-wrap items-center gap-2"
     >
-      <div class="flex items-center gap-1.5">
-        <span class="text-[0.8125rem] text-base-content/60">
-          {{ t('groupBy') }}
-        </span>
-        <select
-          class="cursor-pointer appearance-none rounded-lg border border-base-content/12 bg-base-200/60 bg-[length:1rem] bg-[right_0.5rem_center] bg-no-repeat py-1.5 pr-7 pl-3 text-[0.8125rem] text-base-content transition-all duration-200 focus:border-primary"
-          style="
-            background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E&quot;);
-          "
-          :value="groupingColumn ?? ''"
-          @change="
-            emit(
-              'update:groupingColumn',
-              ($event.target as HTMLSelectElement).value || null,
-            )
-          "
-        >
-          <option value="">{{ t('none') }}</option>
-          <option v-for="col in groupableColumns" :key="col.id" :value="col.id">
-            {{ t(col.key) }}
-          </option>
-        </select>
-      </div>
+      <IconMenuSelect
+        :icon="IconStack2"
+        :title="t('groupBy')"
+        :options="groupOptions"
+        :model-value="groupingColumn ?? ''"
+        @update:model-value="
+          (v: string) => emit('update:groupingColumn', v || null)
+        "
+      />
     </div>
   </div>
 </template>

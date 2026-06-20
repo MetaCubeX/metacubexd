@@ -81,7 +81,7 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside))
           ref="floating"
           :style="floatingStyles"
           role="menu"
-          class="z-70 min-w-40 overflow-hidden rounded-xl border border-base-content/10 bg-base-300/98 p-1.5 shadow-[0_10px_40px_rgb(0_0_0/0.3)] backdrop-blur-[12px]"
+          class="z-70 max-h-80 min-w-40 overflow-y-auto rounded-xl border border-base-content/10 bg-base-300/98 p-1.5 shadow-[0_10px_40px_rgb(0_0_0/0.3)] backdrop-blur-[12px]"
           @keydown="onKeydown"
         >
           <button
