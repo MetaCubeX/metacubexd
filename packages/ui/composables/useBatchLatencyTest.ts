@@ -62,6 +62,10 @@ export function useBatchLatencyTest() {
         .get(`proxies/${encodeURIComponent(proxyName)}/delay`, {
           searchParams: { url, timeout },
           signal,
+          // Client timeout must exceed the backend per-node budget + network
+          // overhead, else ky aborts a slow-but-valid probe before the kernel
+          // answers and the node always reads as failed (#2041).
+          timeout: Math.max(20_000, timeout + 10_000),
         })
         .json<{ delay: number }>()
       return { proxyName, delay: result.delay }

@@ -375,6 +375,12 @@ export function proxyLatencyTestAPI(
   return request
     .get(path, {
       searchParams: { url, timeout },
+      // `timeout` is the backend's per-node budget; the client round trip adds
+      // network overhead on top. ky's default 5s timeout equals the default
+      // backend timeout, so a slow-but-valid node was aborted client-side
+      // before the kernel answered and always showed as failed (#2041). Give
+      // the client comfortable headroom over the backend budget.
+      timeout: Math.max(20_000, timeout + 10_000),
     })
     .json<{ delay: number }>()
 }
