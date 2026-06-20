@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.258.1](https://github.com/MetaCubeX/metacubexd/compare/v1.258.0...v1.258.1) (2026-06-20)
+
+
+### Bug Fixes
+
+* **connections:** drop redundant table-container background that banded on h-scroll ([9ed9a13](https://github.com/MetaCubeX/metacubexd/commit/9ed9a134a153dc85014fe6b63ec06b06f93f70c6))
+
 ## [1.258.0](https://github.com/MetaCubeX/metacubexd/compare/v1.257.1...v1.258.0) (2026-06-20)
 
 
