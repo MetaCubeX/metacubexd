@@ -1,6 +1,6 @@
 {
   "name": "@metacubexd/desktop",
-  "version": "1.256.2",
+  "version": "1.256.3",
   "private": true,
   "type": "module",
   "main": "out/main/index.js",

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.256.3](https://github.com/MetaCubeX/metacubexd/compare/v1.256.2...v1.256.3) (2026-06-20)
+
+
+### Bug Fixes
+
+* **desktop:** unblock the Windows and Linux release packaging ([f44b502](https://github.com/MetaCubeX/metacubexd/commit/f44b502540292aec557f421d8d26ad3910ee0732))
+
 ## [1.256.2](https://github.com/MetaCubeX/metacubexd/compare/v1.256.1...v1.256.2) (2026-06-20)
 
 
