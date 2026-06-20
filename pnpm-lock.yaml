@@ -48,9 +48,6 @@ catalogs:
     '@tanstack/vue-query':
       specifier: ^5.101.0
       version: 5.101.0
-    '@tanstack/vue-table':
-      specifier: ^8.21.3
-      version: 8.21.3
     '@tanstack/vue-virtual':
       specifier: ^3.13.28
       version: 3.13.28
@@ -60,27 +57,15 @@ catalogs:
     '@types/d3':
       specifier: ^7.4.3
       version: 7.4.3
-    '@types/lodash':
-      specifier: ^4.17.24
-      version: 4.17.24
-    '@types/lodash-es':
-      specifier: ^4.17.12
-      version: 4.17.12
     '@types/markdown-it':
       specifier: ^14.1.2
       version: 14.1.2
     '@types/node':
       specifier: ^25.9.2
       version: 25.9.2
-    '@types/semver':
-      specifier: ^7.7.1
-      version: 7.7.1
     '@types/sortablejs':
       specifier: ^1.15.9
       version: 1.15.9
-    '@types/uuid':
-      specifier: ^11.0.0
-      version: 11.0.0
     '@vite-pwa/nuxt':
       specifier: ^1.1.1
       version: 1.1.1
@@ -132,9 +117,6 @@ catalogs:
     husky:
       specifier: ^9.1.7
       version: 9.1.7
-    is-ip:
-      specifier: ^5.0.1
-      version: 5.0.1
     jsdom:
       specifier: ^29.1.1
       version: 29.1.1
@@ -144,12 +126,6 @@ catalogs:
     lint-staged:
       specifier: ^17.0.7
       version: 17.0.7
-    lodash:
-      specifier: ^4.18.1
-      version: 4.18.1
-    lodash-es:
-      specifier: ^4.18.1
-      version: 4.18.1
     markdown-it:
       specifier: ^14.2.0
       version: 14.2.0
@@ -183,30 +159,18 @@ catalogs:
     prettier-plugin-tailwindcss:
       specifier: ^0.8.0
       version: 0.8.0
-    semver:
-      specifier: ^7.8.3
-      version: 7.8.3
     sort-package-json:
       specifier: ^4.0.0
       version: 4.0.0
     sortablejs:
       specifier: ^1.15.7
       version: 1.15.7
-    tailwind-merge:
-      specifier: ^3.6.0
-      version: 3.6.0
-    tailwind-variants:
-      specifier: ^3.2.2
-      version: 3.2.2
     tailwindcss:
       specifier: ^4.3.0
       version: 4.3.0
     tree-kill:
       specifier: ^1.2.2
       version: 1.2.2
-    tslib:
-      specifier: ^2.8.1
-      version: 2.8.1
     tsx:
       specifier: ^4.22.4
       version: 4.22.4
@@ -216,9 +180,6 @@ catalogs:
     uqr:
       specifier: ^0.1.2
       version: 0.1.3
-    uuid:
-      specifier: ^14.0.0
-      version: 14.0.0
     vitest:
       specifier: ^4.1.8
       version: 4.1.8
@@ -234,12 +195,6 @@ catalogs:
     vue-tsc:
       specifier: ^3.3.4
       version: 3.3.4
-    vue3-marquee:
-      specifier: ^4.2.2
-      version: 4.2.2
-    zod:
-      specifier: ^4.4.3
-      version: 4.4.3
 
 overrides:
   '@isaacs/brace-expansion': '>=5.0.1'
@@ -356,12 +311,6 @@ importers:
 
   packages/ui:
     dependencies:
-      '@antfu/eslint-config':
-        specifier: 'catalog:'
-        version: 9.0.0(@typescript-eslint/rule-tester@8.57.1(eslint@10.4.1(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/typescript-estree@8.59.3(typescript@6.0.3))(@typescript-eslint/utils@8.59.3(eslint@10.4.1(jiti@2.7.0))(typescript@6.0.3))(@vue/compiler-sfc@3.5.35)(eslint-plugin-format@2.0.1(eslint@10.4.1(jiti@2.7.0)))(eslint@10.4.1(jiti@2.7.0))(ts-declaration-location@1.0.7(typescript@6.0.3))(typescript@6.0.3)(vitest@4.1.8)
-      '@commitlint/config-conventional':
-        specifier: 'catalog:'
-        version: 21.0.2
       '@floating-ui/vue':
         specifier: 'catalog:'
         version: 1.1.11(vue@3.5.35(typescript@6.0.3))
@@ -377,12 +326,6 @@ importers:
       '@pinia/nuxt':
         specifier: 'catalog:'
         version: 0.11.3(magicast@0.5.3)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.35(typescript@6.0.3)))
-      '@playwright/test':
-        specifier: 'catalog:'
-        version: 1.60.0
-      '@prettier/plugin-oxc':
-        specifier: 'catalog:'
-        version: 0.1.4
       '@tabler/icons-vue':
         specifier: 'catalog:'
         version: 3.44.0(vue@3.5.35(typescript@6.0.3))
@@ -395,36 +338,9 @@ importers:
       '@tanstack/vue-query':
         specifier: 'catalog:'
         version: 5.101.0(vue@3.5.35(typescript@6.0.3))
-      '@tanstack/vue-table':
-        specifier: 'catalog:'
-        version: 8.21.3(vue@3.5.35(typescript@6.0.3))
       '@tanstack/vue-virtual':
         specifier: 'catalog:'
         version: 3.13.28(vue@3.5.35(typescript@6.0.3))
-      '@types/byte-size':
-        specifier: 'catalog:'
-        version: 8.1.2
-      '@types/d3':
-        specifier: 'catalog:'
-        version: 7.4.3
-      '@types/lodash':
-        specifier: 'catalog:'
-        version: 4.17.24
-      '@types/lodash-es':
-        specifier: 'catalog:'
-        version: 4.17.12
-      '@types/markdown-it':
-        specifier: 'catalog:'
-        version: 14.1.2
-      '@types/node':
-        specifier: 'catalog:'
-        version: 25.9.2
-      '@types/sortablejs':
-        specifier: 'catalog:'
-        version: 1.15.9
-      '@types/uuid':
-        specifier: 'catalog:'
-        version: 11.0.0
       '@vueuse/core':
         specifier: 'catalog:'
         version: 14.3.0(vue@3.5.35(typescript@6.0.3))
@@ -437,9 +353,6 @@ importers:
       byte-size:
         specifier: 'catalog:'
         version: 9.0.1
-      commitlint:
-        specifier: 'catalog:'
-        version: 21.0.2(@types/node@25.9.2)(conventional-commits-parser@6.4.0)(typescript@6.0.3)
       d3:
         specifier: 'catalog:'
         version: 7.9.0
@@ -449,33 +362,12 @@ importers:
       dayjs:
         specifier: 'catalog:'
         version: 1.11.21
-      eslint:
-        specifier: 'catalog:'
-        version: 10.4.1(jiti@2.7.0)
-      eslint-plugin-format:
-        specifier: 'catalog:'
-        version: 2.0.1(eslint@10.4.1(jiti@2.7.0))
       highcharts:
         specifier: 'catalog:'
         version: 12.6.0
-      husky:
-        specifier: 'catalog:'
-        version: 9.1.7
-      is-ip:
-        specifier: 'catalog:'
-        version: 5.0.1
       ky:
         specifier: 'catalog:'
         version: 2.0.2
-      lint-staged:
-        specifier: 'catalog:'
-        version: 17.0.7
-      lodash:
-        specifier: 'catalog:'
-        version: 4.18.1
-      lodash-es:
-        specifier: 'catalog:'
-        version: 4.18.1
       markdown-it:
         specifier: 'catalog:'
         version: 14.2.0
@@ -497,54 +389,21 @@ importers:
       pinia:
         specifier: 'catalog:'
         version: 3.0.4(typescript@6.0.3)(vue@3.5.35(typescript@6.0.3))
-      playwright:
-        specifier: 'catalog:'
-        version: 1.60.0
-      prettier:
-        specifier: 'catalog:'
-        version: 3.8.4
-      prettier-plugin-tailwindcss:
-        specifier: 'catalog:'
-        version: 0.8.0(@prettier/plugin-oxc@0.1.4)(prettier-plugin-organize-imports@4.3.0(prettier@3.8.4)(typescript@6.0.3)(vue-tsc@3.3.4(typescript@6.0.3)))(prettier@3.8.4)
-      semver:
-        specifier: 'catalog:'
-        version: 7.8.3
-      sort-package-json:
-        specifier: 'catalog:'
-        version: 4.0.0
       sortablejs:
         specifier: 'catalog:'
         version: 1.15.7
-      tailwind-merge:
-        specifier: 'catalog:'
-        version: 3.6.0
-      tailwind-variants:
-        specifier: 'catalog:'
-        version: 3.2.2(tailwind-merge@3.6.0)(tailwindcss@4.3.0)
       tailwindcss:
         specifier: 'catalog:'
         version: 4.3.0
-      tslib:
-        specifier: 'catalog:'
-        version: 2.8.1
-      tsx:
-        specifier: 'catalog:'
-        version: 4.22.4
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
       uqr:
         specifier: 'catalog:'
         version: 0.1.3
-      uuid:
-        specifier: 'catalog:'
-        version: 14.0.0
       vite:
         specifier: npm:rolldown-vite@7.3.1
         version: rolldown-vite@7.3.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.9.2)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
-      vitest:
-        specifier: 'catalog:'
-        version: 4.1.8(@types/node@25.9.2)(@vitest/coverage-v8@4.1.8)(jsdom@29.1.1(@noble/hashes@2.2.0))(rolldown-vite@7.3.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.9.2)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       vue:
         specifier: 'catalog:'
         version: 3.5.35(typescript@6.0.3)
@@ -554,28 +413,67 @@ importers:
       vue-sonner:
         specifier: 'catalog:'
         version: 2.0.9(@nuxt/kit@4.4.8(magicast@0.5.3))(@nuxt/schema@4.4.8)(nuxt@4.4.8(@babel/plugin-syntax-jsx@7.29.7(@babel/core@7.29.7))(@babel/plugin-syntax-typescript@7.29.7(@babel/core@7.29.7))(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@parcel/watcher@2.5.6)(@rollup/plugin-babel@6.1.0(@babel/core@7.29.7)(rollup@4.61.1))(@types/node@25.9.2)(@vue/compiler-sfc@3.5.35)(cac@6.7.14)(db0@0.3.4)(esbuild@0.27.7)(eslint@10.4.1(jiti@2.7.0))(ioredis@5.11.1)(magicast@0.5.3)(meow@13.2.0)(optionator@0.9.4)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.35(typescript@6.0.3)))(rolldown-vite@7.3.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.9.2)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rolldown@1.0.3)(rollup-plugin-visualizer@7.0.1(rolldown@1.0.3)(rollup@4.61.1))(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(typescript@6.0.3)(vue-tsc@3.3.4(typescript@6.0.3))(yaml@2.9.0))
-      vue-tsc:
-        specifier: 'catalog:'
-        version: 3.3.4(typescript@6.0.3)
-      vue3-marquee:
-        specifier: 'catalog:'
-        version: 4.2.2(vue@3.5.35(typescript@6.0.3))
-      zod:
-        specifier: 'catalog:'
-        version: 4.4.3
     devDependencies:
-      '@types/semver':
+      '@antfu/eslint-config':
         specifier: 'catalog:'
-        version: 7.7.1
+        version: 9.0.0(@typescript-eslint/rule-tester@8.57.1(eslint@10.4.1(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/typescript-estree@8.59.3(typescript@6.0.3))(@typescript-eslint/utils@8.59.3(eslint@10.4.1(jiti@2.7.0))(typescript@6.0.3))(@vue/compiler-sfc@3.5.35)(eslint-plugin-format@2.0.1(eslint@10.4.1(jiti@2.7.0)))(eslint@10.4.1(jiti@2.7.0))(ts-declaration-location@1.0.7(typescript@6.0.3))(typescript@6.0.3)(vitest@4.1.8)
+      '@playwright/test':
+        specifier: 'catalog:'
+        version: 1.60.0
+      '@prettier/plugin-oxc':
+        specifier: 'catalog:'
+        version: 0.1.4
+      '@types/byte-size':
+        specifier: 'catalog:'
+        version: 8.1.2
+      '@types/d3':
+        specifier: 'catalog:'
+        version: 7.4.3
+      '@types/markdown-it':
+        specifier: 'catalog:'
+        version: 14.1.2
+      '@types/node':
+        specifier: 'catalog:'
+        version: 25.9.2
+      '@types/sortablejs':
+        specifier: 'catalog:'
+        version: 1.15.9
       '@vite-pwa/nuxt':
         specifier: 'catalog:'
         version: 1.1.1(magicast@0.5.3)(rolldown-vite@7.3.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.9.2)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(workbox-build@7.4.1)(workbox-window@7.4.1)
       '@vitest/coverage-v8':
         specifier: 'catalog:'
         version: 4.1.8(vitest@4.1.8)
+      eslint:
+        specifier: 'catalog:'
+        version: 10.4.1(jiti@2.7.0)
+      eslint-plugin-format:
+        specifier: 'catalog:'
+        version: 2.0.1(eslint@10.4.1(jiti@2.7.0))
       jsdom:
         specifier: 'catalog:'
         version: 29.1.1(@noble/hashes@2.2.0)
+      playwright:
+        specifier: 'catalog:'
+        version: 1.60.0
+      prettier:
+        specifier: 'catalog:'
+        version: 3.8.4
+      prettier-plugin-tailwindcss:
+        specifier: 'catalog:'
+        version: 0.8.0(@prettier/plugin-oxc@0.1.4)(prettier-plugin-organize-imports@4.3.0(prettier@3.8.4)(typescript@6.0.3)(vue-tsc@3.3.4(typescript@6.0.3)))(prettier@3.8.4)
+      sort-package-json:
+        specifier: 'catalog:'
+        version: 4.0.0
+      tsx:
+        specifier: 'catalog:'
+        version: 4.22.4
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.8(@types/node@25.9.2)(@vitest/coverage-v8@4.1.8)(jsdom@29.1.1(@noble/hashes@2.2.0))(rolldown-vite@7.3.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.9.2)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+      vue-tsc:
+        specifier: 'catalog:'
+        version: 3.3.4(typescript@6.0.3)
 
 packages:
   '@alloc/quick-lru@5.2.0':
@@ -5679,13 +5577,6 @@ packages:
         integrity: sha512-cQetA74EB+seWySv1TTKr828TnP0u39m6LykwDXIo84SNortpDkp30TMEjkqtYCNP9c40uT/iwl6MLiufEt0Ow==,
       }
 
-  '@tanstack/table-core@8.21.3':
-    resolution:
-      {
-        integrity: sha512-ldZXEhOBb8Is7xLs01fR3YEc3DERiz5silj8tnGkFZytt1abEvl/GhUmCE0PMLaMPTa3Jk4HbKmRlHmu+gCftg==,
-      }
-    engines: { node: '>=12' }
-
   '@tanstack/virtual-core@3.17.0':
     resolution:
       {
@@ -5703,15 +5594,6 @@ packages:
     peerDependenciesMeta:
       '@vue/composition-api':
         optional: true
-
-  '@tanstack/vue-table@8.21.3':
-    resolution:
-      {
-        integrity: sha512-rusRyd77c5tDPloPskctMyPLFEQUeBzxdQ+2Eow4F7gDPlPOB1UnnhzfpdvqZ8ZyX2rRNGmqNnQWm87OI2OQPw==,
-      }
-    engines: { node: '>=12' }
-    peerDependencies:
-      vue: '>=3.2'
 
   '@tanstack/vue-virtual@3.13.28':
     resolution:
@@ -6016,18 +5898,6 @@ packages:
         integrity: sha512-sVDA58zAw4eWAffKOaQH5/5j3XeayukzDk+ewSsnv3p4yJEZHCCzMDiZM8e0OUrRvmpGZ85jf4yDHkHsgBNr9Q==,
       }
 
-  '@types/lodash-es@4.17.12':
-    resolution:
-      {
-        integrity: sha512-0NgftHUcV4v34VhXm8QBSftKVXtbkBG3ViCjs6+eJ5a6y6Mi/jiFGPc1sC7QK+9BFhWrURE3EOggmWaSxL9OzQ==,
-      }
-
-  '@types/lodash@4.17.24':
-    resolution:
-      {
-        integrity: sha512-gIW7lQLZbue7lRSWEFql49QJJWThrTFFeIMJdp3eH4tKoxm1OvEPg02rm4wCCSHS0cL3/Fizimb35b7k8atwsQ==,
-      }
-
   '@types/markdown-it@14.1.2':
     resolution:
       {
@@ -6076,12 +5946,6 @@ packages:
         integrity: sha512-H/+L+UkTV33uf49PH5pCAUBVPNj2nDBXTN+qS1dOwyyg24l3CcicicCA7ca+HMvJBZcFgl5r8e+RR6elsb4Lyw==,
       }
 
-  '@types/semver@7.7.1':
-    resolution:
-      {
-        integrity: sha512-FmgJfu+MOcQ370SD0ev7EI8TlCAfKYU+B4m5T3yXc1CiRN94g/SZPtsCkk506aUDtlMnFZvasDwHHUcZUEaYuA==,
-      }
-
   '@types/sortablejs@1.15.9':
     resolution:
       {
@@ -6099,13 +5963,6 @@ packages:
       {
         integrity: sha512-ko/gIFJRv177XgZsZcBwnqJN5x/Gien8qNOn0D5bQU/zAzVf9Zt3BlcUiLqhV9y4ARk0GbT3tnUiPNgnTXzc/Q==,
       }
-
-  '@types/uuid@11.0.0':
-    resolution:
-      {
-        integrity: sha512-HVyk8nj2m+jcFRNazzqyVKiZezyhDKrGUA3jlEcg/nZ6Ms+qHwocba1Y/AaVaznJTAM9xpdFSh+ptbNrhOGvZA==,
-      }
-    deprecated: This is a stub types definition. uuid provides its own type definitions, so you do not need this installed.
 
   '@types/web-bluetooth@0.0.21':
     resolution:
@@ -7413,13 +7270,6 @@ packages:
       }
     engines: { node: '>=20' }
 
-  clone-regexp@3.0.0:
-    resolution:
-      {
-        integrity: sha512-ujdnoq2Kxb8s3ItNBtnYeXdm07FcU0u8ARAT1lQ2YdMwQC+cdiXX8KoqMVuglztILivceTtp4ivqGSmEmhBUJw==,
-      }
-    engines: { node: '>=12' }
-
   clone-response@1.0.3:
     resolution:
       {
@@ -7630,13 +7480,6 @@ packages:
       }
     engines: { node: '>=18' }
     hasBin: true
-
-  convert-hrtime@5.0.0:
-    resolution:
-      {
-        integrity: sha512-lOETlkIeYSJWcbbcvjRKGxVMXJR+8+OQb/mTPbA4ObPMytYIsUbuOE0Jzy60hjARYszq1id0j8KgVhC+WGZVTg==,
-      }
-    engines: { node: '>=12' }
 
   convert-source-map@2.0.0:
     resolution:
@@ -9462,13 +9305,6 @@ packages:
         integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==,
       }
 
-  function-timeout@0.1.1:
-    resolution:
-      {
-        integrity: sha512-0NVVC0TaP7dSTvn1yMiy6d6Q8gifzbvQafO46RtLG/kHJUBNd+pVRGOBoK44wNBvtSPUJRfdVvkFdD3p0xvyZg==,
-      }
-    engines: { node: '>=14.16' }
-
   function.prototype.name@1.1.8:
     resolution:
       {
@@ -10039,13 +9875,6 @@ packages:
       }
     engines: { node: '>=12.22.0' }
 
-  ip-regex@5.0.0:
-    resolution:
-      {
-        integrity: sha512-fOCG6lhoKKakwv+C6KdsOnGvgXnmgfmp0myi3bcNwj3qfwPAxRKWEuFhvEFF7ceYIz6+1jRZ+yguLFAmUNPEfw==,
-      }
-    engines: { node: ^12.20.0 || ^14.13.1 || >=16.0.0 }
-
   iron-webcrypto@1.2.1:
     resolution:
       {
@@ -10208,13 +10037,6 @@ packages:
       }
     engines: { node: '>=18' }
 
-  is-ip@5.0.1:
-    resolution:
-      {
-        integrity: sha512-FCsGHdlrOnZQcp0+XT5a+pYowf33itBalCl+7ovNXC/7o5BhIpG14M3OrpPPdBSIQJCm+0M5+9mO7S9VVTTCFw==,
-      }
-    engines: { node: '>=14.16' }
-
   is-map@2.0.3:
     resolution:
       {
@@ -10302,13 +10124,6 @@ packages:
         integrity: sha512-7zjFAPO4/gwyQAAgRRmqeEeyIICSdmCqa3tsVHMdBzaXXRiqopZL4Cyghg/XulGWrtABTpbnYYzzIRffLkP4oA==,
       }
     engines: { node: '>=0.10.0' }
-
-  is-regexp@3.1.0:
-    resolution:
-      {
-        integrity: sha512-rbku49cWloU5bSMI+zaRaXdQHXnthP6DZ/vLnfdSKyL4zUzuWnomtOEiZZOd+ioQ+avFo/qau3KPTc7Fjy1uPA==,
-      }
-    engines: { node: '>=12' }
 
   is-set@2.0.3:
     resolution:
@@ -10923,12 +10738,6 @@ packages:
         integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==,
       }
     engines: { node: '>=10' }
-
-  lodash-es@4.18.1:
-    resolution:
-      {
-        integrity: sha512-J8xewKD/Gk22OZbhpOVSwcs60zhd95ESDwezOFuA3/099925PdHJ7OFHNTGtajL3AlZkykD32HykiMo+BIBI8A==,
-      }
 
   lodash.debounce@4.0.8:
     resolution:
@@ -13868,13 +13677,6 @@ packages:
       }
     engines: { node: '>= 8.0' }
 
-  super-regex@0.2.0:
-    resolution:
-      {
-        integrity: sha512-WZzIx3rC1CvbMDloLsVw0lkZVKJWbrkJ0k1ghKFmcnPrW1+jWbgTkTEWVtD9lMdmI4jZEz40+naBxl1dCUhXXw==,
-      }
-    engines: { node: '>=14.16' }
-
   superjson@2.2.6:
     resolution:
       {
@@ -13940,25 +13742,6 @@ packages:
     hasBin: true
     peerDependencies:
       tailwindcss: 1 || 2 || 2.0.1-compat || 3
-
-  tailwind-merge@3.6.0:
-    resolution:
-      {
-        integrity: sha512-uxL7qAVQriqRQPAyK3pj66VqskWqoZ37PW94jwOTwNfq/z9oyu1V+eqrZqtR2+fCiXdYOZe/Modt8GtvqNzu+w==,
-      }
-
-  tailwind-variants@3.2.2:
-    resolution:
-      {
-        integrity: sha512-Mi4kHeMTLvKlM98XPnK+7HoBPmf4gygdFmqQPaDivc3DpYS6aIY6KiG/PgThrGvii5YZJqRsPz0aPyhoFzmZgg==,
-      }
-    engines: { node: '>=16.x', pnpm: '>=7.x' }
-    peerDependencies:
-      tailwind-merge: '>=3.0.0'
-      tailwindcss: '*'
-    peerDependenciesMeta:
-      tailwind-merge:
-        optional: true
 
   tailwindcss@3.4.19:
     resolution:
@@ -14053,13 +13836,6 @@ packages:
       {
         integrity: sha512-RVZSIV5IG10Hk3enotrhvz0T9em6cyHBLkH/YAZuKqd8hRkKhSfCGIcP2KUY0EPxndzANBmNllzWPwak+bheSw==,
       }
-
-  time-span@5.1.0:
-    resolution:
-      {
-        integrity: sha512-75voc/9G4rDIJleOo4jPvN4/YC4GRZrY8yy1uU4lwrB3XEQbWve8zXoO5No4eFrGcTAMYyoY67p8jRQdtA1HbA==,
-      }
-    engines: { node: '>=12' }
 
   tiny-async-pool@1.3.0:
     resolution:
@@ -14695,13 +14471,6 @@ packages:
         integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==,
       }
 
-  uuid@14.0.0:
-    resolution:
-      {
-        integrity: sha512-Qo+uWgilfSmAhXCMav1uYFynlQO7fMFiMVZsQqZRMIXp0O7rR7qjkj+cPvBHLgBqi960QCoo/PH2/6ZtVqKvrg==,
-      }
-    hasBin: true
-
   vary@1.1.2:
     resolution:
       {
@@ -15015,15 +14784,6 @@ packages:
     hasBin: true
     peerDependencies:
       typescript: '>=5.0.0'
-
-  vue3-marquee@4.2.2:
-    resolution:
-      {
-        integrity: sha512-FeFvGUVInKfFilXFcnl8sDRBJBZCZSNLlQDquJErB9db6W2xICRVqbRV/jtdzsEP0rftarLQhx9MeEAU0+TPuQ==,
-      }
-    engines: { node: '>=12' }
-    peerDependencies:
-      vue: ^3.2
 
   vue@3.5.35:
     resolution:
@@ -15448,12 +15208,6 @@ packages:
         integrity: sha512-zK7YHHz4ZXpW89AHXUPbQVGKI7uvkd3hzusTdotCg1UxyaVtg0zFJSTfW/Dq5f7OBBVnq6cZIaC8Ti4hb6dtCA==,
       }
     engines: { node: '>= 14' }
-
-  zod@4.4.3:
-    resolution:
-      {
-        integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==,
-      }
 
   zwitch@2.0.4:
     resolution:
@@ -18517,8 +18271,6 @@ snapshots:
 
   '@tanstack/query-core@5.101.0': {}
 
-  '@tanstack/table-core@8.21.3': {}
-
   '@tanstack/virtual-core@3.17.0': {}
 
   '@tanstack/vue-query@5.101.0(vue@3.5.35(typescript@6.0.3))':
@@ -18528,11 +18280,6 @@ snapshots:
       '@vue/devtools-api': 6.6.4
       vue: 3.5.35(typescript@6.0.3)
       vue-demi: 0.14.10(vue@3.5.35(typescript@6.0.3))
-
-  '@tanstack/vue-table@8.21.3(vue@3.5.35(typescript@6.0.3))':
-    dependencies:
-      '@tanstack/table-core': 8.21.3
-      vue: 3.5.35(typescript@6.0.3)
 
   '@tanstack/vue-virtual@3.13.28(vue@3.5.35(typescript@6.0.3))':
     dependencies:
@@ -18716,12 +18463,6 @@ snapshots:
 
   '@types/linkify-it@5.0.0': {}
 
-  '@types/lodash-es@4.17.12':
-    dependencies:
-      '@types/lodash': 4.17.24
-
-  '@types/lodash@4.17.24': {}
-
   '@types/markdown-it@14.1.2':
     dependencies:
       '@types/linkify-it': 5.0.0
@@ -18749,17 +18490,11 @@ snapshots:
     dependencies:
       '@types/node': 25.9.2
 
-  '@types/semver@7.7.1': {}
-
   '@types/sortablejs@1.15.9': {}
 
   '@types/trusted-types@2.0.7': {}
 
   '@types/unist@3.0.3': {}
-
-  '@types/uuid@11.0.0':
-    dependencies:
-      uuid: 14.0.0
 
   '@types/web-bluetooth@0.0.21': {}
 
@@ -19742,10 +19477,6 @@ snapshots:
       strip-ansi: 7.2.0
       wrap-ansi: 9.0.2
 
-  clone-regexp@3.0.0:
-    dependencies:
-      is-regexp: 3.1.0
-
   clone-response@1.0.3:
     dependencies:
       mimic-response: 1.0.1
@@ -19838,8 +19569,6 @@ snapshots:
     dependencies:
       '@simple-libs/stream-utils': 1.2.0
       meow: 13.2.0
-
-  convert-hrtime@5.0.0: {}
 
   convert-source-map@2.0.0: {}
 
@@ -21157,8 +20886,6 @@ snapshots:
 
   function-bind@1.1.2: {}
 
-  function-timeout@0.1.1: {}
-
   function.prototype.name@1.1.8:
     dependencies:
       call-bind: 1.0.9
@@ -21510,8 +21237,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  ip-regex@5.0.0: {}
-
   iron-webcrypto@1.2.1: {}
 
   is-array-buffer@3.0.5:
@@ -21603,11 +21328,6 @@ snapshots:
       global-directory: 4.0.1
       is-path-inside: 4.0.0
 
-  is-ip@5.0.1:
-    dependencies:
-      ip-regex: 5.0.0
-      super-regex: 0.2.0
-
   is-map@2.0.3: {}
 
   is-module@1.0.0: {}
@@ -21643,8 +21363,6 @@ snapshots:
       hasown: 2.0.4
 
   is-regexp@1.0.0: {}
-
-  is-regexp@3.1.0: {}
 
   is-set@2.0.3: {}
 
@@ -22007,8 +21725,6 @@ snapshots:
   locate-path@6.0.0:
     dependencies:
       p-locate: 5.0.0
-
-  lodash-es@4.18.1: {}
 
   lodash.debounce@4.0.8: {}
 
@@ -24253,12 +23969,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  super-regex@0.2.0:
-    dependencies:
-      clone-regexp: 3.0.0
-      function-timeout: 0.1.1
-      time-span: 5.1.0
-
   superjson@2.2.6:
     dependencies:
       copy-anything: 4.0.5
@@ -24302,14 +24012,6 @@ snapshots:
       tailwindcss: 3.4.19(tsx@4.22.4)(yaml@2.9.0)
     transitivePeerDependencies:
       - supports-color
-
-  tailwind-merge@3.6.0: {}
-
-  tailwind-variants@3.2.2(tailwind-merge@3.6.0)(tailwindcss@4.3.0):
-    dependencies:
-      tailwindcss: 4.3.0
-    optionalDependencies:
-      tailwind-merge: 3.6.0
 
   tailwindcss@3.4.19(tsx@4.22.4)(yaml@2.9.0):
     dependencies:
@@ -24408,10 +24110,6 @@ snapshots:
   thenify@3.3.1:
     dependencies:
       any-promise: 1.3.0
-
-  time-span@5.1.0:
-    dependencies:
-      convert-hrtime: 5.0.0
 
   tiny-async-pool@1.3.0:
     dependencies:
@@ -24762,8 +24460,6 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-  uuid@14.0.0: {}
-
   vary@1.1.2: {}
 
   vite-dev-rpc@2.0.0(rolldown-vite@7.3.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.9.2)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)):
@@ -25004,10 +24700,6 @@ snapshots:
       '@volar/typescript': 2.4.28
       '@vue/language-core': 3.3.4
       typescript: 6.0.3
-
-  vue3-marquee@4.2.2(vue@3.5.35(typescript@6.0.3)):
-    dependencies:
-      vue: 3.5.35(typescript@6.0.3)
 
   vue@3.5.35(typescript@6.0.3):
     dependencies:
@@ -25337,7 +25029,5 @@ snapshots:
       archiver-utils: 5.0.2
       compress-commons: 6.0.2
       readable-stream: 4.7.0
-
-  zod@4.4.3: {}
 
   zwitch@2.0.4: {}
