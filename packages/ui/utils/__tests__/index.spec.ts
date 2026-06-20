@@ -12,6 +12,7 @@ import {
   formatIPv6,
   formatProxyType,
   fuzzyFilter,
+  gapLeadingFlag,
   getLatencyClassName,
   getRegionFacets,
   getRuleFacets,
@@ -748,10 +749,24 @@ describe('utils/index', () => {
   })
 
   describe('splitLeadingFlag', () => {
-    it('splits a leading flag emoji off the name', () => {
+    it('splits a leading country-flag emoji off the name', () => {
       expect(splitLeadingFlag('🇭🇰HK_香港|🟡44')).toEqual({
         flag: '🇭🇰',
         rest: 'HK_香港|🟡44',
+      })
+    })
+
+    it("strips the provider's own space after the flag", () => {
+      expect(splitLeadingFlag('🇭🇰 香港 04')).toEqual({
+        flag: '🇭🇰',
+        rest: '香港 04',
+      })
+    })
+
+    it('handles a lone (non-regional-indicator) flag emoji', () => {
+      expect(splitLeadingFlag('🏳未知_未知|🟡44')).toEqual({
+        flag: '🏳',
+        rest: '未知_未知|🟡44',
       })
     })
 
@@ -761,6 +776,18 @@ describe('utils/index', () => {
         rest: 'SG-Singapore-09',
       })
       expect(splitLeadingFlag('日本 05')).toEqual({ flag: '', rest: '日本 05' })
+    })
+  })
+
+  describe('gapLeadingFlag', () => {
+    it('normalizes spacing to one space after a leading flag', () => {
+      expect(gapLeadingFlag('🇺🇸US_美国')).toBe('🇺🇸 US_美国')
+      expect(gapLeadingFlag('🇭🇰 香港 04')).toBe('🇭🇰 香港 04')
+      expect(gapLeadingFlag('🏳未知')).toBe('🏳 未知')
+    })
+
+    it('leaves flagless names untouched', () => {
+      expect(gapLeadingFlag('SG-Singapore-09')).toBe('SG-Singapore-09')
     })
   })
 })

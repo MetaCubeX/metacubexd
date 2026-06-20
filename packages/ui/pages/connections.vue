@@ -19,7 +19,7 @@ import {
   closeSingleConnectionAPI,
 } from '~/composables/useApi'
 import { CONNECTIONS_TABLE_ACCESSOR_KEY } from '~/constants'
-import { formatIPv6, formatTimeFromNow } from '~/utils'
+import { formatIPv6, formatTimeFromNow, gapLeadingFlag } from '~/utils'
 import { renderTwoLineCell } from '~/utils/connectionCells'
 
 const { t, locale } = useI18n()
@@ -230,7 +230,9 @@ const allColumns: ConnectionColumn[] = [
             h(IconChevronRight, { class: 'inline-block', size: 18 }),
           )
         }
-        children.push(h('span', { class: 'align-middle' }, name))
+        children.push(
+          h('span', { class: 'align-middle' }, gapLeadingFlag(name)),
+        )
       })
       return h('span', children)
     },

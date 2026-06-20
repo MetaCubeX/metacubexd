@@ -484,21 +484,32 @@ export function filterNodesByRegion(
   return names.filter((n) => selected.has(parseNodeRegion(n) ?? REGION_OTHER))
 }
 
-// Split a leading flag emoji (two regional-indicator code points) off a node
-// name so the UI can render a gap between flag and text. `flag` is '' when the
-// name doesn't start with one (then `rest` is the whole name).
+// Leading flag / emoji prefix: a regional-indicator pair (country flag) or a
+// single pictographic emoji (variation selectors, skin-tone, tag and ZWJ
+// sequences included — covers lone flags like 🏳 / 🏴 too), then any whitespace
+// the provider already inserted after it.
+const LEADING_FLAG_RE =
+  /^(?:\p{Regional_Indicator}\p{Regional_Indicator}|\p{Extended_Pictographic}\uFE0F?)\s*/u
+
+// Split a leading flag/emoji off a node name so the UI can render ONE consistent
+// gap between flag and text. Strips the provider's own trailing space (so names
+// that already include it don't end up double-gapped). `flag` is '' when the
+// name doesn't start with a flag/emoji (then `rest` is the whole name).
 export function splitLeadingFlag(name: string): { flag: string; rest: string } {
-  const cps = [...name]
-  const first = cps[0] ?? ''
-  const second = cps[1] ?? ''
-  const isRegionalIndicator = (ch: string) => {
-    const cp = ch.codePointAt(0) ?? 0
-    return cp >= FLAG_OFFSET && cp <= FLAG_OFFSET + 25
+  const matched = name.match(LEADING_FLAG_RE)?.[0] ?? ''
+  if (!matched) return { flag: '', rest: name }
+  return {
+    flag: matched.replace(/\s+$/u, ''),
+    rest: name.slice(matched.length),
   }
-  if (isRegionalIndicator(first) && isRegionalIndicator(second)) {
-    return { flag: first + second, rest: cps.slice(2).join('') }
-  }
-  return { flag: '', rest: name }
+}
+
+// String form of splitLeadingFlag for plain-text contexts (e.g. joined
+// connection chains): normalizes the spacing to a single space after a leading
+// flag/emoji. No-op when there's no leading flag.
+export function gapLeadingFlag(name: string): string {
+  const { flag, rest } = splitLeadingFlag(name)
+  return flag ? `${flag} ${rest}` : name
 }
 
 export interface RuleFacet {
