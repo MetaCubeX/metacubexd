@@ -544,5 +544,7 @@
   "profilesActionFailed": "操作に失敗しました",
   "profilesDeleteConfirm": "「{name}」を削除しますか？この操作は元に戻せません。",
   "profilesDeleteActiveConfirm": "「{name}」は現在有効なプロファイルです。削除すると実行中の設定が破棄されます。続行しますか？",
-  "profilesEditing": "{name}を編集中"
+  "profilesEditing": "{name}を編集中",
+  "quality": "品質",
+  "sortDefault": "デフォルト"
 }

@@ -544,5 +544,7 @@
   "profilesActionFailed": "عملیات ناموفق بود",
   "profilesDeleteConfirm": "«{name}» حذف شود؟ این عمل قابل بازگشت نیست.",
   "profilesDeleteActiveConfirm": "«{name}» نمایه فعال است. حذف آن پیکربندی در حال اجرا را از کار می‌اندازد. ادامه می‌دهید؟",
-  "profilesEditing": "در حال ویرایش {name}"
+  "profilesEditing": "در حال ویرایش {name}",
+  "quality": "کیفیت",
+  "sortDefault": "پیش‌فرض"
 }

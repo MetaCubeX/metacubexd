@@ -501,5 +501,7 @@
   "profilesActionFailed": "Не удалось выполнить действие",
   "profilesDeleteConfirm": "Удалить «{name}»? Это действие нельзя отменить.",
   "profilesDeleteActiveConfirm": "«{name}» — это активный профиль. Его удаление остановит работающую конфигурацию. Продолжить?",
-  "profilesEditing": "Редактирование {name}"
+  "profilesEditing": "Редактирование {name}",
+  "quality": "Качество",
+  "sortDefault": "По умолчанию"
 }

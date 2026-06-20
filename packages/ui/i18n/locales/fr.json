@@ -544,5 +544,7 @@
   "profilesActionFailed": "Échec de l'opération",
   "profilesDeleteConfirm": "Supprimer « {name} » ? Cette action est irréversible.",
   "profilesDeleteActiveConfirm": "« {name} » est le profil actif. Le supprimer démantèle la configuration en cours. Continuer ?",
-  "profilesEditing": "Modification de {name}"
+  "profilesEditing": "Modification de {name}",
+  "quality": "Qualité",
+  "sortDefault": "Défaut"
 }

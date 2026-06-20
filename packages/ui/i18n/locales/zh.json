@@ -544,5 +544,7 @@
   "profilesActionFailed": "操作失败",
   "profilesDeleteConfirm": "删除「{name}」？此操作无法撤销。",
   "profilesDeleteActiveConfirm": "「{name}」是当前激活的配置，删除它会拆除正在运行的配置。是否继续？",
-  "profilesEditing": "正在编辑 {name}"
+  "profilesEditing": "正在编辑 {name}",
+  "quality": "质量",
+  "sortDefault": "默认"
 }

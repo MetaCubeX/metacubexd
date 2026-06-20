@@ -544,5 +544,7 @@
   "profilesActionFailed": "작업에 실패했습니다",
   "profilesDeleteConfirm": "\"{name}\"을(를) 삭제할까요? 이 작업은 되돌릴 수 없습니다.",
   "profilesDeleteActiveConfirm": "\"{name}\"은(는) 현재 활성화된 프로필입니다. 삭제하면 실행 중인 설정이 해제됩니다. 계속할까요?",
-  "profilesEditing": "{name} 편집 중"
+  "profilesEditing": "{name} 편집 중",
+  "quality": "품질",
+  "sortDefault": "기본"
 }

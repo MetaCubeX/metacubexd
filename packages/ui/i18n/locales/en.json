@@ -544,5 +544,7 @@
   "profilesActionFailed": "Action failed",
   "profilesDeleteConfirm": "Delete \"{name}\"? This cannot be undone.",
   "profilesDeleteActiveConfirm": "\"{name}\" is the active profile. Deleting it tears down the running config. Continue?",
-  "profilesEditing": "Editing {name}"
+  "profilesEditing": "Editing {name}",
+  "quality": "Quality",
+  "sortDefault": "Default"
 }

@@ -749,7 +749,7 @@ const ProviderProxyNodes = defineComponent({
         <!-- Collapse / Expand All Groups Button -->
         <Button
           v-if="activeTab === 'proxies'"
-          class="flex h-9 items-center gap-1.5 rounded-[0.625rem] border border-base-content/10 bg-base-200/80 px-3 transition-all duration-200 hover:border-primary/30 hover:bg-primary/15 hover:text-primary"
+          class="flex h-9 w-9 items-center justify-center rounded-[0.625rem] border border-base-content/10 bg-base-200/80 transition-all duration-200 hover:border-primary/30 hover:bg-primary/15 hover:text-primary"
           :title="
             anyGroupExpanded
               ? t('collapseAll', 'Collapse All')
@@ -759,19 +759,12 @@ const ProviderProxyNodes = defineComponent({
         >
           <IconChevronsUp v-if="anyGroupExpanded" :size="18" />
           <IconChevronsDown v-else :size="18" />
-          <span class="hidden text-sm font-medium sm:inline">
-            {{
-              anyGroupExpanded
-                ? t('collapseAll', 'Collapse All')
-                : t('expandAll', 'Expand All')
-            }}
-          </span>
         </Button>
 
         <!-- Test All Groups Button -->
         <Button
           v-if="activeTab === 'proxies'"
-          class="flex h-9 items-center gap-1.5 rounded-[0.625rem] border border-base-content/10 bg-base-200/80 px-3 transition-all duration-200 hover:border-primary/30 hover:bg-primary/15 hover:text-primary"
+          class="flex h-9 w-9 items-center justify-center rounded-[0.625rem] border border-base-content/10 bg-base-200/80 transition-all duration-200 hover:border-primary/30 hover:bg-primary/15 hover:text-primary"
           :disabled="isBatchTesting"
           :title="t('recommendation.testAllGroups', 'Test All Groups')"
           @click="testAllGroups"
@@ -780,9 +773,6 @@ const ProviderProxyNodes = defineComponent({
             :size="18"
             :class="{ 'animate-pulse text-success': isBatchTesting }"
           />
-          <span class="hidden text-sm font-medium sm:inline">
-            {{ t('recommendation.testAll', 'Test All') }}
-          </span>
         </Button>
 
         <!-- Batch Test Progress Indicator -->
@@ -807,7 +797,7 @@ const ProviderProxyNodes = defineComponent({
         <!-- Health-check All Providers Button -->
         <Button
           v-if="activeTab === 'proxyProviders'"
-          class="flex h-9 items-center gap-1.5 rounded-[0.625rem] border border-base-content/10 bg-base-200/80 px-3 transition-all duration-200 hover:border-primary/30 hover:bg-primary/15 hover:text-primary"
+          class="flex h-9 w-9 items-center justify-center rounded-[0.625rem] border border-base-content/10 bg-base-200/80 transition-all duration-200 hover:border-primary/30 hover:bg-primary/15 hover:text-primary"
           :disabled="isBatchTesting"
           :title="t('healthCheckAllProviders')"
           @click="healthCheckAllProviders"
@@ -816,9 +806,6 @@ const ProviderProxyNodes = defineComponent({
             :size="18"
             :class="{ 'animate-pulse text-success': isBatchTesting }"
           />
-          <span class="hidden text-sm font-medium sm:inline">
-            {{ t('healthCheckAllProviders') }}
-          </span>
         </Button>
 
         <Button
