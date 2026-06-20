@@ -22,6 +22,7 @@
 // should show RunAsNode=Enable and the three above Disable/Enable as set here,
 // and TUN enable must still elevate + route on a real machine.
 
+const fs = require('node:fs')
 const path = require('node:path')
 const { flipFuses, FuseVersion, FuseV1Options } = require('@electron/fuses')
 
@@ -29,11 +30,29 @@ const { flipFuses, FuseVersion, FuseV1Options } = require('@electron/fuses')
 exports.default = async function afterPack(context) {
   const { appOutDir, electronPlatformName, packager } = context
   const productName = packager.appInfo.productFilename
-  const binaryExt = { darwin: '.app', win32: '.exe', linux: '' }
-  const electronBinaryPath = path.join(
-    appOutDir,
-    `${productName}${binaryExt[electronPlatformName] ?? ''}`,
-  )
+
+  let electronBinaryPath
+  if (electronPlatformName === 'darwin') {
+    electronBinaryPath = path.join(appOutDir, `${productName}.app`)
+  } else if (electronPlatformName === 'win32') {
+    electronBinaryPath = path.join(appOutDir, `${productName}.exe`)
+  } else {
+    // Linux: electron-builder names the unpacked executable from executableName
+    // (lowercased), which differs from the product name — pick whichever
+    // candidate actually exists rather than guessing.
+    const candidates = [
+      packager.executableName,
+      productName,
+      productName.toLowerCase(),
+    ].filter(Boolean)
+    const found = candidates.find((n) => fs.existsSync(path.join(appOutDir, n)))
+    if (!found) {
+      throw new Error(
+        `[after-pack] linux executable not found in ${appOutDir} (tried: ${candidates.join(', ')})`,
+      )
+    }
+    electronBinaryPath = path.join(appOutDir, found)
+  }
 
   await flipFuses(electronBinaryPath, {
     version: FuseVersion.V1,
