@@ -742,6 +742,9 @@ const ProviderProxyNodes = defineComponent({
       <div class="flex items-center gap-2">
         <ProxiesDisplayModeSwitcher />
         <ProxiesSortSelect />
+        <ProxiesCardSizeSelect
+          v-if="configStore.proxiesDisplayMode === PROXIES_DISPLAY_MODE.CARD"
+        />
 
         <!-- Collapse / Expand All Groups Button -->
         <Button
@@ -1187,26 +1190,6 @@ const ProviderProxyNodes = defineComponent({
               type="checkbox"
             />
           </div>
-        </div>
-
-        <div>
-          <ConfigTitle with-divider>
-            {{ t('proxiesCardSize') }}
-          </ConfigTitle>
-          <select
-            v-model="configStore.proxiesCardSize"
-            class="select-bordered select w-full"
-          >
-            <option value="comfortable">
-              {{ t('cardSizeComfortable') }}
-            </option>
-            <option value="compact">
-              {{ t('cardSizeCompact') }}
-            </option>
-            <option value="tight">
-              {{ t('cardSizeTight') }}
-            </option>
-          </select>
         </div>
 
         <div>
