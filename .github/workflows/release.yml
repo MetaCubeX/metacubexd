@@ -16,12 +16,13 @@ jobs:
   release-please:
     permissions:
       contents: write
+      pull-requests: write
 
     runs-on: ubuntu-latest
 
     outputs:
-      release_created: ${{ steps.release.outputs.release_created }}
-      tag_name: ${{ steps.release.outputs.tag_name }}
+      release_created: ${{ steps.release.outputs.releases_created }}
+      tag_name: ${{ steps.release.outputs['.--tag_name'] }}
 
     steps:
       - name: release-please
@@ -29,7 +30,6 @@ jobs:
         uses: googleapis/release-please-action@v5
         with:
           token: ${{ secrets.CI_TOKEN }}
-          release-type: node
 
   release-assets:
     needs: release-please
