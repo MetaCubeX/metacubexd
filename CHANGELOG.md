@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.256.4](https://github.com/MetaCubeX/metacubexd/compare/v1.256.3...v1.256.4) (2026-06-20)
+
+
+### Bug Fixes
+
+* **desktop:** set the Linux .deb package maintainer ([d9de6fa](https://github.com/MetaCubeX/metacubexd/commit/d9de6fa88e770c9bf6f72e92e7f4130dfbf8b265))
+
 ## [1.256.3](https://github.com/MetaCubeX/metacubexd/compare/v1.256.2...v1.256.3) (2026-06-20)
 
 
