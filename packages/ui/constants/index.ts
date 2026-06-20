@@ -76,6 +76,19 @@ export enum PROXIES_ORDERING_TYPE {
   QUALITY_DESC = 'orderQuality_desc',
 }
 
+// Order of options in the proxies-page sort control. Single source of truth so
+// a new ordering can never be silently missing from the dropdown (mirrors
+// RULES_ORDERING_TYPE_ORDER).
+export const PROXIES_ORDERING_TYPE_ORDER: PROXIES_ORDERING_TYPE[] = [
+  PROXIES_ORDERING_TYPE.NATURAL,
+  PROXIES_ORDERING_TYPE.LATENCY_ASC,
+  PROXIES_ORDERING_TYPE.LATENCY_DESC,
+  PROXIES_ORDERING_TYPE.QUALITY_ASC,
+  PROXIES_ORDERING_TYPE.QUALITY_DESC,
+  PROXIES_ORDERING_TYPE.NAME_ASC,
+  PROXIES_ORDERING_TYPE.NAME_DESC,
+]
+
 export enum RULES_ORDERING_TYPE {
   NATURAL = 'orderNatural', // reuse existing key — config/index order (default)
   TYPE_ASC = 'orderRuleType_asc',

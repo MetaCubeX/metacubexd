@@ -349,6 +349,8 @@
   "mixedContentError": "연결할 수 없음: 이 페이지는 HTTPS로 로드되었지만 백엔드 URL은 HTTP입니다. 브라우저는 보안을 위해 이를 차단합니다. 백엔드를 통해 직접 패널에 접속하거나(예: http://127.0.0.1:9090/ui) HTTP로 패널을 배포하세요.",
   "endpointConnectError": "백엔드 연결에 실패했습니다. URL을 확인하고 백엔드가 실행 중인지 확인하세요.",
   "filterNodesByName": "이름으로 노드 필터링",
+  "jumpToCurrent": "현재 노드로",
+  "regionOther": "기타",
   "clear": "지우기",
   "copy": "복사",
   "copyValue": "값 복사",

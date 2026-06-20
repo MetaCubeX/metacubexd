@@ -349,6 +349,8 @@
   "mixedContentError": "接続できません: このページは HTTPS で読み込まれていますが、バックエンド URL は HTTP です。ブラウザはセキュリティのためこれをブロックします。バックエンド経由で直接パネルにアクセスするか（例: http://127.0.0.1:9090/ui）、HTTP でパネルをデプロイしてください。",
   "endpointConnectError": "バックエンドへの接続に失敗しました。URL を確認し、バックエンドが実行中であることを確認してください。",
   "filterNodesByName": "名前でノードをフィルター",
+  "jumpToCurrent": "現在のノードへ",
+  "regionOther": "その他",
   "clear": "クリア",
   "copy": "コピー",
   "copyValue": "値をコピー",

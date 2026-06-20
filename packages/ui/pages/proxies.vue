@@ -741,6 +741,7 @@ const ProviderProxyNodes = defineComponent({
       <!-- Action Buttons -->
       <div class="flex items-center gap-2">
         <ProxiesDisplayModeSwitcher />
+        <ProxiesSortSelect />
 
         <!-- Collapse / Expand All Groups Button -->
         <Button

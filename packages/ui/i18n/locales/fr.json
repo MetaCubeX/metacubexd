@@ -349,6 +349,8 @@
   "mixedContentError": "Connexion impossible : cette page est chargée via HTTPS mais l'URL du backend est en HTTP. Les navigateurs bloquent cela pour des raisons de sécurité. Veuillez accéder au panneau directement via votre backend (par ex. http://127.0.0.1:9090/ui) ou déployer le panneau via HTTP.",
   "endpointConnectError": "Échec de la connexion au backend. Veuillez vérifier l'URL et vous assurer que le backend est en cours d'exécution.",
   "filterNodesByName": "Filtrer les nœuds par nom",
+  "jumpToCurrent": "Aller à l'actuel",
+  "regionOther": "Autre",
   "clear": "Effacer",
   "copy": "Copier",
   "copyValue": "Copier la valeur",
