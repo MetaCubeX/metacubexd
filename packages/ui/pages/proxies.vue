@@ -1165,38 +1165,6 @@ const ProviderProxyNodes = defineComponent({
 
         <div>
           <ConfigTitle with-divider>
-            {{ t('proxiesSorting') }}
-          </ConfigTitle>
-          <select
-            v-model="configStore.proxiesOrderingType"
-            class="select-bordered select w-full"
-          >
-            <option value="orderNatural">
-              {{ t('orderNatural') }}
-            </option>
-            <option value="orderLatency_asc">
-              {{ t('orderLatency_asc') }}
-            </option>
-            <option value="orderLatency_desc">
-              {{ t('orderLatency_desc') }}
-            </option>
-            <option value="orderQuality_asc">
-              {{ t('orderQuality_asc') }}
-            </option>
-            <option value="orderQuality_desc">
-              {{ t('orderQuality_desc') }}
-            </option>
-            <option value="orderName_asc">
-              {{ t('orderName_asc') }}
-            </option>
-            <option value="orderName_desc">
-              {{ t('orderName_desc') }}
-            </option>
-          </select>
-        </div>
-
-        <div>
-          <ConfigTitle with-divider>
             {{ t('hideUnavailableProxies') }}
           </ConfigTitle>
           <div class="flex w-full justify-center">
