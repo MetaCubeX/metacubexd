@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.256.6](https://github.com/MetaCubeX/metacubexd/compare/v1.256.5...v1.256.6) (2026-06-20)
+
+
+### Bug Fixes
+
+* **desktop:** add homepage and author for the Linux package metadata ([f0e937b](https://github.com/MetaCubeX/metacubexd/commit/f0e937b46808d0785191e2838525fa6bc5f09c25))
+
 ## [1.256.5](https://github.com/MetaCubeX/metacubexd/compare/v1.256.4...v1.256.5) (2026-06-20)
 
 
