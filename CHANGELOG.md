@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.256.1](https://github.com/MetaCubeX/metacubexd/compare/v1.256.0...v1.256.1) (2026-06-20)
+
+
+### Bug Fixes
+
+* **ui:** render custom background over the daisyUI theme layer ([52be2a2](https://github.com/MetaCubeX/metacubexd/commit/52be2a2c5f984aa6f70d24937d06a43b63721e2f)), closes [#2035](https://github.com/MetaCubeX/metacubexd/issues/2035)
+* **ui:** scope Twemoji font to flag codepoints ([08f16ec](https://github.com/MetaCubeX/metacubexd/commit/08f16ec0f8ff90f298952a8c388d8b5136c2d736)), closes [#2038](https://github.com/MetaCubeX/metacubexd/issues/2038)
+* **ui:** stop auto-switch from reselecting select groups onto subgroups ([c9eb2b6](https://github.com/MetaCubeX/metacubexd/commit/c9eb2b6be7324994d4d9e3cc19a79f7df451885b)), closes [#2040](https://github.com/MetaCubeX/metacubexd/issues/2040)
+* **ui:** widen per-node latency test client timeout ([c481231](https://github.com/MetaCubeX/metacubexd/commit/c4812316f62611de6fc33ad99d86e69b247d026b)), closes [#2041](https://github.com/MetaCubeX/metacubexd/issues/2041)
+
 ## [1.256.0](https://github.com/MetaCubeX/metacubexd/compare/v1.255.2...v1.256.0) (2026-06-18)
 
 
