@@ -466,7 +466,10 @@ async function copyCell(
     var(--color-base-content) 10%,
     transparent
   );
-  background: color-mix(in oklch, var(--color-base-200) 50%, transparent);
+  /* No background here: the scroll wrapper already paints bg-base-200/50. A
+     second semi-transparent layer here scrolls with the (wider) table content,
+     so on horizontal scroll it doubles with the wrapper's fixed background over
+     only part of the width — showing a lighter vertical band on the rest. */
 }
 
 .conn-th {
