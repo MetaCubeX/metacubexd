@@ -9,7 +9,6 @@ import {
   IconX,
 } from '@tabler/icons-vue'
 import byteSize from 'byte-size'
-import { uniq } from 'lodash-es'
 import {
   connectionsToCSV,
   connectionsToJSON,
@@ -393,13 +392,15 @@ const uniqueSourceIPs = computed(() => {
     )
     return tagged?.tagName || src
   })
-  return uniq(ips).sort()
+  return [...new Set(ips)].sort()
 })
 
 const untaggedSourceIPs = computed(() => {
-  const ips = uniq(
-    connectionsStore.allConnections.map((conn) => conn.metadata.sourceIP),
-  ).sort()
+  const ips = [
+    ...new Set(
+      connectionsStore.allConnections.map((conn) => conn.metadata.sourceIP),
+    ),
+  ].sort()
   return ips.filter(
     (ip) => !configStore.clientSourceIPTags.some((tag) => tag.sourceIP === ip),
   )

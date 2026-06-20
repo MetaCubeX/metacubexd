@@ -19,7 +19,6 @@ import {
   IconX,
 } from '@tabler/icons-vue'
 import byteSize from 'byte-size'
-import { throttle } from 'lodash-es'
 import Button from '~/components/Button.vue'
 import ConnectivityBoard from '~/components/ConnectivityBoard.vue'
 import ProxyNodeCard from '~/components/ProxyNodeCard.vue'
@@ -210,9 +209,14 @@ onMounted(() => {
 // Enable window focus refetch for proxies data
 watch(
   useWindowFocus(),
-  throttle((focused) => {
-    if (focused) proxiesStore.fetchProxies()
-  }, 30000),
+  useThrottleFn(
+    (focused) => {
+      if (focused) proxiesStore.fetchProxies()
+    },
+    30000,
+    true,
+    true,
+  ),
 )
 
 // ProxyGroupTitle component

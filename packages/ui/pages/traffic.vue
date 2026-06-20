@@ -14,7 +14,6 @@ import {
   IconWorld,
 } from '@tabler/icons-vue'
 import dayjs from 'dayjs'
-import { throttle } from 'lodash-es'
 import { useDataUsage } from '~/composables/useDataUsage'
 import { formatBytes, formatDuration } from '~/utils'
 
@@ -144,9 +143,14 @@ watch(
 // Enable window focus refetch for traffic data with throttling
 watch(
   useWindowFocus(),
-  throttle((focused) => {
-    if (focused && selectedTimeRange.value !== -1) fetchData()
-  }, 30000),
+  useThrottleFn(
+    (focused) => {
+      if (focused && selectedTimeRange.value !== -1) fetchData()
+    },
+    30000,
+    true,
+    true,
+  ),
 )
 
 const viewOptions = computed(() => [

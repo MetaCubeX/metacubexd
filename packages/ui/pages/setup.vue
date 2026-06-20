@@ -10,7 +10,6 @@ import {
   IconX,
 } from '@tabler/icons-vue'
 import { useSortable } from '@vueuse/integrations/useSortable'
-import { v4 as uuid } from 'uuid'
 import { checkEndpointAPI } from '~/composables/useApi'
 import { FALLBACK_BACKEND_URL } from '~/constants'
 import { transformEndpointURL } from '~/utils'
@@ -91,7 +90,7 @@ async function onSubmit() {
       return
     }
 
-    const id = uuid()
+    const id = crypto.randomUUID()
     const list = [...endpointStore.endpointList]
     const point = list.find((history) => history.url === transformedURL)
 

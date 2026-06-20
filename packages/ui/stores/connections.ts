@@ -5,7 +5,6 @@ import type {
   WsMsg,
 } from '~/types'
 import type { DataUsageLog } from '~/utils/db'
-import { isNumber } from 'lodash-es'
 import { defineStore } from 'pinia'
 
 import { CONNECTIONS_TABLE_MAX_CLOSED_ROWS } from '~/constants'
@@ -92,8 +91,8 @@ export const useConnectionsStore = defineStore('connections', () => {
 
       if (
         !prevConn ||
-        !isNumber(prevConn.download) ||
-        !isNumber(prevConn.upload)
+        typeof prevConn.download !== 'number' ||
+        typeof prevConn.upload !== 'number'
       ) {
         return {
           ...connection,
