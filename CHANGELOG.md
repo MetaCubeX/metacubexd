@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.256.2](https://github.com/MetaCubeX/metacubexd/compare/v1.256.1...v1.256.2) (2026-06-20)
+
+
+### Bug Fixes
+
+* **agent:** extract the correct mihomo binary entry from the Windows zip ([98c10c4](https://github.com/MetaCubeX/metacubexd/commit/98c10c4e0e2ff75fd028f4627f78e90df377fc08))
+* **deps:** patch Dependabot transitive vulnerabilities ([c5ef22d](https://github.com/MetaCubeX/metacubexd/commit/c5ef22df9809c466da34d8253b5ec6cc98e442b2))
+* **desktop:** locate the linux executable in the after-pack fuses hook ([691639a](https://github.com/MetaCubeX/metacubexd/commit/691639aa16edcbd331b4511eea3bf051bedcd2bb))
+
 ## [1.256.1](https://github.com/MetaCubeX/metacubexd/compare/v1.256.0...v1.256.1) (2026-06-20)
 
 
