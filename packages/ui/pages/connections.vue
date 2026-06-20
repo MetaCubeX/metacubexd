@@ -350,7 +350,7 @@ const allColumns: ConnectionColumn[] = [
     render: (conn: Connection) => {
       const primary = getRule(conn)
       const aux = conn.chains.length
-        ? [...conn.chains].reverse().join(' → ')
+        ? [...conn.chains].reverse().map(gapLeadingFlag).join(' → ')
         : ''
       return renderTwoLineCell(primary, aux)
     },
