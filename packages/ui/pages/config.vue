@@ -310,10 +310,11 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
 </script>
 
 <template>
-  <!-- px-1: overflow-y-auto forces overflow-x to compute to auto, which would
-       clip the config-card box-shadow ring on the left/right edges; the
-       horizontal padding gives the 1px accent ring room to render. -->
-  <div class="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-1">
+  <!-- p-1: overflow-y-auto forces overflow-x to compute to auto, which clips
+       the config-card box-shadow ring on the left/right edges; padding on all
+       sides also gives the first/last card's top/bottom ring room (gap-4 only
+       spaces the inner edges). -->
+  <div class="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-1">
     <!-- Loading State -->
     <div
       v-if="isLoading && !isError"
