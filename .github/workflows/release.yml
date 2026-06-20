@@ -21,8 +21,11 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      release_created: ${{ steps.release.outputs.releases_created }}
-      tag_name: ${{ steps.release.outputs['.--tag_name'] }}
+      # release-please sets release_created to the STRING "false" when no release
+      # is cut; GitHub Actions treats a non-empty string as truthy in `if:`, so
+      # normalize to "true"/"" to gate the downstream jobs correctly.
+      release_created: ${{ steps.release.outputs.release_created == 'true' && 'true' || '' }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
 
     steps:
       - name: release-please

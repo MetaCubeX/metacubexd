@@ -1,5 +1,10 @@
 appId: one.metacubex.desktop
 productName: MetaCubeXD
+# No auto-update / no publish provider: the app updates manually. Without this,
+# electron-builder tries to auto-detect a GitHub publish provider, fails
+# ("Cannot detect repository"), then crashes in computeChannelNames (reading
+# `channel` of a null publish config) even under `--publish never`.
+publish: null
 # Re-stage the arch-correct mihomo (+ wintun on Windows) before EACH arch is
 # packed. Required because the Windows/Linux legs build --x64 AND --arm64 from
 # one x64 host in a single invocation; without this the arm64 installer ships
