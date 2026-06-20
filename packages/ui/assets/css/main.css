@@ -269,12 +269,18 @@ body {
    - No border-radius here: outline already follows element radius;
      setting it would clobber real corner radii on focus
    ============================================================ */
-:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-}
-:focus:not(:focus-visible) {
-  outline: none;
+/* In @layer base so an explicit `outline-none` utility wins — icon search
+   fields wrap a transparent <input> in a focus-within container that already
+   draws the ring, and the input's `outline-none` must suppress this global one
+   to avoid a doubled (inner + outer) ring. Unlayered, base would lose to it. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
 }
 
 /* Reduced-motion respect */
