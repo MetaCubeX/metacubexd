@@ -382,7 +382,6 @@ const ISO_CODES = new Set([
   'KR',
   'DE',
   'GB',
-  'UK',
   'FR',
   'NL',
   'CA',
