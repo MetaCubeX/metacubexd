@@ -442,11 +442,8 @@ export function parseNodeRegion(name: string): string | null {
   const flagCode = leadingFlagToCode(name)
   if (flagCode) return flagCode
 
-  const match = name.match(/^([A-Z]{2})[_\-\s]/i)
-  if (match) {
-    const code = match[1].toUpperCase()
-    if (ISO_CODES.has(code)) return code
-  }
+  const code = name.match(/^([A-Z]{2})[_\-\s]/i)?.[1]?.toUpperCase()
+  if (code && ISO_CODES.has(code)) return code
   return null
 }
 

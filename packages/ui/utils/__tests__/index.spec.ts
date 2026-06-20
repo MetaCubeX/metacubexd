@@ -726,8 +726,8 @@ describe('utils/index', () => {
         ['JP', 1],
         [REGION_OTHER, 1],
       ])
-      expect(facets[0].flag).toBe('🇸🇬')
-      expect(facets[2].flag).toBe('')
+      expect(facets[0]?.flag).toBe('🇸🇬')
+      expect(facets[2]?.flag).toBe('')
     })
   })
 
