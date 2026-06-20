@@ -1,6 +1,6 @@
 {
   "name": "@metacubexd/desktop",
-  "version": "1.256.4",
+  "version": "1.256.5",
   "description": "MetaCubeXD — the official Mihomo dashboard, desktop app",
   "private": true,
   "type": "module",
