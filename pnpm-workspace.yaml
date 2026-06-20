@@ -108,7 +108,13 @@ overrides:
   'brace-expansion@^2': '>=2.1.1'
   defu: 6.1.7
   diff: '>=9.0.0'
+  # Dependabot transitive-vuln patches. Scoped per major so the bump stays
+  # within the resolved line (no cross-major API breakage). esbuild's vuln
+  # range is 0.27.3–0.28.0; the unrelated 0.25.12 (< floor) is left untouched.
+  'esbuild@0.27': 0.28.1
+  'esbuild@0.28': 0.28.1
   h3: '>=1.15.11'
+  'js-yaml@4': ^4.2.0
   koa: '>=3.2.1'
   node-forge: '>=1.4.0'
   picomatch: '>=4.0.4'
@@ -116,6 +122,8 @@ overrides:
   serialize-javascript: '>=7.0.5'
   srvx: '>=0.11.16'
   tar: '>=7.5.15'
+  'undici@6': ^6.27.0
+  'undici@7': ^7.28.0
   yaml: '>=2.9.0'
   # Pin the exact rolldown-vite version (was '@latest'). @latest is a moving
   # target — only the lockfile kept a fresh install from pulling a newer pre-1.0
