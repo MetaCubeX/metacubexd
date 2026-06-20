@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.257.1](https://github.com/MetaCubeX/metacubexd/compare/v1.257.0...v1.257.1) (2026-06-20)
+
+
+### Bug Fixes
+
+* **ui:** stack sidebar kernel action buttons vertically to prevent text overflow ([fec4cea](https://github.com/MetaCubeX/metacubexd/commit/fec4ceade7111325f4bae847a1029518748d600a))
+
 ## [1.257.0](https://github.com/MetaCubeX/metacubexd/compare/v1.256.6...v1.257.0) (2026-06-20)
 
 
