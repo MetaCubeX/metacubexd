@@ -7,6 +7,12 @@
 @font-face {
   font-family: 'Twemoji Mozilla';
   src: url('~/assets/fonts/TwemojiMozilla-flags.woff2') format('woff2');
+  /* This is a flag-only COLR/CPAL color font. Scope it to the codepoints it
+     actually contains (regional-indicator flags + subdivision-tag flags) so the
+     `.font-twemoji` stack only ever invokes it for flag emoji. Without this the
+     font is the PRIMARY family for ALL text, which corrupts node rendering on
+     old iPadOS WebKit (#2038). */
+  unicode-range: U+1F1E6-1F1FF, U+1F3F4, U+E0020-E007F;
 }
 
 /* ============================================================
