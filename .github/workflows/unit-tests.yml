@@ -38,13 +38,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Run unit tests with coverage
-        run: pnpm test:coverage
+      - name: Run unit tests
+        run: |
+          pnpm --filter @metacubexd/agent test
+          pnpm --filter @metacubexd/server test
+          pnpm --filter @metacubexd/ui test:coverage
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v7
         with:
-          files: ./coverage/lcov.info
+          files: ./packages/ui/coverage/lcov.info
           fail_ci_if_error: false
           verbose: true
         env:

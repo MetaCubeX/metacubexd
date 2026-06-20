@@ -31,7 +31,7 @@ Thumbs.db
 # Local build output
 dist
 
-/coverage
+coverage
 
 # superpowers brainstorm visual companion
 .superpowers/
