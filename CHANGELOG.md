@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.256.5](https://github.com/MetaCubeX/metacubexd/compare/v1.256.4...v1.256.5) (2026-06-20)
+
+
+### Bug Fixes
+
+* **desktop:** add a package description for the Linux .deb build ([aaee72d](https://github.com/MetaCubeX/metacubexd/commit/aaee72d6ed8ee77e78afe41d047d497c68b24fba))
+
 ## [1.256.4](https://github.com/MetaCubeX/metacubexd/compare/v1.256.3...v1.256.4) (2026-06-20)
 
 
