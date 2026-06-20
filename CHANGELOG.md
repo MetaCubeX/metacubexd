@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.257.0](https://github.com/MetaCubeX/metacubexd/compare/v1.256.6...v1.257.0) (2026-06-20)
+
+
+### Features
+
+* **ui:** add sidebar kernel shortcuts and fix overview card background ([717761c](https://github.com/MetaCubeX/metacubexd/commit/717761cc2ea41173bfb6d522021c9ec092498785))
+
 ## [1.256.6](https://github.com/MetaCubeX/metacubexd/compare/v1.256.5...v1.256.6) (2026-06-20)
 
 
