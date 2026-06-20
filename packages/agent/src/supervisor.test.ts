@@ -523,10 +523,16 @@ describe('createSupervisor — crash auto-restart watchdog', () => {
     expect(timers.msList()).toEqual([BACKOFF])
     expect(spawn).toHaveBeenCalledTimes(1)
 
-    // Fire the backoff timer -> respawn.
+    // Fire the backoff timer -> respawn. The restart chain does real config-file
+    // I/O before spawn, so wait for it to settle instead of a fixed turn count.
     await timers.fireMs(BACKOFF)
-    expect(spawn).toHaveBeenCalledTimes(2)
-    expect(sup.getState().status).toBe('running')
+    await vi.waitFor(
+      () => {
+        expect(spawn).toHaveBeenCalledTimes(2)
+        expect(sup.getState().status).toBe('running')
+      },
+      { timeout: 3000 },
+    )
     await sup.dispose()
   })
 
@@ -584,17 +590,30 @@ describe('createSupervisor — crash auto-restart watchdog', () => {
     expect(spawn).toHaveBeenCalledTimes(1)
 
     // Crash #1 -> restart #1 (count 1). It reaches running but we never let the
-    // stability window elapse, so the counter is NOT reset.
+    // stability window elapse, so the counter is NOT reset. Wait for the restart
+    // to fully reach running before the next crash (the chain does real I/O).
     procs[procs.length - 1]!.emitExit(1, null)
     await new Promise((r) => setImmediate(r))
     await timers.fireMs(BACKOFF)
-    expect(spawn).toHaveBeenCalledTimes(2)
+    await vi.waitFor(
+      () => {
+        expect(spawn).toHaveBeenCalledTimes(2)
+        expect(sup.getState().status).toBe('running')
+      },
+      { timeout: 3000 },
+    )
 
     // Crash #2 -> restart #2 (count 2 == maxRestarts)
     procs[procs.length - 1]!.emitExit(1, null)
     await new Promise((r) => setImmediate(r))
     await timers.fireMs(BACKOFF)
-    expect(spawn).toHaveBeenCalledTimes(3)
+    await vi.waitFor(
+      () => {
+        expect(spawn).toHaveBeenCalledTimes(3)
+        expect(sup.getState().status).toBe('running')
+      },
+      { timeout: 3000 },
+    )
 
     // Crash #3 -> exceeds maxRestarts -> no further restart, stay errored.
     procs[procs.length - 1]!.emitExit(1, null)
@@ -635,8 +654,13 @@ describe('createSupervisor — crash auto-restart watchdog', () => {
     procs[procs.length - 1]!.emitExit(1, null)
     await new Promise((r) => setImmediate(r))
     await timers.fireMs(BACKOFF)
-    expect(spawn).toHaveBeenCalledTimes(2)
-    expect(sup.getState().status).toBe('running')
+    await vi.waitFor(
+      () => {
+        expect(spawn).toHaveBeenCalledTimes(2)
+        expect(sup.getState().status).toBe('running')
+      },
+      { timeout: 3000 },
+    )
 
     // Let the stability window elapse -> counter resets to 0.
     await timers.fireMs(STABLE)
@@ -646,8 +670,13 @@ describe('createSupervisor — crash auto-restart watchdog', () => {
     await new Promise((r) => setImmediate(r))
     expect(timers.msList()).toEqual([BACKOFF])
     await timers.fireMs(BACKOFF)
-    expect(spawn).toHaveBeenCalledTimes(3)
-    expect(sup.getState().status).toBe('running')
+    await vi.waitFor(
+      () => {
+        expect(spawn).toHaveBeenCalledTimes(3)
+        expect(sup.getState().status).toBe('running')
+      },
+      { timeout: 3000 },
+    )
     await sup.dispose()
   })
 
