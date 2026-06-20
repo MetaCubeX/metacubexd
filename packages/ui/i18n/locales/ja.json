@@ -112,6 +112,8 @@
   "stickyGroupHeader": "グループヘッダーを固定",
   "updateGEODatabases": "GEO データベースを更新",
   "restartCore": "コアを再起動",
+  "reloadConfigSuccess": "設定を再読み込みしました",
+  "restartCoreConfirm": "コアを再起動しますか？すべての接続が切断されます。",
   "upgradeCore": "コアをアップグレード",
   "upgradeUI": "ダッシュボードをアップグレード",
   "proxiesSorting": "プロキシの並び替え",

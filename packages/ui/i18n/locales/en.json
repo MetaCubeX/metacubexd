@@ -112,6 +112,8 @@
   "stickyGroupHeader": "Sticky Group Header",
   "updateGEODatabases": "Update GEO Databases",
   "restartCore": "Restart Core",
+  "reloadConfigSuccess": "Config reloaded",
+  "restartCoreConfirm": "Restart the core? This will interrupt all active connections.",
   "upgradeCore": "Upgrade Core",
   "upgradeUI": "Upgrade Dashboard",
   "proxiesSorting": "Proxies Sorting",

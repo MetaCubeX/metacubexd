@@ -112,6 +112,8 @@
   "stickyGroupHeader": "En-tête de groupe fixe",
   "updateGEODatabases": "Mettre à jour les bases GEO",
   "restartCore": "Redémarrer le noyau",
+  "reloadConfigSuccess": "Configuration rechargée",
+  "restartCoreConfirm": "Redémarrer le noyau ? Toutes les connexions actives seront interrompues.",
   "upgradeCore": "Mettre à niveau le noyau",
   "upgradeUI": "Mettre à niveau le tableau de bord",
   "proxiesSorting": "Tri des proxies",

@@ -112,6 +112,8 @@
   "stickyGroupHeader": "分组头部吸顶",
   "updateGEODatabases": "更新 GEO 数据库",
   "restartCore": "重启核心",
+  "reloadConfigSuccess": "配置已重载",
+  "restartCoreConfirm": "确定要重启核心吗？这将中断所有连接。",
   "upgradeCore": "更新核心",
   "upgradeUI": "更新控制面板",
   "proxiesSorting": "节点排序",

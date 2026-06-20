@@ -112,6 +112,8 @@
   "stickyGroupHeader": "Закреплять заголовок группы",
   "updateGEODatabases": "Обновить базы GEO",
   "restartCore": "Перезапустить ядро",
+  "reloadConfigSuccess": "Конфигурация перезагружена",
+  "restartCoreConfirm": "Перезапустить ядро? Все активные соединения будут разорваны.",
   "upgradeCore": "Обновить ядро",
   "upgradeUI": "Обновить панель",
   "proxiesSorting": "Сортировка прокси",

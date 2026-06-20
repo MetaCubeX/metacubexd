@@ -112,6 +112,8 @@
   "stickyGroupHeader": "그룹 헤더 고정",
   "updateGEODatabases": "GEO 데이터베이스 업데이트",
   "restartCore": "코어 재시작",
+  "reloadConfigSuccess": "설정을 다시 불러왔습니다",
+  "restartCoreConfirm": "코어를 다시 시작하시겠습니까? 모든 연결이 끊어집니다.",
   "upgradeCore": "코어 업그레이드",
   "upgradeUI": "대시보드 업그레이드",
   "proxiesSorting": "프록시 정렬",

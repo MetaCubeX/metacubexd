@@ -26,19 +26,7 @@ function handleProviderChange(event: Event) {
 </script>
 
 <template>
-  <div
-    class="rounded-xl border p-4 shadow-sm"
-    style="
-      background: color-mix(in oklch, var(--color-base-200) 60%, transparent);
-      border-color: color-mix(
-        in oklch,
-        var(--color-base-content) 10%,
-        transparent
-      );
-      box-shadow: 0 2px 8px
-        color-mix(in oklch, var(--color-base-content) 5%, transparent);
-    "
-  >
+  <div class="rounded-xl border border-base-content/10 bg-base-200 p-4">
     <div class="mb-3.5 flex items-center justify-between gap-3">
       <div class="flex items-center gap-2">
         <div

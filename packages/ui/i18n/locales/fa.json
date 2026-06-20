@@ -112,6 +112,8 @@
   "stickyGroupHeader": "سربرگ گروه چسبان",
   "updateGEODatabases": "به‌روزرسانی پایگاه‌های داده GEO",
   "restartCore": "راه‌اندازی مجدد هسته",
+  "reloadConfigSuccess": "پیکربندی دوباره بارگذاری شد",
+  "restartCoreConfirm": "هسته دوباره راه‌اندازی شود؟ همه اتصال‌های فعال قطع خواهند شد.",
   "upgradeCore": "ارتقای هسته",
   "upgradeUI": "ارتقای داشبورد",
   "proxiesSorting": "مرتب‌سازی پروکسی‌ها",

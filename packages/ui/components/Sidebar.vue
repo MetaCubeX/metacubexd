@@ -12,6 +12,8 @@ import {
   IconHome,
   IconMenu2,
   IconNetwork,
+  IconPower,
+  IconReload,
   IconRoute,
   IconRuler,
   IconServerCog,
@@ -28,6 +30,7 @@ const route = useRoute()
 const { t } = useI18n()
 const configStore = useConfigStore()
 const { hasAgent, hasFeature } = useControlInfo()
+const configActions = useConfigActions()
 
 const navItems = computed(() => {
   const items = [
@@ -175,6 +178,21 @@ watch(
 // Toggle sidebar expanded state
 const toggleSidebar = () => {
   configStore.sidebarExpanded = !configStore.sidebarExpanded
+}
+
+// Quick kernel actions (#2048): reuse the same Clash-API calls the config page
+// uses, so the sidebar shortcuts work against any mihomo backend without a page
+// switch.
+async function onReloadConfig() {
+  await configActions.reloadConfigFileAPI()
+  toast.success(t('reloadConfigSuccess'))
+}
+
+function onRestartCore() {
+  // Restarting drops every active connection — guard the one-click action with a
+  // confirm (matches traffic.vue's confirm() pattern for destructive ops).
+  if (!window.confirm(t('restartCoreConfirm'))) return
+  void configActions.restartBackendAPI()
 }
 </script>
 
@@ -470,6 +488,53 @@ const toggleSidebar = () => {
             class="mb-2 hidden w-full lg:block"
             :class="configStore.sidebarExpanded ? 'lg:!hidden' : ''"
           />
+          <!-- Quick kernel actions (#2048): reload config / restart core -->
+          <div
+            class="mb-2 hidden gap-1 lg:flex"
+            :class="
+              configStore.sidebarExpanded ? 'flex-row' : 'flex-col items-center'
+            "
+          >
+            <button
+              class="press-tactile flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-[var(--sidebar-border)] bg-transparent text-xs font-medium text-base-content hover:border-[color-mix(in_oklch,var(--color-base-content)_20%,transparent)] hover:bg-[var(--sidebar-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+              :class="
+                configStore.sidebarExpanded ? 'flex-1' : 'aspect-square w-9'
+              "
+              :title="t('reloadConfig')"
+              :disabled="configActions.reloadingConfigFile.value"
+              @click="onReloadConfig"
+            >
+              <IconReload
+                class="h-4 w-4 shrink-0"
+                :class="
+                  configActions.reloadingConfigFile.value ? 'animate-spin' : ''
+                "
+              />
+              <span v-if="configStore.sidebarExpanded" class="truncate">
+                {{ t('reloadConfig') }}
+              </span>
+            </button>
+            <button
+              class="press-tactile flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-[var(--sidebar-border)] bg-transparent text-xs font-medium text-base-content hover:border-[color-mix(in_oklch,var(--color-warning)_40%,transparent)] hover:bg-[color-mix(in_oklch,var(--color-warning)_12%,transparent)] hover:text-warning disabled:cursor-not-allowed disabled:opacity-50"
+              :class="
+                configStore.sidebarExpanded ? 'flex-1' : 'aspect-square w-9'
+              "
+              :title="t('restartCore')"
+              :disabled="configActions.restartingBackend.value"
+              @click="onRestartCore"
+            >
+              <IconPower
+                class="h-4 w-4 shrink-0"
+                :class="
+                  configActions.restartingBackend.value ? 'animate-spin' : ''
+                "
+              />
+              <span v-if="configStore.sidebarExpanded" class="truncate">
+                {{ t('restartCore') }}
+              </span>
+            </button>
+          </div>
+
           <!-- Theme/Lang switchers (desktop only) -->
           <div
             class="mb-2 hidden items-center gap-1 lg:flex"
