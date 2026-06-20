@@ -746,9 +746,10 @@ const ProviderProxyNodes = defineComponent({
           v-if="configStore.proxiesDisplayMode === PROXIES_DISPLAY_MODE.CARD"
         />
 
-        <!-- Collapse / Expand All Groups Button -->
+        <!-- Collapse / Expand All Groups Button — master-detail has no
+             collapsible group panels, so the toggle is meaningless there. -->
         <Button
-          v-if="activeTab === 'proxies'"
+          v-if="activeTab === 'proxies' && !isMasterMode"
           class="flex h-9 w-9 items-center justify-center rounded-[0.625rem] border border-base-content/10 bg-base-200/80 transition-all duration-200 hover:border-primary/30 hover:bg-primary/15 hover:text-primary"
           :title="
             anyGroupExpanded
