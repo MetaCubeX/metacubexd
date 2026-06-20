@@ -1,5 +1,9 @@
 appId: one.metacubex.desktop
 productName: MetaCubeXD
+# Explicit, filesystem-safe executable name. Without it electron-builder derives
+# it from the package name (@metacubexd/desktop -> @metacubexddesktop), whose `@`
+# is rejected by the Linux AppImage builder.
+executableName: metacubexd
 # No auto-update / no publish provider: the app updates manually. Without this,
 # electron-builder tries to auto-detect a GitHub publish provider, fails
 # ("Cannot detect repository"), then crashes in computeChannelNames (reading

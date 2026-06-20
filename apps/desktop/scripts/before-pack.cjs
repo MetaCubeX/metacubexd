@@ -24,6 +24,8 @@ exports.default = async function beforePack(context) {
   const os = context.packager.platform.nodeName
 
   console.log(`[before-pack] staging mihomo for os=${os} arch=${arch}`)
+  // shell: true so Windows resolves `pnpm` -> `pnpm.cmd` (execFileSync can't
+  // find the bare `pnpm` on win32, which is what broke the Windows release leg).
   execFileSync(
     'pnpm',
     [
@@ -37,6 +39,6 @@ exports.default = async function beforePack(context) {
       '--arch',
       arch,
     ],
-    { stdio: 'inherit' },
+    { stdio: 'inherit', shell: true },
   )
 }

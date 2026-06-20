@@ -30,29 +30,30 @@ const { flipFuses, FuseVersion, FuseV1Options } = require('@electron/fuses')
 exports.default = async function afterPack(context) {
   const { appOutDir, electronPlatformName, packager } = context
   const productName = packager.appInfo.productFilename
+  const execName = packager.executableName
 
-  let electronBinaryPath
-  if (electronPlatformName === 'darwin') {
-    electronBinaryPath = path.join(appOutDir, `${productName}.app`)
-  } else if (electronPlatformName === 'win32') {
-    electronBinaryPath = path.join(appOutDir, `${productName}.exe`)
-  } else {
-    // Linux: electron-builder names the unpacked executable from executableName
-    // (lowercased), which differs from the product name — pick whichever
-    // candidate actually exists rather than guessing.
-    const candidates = [
-      packager.executableName,
-      productName,
-      productName.toLowerCase(),
-    ].filter(Boolean)
-    const found = candidates.find((n) => fs.existsSync(path.join(appOutDir, n)))
-    if (!found) {
-      throw new Error(
-        `[after-pack] linux executable not found in ${appOutDir} (tried: ${candidates.join(', ')})`,
-      )
-    }
-    electronBinaryPath = path.join(appOutDir, found)
+  // The packed binary is named from executableName (win/linux) or productName
+  // (the mac .app bundle), which can differ — pick whichever actually exists
+  // rather than guessing, so a change to executableName can't break this.
+  const candidates =
+    electronPlatformName === 'darwin'
+      ? [`${productName}.app`, `${execName}.app`]
+      : electronPlatformName === 'win32'
+        ? [
+            `${execName}.exe`,
+            `${productName}.exe`,
+            `${productName.toLowerCase()}.exe`,
+          ]
+        : [execName, productName, productName.toLowerCase()]
+  const found = candidates
+    .filter(Boolean)
+    .find((n) => fs.existsSync(path.join(appOutDir, n)))
+  if (!found) {
+    throw new Error(
+      `[after-pack] ${electronPlatformName} executable not found in ${appOutDir} (tried: ${candidates.filter(Boolean).join(', ')})`,
+    )
   }
+  const electronBinaryPath = path.join(appOutDir, found)
 
   await flipFuses(electronBinaryPath, {
     version: FuseVersion.V1,
