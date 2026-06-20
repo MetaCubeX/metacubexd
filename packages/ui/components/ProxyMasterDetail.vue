@@ -127,13 +127,13 @@ function aliveCount(group: ProxyType) {
     <div
       v-if="activeGroup"
       ref="detailEl"
-      class="flex min-h-0 min-w-0 flex-1 flex-col gap-2 overflow-y-auto rounded-xl border border-base-content/8 bg-base-200/40 p-3"
+      class="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto rounded-xl border border-base-content/8 bg-base-200/40"
     >
       <!-- Sticky header: title + search + jump + region chips.
            z-20 keeps it above a selected node row (its wrapper is z-10 and its
            glow/elevation would otherwise bleed up over the region chips). -->
       <div
-        class="sticky top-0 z-20 -mx-3 -mt-3 mb-1 flex flex-col gap-2 border-b border-base-content/8 bg-base-200/95 px-3 pt-3 pb-2 backdrop-blur-sm"
+        class="sticky top-0 z-20 flex flex-col gap-2 rounded-t-xl border-b border-base-content/8 bg-base-200/95 px-3 pt-3 pb-2 backdrop-blur-sm"
       >
         <div class="flex items-center gap-2">
           <span class="text-lg font-semibold text-base-content">{{
@@ -226,7 +226,7 @@ function aliveCount(group: ProxyType) {
       </div>
 
       <!-- Node list -->
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-2 px-3 pt-2 pb-3">
         <ProxyNodeListItem
           v-for="name in displayNodes"
           :key="name"
