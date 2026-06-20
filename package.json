@@ -10,6 +10,7 @@
     "dev:server": "pnpm build:ui && pnpm --filter @metacubexd/server dev",
     "dev:desktop": "pnpm --filter @metacubexd/desktop fetch:mihomo && pnpm --filter @metacubexd/desktop ensure:electron && node apps/desktop/scripts/dev-desktop.mjs",
     "build:ui": "pnpm --filter @metacubexd/ui generate",
+    "generate": "pnpm build:ui && rm -rf .output && cp -r packages/ui/.output .output",
     "build:server": "pnpm --filter @metacubexd/server... build",
     "build:desktop": "pnpm --filter @metacubexd/desktop... build",
     "build": "pnpm build:ui && pnpm build:server",
