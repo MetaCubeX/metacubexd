@@ -103,4 +103,6 @@ linux:
         - x64
         - arm64
   category: Network
+  # Required by the .deb (fpm) target.
+  maintainer: MetaCubeX <maintainers@metacubex.one>
   artifactName: ${productName}-${version}-linux-${arch}.${ext}
