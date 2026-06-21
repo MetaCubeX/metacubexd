@@ -107,7 +107,7 @@ describe('composables/useGeneralConfig', () => {
     expect(onModeChange).not.toHaveBeenCalled()
   })
 
-  it('pORT_FIELDS maps every listener port to its config key', () => {
+  it('PORT_FIELDS maps every listener port to its config key', () => {
     expect(PORT_FIELDS.map((p) => [p.key, p.configKey])).toEqual([
       ['mixedPort', 'mixed-port'],
       ['port', 'port'],

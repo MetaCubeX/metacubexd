@@ -125,6 +125,9 @@ const tunConfig = useTunConfig({
 onMounted(() => tunConfig.init())
 
 async function onTunToggle() {
+  // In desktop mode onToggle drives the privileged enable/disable and syncs its
+  // own status; keep the local checkbox in lock-step with the resolved state so
+  // a rejected/cancelled elevation does not leave the toggle stuck "on".
   await tunConfig.onToggle(tunForm.tunEnable, tunForm.tunStack)
   if (tunConfig.desktopMode.value) {
     tunForm.tunEnable = tunConfig.enabled.value
@@ -141,8 +144,11 @@ async function onRecoverNetwork() {
 }
 
 async function onUninstallHelper() {
+  // Removing the privileged helper revokes the elevation grant and is
+  // irreversible — confirm before the single-click destructive action.
   if (!confirm(t('tunUninstallConfirm'))) return
   await tunConfig.onUninstall()
+  // Uninstall tears TUN down to the sidecar, so reflect that in the toggle.
   tunForm.tunEnable = tunConfig.enabled.value
 }
 
@@ -704,14 +710,14 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                     class="fieldset"
                   >
                     <label class="label text-xs opacity-70" :for="port.key">
-                      {{ port.label }}
+                      {{ t('port', { name: port.label }) }}
                     </label>
                     <input
                       :id="port.key"
                       v-model.number="generalConfig.form[port.key]"
                       type="number"
                       class="input-bordered input input-sm w-full font-mono"
-                      :placeholder="port.label"
+                      :placeholder="t('port', { name: port.label })"
                       @change="
                         generalConfig.save(
                           port.configKey,

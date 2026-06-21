@@ -50,3 +50,17 @@ _Avoid_: latency color, latency class, quality level
 A proxy node's rolling history of latency readings, summarized as
 min / average / jitter / success-rate and drawn as a sparkline.
 _Avoid_: latency history chart, latency stats
+
+### Kernel configuration
+
+**General Config**:
+The kernel's top-level scalar settings — allow-lan, running mode (+ mode list),
+unified-delay, outbound interface, and the listener ports (mixed / http / socks /
+redir / tproxy) — edited via `PATCH /configs`. Distinct from DNS, TUN, profile,
+and proxy configuration, which have their own seams.
+_Avoid_: core config, basic settings, localConfig
+
+**Running Mode**:
+How the kernel decides routing: rule / global / direct. Changing it re-routes the
+whole session, so a change closes existing connections.
+_Avoid_: mode (bare), policy mode
