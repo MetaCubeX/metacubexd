@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type { Config, DNSQuery } from '~/types'
+import type { DNSQuery } from '~/types'
 import { useMutation } from '@tanstack/vue-query'
 import { useConfigActions, useRequest } from '~/composables/useApi'
+import { PORT_FIELDS, useGeneralConfig } from '~/composables/useGeneralConfig'
 import {
   useConfigQuery,
   useUpdateConfigMutation,
@@ -87,6 +88,18 @@ const {
 } = useVersionQuery()
 const updateConfigMutation = useUpdateConfigMutation()
 
+// TUN PATCH (remote backends only — desktop routes through /api/control/tun).
+function saveTun(value: { enable?: boolean; stack?: string; device?: string }) {
+  updateConfigMutation.mutate({ key: 'tun', value: value as any })
+}
+
+const generalConfig = useGeneralConfig({
+  mutation: {
+    mutate: (vars, opts) => updateConfigMutation.mutate(vars as any, opts),
+  },
+  onModeChange: () => proxiesStore.closeAllConnections(),
+})
+
 // DNS settings editor (PATCH /configs { dns }) — works against any mihomo
 // backend. mutateAsync rejects on failure so save() can surface it via toast.
 const dnsSettings = useDnsSettings({
@@ -107,36 +120,30 @@ const tunStacks = ['Mixed', 'gVisor', 'System', 'LWIP']
 // privileged-restarts mihomo. On a plain remote backend the capability is
 // absent and we keep the existing PATCH behaviour (the `patch` callback).
 const tunConfig = useTunConfig({
-  patch: (value) => updateConfig('tun', value),
+  patch: (value) => saveTun(value),
 })
 onMounted(() => tunConfig.init())
 
 async function onTunToggle() {
-  // In desktop mode onToggle drives the privileged enable/disable and syncs its
-  // own status; keep the local checkbox in lock-step with the resolved state so
-  // a rejected/cancelled elevation does not leave the toggle stuck "on".
-  await tunConfig.onToggle(localConfig.tunEnable, localConfig.tunStack)
+  await tunConfig.onToggle(tunForm.tunEnable, tunForm.tunStack)
   if (tunConfig.desktopMode.value) {
-    localConfig.tunEnable = tunConfig.enabled.value
+    tunForm.tunEnable = tunConfig.enabled.value
   }
 }
 
 function onTunStackChange() {
-  void tunConfig.onStackChange(localConfig.tunStack)
+  void tunConfig.onStackChange(tunForm.tunStack)
 }
 
 async function onRecoverNetwork() {
   await tunConfig.onRecoverNetwork()
-  localConfig.tunEnable = tunConfig.enabled.value
+  tunForm.tunEnable = tunConfig.enabled.value
 }
 
 async function onUninstallHelper() {
-  // Removing the privileged helper revokes the elevation grant and is
-  // irreversible — confirm before the single-click destructive action.
   if (!confirm(t('tunUninstallConfirm'))) return
   await tunConfig.onUninstall()
-  // Uninstall tears TUN down to the sidecar, so reflect that in the toggle.
-  localConfig.tunEnable = tunConfig.enabled.value
+  tunForm.tunEnable = tunConfig.enabled.value
 }
 
 // DNS Query
@@ -181,50 +188,29 @@ async function onFetchRemoteConfig() {
   }
 }
 
-// Local state for form inputs (synced from query data)
-const localConfig = reactive({
-  allowLan: false,
-  mode: 'rule',
-  unifiedDelay: false,
-  interfaceName: '',
+// TUN display adapter — deliberately merges desktop-live tun.status (watch #2)
+// with the remote backend config (watch #1) into one bound value. NOT pure
+// duplication; consolidating it into useTunConfig is a deferred follow-up.
+const tunForm = reactive({
   tunEnable: false,
   tunStack: 'Mixed',
   tunDevice: '',
-  mixedPort: 0,
-  port: 0,
-  socksPort: 0,
-  redirPort: 0,
-  tproxyPort: 0,
 })
 
-const modes = ref<string[]>(['rule', 'direct', 'global'])
-
-// Sync backend config to local state
+// Hydrate the domain composables + the TUN adapter from the loaded config.
 watch(
   backendConfig,
   (config) => {
-    if (config) {
-      localConfig.allowLan = config['allow-lan'] || false
-      localConfig.mode = config.mode || 'rule'
-      localConfig.unifiedDelay =
-        config['unified-delay'] ?? config.UnifiedDelay ?? false
-      localConfig.interfaceName = config['interface-name'] || ''
-      // On desktop the live TUN state is owned by /api/control/tun (synced via
-      // the watch below); only seed from the Clash config on a remote backend.
-      if (!tunConfig.desktopMode.value) {
-        localConfig.tunEnable = config.tun?.enable || false
-      }
-      localConfig.tunStack = config.tun?.stack || 'Mixed'
-      localConfig.tunDevice = config.tun?.device || ''
-      localConfig.mixedPort = config['mixed-port'] || 0
-      localConfig.port = config.port || 0
-      localConfig.socksPort = config['socks-port'] || 0
-      localConfig.redirPort = config['redir-port'] || 0
-      localConfig.tproxyPort = config['tproxy-port'] || 0
-      modes.value = config['mode-list'] ||
-        config.modes || ['rule', 'direct', 'global']
-      dnsSettings.syncFromConfig(config)
+    if (!config) return
+    generalConfig.syncFromConfig(config)
+    dnsSettings.syncFromConfig(config)
+    // On desktop the live TUN enable is owned by /api/control/tun (watch below);
+    // only seed it from the Clash config on a remote backend.
+    if (!tunConfig.desktopMode.value) {
+      tunForm.tunEnable = config.tun?.enable || false
     }
+    tunForm.tunStack = config.tun?.stack || 'Mixed'
+    tunForm.tunDevice = config.tun?.device || ''
   },
   { immediate: true },
 )
@@ -235,38 +221,10 @@ watch(
   () => [tunConfig.enabled.value, tunConfig.stack.value] as const,
   ([enabled, stack]) => {
     if (!tunConfig.desktopMode.value) return
-    localConfig.tunEnable = enabled
-    if (stack) localConfig.tunStack = stack
+    tunForm.tunEnable = enabled
+    if (stack) tunForm.tunStack = stack
   },
 )
-
-const portList = computed(() => [
-  {
-    label: t('port', { name: 'Mixed' }),
-    key: 'mixedPort' as const,
-    configKey: 'mixed-port' as const,
-  },
-  {
-    label: t('port', { name: 'HTTP' }),
-    key: 'port' as const,
-    configKey: 'port' as const,
-  },
-  {
-    label: t('port', { name: 'Socks' }),
-    key: 'socksPort' as const,
-    configKey: 'socks-port' as const,
-  },
-  {
-    label: t('port', { name: 'Redir' }),
-    key: 'redirPort' as const,
-    configKey: 'redir-port' as const,
-  },
-  {
-    label: t('port', { name: 'TProxy' }),
-    key: 'tproxyPort' as const,
-    configKey: 'tproxy-port' as const,
-  },
-])
 
 function getModeLabel(mode: string) {
   const knownModes = ['rule', 'direct', 'global']
@@ -274,24 +232,6 @@ function getModeLabel(mode: string) {
     return t(mode as any) || mode
   }
   return mode
-}
-
-function updateConfig(key: keyof Config | string, value: unknown) {
-  updateConfigMutation.mutate(
-    { key: key as keyof Config, value: value as any },
-    {
-      // Switching running mode (rule/global/direct) re-routes traffic, so drop
-      // the active connections (when the user opted into autoCloseConns) for the
-      // change to take effect immediately instead of waiting for live
-      // connections to die naturally.
-      onSuccess:
-        key === 'mode'
-          ? () => {
-              proxiesStore.closeAllConnections()
-            }
-          : undefined,
-    },
-  )
 }
 
 function switchEndpoint() {
@@ -477,10 +417,12 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                 </div>
                 <input
                   id="enable-allow-lan"
-                  v-model="localConfig.allowLan"
+                  v-model="generalConfig.form.allowLan"
                   type="checkbox"
                   class="toggle toggle-primary"
-                  @change="updateConfig('allow-lan', localConfig.allowLan)"
+                  @change="
+                    generalConfig.save('allow-lan', generalConfig.form.allowLan)
+                  "
                 />
               </div>
 
@@ -502,11 +444,15 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                 </div>
                 <select
                   id="mode"
-                  v-model="localConfig.mode"
+                  v-model="generalConfig.form.mode"
                   class="select-bordered select w-32 select-sm"
-                  @change="updateConfig('mode', localConfig.mode)"
+                  @change="generalConfig.saveMode()"
                 >
-                  <option v-for="mode in modes" :key="mode" :value="mode">
+                  <option
+                    v-for="mode in generalConfig.modes.value"
+                    :key="mode"
+                    :value="mode"
+                  >
                     {{ getModeLabel(mode) }}
                   </option>
                 </select>
@@ -532,11 +478,14 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                 </div>
                 <input
                   id="unified-delay"
-                  v-model="localConfig.unifiedDelay"
+                  v-model="generalConfig.form.unifiedDelay"
                   type="checkbox"
                   class="toggle toggle-primary"
                   @change="
-                    updateConfig('unified-delay', localConfig.unifiedDelay)
+                    generalConfig.save(
+                      'unified-delay',
+                      generalConfig.form.unifiedDelay,
+                    )
                   "
                 />
               </div>
@@ -560,11 +509,14 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                 </div>
                 <input
                   id="interface-name"
-                  v-model="localConfig.interfaceName"
+                  v-model="generalConfig.form.interfaceName"
                   type="text"
                   class="input-bordered input input-sm w-32"
                   @change="
-                    updateConfig('interface-name', localConfig.interfaceName)
+                    generalConfig.save(
+                      'interface-name',
+                      generalConfig.form.interfaceName,
+                    )
                   "
                 />
               </div>
@@ -600,7 +552,7 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                     />
                     <input
                       id="enable-tun-device"
-                      v-model="localConfig.tunEnable"
+                      v-model="tunForm.tunEnable"
                       type="checkbox"
                       class="toggle toggle-primary"
                       :disabled="
@@ -706,7 +658,7 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                   </div>
                   <select
                     id="tun-ip-stack"
-                    v-model="localConfig.tunStack"
+                    v-model="tunForm.tunStack"
                     class="select-bordered select w-32 select-sm"
                     :disabled="
                       tunConfig.desktopMode.value && tunConfig.busy.value
@@ -734,12 +686,10 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                   </div>
                   <input
                     id="device-name"
-                    v-model="localConfig.tunDevice"
+                    v-model="tunForm.tunDevice"
                     type="text"
                     class="input-bordered input input-sm w-32"
-                    @change="
-                      updateConfig('tun', { device: localConfig.tunDevice })
-                    "
+                    @change="saveTun({ device: tunForm.tunDevice })"
                   />
                 </div>
               </div>
@@ -749,7 +699,7 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
               <div class="flex flex-col gap-2">
                 <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
                   <fieldset
-                    v-for="port in portList"
+                    v-for="port in PORT_FIELDS"
                     :key="port.key"
                     class="fieldset"
                   >
@@ -758,12 +708,15 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                     </label>
                     <input
                       :id="port.key"
-                      v-model.number="localConfig[port.key]"
+                      v-model.number="generalConfig.form[port.key]"
                       type="number"
                       class="input-bordered input input-sm w-full font-mono"
                       :placeholder="port.label"
                       @change="
-                        updateConfig(port.configKey, localConfig[port.key])
+                        generalConfig.save(
+                          port.configKey,
+                          generalConfig.form[port.key],
+                        )
                       "
                     />
                   </fieldset>
