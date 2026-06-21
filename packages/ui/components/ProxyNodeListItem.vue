@@ -1,11 +1,7 @@
 <script setup lang="ts">
 import { IconCircleCheckFilled } from '@tabler/icons-vue'
 import dayjs from 'dayjs'
-import {
-  filterSpecialProxyType,
-  formatProxyType,
-  getLatencyClassName,
-} from '~/utils'
+import { getLatencyClassName } from '~/utils'
 
 interface Props {
   proxyName: string
@@ -24,57 +20,23 @@ const emit = defineEmits<{
   click: []
 }>()
 
-const proxiesStore = useProxiesStore()
 const configStore = useConfigStore()
 const { t } = useI18n()
 
-const proxyNode = computed(() => proxiesStore.proxyNodeMap[props.proxyName])
-const proxyType = computed(() =>
-  formatProxyType(proxyNode.value?.type || '', t),
+const {
+  proxyType,
+  isUDP,
+  specialTypes,
+  isTesting,
+  stabilityBar,
+  historyReversed,
+  runLatencyTest,
+} = useProxyNode(
+  () => props.proxyName,
+  () => props.testUrl,
+  () => props.timeout,
+  { providerName: () => props.providerName },
 )
-const isUDP = computed(() => proxyNode.value?.xudp || proxyNode.value?.udp)
-const isProviderTesting = computed(() =>
-  props.providerName
-    ? proxiesStore.proxyProviderLatencyTestingMap[props.providerName] || false
-    : false,
-)
-const isTesting = computed(
-  () =>
-    proxiesStore.proxyLatencyTestingMap[props.proxyName] ||
-    isProviderTesting.value,
-)
-
-const specialTypes = computed(() => {
-  if (!proxyNode.value || !filterSpecialProxyType(proxyNode.value.type))
-    return null
-
-  return [
-    proxyNode.value.xudp && 'xudp',
-    proxyNode.value.udp && 'udp',
-    proxyNode.value.tfo && 'TFO',
-  ]
-    .filter(Boolean)
-    .join(' / ')
-})
-
-const latencyTestHistory = computed(() =>
-  proxiesStore
-    .getLatencyHistoryByName(props.proxyName, props.testUrl)
-    .toReversed(),
-)
-
-// Stability bar: chronological order, each segment colored by latency quality
-const latencyStabilityBar = computed(() => {
-  const history = proxiesStore.getLatencyHistoryByName(
-    props.proxyName,
-    props.testUrl,
-  )
-  return history.map((result) => ({
-    colorClass: result.delay
-      ? getLatencyClassName(result.delay, configStore.latencyQualityMap)
-      : 'text-neutral-content/30',
-  }))
-})
 
 // Anchor element for the lazily-mounted tooltip
 const reference = ref<HTMLElement | null>(null)
@@ -135,12 +97,7 @@ function onClick() {
 function handleLatencyTest() {
   clearTimeouts()
   openTooltip()
-  proxiesStore.proxyLatencyTest(
-    props.proxyName,
-    proxyNode.value?.provider || '',
-    props.testUrl,
-    props.timeout,
-  )
+  runLatencyTest()
 }
 
 onBeforeUnmount(() => {
@@ -214,11 +171,11 @@ onBeforeUnmount(() => {
           />
           <!-- Latency stability bar -->
           <div
-            v-if="latencyStabilityBar.length > 0"
+            v-if="stabilityBar.length > 0"
             class="flex h-[3px] w-full max-w-[44px] gap-px overflow-hidden rounded-full"
           >
             <div
-              v-for="(result, index) in latencyStabilityBar"
+              v-for="(result, index) in stabilityBar"
               :key="index"
               class="h-full flex-1 bg-current first:rounded-l-full last:rounded-r-full"
               :class="result.colorClass"
@@ -241,10 +198,10 @@ onBeforeUnmount(() => {
             ({{ specialTypes }})
           </div>
 
-          <template v-if="latencyTestHistory.length > 0">
+          <template v-if="historyReversed.length > 0">
             <div class="flex max-h-60 w-full flex-col gap-2 overflow-y-auto">
               <div
-                v-for="(result, index) in latencyTestHistory"
+                v-for="(result, index) in historyReversed"
                 :key="index"
                 class="flex items-start gap-2"
               >

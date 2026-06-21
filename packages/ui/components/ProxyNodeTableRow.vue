@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { IconCircleCheckFilled } from '@tabler/icons-vue'
-import { formatProxyType } from '~/utils'
 
 interface Props {
   proxyName: string
@@ -17,23 +16,12 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{ click: [] }>()
 
-const proxiesStore = useProxiesStore()
-const { t } = useI18n()
-
-const proxyNode = computed(() => proxiesStore.proxyNodeMap[props.proxyName])
-const proxyType = computed(() =>
-  formatProxyType(proxyNode.value?.type || '', t),
+const { proxyType, isUDP, runLatencyTest } = useProxyNode(
+  () => props.proxyName,
+  () => props.testUrl,
+  () => props.timeout,
+  { providerName: () => props.providerName },
 )
-const isUDP = computed(() => proxyNode.value?.xudp || proxyNode.value?.udp)
-
-function handleLatencyTest() {
-  proxiesStore.proxyLatencyTest(
-    props.proxyName,
-    proxyNode.value?.provider || '',
-    props.testUrl,
-    props.timeout,
-  )
-}
 </script>
 
 <template>
@@ -76,7 +64,7 @@ function handleLatencyTest() {
         :test-url="testUrl"
         :provider-name="providerName"
         interactive
-        @click.stop="handleLatencyTest"
+        @click.stop="runLatencyTest"
       />
     </span>
   </div>

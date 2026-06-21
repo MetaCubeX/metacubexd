@@ -34,22 +34,11 @@ const latency = computed(() =>
   proxiesStore.getLatencyByName(props.proxyName, props.testUrl),
 )
 
-const isProviderTesting = computed(() =>
-  props.providerName
-    ? proxiesStore.proxyProviderLatencyTestingMap[props.providerName] || false
-    : false,
-)
-const isGroupTesting = computed(() =>
-  props.groupName
-    ? proxiesStore.proxyGroupLatencyTestingMap[props.groupName] || false
-    : false,
-)
-
-const isTesting = computed(
-  () =>
-    proxiesStore.proxyLatencyTestingMap[props.proxyName] ||
-    isProviderTesting.value ||
-    isGroupTesting.value,
+const isTesting = computed(() =>
+  proxiesStore.isTesting(props.proxyName, {
+    providerName: props.providerName,
+    groupName: props.groupName,
+  }),
 )
 
 const latencyClass = computed(() =>

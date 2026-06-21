@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { getLatencyClassName } from '~/utils'
-
 interface Props {
   proxyName: string
   testUrl: string | null
@@ -16,30 +14,12 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{ click: [] }>()
 
-const proxiesStore = useProxiesStore()
-const configStore = useConfigStore()
-
-const proxyNode = computed(() => proxiesStore.proxyNodeMap[props.proxyName])
-const isUDP = computed(() => proxyNode.value?.xudp || proxyNode.value?.udp)
-
-// Latency-quality colored dot (mirrors the stability-bar coloring in ListItem)
-const latency = computed(() =>
-  proxiesStore.getLatencyByName(props.proxyName, props.testUrl),
+const { isUDP, latencyColorClass, runLatencyTest } = useProxyNode(
+  () => props.proxyName,
+  () => props.testUrl,
+  () => props.timeout,
+  { providerName: () => props.providerName },
 )
-const dotColorClass = computed(() =>
-  latency.value
-    ? getLatencyClassName(latency.value, configStore.latencyQualityMap)
-    : 'text-neutral-content/30',
-)
-
-function handleLatencyTest() {
-  proxiesStore.proxyLatencyTest(
-    props.proxyName,
-    proxyNode.value?.provider || '',
-    props.testUrl,
-    props.timeout,
-  )
-}
 </script>
 
 <template>
@@ -55,7 +35,7 @@ function handleLatencyTest() {
   >
     <span
       class="size-2 shrink-0 rounded-full bg-current"
-      :class="isSelected ? '' : dotColorClass"
+      :class="isSelected ? '' : latencyColorClass"
     />
     <span class="max-w-[12rem] truncate font-medium">
       <ProxyNodeName :name="proxyName" />
@@ -65,7 +45,7 @@ function handleLatencyTest() {
       :proxy-name="proxyName"
       :test-url="testUrl"
       :provider-name="providerName"
-      @click.stop="handleLatencyTest"
+      @click.stop="runLatencyTest"
     />
   </button>
 </template>

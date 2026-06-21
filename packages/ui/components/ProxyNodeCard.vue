@@ -1,11 +1,7 @@
 <script setup lang="ts">
 import { IconCircleCheckFilled, IconStar } from '@tabler/icons-vue'
 import dayjs from 'dayjs'
-import {
-  filterSpecialProxyType,
-  formatProxyType,
-  getLatencyClassName,
-} from '~/utils'
+import { getLatencyClassName } from '~/utils'
 import { computeLatencyTrend, svgPathFromPoints } from '~/utils/latencyTrend'
 import {
   calculateNodeScore,
@@ -38,12 +34,6 @@ const proxiesStore = useProxiesStore()
 const configStore = useConfigStore()
 const nodeRecommendationStore = useNodeRecommendationStore()
 const { t } = useI18n()
-
-const proxyNode = computed(() => proxiesStore.proxyNodeMap[props.proxyName])
-const proxyType = computed(() =>
-  formatProxyType(proxyNode.value?.type || '', t),
-)
-const isUDP = computed(() => proxyNode.value?.xudp || proxyNode.value?.udp)
 
 // Node performance data
 const nodePerformance = computed(() =>
@@ -85,54 +75,20 @@ const scoreColorClass = computed(() => {
   return getScoreColorClass(nodeScore.value)
 })
 
-// Check if this node is being tested (individually, via provider, or via group)
-const isProviderTesting = computed(() =>
-  props.providerName
-    ? proxiesStore.proxyProviderLatencyTestingMap[props.providerName] || false
-    : false,
+const {
+  proxyType,
+  isUDP,
+  specialTypes,
+  isTesting,
+  stabilityBar,
+  historyReversed,
+  runLatencyTest,
+} = useProxyNode(
+  () => props.proxyName,
+  () => props.testUrl,
+  () => props.timeout,
+  { providerName: () => props.providerName, groupName: () => props.groupName },
 )
-const isGroupTesting = computed(() =>
-  props.groupName
-    ? proxiesStore.proxyGroupLatencyTestingMap[props.groupName] || false
-    : false,
-)
-const isTesting = computed(
-  () =>
-    proxiesStore.proxyLatencyTestingMap[props.proxyName] ||
-    isProviderTesting.value ||
-    isGroupTesting.value,
-)
-
-const specialTypes = computed(() => {
-  if (!filterSpecialProxyType(proxyNode.value?.type)) return null
-
-  return `(${[
-    proxyNode.value?.xudp && 'xudp',
-    proxyNode.value?.udp && 'udp',
-    proxyNode.value?.tfo && 'TFO',
-  ]
-    .filter(Boolean)
-    .join(' / ')})`
-})
-
-const latencyTestHistory = computed(() =>
-  proxiesStore
-    .getLatencyHistoryByName(props.proxyName, props.testUrl)
-    .toReversed(),
-)
-
-// Stability bar: chronological order, each segment colored by latency quality
-const latencyStabilityBar = computed(() => {
-  const history = proxiesStore.getLatencyHistoryByName(
-    props.proxyName,
-    props.testUrl,
-  )
-  return history.map((result) => ({
-    colorClass: result.delay
-      ? getLatencyClassName(result.delay, configStore.latencyQualityMap)
-      : 'text-neutral-content/30',
-  }))
-})
 
 // Anchor element for the lazily-mounted tooltip
 const reference = ref<HTMLElement | null>(null)
@@ -265,12 +221,7 @@ function onClick() {
 function handleLatencyTest() {
   clearTimeouts()
   openTooltip()
-  proxiesStore.proxyLatencyTest(
-    props.proxyName,
-    proxyNode.value?.provider || '',
-    props.testUrl,
-    props.timeout,
-  )
+  runLatencyTest()
 }
 </script>
 
@@ -363,11 +314,11 @@ function handleLatencyTest() {
         <div class="mt-auto min-h-[0.375rem]">
           <!-- Latency stability bar -->
           <div
-            v-if="latencyStabilityBar.length > 0"
+            v-if="stabilityBar.length > 0"
             class="flex h-1.5 w-full gap-px overflow-hidden rounded-full"
           >
             <div
-              v-for="(result, index) in latencyStabilityBar"
+              v-for="(result, index) in stabilityBar"
               :key="index"
               class="h-full flex-1 bg-current first:rounded-l-full last:rounded-r-full"
               :class="result.colorClass"
@@ -397,7 +348,7 @@ function handleLatencyTest() {
             v-if="specialTypes"
             class="w-full text-center text-xs uppercase opacity-80"
           >
-            {{ specialTypes }}
+            ({{ specialTypes }})
           </div>
 
           <!-- Latency Trend Mini Chart -->
@@ -462,11 +413,11 @@ function handleLatencyTest() {
             </div>
           </div>
 
-          <template v-if="latencyTestHistory.length > 0">
+          <template v-if="historyReversed.length > 0">
             <ul
               class="m-0 max-h-48 w-full [scrollbar-width:thin] [scrollbar-color:color-mix(in_oklch,var(--color-primary-content)_30%,transparent)_transparent] list-none overflow-y-auto p-0 pr-2 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:rounded-sm [&::-webkit-scrollbar-thumb]:bg-[color-mix(in_oklch,var(--color-primary-content)_30%,transparent)] [&::-webkit-scrollbar-track]:bg-transparent"
             >
-              <li v-for="(result, index) in latencyTestHistory" :key="index">
+              <li v-for="(result, index) in historyReversed" :key="index">
                 <div
                   class="flex items-start gap-2 border-b border-[color-mix(in_oklch,var(--color-primary-content)_15%,transparent)] py-1.5 last:border-b-0"
                 >
