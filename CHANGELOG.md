@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.258.3](https://github.com/MetaCubeX/metacubexd/compare/v1.258.2...v1.258.3) (2026-06-21)
+
+
+### Bug Fixes
+
+* honor CONTROL_PORT in docker and auto-refresh after sidebar kernel actions ([275f5af](https://github.com/MetaCubeX/metacubexd/commit/275f5afb7dd7f6ea0307d617bcd8670abc090f12))
+
 ## [1.258.2](https://github.com/MetaCubeX/metacubexd/compare/v1.258.1...v1.258.2) (2026-06-21)
 
 
