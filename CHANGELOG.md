@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.258.2](https://github.com/MetaCubeX/metacubexd/compare/v1.258.1...v1.258.2) (2026-06-21)
+
+
+### Bug Fixes
+
+* **setup:** generate endpoint id without crypto.randomUUID in insecure contexts ([449bdd5](https://github.com/MetaCubeX/metacubexd/commit/449bdd5a4e2ff79814caf12f4562951aa26b62a8)), closes [#2054](https://github.com/MetaCubeX/metacubexd/issues/2054)
+
 ## [1.258.1](https://github.com/MetaCubeX/metacubexd/compare/v1.258.0...v1.258.1) (2026-06-20)
 
 
