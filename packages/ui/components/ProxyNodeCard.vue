@@ -241,47 +241,67 @@ function onTooltipMouseLeave() {
   closeTooltip()
 }
 
+// Mobile: a quick tap selects the node; a long-press opens the tooltip.
+// Tap and the synthetic click that follows touchend must NOT both fire —
+// long-press sets longPressFired so the resulting click skips selection.
 let touchStartX = 0
 let touchStartY = 0
-let isTouchMoved = false
+let longPressFired = false
+let longPressTimeout: ReturnType<typeof setTimeout> | null = null
 const TOUCH_MOVE_THRESHOLD = 10
+const LONG_PRESS_DURATION = 500
+
+function clearLongPress() {
+  if (longPressTimeout) {
+    clearTimeout(longPressTimeout)
+    longPressTimeout = null
+  }
+}
 
 function onTouchStart(e: TouchEvent) {
-  if (isTooltipOpen.value) {
-    return
-  }
+  if (isTooltipOpen.value) return
   const touch = e.touches[0]
   if (!touch) return
   touchStartX = touch.clientX
   touchStartY = touch.clientY
-  isTouchMoved = false
+  longPressFired = false
+  clearLongPress()
+  longPressTimeout = setTimeout(() => {
+    longPressFired = true
+    openTooltip()
+  }, LONG_PRESS_DURATION)
 }
 
 function onTouchMove(e: TouchEvent) {
-  if (isTouchMoved) return
   const touch = e.touches[0]
   if (!touch) return
   const dx = Math.abs(touch.clientX - touchStartX)
   const dy = Math.abs(touch.clientY - touchStartY)
+  // Moved past the threshold — this is a scroll, not a long-press.
   if (dx > TOUCH_MOVE_THRESHOLD || dy > TOUCH_MOVE_THRESHOLD) {
-    isTouchMoved = true
+    clearLongPress()
   }
 }
 
 function onTouchEnd() {
-  if (!isTouchMoved && !isTooltipOpen.value) {
-    openTooltip()
-  }
+  // Lifted before the timer fired — a tap; let the click select the node.
+  clearLongPress()
 }
 
 onBeforeUnmount(() => {
   clearTimeouts()
+  clearLongPress()
   document.removeEventListener('click', onDocumentClick, true)
   document.removeEventListener('touchstart', onDocumentClick, true)
   releaseSingletonPopover(closeTooltip)
 })
 
 function onClick() {
+  // Long-press already opened the tooltip; swallow the trailing synthetic click.
+  if (longPressFired) {
+    longPressFired = false
+    return
+  }
   emit('click')
 }
 
@@ -302,7 +322,7 @@ function handleLatencyTest() {
   <div class="relative h-full p-0.5" :class="isSelected ? 'z-10' : 'z-0'">
     <div
       ref="reference"
-      class="proxy-card relative h-full w-full rounded-[0.625rem]"
+      class="proxy-card relative h-full w-full rounded-[0.625rem] select-none"
       :class="[
         isSelected
           ? 'proxy-card--selected animate-[glowPulse_2s_ease-in-out_infinite] bg-primary text-primary-content'
