@@ -1,6 +1,6 @@
 {
   "name": "metacubexd-monorepo",
-  "version": "1.258.4",
+  "version": "1.259.0",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.34.1",
