@@ -25,8 +25,10 @@ export interface ProxyNodeView {
   tfo: boolean
   alive?: boolean
   provider: string
-  // The honest `now`: the leaf node a group currently routes through, or
-  // undefined for a leaf. Internalizes the kernel's `latency`-as-now alias.
+  // The member this group directly selects (the kernel's `now`) — ONE hop, not
+  // recursively resolved to the leaf (use getNowProxyNodeName for the leaf).
+  // undefined for a leaf node. Internalizes the `latency`-as-now alias so the
+  // trap field never surfaces on the view.
   selectedNodeName?: string
 }
 

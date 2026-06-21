@@ -18,6 +18,7 @@ describe('computeLatencyTrend', () => {
     expect(trend!.min).toBe(100)
     expect(trend!.max).toBe(200)
     expect(trend!.avg).toBe(150)
+    expect(trend!.jitter).toBe(50)
     expect(trend!.successTests).toBe(2)
     expect(trend!.totalTests).toBe(3)
     expect(trend!.successRate).toBe(67)
