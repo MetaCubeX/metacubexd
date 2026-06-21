@@ -2,6 +2,7 @@ import type { Rule } from '~/types'
 import { describe, expect, it, vi } from 'vitest'
 import { PROXIES_ORDERING_TYPE, RULES_ORDERING_TYPE } from '~/constants'
 import {
+  classifyLatency,
   codeToFlag,
   compareVersions,
   encodeSvg,
@@ -156,6 +157,26 @@ describe('utils/index', () => {
 
     it('handles empty string', () => {
       expect(formatProxyType('', mockT)).toBe('')
+    })
+  })
+
+  describe('classifyLatency', () => {
+    const map = { NOT_CONNECTED: 0, MEDIUM: 200, HIGH: 500 }
+
+    it('bands a fast reading as good', () => {
+      expect(classifyLatency(100, map)).toBe('good')
+    })
+    it('bands a mid reading as medium', () => {
+      expect(classifyLatency(300, map)).toBe('medium')
+    })
+    it('bands a slow reading as slow', () => {
+      expect(classifyLatency(600, map)).toBe('slow')
+    })
+    it('bands the NOT_CONNECTED sentinel as not-connected', () => {
+      expect(classifyLatency(0, map)).toBe('not-connected')
+    })
+    it('treats the MEDIUM boundary as good (not medium)', () => {
+      expect(classifyLatency(200, map)).toBe('good')
     })
   })
 

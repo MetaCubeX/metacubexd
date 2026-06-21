@@ -217,18 +217,32 @@ export function formatProxyType(
   return lt
 }
 
+export type LatencyBand = 'good' | 'medium' | 'slow' | 'not-connected'
+
+// The single Latency Band ladder. getLatencyClassName, ProxyPreviewBar and
+// ProxyPreviewDots all classify against THIS — no forked thresholds.
+export function classifyLatency(
+  latency: number,
+  latencyQualityMap: LatencyQualityMap,
+): LatencyBand {
+  if (latency > latencyQualityMap.HIGH) return 'slow'
+  if (latency > latencyQualityMap.MEDIUM) return 'medium'
+  if (latency === latencyQualityMap.NOT_CONNECTED) return 'not-connected'
+  return 'good'
+}
+
+const LATENCY_BAND_TEXT_CLASS: Record<LatencyBand, string> = {
+  slow: 'text-red-500',
+  medium: 'text-yellow-500',
+  'not-connected': 'text-gray',
+  good: 'text-green-600',
+}
+
 export function getLatencyClassName(
   latency: number,
   latencyQualityMap: LatencyQualityMap,
 ) {
-  if (latency > latencyQualityMap.HIGH) {
-    return 'text-red-500'
-  } else if (latency > latencyQualityMap.MEDIUM) {
-    return 'text-yellow-500'
-  } else if (latency === latencyQualityMap.NOT_CONNECTED) {
-    return 'text-gray'
-  }
-  return 'text-green-600'
+  return LATENCY_BAND_TEXT_CLASS[classifyLatency(latency, latencyQualityMap)]
 }
 
 export function filterSpecialProxyType(type: string = '') {
