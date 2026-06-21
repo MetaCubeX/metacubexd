@@ -6,6 +6,7 @@ import {
   formatProxyType,
   getLatencyClassName,
 } from '~/utils'
+import { computeLatencyTrend, svgPathFromPoints } from '~/utils/latencyTrend'
 import {
   calculateNodeScore,
   formatTimeSince,
@@ -63,64 +64,20 @@ const lastTestTimeFormatted = computed(() => {
   return formatTimeSince(perf.lastTestTime)
 })
 
-// Latency trend data for the mini chart — derived from the SAME kernel history
-// the detail list below renders (getLatencyHistoryByName), so the sparkline,
-// the min/avg/max/jitter stats and the per-test list always agree.
-const latencyTrendData = computed(() => {
-  const history = proxiesStore.getLatencyHistoryByName(
-    props.proxyName,
-    props.testUrl,
-  )
-  if (history.length === 0) return null
+// Latency trend for the mini chart — derived from the SAME kernel history the
+// detail list renders (getLatencyHistoryByName), so sparkline, stats and list
+// always agree.
+const latencyTrendData = computed(() =>
+  computeLatencyTrend(
+    proxiesStore.getLatencyHistoryByName(props.proxyName, props.testUrl),
+  ),
+)
 
-  // Successful measurements only — delay === 0 is NOT_CONNECTED (a failed test).
-  // Already chronological, so the sparkline reads left (oldest) to right (newest).
-  const latencies = history.filter((h) => h.delay > 0).map((h) => h.delay)
-
-  if (latencies.length < 2) return null
-
-  const min = Math.min(...latencies)
-  const max = Math.max(...latencies)
-  const range = max - min || 1
-  const avg = Math.round(
-    latencies.reduce((a, b) => a + b, 0) / latencies.length,
-  )
-
-  // Jitter = standard deviation of the successful latencies
-  const variance =
-    latencies.reduce((sum, lat) => sum + (lat - avg) ** 2, 0) / latencies.length
-  const jitter = Math.round(Math.sqrt(variance))
-
-  // Success rate spans the full history (failed tests counted in the divisor)
-  const totalTests = history.length
-  const successTests = latencies.length
-  const successRate = Math.round((successTests / totalTests) * 100)
-
-  // Normalize into the SVG coordinate space (viewBox is 100 x 50 below).
-  // y must stay within 0-50 or the sparkline is clipped by the viewBox.
-  const points = latencies.map((lat, i) => ({
-    x: (i / (latencies.length - 1)) * 100,
-    y: 50 - ((lat - min) / range) * 40 - 5, // 5-45 range to leave padding
-  }))
-
-  return {
-    points,
-    min,
-    max,
-    avg,
-    jitter,
-    successRate,
-    totalTests,
-    successTests,
-  }
-})
-
-// SVG path for sparkline
-const sparklinePath = computed(() => {
-  if (!latencyTrendData.value) return ''
-  const { points } = latencyTrendData.value
-  return points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')
-})
+const sparklinePath = computed(() =>
+  latencyTrendData.value
+    ? svgPathFromPoints(latencyTrendData.value.points)
+    : '',
+)
 
 // Score color class
 const scoreColorClass = computed(() => {
