@@ -449,8 +449,9 @@ export function useConfigActions() {
         searchParams: { force: true },
         json: { path: '', payload: '' },
       })
+      return true
     } catch {
-      /* empty */
+      return false
     } finally {
       reloadingConfigFile.value = false
     }
@@ -543,8 +544,9 @@ export function useConfigActions() {
     restartingBackend.value = true
     try {
       await request.post('restart')
+      return true
     } catch {
-      /* empty */
+      return false
     } finally {
       restartingBackend.value = false
     }

@@ -184,15 +184,18 @@ const toggleSidebar = () => {
 // uses, so the sidebar shortcuts work against any mihomo backend without a page
 // switch.
 async function onReloadConfig() {
-  await configActions.reloadConfigFileAPI()
-  toast.success(t('reloadConfigSuccess'))
+  // #2057: on success, reload the page so the freshly-applied config surfaces
+  // across every view (proxies/rules/etc.) — same window.location.reload()
+  // pattern used after a settings import. The reload itself is the feedback.
+  if (await configActions.reloadConfigFileAPI()) window.location.reload()
 }
 
-function onRestartCore() {
+async function onRestartCore() {
   // Restarting drops every active connection — guard the one-click action with a
   // confirm (matches traffic.vue's confirm() pattern for destructive ops).
   if (!window.confirm(t('restartCoreConfirm'))) return
-  void configActions.restartBackendAPI()
+  // #2057: refresh once the core is back so the UI reconnects to the new process.
+  if (await configActions.restartBackendAPI()) window.location.reload()
 }
 </script>
 
