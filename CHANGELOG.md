@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.259.0](https://github.com/MetaCubeX/metacubexd/compare/v1.258.4...v1.259.0) (2026-06-21)
+
+
+### Features
+
+* **ui:** add useProxyNode read-model composable ([7dbc097](https://github.com/MetaCubeX/metacubexd/commit/7dbc09737885944a4756b635ccfa520a24967cc0))
+
 ## [1.258.4](https://github.com/MetaCubeX/metacubexd/compare/v1.258.3...v1.258.4) (2026-06-21)
 
 
