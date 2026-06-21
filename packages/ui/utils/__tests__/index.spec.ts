@@ -18,6 +18,7 @@ import {
   getRuleFacets,
   isSingBoxVersion,
   parseNodeRegion,
+  randomUUID,
   REGION_OTHER,
   sortProxiesByOrderingType,
   sortRulesByOrderingType,
@@ -54,6 +55,28 @@ describe('utils/index', () => {
       // In test environment, window.location.protocol may not be defined
       const result = transformEndpointURL('localhost:9090')
       expect(result).toMatch(/^https?:\/\/localhost:9090$/)
+    })
+  })
+
+  describe('randomUUID', () => {
+    const UUID_V4_RE =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
+
+    it('uses native crypto.randomUUID when available', () => {
+      expect(randomUUID()).toMatch(UUID_V4_RE)
+    })
+
+    it('falls back to getRandomValues in non-secure contexts', () => {
+      // Simulate http://IP:port where crypto.randomUUID is unavailable.
+      const original = crypto.randomUUID
+      // @ts-expect-error force the typeof guard to fall through
+      crypto.randomUUID = undefined
+
+      try {
+        expect(randomUUID()).toMatch(UUID_V4_RE)
+      } finally {
+        crypto.randomUUID = original
+      }
     })
   })
 

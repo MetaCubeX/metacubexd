@@ -117,6 +117,22 @@ export function transformEndpointURL(url: string) {
     : `${typeof window !== 'undefined' ? window.location.protocol : 'http:'}//${url}`
 }
 
+// crypto.randomUUID() is restricted to secure contexts (HTTPS/localhost), so it
+// throws over plain-HTTP LAN access (e.g. http://IP:port). getRandomValues()
+// works there, so fall back to building a v4 UUID from it.
+export function randomUUID(): string {
+  if (typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
+  }
+
+  const bytes = crypto.getRandomValues(new Uint8Array(16))
+  bytes[6] = (bytes[6]! & 0x0F) | 0x40 // version 4
+  bytes[8] = (bytes[8]! & 0x3F) | 0x80 // variant 10
+  const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
+
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
+}
+
 const IPV6_RE = /:.*:/
 const IPV4_RE = /\./
 

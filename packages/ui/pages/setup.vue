@@ -12,7 +12,7 @@ import {
 import { useSortable } from '@vueuse/integrations/useSortable'
 import { checkEndpointAPI } from '~/composables/useApi'
 import { FALLBACK_BACKEND_URL } from '~/constants'
-import { transformEndpointURL } from '~/utils'
+import { randomUUID, transformEndpointURL } from '~/utils'
 
 definePageMeta({
   layout: 'default',
@@ -90,7 +90,7 @@ async function onSubmit() {
       return
     }
 
-    const id = crypto.randomUUID()
+    const id = randomUUID()
     const list = [...endpointStore.endpointList]
     const point = list.find((history) => history.url === transformedURL)
 
