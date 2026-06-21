@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.258.4](https://github.com/MetaCubeX/metacubexd/compare/v1.258.3...v1.258.4) (2026-06-21)
+
+
+### Bug Fixes
+
+* **proxies:** require long-press for node tooltip on mobile so tap only selects ([5205b43](https://github.com/MetaCubeX/metacubexd/commit/5205b437e6967d8ba61304f5ee2ede2e906afc12))
+
 ## [1.258.3](https://github.com/MetaCubeX/metacubexd/compare/v1.258.2...v1.258.3) (2026-06-21)
 
 
