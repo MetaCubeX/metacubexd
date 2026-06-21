@@ -238,10 +238,7 @@ const ProxyGroupTitle = defineComponent({
     const recommendedNode = computed(() => getRecommendedNode(props.proxyGroup))
     const totalProxyCount = computed(() => props.proxyGroup.all?.length ?? 0)
     const aliveProxyCount = computed(
-      () =>
-        props.proxyGroup.all?.filter(
-          (proxyName) => proxiesStore.proxyNodeMap[proxyName]?.alive === true,
-        ).length ?? 0,
+      () => proxiesStore.aliveNodeNames(props.proxyGroup.all ?? []).length,
     )
     const hasRecommendation = computed(
       () =>

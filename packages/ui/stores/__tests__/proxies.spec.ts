@@ -82,32 +82,34 @@ describe('stores/proxies latency state', () => {
     )
 
     const store = useProxiesStore()
-    store.proxyNodeMap = {
-      'node-a': {
-        name: 'node-a',
-        alive: true,
-        udp: false,
-        tfo: false,
-        latencyTestHistory: {
-          [mockConfigStore.urlForLatencyTest]: [
-            { time: '2026-05-19T13:17:31.000Z', delay: 88 },
-          ],
-          'https://latency.test/old': [
-            { time: '2026-05-19T13:15:31.000Z', delay: 66 },
-          ],
+    store.__seed({
+      nodes: {
+        'node-a': {
+          name: 'node-a',
+          alive: true,
+          udp: false,
+          tfo: false,
+          latencyTestHistory: {
+            [mockConfigStore.urlForLatencyTest]: [
+              { time: '2026-05-19T13:17:31.000Z', delay: 88 },
+            ],
+            'https://latency.test/old': [
+              { time: '2026-05-19T13:15:31.000Z', delay: 66 },
+            ],
+          },
+          latency: '',
+          xudp: false,
+          type: 'ss',
+          provider: '',
         },
-        latency: '',
-        xudp: false,
-        type: 'ss',
-        provider: '',
       },
-    }
-    store.latencyMap = {
-      'node-a': {
-        [mockConfigStore.urlForLatencyTest]: 88,
-        'https://latency.test/old': 66,
+      latency: {
+        'node-a': {
+          [mockConfigStore.urlForLatencyTest]: 88,
+          'https://latency.test/old': 66,
+        },
       },
-    }
+    })
 
     const testing = store.proxyLatencyTest('node-a', '', null, null)
 
@@ -128,28 +130,30 @@ describe('stores/proxies latency state', () => {
     apiMocks.proxyLatencyTestAPI.mockResolvedValue({ delay: 42 })
 
     const store = useProxiesStore()
-    store.proxyNodeMap = {
-      'node-a': {
-        name: 'node-a',
-        alive: true,
-        udp: false,
-        tfo: false,
-        latencyTestHistory: {
-          [mockConfigStore.urlForLatencyTest]: [
-            { time: '2026-05-19T13:17:31.000Z', delay: 88 },
-          ],
+    store.__seed({
+      nodes: {
+        'node-a': {
+          name: 'node-a',
+          alive: true,
+          udp: false,
+          tfo: false,
+          latencyTestHistory: {
+            [mockConfigStore.urlForLatencyTest]: [
+              { time: '2026-05-19T13:17:31.000Z', delay: 88 },
+            ],
+          },
+          latency: '',
+          xudp: false,
+          type: 'ss',
+          provider: '',
         },
-        latency: '',
-        xudp: false,
-        type: 'ss',
-        provider: '',
       },
-    }
-    store.latencyMap = {
-      'node-a': {
-        [mockConfigStore.urlForLatencyTest]: 88,
+      latency: {
+        'node-a': {
+          [mockConfigStore.urlForLatencyTest]: 88,
+        },
       },
-    }
+    })
 
     await store.proxyLatencyTest('node-a', '', null, null)
 
@@ -169,28 +173,30 @@ describe('stores/proxies latency state', () => {
     apiMocks.proxyLatencyTestAPI.mockRejectedValue(new Error('boom'))
 
     const store = useProxiesStore()
-    store.proxyNodeMap = {
-      'node-a': {
-        name: 'node-a',
-        alive: true,
-        udp: false,
-        tfo: false,
-        latencyTestHistory: {
-          [mockConfigStore.urlForLatencyTest]: [
-            { time: '2026-05-19T13:17:31.000Z', delay: 88 },
-          ],
+    store.__seed({
+      nodes: {
+        'node-a': {
+          name: 'node-a',
+          alive: true,
+          udp: false,
+          tfo: false,
+          latencyTestHistory: {
+            [mockConfigStore.urlForLatencyTest]: [
+              { time: '2026-05-19T13:17:31.000Z', delay: 88 },
+            ],
+          },
+          latency: '',
+          xudp: false,
+          type: 'ss',
+          provider: '',
         },
-        latency: '',
-        xudp: false,
-        type: 'ss',
-        provider: '',
       },
-    }
-    store.latencyMap = {
-      'node-a': {
-        [mockConfigStore.urlForLatencyTest]: 88,
+      latency: {
+        'node-a': {
+          [mockConfigStore.urlForLatencyTest]: 88,
+        },
       },
-    }
+    })
 
     await store.proxyLatencyTest('node-a', '', null, null)
 
@@ -227,38 +233,40 @@ describe('stores/proxies latency state', () => {
         now: 'node-a',
       } as never,
     ]
-    store.proxyNodeMap = {
-      'node-a': {
-        name: 'node-a',
-        alive: true,
-        udp: false,
-        tfo: false,
-        latencyTestHistory: {
-          [mockConfigStore.urlForLatencyTest]: [
-            { time: '2026-05-19T13:17:31.000Z', delay: 88 },
-          ],
+    store.__seed({
+      nodes: {
+        'node-a': {
+          name: 'node-a',
+          alive: true,
+          udp: false,
+          tfo: false,
+          latencyTestHistory: {
+            [mockConfigStore.urlForLatencyTest]: [
+              { time: '2026-05-19T13:17:31.000Z', delay: 88 },
+            ],
+          },
+          latency: '',
+          xudp: false,
+          type: 'ss',
+          provider: '',
         },
-        latency: '',
-        xudp: false,
-        type: 'ss',
-        provider: '',
+        'node-b': {
+          name: 'node-b',
+          alive: true,
+          udp: false,
+          tfo: false,
+          latencyTestHistory: {},
+          latency: '',
+          xudp: false,
+          type: 'ss',
+          provider: '',
+        },
       },
-      'node-b': {
-        name: 'node-b',
-        alive: true,
-        udp: false,
-        tfo: false,
-        latencyTestHistory: {},
-        latency: '',
-        xudp: false,
-        type: 'ss',
-        provider: '',
+      latency: {
+        'node-a': { [mockConfigStore.urlForLatencyTest]: 88 },
+        'node-b': { [mockConfigStore.urlForLatencyTest]: 120 },
       },
-    }
-    store.latencyMap = {
-      'node-a': { [mockConfigStore.urlForLatencyTest]: 88 },
-      'node-b': { [mockConfigStore.urlForLatencyTest]: 120 },
-    }
+    })
 
     // Must not reject — store should swallow the network failure.
     await expect(store.proxyGroupLatencyTest('GROUP')).resolves.toBeUndefined()
@@ -300,30 +308,32 @@ describe('stores/proxies latency state', () => {
         proxies: [{ name: 'node-a' }, { name: 'node-b' }],
       } as never,
     ]
-    store.proxyNodeMap = {
-      'node-a': {
-        name: 'node-a',
-        alive: true,
-        udp: false,
-        tfo: false,
-        latencyTestHistory: {},
-        latency: '',
-        xudp: false,
-        type: 'ss',
-        provider: '订阅',
+    store.__seed({
+      nodes: {
+        'node-a': {
+          name: 'node-a',
+          alive: true,
+          udp: false,
+          tfo: false,
+          latencyTestHistory: {},
+          latency: '',
+          xudp: false,
+          type: 'ss',
+          provider: '订阅',
+        },
+        'node-b': {
+          name: 'node-b',
+          alive: true,
+          udp: false,
+          tfo: false,
+          latencyTestHistory: {},
+          latency: '',
+          xudp: false,
+          type: 'ss',
+          provider: '订阅',
+        },
       },
-      'node-b': {
-        name: 'node-b',
-        alive: true,
-        udp: false,
-        tfo: false,
-        latencyTestHistory: {},
-        latency: '',
-        xudp: false,
-        type: 'ss',
-        provider: '订阅',
-      },
-    }
+    })
 
     await store.proxyProviderLatencyTest('订阅')
 
@@ -405,11 +415,13 @@ describe('stores/proxies latency state', () => {
 
   it('drops stale latency when fresh proxy data has no successful history', async () => {
     const store = useProxiesStore()
-    store.latencyMap = {
-      'node-a': {
-        [mockConfigStore.urlForLatencyTest]: 88,
+    store.__seed({
+      latency: {
+        'node-a': {
+          [mockConfigStore.urlForLatencyTest]: 88,
+        },
       },
-    }
+    })
     apiMocks.fetchProxiesAPI.mockResolvedValue({
       proxies: {
         'node-a': proxy({
@@ -482,6 +494,101 @@ describe('stores/proxies latency state', () => {
     expect(store.getLatencyHistoryByName('node-a', null)).toEqual([
       { time: '2026-05-19T13:17:31.000Z', delay: 506 },
     ])
+  })
+})
+
+describe('stores/proxies read model', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    vi.clearAllMocks()
+    apiMocks.fetchProxyProvidersAPI.mockResolvedValue({ providers: {} })
+  })
+
+  it('getNode returns an honest view and never leaks latency-as-now', () => {
+    const store = useProxiesStore()
+    store.__seed({
+      nodes: {
+        GROUP: {
+          name: 'GROUP',
+          alive: undefined,
+          udp: false,
+          tfo: false,
+          xudp: false,
+          type: 'selector',
+          latency: 'leaf', // the kernel's `now` alias lives in `latency`
+          provider: '',
+          latencyTestHistory: {},
+        },
+        leaf: {
+          name: 'leaf',
+          alive: true,
+          udp: true,
+          tfo: false,
+          xudp: false,
+          type: 'ss',
+          latency: '',
+          provider: 'subA',
+          latencyTestHistory: {},
+        },
+      },
+    })
+
+    const group = store.getNode('GROUP')!
+    expect(group.selectedNodeName).toBe('leaf')
+    expect(group).not.toHaveProperty('latency')
+
+    const leaf = store.getNode('leaf')!
+    expect(leaf.selectedNodeName).toBeUndefined()
+    expect(leaf.alive).toBe(true)
+    expect(leaf.provider).toBe('subA')
+    expect(store.getNode('missing')).toBeUndefined()
+  })
+
+  it('aliveNodeNames / nodeNames query the hidden map', () => {
+    const store = useProxiesStore()
+    store.__seed({
+      nodes: {
+        a: {
+          name: 'a',
+          alive: true,
+          udp: false,
+          tfo: false,
+          xudp: false,
+          type: 'ss',
+          latency: '',
+          provider: '',
+          latencyTestHistory: {},
+        },
+        b: {
+          name: 'b',
+          alive: false,
+          udp: false,
+          tfo: false,
+          xudp: false,
+          type: 'ss',
+          latency: '',
+          provider: '',
+          latencyTestHistory: {},
+        },
+      },
+    })
+    expect(store.aliveNodeNames(['a', 'b', 'missing'])).toEqual(['a'])
+    expect(store.nodeNames().sort()).toEqual(['a', 'b'])
+  })
+
+  it('isTesting ORs node, provider and group flags', () => {
+    const store = useProxiesStore()
+    expect(store.isTesting('n')).toBe(false)
+    store.proxyLatencyTestingMap.n = true
+    expect(store.isTesting('n')).toBe(true)
+    store.proxyLatencyTestingMap.n = false
+    store.proxyProviderLatencyTestingMap.p = true
+    expect(store.isTesting('n', { providerName: 'p' })).toBe(true)
+    expect(store.isTesting('n')).toBe(false)
+    store.proxyProviderLatencyTestingMap.p = false
+    store.proxyGroupLatencyTestingMap.g = true
+    expect(store.isTesting('n', { groupName: 'g' })).toBe(true)
+    expect(store.isTesting('n', { providerName: 'p' })).toBe(false)
   })
 })
 

@@ -17,6 +17,19 @@ import {
   updateProxyProviderAPI,
 } from '~/composables/useApi'
 
+export interface ProxyNodeView {
+  name: string
+  type: string
+  udp: boolean
+  xudp: boolean
+  tfo: boolean
+  alive?: boolean
+  provider: string
+  // The honest `now`: the leaf node a group currently routes through, or
+  // undefined for a leaf. Internalizes the kernel's `latency`-as-now alias.
+  selectedNodeName?: string
+}
+
 interface ProxyInfo {
   name: string
   alive?: boolean
@@ -454,6 +467,59 @@ export const useProxiesStore = defineStore('proxies', () => {
     )
   }
 
+  // Honest, caller-facing projection of a node. Resolves the kernel's
+  // `latency`-as-now alias into selectedNodeName so callers never see the trap.
+  const getNode = (name: string): ProxyNodeView | undefined => {
+    const info = proxyNodeMap.value[name]
+    if (!info) return undefined
+
+    const selectedNodeName =
+      info.latency && info.latency !== info.name ? info.latency : undefined
+
+    return {
+      name: info.name,
+      type: info.type,
+      udp: info.udp,
+      xudp: info.xudp,
+      tfo: info.tfo,
+      alive: info.alive,
+      provider: info.provider,
+      selectedNodeName,
+    }
+  }
+
+  const aliveNodeNames = (names: string[]): string[] =>
+    names.filter((name) => proxyNodeMap.value[name]?.alive === true)
+
+  const nodeNames = (): string[] => Object.keys(proxyNodeMap.value)
+
+  // Consolidated per-node "is a latency test running" flag: the node's own
+  // test, its provider's batch test, or its group's batch test. Each caller
+  // passes only the context it has (a leaf row has no groupName), preserving
+  // its current OR-arity.
+  const isTesting = (
+    name: string,
+    opts: { providerName?: string; groupName?: string } = {},
+  ): boolean =>
+    proxyLatencyTestingMap.value[name] ||
+    (opts.providerName
+      ? proxyProviderLatencyTestingMap.value[opts.providerName] || false
+      : false) ||
+    (opts.groupName
+      ? proxyGroupLatencyTestingMap.value[opts.groupName] || false
+      : false) ||
+    false
+
+  // Test-only seam: the maps are no longer exported, so specs seed through here
+  // instead of assigning store.proxyNodeMap / store.latencyMap directly.
+  const __seed = (partial: {
+    nodes?: Record<string, ProxyInfo>
+    latency?: Record<string, Record<string, number>>
+  }) => {
+    if (partial.nodes) proxyNodeMap.value = partial.nodes
+    if (partial.latency) latencyMap.value = partial.latency
+  }
+
   // Proxy latency test
   const proxyLatencyTest = async (
     proxyName: string,
@@ -636,8 +702,6 @@ export const useProxiesStore = defineStore('proxies', () => {
     proxies,
     proxyProviders,
     proxiesLoaded,
-    latencyMap,
-    proxyNodeMap,
     proxyLatencyTestingMap,
     proxyGroupLatencyTestingMap,
     proxyProviderLatencyTestingMap,
@@ -649,6 +713,11 @@ export const useProxiesStore = defineStore('proxies', () => {
     selectProxyInGroup,
     unfixProxyInGroup,
     getNowProxyNodeName,
+    getNode,
+    aliveNodeNames,
+    nodeNames,
+    isTesting,
+    __seed,
     getLatencyByName,
     getLatencyHistoryByName,
     clearLatencyTestStateForNodes,

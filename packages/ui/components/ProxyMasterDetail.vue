@@ -86,10 +86,7 @@ watch(activeName, () => {
 })
 
 function aliveCount(group: ProxyType) {
-  return (
-    group.all?.filter((n) => proxiesStore.proxyNodeMap[n]?.alive === true)
-      .length ?? 0
-  )
+  return proxiesStore.aliveNodeNames(group.all ?? []).length
 }
 </script>
 

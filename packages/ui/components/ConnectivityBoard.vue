@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {ReachabilityTarget} from '~/composables/useReachabilityBoard';
+import type { ReachabilityTarget } from '~/composables/useReachabilityBoard'
 import {
   IconActivity,
   IconBrandSpeedtest,
@@ -10,9 +10,8 @@ import {
 import Button from '~/components/Button.vue'
 import {
   CONNECTIVITY_TARGETS,
-  
   STREAMING_UNLOCK_TARGETS,
-  useReachabilityBoard
+  useReachabilityBoard,
 } from '~/composables/useReachabilityBoard'
 
 const { t } = useI18n()
@@ -26,7 +25,7 @@ const { isRunning, results, testTargetsThroughNode } = useReachabilityBoard()
 // node and a node tests directly.
 const selectableNames = computed(() => {
   const groupNames = proxiesStore.proxies.map((proxy) => proxy.name)
-  const nodeNames = Object.keys(proxiesStore.proxyNodeMap)
+  const nodeNames = proxiesStore.nodeNames()
   return Array.from(new Set([...groupNames, ...nodeNames]))
 })
 
