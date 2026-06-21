@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { classifyLatency } from '~/utils'
+
 interface Props {
   proxyNameList: string[]
   testUrl: string | null
@@ -18,36 +20,17 @@ const latencyList = computed(() =>
 
 const all = computed(() => latencyList.value.length || 1)
 
-const good = computed(
-  () =>
-    latencyList.value.filter(
-      (latency) =>
-        latency > configStore.latencyQualityMap.NOT_CONNECTED &&
-        latency <= configStore.latencyQualityMap.MEDIUM,
-    ).length,
+const bands = computed(() =>
+  latencyList.value.map((latency) =>
+    classifyLatency(latency, configStore.latencyQualityMap),
+  ),
 )
 
-const middle = computed(
-  () =>
-    latencyList.value.filter(
-      (latency) =>
-        latency > configStore.latencyQualityMap.MEDIUM &&
-        latency <= configStore.latencyQualityMap.HIGH,
-    ).length,
-)
-
-const slow = computed(
-  () =>
-    latencyList.value.filter(
-      (latency) => latency > configStore.latencyQualityMap.HIGH,
-    ).length,
-)
-
+const good = computed(() => bands.value.filter((b) => b === 'good').length)
+const middle = computed(() => bands.value.filter((b) => b === 'medium').length)
+const slow = computed(() => bands.value.filter((b) => b === 'slow').length)
 const notConnected = computed(
-  () =>
-    latencyList.value.filter(
-      (latency) => latency === configStore.latencyQualityMap.NOT_CONNECTED,
-    ).length,
+  () => bands.value.filter((b) => b === 'not-connected').length,
 )
 
 const goodPercent = computed(() => (good.value * 100) / all.value)

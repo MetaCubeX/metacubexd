@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { classifyLatency } from '~/utils'
+
 interface Props {
   proxyNameList: string[]
   testUrl: string | null
@@ -18,19 +20,20 @@ const proxyLatencies = computed(() =>
   ]),
 )
 
-function getDotClass(latency: number | undefined, selected: boolean): string {
-  const notConnected = configStore.latencyQualityMap.NOT_CONNECTED
-  const medium = configStore.latencyQualityMap.MEDIUM
-  const high = configStore.latencyQualityMap.HIGH
+const DOT_BAND_SUFFIX = {
+  'not-connected': 'neutral',
+  slow: 'slow',
+  medium: 'medium',
+  good: 'good',
+} as const
 
-  if (typeof latency !== 'number' || latency === notConnected) {
-    return selected ? 'dot-neutral-selected' : 'dot-neutral'
-  } else if (latency > high) {
-    return selected ? 'dot-slow-selected' : 'dot-slow'
-  } else if (latency > medium) {
-    return selected ? 'dot-medium-selected' : 'dot-medium'
-  }
-  return selected ? 'dot-good-selected' : 'dot-good'
+function getDotClass(latency: number | undefined, selected: boolean): string {
+  const band =
+    typeof latency !== 'number'
+      ? 'not-connected'
+      : classifyLatency(latency, configStore.latencyQualityMap)
+  const suffix = DOT_BAND_SUFFIX[band]
+  return selected ? `dot-${suffix}-selected` : `dot-${suffix}`
 }
 </script>
 
