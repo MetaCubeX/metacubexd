@@ -1,0 +1,21 @@
+name: stale
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/stale@v10
+        with:
+          days-before-stale: 30
+          days-before-close: 7
+          stale-issue-message: 'This issue has been inactive for 30 days and is now marked as stale. It will be closed in 7 days if there is no further activity.'
+          stale-issue-label: stale
