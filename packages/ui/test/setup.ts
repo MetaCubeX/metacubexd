@@ -11,6 +11,7 @@ import {
   ref,
   shallowRef,
   toRef,
+  toValue,
   watch,
   watchEffect,
 } from 'vue'
@@ -25,6 +26,7 @@ vi.stubGlobal('toRef', toRef)
 vi.stubGlobal('watch', watch)
 vi.stubGlobal('watchEffect', watchEffect)
 vi.stubGlobal('effectScope', effectScope)
+vi.stubGlobal('toValue', toValue)
 vi.stubGlobal('useLocalStorage', useLocalStorage)
 vi.stubGlobal('useSessionStorage', useSessionStorage)
 
