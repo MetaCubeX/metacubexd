@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.261.0](https://github.com/MetaCubeX/metacubexd/compare/v1.260.0...v1.261.0) (2026-06-22)
+
+
+### Features
+
+* **ui:** filter master-detail nodes by protocol type and UDP/XUDP ([fb70ab5](https://github.com/MetaCubeX/metacubexd/commit/fb70ab5d23f02593053660f29b1ef9686bfcad11))
+
 ## [1.260.0](https://github.com/MetaCubeX/metacubexd/compare/v1.259.0...v1.260.0) (2026-06-21)
 
 
