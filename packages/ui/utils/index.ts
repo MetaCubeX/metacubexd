@@ -514,6 +514,89 @@ export function filterNodesByRegion(
   return names.filter((n) => selected.has(parseNodeRegion(n) ?? REGION_OTHER))
 }
 
+// Region is parseable from the node name, but protocol type and UDP/XUDP
+// support live on the node metadata — so these helpers take a lookup callback
+// (the proxies store's getNode) to stay decoupled from the store.
+interface NodeMeta {
+  type: string
+  udp: boolean
+  xudp: boolean
+}
+type NodeMetaLookup = (name: string) => NodeMeta | undefined
+
+export interface TypeFacet {
+  type: string // raw proxy type, e.g. 'Shadowsocks' / 'Vmess'
+  count: number
+}
+
+// Protocol-type facets for a node-name list, sorted by count desc then type asc.
+// Nodes with no resolvable metadata/type are skipped.
+export function getTypeFacets(
+  names: string[],
+  metaOf: NodeMetaLookup,
+): TypeFacet[] {
+  const counts = new Map<string, number>()
+  for (const name of names) {
+    const type = metaOf(name)?.type
+    if (!type) continue
+    counts.set(type, (counts.get(type) ?? 0) + 1)
+  }
+
+  return [...counts.entries()]
+    .map(([type, count]) => ({ type, count }))
+    .sort((a, b) => b.count - a.count || a.type.localeCompare(b.type))
+}
+
+// Keep only nodes whose type is in `selected`. Empty set imposes no constraint.
+export function filterNodesByType(
+  names: string[],
+  selected: Set<string>,
+  metaOf: NodeMetaLookup,
+): string[] {
+  if (selected.size === 0) return names
+  return names.filter((n) => {
+    const type = metaOf(n)?.type
+    return type ? selected.has(type) : false
+  })
+}
+
+export interface CapabilityFacet {
+  udp: number
+  xudp: number
+}
+
+// How many nodes in the list advertise UDP / XUDP support.
+export function getCapabilityFacets(
+  names: string[],
+  metaOf: NodeMetaLookup,
+): CapabilityFacet {
+  let udp = 0
+  let xudp = 0
+  for (const name of names) {
+    const meta = metaOf(name)
+    if (meta?.udp) udp++
+    if (meta?.xudp) xudp++
+  }
+  return { udp, xudp }
+}
+
+// Keep only nodes matching every enabled capability (AND). Both off imposes no
+// constraint; nodes with no metadata are dropped once any capability is on.
+export function filterNodesByCapability(
+  names: string[],
+  caps: { udp: boolean; xudp: boolean },
+  metaOf: NodeMetaLookup,
+): string[] {
+  if (!caps.udp && !caps.xudp) return names
+  return names.filter((n) => {
+    const meta = metaOf(n)
+    if (!meta) return false
+    if (caps.udp && !meta.udp) return false
+    if (caps.xudp && !meta.xudp) return false
+    return true
+  })
+}
+
 // Leading flag / emoji prefix: a regional-indicator pair (country flag) or a
 // single pictographic emoji (variation selectors, skin-tone, tag and ZWJ
 // sequences included — covers lone flags like 🏳 / 🏴 too), then any whitespace

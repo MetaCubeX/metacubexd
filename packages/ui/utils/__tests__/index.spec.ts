@@ -6,7 +6,9 @@ import {
   codeToFlag,
   compareVersions,
   encodeSvg,
+  filterNodesByCapability,
   filterNodesByRegion,
+  filterNodesByType,
   filterRules,
   filterSpecialProxyType,
   formatDuration,
@@ -14,9 +16,11 @@ import {
   formatProxyType,
   fuzzyFilter,
   gapLeadingFlag,
+  getCapabilityFacets,
   getLatencyClassName,
   getRegionFacets,
   getRuleFacets,
+  getTypeFacets,
   isSingBoxVersion,
   parseNodeRegion,
   randomUUID,
@@ -789,6 +793,66 @@ describe('utils/index', () => {
       expect(filterNodesByRegion(names, new Set([REGION_OTHER]))).toEqual([
         'sg01-reality',
       ])
+    })
+  })
+
+  describe('protocol type + capability facets', () => {
+    const meta: Record<string, { type: string; udp: boolean; xudp: boolean }> =
+      {
+        a: { type: 'Shadowsocks', udp: true, xudp: true },
+        b: { type: 'Shadowsocks', udp: true, xudp: false },
+        c: { type: 'Vmess', udp: false, xudp: false },
+        d: { type: 'Trojan', udp: true, xudp: false },
+      }
+    const metaOf = (name: string) => meta[name]
+    const names = ['a', 'b', 'c', 'd', 'ghost']
+
+    describe('getTypeFacets', () => {
+      it('counts types (count desc, type asc) and skips unknown nodes', () => {
+        expect(getTypeFacets(names, metaOf)).toEqual([
+          { type: 'Shadowsocks', count: 2 },
+          { type: 'Trojan', count: 1 },
+          { type: 'Vmess', count: 1 },
+        ])
+      })
+    })
+
+    describe('filterNodesByType', () => {
+      it('passes through on an empty set', () => {
+        expect(filterNodesByType(names, new Set(), metaOf)).toBe(names)
+      })
+
+      it('keeps only selected types', () => {
+        expect(
+          filterNodesByType(names, new Set(['Shadowsocks']), metaOf),
+        ).toEqual(['a', 'b'])
+      })
+    })
+
+    describe('getCapabilityFacets', () => {
+      it('counts UDP and XUDP support', () => {
+        expect(getCapabilityFacets(names, metaOf)).toEqual({ udp: 3, xudp: 1 })
+      })
+    })
+
+    describe('filterNodesByCapability', () => {
+      it('passes through when no capability is required', () => {
+        expect(
+          filterNodesByCapability(names, { udp: false, xudp: false }, metaOf),
+        ).toBe(names)
+      })
+
+      it('filters by UDP, dropping unknown nodes', () => {
+        expect(
+          filterNodesByCapability(names, { udp: true, xudp: false }, metaOf),
+        ).toEqual(['a', 'b', 'd'])
+      })
+
+      it('requires both UDP and XUDP when both are on', () => {
+        expect(
+          filterNodesByCapability(names, { udp: true, xudp: true }, metaOf),
+        ).toEqual(['a'])
+      })
     })
   })
 

@@ -1,16 +1,23 @@
 <script setup lang="ts">
 import type { Proxy as ProxyType } from '~/types'
 import {
+  IconBolt,
   IconChevronRight,
+  IconRouter,
   IconSearch,
   IconTarget,
+  IconWorld,
   IconX,
 } from '@tabler/icons-vue'
 import {
+  filterNodesByCapability,
   filterNodesByRegion,
+  filterNodesByType,
   filterProxiesByName,
   formatProxyType,
+  getCapabilityFacets,
   getRegionFacets,
+  getTypeFacets,
   resolveActiveGroup,
 } from '~/utils'
 
@@ -44,14 +51,50 @@ const activeNodes = computed(() =>
 // --- Local workbench state (scoped to the active group; reset on switch) ---
 const localKeyword = ref('')
 const selectedRegions = ref<Set<string>>(new Set())
+const selectedTypes = ref<Set<string>>(new Set())
+const filterUdp = ref(false)
+const filterXudp = ref(false)
 
-// Region facets derived from the (sorted/globally-filtered) group node list, so
-// chip counts stay stable as region/keyword filters narrow the displayed list.
+// type/udp/xudp aren't encoded in the node name, so facet/filter helpers read
+// them through the store's node read-model.
+const metaOf = (name: string) => proxiesStore.getNode(name)
+
+// Facets derive from the (sorted/globally-filtered) group node list, so chip
+// counts stay stable as the active filters narrow the displayed list.
 const regionFacets = computed(() => getRegionFacets(activeNodes.value))
+const typeFacets = computed(() => getTypeFacets(activeNodes.value, metaOf))
+const capabilityFacets = computed(() =>
+  getCapabilityFacets(activeNodes.value, metaOf),
+)
+
+const hasCapability = computed(
+  () => capabilityFacets.value.udp > 0 || capabilityFacets.value.xudp > 0,
+)
+const hasAnyFacet = computed(
+  () =>
+    regionFacets.value.length > 1 ||
+    typeFacets.value.length > 1 ||
+    hasCapability.value,
+)
+const hasActiveFilter = computed(
+  () =>
+    selectedRegions.value.size > 0 ||
+    selectedTypes.value.size > 0 ||
+    filterUdp.value ||
+    filterXudp.value,
+)
 
 const displayNodes = computed(() =>
   filterProxiesByName(
-    filterNodesByRegion(activeNodes.value, selectedRegions.value),
+    filterNodesByCapability(
+      filterNodesByType(
+        filterNodesByRegion(activeNodes.value, selectedRegions.value),
+        selectedTypes.value,
+        metaOf,
+      ),
+      { udp: filterUdp.value, xudp: filterXudp.value },
+      metaOf,
+    ),
     localKeyword.value,
   ),
 )
@@ -62,11 +105,30 @@ const selectedVisible = computed(
     displayNodes.value.includes(activeGroup.value.now),
 )
 
-function toggleRegion(code: string) {
-  const next = new Set(selectedRegions.value)
-  if (next.has(code)) next.delete(code)
-  else next.add(code)
-  selectedRegions.value = next
+function toggleInSet(set: Ref<Set<string>>, key: string) {
+  const next = new Set(set.value)
+  if (next.has(key)) next.delete(key)
+  else next.add(key)
+  set.value = next
+}
+const toggleRegion = (code: string) => toggleInSet(selectedRegions, code)
+const toggleType = (type: string) => toggleInSet(selectedTypes, type)
+
+function clearFilters() {
+  selectedRegions.value = new Set()
+  selectedTypes.value = new Set()
+  filterUdp.value = false
+  filterXudp.value = false
+}
+
+// Shared pill styling for every filter chip (region / protocol / feature).
+function chipClass(active: boolean) {
+  return [
+    'flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border px-2 py-0.5 text-xs transition-all duration-150',
+    active
+      ? 'border-primary/50 bg-primary/15 text-primary'
+      : 'border-base-content/10 bg-base-100/60 text-base-content/60 hover:border-primary/30 hover:text-base-content/80',
+  ]
 }
 
 // Scroll container for the right detail; the selected row carries
@@ -81,7 +143,7 @@ function scrollSelectedIntoView(behavior: ScrollBehavior = 'smooth') {
 // On group switch: reset local filters and reveal the selected node.
 watch(activeName, () => {
   localKeyword.value = ''
-  selectedRegions.value = new Set()
+  clearFilters()
   nextTick(() => scrollSelectedIntoView('auto'))
 })
 
@@ -187,37 +249,119 @@ function aliveCount(group: ProxyType) {
           </button>
         </div>
 
-        <!-- Region quick-filter chips (only when >1 region present) -->
-        <div v-if="regionFacets.length > 1" class="flex flex-wrap gap-1.5">
-          <button
-            type="button"
-            class="flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs transition-all duration-150"
-            :class="
-              selectedRegions.size === 0
-                ? 'border-primary/50 bg-primary/15 text-primary'
-                : 'border-base-content/10 bg-base-100/60 text-base-content/60 hover:border-primary/30'
-            "
-            :aria-pressed="selectedRegions.size === 0"
-            @click="selectedRegions = new Set()"
+        <!-- Quick-filter rail: region · protocol · features, grouped by
+             hairline dividers and horizontally scrollable so chips never wrap
+             into a blob. Each group renders only when it offers a real choice. -->
+        <div v-if="hasAnyFacet" class="flex items-center gap-1.5">
+          <div
+            class="-mx-0.5 flex flex-1 [scrollbar-width:none] items-center gap-1.5 overflow-x-auto px-0.5 py-px [&::-webkit-scrollbar]:hidden"
           >
-            {{ t('all') }}
-            <span class="opacity-60">{{ activeNodes.length }}</span>
-          </button>
+            <!-- Region -->
+            <template v-if="regionFacets.length > 1">
+              <IconWorld
+                :size="14"
+                class="shrink-0 text-base-content/35"
+                aria-hidden="true"
+              />
+              <button
+                type="button"
+                :class="chipClass(selectedRegions.size === 0)"
+                :aria-pressed="selectedRegions.size === 0"
+                @click="selectedRegions = new Set()"
+              >
+                {{ t('all') }}
+              </button>
+              <button
+                v-for="facet in regionFacets"
+                :key="`region-${facet.code}`"
+                type="button"
+                :class="chipClass(selectedRegions.has(facet.code))"
+                :aria-pressed="selectedRegions.has(facet.code)"
+                @click="toggleRegion(facet.code)"
+              >
+                <span>{{ facet.flag || t('regionOther') }}</span>
+                <span class="opacity-55">{{ facet.count }}</span>
+              </button>
+            </template>
+
+            <!-- Protocol -->
+            <template v-if="typeFacets.length > 1">
+              <span
+                v-if="regionFacets.length > 1"
+                class="h-3.5 w-px shrink-0 bg-base-content/12"
+                aria-hidden="true"
+              />
+              <IconRouter
+                :size="14"
+                class="shrink-0 text-base-content/35"
+                aria-hidden="true"
+              />
+              <button
+                type="button"
+                :class="chipClass(selectedTypes.size === 0)"
+                :aria-pressed="selectedTypes.size === 0"
+                @click="selectedTypes = new Set()"
+              >
+                {{ t('all') }}
+              </button>
+              <button
+                v-for="facet in typeFacets"
+                :key="`type-${facet.type}`"
+                type="button"
+                :class="chipClass(selectedTypes.has(facet.type))"
+                :aria-pressed="selectedTypes.has(facet.type)"
+                @click="toggleType(facet.type)"
+              >
+                <span>{{ formatProxyType(facet.type, t) }}</span>
+                <span class="opacity-55">{{ facet.count }}</span>
+              </button>
+            </template>
+
+            <!-- Features: UDP / XUDP independent toggles -->
+            <template v-if="hasCapability">
+              <span
+                v-if="regionFacets.length > 1 || typeFacets.length > 1"
+                class="h-3.5 w-px shrink-0 bg-base-content/12"
+                aria-hidden="true"
+              />
+              <IconBolt
+                :size="14"
+                class="shrink-0 text-base-content/35"
+                aria-hidden="true"
+              />
+              <button
+                v-if="capabilityFacets.udp > 0"
+                type="button"
+                :class="chipClass(filterUdp)"
+                :aria-pressed="filterUdp"
+                @click="filterUdp = !filterUdp"
+              >
+                <span>{{ t('udp') }}</span>
+                <span class="opacity-55">{{ capabilityFacets.udp }}</span>
+              </button>
+              <button
+                v-if="capabilityFacets.xudp > 0"
+                type="button"
+                :class="chipClass(filterXudp)"
+                :aria-pressed="filterXudp"
+                @click="filterXudp = !filterXudp"
+              >
+                <span>XUDP</span>
+                <span class="opacity-55">{{ capabilityFacets.xudp }}</span>
+              </button>
+            </template>
+          </div>
+
+          <!-- Clear all active filters; kept out of the scroll area, pinned right -->
           <button
-            v-for="facet in regionFacets"
-            :key="facet.code"
+            v-if="hasActiveFilter"
             type="button"
-            class="flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs transition-all duration-150"
-            :class="
-              selectedRegions.has(facet.code)
-                ? 'border-primary/50 bg-primary/15 text-primary'
-                : 'border-base-content/10 bg-base-100/60 text-base-content/60 hover:border-primary/30'
-            "
-            :aria-pressed="selectedRegions.has(facet.code)"
-            @click="toggleRegion(facet.code)"
+            class="flex shrink-0 items-center rounded-full p-1 text-base-content/40 transition-colors hover:bg-base-content/8 hover:text-base-content"
+            :title="t('clearFilters')"
+            :aria-label="t('clearFilters')"
+            @click="clearFilters"
           >
-            <span>{{ facet.flag || t('regionOther') }}</span>
-            <span class="opacity-60">{{ facet.count }}</span>
+            <IconX :size="14" />
           </button>
         </div>
       </div>
