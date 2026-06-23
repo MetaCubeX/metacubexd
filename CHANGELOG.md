@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.261.3](https://github.com/MetaCubeX/metacubexd/compare/v1.261.2...v1.261.3) (2026-06-23)
+
+
+### Bug Fixes
+
+* **server:** auto-start bundled mihomo on boot and bind MIXED_PORT ([de883e3](https://github.com/MetaCubeX/metacubexd/commit/de883e3b42445825f1acd534b579a5c37af9927e)), closes [#2067](https://github.com/MetaCubeX/metacubexd/issues/2067)
+
 ## [1.261.2](https://github.com/MetaCubeX/metacubexd/compare/v1.261.1...v1.261.2) (2026-06-23)
 
 
