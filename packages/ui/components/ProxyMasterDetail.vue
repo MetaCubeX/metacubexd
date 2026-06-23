@@ -147,6 +147,11 @@ watch(activeName, () => {
   nextTick(() => scrollSelectedIntoView('auto'))
 })
 
+// First paint (master mode just opened): activeName resolves synchronously in
+// the watchEffect above, before the watch() is wired — so it never fires for the
+// initial group. Reveal the selected node once the list is mounted.
+onMounted(() => nextTick(() => scrollSelectedIntoView('auto')))
+
 function aliveCount(group: ProxyType) {
   return proxiesStore.aliveNodeNames(group.all ?? []).length
 }
@@ -249,114 +254,119 @@ function aliveCount(group: ProxyType) {
           </button>
         </div>
 
-        <!-- Quick-filter rail: region · protocol · features, grouped by
-             hairline dividers and horizontally scrollable so chips never wrap
-             into a blob. Each group renders only when it offers a real choice. -->
-        <div v-if="hasAnyFacet" class="flex items-center gap-1.5">
-          <div
-            class="-mx-0.5 flex flex-1 [scrollbar-width:none] items-center gap-1.5 overflow-x-auto px-0.5 py-px [&::-webkit-scrollbar]:hidden"
-          >
+        <!-- Quick-filter rail: region · protocol · features. Each facet group
+             gets its own row so a long region list (many flags) can never push
+             the protocol/feature filters off-screen — every row scrolls on its
+             own, with its category icon pinned left. Rows render only when the
+             group offers a real choice. -->
+        <div v-if="hasAnyFacet" class="flex items-start gap-1.5">
+          <div class="flex min-w-0 flex-1 flex-col gap-1.5">
             <!-- Region -->
-            <template v-if="regionFacets.length > 1">
+            <div
+              v-if="regionFacets.length > 1"
+              class="flex items-center gap-1.5"
+            >
               <IconWorld
                 :size="14"
                 class="shrink-0 text-base-content/35"
                 aria-hidden="true"
               />
-              <button
-                type="button"
-                :class="chipClass(selectedRegions.size === 0)"
-                :aria-pressed="selectedRegions.size === 0"
-                @click="selectedRegions = new Set()"
+              <div
+                class="-mx-0.5 flex min-w-0 flex-1 [scrollbar-width:none] items-center gap-1.5 overflow-x-auto px-0.5 py-px [&::-webkit-scrollbar]:hidden"
               >
-                {{ t('all') }}
-              </button>
-              <button
-                v-for="facet in regionFacets"
-                :key="`region-${facet.code}`"
-                type="button"
-                :class="chipClass(selectedRegions.has(facet.code))"
-                :aria-pressed="selectedRegions.has(facet.code)"
-                @click="toggleRegion(facet.code)"
-              >
-                <span>{{ facet.flag || t('regionOther') }}</span>
-                <span class="opacity-55">{{ facet.count }}</span>
-              </button>
-            </template>
+                <button
+                  type="button"
+                  :class="chipClass(selectedRegions.size === 0)"
+                  :aria-pressed="selectedRegions.size === 0"
+                  @click="selectedRegions = new Set()"
+                >
+                  {{ t('all') }}
+                </button>
+                <button
+                  v-for="facet in regionFacets"
+                  :key="`region-${facet.code}`"
+                  type="button"
+                  :class="chipClass(selectedRegions.has(facet.code))"
+                  :aria-pressed="selectedRegions.has(facet.code)"
+                  @click="toggleRegion(facet.code)"
+                >
+                  <span>{{ facet.flag || t('regionOther') }}</span>
+                  <span class="opacity-55">{{ facet.count }}</span>
+                </button>
+              </div>
+            </div>
 
             <!-- Protocol -->
-            <template v-if="typeFacets.length > 1">
-              <span
-                v-if="regionFacets.length > 1"
-                class="h-3.5 w-px shrink-0 bg-base-content/12"
-                aria-hidden="true"
-              />
+            <div v-if="typeFacets.length > 1" class="flex items-center gap-1.5">
               <IconRouter
                 :size="14"
                 class="shrink-0 text-base-content/35"
                 aria-hidden="true"
               />
-              <button
-                type="button"
-                :class="chipClass(selectedTypes.size === 0)"
-                :aria-pressed="selectedTypes.size === 0"
-                @click="selectedTypes = new Set()"
+              <div
+                class="-mx-0.5 flex min-w-0 flex-1 [scrollbar-width:none] items-center gap-1.5 overflow-x-auto px-0.5 py-px [&::-webkit-scrollbar]:hidden"
               >
-                {{ t('all') }}
-              </button>
-              <button
-                v-for="facet in typeFacets"
-                :key="`type-${facet.type}`"
-                type="button"
-                :class="chipClass(selectedTypes.has(facet.type))"
-                :aria-pressed="selectedTypes.has(facet.type)"
-                @click="toggleType(facet.type)"
-              >
-                <span>{{ formatProxyType(facet.type, t) }}</span>
-                <span class="opacity-55">{{ facet.count }}</span>
-              </button>
-            </template>
+                <button
+                  type="button"
+                  :class="chipClass(selectedTypes.size === 0)"
+                  :aria-pressed="selectedTypes.size === 0"
+                  @click="selectedTypes = new Set()"
+                >
+                  {{ t('all') }}
+                </button>
+                <button
+                  v-for="facet in typeFacets"
+                  :key="`type-${facet.type}`"
+                  type="button"
+                  :class="chipClass(selectedTypes.has(facet.type))"
+                  :aria-pressed="selectedTypes.has(facet.type)"
+                  @click="toggleType(facet.type)"
+                >
+                  <span>{{ formatProxyType(facet.type, t) }}</span>
+                  <span class="opacity-55">{{ facet.count }}</span>
+                </button>
+              </div>
+            </div>
 
             <!-- Features: UDP / XUDP independent toggles -->
-            <template v-if="hasCapability">
-              <span
-                v-if="regionFacets.length > 1 || typeFacets.length > 1"
-                class="h-3.5 w-px shrink-0 bg-base-content/12"
-                aria-hidden="true"
-              />
+            <div v-if="hasCapability" class="flex items-center gap-1.5">
               <IconBolt
                 :size="14"
                 class="shrink-0 text-base-content/35"
                 aria-hidden="true"
               />
-              <button
-                v-if="capabilityFacets.udp > 0"
-                type="button"
-                :class="chipClass(filterUdp)"
-                :aria-pressed="filterUdp"
-                @click="filterUdp = !filterUdp"
+              <div
+                class="-mx-0.5 flex min-w-0 flex-1 [scrollbar-width:none] items-center gap-1.5 overflow-x-auto px-0.5 py-px [&::-webkit-scrollbar]:hidden"
               >
-                <span>{{ t('udp') }}</span>
-                <span class="opacity-55">{{ capabilityFacets.udp }}</span>
-              </button>
-              <button
-                v-if="capabilityFacets.xudp > 0"
-                type="button"
-                :class="chipClass(filterXudp)"
-                :aria-pressed="filterXudp"
-                @click="filterXudp = !filterXudp"
-              >
-                <span>XUDP</span>
-                <span class="opacity-55">{{ capabilityFacets.xudp }}</span>
-              </button>
-            </template>
+                <button
+                  v-if="capabilityFacets.udp > 0"
+                  type="button"
+                  :class="chipClass(filterUdp)"
+                  :aria-pressed="filterUdp"
+                  @click="filterUdp = !filterUdp"
+                >
+                  <span>{{ t('udp') }}</span>
+                  <span class="opacity-55">{{ capabilityFacets.udp }}</span>
+                </button>
+                <button
+                  v-if="capabilityFacets.xudp > 0"
+                  type="button"
+                  :class="chipClass(filterXudp)"
+                  :aria-pressed="filterXudp"
+                  @click="filterXudp = !filterXudp"
+                >
+                  <span>XUDP</span>
+                  <span class="opacity-55">{{ capabilityFacets.xudp }}</span>
+                </button>
+              </div>
+            </div>
           </div>
 
-          <!-- Clear all active filters; kept out of the scroll area, pinned right -->
+          <!-- Clear all active filters; pinned top-right, outside the rows -->
           <button
             v-if="hasActiveFilter"
             type="button"
-            class="flex shrink-0 items-center rounded-full p-1 text-base-content/40 transition-colors hover:bg-base-content/8 hover:text-base-content"
+            class="mt-0.5 flex shrink-0 items-center rounded-full p-1 text-base-content/40 transition-colors hover:bg-base-content/8 hover:text-base-content"
             :title="t('clearFilters')"
             :aria-label="t('clearFilters')"
             @click="clearFilters"
