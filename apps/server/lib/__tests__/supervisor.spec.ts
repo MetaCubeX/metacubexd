@@ -75,5 +75,7 @@ describe('apps/server lib/supervisor', () => {
     expect(opts.agentToken).toBe('agent-tok')
     expect(opts.externalController).toBe('0.0.0.0:9090')
     expect(opts.secret).toBe('clash-x')
+    // MIXED_PORT must reach the supervisor or the published 7890 stays closed (#2067).
+    expect(opts.mixedPort).toBe(7890)
   })
 })

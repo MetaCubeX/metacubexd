@@ -54,6 +54,10 @@ export function getAgent(): Agent {
     // the published container port is reachable; secret is CLASH_SECRET.
     externalController: `0.0.0.0:${env.clashApiPort}`,
     secret: env.clashSecret,
+    // Inject mixed-port too, otherwise MIXED_PORT is dead env: the supervisor
+    // strips any profile mixed-port on spawn and, without a managed value, never
+    // re-adds one, so the published proxy port (7890) stays closed (#2067).
+    mixedPort: env.mixedPort,
   })
   return agentSingleton
 }
