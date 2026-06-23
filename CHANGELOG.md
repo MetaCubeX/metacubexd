@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.261.1](https://github.com/MetaCubeX/metacubexd/compare/v1.261.0...v1.261.1) (2026-06-23)
+
+
+### Bug Fixes
+
+* **server:** serve real static assets from UI_DIST, not the SPA shell ([a978ce9](https://github.com/MetaCubeX/metacubexd/commit/a978ce99124bb57df6f6cc1eb88aac30ec65bdb6)), closes [#2063](https://github.com/MetaCubeX/metacubexd/issues/2063)
+
 ## [1.261.0](https://github.com/MetaCubeX/metacubexd/compare/v1.260.0...v1.261.0) (2026-06-22)
 
 
