@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.261.2](https://github.com/MetaCubeX/metacubexd/compare/v1.261.1...v1.261.2) (2026-06-23)
+
+
+### Bug Fixes
+
+* **ui:** auto-scroll to selected node and stack master-detail filter rows ([841ff94](https://github.com/MetaCubeX/metacubexd/commit/841ff94c194387f23cbc277561975dd9065a727b))
+
 ## [1.261.1](https://github.com/MetaCubeX/metacubexd/compare/v1.261.0...v1.261.1) (2026-06-23)
 
 
