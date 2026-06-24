@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.261.6](https://github.com/MetaCubeX/metacubexd/compare/v1.261.5...v1.261.6) (2026-06-24)
+
+
+### Bug Fixes
+
+* **ui:** dedupe group members so duplicate node names don't double-select ([e30bc2b](https://github.com/MetaCubeX/metacubexd/commit/e30bc2b3723f91d5ec6523ae4baac05f22418ffc))
+
 ## [1.261.5](https://github.com/MetaCubeX/metacubexd/compare/v1.261.4...v1.261.5) (2026-06-24)
 
 
