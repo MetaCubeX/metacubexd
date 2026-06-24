@@ -116,6 +116,8 @@
   "restartCoreConfirm": "코어를 다시 시작하시겠습니까? 모든 연결이 끊어집니다.",
   "upgradeCore": "코어 업그레이드",
   "upgradeUI": "대시보드 업그레이드",
+  "upgradeUIConfirm": "대시보드를 업그레이드할까요? 현재 웹 대시보드 파일을 다운로드하여 교체합니다.",
+  "upgradeCoreConfirm": "코어를 업그레이드할까요? 새 버전을 다운로드하고 코어를 재시작하여 모든 연결이 끊어집니다.",
   "proxiesSorting": "프록시 정렬",
   "orderNatural": "구성 파일의 원래 순서",
   "orderLatency_asc": "지연 낮은 순",

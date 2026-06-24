@@ -116,6 +116,8 @@
   "restartCoreConfirm": "コアを再起動しますか？すべての接続が切断されます。",
   "upgradeCore": "コアをアップグレード",
   "upgradeUI": "ダッシュボードをアップグレード",
+  "upgradeUIConfirm": "ダッシュボードをアップグレードしますか？現在のウェブダッシュボードのファイルをダウンロードして置き換えます。",
+  "upgradeCoreConfirm": "コアをアップグレードしますか？新しいバージョンをダウンロードしてコアを再起動し、すべての接続が切断されます。",
   "proxiesSorting": "プロキシの並び替え",
   "orderNatural": "設定ファイルの元の順序",
   "orderLatency_asc": "レイテンシの低い順",

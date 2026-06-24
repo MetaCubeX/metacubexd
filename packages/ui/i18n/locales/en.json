@@ -116,6 +116,8 @@
   "restartCoreConfirm": "Restart the core? This will interrupt all active connections.",
   "upgradeCore": "Upgrade Core",
   "upgradeUI": "Upgrade Dashboard",
+  "upgradeUIConfirm": "Upgrade the dashboard? This downloads and replaces the current web dashboard files.",
+  "upgradeCoreConfirm": "Upgrade the core? This downloads a new version and restarts the core, interrupting all connections.",
   "proxiesSorting": "Proxies Sorting",
   "orderNatural": "Original order in config file",
   "orderLatency_asc": "By latency from low to high",

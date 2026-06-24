@@ -116,6 +116,8 @@
   "restartCoreConfirm": "Redémarrer le noyau ? Toutes les connexions actives seront interrompues.",
   "upgradeCore": "Mettre à niveau le noyau",
   "upgradeUI": "Mettre à niveau le tableau de bord",
+  "upgradeUIConfirm": "Mettre à niveau le tableau de bord ? Cela télécharge et remplace les fichiers actuels du tableau de bord web.",
+  "upgradeCoreConfirm": "Mettre à niveau le noyau ? Cela télécharge une nouvelle version et redémarre le noyau, interrompant toutes les connexions.",
   "proxiesSorting": "Tri des proxies",
   "orderNatural": "Ordre d'origine dans le fichier de configuration",
   "orderLatency_asc": "Par latence croissante",

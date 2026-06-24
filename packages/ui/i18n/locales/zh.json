@@ -116,6 +116,8 @@
   "restartCoreConfirm": "确定要重启核心吗？这将中断所有连接。",
   "upgradeCore": "更新核心",
   "upgradeUI": "更新控制面板",
+  "upgradeUIConfirm": "更新控制面板？将下载并替换当前的 Web 控制面板文件。",
+  "upgradeCoreConfirm": "更新核心？将下载新版本并重启核心，中断所有连接。",
   "proxiesSorting": "节点排序",
   "orderNatural": "原配置文件中的排序",
   "orderLatency_asc": "按延迟从低到高",
