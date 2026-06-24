@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.261.5](https://github.com/MetaCubeX/metacubexd/compare/v1.261.4...v1.261.5) (2026-06-24)
+
+
+### Bug Fixes
+
+* **versions:** confirm before upgrading dashboard/core ([#2069](https://github.com/MetaCubeX/metacubexd/issues/2069)) ([4e3a005](https://github.com/MetaCubeX/metacubexd/commit/4e3a0054b40c74d9f327d4ec2bb6a7ab4cb6fd1f))
+
 ## [1.261.4](https://github.com/MetaCubeX/metacubexd/compare/v1.261.3...v1.261.4) (2026-06-24)
 
 
