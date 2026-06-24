@@ -73,6 +73,30 @@ describe('stores/proxies latency state', () => {
     apiMocks.fetchProxyProvidersAPI.mockResolvedValue({ providers: {} })
   })
 
+  it('dedupes group members so two providers contributing the same node name collapse to one entry', async () => {
+    // mihomo lists a member once per provider, so two providers carrying a node
+    // of the same name surface it twice in `all`. Every API (select / latency /
+    // `now`) is name-keyed, so the duplicate is indistinguishable — keeping it
+    // would light up two rows for one selection. Collapse it.
+    apiMocks.fetchProxiesAPI.mockResolvedValue({
+      proxies: {
+        AI: proxy({
+          name: 'AI',
+          type: 'Selector',
+          now: 'US_88',
+          all: ['US_124', 'US_88', 'US_124', 'US_88'],
+        }),
+      },
+    })
+
+    const store = useProxiesStore()
+    await store.fetchProxies()
+    await nextTick()
+
+    const group = store.proxies.find((p) => p.name === 'AI')
+    expect(group?.all).toEqual(['US_124', 'US_88'])
+  })
+
   it('preserves the previous latency value while an individual test is in flight', async () => {
     let resolveLatency!: (value: { delay: number }) => void
     apiMocks.proxyLatencyTestAPI.mockReturnValue(

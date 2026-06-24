@@ -302,11 +302,17 @@ export const useProxiesStore = defineStore('proxies', () => {
     ])
 
     const proxiesWithTestUrl = Object.values(proxiesData).map((proxy) => {
-      if (proxy.all?.length && !proxy.testUrl) {
+      if (!proxy.all?.length) return proxy
+      // Two proxy-providers can each contribute a member of the same name, so
+      // mihomo lists it twice in `all`. Every API (select / latency / `now`) is
+      // name-keyed, so the duplicate is indistinguishable — keeping it lights up
+      // two rows for one selection. Collapse to the first occurrence.
+      const all = [...new Set(proxy.all)]
+      if (!proxy.testUrl) {
         const { testUrl, timeout } = providers?.[proxy.name] || {}
-        return { ...proxy, testUrl, timeout }
+        return { ...proxy, all, testUrl, timeout }
       }
-      return proxy
+      return { ...proxy, all }
     })
 
     const sortIndex = [...(proxiesData.GLOBAL?.all ?? []), 'GLOBAL']
