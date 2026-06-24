@@ -340,7 +340,7 @@ function handleLatencyTest() {
         @mouse-leave="onTooltipMouseLeave"
       >
         <div class="flex flex-col items-center gap-2">
-          <h2 class="m-0 text-lg font-bold">
+          <h2 class="m-0 w-full text-center text-lg font-bold break-all">
             <ProxyNodeName :name="proxyName" />
           </h2>
 

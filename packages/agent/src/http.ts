@@ -312,9 +312,19 @@ export function createControlRouter(deps: ControlRouterDeps): App {
         setResponseStatus(event, 409)
         return { error: 'no active profile' }
       }
-      const body = (await readBody(event)) as { key: string; value: unknown }
+      const body = (await readBody(event)) as {
+        key: string
+        value: unknown
+        // `false` writes the section back to the active profile WITHOUT
+        // restarting the kernel — used by the general-config card, which already
+        // hot-applies each field via PATCH /configs and only needs the change
+        // persisted so it survives the next restart (#2070). Defaults to true:
+        // the rule/network editors restart once per save.
+        restart?: boolean
+      }
       await profiles.setSection(activeId, body.key, body.value)
       await profiles.setActive(activeId)
+      if (body.restart === false) return supervisor.getState()
       return supervisor.restart()
     }),
   )

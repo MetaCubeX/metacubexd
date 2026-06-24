@@ -134,8 +134,14 @@ export function useControlApi() {
     // restarted KernelState. SHARED CONTRACTS.
     getConfigSection: <T = unknown>(key: string) =>
       client.get('config/section', { searchParams: { key } }).json<T>(),
-    setConfigSection: (body: { key: string; value: unknown }) =>
-      client.put('config/section', { json: body }).json<KernelState>(),
+    // `restart: false` persists the section to the active profile without
+    // restarting the kernel — used when the change was already hot-applied via
+    // PATCH /configs and only needs to survive the next restart (#2070).
+    setConfigSection: (body: {
+      key: string
+      value: unknown
+      restart?: boolean
+    }) => client.put('config/section', { json: body }).json<KernelState>(),
 
     // WebDAV backup/restore (capability-gated 'webdav-backup'). Credentials are
     // sent per-request and never persisted by the agent. Backup ships every

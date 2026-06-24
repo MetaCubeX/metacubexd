@@ -9,6 +9,8 @@ import type {
 } from '~/types'
 import ky from 'ky'
 import { compareVersions, isSingBoxVersion } from '~/utils'
+import { useControlApi } from './useControlApi'
+import { useControlInfo } from './useControlInfo'
 import { useMockData } from './useMockData'
 
 // Mock mode support
@@ -459,15 +461,25 @@ export function useConfigActions() {
 
   const fetchingRemoteConfig = ref(false)
   const fetchRemoteConfigAPI = async (url: string) => {
-    const request = useRequest()
     fetchingRemoteConfig.value = true
     try {
-      // Fetch config content from remote URL
+      if (useControlInfo().hasFeature('profiles')) {
+        // Server/desktop: import the URL as a persisted remote profile and
+        // activate it. The agent fetches it (correct UA + subscription-userinfo),
+        // writes the active config, and restarts the kernel — so the fetched
+        // config survives a restart, unlike PUT /configs which only loads it into
+        // the running kernel and is lost on the next restart (#2070). This also
+        // works on a fresh server with no profile yet, and surfaces the import in
+        // the Profiles page for later refresh/management.
+        const api = useControlApi()
+        const meta = await api.importProfile(url)
+        await api.activateProfile(meta.id)
+        return
+      }
+      // Plain remote mihomo backend (no agent): hot-load into the running kernel.
       const response = await ky.get(url)
       const payload = await response.text()
-
-      // Update config with fetched payload
-      await request.put('configs', {
+      await useRequest().put('configs', {
         searchParams: { force: true },
         json: { path: '', payload },
       })

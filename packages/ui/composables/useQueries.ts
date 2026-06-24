@@ -1,6 +1,8 @@
 import type { Config, Proxy, ProxyProvider, Rule, RuleProvider } from '~/types'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { toggleRuleDisabledAPI, useRequest } from './useApi'
+import { useControlApi } from './useControlApi'
+import { useControlInfo } from './useControlInfo'
 
 // ============== Request Helpers ==============
 
@@ -247,20 +249,57 @@ export function useConfigQuery() {
   })
 }
 
+// Apply a single top-level config change. The PATCH hot-applies it to the
+// running kernel; when `persist` is supplied (server/desktop with the
+// config-sections capability) the SAME change is written back to the active
+// profile so it survives a kernel restart (#2070). Persisting is best-effort:
+// the live PATCH already took effect, so a persistence hiccup must not fail the
+// save the user just saw succeed — it only means the change won't outlast a
+// restart, which is the pre-fix behaviour.
+// ponytail: warn-on-failure; promote to a toast if users actually hit it.
+export async function applyConfigPatch(
+  key: keyof Config,
+  value: unknown,
+  deps: {
+    patch: (json: Record<string, unknown>) => Promise<unknown>
+    persist?: (body: { key: string; value: unknown }) => Promise<unknown>
+  },
+): Promise<void> {
+  await deps.patch({ [key]: value })
+  if (!deps.persist) return
+  try {
+    await deps.persist({ key: String(key), value })
+  } catch (e) {
+    console.warn(
+      '[config] failed to persist config change to the active profile:',
+      e,
+    )
+  }
+}
+
 export function useUpdateConfigMutation() {
   const queryClient = useQueryClient()
+  const controlApi = useControlApi()
+  const { hasFeature } = useControlInfo()
 
   return useMutation({
-    mutationFn: async ({
+    mutationFn: ({
       key,
       value,
     }: {
       key: keyof Config
       value: Partial<Config[keyof Config]>
-    }) => {
-      const request = createRequest()
-      await request.patch('configs', { json: { [key]: value } })
-    },
+    }) =>
+      applyConfigPatch(key, value, {
+        patch: async (json) => {
+          await createRequest().patch('configs', { json })
+        },
+        // Evaluated per-save (NOT at setup): the /info probe is async, so a
+        // setup-time read could miss the agent and skip persistence forever.
+        persist: hasFeature('config-sections')
+          ? (body) => controlApi.setConfigSection({ ...body, restart: false })
+          : undefined,
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.config })
     },

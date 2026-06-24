@@ -1065,6 +1065,28 @@ describe('createControlRouter — config sections', () => {
     )
   })
 
+  it('pUT /api/control/config/section with restart:false persists WITHOUT restarting', async () => {
+    const deps = makeDeps()
+    deps.profiles.getActiveId = vi.fn(async () => 'p1')
+    srv = await mount(deps)
+    const res = await fetch(`${srv.base}/api/control/config/section`, {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ key: 'allow-lan', value: true, restart: false }),
+    })
+    expect(res.status).toBe(200)
+    expect(deps.profiles.setSection).toHaveBeenCalledWith(
+      'p1',
+      'allow-lan',
+      true,
+    )
+    expect(deps.profiles.setActive).toHaveBeenCalledWith('p1')
+    // The field was already hot-applied by the client's PATCH /configs — no
+    // restart, so live connections survive while the change is persisted.
+    expect(deps.supervisor.restart).not.toHaveBeenCalled()
+    expect(deps.supervisor.getState).toHaveBeenCalled()
+  })
+
   it('pUT /api/control/config/section passes a null value through (delete)', async () => {
     const deps = makeDeps()
     deps.profiles.getActiveId = vi.fn(async () => 'p1')
