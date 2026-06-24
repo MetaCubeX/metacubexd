@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.261.4](https://github.com/MetaCubeX/metacubexd/compare/v1.261.3...v1.261.4) (2026-06-24)
+
+
+### Bug Fixes
+
+* persist UI config changes to the active profile ([#2070](https://github.com/MetaCubeX/metacubexd/issues/2070)) ([ed3c906](https://github.com/MetaCubeX/metacubexd/commit/ed3c9069d1242ac610d7495ae266a28d7530bbc9))
+
 ## [1.261.3](https://github.com/MetaCubeX/metacubexd/compare/v1.261.2...v1.261.3) (2026-06-23)
 
 
