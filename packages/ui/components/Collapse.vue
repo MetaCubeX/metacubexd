@@ -57,7 +57,7 @@ const cardGridStyle = computed(() => ({
     style="
       background: color-mix(in oklch, var(--color-base-200) 80%, transparent);
       border: 1px solid
-        color-mix(in oklch, var(--color-secondary) 30%, transparent);
+        color-mix(in oklch, var(--color-base-content) 10%, transparent);
       box-shadow: var(--lift-1);
     "
   >
