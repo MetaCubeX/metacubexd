@@ -229,8 +229,9 @@ docker compose pull && docker compose up -d
 ```
 
 Open `http://<host>:8080` for the dashboard. The control agent unlocks the
-kernel/profile UI automatically (it probes `/api/control/info` on the same
-origin).
+kernel/profile UI automatically: the server injects `CONTROL_TOKEN` into the
+same-origin page, so the dashboard authenticates its `/api/control` probe
+without you entering the token anywhere.
 
 **Point the UI endpoint at the kernel.** The dashboard talks to mihomo's Clash
 API directly (never proxied), so set the endpoint to:

@@ -41,6 +41,16 @@ describe('composables/useControlApi resolveControlConfig', () => {
     expect(cfg.token).toBeUndefined()
   })
 
+  it('uses the controlToken injected via config.js for the same-origin base (#2074)', () => {
+    ;(globalThis as any).window = {
+      location: { origin: 'http://192.168.5.30:8088' },
+      __METACUBEXD_CONFIG__: { defaultBackendURL: '', controlToken: 'test' },
+    }
+    const cfg = resolveControlConfig()
+    expect(cfg.base).toBe('http://192.168.5.30:8088/api/control')
+    expect(cfg.token).toBe('test')
+  })
+
   it('builds a ky client with the Authorization header when a token is present', () => {
     ;(globalThis as any).window = {
       metacubexd: { control: { base: 'http://x/api/control', token: 'tok' } },

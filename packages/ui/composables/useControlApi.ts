@@ -29,7 +29,10 @@ interface MetacubexdBridge {
 export function resolveControlConfig(): ControlConfig {
   const w =
     typeof window !== 'undefined'
-      ? (window as unknown as { metacubexd?: MetacubexdBridge })
+      ? (window as unknown as {
+          metacubexd?: MetacubexdBridge
+          __METACUBEXD_CONFIG__?: { controlToken?: string }
+        })
       : undefined
   const bridge = w?.metacubexd?.control
   if (bridge?.base) {
@@ -39,7 +42,11 @@ export function resolveControlConfig(): ControlConfig {
     typeof window !== 'undefined' && window.location?.origin
       ? window.location.origin
       : ''
-  return { base: `${stripTrailingSlash(origin)}/api/control` }
+  // All-in-One server mode: the dashboard is served same-origin with the agent,
+  // and the server injects CONTROL_TOKEN into config.js so control unlocks
+  // automatically (#2074). Plain static deploys leave controlToken undefined.
+  const token = w?.__METACUBEXD_CONFIG__?.controlToken || undefined
+  return { base: `${stripTrailingSlash(origin)}/api/control`, token }
 }
 
 function stripTrailingSlash(s: string): string {
