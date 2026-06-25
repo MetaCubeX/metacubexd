@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.261.8](https://github.com/MetaCubeX/metacubexd/compare/v1.261.7...v1.261.8) (2026-06-25)
+
+
+### Bug Fixes
+
+* **ui:** use neutral border for proxy group cards instead of theme secondary ([dd30e22](https://github.com/MetaCubeX/metacubexd/commit/dd30e22d85f9a91b0fc38e6005d12c5c293fe369))
+
 ## [1.261.7](https://github.com/MetaCubeX/metacubexd/compare/v1.261.6...v1.261.7) (2026-06-25)
 
 
