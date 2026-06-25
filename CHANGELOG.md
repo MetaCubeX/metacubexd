@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.261.7](https://github.com/MetaCubeX/metacubexd/compare/v1.261.6...v1.261.7) (2026-06-25)
+
+
+### Bug Fixes
+
+* **server:** inject CONTROL_TOKEN into config.js so the UI unlocks control ([#2074](https://github.com/MetaCubeX/metacubexd/issues/2074)) ([00e53c4](https://github.com/MetaCubeX/metacubexd/commit/00e53c425bf212586564896808e4b6be1357f976))
+
 ## [1.261.6](https://github.com/MetaCubeX/metacubexd/compare/v1.261.5...v1.261.6) (2026-06-24)
 
 
