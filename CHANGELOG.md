@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.261.10](https://github.com/MetaCubeX/metacubexd/compare/v1.261.9...v1.261.10) (2026-06-26)
+
+
+### Bug Fixes
+
+* **ui:** use oklab for color-mix to stop hue degradation in packaged builds ([1ff63a2](https://github.com/MetaCubeX/metacubexd/commit/1ff63a2bb2e8481523d1483075f8cea5c7224fe4)), closes [#2078](https://github.com/MetaCubeX/metacubexd/issues/2078)
+
 ## [1.261.9](https://github.com/MetaCubeX/metacubexd/compare/v1.261.8...v1.261.9) (2026-06-26)
 
 
