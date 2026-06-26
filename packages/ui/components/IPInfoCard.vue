@@ -33,7 +33,7 @@ function handleProviderChange(event: Event) {
           class="flex h-8 w-8 items-center justify-center rounded-lg text-primary"
           style="
             background: color-mix(
-              in oklch,
+              in oklab,
               var(--color-primary) 15%,
               transparent
             );
@@ -51,7 +51,7 @@ function handleProviderChange(event: Event) {
           class="cursor-pointer appearance-none rounded-md bg-base-100 py-1.5 pr-6 pl-2.5 text-xs text-base-content transition-all duration-200 focus:border-primary focus:outline-none"
           style="
             border: 1px solid
-              color-mix(in oklch, var(--color-base-content) 10%, transparent);
+              color-mix(in oklab, var(--color-base-content) 10%, transparent);
             background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E&quot;);
             background-repeat: no-repeat;
             background-position: right 0.375rem center;
@@ -83,9 +83,9 @@ function handleProviderChange(event: Event) {
       v-else-if="error"
       class="rounded-lg p-3 text-[0.8125rem] text-error"
       style="
-        background: color-mix(in oklch, var(--color-error) 10%, transparent);
+        background: color-mix(in oklab, var(--color-error) 10%, transparent);
         border: 1px solid
-          color-mix(in oklch, var(--color-error) 20%, transparent);
+          color-mix(in oklab, var(--color-error) 20%, transparent);
       "
     >
       <span>{{ error }}</span>
@@ -95,9 +95,9 @@ function handleProviderChange(event: Event) {
       <div
         class="-mx-1 -mt-1 mb-1 flex items-center justify-between gap-3 rounded-lg px-2.5 py-2"
         style="
-          background: color-mix(in oklch, var(--color-primary) 8%, transparent);
+          background: color-mix(in oklab, var(--color-primary) 8%, transparent);
           border: 1px solid
-            color-mix(in oklch, var(--color-primary) 15%, transparent);
+            color-mix(in oklab, var(--color-primary) 15%, transparent);
         "
       >
         <span class="shrink-0 text-[0.8125rem] text-base-content/60">
@@ -184,7 +184,7 @@ function handleProviderChange(event: Event) {
             class="inline-flex items-center rounded-full px-2 py-0.5 text-[0.6875rem] font-semibold tracking-wide text-warning uppercase"
             style="
               background: color-mix(
-                in oklch,
+                in oklab,
                 var(--color-warning) 15%,
                 transparent
               );
@@ -197,7 +197,7 @@ function handleProviderChange(event: Event) {
             class="inline-flex items-center rounded-full px-2 py-0.5 text-[0.6875rem] font-semibold tracking-wide text-warning uppercase"
             style="
               background: color-mix(
-                in oklch,
+                in oklab,
                 var(--color-warning) 15%,
                 transparent
               );
@@ -210,7 +210,7 @@ function handleProviderChange(event: Event) {
             class="inline-flex items-center rounded-full px-2 py-0.5 text-[0.6875rem] font-semibold tracking-wide text-success uppercase"
             style="
               background: color-mix(
-                in oklch,
+                in oklab,
                 var(--color-success) 15%,
                 transparent
               );

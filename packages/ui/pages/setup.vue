@@ -408,16 +408,16 @@ onMounted(async () => {
 /* Custom shadows using CSS variables */
 .shadow-primary-glow {
   box-shadow: 0 8px 24px
-    color-mix(in oklch, var(--color-primary) 30%, transparent);
+    color-mix(in oklab, var(--color-primary) 30%, transparent);
 }
 
 .shadow-primary-glow-lg {
   box-shadow: 0 6px 20px
-    color-mix(in oklch, var(--color-primary) 40%, transparent);
+    color-mix(in oklab, var(--color-primary) 40%, transparent);
 }
 
 .shadow-card {
   box-shadow: 0 4px 24px
-    color-mix(in oklch, var(--color-base-content) 5%, transparent);
+    color-mix(in oklab, var(--color-base-content) 5%, transparent);
 }
 </style>

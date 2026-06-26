@@ -136,11 +136,11 @@ watch(
 
 <template>
   <div
-    class="relative flex h-[600px] shrink-0 flex-col overflow-hidden rounded-2xl border border-[color-mix(in_oklch,var(--color-base-content)_10%,transparent)] bg-base-200/50 shadow-[0_0_0_1px_color-mix(in_oklch,var(--color-primary)_20%,transparent),0_4px_24px_-4px_color-mix(in_oklch,var(--color-primary)_10%,transparent)] backdrop-blur-[4px] transition-all duration-300 hover:border-primary/30 hover:shadow-[0_0_0_1px_color-mix(in_oklch,var(--color-primary)_30%,transparent),0_8px_32px_-4px_color-mix(in_oklch,var(--color-primary)_10%,transparent)]"
+    class="relative flex h-[600px] shrink-0 flex-col overflow-hidden rounded-2xl border border-[color-mix(in_oklab,var(--color-base-content)_10%,transparent)] bg-base-200/50 shadow-[0_0_0_1px_color-mix(in_oklab,var(--color-primary)_20%,transparent),0_4px_24px_-4px_color-mix(in_oklab,var(--color-primary)_10%,transparent)] backdrop-blur-[4px] transition-all duration-300 hover:border-primary/30 hover:shadow-[0_0_0_1px_color-mix(in_oklab,var(--color-primary)_30%,transparent),0_8px_32px_-4px_color-mix(in_oklab,var(--color-primary)_10%,transparent)]"
   >
     <!-- Card Header -->
     <div
-      class="flex items-center gap-3 border-b border-[color-mix(in_oklch,var(--color-base-content)_5%,transparent)] bg-base-300/30 px-4 py-3"
+      class="flex items-center gap-3 border-b border-[color-mix(in_oklab,var(--color-base-content)_5%,transparent)] bg-base-300/30 px-4 py-3"
     >
       <IconListDetails :size="20" class="text-primary" />
       <h3 class="font-semibold tracking-tight text-base-content">
@@ -159,7 +159,7 @@ watch(
           v-model="subSearchQuery"
           type="search"
           :placeholder="t('search')"
-          class="w-full rounded-lg border border-[color-mix(in_oklch,var(--color-base-content)_12%,transparent)] bg-base-200/60 py-1.5 pr-3 pl-9 text-[0.8125rem] text-base-content transition-all duration-200 placeholder:text-base-content/40 focus:border-primary focus:bg-base-100 focus:outline-none"
+          class="w-full rounded-lg border border-[color-mix(in_oklab,var(--color-base-content)_12%,transparent)] bg-base-200/60 py-1.5 pr-3 pl-9 text-[0.8125rem] text-base-content transition-all duration-200 placeholder:text-base-content/40 focus:border-primary focus:bg-base-100 focus:outline-none"
         />
       </div>
     </div>
@@ -170,7 +170,7 @@ watch(
         <thead class="hidden md:table-header-group">
           <tr class="sticky top-0 z-10 bg-base-200">
             <th
-              class="cursor-pointer border-b border-[color-mix(in_oklch,var(--color-base-content)_10%,transparent)] px-4 py-3 text-left text-xs font-semibold tracking-wide whitespace-nowrap text-base-content/70 uppercase transition-colors hover:bg-base-content/5"
+              class="cursor-pointer border-b border-[color-mix(in_oklab,var(--color-base-content)_10%,transparent)] px-4 py-3 text-left text-xs font-semibold tracking-wide whitespace-nowrap text-base-content/70 uppercase transition-colors hover:bg-base-content/5"
               @click="handleSort('label')"
             >
               <div class="flex items-center gap-1">
@@ -185,7 +185,7 @@ watch(
               </div>
             </th>
             <th
-              class="hidden cursor-pointer border-b border-[color-mix(in_oklch,var(--color-base-content)_10%,transparent)] px-4 py-3 text-left text-xs font-semibold tracking-wide whitespace-nowrap text-base-content/70 uppercase transition-colors hover:bg-base-content/5 lg:table-cell"
+              class="hidden cursor-pointer border-b border-[color-mix(in_oklab,var(--color-base-content)_10%,transparent)] px-4 py-3 text-left text-xs font-semibold tracking-wide whitespace-nowrap text-base-content/70 uppercase transition-colors hover:bg-base-content/5 lg:table-cell"
               @click="handleSort('upload')"
             >
               <div class="flex items-center gap-1">
@@ -198,7 +198,7 @@ watch(
               </div>
             </th>
             <th
-              class="hidden cursor-pointer border-b border-[color-mix(in_oklch,var(--color-base-content)_10%,transparent)] px-4 py-3 text-left text-xs font-semibold tracking-wide whitespace-nowrap text-base-content/70 uppercase transition-colors hover:bg-base-content/5 lg:table-cell"
+              class="hidden cursor-pointer border-b border-[color-mix(in_oklab,var(--color-base-content)_10%,transparent)] px-4 py-3 text-left text-xs font-semibold tracking-wide whitespace-nowrap text-base-content/70 uppercase transition-colors hover:bg-base-content/5 lg:table-cell"
               @click="handleSort('download')"
             >
               <div class="flex items-center gap-1">
@@ -211,7 +211,7 @@ watch(
               </div>
             </th>
             <th
-              class="cursor-pointer border-b border-[color-mix(in_oklch,var(--color-base-content)_10%,transparent)] px-4 py-3 text-right text-xs font-semibold tracking-wide whitespace-nowrap text-base-content/70 uppercase transition-colors hover:bg-base-content/5 md:text-left"
+              class="cursor-pointer border-b border-[color-mix(in_oklab,var(--color-base-content)_10%,transparent)] px-4 py-3 text-right text-xs font-semibold tracking-wide whitespace-nowrap text-base-content/70 uppercase transition-colors hover:bg-base-content/5 md:text-left"
               @click="handleSort('total')"
             >
               <div class="flex items-center justify-end gap-1 md:justify-start">
@@ -308,7 +308,7 @@ watch(
                   <div
                     v-for="item in getSubRowProxyStats(sub.label)"
                     :key="item.label"
-                    class="flex h-full flex-col justify-between gap-1 rounded-lg border border-[color-mix(in_oklch,var(--color-base-content)_10%,transparent)] bg-base-300/30 p-2 shadow-sm transition-all hover:border-primary/30 sm:rounded-xl sm:p-3"
+                    class="flex h-full flex-col justify-between gap-1 rounded-lg border border-[color-mix(in_oklab,var(--color-base-content)_10%,transparent)] bg-base-300/30 p-2 shadow-sm transition-all hover:border-primary/30 sm:rounded-xl sm:p-3"
                   >
                     <span
                       class="mb-1 truncate border-b border-base-content/5 pb-1 font-mono text-[9px] font-bold text-secondary sm:text-[10px]"
@@ -366,12 +366,12 @@ watch(
 
     <!-- Footer Pagination -->
     <div
-      class="flex shrink-0 items-center justify-between gap-4 border-t border-[color-mix(in_oklch,var(--color-base-content)_10%,transparent)] bg-base-200/60 p-3"
+      class="flex shrink-0 items-center justify-between gap-4 border-t border-[color-mix(in_oklab,var(--color-base-content)_10%,transparent)] bg-base-200/60 p-3"
     >
       <div class="flex items-center gap-3">
         <select
           v-model.number="subPageSize"
-          class="cursor-pointer rounded-md border border-[color-mix(in_oklch,var(--color-base-content)_10%,transparent)] bg-base-100 px-2.5 py-1.5 text-[0.8125rem] text-base-content transition-colors duration-200 focus:border-primary focus:outline-none"
+          class="cursor-pointer rounded-md border border-[color-mix(in_oklab,var(--color-base-content)_10%,transparent)] bg-base-100 px-2.5 py-1.5 text-[0.8125rem] text-base-content transition-colors duration-200 focus:border-primary focus:outline-none"
         >
           <option v-for="size in pageSizeOptions" :key="size" :value="size">
             {{ size }}

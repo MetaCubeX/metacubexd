@@ -112,7 +112,7 @@ onMounted(() => {
   background: linear-gradient(
     135deg,
     var(--color-primary) 0%,
-    color-mix(in oklch, var(--color-primary) 50%, transparent) 100%
+    color-mix(in oklab, var(--color-primary) 50%, transparent) 100%
   );
 }
 
@@ -124,7 +124,7 @@ onMounted(() => {
   background: linear-gradient(
     135deg,
     var(--color-secondary) 0%,
-    color-mix(in oklch, var(--color-secondary) 50%, transparent) 100%
+    color-mix(in oklab, var(--color-secondary) 50%, transparent) 100%
   );
   animation-delay: -7s;
 }
@@ -138,7 +138,7 @@ onMounted(() => {
   background: linear-gradient(
     135deg,
     var(--color-accent) 0%,
-    color-mix(in oklch, var(--color-accent) 30%, transparent) 100%
+    color-mix(in oklab, var(--color-accent) 30%, transparent) 100%
   );
   animation-delay: -14s;
   opacity: 0.2;
@@ -211,13 +211,13 @@ onMounted(() => {
   );
   color: var(--color-primary-content);
   box-shadow:
-    0 4px 15px color-mix(in oklch, var(--color-primary) 40%, transparent),
+    0 4px 15px color-mix(in oklab, var(--color-primary) 40%, transparent),
     0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .index-btn-primary:hover {
   box-shadow:
-    0 8px 25px color-mix(in oklch, var(--color-primary) 50%, transparent),
+    0 8px 25px color-mix(in oklab, var(--color-primary) 50%, transparent),
     0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -240,15 +240,15 @@ onMounted(() => {
 
 /* Secondary button styles */
 .index-btn-secondary {
-  background: color-mix(in oklch, var(--color-base-content) 8%, transparent);
+  background: color-mix(in oklab, var(--color-base-content) 8%, transparent);
   color: var(--color-base-content);
   border: 1px solid
-    color-mix(in oklch, var(--color-base-content) 15%, transparent);
+    color-mix(in oklab, var(--color-base-content) 15%, transparent);
 }
 
 .index-btn-secondary:hover {
-  background: color-mix(in oklch, var(--color-base-content) 12%, transparent);
-  border-color: color-mix(in oklch, var(--color-base-content) 25%, transparent);
+  background: color-mix(in oklab, var(--color-base-content) 12%, transparent);
+  border-color: color-mix(in oklab, var(--color-base-content) 25%, transparent);
 }
 
 /* Animations */

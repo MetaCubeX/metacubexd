@@ -14,7 +14,7 @@ const { isMaximized, minimize, toggleMaximize, close } = useWindowControls()
   <!-- 32px draggable bar. dblclick toggles maximize on Win/Linux (frameless has
        no native double-click-to-maximize); macOS handles it natively. -->
   <div
-    class="flex h-8 shrink-0 items-center border-b border-[color-mix(in_oklch,var(--color-base-content)_10%,transparent)] bg-[color-mix(in_oklch,var(--color-base-200)_95%,transparent)] backdrop-blur-[12px]"
+    class="flex h-8 shrink-0 items-center border-b border-[color-mix(in_oklab,var(--color-base-content)_10%,transparent)] bg-[color-mix(in_oklab,var(--color-base-200)_95%,transparent)] backdrop-blur-[12px]"
     style="-webkit-app-region: drag"
     @dblclick="!isMac && toggleMaximize()"
   >
@@ -30,14 +30,14 @@ const { isMaximized, minimize, toggleMaximize, close } = useWindowControls()
       style="-webkit-app-region: no-drag"
     >
       <button
-        class="flex h-full w-12 items-center justify-center text-base-content/70 transition-colors hover:bg-[color-mix(in_oklch,var(--color-base-content)_8%,transparent)] hover:text-base-content focus-visible:-outline-offset-2 active:bg-[color-mix(in_oklch,var(--color-base-content)_14%,transparent)]"
+        class="flex h-full w-12 items-center justify-center text-base-content/70 transition-colors hover:bg-[color-mix(in_oklab,var(--color-base-content)_8%,transparent)] hover:text-base-content focus-visible:-outline-offset-2 active:bg-[color-mix(in_oklab,var(--color-base-content)_14%,transparent)]"
         aria-label="minimize"
         @click="minimize"
       >
         <IconMinus class="h-4 w-4" />
       </button>
       <button
-        class="flex h-full w-12 items-center justify-center text-base-content/70 transition-colors hover:bg-[color-mix(in_oklch,var(--color-base-content)_8%,transparent)] hover:text-base-content focus-visible:-outline-offset-2 active:bg-[color-mix(in_oklch,var(--color-base-content)_14%,transparent)]"
+        class="flex h-full w-12 items-center justify-center text-base-content/70 transition-colors hover:bg-[color-mix(in_oklab,var(--color-base-content)_8%,transparent)] hover:text-base-content focus-visible:-outline-offset-2 active:bg-[color-mix(in_oklab,var(--color-base-content)_14%,transparent)]"
         :aria-label="isMaximized ? 'restore' : 'maximize'"
         @click="toggleMaximize"
       >

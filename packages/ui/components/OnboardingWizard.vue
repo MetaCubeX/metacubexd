@@ -407,7 +407,7 @@ onUnmounted(() => {
   border: none;
   background: transparent;
   font-size: 0.8125rem;
-  color: color-mix(in oklch, var(--color-base-content) 55%, transparent);
+  color: color-mix(in oklab, var(--color-base-content) 55%, transparent);
   transition: color var(--dur-fast, 150ms) var(--ease-soft, ease);
 }
 .ob-skip:hover {

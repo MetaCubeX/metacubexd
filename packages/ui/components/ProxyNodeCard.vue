@@ -236,7 +236,7 @@ function handleLatencyTest() {
           ? 'proxy-card--selected bg-primary/15 text-base-content'
           : 'bg-neutral text-neutral-content',
         isTesting
-          ? 'animate-[testingPulse_1.5s_ease-in-out_infinite] border border-[color-mix(in_oklch,var(--color-success)_50%,transparent)]'
+          ? 'animate-[testingPulse_1.5s_ease-in-out_infinite] border border-[color-mix(in_oklab,var(--color-success)_50%,transparent)]'
           : isSelected
             ? 'border border-primary'
             : 'border border-transparent',
@@ -356,7 +356,7 @@ function handleLatencyTest() {
           <!-- Latency Trend Mini Chart -->
           <div
             v-if="latencyTrendData"
-            class="w-full rounded-lg bg-[color-mix(in_oklch,var(--color-primary-content)_10%,transparent)] p-2"
+            class="w-full rounded-lg bg-[color-mix(in_oklab,var(--color-primary-content)_10%,transparent)] p-2"
           >
             <div
               class="mb-1 flex items-center justify-between text-[0.625rem] opacity-70"
@@ -417,11 +417,11 @@ function handleLatencyTest() {
 
           <template v-if="historyReversed.length > 0">
             <ul
-              class="m-0 max-h-48 w-full [scrollbar-width:thin] [scrollbar-color:color-mix(in_oklch,var(--color-primary-content)_30%,transparent)_transparent] list-none overflow-y-auto p-0 pr-2 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:rounded-sm [&::-webkit-scrollbar-thumb]:bg-[color-mix(in_oklch,var(--color-primary-content)_30%,transparent)] [&::-webkit-scrollbar-track]:bg-transparent"
+              class="m-0 max-h-48 w-full [scrollbar-width:thin] [scrollbar-color:color-mix(in_oklab,var(--color-primary-content)_30%,transparent)_transparent] list-none overflow-y-auto p-0 pr-2 [&::-webkit-scrollbar]:block [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:rounded-sm [&::-webkit-scrollbar-thumb]:bg-[color-mix(in_oklab,var(--color-primary-content)_30%,transparent)] [&::-webkit-scrollbar-track]:bg-transparent"
             >
               <li v-for="(result, index) in historyReversed" :key="index">
                 <div
-                  class="flex items-start gap-2 border-b border-[color-mix(in_oklch,var(--color-primary-content)_15%,transparent)] py-1.5 last:border-b-0"
+                  class="flex items-start gap-2 border-b border-[color-mix(in_oklab,var(--color-primary-content)_15%,transparent)] py-1.5 last:border-b-0"
                 >
                   <div class="shrink-0 opacity-80">
                     <IconCircleCheckFilled class="size-4" />
@@ -444,7 +444,7 @@ function handleLatencyTest() {
                       </div>
                       <div
                         v-if="result.delay && latencyTrendData"
-                        class="h-1.5 flex-1 overflow-hidden rounded-full bg-[color-mix(in_oklch,var(--color-primary-content)_15%,transparent)]"
+                        class="h-1.5 flex-1 overflow-hidden rounded-full bg-[color-mix(in_oklab,var(--color-primary-content)_15%,transparent)]"
                       >
                         <div
                           class="h-full rounded-full bg-current transition-all duration-300"
@@ -510,7 +510,7 @@ function handleLatencyTest() {
   pointer-events: none;
   background: linear-gradient(
     180deg,
-    color-mix(in oklch, white 14%, transparent) 0%,
+    color-mix(in oklab, white 14%, transparent) 0%,
     transparent 30%
   );
   mix-blend-mode: overlay;
@@ -520,7 +520,7 @@ function handleLatencyTest() {
 .proxy-card--selected .proxy-card__highlight {
   background: linear-gradient(
     180deg,
-    color-mix(in oklch, white 22%, transparent) 0%,
+    color-mix(in oklab, white 22%, transparent) 0%,
     transparent 35%
   );
 }
@@ -529,11 +529,11 @@ function handleLatencyTest() {
   0%,
   100% {
     box-shadow: 0 0 8px
-      color-mix(in oklch, var(--color-success) 30%, transparent);
+      color-mix(in oklab, var(--color-success) 30%, transparent);
   }
   50% {
     box-shadow: 0 0 16px
-      color-mix(in oklch, var(--color-success) 50%, transparent);
+      color-mix(in oklab, var(--color-success) 50%, transparent);
   }
 }
 </style>

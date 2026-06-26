@@ -201,7 +201,7 @@ async function onRestartCore() {
 
 <template>
   <div
-    class="drawer h-full [--sidebar-border:color-mix(in_oklch,var(--color-base-content)_10%,transparent)] [--sidebar-hover:color-mix(in_oklch,var(--color-base-content)_5%,transparent)]"
+    class="drawer h-full [--sidebar-border:color-mix(in_oklab,var(--color-base-content)_10%,transparent)] [--sidebar-hover:color-mix(in_oklab,var(--color-base-content)_5%,transparent)]"
     :class="{ 'lg:drawer-open': route.path !== '/setup' }"
   >
     <input
@@ -214,7 +214,7 @@ async function onRestartCore() {
     <div class="drawer-content flex h-full flex-col">
       <!-- Header/Navbar (mobile only) -->
       <header
-        class="z-50 flex h-14 items-center gap-2 border-b border-[var(--sidebar-border)] bg-[color-mix(in_oklch,var(--color-base-300)_95%,transparent)] px-2 shadow-[0_4px_20px_color-mix(in_oklch,var(--color-base-content)_5%,transparent)] backdrop-blur-[12px] sm:px-4 lg:hidden"
+        class="z-50 flex h-14 items-center gap-2 border-b border-[var(--sidebar-border)] bg-[color-mix(in_oklab,var(--color-base-300)_95%,transparent)] px-2 shadow-[0_4px_20px_color-mix(in_oklab,var(--color-base-content)_5%,transparent)] backdrop-blur-[12px] sm:px-4 lg:hidden"
       >
         <!-- Mobile menu button (hidden when using bottom nav) -->
         <label
@@ -259,12 +259,12 @@ async function onRestartCore() {
       <label
         for="main-drawer"
         aria-label="close sidebar"
-        class="drawer-overlay bg-[color-mix(in_oklch,var(--color-base-content)_40%,transparent)] backdrop-blur-[4px]"
+        class="drawer-overlay bg-[color-mix(in_oklab,var(--color-base-content)_40%,transparent)] backdrop-blur-[4px]"
       />
 
       <!-- Sidebar container - collapsible on desktop -->
       <div
-        class="flex h-full w-52 flex-col border-r border-[var(--sidebar-border)] bg-[linear-gradient(180deg,color-mix(in_oklch,var(--color-base-200)_98%,transparent)_0%,var(--color-base-200)_100%)] backdrop-blur-[12px] transition-[width] duration-300 ease-[var(--ease-spring-soft)]"
+        class="flex h-full w-52 flex-col border-r border-[var(--sidebar-border)] bg-[linear-gradient(180deg,color-mix(in_oklab,var(--color-base-200)_98%,transparent)_0%,var(--color-base-200)_100%)] backdrop-blur-[12px] transition-[width] duration-300 ease-[var(--ease-spring-soft)]"
         :class="configStore.sidebarExpanded ? '' : 'lg:w-16'"
       >
         <!-- Sidebar header -->
@@ -284,7 +284,7 @@ async function onRestartCore() {
           </div>
           <!-- Expand/Collapse button (desktop only) -->
           <button
-            class="press-tactile hidden cursor-pointer items-center justify-center gap-2 rounded-lg border border-[var(--sidebar-border)] bg-transparent p-2 text-sm text-base-content hover:border-[color-mix(in_oklch,var(--color-base-content)_20%,transparent)] hover:bg-[var(--sidebar-hover)] lg:flex"
+            class="press-tactile hidden cursor-pointer items-center justify-center gap-2 rounded-lg border border-[var(--sidebar-border)] bg-transparent p-2 text-sm text-base-content hover:border-[color-mix(in_oklab,var(--color-base-content)_20%,transparent)] hover:bg-[var(--sidebar-hover)] lg:flex"
             :class="
               configStore.sidebarExpanded
                 ? 'w-full'
@@ -318,7 +318,7 @@ async function onRestartCore() {
               <button
                 v-for="mode in modes"
                 :key="mode"
-                class="press-tactile flex min-w-0 flex-1 cursor-pointer items-center justify-center rounded-md border-none bg-transparent px-1.5 py-1.5 text-xs font-medium text-[color-mix(in_oklch,var(--color-base-content)_70%,transparent)] transition-colors duration-200 hover:text-base-content"
+                class="press-tactile flex min-w-0 flex-1 cursor-pointer items-center justify-center rounded-md border-none bg-transparent px-1.5 py-1.5 text-xs font-medium text-[color-mix(in_oklab,var(--color-base-content)_70%,transparent)] transition-colors duration-200 hover:text-base-content"
                 :class="
                   currentMode === mode
                     ? 'bg-primary/15 text-primary hover:text-primary'
@@ -339,7 +339,7 @@ async function onRestartCore() {
           >
             <button
               ref="modeReference"
-              class="press-tactile flex aspect-square w-9 cursor-pointer items-center justify-center rounded-lg border border-[var(--sidebar-border)] bg-transparent text-base-content hover:border-[color-mix(in_oklch,var(--color-base-content)_20%,transparent)] hover:bg-[var(--sidebar-hover)]"
+              class="press-tactile flex aspect-square w-9 cursor-pointer items-center justify-center rounded-lg border border-[var(--sidebar-border)] bg-transparent text-base-content hover:border-[color-mix(in_oklab,var(--color-base-content)_20%,transparent)] hover:bg-[var(--sidebar-hover)]"
               :class="{
                 'border-primary/40 bg-primary/15 text-primary': isModeMenuOpen,
               }"
@@ -434,7 +434,7 @@ async function onRestartCore() {
             >
               <NuxtLink
                 :to="nav.href"
-                class="nav-link group relative flex w-full items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-sm font-medium text-[color-mix(in_oklch,var(--color-base-content)_70%,transparent)] no-underline hover:text-base-content"
+                class="nav-link group relative flex w-full items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-sm font-medium text-[color-mix(in_oklab,var(--color-base-content)_70%,transparent)] no-underline hover:text-base-content"
                 :class="[
                   isActive(nav.href) ? 'is-active' : '',
                   configStore.sidebarExpanded
@@ -497,7 +497,7 @@ async function onRestartCore() {
             :class="configStore.sidebarExpanded ? '' : 'items-center'"
           >
             <button
-              class="press-tactile flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-[var(--sidebar-border)] bg-transparent text-xs font-medium text-base-content hover:border-[color-mix(in_oklch,var(--color-base-content)_20%,transparent)] hover:bg-[var(--sidebar-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+              class="press-tactile flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-[var(--sidebar-border)] bg-transparent text-xs font-medium text-base-content hover:border-[color-mix(in_oklab,var(--color-base-content)_20%,transparent)] hover:bg-[var(--sidebar-hover)] disabled:cursor-not-allowed disabled:opacity-50"
               :class="
                 configStore.sidebarExpanded ? 'w-full' : 'aspect-square w-9'
               "
@@ -516,7 +516,7 @@ async function onRestartCore() {
               </span>
             </button>
             <button
-              class="press-tactile flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-[var(--sidebar-border)] bg-transparent text-xs font-medium text-base-content hover:border-[color-mix(in_oklch,var(--color-warning)_40%,transparent)] hover:bg-[color-mix(in_oklch,var(--color-warning)_12%,transparent)] hover:text-warning disabled:cursor-not-allowed disabled:opacity-50"
+              class="press-tactile flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-[var(--sidebar-border)] bg-transparent text-xs font-medium text-base-content hover:border-[color-mix(in_oklab,var(--color-warning)_40%,transparent)] hover:bg-[color-mix(in_oklab,var(--color-warning)_12%,transparent)] hover:text-warning disabled:cursor-not-allowed disabled:opacity-50"
               :class="
                 configStore.sidebarExpanded ? 'w-full' : 'aspect-square w-9'
               "
@@ -611,15 +611,15 @@ async function onRestartCore() {
   transform: scale(1);
   background: linear-gradient(
     90deg,
-    color-mix(in oklch, var(--color-primary) 18%, transparent) 0%,
-    color-mix(in oklch, var(--color-primary) 8%, transparent) 100%
+    color-mix(in oklab, var(--color-primary) 18%, transparent) 0%,
+    color-mix(in oklab, var(--color-primary) 8%, transparent) 100%
   );
 }
 .nav-link.is-active:hover .nav-link__glow {
   background: linear-gradient(
     90deg,
-    color-mix(in oklch, var(--color-primary) 24%, transparent) 0%,
-    color-mix(in oklch, var(--color-primary) 12%, transparent) 100%
+    color-mix(in oklab, var(--color-primary) 24%, transparent) 0%,
+    color-mix(in oklab, var(--color-primary) 12%, transparent) 100%
   );
 }
 
@@ -628,8 +628,8 @@ async function onRestartCore() {
   width: 3px;
   height: 60%;
   box-shadow:
-    0 0 8px color-mix(in oklch, var(--color-primary) 60%, transparent),
-    0 0 2px color-mix(in oklch, var(--color-primary) 80%, transparent);
+    0 0 8px color-mix(in oklab, var(--color-primary) 60%, transparent),
+    0 0 2px color-mix(in oklab, var(--color-primary) 80%, transparent);
   animation: indicatorFadeIn var(--dur-base) var(--ease-soft);
 }
 

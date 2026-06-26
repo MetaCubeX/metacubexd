@@ -1735,20 +1735,20 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
   overflow: hidden;
   border-radius: 1rem;
   border: 1px solid
-    color-mix(in oklch, var(--color-base-content) 10%, transparent);
+    color-mix(in oklab, var(--color-base-content) 10%, transparent);
   backdrop-filter: blur(4px);
   transition: all 0.3s;
-  background-color: color-mix(in oklch, var(--color-base-200) 50%, transparent);
+  background-color: color-mix(in oklab, var(--color-base-200) 50%, transparent);
   box-shadow:
-    0 0 0 1px color-mix(in oklch, var(--color-primary) 20%, transparent),
-    0 4px 24px -4px color-mix(in oklch, var(--color-primary) 10%, transparent);
+    0 0 0 1px color-mix(in oklab, var(--color-primary) 20%, transparent),
+    0 4px 24px -4px color-mix(in oklab, var(--color-primary) 10%, transparent);
 }
 
 .config-card:hover {
-  border-color: color-mix(in oklch, var(--color-primary) 30%, transparent);
+  border-color: color-mix(in oklab, var(--color-primary) 30%, transparent);
   box-shadow:
-    0 0 0 1px color-mix(in oklch, var(--color-primary) 30%, transparent),
-    0 8px 32px -4px color-mix(in oklch, var(--color-primary) 10%, transparent);
+    0 0 0 1px color-mix(in oklab, var(--color-primary) 30%, transparent),
+    0 8px 32px -4px color-mix(in oklab, var(--color-primary) 10%, transparent);
 }
 
 /* Animations */

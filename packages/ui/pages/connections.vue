@@ -868,14 +868,14 @@ function exportConnectionsJSON() {
   height: 24px;
   border-radius: 50%;
   border: none;
-  background: color-mix(in oklch, var(--color-error) 10%, transparent);
+  background: color-mix(in oklab, var(--color-error) 10%, transparent);
   color: var(--color-error);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .conn-close-btn:hover {
-  background: color-mix(in oklch, var(--color-error) 20%, transparent);
+  background: color-mix(in oklab, var(--color-error) 20%, transparent);
   transform: scale(1.1);
 }
 
@@ -907,7 +907,7 @@ function exportConnectionsJSON() {
   font-size: 0.85em;
   line-height: 1.35;
   font-weight: 400;
-  color: color-mix(in oklch, var(--color-base-content) 58%, transparent);
+  color: color-mix(in oklab, var(--color-base-content) 58%, transparent);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

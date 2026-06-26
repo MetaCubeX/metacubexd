@@ -122,7 +122,7 @@ const showBackup = computed(() => hasFeature('webdav-backup'))
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: color-mix(in oklch, var(--color-base-content) 50%, transparent);
+  color: color-mix(in oklab, var(--color-base-content) 50%, transparent);
 }
 
 .cc-fade-in {

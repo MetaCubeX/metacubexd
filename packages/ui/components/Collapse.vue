@@ -53,11 +53,11 @@ const cardGridStyle = computed(() => ({
 
 <template>
   <div
-    class="rounded-xl transition-[background,border-color] duration-200 ease-out select-none hover:border-[color-mix(in_oklch,var(--color-primary)_40%,transparent)] hover:bg-[color-mix(in_oklch,var(--color-base-200)_95%,transparent)]"
+    class="rounded-xl transition-[background,border-color] duration-200 ease-out select-none hover:border-[color-mix(in_oklab,var(--color-primary)_40%,transparent)] hover:bg-[color-mix(in_oklab,var(--color-base-200)_95%,transparent)]"
     style="
-      background: color-mix(in oklch, var(--color-base-200) 80%, transparent);
+      background: color-mix(in oklab, var(--color-base-200) 80%, transparent);
       border: 1px solid
-        color-mix(in oklch, var(--color-base-content) 10%, transparent);
+        color-mix(in oklab, var(--color-base-content) 10%, transparent);
       box-shadow: var(--lift-1);
     "
   >
@@ -72,7 +72,7 @@ const cardGridStyle = computed(() => ({
         configStore.stickyGroupHeader && isOpen
           ? {
               background:
-                'color-mix(in oklch, var(--color-base-200) 80%, transparent)',
+                'color-mix(in oklab, var(--color-base-200) 80%, transparent)',
             }
           : undefined
       "
@@ -80,7 +80,7 @@ const cardGridStyle = computed(() => ({
     >
       <slot name="title" />
       <div
-        class="flex h-6 w-6 items-center justify-center text-[color-mix(in_oklch,var(--color-base-content)_50%,transparent)] transition-transform duration-[var(--dur-slow)] ease-[var(--ease-soft)]"
+        class="flex h-6 w-6 items-center justify-center text-[color-mix(in_oklab,var(--color-base-content)_50%,transparent)] transition-transform duration-[var(--dur-slow)] ease-[var(--ease-soft)]"
         :class="isOpen ? 'rotate-180' : ''"
       >
         <svg

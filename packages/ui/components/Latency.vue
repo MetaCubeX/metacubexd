@@ -83,7 +83,7 @@ const ariaLabel = computed(() => {
 <style scoped>
 .latency-pill {
   position: relative;
-  background-color: color-mix(in oklch, currentColor 12%, transparent);
+  background-color: color-mix(in oklab, currentColor 12%, transparent);
   box-shadow: var(--inner-highlight);
   transition:
     transform var(--dur-base) var(--ease-spring),
@@ -91,7 +91,7 @@ const ariaLabel = computed(() => {
 }
 .latency-pill:hover {
   transform: scale(1.06);
-  background-color: color-mix(in oklch, currentColor 18%, transparent);
+  background-color: color-mix(in oklab, currentColor 18%, transparent);
 }
 .latency-pill:active {
   transform: scale(0.92);

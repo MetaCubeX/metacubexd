@@ -113,12 +113,12 @@ const renderMarkdown = (content: string) => md.render(content)
 
 <style scoped>
 .changelog-dot {
-  background: color-mix(in oklch, var(--color-base-content) 30%, transparent);
+  background: color-mix(in oklab, var(--color-base-content) 30%, transparent);
 }
 
 .changelog-dot-current {
   background: var(--color-primary);
-  box-shadow: 0 0 8px color-mix(in oklch, var(--color-primary) 50%, transparent);
+  box-shadow: 0 0 8px color-mix(in oklab, var(--color-primary) 50%, transparent);
 }
 
 .changelog-item:not(:last-child) .changelog-line::after {
@@ -126,7 +126,7 @@ const renderMarkdown = (content: string) => md.render(content)
   flex: 1;
   width: 2px;
   margin-top: 0.375rem;
-  background: color-mix(in oklch, var(--color-base-content) 15%, transparent);
+  background: color-mix(in oklab, var(--color-base-content) 15%, transparent);
 }
 
 .changelog-body :deep(a) {
@@ -155,12 +155,12 @@ const renderMarkdown = (content: string) => md.render(content)
   font-size: 0.75rem;
   padding: 0.125rem 0.25rem;
   border-radius: 0.25rem;
-  background: color-mix(in oklch, var(--color-base-content) 10%, transparent);
+  background: color-mix(in oklab, var(--color-base-content) 10%, transparent);
 }
 
 .changelog-spinner {
   border: 2px solid
-    color-mix(in oklch, var(--color-base-content) 20%, transparent);
+    color-mix(in oklab, var(--color-base-content) 20%, transparent);
   border-top-color: var(--color-primary);
   animation: spin 0.6s linear infinite;
 }

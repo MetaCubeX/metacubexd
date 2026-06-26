@@ -278,14 +278,14 @@ const currentViewLabel = computed(
       class="animate-fade-slide-in flex shrink-0 flex-wrap items-center justify-between gap-3 px-1"
     >
       <div
-        class="flex shrink-0 gap-1 rounded-lg border border-[color-mix(in_oklch,var(--color-base-content)_12%,transparent)] bg-base-200/60 p-1"
+        class="flex shrink-0 gap-1 rounded-lg border border-[color-mix(in_oklab,var(--color-base-content)_12%,transparent)] bg-base-200/60 p-1"
       >
         <button
           v-for="opt in viewOptions"
           :key="opt.value"
           class="flex cursor-pointer items-center gap-2 rounded-md border-none bg-transparent px-3 py-1.5 text-[0.8125rem] font-medium text-base-content/60 transition-all duration-200 hover:bg-base-content/5 hover:text-base-content"
           :class="{
-            'bg-primary! text-primary-content! shadow-[0_2px_8px_color-mix(in_oklch,var(--color-primary)_30%,transparent)]':
+            'bg-primary! text-primary-content! shadow-[0_2px_8px_color-mix(in_oklab,var(--color-primary)_30%,transparent)]':
               activeView === opt.value,
           }"
           @click="activeView = opt.value as DataUsageType"
@@ -304,14 +304,14 @@ const currentViewLabel = computed(
           <input
             v-model="customStart"
             type="datetime-local"
-            class="rounded-lg border border-[color-mix(in_oklch,var(--color-base-content)_12%,transparent)] bg-base-200/60 px-2 py-1.5 text-[0.75rem] text-base-content focus:border-primary focus:outline-none"
+            class="rounded-lg border border-[color-mix(in_oklab,var(--color-base-content)_12%,transparent)] bg-base-200/60 px-2 py-1.5 text-[0.75rem] text-base-content focus:border-primary focus:outline-none"
             @change="fetchData"
           />
           <span class="text-[10px] opacity-30">→</span>
           <input
             v-model="customEnd"
             type="datetime-local"
-            class="rounded-lg border border-[color-mix(in_oklch,var(--color-base-content)_12%,transparent)] bg-base-200/60 px-2 py-1.5 text-[0.75rem] text-base-content focus:border-primary focus:outline-none"
+            class="rounded-lg border border-[color-mix(in_oklab,var(--color-base-content)_12%,transparent)] bg-base-200/60 px-2 py-1.5 text-[0.75rem] text-base-content focus:border-primary focus:outline-none"
             @change="fetchData"
           />
         </div>
@@ -324,7 +324,7 @@ const currentViewLabel = computed(
             <select
               v-model.number="selectedTimeRange"
               :title="t('timeRange')"
-              class="cursor-pointer appearance-none rounded-lg border border-[color-mix(in_oklch,var(--color-base-content)_12%,transparent)] bg-base-200/60 py-1.5 pr-8 pl-3 text-[0.8125rem] text-base-content transition-all duration-200 hover:border-[color-mix(in_oklch,var(--color-base-content)_20%,transparent)] focus:border-primary"
+              class="cursor-pointer appearance-none rounded-lg border border-[color-mix(in_oklab,var(--color-base-content)_12%,transparent)] bg-base-200/60 py-1.5 pr-8 pl-3 text-[0.8125rem] text-base-content transition-all duration-200 hover:border-[color-mix(in_oklab,var(--color-base-content)_20%,transparent)] focus:border-primary"
               style="
                 background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E&quot;);
                 background-repeat: no-repeat;
@@ -351,7 +351,7 @@ const currentViewLabel = computed(
             <select
               v-model.number="selectedDataRetention"
               :title="t('dataRetention')"
-              class="cursor-pointer appearance-none rounded-lg border border-[color-mix(in_oklch,var(--color-base-content)_12%,transparent)] bg-base-200/60 py-1.5 pr-8 pl-3 text-[0.8125rem] text-base-content transition-all duration-200 hover:border-[color-mix(in_oklch,var(--color-base-content)_20%,transparent)] focus:border-primary"
+              class="cursor-pointer appearance-none rounded-lg border border-[color-mix(in_oklab,var(--color-base-content)_12%,transparent)] bg-base-200/60 py-1.5 pr-8 pl-3 text-[0.8125rem] text-base-content transition-all duration-200 hover:border-[color-mix(in_oklab,var(--color-base-content)_20%,transparent)] focus:border-primary"
               style="
                 background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E&quot;);
                 background-repeat: no-repeat;
@@ -371,7 +371,7 @@ const currentViewLabel = computed(
         </div>
 
         <button
-          class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-[color-mix(in_oklch,var(--color-base-content)_12%,transparent)] bg-base-200/60 text-base-content transition-all duration-200 hover:border-error/30 hover:bg-error/15 hover:text-error"
+          class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-[color-mix(in_oklab,var(--color-base-content)_12%,transparent)] bg-base-200/60 text-base-content transition-all duration-200 hover:border-error/30 hover:bg-error/15 hover:text-error"
           :title="t('clearAll')"
           @click="handleClearAll"
         >
@@ -386,7 +386,7 @@ const currentViewLabel = computed(
         <!-- Summary Cards -->
         <div class="grid shrink-0 grid-cols-2 gap-3 xl:grid-cols-4">
           <div
-            class="animate-fade-slide-in flex h-16 items-center gap-3 rounded-2xl border border-[color-mix(in_oklch,var(--color-base-content)_10%,transparent)] bg-base-200/50 p-3 shadow-sm [animation-delay:50ms] xl:h-20"
+            class="animate-fade-slide-in flex h-16 items-center gap-3 rounded-2xl border border-[color-mix(in_oklab,var(--color-base-content)_10%,transparent)] bg-base-200/50 p-3 shadow-sm [animation-delay:50ms] xl:h-20"
           >
             <div
               class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary xl:h-10 xl:w-10 xl:rounded-xl"
@@ -407,7 +407,7 @@ const currentViewLabel = computed(
             </div>
           </div>
           <div
-            class="animate-fade-slide-in flex h-16 items-center gap-3 rounded-2xl border border-[color-mix(in_oklch,var(--color-base-content)_10%,transparent)] bg-base-200/50 p-3 shadow-sm [animation-delay:100ms] xl:h-20"
+            class="animate-fade-slide-in flex h-16 items-center gap-3 rounded-2xl border border-[color-mix(in_oklab,var(--color-base-content)_10%,transparent)] bg-base-200/50 p-3 shadow-sm [animation-delay:100ms] xl:h-20"
           >
             <div
               class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-success/10 text-success xl:h-10 xl:w-10 xl:rounded-xl"
@@ -425,7 +425,7 @@ const currentViewLabel = computed(
             </div>
           </div>
           <div
-            class="animate-fade-slide-in flex h-16 items-center gap-3 rounded-2xl border border-[color-mix(in_oklch,var(--color-base-content)_10%,transparent)] bg-base-200/50 p-3 shadow-sm [animation-delay:150ms] xl:h-20"
+            class="animate-fade-slide-in flex h-16 items-center gap-3 rounded-2xl border border-[color-mix(in_oklab,var(--color-base-content)_10%,transparent)] bg-base-200/50 p-3 shadow-sm [animation-delay:150ms] xl:h-20"
           >
             <div
               class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-info/10 text-info xl:h-10 xl:w-10 xl:rounded-xl"
@@ -443,7 +443,7 @@ const currentViewLabel = computed(
             </div>
           </div>
           <div
-            class="animate-fade-slide-in relative flex h-16 items-center gap-3 overflow-hidden rounded-2xl border border-[color-mix(in_oklch,var(--color-base-content)_10%,transparent)] bg-base-200/50 p-3 shadow-sm [animation-delay:200ms] xl:h-20"
+            class="animate-fade-slide-in relative flex h-16 items-center gap-3 overflow-hidden rounded-2xl border border-[color-mix(in_oklab,var(--color-base-content)_10%,transparent)] bg-base-200/50 p-3 shadow-sm [animation-delay:200ms] xl:h-20"
           >
             <div
               class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-secondary/10 text-secondary xl:h-10 xl:w-10 xl:rounded-xl"
@@ -477,7 +477,7 @@ const currentViewLabel = computed(
           class="grid h-auto shrink-0 grid-cols-1 gap-4 xl:h-[320px] xl:grid-cols-4"
         >
           <div
-            class="animate-fade-slide-in col-span-1 min-h-[300px] w-full overflow-hidden rounded-xl border border-[color-mix(in_oklch,var(--color-base-content)_10%,transparent)] bg-base-200 p-4 shadow-sm transition-all duration-200 [animation-delay:250ms] hover:border-[color-mix(in_oklch,var(--color-base-content)_20%,transparent)] xl:h-full"
+            class="animate-fade-slide-in col-span-1 min-h-[300px] w-full overflow-hidden rounded-xl border border-[color-mix(in_oklab,var(--color-base-content)_10%,transparent)] bg-base-200 p-4 shadow-sm transition-all duration-200 [animation-delay:250ms] hover:border-[color-mix(in_oklab,var(--color-base-content)_20%,transparent)] xl:h-full"
           >
             <TrafficRankings
               :title="t('topProxies').slice(0, 2) + currentViewLabel"
@@ -491,7 +491,7 @@ const currentViewLabel = computed(
           </div>
 
           <div
-            class="animate-fade-slide-in col-span-1 min-h-[320px] min-w-0 overflow-hidden rounded-xl border border-[color-mix(in_oklch,var(--color-base-content)_10%,transparent)] bg-base-200 p-2 shadow-sm transition-all duration-200 [animation-delay:300ms] hover:border-[color-mix(in_oklch,var(--color-base-content)_20%,transparent)] xl:col-span-3 xl:h-full"
+            class="animate-fade-slide-in col-span-1 min-h-[320px] min-w-0 overflow-hidden rounded-xl border border-[color-mix(in_oklab,var(--color-base-content)_10%,transparent)] bg-base-200 p-2 shadow-sm transition-all duration-200 [animation-delay:300ms] hover:border-[color-mix(in_oklab,var(--color-base-content)_20%,transparent)] xl:col-span-3 xl:h-full"
           >
             <TrafficTrendChart
               :data="trendData"

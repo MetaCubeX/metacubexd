@@ -77,7 +77,7 @@ const arrowStyles = computed(() => {
       ref="floating"
       data-proxy-tooltip
       :style="floatingStyles"
-      class="animate-pop-in z-50 w-max max-w-80 rounded-xl bg-primary p-3 text-primary-content shadow-[0_10px_40px_color-mix(in_oklch,var(--color-base-content)_30%,transparent)]"
+      class="animate-pop-in z-50 w-max max-w-80 rounded-xl bg-primary p-3 text-primary-content shadow-[0_10px_40px_color-mix(in_oklab,var(--color-base-content)_30%,transparent)]"
       :class="configStore.enableTwemoji ? 'font-twemoji' : 'font-default'"
       @mouseenter="$emit('mouseEnter')"
       @mouseleave="$emit('mouseLeave')"

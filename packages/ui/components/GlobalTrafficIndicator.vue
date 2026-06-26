@@ -451,7 +451,7 @@ onBeforeUnmount(() => {
   <Teleport v-if="headerTargetExists" to="#header-traffic-indicator">
     <div
       v-if="isVisible && isCollapsed && globalStore.latestTraffic"
-      class="flex cursor-pointer items-center gap-2 rounded-lg bg-[color-mix(in_oklch,var(--color-base-100)_50%,transparent)] px-2 py-1 transition-[background] duration-200 ease-in-out hover:bg-[var(--color-base-100)]"
+      class="flex cursor-pointer items-center gap-2 rounded-lg bg-[color-mix(in_oklab,var(--color-base-100)_50%,transparent)] px-2 py-1 transition-[background] duration-200 ease-in-out hover:bg-[var(--color-base-100)]"
       @click="expandFromHeader"
     >
       <div class="flex items-center gap-1">
@@ -461,7 +461,7 @@ onBeforeUnmount(() => {
         >
       </div>
       <div
-        class="h-3 w-px bg-[color-mix(in_oklch,var(--color-base-content)_20%,transparent)]"
+        class="h-3 w-px bg-[color-mix(in_oklab,var(--color-base-content)_20%,transparent)]"
       />
       <div class="flex items-center gap-1">
         <IconArrowUp class="size-3 shrink-0 text-[var(--color-info)]" />
@@ -474,7 +474,7 @@ onBeforeUnmount(() => {
   <Teleport v-if="sidebarTargetExists" to="#sidebar-traffic-indicator">
     <div
       v-if="globalStore.latestTraffic"
-      class="w-full cursor-pointer rounded-lg bg-[color-mix(in_oklch,var(--color-base-100)_50%,transparent)] p-2 transition-[background] duration-200 ease-in-out hover:bg-[var(--color-base-100)]"
+      class="w-full cursor-pointer rounded-lg bg-[color-mix(in_oklab,var(--color-base-100)_50%,transparent)] p-2 transition-[background] duration-200 ease-in-out hover:bg-[var(--color-base-100)]"
       @click="expandFromHeader"
     >
       <div class="flex w-full flex-col items-center gap-2 overflow-hidden py-1">
@@ -500,7 +500,7 @@ onBeforeUnmount(() => {
   <Teleport v-if="sidebarExpandedTargetExists" to="#sidebar-traffic-expanded">
     <div
       v-if="globalStore.latestTraffic"
-      class="w-full rounded-lg bg-[color-mix(in_oklch,var(--color-base-100)_50%,transparent)] p-2"
+      class="w-full rounded-lg bg-[color-mix(in_oklab,var(--color-base-100)_50%,transparent)] p-2"
     >
       <!-- Mini chart -->
       <div ref="sidebarChartContainer" class="mb-2 h-10 w-full" />
@@ -540,7 +540,7 @@ onBeforeUnmount(() => {
       <span class="font-mono text-xs">{{ formatBytes(downloadSpeed) }}/s</span>
     </div>
     <div
-      class="h-3 w-px bg-[color-mix(in_oklch,var(--color-base-content)_20%,transparent)]"
+      class="h-3 w-px bg-[color-mix(in_oklab,var(--color-base-content)_20%,transparent)]"
     />
     <div class="flex items-center gap-1">
       <IconArrowUp class="size-3 shrink-0 text-[var(--color-info)]" />
@@ -584,7 +584,7 @@ onBeforeUnmount(() => {
           <div class="flex items-center gap-1">
             <!-- Collapse button -->
             <button
-              class="flex size-6 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-[var(--color-base-content)] transition-[background] duration-200 ease-in-out hover:bg-[color-mix(in_oklch,var(--color-base-content)_10%,transparent)]"
+              class="flex size-6 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-[var(--color-base-content)] transition-[background] duration-200 ease-in-out hover:bg-[color-mix(in_oklab,var(--color-base-content)_10%,transparent)]"
               :title="$t('hideTrafficIndicator')"
               @click="toggleCollapsed"
             >
@@ -592,7 +592,7 @@ onBeforeUnmount(() => {
             </button>
             <!-- Close button -->
             <button
-              class="flex size-6 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-[var(--color-base-content)] transition-[background] duration-200 ease-in-out hover:bg-[color-mix(in_oklch,var(--color-base-content)_10%,transparent)]"
+              class="flex size-6 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-[var(--color-base-content)] transition-[background] duration-200 ease-in-out hover:bg-[color-mix(in_oklab,var(--color-base-content)_10%,transparent)]"
               :title="$t('hideTrafficIndicator')"
               @click="toggleVisibility"
             >

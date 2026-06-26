@@ -74,7 +74,7 @@ defineExpose({ open, close })
     :aria-labelledby="title ? titleId : undefined"
     :style="{
       '--modal-border':
-        'color-mix(in oklch, var(--color-base-content) 10%, transparent)',
+        'color-mix(in oklab, var(--color-base-content) 10%, transparent)',
     }"
     @cancel.prevent="close"
   >
@@ -85,7 +85,7 @@ defineExpose({ open, close })
         background: 'var(--color-base-100)',
         border: '1px solid var(--modal-border)',
         boxShadow:
-          '0 25px 50px -12px color-mix(in oklch, var(--color-base-content) 25%, transparent), 0 0 0 1px var(--modal-border), inset 0 1px 0 0 color-mix(in oklch, var(--color-base-content) 6%, transparent)',
+          '0 25px 50px -12px color-mix(in oklab, var(--color-base-content) 25%, transparent), 0 0 0 1px var(--modal-border), inset 0 1px 0 0 color-mix(in oklab, var(--color-base-content) 6%, transparent)',
       }"
       @contextmenu.prevent
     >
@@ -109,7 +109,7 @@ defineExpose({ open, close })
           :style="{
             border: '1px solid var(--modal-border)',
             color:
-              'color-mix(in oklch, var(--color-base-content) 60%, transparent)',
+              'color-mix(in oklab, var(--color-base-content) 60%, transparent)',
           }"
           @click="close"
         >
@@ -205,9 +205,9 @@ defineExpose({ open, close })
 .modal-close:hover {
   transform: rotate(90deg);
   color: var(--color-error);
-  background-color: color-mix(in oklch, var(--color-error) 15%, transparent);
+  background-color: color-mix(in oklab, var(--color-error) 15%, transparent);
   border-color: color-mix(
-    in oklch,
+    in oklab,
     var(--color-error) 30%,
     transparent
   ) !important;

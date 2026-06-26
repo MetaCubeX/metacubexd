@@ -342,27 +342,27 @@ function computeNodeColors() {
   return {
     root: {
       fill: theme.neutral,
-      bg: `color-mix(in oklch, ${theme.neutral} 15%, transparent)`,
+      bg: `color-mix(in oklab, ${theme.neutral} 15%, transparent)`,
     },
     client: {
       fill: theme.primary,
-      bg: `color-mix(in oklch, ${theme.primary} 15%, transparent)`,
+      bg: `color-mix(in oklab, ${theme.primary} 15%, transparent)`,
     },
     port: {
       fill: theme.warning,
-      bg: `color-mix(in oklch, ${theme.warning} 15%, transparent)`,
+      bg: `color-mix(in oklab, ${theme.warning} 15%, transparent)`,
     },
     rule: {
       fill: theme.secondary,
-      bg: `color-mix(in oklch, ${theme.secondary} 15%, transparent)`,
+      bg: `color-mix(in oklab, ${theme.secondary} 15%, transparent)`,
     },
     group: {
       fill: theme.accent,
-      bg: `color-mix(in oklch, ${theme.accent} 15%, transparent)`,
+      bg: `color-mix(in oklab, ${theme.accent} 15%, transparent)`,
     },
     proxy: {
       fill: theme.info,
-      bg: `color-mix(in oklch, ${theme.info} 15%, transparent)`,
+      bg: `color-mix(in oklab, ${theme.info} 15%, transparent)`,
     },
     baseContent: theme.baseContent,
   }

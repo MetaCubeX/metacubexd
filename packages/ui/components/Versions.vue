@@ -440,7 +440,7 @@ watch(
   <div v-else class="flex justify-center pt-1">
     <button
       type="button"
-      class="press-tactile relative flex aspect-square w-9 items-center justify-center rounded-lg border border-[color-mix(in_oklch,var(--color-base-content)_10%,transparent)] bg-transparent text-base-content/70 hover:border-[color-mix(in_oklch,var(--color-base-content)_20%,transparent)] hover:bg-[color-mix(in_oklch,var(--color-base-content)_5%,transparent)] hover:text-base-content"
+      class="press-tactile relative flex aspect-square w-9 items-center justify-center rounded-lg border border-[color-mix(in_oklab,var(--color-base-content)_10%,transparent)] bg-transparent text-base-content/70 hover:border-[color-mix(in_oklab,var(--color-base-content)_20%,transparent)] hover:bg-[color-mix(in_oklab,var(--color-base-content)_5%,transparent)] hover:text-base-content"
       :title="versionsTitle"
       :aria-label="versionsTitle"
       @click="onCollapsedClick"
@@ -463,12 +463,12 @@ watch(
 <style scoped>
 .version-badge {
   border: 1px solid
-    color-mix(in oklch, var(--color-base-content) 20%, transparent);
-  background: color-mix(in oklch, var(--color-base-200) 80%, transparent);
+    color-mix(in oklab, var(--color-base-content) 20%, transparent);
+  background: color-mix(in oklab, var(--color-base-200) 80%, transparent);
   color: var(--color-base-content);
 }
 
 .version-badge:hover {
-  background: color-mix(in oklch, var(--color-base-content) 10%, transparent);
+  background: color-mix(in oklab, var(--color-base-content) 10%, transparent);
 }
 </style>
