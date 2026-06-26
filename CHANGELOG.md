@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.261.9](https://github.com/MetaCubeX/metacubexd/compare/v1.261.8...v1.261.9) (2026-06-26)
+
+
+### Bug Fixes
+
+* **ui:** soften selected proxy-node card on sunset theme ([#2078](https://github.com/MetaCubeX/metacubexd/issues/2078)) ([274be20](https://github.com/MetaCubeX/metacubexd/commit/274be20156494bf1e0283a90cc68aefa6134da20))
+
 ## [1.261.8](https://github.com/MetaCubeX/metacubexd/compare/v1.261.7...v1.261.8) (2026-06-25)
 
 
