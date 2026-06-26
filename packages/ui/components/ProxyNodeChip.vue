@@ -28,14 +28,14 @@ const { isUDP, latencyColorClass, runLatencyTest } = useProxyNode(
     class="flex items-center gap-2 rounded-full px-3 py-1 text-sm transition-all duration-200"
     :class="
       isSelected
-        ? 'bg-primary text-primary-content shadow-sm'
+        ? 'bg-primary/15 text-base-content ring-1 ring-primary'
         : 'bg-neutral text-neutral-content hover:shadow-md'
     "
     @click="emit('click')"
   >
     <span
       class="size-2 shrink-0 rounded-full bg-current"
-      :class="isSelected ? '' : latencyColorClass"
+      :class="isSelected ? 'text-primary' : latencyColorClass"
     />
     <span class="max-w-[12rem] truncate font-medium">
       <ProxyNodeName :name="proxyName" />

@@ -226,18 +226,20 @@ function handleLatencyTest() {
 </script>
 
 <template>
-  <!-- Wrapper for glow effect -->
+  <!-- Wrapper lifts the selected card above its neighbours -->
   <div class="relative h-full p-0.5" :class="isSelected ? 'z-10' : 'z-0'">
     <div
       ref="reference"
       class="proxy-card relative h-full w-full rounded-[0.625rem] select-none"
       :class="[
         isSelected
-          ? 'proxy-card--selected animate-[glowPulse_2s_ease-in-out_infinite] bg-primary text-primary-content'
+          ? 'proxy-card--selected bg-primary/15 text-base-content'
           : 'bg-neutral text-neutral-content',
         isTesting
           ? 'animate-[testingPulse_1.5s_ease-in-out_infinite] border border-[color-mix(in_oklch,var(--color-success)_50%,transparent)]'
-          : '',
+          : isSelected
+            ? 'border border-primary'
+            : 'border border-transparent',
       ]"
       @mouseenter="onMouseEnter"
       @mouseleave="onMouseLeave"
@@ -532,18 +534,6 @@ function handleLatencyTest() {
   50% {
     box-shadow: 0 0 16px
       color-mix(in oklch, var(--color-success) 50%, transparent);
-  }
-}
-
-@keyframes glowPulse {
-  0%,
-  100% {
-    box-shadow: 0 0 15px
-      color-mix(in oklch, var(--color-primary) 40%, transparent);
-  }
-  50% {
-    box-shadow: 0 0 25px
-      color-mix(in oklch, var(--color-primary) 60%, transparent);
   }
 }
 </style>

@@ -107,14 +107,14 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <!-- Wrapper for glow effect -->
+  <!-- Wrapper lifts the selected row above its neighbours -->
   <div class="relative z-0" :class="isSelected ? 'z-10' : ''">
     <div
       ref="reference"
       class="relative rounded-lg transition-all duration-300"
       :class="
         isSelected
-          ? 'animate-glow-pulse bg-primary text-primary-content'
+          ? 'bg-primary/15 text-base-content shadow-[inset_2px_0_var(--color-primary)]'
           : 'bg-neutral text-neutral-content hover:shadow-md'
       "
       @mouseenter="onMouseEnter"
@@ -132,7 +132,10 @@ onBeforeUnmount(() => {
         @keydown.space.prevent="onClick"
       >
         <!-- Selected indicator -->
-        <IconCircleCheckFilled v-if="isSelected" class="size-4 shrink-0" />
+        <IconCircleCheckFilled
+          v-if="isSelected"
+          class="size-4 shrink-0 text-primary"
+        />
 
         <!-- Proxy name -->
         <span class="line-clamp-1 min-w-0 flex-1 text-sm font-medium break-all">
