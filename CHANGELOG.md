@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.262.0](https://github.com/MetaCubeX/metacubexd/compare/v1.261.10...v1.262.0) (2026-06-27)
+
+
+### Features
+
+* adapt vernesong/mihomo ([#2085](https://github.com/MetaCubeX/metacubexd/issues/2085)) ([73ee2dd](https://github.com/MetaCubeX/metacubexd/commit/73ee2ddd14bee117d063967ac7418e77841a5d7b))
+
 ## [1.261.10](https://github.com/MetaCubeX/metacubexd/compare/v1.261.9...v1.261.10) (2026-06-26)
 
 
