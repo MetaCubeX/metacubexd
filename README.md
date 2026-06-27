@@ -285,6 +285,36 @@ With `network_mode: host` the `ports:` mapping is ignored — the container
 binds `8080`/`9090`/`7890` directly on the host. Enable a `tun:` block in your
 profile's mihomo config for the tunnel to come up.
 
+### Migrating from the legacy `metacubexd` image
+
+The old **`ghcr.io/metacubex/metacubexd`** image was a **static dashboard only**
+— it served the UI and you pointed it at a mihomo you ran yourself (often a
+separate `mihomo` container). The monorepo migration **froze that image** (its
+repo-root `Dockerfile` is gone), which is why pulls stopped updating. Nothing is
+broken — the dashboard moved to two supported forms, so pick the one that
+matches your old setup:
+
+- **You want to keep running your own mihomo** (you had a separate `mihomo`
+  container or a host mihomo). You don't need a dashboard container at all — open
+  the [hosted panel](#1-hosted-panel-point-at-your-own-mihomo) and enter your
+  mihomo's `{url, secret}`, or self-host the static assets via `external-ui`.
+  Add your dashboard origin to `external-controller-cors` (see
+  [CORS](#unable-to-connect-to-backend-when-self-hosting-cors)).
+
+- **You want one container that runs everything.** Switch to
+  [`metacubexd-server`](#3-all-in-one-server-docker). It **bundles its own
+  mihomo**, so the old `# Optional: mihomo instance` service is no longer needed
+  — **delete it**. Move your `config.yaml` in as a profile (paste it into the
+  in-app config editor, or drop it under the `/data` volume) instead of mounting
+  it at mihomo's old path.
+
+Two gotchas when porting an old `compose.yaml`:
+
+- **Port.** The legacy image listened on `80`; the server's dashboard is `8080`.
+  Map `'80:8080'` if you want to keep hitting it on port 80.
+- **Image name.** `ghcr.io/metacubex/metacubexd` →
+  `ghcr.io/metacubex/metacubexd-server:latest`.
+
 ### Profiles & Config Editor (desktop / server)
 
 When connected to a bundled agent (desktop app or the server image), the
