@@ -155,6 +155,10 @@ describe('utils/index', () => {
       expect(formatProxyType('selector', mockT)).toBe('SELECTOR')
     })
 
+    it('uses translation function for smart groups', () => {
+      expect(formatProxyType('smart', mockT)).toBe('SMART')
+    })
+
     it('returns lowercase for unknown types', () => {
       expect(formatProxyType('VMESS', mockT)).toBe('vmess')
     })

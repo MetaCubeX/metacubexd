@@ -202,6 +202,7 @@ export function formatProxyType(
     ['wireguard', 'WG'],
     ['selector', t('selector')],
     ['urltest', t('urltest')],
+    ['smart', t('smart')],
     ['fallback', t('fallback')],
     ['loadbalance', t('loadbalance')],
     ['direct', t('direct')],

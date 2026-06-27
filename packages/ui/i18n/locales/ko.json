@@ -171,6 +171,7 @@
   "rejectdrop": "드롭",
   "selector": "셀렉터",
   "urltest": "URL 테스트",
+  "smart": "스마트 선택",
   "loadbalance": "부하 분산",
   "fallback": "폴백",
   "relay": "릴레이",

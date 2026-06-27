@@ -171,6 +171,7 @@
   "rejectdrop": "Drop",
   "selector": "Selector",
   "urltest": "Urltest",
+  "smart": "Smart",
   "loadbalance": "Balance",
   "fallback": "Fallback",
   "relay": "Relay",

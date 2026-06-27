@@ -171,6 +171,7 @@
   "rejectdrop": "ドロップ",
   "selector": "セレクター",
   "urltest": "URL テスト",
+  "smart": "スマート選択",
   "loadbalance": "負荷分散",
   "fallback": "フォールバック",
   "relay": "リレー",

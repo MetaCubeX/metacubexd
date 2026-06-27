@@ -171,6 +171,7 @@
   "rejectdrop": "Abandonner",
   "selector": "Sélecteur",
   "urltest": "Test d'URL",
+  "smart": "Sélection intelligente",
   "loadbalance": "Équilibrage",
   "fallback": "Repli",
   "relay": "Relais",
