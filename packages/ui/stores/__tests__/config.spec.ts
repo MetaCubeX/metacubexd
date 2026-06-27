@@ -64,3 +64,31 @@ describe('connections display mode migration', () => {
     expect(store.connectionsDisplayMode).toBe('card')
   })
 })
+
+describe('resolveLatencyTestUrl (latencyTestUrlSource, #2082)', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    localStorageMock.clear()
+  })
+
+  it("defaults to 'core': the group's testUrl wins, dashboard url is the fallback", () => {
+    const store = useConfigStore()
+
+    expect(store.latencyTestUrlSource).toBe('core')
+    expect(store.resolveLatencyTestUrl('https://group.test/204')).toBe(
+      'https://group.test/204',
+    )
+    expect(store.resolveLatencyTestUrl(null)).toBe(store.urlForLatencyTest)
+    expect(store.resolveLatencyTestUrl('')).toBe(store.urlForLatencyTest)
+  })
+
+  it("in 'dashboard' mode the dashboard url always overrides the group testUrl", () => {
+    const store = useConfigStore()
+    store.latencyTestUrlSource = 'dashboard'
+
+    expect(store.resolveLatencyTestUrl('https://group.test/204')).toBe(
+      store.urlForLatencyTest,
+    )
+    expect(store.resolveLatencyTestUrl(null)).toBe(store.urlForLatencyTest)
+  })
+})

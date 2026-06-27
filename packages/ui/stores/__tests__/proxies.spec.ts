@@ -34,6 +34,10 @@ const mockConfigStore = {
   },
   latencyTestTimeoutDuration: 5000,
   urlForLatencyTest: 'https://latency.test/default',
+  // Mirrors the real store's default ('core') resolution: a group's own
+  // testUrl wins, falling back to the dashboard url.
+  resolveLatencyTestUrl: (groupTestUrl?: string | null) =>
+    groupTestUrl || mockConfigStore.urlForLatencyTest,
 }
 
 vi.stubGlobal('useConfigStore', () => mockConfigStore)

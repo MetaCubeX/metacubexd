@@ -1114,6 +1114,23 @@ const ProviderProxyNodes = defineComponent({
           />
         </div>
 
+        <div class="flex flex-col">
+          <ConfigTitle with-divider>
+            {{ t('latencyTestUrlSource') }}
+          </ConfigTitle>
+          <select
+            v-model="configStore.latencyTestUrlSource"
+            class="select-bordered select w-full"
+          >
+            <option value="core">
+              {{ t('latencyTestUrlSourceCore') }}
+            </option>
+            <option value="dashboard">
+              {{ t('latencyTestUrlSourceDashboard') }}
+            </option>
+          </select>
+        </div>
+
         <div>
           <ConfigTitle with-divider>
             {{ t('latencyTestTimeoutDuration') }} ({{ t('ms') }})

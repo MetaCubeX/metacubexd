@@ -105,7 +105,7 @@ export const useProxiesStore = defineStore('proxies', () => {
     )
 
     if (fallbackDefault) {
-      const defaultTestUrl = proxy.testUrl || configStore.urlForLatencyTest
+      const defaultTestUrl = configStore.resolveLatencyTestUrl(proxy.testUrl)
       const isDefaultTestUrlLatencyExists =
         defaultTestUrl in result.allTestUrlLatency
 
@@ -122,7 +122,7 @@ export const useProxiesStore = defineStore('proxies', () => {
   }
 
   const normalizeLatencyTestUrl = (testUrl: string | null) =>
-    testUrl || configStore.urlForLatencyTest
+    configStore.resolveLatencyTestUrl(testUrl)
 
   // First positive (successful) latency among a node's per-test-url readings.
   // NOT_CONNECTED (0) reads are treated as "no data" and skipped, so a node
@@ -420,7 +420,7 @@ export const useProxiesStore = defineStore('proxies', () => {
 
   // Get latency by name
   const getLatencyByName = (name: string, testUrl: string | null) => {
-    const finalTestUrl = testUrl || configStore.urlForLatencyTest
+    const finalTestUrl = configStore.resolveLatencyTestUrl(testUrl)
     const latencyMapValue = latencyMap.value
     const nowName = getNowProxyNodeName(name)
 
@@ -448,7 +448,7 @@ export const useProxiesStore = defineStore('proxies', () => {
 
   // Get latency history by name
   const getLatencyHistoryByName = (name: string, testUrl: string | null) => {
-    const finalTestUrl = testUrl || configStore.urlForLatencyTest
+    const finalTestUrl = configStore.resolveLatencyTestUrl(testUrl)
     const nowProxyNodeName = getNowProxyNodeName(name)
     const nowHistories =
       proxyNodeMap.value[nowProxyNodeName]?.latencyTestHistory || {}
@@ -581,8 +581,9 @@ export const useProxiesStore = defineStore('proxies', () => {
     const currentProxyGroup = proxies.value.find(
       (item) => item.name === proxyGroupName,
     )
-    const finalTestUrl =
-      currentProxyGroup?.testUrl || configStore.urlForLatencyTest
+    const finalTestUrl = configStore.resolveLatencyTestUrl(
+      currentProxyGroup?.testUrl,
+    )
     const memberNames = currentProxyGroup?.all ?? [proxyGroupName]
 
     try {
@@ -655,7 +656,7 @@ export const useProxiesStore = defineStore('proxies', () => {
     const provider = proxyProviders.value.find(
       (item) => item.name === providerName,
     )
-    const finalTestUrl = provider?.testUrl || configStore.urlForLatencyTest
+    const finalTestUrl = configStore.resolveLatencyTestUrl(provider?.testUrl)
     const timeout = provider?.timeout ?? configStore.latencyTestTimeoutDuration
     const memberNames = provider?.proxies.map((proxy) => proxy.name) ?? []
     const results: Record<string, number> = {}

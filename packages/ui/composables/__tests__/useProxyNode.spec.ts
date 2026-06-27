@@ -25,6 +25,8 @@ const mockConfigStore = {
   latencyQualityMap: { NOT_CONNECTED: 0, MEDIUM: 200, HIGH: 500 },
   latencyTestTimeoutDuration: 5000,
   urlForLatencyTest: 'https://latency.test/default',
+  resolveLatencyTestUrl: (groupTestUrl?: string | null) =>
+    groupTestUrl || mockConfigStore.urlForLatencyTest,
 }
 vi.stubGlobal('useConfigStore', () => mockConfigStore)
 vi.stubGlobal('useConnectionsStore', () => ({

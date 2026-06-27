@@ -69,6 +69,16 @@ export const useConfigStore = defineStore('config', () => {
     'urlForLatencyTest',
     'https://www.gstatic.com/generate_204',
   )
+  // Which URL a latency test probes against (#2082):
+  //   'core'      — the kernel's per-group/per-provider `testUrl` wins, falling
+  //                 back to the dashboard url when a group defines none. Lets two
+  //                 groups over the same nodes test against different urls.
+  //   'dashboard' — the single dashboard url always wins, overriding any
+  //                 per-group url (a uniform probe across every group).
+  const latencyTestUrlSource = useLocalStorage<'core' | 'dashboard'>(
+    'latencyTestUrlSource',
+    'core',
+  )
   const autoCloseConns = useLocalStorage('autoCloseConns', true)
   const latencyTestTimeoutDuration = useLocalStorage(
     'latencyTestTimeoutDuration',
@@ -246,6 +256,15 @@ export const useConfigStore = defineStore('config', () => {
   // users restyle the dashboard arbitrarily; see useCustomCss for application.
   const customCss = useLocalStorage('customCss', '')
 
+  // Resolve the effective latency-test URL for a group/provider/node given its
+  // kernel-configured `testUrl`, honoring latencyTestUrlSource (#2082). In
+  // 'core' mode this is the historical `groupTestUrl || urlForLatencyTest`; in
+  // 'dashboard' mode the dashboard url always overrides.
+  const resolveLatencyTestUrl = (groupTestUrl?: string | null) =>
+    latencyTestUrlSource.value === 'dashboard'
+      ? urlForLatencyTest.value
+      : groupTestUrl || urlForLatencyTest.value
+
   // Computed
   const isLatencyTestByHttps = computed(() =>
     urlForLatencyTest.value.startsWith('https'),
@@ -290,6 +309,7 @@ export const useConfigStore = defineStore('config', () => {
     stickyGroupHeader.value = true
     hideUnAvailableProxies.value = false
     urlForLatencyTest.value = 'https://www.gstatic.com/generate_204'
+    latencyTestUrlSource.value = 'core'
     autoCloseConns.value = true
     latencyTestTimeoutDuration.value = 5000
     latencyMediumThreshold.value = 0
@@ -337,6 +357,8 @@ export const useConfigStore = defineStore('config', () => {
     stickyGroupHeader,
     hideUnAvailableProxies,
     urlForLatencyTest,
+    latencyTestUrlSource,
+    resolveLatencyTestUrl,
     autoCloseConns,
     latencyTestTimeoutDuration,
     latencyMediumThreshold,

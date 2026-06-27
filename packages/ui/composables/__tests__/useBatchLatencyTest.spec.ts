@@ -24,6 +24,10 @@ vi.mock('vue-sonner', () => ({ toast }))
 const mockConfigStore = {
   urlForLatencyTest: 'https://www.gstatic.com/generate_204',
   latencyTestTimeoutDuration: 5000,
+  // Mirrors the real store's default ('core') resolution: a group's own
+  // testUrl wins, falling back to the dashboard url.
+  resolveLatencyTestUrl: (groupTestUrl?: string | null) =>
+    groupTestUrl || mockConfigStore.urlForLatencyTest,
 }
 
 const mockNodeRecommendationStore = {
@@ -44,7 +48,7 @@ const mockProxiesStore: {
   recordLatencyTestResult: ReturnType<typeof vi.fn>
   recordLatencyTestResults: ReturnType<typeof vi.fn>
   proxyProviderLatencyTest: ReturnType<typeof vi.fn>
-  proxies: { name: string; all: string[] }[]
+  proxies: { name: string; all: string[]; testUrl?: string }[]
   proxyProviders: { name: string }[]
 } = {
   clearLatencyTestStateForGroup: vi.fn(),
@@ -71,6 +75,7 @@ describe('composables/useBatchLatencyTest', () => {
       current: null,
       isRunning: false,
     }
+    mockProxiesStore.proxies = []
     mockProxiesStore.proxyProviders = []
     mockProxiesStore.proxyProviderLatencyTest.mockResolvedValue(undefined)
   })
@@ -318,6 +323,26 @@ describe('composables/useBatchLatencyTest', () => {
             url: mockConfigStore.urlForLatencyTest,
             timeout: mockConfigStore.latencyTestTimeoutDuration,
           },
+        }),
+      )
+    })
+
+    it("probes against the group's own testUrl in core mode (#2082)", async () => {
+      mockJson.mockResolvedValue({ node1: 100 })
+      mockProxiesStore.proxies = [
+        { name: 'group1', all: ['node1'], testUrl: 'https://group1.test/204' },
+      ]
+
+      const { testGroupNodes } = useBatchLatencyTest()
+
+      await testGroupNodes('group1')
+
+      expect(mockGet).toHaveBeenCalledWith(
+        'group/group1/delay',
+        expect.objectContaining({
+          searchParams: expect.objectContaining({
+            url: 'https://group1.test/204',
+          }),
         }),
       )
     })
