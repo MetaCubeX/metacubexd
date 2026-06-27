@@ -695,7 +695,7 @@ export async function fetchFrontendReleasesAPI(
 ): Promise<ReleaseInfo[]> {
   const githubAPI = useGithubAPI()
   const releases = await githubAPI
-    .get(`repos/toddyoe/metacubexd/releases`, {
+    .get(`repos/MetaCubeX/metacubexd/releases`, {
       searchParams: { per_page: count },
     })
     .json<ReleaseAPIResponse[]>()
