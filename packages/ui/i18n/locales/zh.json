@@ -171,6 +171,7 @@
   "rejectdrop": "丢弃",
   "selector": "手动选择",
   "urltest": "自动选择",
+  "smart": "智能选择",
   "loadbalance": "负载均衡",
   "fallback": "故障转移",
   "relay": "链式代理",

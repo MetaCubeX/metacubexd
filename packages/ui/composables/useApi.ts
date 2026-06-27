@@ -585,7 +585,41 @@ export function useConfigActions() {
 }
 
 // Release API
-const BACKEND_VERSION_RE = /(alpha|beta|meta)-?(\w+)/
+const METACUBEX_MIHOMO_REPOSITORY_URL = 'repos/MetaCubeX/mihomo'
+const VERNESONG_MIHOMO_REPOSITORY_URL = 'repos/vernesong/mihomo'
+const BACKEND_VERSION_RE = /\b(alpha|beta|meta)-?(\S+)/i
+const VERNESONG_MIHOMO_RE = /-smart-/i
+
+type BackendReleaseChannel = 'alpha' | 'beta' | 'meta' | 'stable'
+
+function resolveBackendReleaseTarget(currentVersion: string): {
+  channel: BackendReleaseChannel
+  repositoryURL: string
+  versionSuffix: string
+} {
+  const match = BACKEND_VERSION_RE.exec(currentVersion)
+  const channel = match?.[1]?.toLowerCase() as BackendReleaseChannel | undefined
+
+  return {
+    channel: channel ?? 'stable',
+    repositoryURL: VERNESONG_MIHOMO_RE.test(currentVersion)
+      ? VERNESONG_MIHOMO_REPOSITORY_URL
+      : METACUBEX_MIHOMO_REPOSITORY_URL,
+    versionSuffix: match?.[2] ?? '',
+  }
+}
+
+function isStableRelease(release: ReleaseAPIResponse) {
+  const tagName = release.tag_name.toLowerCase()
+
+  return !tagName.includes('alpha') && !tagName.includes('prerelease')
+}
+
+function isAlphaRelease(release: ReleaseAPIResponse) {
+  const tagName = release.tag_name.toLowerCase()
+
+  return tagName.includes('alpha') || tagName.includes('prerelease')
+}
 
 interface ReleaseAPIResponse {
   tag_name: string
@@ -613,8 +647,8 @@ export async function backendReleaseAPI(currentVersion: string) {
   if (isSingBoxVersion(currentVersion)) return { isUpdateAvailable: false }
 
   const githubAPI = useGithubAPI()
-  const repositoryURL = 'repos/MetaCubeX/mihomo'
-  const match = BACKEND_VERSION_RE.exec(currentVersion)
+  const { channel, repositoryURL, versionSuffix } =
+    resolveBackendReleaseTarget(currentVersion)
 
   const releaseByAssets = async (url: string, versionSuffix: string) => {
     const { assets, body } = await githubAPI
@@ -631,10 +665,7 @@ export async function backendReleaseAPI(currentVersion: string) {
     }
   }
 
-  if (match) {
-    const versionSuffix = match[2] || ''
-    const channel = match[1] || ''
-
+  if (channel !== 'stable') {
     if (channel === 'meta')
       return await releaseByAssets('releases/latest', versionSuffix)
 
@@ -664,7 +695,7 @@ export async function fetchFrontendReleasesAPI(
 ): Promise<ReleaseInfo[]> {
   const githubAPI = useGithubAPI()
   const releases = await githubAPI
-    .get(`repos/MetaCubeX/metacubexd/releases`, {
+    .get(`repos/toddyoe/metacubexd/releases`, {
       searchParams: { per_page: count },
     })
     .json<ReleaseAPIResponse[]>()
@@ -682,20 +713,17 @@ export async function fetchBackendReleasesAPI(
   count: number = 10,
 ): Promise<ReleaseInfo[]> {
   const githubAPI = useGithubAPI()
-  const repositoryURL = 'repos/MetaCubeX/mihomo'
-  const match = BACKEND_VERSION_RE.exec(currentVersion)
+  const { channel, repositoryURL, versionSuffix } =
+    resolveBackendReleaseTarget(currentVersion)
 
-  if (!match) {
+  if (channel === 'stable') {
     // Stable version (e.g. "v1.19.9") - fetch stable releases
     let releases = await githubAPI
       .get(`${repositoryURL}/releases`, {
         searchParams: { per_page: count },
       })
       .json<ReleaseAPIResponse[]>()
-    releases = releases.filter(
-      (r) =>
-        !r.tag_name.includes('Alpha') && !r.tag_name.includes('Prerelease'),
-    )
+    releases = releases.filter(isStableRelease)
 
     return releases.map((release) => ({
       version: release.tag_name,
@@ -705,30 +733,20 @@ export async function fetchBackendReleasesAPI(
     }))
   }
 
-  const channel = match[1] || ''
-  const versionSuffix = match[2] || ''
   let releases: ReleaseAPIResponse[] = []
 
   if (channel === 'meta') {
     releases = await githubAPI
       .get(`${repositoryURL}/releases`, { searchParams: { per_page: count } })
       .json<ReleaseAPIResponse[]>()
-    releases = releases.filter(
-      (r) =>
-        !r.tag_name.includes('Alpha') && !r.tag_name.includes('Prerelease'),
-    )
+    releases = releases.filter(isStableRelease)
   } else if (channel === 'alpha') {
     releases = await githubAPI
       .get(`${repositoryURL}/releases`, {
         searchParams: { per_page: count * 2 },
       })
       .json<ReleaseAPIResponse[]>()
-    releases = releases
-      .filter(
-        (r) =>
-          r.tag_name.includes('Alpha') || r.tag_name.includes('Prerelease'),
-      )
-      .slice(0, count)
+    releases = releases.filter(isAlphaRelease).slice(0, count)
   }
 
   return releases.map((release) => ({
