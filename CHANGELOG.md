@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.263.0](https://github.com/MetaCubeX/metacubexd/compare/v1.262.0...v1.263.0) (2026-06-27)
+
+
+### Features
+
+* **proxies:** add core-controlled latency test url source ([#2082](https://github.com/MetaCubeX/metacubexd/issues/2082)) ([3287f6a](https://github.com/MetaCubeX/metacubexd/commit/3287f6a9d820852fb4cc06aec864bfb08180a59d))
+
+
+### Bug Fixes
+
+* **ui:** fetch frontend release list from upstream repo, not a fork ([fa7b15b](https://github.com/MetaCubeX/metacubexd/commit/fa7b15b0eeb29ff2b1ff4c073064813c1b29b384))
+
 ## [1.262.0](https://github.com/MetaCubeX/metacubexd/compare/v1.261.10...v1.262.0) (2026-06-27)
 
 
