@@ -79,10 +79,8 @@ jobs:
           files: compressed-dist.tgz
           tag_name: ${{ needs.release-please.outputs.tag_name }}
 
-  # NOTE: the legacy static-panel image (ghcr.io/metacubex/metacubexd) built from
-  # a repo-root Dockerfile was dropped in the monorepo migration (the Dockerfile
-  # no longer exists). The hosted gh-pages panel + the all-in-one server image
-  # below supersede it.
+  # All-in-one image (ghcr.io/metacubex/metacubexd-server): bundles the mihomo
+  # kernel + Nitro server + dashboard in one container.
   release-server-image:
     needs: release-please
     if: ${{ needs.release-please.outputs.release_created }}
@@ -133,6 +131,56 @@ jobs:
           tags: |
             ghcr.io/metacubex/metacubexd-server:latest
             ghcr.io/metacubex/metacubexd-server:${{ needs.release-please.outputs.tag_name }}
+
+  # Standalone panel image (ghcr.io/metacubex/metacubexd): ships only the
+  # dashboard over HTTP, so it can be self-hosted to manage one or more mihomo
+  # backends without the hosted gh-pages panel's HTTPS mixed-content block.
+  release-panel-image:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+
+    permissions:
+      contents: read
+      packages: write
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-qemu-action@v4
+
+      - uses: docker/setup-docker-action@v5
+        with:
+          daemon-config: |
+            {
+              "debug": true,
+              "features": {
+                "containerd-snapshotter": true
+              }
+            }
+
+      - uses: docker/setup-buildx-action@v4
+        id: buildx
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v7
+        with:
+          context: .
+          builder: ${{ steps.buildx.outputs.name }}
+          file: packages/ui/Dockerfile
+          push: true
+          platforms: linux/amd64,linux/arm64
+          cache-from: type=gha,scope=panel
+          cache-to: type=gha,mode=max,scope=panel
+          tags: |
+            ghcr.io/metacubex/metacubexd:latest
+            ghcr.io/metacubex/metacubexd:${{ needs.release-please.outputs.tag_name }}
 
   release-desktop:
     needs: release-please
