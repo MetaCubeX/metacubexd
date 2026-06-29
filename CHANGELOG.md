@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.264.0](https://github.com/MetaCubeX/metacubexd/compare/v1.263.0...v1.264.0) (2026-06-29)
+
+
+### Features
+
+* **docker:** publish the standalone metacubexd panel image again ([#2091](https://github.com/MetaCubeX/metacubexd/issues/2091)) ([9164c8b](https://github.com/MetaCubeX/metacubexd/commit/9164c8b7cb5d03a58c4e7a36990fd94cbdd89f70)), closes [#2088](https://github.com/MetaCubeX/metacubexd/issues/2088)
+
+
+### Bug Fixes
+
+* **ui:** spin only the refresh icon and unify the two overview refresh buttons ([#2090](https://github.com/MetaCubeX/metacubexd/issues/2090)) ([b21e5a1](https://github.com/MetaCubeX/metacubexd/commit/b21e5a1abb575223640a7c27e34782cb94debab0)), closes [#2089](https://github.com/MetaCubeX/metacubexd/issues/2089)
+
 ## [1.263.0](https://github.com/MetaCubeX/metacubexd/compare/v1.262.0...v1.263.0) (2026-06-27)
 
 
