@@ -56,12 +56,16 @@ function getLatencyBarClass(latency: number | null | undefined) {
           {{ t('average') }}: {{ averageLatency }}ms
         </span>
         <button
-          class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-base-content/60 transition-all duration-200 hover:bg-base-content/10 hover:text-base-content disabled:cursor-not-allowed disabled:opacity-50"
-          :class="{ 'animate-spin': isTestingAll }"
+          class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border border-base-content/10 bg-transparent text-base-content/60 transition-all duration-200 hover:bg-base-300 hover:text-base-content disabled:cursor-not-allowed disabled:opacity-50"
           :disabled="isTestingAll"
           @click="testAllLatencies"
         >
-          <IconRefresh class="h-4 w-4" />
+          <IconRefresh
+            :size="16"
+            :class="{
+              'animate-spin [animation-direction:reverse]': isTestingAll,
+            }"
+          />
         </button>
       </div>
     </div>
