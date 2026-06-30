@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.264.1](https://github.com/MetaCubeX/metacubexd/compare/v1.264.0...v1.264.1) (2026-06-30)
+
+
+### Bug Fixes
+
+* **i18n:** unify latency terminology in Russian locale ([#2093](https://github.com/MetaCubeX/metacubexd/issues/2093)) ([96d34d5](https://github.com/MetaCubeX/metacubexd/commit/96d34d501859576f8126f7cbad88cd946ac291c1))
+
 ## [1.264.0](https://github.com/MetaCubeX/metacubexd/compare/v1.263.0...v1.264.0) (2026-06-29)
 
 
