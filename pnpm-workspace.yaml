@@ -6,60 +6,60 @@ packages:
 # Versions are transcribed verbatim from the pre-migration root package.json
 # (dependencies + devDependencies). ZERO version bumps in this migration.
 catalog:
-  '@antfu/eslint-config': ^9.0.0
-  '@commitlint/config-conventional': ^21.0.2
-  '@floating-ui/vue': ^1.1.11
+  '@antfu/eslint-config': ^9.1.0
+  '@commitlint/config-conventional': ^21.2.0
+  '@floating-ui/vue': ^2.0.0
   '@nuxt/fonts': ^0.14.0
   '@nuxtjs/i18n': ^10.4.0
   '@nuxtjs/tailwindcss': ^6.14.0
   '@pinia/nuxt': ^0.11.3
-  '@playwright/test': ^1.60.0
-  '@prettier/plugin-oxc': ^0.1.4
+  '@playwright/test': ^1.61.1
+  '@prettier/plugin-oxc': ^0.2.0
   '@tabler/icons-vue': ^3.44.0
   '@tailwindcss/typography': ^0.5.20
-  '@tailwindcss/vite': ^4.3.0
-  '@tanstack/vue-query': ^5.101.0
-  '@tanstack/vue-virtual': ^3.13.28
+  '@tailwindcss/vite': ^4.3.2
+  '@tanstack/vue-query': ^5.101.2
+  '@tanstack/vue-virtual': ^3.13.31
   '@types/byte-size': ^8.1.2
   '@types/d3': ^7.4.3
   '@types/markdown-it': ^14.1.2
-  '@types/node': ^25.9.2
+  '@types/node': ^26.0.1
   '@types/sortablejs': ^1.15.9
   '@vueuse/core': ^14.3.0
   '@vueuse/integrations': ^14.3.0
   '@vueuse/nuxt': ^14.3.0
   byte-size: ^9.0.1
-  commitlint: ^21.0.2
+  commitlint: ^21.2.0
   d3: ^7.9.0
-  daisyui: ^5.5.23
+  daisyui: ^5.6.6
   dayjs: ^1.11.21
-  eslint: ^10.4.1
+  eslint: ^10.6.0
   eslint-plugin-format: ^2.0.1
-  highcharts: ^12.6.0
+  highcharts: ^13.0.0
   husky: ^9.1.7
   ky: ^2.0.2
-  lint-staged: ^17.0.7
+  lint-staged: ^17.0.8
   markdown-it: ^14.2.0
   match-sorter: ^8.3.0
   nuxt: 4.4.8
   pinia: ^3.0.4
-  playwright: ^1.60.0
-  prettier: ^3.8.4
+  playwright: ^1.61.1
+  prettier: ^3.9.4
   prettier-plugin-tailwindcss: ^0.8.0
   sort-package-json: ^4.0.0
   sortablejs: ^1.15.7
-  tailwindcss: ^4.3.0
+  tailwindcss: ^4.3.2
   tsx: ^4.22.4
   typescript: ^6.0.3
   uqr: ^0.1.2
-  vite: 8.0.16
-  vitest: ^4.1.8
-  vue: ^3.5.35
+  vite: 8.1.2
+  vitest: ^4.1.9
+  vue: ^3.5.39
   vue-router: ^5.1.0
   vue-sonner: ^2.0.9
-  vue-tsc: ^3.3.4
+  vue-tsc: ^3.3.6
   '@vite-pwa/nuxt': ^1.1.1
-  '@vitest/coverage-v8': ^4.1.8
+  '@vitest/coverage-v8': ^4.1.9
   jsdom: ^29.1.1
   # NEW-SUBSYSTEM deps (consumed by the future agent/server/desktop packages
   # in plans 02-05, NOT by packages/ui). These are brand-new catalog entries
@@ -70,13 +70,13 @@ catalog:
   tree-kill: ^1.2.2
   yaml: ^2.9.0
   nitropack: ^2.12.6
-  electron: ^42.0.0
+  electron: ^43.0.0
   electron-vite: ^5.0.0
   electron-builder: ^26.0.0
   # Flips Electron's runtime fuses on the packaged binary via an afterPack hook
   # (scripts/after-pack.cjs). Already present transitively under electron-builder;
   # pinned here so the desktop package can require() it directly.
-  '@electron/fuses': ^1.8.0
+  '@electron/fuses': ^2.1.3
   # PINNED, do not bump past 0.52.x. monaco-yaml@5.5.1 (latest) pulls
   # monaco-worker-manager@2.0.1 (latest), which calls the OLD
   # editor.createWebWorker({ moduleId, label, createData }) API. monaco-editor
@@ -86,14 +86,14 @@ catalog:
   # language worker silently falls back to the main-thread editor worker, which
   # has no YAML methods ("Missing requestHandler or method: doValidation/...").
   # 0.52.2 is the last release with the old IWebWorkerOptions public API.
-  monaco-editor: 0.52.2
+  monaco-editor: 0.55.1
   monaco-yaml: ^5.5.1
   meta-json-schema: ^1.19.27
 
 # overrides MUST live only at the workspace root (pnpm 10/11). This is the
 # merge of OLD package.json#pnpm.overrides + the OLD workspace override.
 # CONFLICT RESOLUTION (see spec §2): the old package.json pinned
-# vite: 8.0.16 in BOTH dependencies and pnpm.overrides, but the old
+# vite: 8.1.2 in BOTH dependencies and pnpm.overrides, but the old
 # pnpm-workspace.yaml override 'vite: npm:rolldown-vite@latest' WON at install
 # time — the project already runs on rolldown-vite. Keep ONLY rolldown-vite
 # here; drop the 8.0.16 pin. (The 8.0.16 entry survives in the catalog above
