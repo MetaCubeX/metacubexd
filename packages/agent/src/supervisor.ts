@@ -105,11 +105,26 @@ export function createSupervisor(
     }
   }
 
+  // The readiness poll opens a *client* socket, so it must target loopback, not
+  // the wildcard bind host. The server binds external-controller on 0.0.0.0 so
+  // the published container port is reachable, but connecting a client to
+  // 0.0.0.0 (or ::) isn't routable on every host — on some NAS/Docker network
+  // stacks it fails, so every poll misses, the start timeout elapses, and the
+  // supervisor SIGKILLs an otherwise-healthy kernel: "errored (pid N)" with a
+  // dashboard that can't reach the core (#2098). Rewrite a wildcard host to
+  // 127.0.0.1 for the poll only; the injected bind address is untouched.
   function versionUrl(): string {
-    const base = state.externalController.startsWith('http')
-      ? state.externalController
-      : `http://${state.externalController}`
-    return `${base}/version`
+    const addr = state.externalController
+    const withScheme = addr.startsWith('http') ? addr : `http://${addr}`
+    try {
+      const u = new URL(withScheme)
+      // hostname is bracketless '::' on some Node versions, '[::]' on others.
+      const WILDCARD = new Set(['0.0.0.0', '::', '[::]', ''])
+      if (WILDCARD.has(u.hostname)) u.hostname = '127.0.0.1'
+      return `${u.origin}/version`
+    } catch {
+      return `${withScheme}/version`
+    }
   }
 
   async function pollReady(deadline: number): Promise<boolean> {

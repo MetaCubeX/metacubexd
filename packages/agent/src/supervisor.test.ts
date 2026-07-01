@@ -98,6 +98,27 @@ describe('createSupervisor — initial state', () => {
     await sup.dispose()
   })
 
+  it('polls loopback, not the 0.0.0.0 wildcard bind host, for readiness (#2098)', async () => {
+    const opts = baseOpts()
+    const proc = new FakeProc()
+    const urls: string[] = []
+    const sup = createSupervisor(
+      { ...opts, externalController: '0.0.0.0:9090' },
+      {
+        spawn: (() => proc) as never,
+        fetch: (async (url: string) => {
+          urls.push(url)
+          return new Response(JSON.stringify({ version: '1' }), { status: 200 })
+        }) as unknown as typeof fetch,
+      },
+    )
+    await sup.start()
+    // The bind address stays 0.0.0.0, but the client poll must hit loopback,
+    // else a host that can't connect to 0.0.0.0 SIGKILLs a healthy kernel.
+    expect(urls[0]).toBe('http://127.0.0.1:9090/version')
+    await sup.dispose()
+  })
+
   it('injects external-controller/secret/mixed-port into the active config before spawn (stripping profile values)', async () => {
     const opts = baseOpts()
     // Profile carried its own (conflicting) clash-api + mixed-port lines.
