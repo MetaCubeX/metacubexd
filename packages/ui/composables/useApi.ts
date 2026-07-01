@@ -248,7 +248,11 @@ export function useGithubAPI() {
 }
 
 // API Functions
-export type EndpointCheckError = 'mixed_content' | 'network_error' | null
+export type EndpointCheckError =
+  | 'mixed_content'
+  | 'auth_error'
+  | 'network_error'
+  | null
 
 export function checkEndpointAPI(
   url: string,
@@ -262,6 +266,14 @@ export function checkEndpointAPI(
     .then(() => null)
     .catch((err) => {
       console.error(err)
+
+      // A rejected secret (Mihomo answers /version with 401) is an auth
+      // problem, not a reachability one — surface it distinctly so the fix
+      // is "check the secret", not "check the URL / is the kernel running".
+      const status = err?.response?.status
+      if (status === 401 || status === 403) {
+        return 'auth_error'
+      }
 
       if (
         typeof window !== 'undefined' &&

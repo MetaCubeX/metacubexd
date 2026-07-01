@@ -14,6 +14,11 @@ export function useConnect() {
   const endpointError = ref<EndpointCheckError>(null)
   const isSubmitting = ref(false)
 
+  // Live state of the automatic default-backend probe, surfaced as an
+  // instrument-style status readout on the connect form.
+  const probeState = ref<'idle' | 'probing' | 'unreachable'>('idle')
+  const probeTarget = ref('')
+
   // Priority: runtime config (NUXT_PUBLIC_DEFAULT_BACKEND_URL) > config.js > fallback
   const defaultBackendURL = computed(() => {
     if (runtimeConfig.public.defaultBackendURL) {
@@ -40,9 +45,9 @@ export function useConnect() {
   async function connect(
     url: string,
     secret: string,
-    options: { silent?: boolean } = {},
+    options: { silent?: boolean; shouldNavigate?: () => boolean } = {},
   ): Promise<boolean> {
-    const { silent = false } = options
+    const { silent = false, shouldNavigate } = options
     if (!silent) {
       isSubmitting.value = true
       endpointError.value = null
@@ -57,23 +62,28 @@ export function useConnect() {
         return false
       }
 
-      const id = randomUUID()
-      const list = [...endpointStore.endpointList]
-      const existing = list.find((history) => history.url === transformedURL)
+      // Only persist + select + navigate when we're actually connecting the
+      // user. A silent probe the user has since bypassed (focused/edited the
+      // form) leaves no trace — no stray endpoint, no navigation.
+      if (!shouldNavigate || shouldNavigate()) {
+        const id = randomUUID()
+        const list = [...endpointStore.endpointList]
+        const existing = list.find((history) => history.url === transformedURL)
 
-      if (!existing) {
-        endpointStore.setEndpointList([
-          { id, url: transformedURL, secret },
-          ...list,
-        ])
-      } else {
-        // Reuse the saved entry, refresh its secret + id.
-        existing.secret = secret
-        existing.id = id
-        endpointStore.setEndpointList(list)
+        if (!existing) {
+          endpointStore.setEndpointList([
+            { id, url: transformedURL, secret },
+            ...list,
+          ])
+        } else {
+          // Reuse the saved entry, refresh its secret + id.
+          existing.secret = secret
+          existing.id = id
+          endpointStore.setEndpointList(list)
+        }
+
+        onSuccess(id)
       }
-
-      onSuccess(id)
       return true
     } finally {
       // A silent probe never set isSubmitting, so it must not clear a
@@ -87,15 +97,21 @@ export function useConnect() {
     const endpoint = endpointStore.endpointList.find((e) => e.id === id)
     if (!endpoint) return false
 
-    const error = await checkEndpointAPI(endpoint.url, endpoint.secret)
-    if (error) {
-      endpointError.value = error
-      return false
-    }
-
+    // Surface the re-probe on the shared status readout (statusConnecting)
+    // instead of leaving it reading "idle" during the up-to-5s check.
+    isSubmitting.value = true
     endpointError.value = null
-    onSuccess(id)
-    return true
+    try {
+      const error = await checkEndpointAPI(endpoint.url, endpoint.secret)
+      if (error) {
+        endpointError.value = error
+        return false
+      }
+      onSuccess(id)
+      return true
+    } finally {
+      isSubmitting.value = false
+    }
   }
 
   // Zero-click connect on first load: honor a `?hostname` deep-link, else
@@ -106,11 +122,11 @@ export function useConnect() {
   async function autoLogin(
     query: Record<string, any>,
     formData: { url: string; secret: string },
-    options: { tryDefault?: boolean } = {},
+    options: { tryDefault?: boolean; shouldNavigate?: () => boolean } = {},
   ): Promise<void> {
     if (runtimeConfig.public.mockMode) return
 
-    const { tryDefault = true } = options
+    const { tryDefault = true, shouldNavigate } = options
     const hostname = query?.hostname
 
     if (hostname) {
@@ -132,15 +148,27 @@ export function useConnect() {
     if (tryDefault && endpointStore.endpointList.length === 0) {
       formData.url = defaultBackendURL.value
       formData.secret = ''
+      probeTarget.value = transformEndpointURL(defaultBackendURL.value)
+      probeState.value = 'probing'
       // Silent: the default backend is a guess, not the user's request, so a
-      // failed probe must not paint an error onto a fresh first-run screen.
-      await connect(formData.url, formData.secret, { silent: true })
+      // failed probe reports as an amber "no backend detected" readout rather
+      // than painting a red error onto a fresh first-run screen.
+      const ok = await connect(formData.url, formData.secret, {
+        silent: true,
+        shouldNavigate,
+      })
+      // If the user engaged mid-probe, a miss degrades to the idle prompt
+      // rather than a stuck amber warning pointing at the default they bypassed.
+      const engaged = shouldNavigate ? !shouldNavigate() : false
+      probeState.value = ok || engaged ? 'idle' : 'unreachable'
     }
   }
 
   return {
     endpointError,
     isSubmitting,
+    probeState,
+    probeTarget,
     defaultBackendURL,
     connect,
     selectEndpoint,
