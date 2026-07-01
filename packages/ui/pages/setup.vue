@@ -2,14 +2,11 @@
 import type { Endpoint } from '~/types'
 import {
   IconGripVertical,
-  IconLink,
-  IconLock,
   IconPencil,
   IconServer,
   IconX,
 } from '@tabler/icons-vue'
 import { useSortable } from '@vueuse/integrations/useSortable'
-import { FALLBACK_BACKEND_URL } from '~/constants'
 
 definePageMeta({
   layout: 'default',
@@ -21,29 +18,13 @@ useHead({ title: computed(() => t('setup')) })
 const route = useRoute()
 const endpointStore = useEndpointStore()
 
-const {
-  endpointError,
-  isSubmitting,
-  defaultBackendURL,
-  connect,
-  selectEndpoint,
-  autoLogin,
-} = useConnect()
-
-const formData = reactive({
-  url: '',
-  secret: '',
-})
-
-// Get current origin for datalist
-const currentOrigin = computed(() => {
-  if (typeof window === 'undefined') return ''
-  return window.location.origin
-})
-
-function onSubmit() {
-  return connect(formData.url, formData.secret)
-}
+const connectForm = ref<{
+  autoLogin: (
+    query: Record<string, any>,
+    options?: { tryDefault?: boolean },
+  ) => Promise<void>
+  selectEndpoint: (id: string) => Promise<boolean>
+} | null>(null)
 
 function onRemove(id: string) {
   endpointStore.removeEndpoint(id)
@@ -66,10 +47,12 @@ useSortable(endpointListRef, endpointOrder, {
   watchElement: true,
 })
 
-// Auto-login: honor a ?hostname deep-link, or try the default backend once if
-// nothing is saved yet — shared with the '/' landing entry via useConnect().
+// Auto-login only honors a ?hostname deep-link here; the default-backend probe
+// belongs to the '/' landing entry, so this manager never auto-connects blind.
 onMounted(async () => {
-  await autoLogin(route.query as Record<string, any>, formData)
+  await connectForm.value?.autoLogin(route.query as Record<string, any>, {
+    tryDefault: false,
+  })
 })
 </script>
 
@@ -111,101 +94,8 @@ onMounted(async () => {
         </p>
       </div>
 
-      <!-- Form Card -->
-      <div class="rounded-box border border-base-content/10 bg-base-200 p-6">
-        <form class="flex flex-col gap-5" @submit.prevent="onSubmit">
-          <!-- URL Field -->
-          <div class="flex flex-col gap-2">
-            <label
-              class="flex items-center gap-2 text-sm font-medium text-base-content/70"
-              for="url"
-            >
-              <IconLink :size="16" />
-              <span>{{ t('endpointURL') }}</span>
-            </label>
-            <input
-              id="url"
-              v-model="formData.url"
-              type="url"
-              class="w-full rounded-lg border border-base-content/15 bg-base-100 px-4 py-3 text-[0.9375rem] text-base-content transition-colors duration-200 placeholder:text-base-content/70 focus:border-primary focus:ring-3 focus:ring-primary/20 focus:outline-none"
-              placeholder="http(s)://{hostname}:{port}"
-              list="defaultEndpoints"
-              autocomplete="on"
-            />
-            <datalist id="defaultEndpoints">
-              <option :value="FALLBACK_BACKEND_URL" />
-              <option
-                v-if="
-                  defaultBackendURL &&
-                  defaultBackendURL !== FALLBACK_BACKEND_URL
-                "
-                :value="defaultBackendURL"
-              />
-              <option
-                v-if="currentOrigin && currentOrigin !== FALLBACK_BACKEND_URL"
-                :value="currentOrigin"
-              />
-              <option
-                v-for="endpoint in endpointStore.endpointList"
-                :key="endpoint.id"
-                :value="endpoint.url"
-              />
-            </datalist>
-          </div>
-
-          <!-- Hidden username field for password managers -->
-          <input
-            type="text"
-            name="username"
-            autocomplete="username"
-            class="sr-only"
-            aria-hidden="true"
-            tabindex="-1"
-          />
-
-          <!-- Secret Field -->
-          <div class="flex flex-col gap-2">
-            <label
-              class="flex items-center gap-2 text-sm font-medium text-base-content/70"
-              for="secret"
-            >
-              <IconLock :size="16" />
-              <span>{{ t('secret') }}</span>
-            </label>
-            <input
-              id="secret"
-              v-model="formData.secret"
-              type="password"
-              class="w-full rounded-lg border border-base-content/15 bg-base-100 px-4 py-3 text-[0.9375rem] text-base-content transition-colors duration-200 placeholder:text-base-content/70 focus:border-primary focus:ring-3 focus:ring-primary/20 focus:outline-none"
-              placeholder="secret"
-              autocomplete="current-password"
-            />
-          </div>
-
-          <!-- Error Message -->
-          <div
-            v-if="endpointError"
-            role="alert"
-            class="rounded-lg border border-error/25 bg-error/10 px-4 py-3 text-sm text-error"
-          >
-            <template v-if="endpointError === 'mixed_content'">
-              {{ t('mixedContentError') }}
-            </template>
-            <template v-else>
-              {{ t('endpointConnectError') }}
-            </template>
-          </div>
-
-          <!-- Submit Button -->
-          <Button
-            type="submit"
-            class="w-full btn-primary"
-            :loading="isSubmitting"
-          >
-            {{ t('add') }}
-          </Button>
-        </form>
-      </div>
+      <!-- Connect form (shared with the '/' landing entry) -->
+      <ConnectForm ref="connectForm" :submit-label="t('add')" />
 
       <!-- Saved Endpoints -->
       <div v-if="endpointStore.endpointList.length > 0" class="mt-6">
@@ -219,7 +109,7 @@ onMounted(async () => {
             v-for="endpoint in endpointStore.endpointList"
             :key="endpoint.id"
             class="group flex cursor-pointer items-center gap-2 rounded-xl border border-base-content/10 bg-base-200 p-3 transition-colors duration-200 hover:border-base-content/20 hover:bg-base-300"
-            @click="selectEndpoint(endpoint.id)"
+            @click="connectForm?.selectEndpoint(endpoint.id)"
           >
             <IconGripVertical
               class="drag-handle shrink-0 cursor-grab text-base-content/30 transition-colors duration-200 hover:text-base-content/60 active:cursor-grabbing"

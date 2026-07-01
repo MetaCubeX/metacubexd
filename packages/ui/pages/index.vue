@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { IconLink, IconLock, IconServer, IconSettings } from '@tabler/icons-vue'
-import { FALLBACK_BACKEND_URL } from '~/constants'
+import { IconServer, IconSettings } from '@tabler/icons-vue'
 
 const { t } = useI18n()
 
@@ -12,16 +11,14 @@ const runtimeConfig = useRuntimeConfig()
 const router = useRouter()
 const route = useRoute()
 
-const { endpointError, isSubmitting, defaultBackendURL, connect, autoLogin } =
-  useConnect()
-
-const formData = reactive({ url: '', secret: '' })
+const connectForm = ref<{
+  autoLogin: (
+    query: Record<string, any>,
+    options?: { tryDefault?: boolean },
+  ) => Promise<void>
+} | null>(null)
 
 const hasSavedEndpoints = computed(() => endpointStore.endpointList.length > 0)
-
-const currentOrigin = computed(() =>
-  typeof window === 'undefined' ? '' : window.location.origin,
-)
 
 onMounted(async () => {
   // Mock demos and already-connected users skip the entry entirely.
@@ -29,8 +26,8 @@ onMounted(async () => {
     router.replace(`/${configStore.defaultPage || 'overview'}`)
     return
   }
-  // First run: honor a ?hostname deep-link, else try the default backend once.
-  await autoLogin(route.query as Record<string, any>, formData)
+  // First run: honor a ?hostname deep-link, else silently probe the default.
+  await connectForm.value?.autoLogin(route.query as Record<string, any>)
 })
 </script>
 
@@ -51,104 +48,18 @@ onMounted(async () => {
         >
           MetaCube<span class="text-primary">XD</span>
         </h1>
-        <p class="mt-2 text-[0.9375rem] text-base-content">
+        <p class="mt-2 text-sm text-base-content">
           {{ t('connectPrompt') }}
         </p>
       </div>
 
-      <!-- Connect form -->
-      <form
-        class="flex flex-col gap-5"
-        @submit.prevent="connect(formData.url, formData.secret)"
-      >
-        <div class="flex flex-col gap-2">
-          <label
-            class="flex items-center gap-2 text-sm font-medium text-base-content/80"
-            for="url"
-          >
-            <IconLink :size="16" />
-            <span>{{ t('endpointURL') }}</span>
-          </label>
-          <input
-            id="url"
-            v-model="formData.url"
-            type="url"
-            class="w-full rounded-lg border border-base-content/15 bg-base-100 px-4 py-3 text-[0.9375rem] text-base-content transition-colors duration-200 placeholder:text-base-content/70 focus:border-primary focus:ring-3 focus:ring-primary/20 focus:outline-none"
-            placeholder="http(s)://{hostname}:{port}"
-            list="defaultEndpoints"
-            autocomplete="on"
-          />
-          <datalist id="defaultEndpoints">
-            <option :value="FALLBACK_BACKEND_URL" />
-            <option
-              v-if="
-                defaultBackendURL && defaultBackendURL !== FALLBACK_BACKEND_URL
-              "
-              :value="defaultBackendURL"
-            />
-            <option
-              v-if="currentOrigin && currentOrigin !== FALLBACK_BACKEND_URL"
-              :value="currentOrigin"
-            />
-          </datalist>
-        </div>
-
-        <!-- Hidden username field for password managers -->
-        <input
-          type="text"
-          name="username"
-          autocomplete="username"
-          class="sr-only"
-          aria-hidden="true"
-          tabindex="-1"
-        />
-
-        <div class="flex flex-col gap-2">
-          <label
-            class="flex items-center gap-2 text-sm font-medium text-base-content/80"
-            for="secret"
-          >
-            <IconLock :size="16" />
-            <span>{{ t('secret') }}</span>
-          </label>
-          <input
-            id="secret"
-            v-model="formData.secret"
-            type="password"
-            class="w-full rounded-lg border border-base-content/15 bg-base-100 px-4 py-3 text-[0.9375rem] text-base-content transition-colors duration-200 placeholder:text-base-content/70 focus:border-primary focus:ring-3 focus:ring-primary/20 focus:outline-none"
-            placeholder="secret"
-            autocomplete="current-password"
-          />
-        </div>
-
-        <!-- Error Message -->
-        <div
-          v-if="endpointError"
-          role="alert"
-          class="rounded-lg border border-error/25 bg-error/10 px-4 py-3 text-sm text-error"
-        >
-          <template v-if="endpointError === 'mixed_content'">
-            {{ t('mixedContentError') }}
-          </template>
-          <template v-else>
-            {{ t('endpointConnectError') }}
-          </template>
-        </div>
-
-        <Button
-          type="submit"
-          class="w-full btn-primary"
-          :loading="isSubmitting"
-        >
-          {{ t('connect') }}
-        </Button>
-      </form>
+      <ConnectForm ref="connectForm" :submit-label="t('connect')" />
 
       <!-- Advanced / saved backends -->
       <div class="mt-6 text-center">
         <NuxtLink
           to="/setup"
-          class="inline-flex items-center gap-1.5 text-sm text-base-content/70 no-underline transition-colors hover:text-base-content"
+          class="inline-flex items-center gap-1.5 text-sm text-base-content/80 no-underline transition-colors hover:text-base-content"
         >
           <IconSettings :size="15" />
           <span>{{

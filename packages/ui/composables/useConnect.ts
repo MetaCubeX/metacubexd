@@ -34,17 +34,26 @@ export function useConnect() {
   }
 
   // Probe a backend, then save + select it and navigate on success.
-  // Returns true on connect, false on error (with `endpointError` set).
-  async function connect(url: string, secret: string): Promise<boolean> {
-    isSubmitting.value = true
-    endpointError.value = null
+  // Returns true on connect, false on error. A silent attempt (the automatic
+  // default-backend probe) never sets the error banner or the loading spinner,
+  // so the entry never greets a first-timer with a manufactured failure.
+  async function connect(
+    url: string,
+    secret: string,
+    options: { silent?: boolean } = {},
+  ): Promise<boolean> {
+    const { silent = false } = options
+    if (!silent) {
+      isSubmitting.value = true
+      endpointError.value = null
+    }
 
     try {
       const transformedURL = transformEndpointURL(url)
 
       const error = await checkEndpointAPI(transformedURL, secret)
       if (error) {
-        endpointError.value = error
+        if (!silent) endpointError.value = error
         return false
       }
 
@@ -67,7 +76,9 @@ export function useConnect() {
       onSuccess(id)
       return true
     } finally {
-      isSubmitting.value = false
+      // A silent probe never set isSubmitting, so it must not clear a
+      // concurrent user submit's spinner when it resolves.
+      if (!silent) isSubmitting.value = false
     }
   }
 
@@ -121,7 +132,9 @@ export function useConnect() {
     if (tryDefault && endpointStore.endpointList.length === 0) {
       formData.url = defaultBackendURL.value
       formData.secret = ''
-      await connect(formData.url, formData.secret)
+      // Silent: the default backend is a guess, not the user's request, so a
+      // failed probe must not paint an error onto a fresh first-run screen.
+      await connect(formData.url, formData.secret, { silent: true })
     }
   }
 

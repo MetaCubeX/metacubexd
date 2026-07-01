@@ -165,6 +165,7 @@
   "details": "详情",
   "endpointURL": "后端地址",
   "secret": "密钥",
+  "secretHint": "如果后端没有设置 secret，留空即可",
   "connect": "连接",
   "connectPrompt": "连接到你的 Mihomo 后端以开始使用。",
   "runningMode": "运行模式",

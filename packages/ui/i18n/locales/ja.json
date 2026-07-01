@@ -165,6 +165,7 @@
   "details": "詳細",
   "endpointURL": "エンドポイント URL",
   "secret": "シークレット",
+  "secretHint": "バックエンドにシークレットがない場合は空欄のままにします",
   "connect": "接続",
   "connectPrompt": "Mihomo バックエンドに接続して始めましょう。",
   "runningMode": "実行モード",
