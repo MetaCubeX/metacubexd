@@ -1,296 +1,161 @@
 <script setup lang="ts">
-import { IconArrowRight, IconRocket } from '@tabler/icons-vue'
+import { IconLink, IconLock, IconServer, IconSettings } from '@tabler/icons-vue'
+import { FALLBACK_BACKEND_URL } from '~/constants'
 
 const { t } = useI18n()
 
 useHead({ title: computed(() => t('home')) })
+
 const endpointStore = useEndpointStore()
 const configStore = useConfigStore()
+const runtimeConfig = useRuntimeConfig()
 const router = useRouter()
+const route = useRoute()
 
-// Redirect to default page if already connected
-onMounted(() => {
-  if (endpointStore.currentEndpoint) {
+const { endpointError, isSubmitting, defaultBackendURL, connect, autoLogin } =
+  useConnect()
+
+const formData = reactive({ url: '', secret: '' })
+
+const hasSavedEndpoints = computed(() => endpointStore.endpointList.length > 0)
+
+const currentOrigin = computed(() =>
+  typeof window === 'undefined' ? '' : window.location.origin,
+)
+
+onMounted(async () => {
+  // Mock demos and already-connected users skip the entry entirely.
+  if (runtimeConfig.public.mockMode || endpointStore.currentEndpoint) {
     router.replace(`/${configStore.defaultPage || 'overview'}`)
+    return
   }
+  // First run: honor a ?hostname deep-link, else try the default backend once.
+  await autoLogin(route.query as Record<string, any>, formData)
 })
 </script>
 
 <template>
   <div
-    class="index-page-bg relative flex h-full items-center justify-center overflow-hidden p-4"
+    class="flex h-full items-center justify-center overflow-y-auto bg-base-100 p-4"
   >
-    <!-- Animated background elements -->
-    <div class="pointer-events-none absolute inset-0 overflow-hidden">
-      <div class="index-bg-orb index-bg-orb-1"></div>
-      <div class="index-bg-orb index-bg-orb-2"></div>
-      <div class="index-bg-orb index-bg-orb-3"></div>
-    </div>
-
-    <div class="animate-fade-in relative z-10 text-center">
-      <!-- Logo -->
-      <div class="animate-scale-in mb-6">
-        <h1 class="inline-block text-5xl font-black tracking-tight sm:text-6xl">
-          <span class="index-title-gradient">Meta</span>
-          <span class="index-title-gradient">Cube</span>
-          <span class="index-title-xd relative ml-0.5 text-base-content"
-            >XD</span
-          >
+    <div class="animate-spring-up mx-auto w-full max-w-md">
+      <!-- Brand + purpose -->
+      <div class="mb-8 text-center">
+        <div
+          class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-box bg-primary/12 text-primary"
+        >
+          <IconServer :size="28" />
+        </div>
+        <h1
+          class="text-3xl font-bold tracking-tight text-base-content sm:text-4xl"
+        >
+          MetaCube<span class="text-primary">XD</span>
         </h1>
+        <p class="mt-2 text-[0.9375rem] text-base-content">
+          {{ t('connectPrompt') }}
+        </p>
       </div>
 
-      <!-- Subtitle -->
-      <p
-        class="animate-fade-in-delayed mx-auto mb-10 max-w-md text-lg text-base-content/60"
+      <!-- Connect form -->
+      <form
+        class="flex flex-col gap-5"
+        @submit.prevent="connect(formData.url, formData.secret)"
       >
-        Mihomo Dashboard, The Official One
-      </p>
+        <div class="flex flex-col gap-2">
+          <label
+            class="flex items-center gap-2 text-sm font-medium text-base-content/80"
+            for="url"
+          >
+            <IconLink :size="16" />
+            <span>{{ t('endpointURL') }}</span>
+          </label>
+          <input
+            id="url"
+            v-model="formData.url"
+            type="url"
+            class="w-full rounded-lg border border-base-content/15 bg-base-100 px-4 py-3 text-[0.9375rem] text-base-content transition-colors duration-200 placeholder:text-base-content/70 focus:border-primary focus:ring-3 focus:ring-primary/20 focus:outline-none"
+            placeholder="http(s)://{hostname}:{port}"
+            list="defaultEndpoints"
+            autocomplete="on"
+          />
+          <datalist id="defaultEndpoints">
+            <option :value="FALLBACK_BACKEND_URL" />
+            <option
+              v-if="
+                defaultBackendURL && defaultBackendURL !== FALLBACK_BACKEND_URL
+              "
+              :value="defaultBackendURL"
+            />
+            <option
+              v-if="currentOrigin && currentOrigin !== FALLBACK_BACKEND_URL"
+              :value="currentOrigin"
+            />
+          </datalist>
+        </div>
 
-      <!-- Action buttons -->
-      <div
-        class="animate-fade-in-delayed-2 flex flex-col items-center justify-center gap-4 sm:flex-row"
-      >
+        <!-- Hidden username field for password managers -->
+        <input
+          type="text"
+          name="username"
+          autocomplete="username"
+          class="sr-only"
+          aria-hidden="true"
+          tabindex="-1"
+        />
+
+        <div class="flex flex-col gap-2">
+          <label
+            class="flex items-center gap-2 text-sm font-medium text-base-content/80"
+            for="secret"
+          >
+            <IconLock :size="16" />
+            <span>{{ t('secret') }}</span>
+          </label>
+          <input
+            id="secret"
+            v-model="formData.secret"
+            type="password"
+            class="w-full rounded-lg border border-base-content/15 bg-base-100 px-4 py-3 text-[0.9375rem] text-base-content transition-colors duration-200 placeholder:text-base-content/70 focus:border-primary focus:ring-3 focus:ring-primary/20 focus:outline-none"
+            placeholder="secret"
+            autocomplete="current-password"
+          />
+        </div>
+
+        <!-- Error Message -->
+        <div
+          v-if="endpointError"
+          role="alert"
+          class="rounded-lg border border-error/25 bg-error/10 px-4 py-3 text-sm text-error"
+        >
+          <template v-if="endpointError === 'mixed_content'">
+            {{ t('mixedContentError') }}
+          </template>
+          <template v-else>
+            {{ t('endpointConnectError') }}
+          </template>
+        </div>
+
+        <Button
+          type="submit"
+          class="w-full btn-primary"
+          :loading="isSubmitting"
+        >
+          {{ t('connect') }}
+        </Button>
+      </form>
+
+      <!-- Advanced / saved backends -->
+      <div class="mt-6 text-center">
         <NuxtLink
           to="/setup"
-          class="index-btn-primary group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl px-7 py-3.5 text-[0.9375rem] font-semibold no-underline transition-all duration-300 ease-out hover:-translate-y-0.5"
+          class="inline-flex items-center gap-1.5 text-sm text-base-content/70 no-underline transition-colors hover:text-base-content"
         >
-          <IconRocket
-            class="transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-15"
-            :size="20"
-          />
-          <span>{{ t('setup') }}</span>
-          <IconArrowRight
-            class="-translate-x-2 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
-            :size="18"
-          />
+          <IconSettings :size="15" />
+          <span>{{
+            hasSavedEndpoints ? t('savedEndpoints') : t('setup')
+          }}</span>
         </NuxtLink>
-
-        <NuxtLink
-          to="/overview"
-          class="index-btn-secondary inline-flex items-center justify-center gap-2 rounded-xl px-7 py-3.5 text-[0.9375rem] font-semibold no-underline backdrop-blur-sm transition-all duration-300 ease-out hover:-translate-y-0.5"
-        >
-          <span>{{ t('overview') }}</span>
-        </NuxtLink>
-      </div>
-
-      <!-- Version badge -->
-      <div
-        class="animate-fade-in-delayed-3 mt-12 inline-flex items-center gap-2 rounded-full bg-success/10 px-4 py-2 text-[0.8125rem] font-medium text-success"
-      >
-        <span class="h-2 w-2 animate-pulse rounded-full bg-success"></span>
-        <span>Ready to connect</span>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-/* Page background gradient */
-.index-page-bg {
-  background: linear-gradient(
-    135deg,
-    var(--color-base-100) 0%,
-    var(--color-base-200) 50%,
-    var(--color-base-300) 100%
-  );
-}
-
-/* Background orbs - require custom positioning and complex gradients */
-.index-bg-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.4;
-  animation: float 20s ease-in-out infinite;
-}
-
-.index-bg-orb-1 {
-  top: -20%;
-  left: -10%;
-  width: 500px;
-  height: 500px;
-  background: linear-gradient(
-    135deg,
-    var(--color-primary) 0%,
-    color-mix(in oklab, var(--color-primary) 50%, transparent) 100%
-  );
-}
-
-.index-bg-orb-2 {
-  bottom: -30%;
-  right: -10%;
-  width: 600px;
-  height: 600px;
-  background: linear-gradient(
-    135deg,
-    var(--color-secondary) 0%,
-    color-mix(in oklab, var(--color-secondary) 50%, transparent) 100%
-  );
-  animation-delay: -7s;
-}
-
-.index-bg-orb-3 {
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 400px;
-  height: 400px;
-  background: linear-gradient(
-    135deg,
-    var(--color-accent) 0%,
-    color-mix(in oklab, var(--color-accent) 30%, transparent) 100%
-  );
-  animation-delay: -14s;
-  opacity: 0.2;
-}
-
-@keyframes float {
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-  33% {
-    transform: translate(30px, -30px) scale(1.05);
-  }
-  66% {
-    transform: translate(-20px, 20px) scale(0.95);
-  }
-}
-
-/* Title gradient text */
-.index-title-gradient {
-  background: linear-gradient(
-    135deg,
-    var(--color-primary) 0%,
-    var(--color-secondary) 50%,
-    var(--color-accent) 100%
-  );
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  background-size: 200% 200%;
-  animation: gradientShift 8s ease-in-out infinite;
-}
-
-@keyframes gradientShift {
-  0%,
-  100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-}
-
-/* XD underline animation */
-.index-title-xd::after {
-  content: '';
-  position: absolute;
-  bottom: 0.1em;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: var(--color-primary);
-  border-radius: 2px;
-  transform: scaleX(0);
-  animation: underlineIn 0.6s ease-out 0.4s forwards;
-}
-
-@keyframes underlineIn {
-  to {
-    transform: scaleX(1);
-  }
-}
-
-/* Primary button styles */
-.index-btn-primary {
-  background: linear-gradient(
-    135deg,
-    var(--color-primary) 0%,
-    var(--color-secondary) 100%
-  );
-  color: var(--color-primary-content);
-  box-shadow:
-    0 4px 15px color-mix(in oklab, var(--color-primary) 40%, transparent),
-    0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.index-btn-primary:hover {
-  box-shadow:
-    0 8px 25px color-mix(in oklab, var(--color-primary) 50%, transparent),
-    0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.index-btn-primary::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    135deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.2) 100%
-  );
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.index-btn-primary:hover::before {
-  opacity: 1;
-}
-
-/* Secondary button styles */
-.index-btn-secondary {
-  background: color-mix(in oklab, var(--color-base-content) 8%, transparent);
-  color: var(--color-base-content);
-  border: 1px solid
-    color-mix(in oklab, var(--color-base-content) 15%, transparent);
-}
-
-.index-btn-secondary:hover {
-  background: color-mix(in oklab, var(--color-base-content) 12%, transparent);
-  border-color: color-mix(in oklab, var(--color-base-content) 25%, transparent);
-}
-
-/* Animations */
-.animate-fade-in {
-  animation: fadeIn 0.8s ease-out;
-}
-
-.animate-scale-in {
-  animation: scaleIn 0.6s ease-out;
-}
-
-.animate-fade-in-delayed {
-  animation: fadeIn 0.8s ease-out 0.2s backwards;
-}
-
-.animate-fade-in-delayed-2 {
-  animation: fadeIn 0.8s ease-out 0.4s backwards;
-}
-
-.animate-fade-in-delayed-3 {
-  animation: fadeIn 0.8s ease-out 0.6s backwards;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-</style>

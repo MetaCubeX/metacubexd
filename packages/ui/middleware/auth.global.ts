@@ -11,13 +11,15 @@ export default defineNuxtRouteMiddleware((to) => {
   const endpointStore = useEndpointStore()
   const hasEndpoint = !!endpointStore.currentEndpoint
 
-  // Allow access to setup page without endpoint
-  if (to.path === '/setup') {
+  // The landing ('/') is the connection entry and '/setup' manages backends —
+  // both stay reachable without a configured endpoint (and this avoids a
+  // redirect loop when we send no-endpoint users to '/').
+  if (to.path === '/' || to.path === '/setup') {
     return
   }
 
-  // Redirect to setup if no endpoint configured
+  // Redirect to the connection entry if no endpoint is configured
   if (!hasEndpoint) {
-    return navigateTo('/setup', { replace: true })
+    return navigateTo('/', { replace: true })
   }
 })

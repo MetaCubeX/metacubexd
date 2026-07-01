@@ -165,6 +165,8 @@
   "details": "Détails",
   "endpointURL": "URL du point de terminaison",
   "secret": "Secret",
+  "connect": "Se connecter",
+  "connectPrompt": "Connectez-vous à votre backend Mihomo pour commencer.",
   "runningMode": "Mode d'exécution",
   "modeSwitchFailed": "Échec du changement de mode",
   "global": "Global",

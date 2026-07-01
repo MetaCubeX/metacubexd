@@ -165,6 +165,8 @@
   "details": "Детали",
   "endpointURL": "URL эндпоинта",
   "secret": "Секрет",
+  "connect": "Подключить",
+  "connectPrompt": "Подключитесь к вашему бэкенду Mihomo, чтобы начать.",
   "runningMode": "Режим работы",
   "modeSwitchFailed": "Не удалось переключить режим",
   "global": "Глобальный",

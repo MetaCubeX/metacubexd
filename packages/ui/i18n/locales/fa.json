@@ -165,6 +165,8 @@
   "details": "جزئیات",
   "endpointURL": "URL نقطه پایانی",
   "secret": "رمز",
+  "connect": "اتصال",
+  "connectPrompt": "برای شروع به بک‌اند Mihomo خود متصل شوید.",
   "runningMode": "حالت اجرا",
   "modeSwitchFailed": "تغییر حالت ناموفق بود",
   "global": "سراسری",

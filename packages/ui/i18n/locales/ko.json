@@ -165,6 +165,8 @@
   "details": "세부정보",
   "endpointURL": "엔드포인트 URL",
   "secret": "시크릿",
+  "connect": "연결",
+  "connectPrompt": "Mihomo 백엔드에 연결하여 시작하세요.",
   "runningMode": "실행 모드",
   "modeSwitchFailed": "모드 전환에 실패했습니다",
   "global": "글로벌",

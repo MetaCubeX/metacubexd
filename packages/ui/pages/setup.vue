@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { EndpointCheckError } from '~/composables/useApi'
 import type { Endpoint } from '~/types'
 import {
   IconGripVertical,
@@ -10,9 +9,7 @@ import {
   IconX,
 } from '@tabler/icons-vue'
 import { useSortable } from '@vueuse/integrations/useSortable'
-import { checkEndpointAPI } from '~/composables/useApi'
 import { FALLBACK_BACKEND_URL } from '~/constants'
-import { randomUUID, transformEndpointURL } from '~/utils'
 
 definePageMeta({
   layout: 'default',
@@ -21,32 +18,21 @@ definePageMeta({
 const { t } = useI18n()
 
 useHead({ title: computed(() => t('setup')) })
-const router = useRouter()
 const route = useRoute()
 const endpointStore = useEndpointStore()
+
+const {
+  endpointError,
+  isSubmitting,
+  defaultBackendURL,
+  connect,
+  selectEndpoint,
+  autoLogin,
+} = useConnect()
 
 const formData = reactive({
   url: '',
   secret: '',
-})
-
-const isSubmitting = ref(false)
-const endpointError = ref<EndpointCheckError>(null)
-
-// Get default backend URL from config
-// Priority: runtime config (NUXT_PUBLIC_DEFAULT_BACKEND_URL) > config.js > fallback
-const runtimeConfig = useRuntimeConfig()
-const defaultBackendURL = computed(() => {
-  if (runtimeConfig.public.defaultBackendURL) {
-    return runtimeConfig.public.defaultBackendURL
-  }
-  if (
-    typeof window !== 'undefined' &&
-    (window as any).__METACUBEXD_CONFIG__?.defaultBackendURL
-  ) {
-    return (window as any).__METACUBEXD_CONFIG__.defaultBackendURL
-  }
-  return FALLBACK_BACKEND_URL
 })
 
 // Get current origin for datalist
@@ -55,64 +41,8 @@ const currentOrigin = computed(() => {
   return window.location.origin
 })
 
-function onSetupSuccess(id: string) {
-  endpointStore.setSelectedEndpoint(id)
-  router.replace('/overview')
-}
-
-async function onEndpointSelect(id: string) {
-  const endpoint = endpointStore.endpointList.find((e) => e.id === id)
-  if (!endpoint) return
-
-  const error = await checkEndpointAPI(endpoint.url, endpoint.secret)
-  if (error) {
-    endpointError.value = error
-    return
-  }
-
-  endpointError.value = null
-  onSetupSuccess(id)
-}
-
-async function onSubmit() {
-  isSubmitting.value = true
-  endpointError.value = null
-
-  try {
-    const url = formData.url
-    const secret = formData.secret
-    const transformedURL = transformEndpointURL(url)
-
-    const error = await checkEndpointAPI(transformedURL, secret)
-    if (error) {
-      endpointError.value = error
-      isSubmitting.value = false
-      return
-    }
-
-    const id = randomUUID()
-    const list = [...endpointStore.endpointList]
-    const point = list.find((history) => history.url === transformedURL)
-
-    if (!point) {
-      // New endpoint
-      endpointStore.setEndpointList([
-        { id, url: transformedURL, secret },
-        ...list,
-      ])
-      onSetupSuccess(id)
-      return
-    }
-
-    // Update existing endpoint
-    point.secret = secret
-    point.id = id
-
-    endpointStore.setEndpointList(list)
-    onSetupSuccess(id)
-  } finally {
-    isSubmitting.value = false
-  }
+function onSubmit() {
+  return connect(formData.url, formData.secret)
 }
 
 function onRemove(id: string) {
@@ -136,40 +66,10 @@ useSortable(endpointListRef, endpointOrder, {
   watchElement: true,
 })
 
-// Auto-login logic
+// Auto-login: honor a ?hostname deep-link, or try the default backend once if
+// nothing is saved yet — shared with the '/' landing entry via useConnect().
 onMounted(async () => {
-  const search =
-    route.query ||
-    (typeof window !== 'undefined'
-      ? new URLSearchParams(window.location.search)
-      : null)
-
-  if (search && typeof search === 'object') {
-    const hostname = (search as any).hostname
-    if (hostname) {
-      const protocol = (search as any).http
-        ? 'http:'
-        : (search as any).https
-          ? 'https:'
-          : typeof window !== 'undefined'
-            ? window.location.protocol
-            : 'http:'
-      const port = (search as any).port ? `:${(search as any).port}` : ''
-
-      formData.url = `${protocol}//${hostname}${port}`
-      formData.secret = (search as any).secret || ''
-
-      await onSubmit()
-      return
-    }
-  }
-
-  // Auto-login with default if no endpoints
-  if (endpointStore.endpointList.length === 0) {
-    formData.url = defaultBackendURL.value
-    formData.secret = ''
-    await onSubmit()
-  }
+  await autoLogin(route.query as Record<string, any>, formData)
 })
 </script>
 
@@ -325,7 +225,7 @@ onMounted(async () => {
             :key="endpoint.id"
             class="animate-fade-slide-in group flex cursor-pointer items-center gap-2 rounded-xl border border-info/20 bg-info/10 p-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-info/30 hover:bg-info/15"
             :style="{ animationDelay: `${index * 50}ms` }"
-            @click="onEndpointSelect(endpoint.id)"
+            @click="selectEndpoint(endpoint.id)"
           >
             <IconGripVertical
               class="drag-handle shrink-0 cursor-grab text-base-content/30 transition-colors duration-200 hover:text-base-content/60 active:cursor-grabbing"
