@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.264.2](https://github.com/MetaCubeX/metacubexd/compare/v1.264.1...v1.264.2) (2026-07-01)
+
+
+### Bug Fixes
+
+* **proxies:** default the sticky group header off ([#2095](https://github.com/MetaCubeX/metacubexd/issues/2095)) ([acb779a](https://github.com/MetaCubeX/metacubexd/commit/acb779a984bf6e3b37b8ce024840acd83bed1a21))
+
 ## [1.264.1](https://github.com/MetaCubeX/metacubexd/compare/v1.264.0...v1.264.1) (2026-06-30)
 
 
