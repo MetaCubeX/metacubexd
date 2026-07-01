@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.265.0](https://github.com/MetaCubeX/metacubexd/compare/v1.264.3...v1.265.0) (2026-07-01)
+
+
+### Features
+
+* **setup:** instrument-console connect readout, auth-error diagnosis, a11y ([a4f630d](https://github.com/MetaCubeX/metacubexd/commit/a4f630d3cb8317037f5cc0bbbe8d60092f1b2eb6))
+
 ## [1.264.3](https://github.com/MetaCubeX/metacubexd/compare/v1.264.2...v1.264.3) (2026-07-01)
 
 
