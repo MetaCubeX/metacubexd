@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.264.3](https://github.com/MetaCubeX/metacubexd/compare/v1.264.2...v1.264.3) (2026-07-01)
+
+
+### Bug Fixes
+
+* **agent:** poll loopback, not the 0.0.0.0 bind host, for kernel readiness ([9153075](https://github.com/MetaCubeX/metacubexd/commit/9153075389bbcd9abfb02cdd9f630cf81bb336d8)), closes [#2098](https://github.com/MetaCubeX/metacubexd/issues/2098)
+
 ## [1.264.2](https://github.com/MetaCubeX/metacubexd/compare/v1.264.1...v1.264.2) (2026-07-01)
 
 
