@@ -8,6 +8,11 @@ updates:
       all-npm-dependencies:
         patterns:
           - '*'
+    ignore:
+      # monaco-editor is pinned to 0.52.2 — see the catalog comment in
+      # pnpm-workspace.yaml. 0.53+ breaks monaco-yaml's worker bridge and
+      # balloons the dist with unused ts/css/html workers (#2101).
+      - dependency-name: monaco-editor
 
   - package-ecosystem: docker
     directory: /

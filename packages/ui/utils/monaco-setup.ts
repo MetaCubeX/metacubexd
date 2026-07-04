@@ -1,14 +1,22 @@
-import metaSchema from 'meta-json-schema/schemas/meta-json-schema.json'
-;
 // packages/ui/utils/monaco-setup.ts (imported ONLY from the client-only wrapper)
-import * as monaco from 'monaco-editor'
+//
+// Import the slim editor core (edcore.main = full editor UX, zero languages)
+// plus only the two monarch tokenizers we actually edit: yaml (profiles) and
+// javascript (script-profile transforms). The default 'monaco-editor' barrel
+// drags in every basic-language plus the json/css/html/ts language services
+// and their multi-MB workers — the bulk of the dist size in #2101.
+import metaSchema from 'meta-json-schema/schemas/meta-json-schema.json'
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
 import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
-import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
 import { configureMonacoYaml } from 'monaco-yaml'
-import YamlWorker from 'monaco-yaml/yaml.worker?worker';(globalThis as any).MonacoEnvironment = {
+import YamlWorker from 'monaco-yaml/yaml.worker?worker'
+
+;
+import 'monaco-editor/esm/vs/editor/edcore.main'
+import 'monaco-editor/esm/vs/basic-languages/yaml/yaml.contribution'
+import 'monaco-editor/esm/vs/basic-languages/javascript/javascript.contribution';(globalThis as any).MonacoEnvironment = {
   getWorker(_id: string, label: string) {
     if (label === 'yaml') return new YamlWorker()
-    if (label === 'json') return new JsonWorker()
     return new EditorWorker()
   },
 }

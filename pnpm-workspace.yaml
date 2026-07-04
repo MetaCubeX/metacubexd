@@ -86,7 +86,11 @@ catalog:
   # language worker silently falls back to the main-thread editor worker, which
   # has no YAML methods ("Missing requestHandler or method: doValidation/...").
   # 0.52.2 is the last release with the old IWebWorkerOptions public API.
-  monaco-editor: 0.55.1
+  # Bundle size also depends on this pin: 0.53+ instantiates language workers
+  # via `new Worker(new URL(...))`, which makes Vite emit every monaco worker
+  # (ts/css/html, ~9 MB) into the dist even though only yaml is used (#2101).
+  # Dependabot is configured to ignore this package (.github/dependabot.yml).
+  monaco-editor: 0.52.2
   monaco-yaml: ^5.5.1
   meta-json-schema: ^1.19.27
 
