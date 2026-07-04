@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.265.1](https://github.com/MetaCubeX/metacubexd/compare/v1.265.0...v1.265.1) (2026-07-04)
+
+
+### Bug Fixes
+
+* **ui:** restore the monaco-editor 0.52.2 pin and slim monaco imports ([1373d25](https://github.com/MetaCubeX/metacubexd/commit/1373d25d9bd2ad88b3b2205de868d63ce9010752)), closes [#2101](https://github.com/MetaCubeX/metacubexd/issues/2101)
+
 ## [1.265.0](https://github.com/MetaCubeX/metacubexd/compare/v1.264.3...v1.265.0) (2026-07-01)
 
 
