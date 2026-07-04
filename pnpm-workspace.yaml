@@ -23,7 +23,7 @@ catalog:
   '@types/byte-size': ^8.1.2
   '@types/d3': ^7.4.3
   '@types/markdown-it': ^14.1.2
-  '@types/node': ^26.0.1
+  '@types/node': ^26.1.0
   '@types/sortablejs': ^1.15.9
   '@vueuse/core': ^14.3.0
   '@vueuse/integrations': ^14.3.0
@@ -31,7 +31,7 @@ catalog:
   byte-size: ^9.0.1
   commitlint: ^21.2.0
   d3: ^7.9.0
-  daisyui: ^5.6.6
+  daisyui: ^5.6.13
   dayjs: ^1.11.21
   eslint: ^10.6.0
   eslint-plugin-format: ^2.0.1
@@ -39,7 +39,7 @@ catalog:
   husky: ^9.1.7
   ky: ^2.0.2
   lint-staged: ^17.0.8
-  markdown-it: ^14.2.0
+  markdown-it: ^14.3.0
   match-sorter: ^8.3.0
   nuxt: 4.4.8
   pinia: ^3.0.4
@@ -49,10 +49,10 @@ catalog:
   sort-package-json: ^4.0.0
   sortablejs: ^1.15.7
   tailwindcss: ^4.3.2
-  tsx: ^4.22.4
+  tsx: ^4.23.0
   typescript: ^6.0.3
   uqr: ^0.1.2
-  vite: 8.1.2
+  vite: 8.1.3
   vitest: ^4.1.9
   vue: ^3.5.39
   vue-router: ^5.1.0
@@ -97,7 +97,7 @@ catalog:
 # overrides MUST live only at the workspace root (pnpm 10/11). This is the
 # merge of OLD package.json#pnpm.overrides + the OLD workspace override.
 # CONFLICT RESOLUTION (see spec §2): the old package.json pinned
-# vite: 8.1.2 in BOTH dependencies and pnpm.overrides, but the old
+# vite: 8.1.3 in BOTH dependencies and pnpm.overrides, but the old
 # pnpm-workspace.yaml override 'vite: npm:rolldown-vite@latest' WON at install
 # time — the project already runs on rolldown-vite. Keep ONLY rolldown-vite
 # here; drop the 8.0.16 pin. (The 8.0.16 entry survives in the catalog above
