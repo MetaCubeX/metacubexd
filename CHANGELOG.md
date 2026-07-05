@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.265.2](https://github.com/MetaCubeX/metacubexd/compare/v1.265.1...v1.265.2) (2026-07-05)
+
+
+### Bug Fixes
+
+* let proxy group headers scroll with nodes ([f5bce19](https://github.com/MetaCubeX/metacubexd/commit/f5bce197c32fec163e1dfb5e5c28f25b11bcc1f0)), closes [#2095](https://github.com/MetaCubeX/metacubexd/issues/2095)
+
 ## [1.265.1](https://github.com/MetaCubeX/metacubexd/compare/v1.265.0...v1.265.1) (2026-07-04)
 
 
