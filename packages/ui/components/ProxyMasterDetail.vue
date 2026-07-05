@@ -131,8 +131,9 @@ function chipClass(active: boolean) {
   ]
 }
 
-// Scroll container for the right detail; the selected row carries
-// data-selected="true" (a fallthrough attr on ProxyNodeListItem's root).
+// Detail container; on mobile the page scrolls, on desktop this panel scrolls.
+// The selected row carries data-selected="true" (a fallthrough attr on
+// ProxyNodeListItem's root).
 const detailEl = ref<HTMLElement | null>(null)
 function scrollSelectedIntoView(behavior: ScrollBehavior = 'smooth') {
   detailEl.value
@@ -158,7 +159,7 @@ function aliveCount(group: ProxyType) {
 </script>
 
 <template>
-  <div class="flex h-full min-h-0 flex-col gap-3 sm:flex-row">
+  <div class="flex min-h-0 flex-col gap-3 sm:h-full sm:flex-row">
     <!-- Group navigation: horizontal strip on mobile, left rail on >=sm -->
     <div
       class="flex shrink-0 gap-1 overflow-x-auto pb-1 sm:w-48 sm:flex-col sm:overflow-x-visible sm:overflow-y-auto sm:pb-0"
@@ -191,13 +192,10 @@ function aliveCount(group: ProxyType) {
     <div
       v-if="activeGroup"
       ref="detailEl"
-      class="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto rounded-xl border border-base-content/8 bg-base-200/40"
+      class="flex min-w-0 flex-col rounded-xl border border-base-content/8 bg-base-200/40 sm:min-h-0 sm:flex-1 sm:overflow-y-auto"
     >
-      <!-- Sticky header: title + search + jump + region chips.
-           z-20 keeps it above a selected node row (its wrapper is z-10 and its
-           glow/elevation would otherwise bleed up over the region chips). -->
       <div
-        class="sticky top-0 z-20 flex flex-col gap-2 rounded-t-xl border-b border-base-content/8 bg-base-200/95 px-3 pt-3 pb-2 backdrop-blur-sm"
+        class="flex flex-col gap-2 rounded-t-xl border-b border-base-content/8 bg-base-200/95 px-3 pt-3 pb-2"
       >
         <div class="flex items-center gap-2">
           <span class="text-lg font-semibold text-base-content">{{

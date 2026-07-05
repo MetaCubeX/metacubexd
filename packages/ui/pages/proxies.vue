@@ -869,7 +869,6 @@ const ProviderProxyNodes = defineComponent({
       v-if="activeTab === 'proxies'"
       ref="proxiesScrollEl"
       class="min-h-0 flex-1 overflow-y-auto"
-      :class="isMasterMode ? 'overflow-hidden' : ''"
     >
       <!-- Loading skeleton: first load / refetch before anything resolves -->
       <div
@@ -1188,19 +1187,6 @@ const ProviderProxyNodes = defineComponent({
           <div class="flex w-full justify-center">
             <input
               v-model="configStore.renderProxiesInTwoColumns"
-              class="toggle toggle-primary"
-              type="checkbox"
-            />
-          </div>
-        </div>
-
-        <div>
-          <ConfigTitle with-divider>
-            {{ t('stickyGroupHeader') }}
-          </ConfigTitle>
-          <div class="flex w-full justify-center">
-            <input
-              v-model="configStore.stickyGroupHeader"
               class="toggle toggle-primary"
               type="checkbox"
             />

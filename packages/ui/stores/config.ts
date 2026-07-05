@@ -59,10 +59,6 @@ export const useConfigStore = defineStore('config', () => {
     'proxiesCardSize',
     PROXIES_CARD_SIZE.COMFORTABLE,
   )
-  // Pin the group header to the top while scrolling a long expanded group.
-  // Default off (#2095): pinning it plus the page header froze ~half the screen
-  // on mobile, so let the header scroll away with the nodes. Opt in for pinning.
-  const stickyGroupHeader = useLocalStorage('stickyGroupHeader', false)
   const hideUnAvailableProxies = useLocalStorage(
     'hideUnAvailableProxies',
     false,
@@ -140,9 +136,7 @@ export const useConfigStore = defineStore('config', () => {
       localStorage.removeItem('useMobileConnectionsTable')
       try {
         return (JSON.parse(legacyRaw) === true ? 'table' : 'auto') as
-          | 'auto'
-          | 'table'
-          | 'card'
+          'auto' | 'table' | 'card'
       } catch {
         return 'auto' as const
       }
@@ -308,7 +302,6 @@ export const useConfigStore = defineStore('config', () => {
     proxiesDisplayMode.value = PROXIES_DISPLAY_MODE.CARD
     renderProxiesInTwoColumns.value = true
     proxiesCardSize.value = PROXIES_CARD_SIZE.COMFORTABLE
-    stickyGroupHeader.value = false
     hideUnAvailableProxies.value = false
     urlForLatencyTest.value = 'https://www.gstatic.com/generate_204'
     latencyTestUrlSource.value = 'core'
@@ -356,7 +349,6 @@ export const useConfigStore = defineStore('config', () => {
     proxiesDisplayMode,
     renderProxiesInTwoColumns,
     proxiesCardSize,
-    stickyGroupHeader,
     hideUnAvailableProxies,
     urlForLatencyTest,
     latencyTestUrlSource,

@@ -63,19 +63,6 @@ const cardGridStyle = computed(() => ({
   >
     <div
       class="flex cursor-pointer items-center justify-between p-4 pr-3 text-xl font-medium text-[var(--color-base-content)]"
-      :class="
-        configStore.stickyGroupHeader && isOpen
-          ? 'sticky top-0 z-20 rounded-t-xl backdrop-blur-sm'
-          : ''
-      "
-      :style="
-        configStore.stickyGroupHeader && isOpen
-          ? {
-              background:
-                'color-mix(in oklab, var(--color-base-200) 80%, transparent)',
-            }
-          : undefined
-      "
       @click="emit('collapse', !isOpen)"
     >
       <slot name="title" />
