@@ -29,6 +29,15 @@ export const useKernelStore = defineStore('kernel', () => {
   const restart = async () => {
     state.value = await useControlApi().restartKernel()
   }
+  // Recovery escape hatches for a config that bricks the kernel (#2109). Rollback
+  // restores the last-known-good .bak; recover resets to a minimal config. Both
+  // restart the kernel and echo the resulting state.
+  const rollback = async () => {
+    state.value = await useControlApi().rollbackKernel()
+  }
+  const recover = async () => {
+    state.value = await useControlApi().recoverKernel()
+  }
 
   const pushLog = (l: KernelLogLine) => {
     logs.value.push(l)
@@ -83,6 +92,8 @@ export const useKernelStore = defineStore('kernel', () => {
     start,
     stop,
     restart,
+    rollback,
+    recover,
     connectLogs,
     disconnectLogs,
     clearLogs,

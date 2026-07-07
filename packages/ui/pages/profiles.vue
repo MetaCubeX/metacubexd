@@ -44,6 +44,7 @@ const {
   saveScript,
   setEnabled,
   setScriptEnabled,
+  setUpdateInterval,
   load,
   validate,
   activate,
@@ -254,6 +255,23 @@ const onRefresh = (id: string) =>
   // refreshRemote toasts its own success/failure (incl. the "not remote" case).
   withBusy(`refresh:${id}`, () => refreshRemote(id))
 
+// Preset auto-update intervals (minutes). 0 disables; the AIO server scheduler
+// refreshes remote profiles whose interval has elapsed and re-activates the
+// active one so the new subscription takes effect (#2107). Desktop also ticks,
+// notifying on each refresh (apply stays manual there).
+const UPDATE_INTERVAL_PRESETS = [0, 30, 60, 360, 720, 1440] as const
+
+const onUpdateInterval = (p: ProfileMeta, event: Event) => {
+  const minutes = Number((event.target as HTMLSelectElement).value)
+  return withBusy(`interval:${p.id}`, async () => {
+    try {
+      await setUpdateInterval(p.id, minutes)
+    } catch (e) {
+      notifyError(e)
+    }
+  })
+}
+
 const onDuplicate = (p: ProfileMeta) =>
   withBusy(`duplicate:${p.id}`, async () => {
     try {
@@ -369,6 +387,39 @@ const onCopyShareUrl = async () => {
 
           <SubscriptionUsageCard :info="p.subscriptionInfo" />
 
+          <!-- Auto-update interval (remote only). The AIO server ticks every
+               minute and refreshes remote profiles whose interval elapsed; a
+               refreshed active profile re-activates so the new subscription
+               routes immediately (#2107). -->
+          <div
+            v-if="p.type === 'remote'"
+            class="mt-2 flex items-center gap-2 text-sm"
+          >
+            <label
+              class="text-base-content/60"
+              :for="`update-interval-${p.id}`"
+            >
+              {{ t('profilesAutoUpdate') }}
+            </label>
+            <select
+              :id="`update-interval-${p.id}`"
+              class="select-bordered select flex-1 select-xs"
+              :value="p.updateInterval ?? 0"
+              :disabled="isBusy(`interval:${p.id}`)"
+              @change="onUpdateInterval(p, $event)"
+            >
+              <option v-for="m in UPDATE_INTERVAL_PRESETS" :key="m" :value="m">
+                {{
+                  m === 0
+                    ? t('profilesAutoUpdateOff')
+                    : m < 60
+                      ? t('profilesAutoUpdateMinutes', { n: m })
+                      : t('profilesAutoUpdateHours', { n: m / 60 })
+                }}
+              </option>
+            </select>
+          </div>
+
           <div class="mt-3 flex flex-wrap gap-2">
             <Button
               class="btn-xs"
@@ -397,7 +448,7 @@ const onCopyShareUrl = async () => {
             </Button>
             <Button
               v-if="p.id !== activeBaseId"
-              class="btn-xs btn-success"
+              class="btn-success btn-xs"
               :icon="IconPlayerPlay"
               :loading="isBusy(`activate:${p.id}`)"
               @click="onActivate(p.id)"
@@ -413,7 +464,7 @@ const onCopyShareUrl = async () => {
               {{ t('profilesShare') }}
             </Button>
             <Button
-              class="btn-xs btn-error"
+              class="btn-error btn-xs"
               :icon="IconTrash"
               :loading="isBusy(`delete:${p.id}`)"
               @click="onRemove(p.id)"
@@ -447,7 +498,7 @@ const onCopyShareUrl = async () => {
               />
             </label>
             <Button
-              class="btn-sm btn-primary"
+              class="btn-primary btn-sm"
               :icon="IconPlus"
               :loading="isBusy('create')"
               @click="onCreate"
@@ -479,7 +530,7 @@ const onCopyShareUrl = async () => {
                   />
                 </label>
                 <Button
-                  class="btn-sm btn-primary"
+                  class="btn-primary btn-sm"
                   :icon="IconPlus"
                   :loading="isBusy('createMerge')"
                   @click="onCreateMerge"
@@ -525,7 +576,7 @@ const onCopyShareUrl = async () => {
                     {{ t('profilesEdit') }}
                   </Button>
                   <Button
-                    class="btn-xs btn-error"
+                    class="btn-error btn-xs"
                     :icon="IconTrash"
                     :loading="isBusy(`delete:${m.id}`)"
                     @click="onRemove(m.id)"
@@ -563,7 +614,7 @@ const onCopyShareUrl = async () => {
                   />
                 </label>
                 <Button
-                  class="btn-sm btn-primary"
+                  class="btn-primary btn-sm"
                   :icon="IconPlus"
                   :loading="isBusy('createScript')"
                   @click="onCreateScript"
@@ -609,7 +660,7 @@ const onCopyShareUrl = async () => {
                     {{ t('profilesEdit') }}
                   </Button>
                   <Button
-                    class="btn-xs btn-error"
+                    class="btn-error btn-xs"
                     :icon="IconTrash"
                     :loading="isBusy(`delete:${s.id}`)"
                     @click="onRemove(s.id)"
@@ -657,7 +708,7 @@ const onCopyShareUrl = async () => {
 
         <div class="mt-3 flex flex-wrap items-center gap-2">
           <Button
-            class="btn-sm btn-primary"
+            class="btn-primary btn-sm"
             :loading="isBusy('editor-save')"
             @click="onSave"
           >
@@ -713,7 +764,7 @@ const onCopyShareUrl = async () => {
 
         <div class="flex w-full items-center gap-2">
           <input
-            class="input-bordered input input-sm flex-1 font-mono text-xs"
+            class="input-bordered input flex-1 font-mono text-xs input-sm"
             :value="shareUrl"
             readonly
             :aria-label="t('profilesShareUrl')"

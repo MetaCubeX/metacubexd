@@ -1,9 +1,5 @@
 export type KernelStatus =
-  | 'stopped'
-  | 'starting'
-  | 'running'
-  | 'stopping'
-  | 'errored'
+  'stopped' | 'starting' | 'running' | 'stopping' | 'errored'
 
 export interface KernelState {
   status: KernelStatus
@@ -123,7 +119,14 @@ export interface ProfileStore {
   }) => Promise<ProfileMeta>
   update: (
     id: string,
-    p: { name?: string; content?: string; enabled?: boolean },
+    p: {
+      name?: string
+      content?: string
+      enabled?: boolean
+      // minutes; only meaningful for remote profiles (drives the scheduler).
+      // 0 disables auto-update; omit leaves the stored value untouched.
+      updateInterval?: number
+    },
   ) => Promise<ProfileMeta>
   delete: (id: string) => Promise<void>
   duplicate: (id: string, name?: string) => Promise<ProfileMeta>
@@ -131,6 +134,12 @@ export interface ProfileStore {
   refresh: (id: string) => Promise<ProfileMeta> // re-fetch a remote profile in place
   getActiveId: () => Promise<string | undefined>
   setActive: (id: string) => Promise<void> // validate + write activeConfigPath
+  // Restore the last-known-good active config (activeConfigPath.bak written by
+  // the previous setActive). Returns false when no backup exists (#2109).
+  rollback: () => Promise<boolean>
+  // Clear the active config to a minimal (header-only) file and drop activeId so
+  // a broken persisted config can't keep bricking the kernel on boot (#2109).
+  resetActive: () => Promise<void>
   // Read a single top-level key from a profile's parsed YAML (null if absent /
   // the content is not a mapping).
   getSection: (id: string, key: string) => Promise<unknown>

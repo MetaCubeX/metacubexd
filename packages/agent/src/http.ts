@@ -25,6 +25,7 @@ import {
   setResponseStatus,
 } from 'h3'
 import { fetchGeoAssets } from './kernel/geo'
+import { applyActiveRefresh } from './refresh-apply'
 import { TunPreconditionError } from './tun'
 import { createWebdavClient as defaultCreateWebdavClient } from './webdav'
 
@@ -125,6 +126,31 @@ export function createControlRouter(deps: ControlRouterDeps): App {
     `${PREFIX}/kernel/restart`,
     defineEventHandler(() => supervisor.restart()),
   )
+  // Restore the last-known-good active config (the .bak snapshot written by the
+  // previous setActive) and restart. Escape hatch for a config that bricks the
+  // kernel on boot/restart — a single bad subscription must not lock users out
+  // (#2109). 404 when no backup exists.
+  router.post(
+    `${PREFIX}/kernel/rollback`,
+    defineEventHandler(async (event) => {
+      const restored = await profiles.rollback()
+      if (!restored) {
+        setResponseStatus(event, 404)
+        return { error: 'no backup config to roll back to' }
+      }
+      return supervisor.restart()
+    }),
+  )
+  // Reset the active config to a minimal (header-only) file, drop activeId, and
+  // restart on mihomo defaults. Last-resort recovery when even the backup is bad
+  // — the dashboard reconnects and the user can re-import a profile (#2109).
+  router.post(
+    `${PREFIX}/kernel/recover`,
+    defineEventHandler(async () => {
+      await profiles.resetActive()
+      return supervisor.restart()
+    }),
+  )
 
   // ---- Kernel logs (SSE) ----
   router.get(
@@ -186,6 +212,8 @@ export function createControlRouter(deps: ControlRouterDeps): App {
         name?: string
         content?: string
         enabled?: boolean
+        // minutes; remote-only. 0 disables auto-update; omit leaves it untouched.
+        updateInterval?: number
       }
       return profiles.update(id, body)
     }),
@@ -219,7 +247,12 @@ export function createControlRouter(deps: ControlRouterDeps): App {
     `${PREFIX}/profiles/:id/refresh`,
     defineEventHandler(async (event) => {
       const id = getRouterParam(event, 'id')!
-      return profiles.refresh(id)
+      const meta = await profiles.refresh(id)
+      // If this profile IS the active base, re-activate + restart so the
+      // refreshed subscription actually routes instead of sitting in a stored
+      // file while the kernel keeps the stale config (#2108).
+      await applyActiveRefresh(profiles, supervisor, id)
+      return meta
     }),
   )
   router.post(

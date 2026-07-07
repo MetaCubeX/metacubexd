@@ -115,6 +115,16 @@ describe('composables/useProfiles', () => {
     expect(api.listProfiles).toHaveBeenCalled()
   })
 
+  it('setUpdateInterval() persists minutes then re-lists (#2107)', async () => {
+    api.updateProfile.mockResolvedValue(meta('a'))
+    const p = useProfiles()
+    await p.setUpdateInterval('a', 60)
+    expect(api.updateProfile).toHaveBeenCalledWith('a', {
+      updateInterval: 60,
+    })
+    expect(api.listProfiles).toHaveBeenCalled()
+  })
+
   it('validate() returns the validate result', async () => {
     api.validateProfile.mockResolvedValue({ valid: true, message: 'ok' })
     const p = useProfiles()

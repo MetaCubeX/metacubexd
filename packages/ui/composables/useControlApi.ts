@@ -69,6 +69,13 @@ export function useControlApi() {
     startKernel: () => client.post('kernel/start').json<KernelState>(),
     stopKernel: () => client.post('kernel/stop').json<KernelState>(),
     restartKernel: () => client.post('kernel/restart').json<KernelState>(),
+    // Restore the last-known-good active config (.bak from the previous
+    // activate) and restart — escape hatch for a config that bricks the kernel
+    // (#2109). 404s when no backup exists.
+    rollbackKernel: () => client.post('kernel/rollback').json<KernelState>(),
+    // Reset to a minimal (header-only) config + restart on mihomo defaults.
+    // Last-resort recovery when even the backup is bad (#2109).
+    recoverKernel: () => client.post('kernel/recover').json<KernelState>(),
     // EventSource cannot send Authorization headers, so the SSE route also
     // accepts ?token= (SHARED CONTRACTS). Desktop in-process binding skips
     // auth, but passing the token there is harmless.
@@ -88,9 +95,20 @@ export function useControlApi() {
       client.get(`profiles/${id}`).json<ProfileDetail>(),
     updateProfile: (
       id: string,
-      body: { name?: string; content?: string; enabled?: boolean },
+      body: {
+        name?: string
+        content?: string
+        enabled?: boolean
+        // minutes; remote-only. 0 disables auto-update.
+        updateInterval?: number
+      },
     ) => client.put(`profiles/${id}`, { json: body }).json<ProfileMeta>(),
-    deleteProfile: (id: string) => client.delete(`profiles/${id}`).json<void>(),
+    // DELETE returns 204 No Content — there is no body to parse. Chaining
+    // .json() on an empty 204 throws "Unexpected end of JSON input" and makes a
+    // successful delete look like a failure (#2110).
+    deleteProfile: async (id: string) => {
+      await client.delete(`profiles/${id}`)
+    },
     duplicateProfile: (id: string, name?: string) =>
       client
         .post(`profiles/${id}/duplicate`, { json: { name } })

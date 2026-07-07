@@ -245,6 +245,49 @@ describe('createProfileStore — merge profiles', () => {
     expect(reEnabled.enabled).toBe(true)
   })
 
+  it('update persists the auto-update interval (0 disables, undefined untouched)', async () => {
+    await store.create({ name: 'sub', content: 'a: 1\n' })
+    const set = await store.update('id1', { updateInterval: 60 })
+    expect(set.updateInterval).toBe(60)
+    expect((await store.list())[0]!.updateInterval).toBe(60)
+    // 0 is meaningful (disables), not "clear/omit".
+    const disabled = await store.update('id1', { updateInterval: 0 })
+    expect(disabled.updateInterval).toBe(0)
+  })
+
+  it('setActive snapshots the previous active config to active.yaml.bak', async () => {
+    await store.create({ name: 'a', content: 'mode: rule\n' })
+    await store.create({ name: 'b', content: 'mode: global\n' })
+    await store.setActive('id1')
+    // First activation: no prior file existed (active.yaml absent), so no bak.
+    await store.setActive('id2')
+    // Second activation: previous active.yaml ('mode: rule') snapshotted aside.
+    expect(readFileSync(`${activeConfigPath}.bak`, 'utf8')).toContain(
+      'mode: rule',
+    )
+    expect(readFileSync(activeConfigPath, 'utf8')).toContain('mode: global')
+  })
+
+  it('rollback restores the last-known-good config and reports presence', async () => {
+    // No backup yet => false, active.yaml untouched.
+    expect(await store.rollback()).toBe(false)
+    await store.create({ name: 'good', content: 'mode: rule\n' })
+    await store.create({ name: 'bad', content: 'mode: global\n' })
+    await store.setActive('id1')
+    await store.setActive('id2') // writes good config aside as .bak
+    expect(await store.rollback()).toBe(true)
+    expect(readFileSync(activeConfigPath, 'utf8')).toContain('mode: rule')
+  })
+
+  it('resetActive wipes active.yaml to empty and clears the active id', async () => {
+    await store.create({ name: 'a', content: 'mode: rule\n' })
+    await store.setActive('id1')
+    expect(await store.getActiveId()).toBe('id1')
+    await store.resetActive()
+    expect(readFileSync(activeConfigPath, 'utf8')).toBe('')
+    expect(await store.getActiveId()).toBeUndefined()
+  })
+
   it('setActive composes enabled merge overlays onto the base', async () => {
     await store.create({
       name: 'base',

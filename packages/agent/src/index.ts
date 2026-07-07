@@ -7,6 +7,7 @@ import type {
 import { createControlRouter } from './http'
 import { MIHOMO_VERSION } from './kernel/assets'
 import { createProfileStore } from './profiles'
+import { applyActiveRefresh } from './refresh-apply'
 import { createProfileScheduler } from './scheduler'
 import { createSupervisor } from './supervisor'
 
@@ -19,6 +20,7 @@ export { fetchKernel, listMihomoVersions } from './kernel/fetch-kernel'
 export { fetchGeoAssets, GEO_ASSET_URLS } from './kernel/geo'
 export { mergeConfigs } from './merge'
 export { createProfileStore } from './profiles'
+export { applyActiveRefresh } from './refresh-apply'
 export { createProfileScheduler } from './scheduler'
 export type {
   ProfileRefreshResult,
@@ -102,9 +104,27 @@ export function createAgent(opts: CreateAgentOptions) {
     kernelManager,
     tunController,
   })
-  // Wire the auto-update scheduler to the same profiles store. NOT started here —
-  // the desktop boot decides when to start ticking.
-  const scheduler = createProfileScheduler({ profiles })
+  // Wire the auto-update scheduler to the same profiles store. NOT started here
+  // — the server boot plugin starts it (the desktop builds its own scheduler so
+  // it can surface per-refresh notifications, and does NOT start this one).
+  //
+  // Auto-update should take effect, not just refresh a stored file: when a
+  // scheduled refresh hits the ACTIVE base, re-compose + restart so the running
+  // kernel actually picks up the new subscription (#2107). Best-effort and
+  // fire-and-forget (the scheduler never awaits onResult) — a failing apply must
+  // not wedge the tick loop; the next tick retries.
+  const scheduler = createProfileScheduler({
+    profiles,
+    onResult: (r) => {
+      if (!r.ok) return
+      // Auto-update should take effect, not just refresh a stored file: when a
+      // scheduled refresh hits the ACTIVE base, re-compose + restart so the
+      // running kernel picks up the new subscription (#2107). Best-effort and
+      // fire-and-forget (the scheduler never awaits onResult) — a failing apply
+      // must not wedge the tick loop; the next tick retries.
+      void applyActiveRefresh(profiles, supervisor, r.id).catch(() => {})
+    },
+  })
   return {
     supervisor,
     profiles,

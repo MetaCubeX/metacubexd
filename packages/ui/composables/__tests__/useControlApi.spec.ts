@@ -137,9 +137,26 @@ describe('composables/useControlApi methods', () => {
     })
   })
 
+  it('updateProfile() forwards updateInterval for auto-update (#2107)', async () => {
+    await useControlApi().updateProfile('id1', { updateInterval: 60 })
+    expect(put).toHaveBeenCalledWith('profiles/id1', {
+      json: { updateInterval: 60 },
+    })
+  })
+
   it('deleteProfile() DELETEs profiles/:id', async () => {
     await useControlApi().deleteProfile('id1')
     expect(del).toHaveBeenCalledWith('profiles/id1')
+  })
+
+  it('rollbackKernel() POSTs kernel/rollback (#2109)', async () => {
+    await useControlApi().rollbackKernel()
+    expect(post).toHaveBeenCalledWith('kernel/rollback')
+  })
+
+  it('recoverKernel() POSTs kernel/recover (#2109)', async () => {
+    await useControlApi().recoverKernel()
+    expect(post).toHaveBeenCalledWith('kernel/recover')
   })
 
   it('duplicateProfile() POSTs profiles/:id/duplicate', async () => {

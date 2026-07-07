@@ -90,6 +90,8 @@ function makeDeps(token?: string) {
     })),
     getActiveId: vi.fn(async (): Promise<string | undefined> => undefined),
     setActive: vi.fn(async () => {}),
+    rollback: vi.fn(async () => true),
+    resetActive: vi.fn(async () => {}),
     getSection: vi.fn(async (): Promise<unknown> => null),
     setSection: vi.fn(async () => {}),
   }
@@ -321,6 +323,76 @@ describe('createControlRouter — profiles + SSE', () => {
     expect(body.updatedAt).toBe(6)
   })
 
+  it('pOST /profiles/:id/refresh re-activates + restarts when the profile is the active base (#2108)', async () => {
+    const deps = makeDeps()
+    deps.profiles.getActiveId = vi.fn(async () => 'p1')
+    srv = await mount(deps)
+    const res = await fetch(`${srv.base}/api/control/profiles/p1/refresh`, {
+      method: 'POST',
+    })
+    expect(res.status).toBe(200)
+    expect(deps.profiles.setActive).toHaveBeenCalledWith('p1')
+    expect(deps.supervisor.restart).toHaveBeenCalledOnce()
+  })
+
+  it('pOST /profiles/:id/refresh does NOT apply when the profile is not active (#2108)', async () => {
+    const deps = makeDeps()
+    deps.profiles.getActiveId = vi.fn(async () => 'other')
+    srv = await mount(deps)
+    await fetch(`${srv.base}/api/control/profiles/p1/refresh`, {
+      method: 'POST',
+    })
+    expect(deps.profiles.setActive).not.toHaveBeenCalled()
+    expect(deps.supervisor.restart).not.toHaveBeenCalled()
+  })
+
+  it('pUT /api/control/profiles/:id passes through updateInterval (#2107)', async () => {
+    const deps = makeDeps()
+    srv = await mount(deps)
+    const res = await fetch(`${srv.base}/api/control/profiles/p1`, {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ updateInterval: 60 }),
+    })
+    expect(res.status).toBe(200)
+    expect(deps.profiles.update).toHaveBeenCalledWith('p1', {
+      updateInterval: 60,
+    })
+  })
+
+  it('pOST /api/control/kernel/rollback restores the backup + restarts (#2109)', async () => {
+    const deps = makeDeps()
+    srv = await mount(deps)
+    const res = await fetch(`${srv.base}/api/control/kernel/rollback`, {
+      method: 'POST',
+    })
+    expect(res.status).toBe(200)
+    expect(deps.profiles.rollback).toHaveBeenCalled()
+    expect(deps.supervisor.restart).toHaveBeenCalled()
+  })
+
+  it('pOST /api/control/kernel/rollback 404s when no backup exists (#2109)', async () => {
+    const deps = makeDeps()
+    deps.profiles.rollback = vi.fn(async () => false)
+    srv = await mount(deps)
+    const res = await fetch(`${srv.base}/api/control/kernel/rollback`, {
+      method: 'POST',
+    })
+    expect(res.status).toBe(404)
+    expect(deps.supervisor.restart).not.toHaveBeenCalled()
+  })
+
+  it('pOST /api/control/kernel/recover resets to minimal + restarts (#2109)', async () => {
+    const deps = makeDeps()
+    srv = await mount(deps)
+    const res = await fetch(`${srv.base}/api/control/kernel/recover`, {
+      method: 'POST',
+    })
+    expect(res.status).toBe(200)
+    expect(deps.profiles.resetActive).toHaveBeenCalled()
+    expect(deps.supervisor.restart).toHaveBeenCalled()
+  })
+
   it('pOST /api/control/profiles/:id/activate sets active then returns KernelState', async () => {
     const deps = makeDeps()
     srv = await mount(deps)
@@ -355,8 +427,7 @@ describe('createControlRouter — profiles + SSE', () => {
     const deps = makeDeps()
     // Capture the registered 'log' callback so we can drive a fake log line.
     let logCb:
-      | ((l: { stream: string; line: string; ts: number }) => void)
-      | undefined
+      ((l: { stream: string; line: string; ts: number }) => void) | undefined
     deps.supervisor.on = vi.fn((event: string, cb: never) => {
       if (event === 'log') logCb = cb as never
     }) as never

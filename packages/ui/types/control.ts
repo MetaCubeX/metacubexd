@@ -3,11 +3,7 @@
 // Mirror of @metacubexd/agent KernelStatus / KernelState (SHARED CONTRACTS).
 // UI-local copies: the UI builds standalone (gh-pages) and never imports the agent.
 export type KernelStatus =
-  | 'stopped'
-  | 'starting'
-  | 'running'
-  | 'stopping'
-  | 'errored'
+  'stopped' | 'starting' | 'running' | 'stopping' | 'errored'
 
 export interface KernelState {
   status: KernelStatus
@@ -39,6 +35,9 @@ export interface ProfileMeta {
   enabled?: boolean
   url?: string
   userAgent?: string
+  // minutes; remote-only. Drives the AIO server's auto-update scheduler (0 or
+  // undefined => auto-update off). SHARED CONTRACTS.
+  updateInterval?: number
   updatedAt: number
   subscriptionInfo?: ProfileSubscriptionInfo
 }

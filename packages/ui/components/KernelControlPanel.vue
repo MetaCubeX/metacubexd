@@ -1,6 +1,13 @@
 <!-- packages/ui/components/KernelControlPanel.vue -->
 <script setup lang="ts">
-import { IconPlayerPlay, IconPlayerStop, IconRefresh } from '@tabler/icons-vue'
+import {
+  IconArrowBackUp,
+  IconPlayerPlay,
+  IconPlayerStop,
+  IconRefresh,
+  IconRestore,
+} from '@tabler/icons-vue'
+import { toast } from 'vue-sonner'
 
 const { t } = useI18n()
 const { hasFeature, info } = useControlInfo()
@@ -66,6 +73,10 @@ const uptime = computed(() => {
 
 const canStart = computed(() => ['stopped', 'errored'].includes(status.value))
 const canStop = computed(() => status.value === 'running')
+// Surface the kernel's last failure reason when it is errored so a user can tell
+// a bad config from a port conflict or a readiness timeout — the bare 'errored'
+// badge otherwise hides the actionable detail (#2109).
+const lastError = computed(() => kernelStore.state?.lastError)
 
 const run = async (fn: () => Promise<unknown>) => {
   busy.value = true
@@ -74,6 +85,38 @@ const run = async (fn: () => Promise<unknown>) => {
   } finally {
     busy.value = false
   }
+}
+
+// Recovery escape hatches (#2109): a persisted bad active config can brick the
+// kernel across restarts. Rollback restores the last-known-good config; recover
+// resets to a minimal config. Both restart the kernel. Confirmed first because
+// both tear down the running routing state.
+const onRollback = () => {
+  if (!confirm(t('kernelRollbackConfirm'))) return
+  return run(async () => {
+    try {
+      await kernelStore.rollback()
+      toast.success(t('kernelRollbackApplied'))
+    } catch (e) {
+      toast.error(t('kernelRollbackFailed'), {
+        description: e instanceof Error ? e.message : String(e),
+      })
+    }
+  })
+}
+
+const onRecover = () => {
+  if (!confirm(t('kernelRecoverConfirm'))) return
+  return run(async () => {
+    try {
+      await kernelStore.recover()
+      toast.success(t('kernelRecoverApplied'))
+    } catch (e) {
+      toast.error(t('kernelRecoverFailed'), {
+        description: e instanceof Error ? e.message : String(e),
+      })
+    }
+  })
 }
 </script>
 
@@ -108,6 +151,16 @@ const run = async (fn: () => Promise<unknown>) => {
       </div>
     </div>
 
+    <!-- Surface the actionable failure reason (bad config vs port conflict vs
+         readiness timeout) so recovery isn't a guessing game (#2109). -->
+    <p
+      v-if="status === 'errored' && lastError"
+      class="mt-2 text-sm break-words text-error"
+      role="alert"
+    >
+      {{ lastError }}
+    </p>
+
     <div class="mt-3 flex flex-wrap gap-2">
       <Button
         class="btn-sm btn-success"
@@ -119,7 +172,7 @@ const run = async (fn: () => Promise<unknown>) => {
         {{ t('kernelStart') }}
       </Button>
       <Button
-        class="btn-sm btn-error"
+        class="btn-error btn-sm"
         :icon="IconPlayerStop"
         :disabled="!canStop"
         :loading="busy"
@@ -136,6 +189,26 @@ const run = async (fn: () => Promise<unknown>) => {
       >
         {{ t('kernelRestart') }}
       </Button>
+      <!-- Only meaningful once a bad config is in play: a stopped-but-never-
+           started kernel has nothing to roll back or reset away. -->
+      <template v-if="status === 'errored'">
+        <Button
+          class="btn-sm"
+          :icon="IconArrowBackUp"
+          :loading="busy"
+          @click="onRollback"
+        >
+          {{ t('kernelRollback') }}
+        </Button>
+        <Button
+          class="btn-error btn-sm"
+          :icon="IconRestore"
+          :loading="busy"
+          @click="onRecover"
+        >
+          {{ t('kernelRecover') }}
+        </Button>
+      </template>
     </div>
   </div>
 </template>

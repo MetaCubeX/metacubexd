@@ -101,6 +101,13 @@ export function useProfiles() {
     await api.updateProfile(id, { content })
     await refresh()
   }
+  // Persist a remote profile's auto-update interval (minutes; 0 disables). The
+  // AIO server scheduler refreshes remote profiles whose interval has elapsed;
+  // a refreshed active profile re-composes + restarts automatically (#2107).
+  const setUpdateInterval = async (id: string, minutes: number) => {
+    await api.updateProfile(id, { updateInterval: minutes })
+    await refresh()
+  }
   const load = (id: string): Promise<ProfileDetail> => api.getProfile(id)
   const validate = (id: string): Promise<ValidateResult> =>
     api.validateProfile(id)
@@ -199,6 +206,7 @@ export function useProfiles() {
     saveScript,
     setEnabled,
     setScriptEnabled,
+    setUpdateInterval,
     load,
     validate,
     activate,

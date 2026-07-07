@@ -2,7 +2,7 @@ import type { ScriptRunner } from './script'
 import type { ProfileMeta, ProfileStore } from './types'
 import { randomUUID } from 'node:crypto'
 import { existsSync } from 'node:fs'
-import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { copyFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { parse, stringify } from 'yaml'
 import { isPlainObject, mergeConfigs } from './merge'
@@ -130,6 +130,8 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
       if (p.content != null) await writeFile(profilePath(id), p.content)
       if (p.name != null) meta.name = p.name
       if (p.enabled != null) meta.enabled = p.enabled
+      // 0 is meaningful (disables auto-update) so distinguish it from omitted.
+      if (p.updateInterval != null) meta.updateInterval = p.updateInterval
       meta.updatedAt = Date.now()
       await writeIndex(list)
       return meta
@@ -243,8 +245,37 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
         content = stringify(obj)
       }
       await mkdir(join(activeConfigPath, '..'), { recursive: true })
+      // Snapshot the previous active config so /kernel/rollback can restore it
+      // when the new config bricks the kernel. The supervisor has not injected
+      // its header into the in-memory `content` yet, but rollback feeds the file
+      // straight back into restart() which re-injects — so the header round-trips.
+      if (existsSync(activeConfigPath)) {
+        await copyFile(activeConfigPath, `${activeConfigPath}.bak`)
+      }
       await writeFile(activeConfigPath, content)
       await writeState({ activeId: id })
+    },
+
+    async rollback() {
+      const bak = `${activeConfigPath}.bak`
+      if (!existsSync(bak)) return false
+      await mkdir(join(activeConfigPath, '..'), { recursive: true })
+      await copyFile(bak, activeConfigPath)
+      return true
+    },
+
+    async resetActive() {
+      await mkdir(join(activeConfigPath, '..'), { recursive: true })
+      // Keep the broken config aside (same .bak channel) so an operator can still
+      // inspect it on the volume after a reset-to-minimal recovery.
+      if (existsSync(activeConfigPath)) {
+        await copyFile(activeConfigPath, `${activeConfigPath}.bak`)
+      }
+      // Empty body => the supervisor's injectClashConfig writes just its managed
+      // header (external-controller/secret/mixed-port) and mihomo runs on its
+      // defaults — enough for the dashboard to reconnect and re-import a profile.
+      await writeFile(activeConfigPath, '')
+      await writeState({})
     },
 
     async getSection(id, key) {

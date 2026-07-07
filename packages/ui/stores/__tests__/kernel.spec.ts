@@ -9,6 +9,8 @@ const api = {
   startKernel: vi.fn(),
   stopKernel: vi.fn(),
   restartKernel: vi.fn(),
+  rollbackKernel: vi.fn(),
+  recoverKernel: vi.fn(),
   logsUrl: vi.fn(() => 'http://x/api/control/kernel/logs?token=t'),
 }
 vi.mock('~/composables/useControlApi', () => ({
@@ -50,6 +52,18 @@ describe('stores/kernel', () => {
     expect(store.state?.status).toBe('stopped')
     await store.restart()
     expect(store.state?.status).toBe('running')
+  })
+
+  it('rollback/recover store the returned state (#2109)', async () => {
+    api.rollbackKernel.mockResolvedValue({ ...running, pid: 1 })
+    api.recoverKernel.mockResolvedValue({ ...running, pid: 2 })
+    const store = useKernelStore()
+    await store.rollback()
+    expect(api.rollbackKernel).toHaveBeenCalled()
+    expect(store.state?.pid).toBe(1)
+    await store.recover()
+    expect(api.recoverKernel).toHaveBeenCalled()
+    expect(store.state?.pid).toBe(2)
   })
 
   it('connectLogs appends log frames and updates state from state frames', () => {

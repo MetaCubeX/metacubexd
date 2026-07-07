@@ -13,7 +13,7 @@ import { getAgent } from '../lib/supervisor'
 // active config (external-controller/secret/mixed-port) and mihomo runs on its
 // defaults — enough for the dashboard to connect; importing a profile restarts it.
 export default defineNitroPlugin(() => {
-  const { supervisor } = getAgent()
+  const { supervisor, scheduler } = getAgent()
   console.log('[kernel] starting bundled mihomo on boot…')
   supervisor
     .start()
@@ -21,4 +21,12 @@ export default defineNitroPlugin(() => {
       console.log(`[kernel] ${s.status}${s.pid ? ` (pid ${s.pid})` : ''}`),
     )
     .catch((err) => console.error('[kernel] failed to start on boot:', err))
+
+  // Drive subscription auto-update: remote profiles whose updateInterval has
+  // elapsed refresh on each 60s tick, and the active one re-composes + restarts
+  // so the new subscription takes effect without external cron (#2107). The
+  // desktop builds its own scheduler (with notifications); only the server uses
+  // the agent's, so starting it here is server-only behavior.
+  scheduler.start()
+  console.log('[profiles] auto-update scheduler started')
 })
