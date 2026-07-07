@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.266.0](https://github.com/MetaCubeX/metacubexd/compare/v1.265.2...v1.266.0) (2026-07-07)
+
+
+### Features
+
+* **server:** wire profile auto-update, refresh-apply, and kernel rollback/recover ([62d3855](https://github.com/MetaCubeX/metacubexd/commit/62d3855d7d5be6b645504b1a9e11dbd63afe20c4))
+
 ## [1.265.2](https://github.com/MetaCubeX/metacubexd/compare/v1.265.1...v1.265.2) (2026-07-05)
 
 
