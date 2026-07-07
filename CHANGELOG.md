@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.266.1](https://github.com/MetaCubeX/metacubexd/compare/v1.266.0...v1.266.1) (2026-07-07)
+
+
+### Bug Fixes
+
+* **server:** separate refresh/apply endpoints and validate before activate ([c3f56c1](https://github.com/MetaCubeX/metacubexd/commit/c3f56c16e23fc9fbbe4a584bcd6c904e8fe30079))
+
 ## [1.266.0](https://github.com/MetaCubeX/metacubexd/compare/v1.265.2...v1.266.0) (2026-07-07)
 
 
