@@ -561,6 +561,7 @@
   "profilesImportFailed": "Failed to import subscription",
   "profilesAdvanced": "Advanced",
   "profilesRefresh": "Refresh",
+  "profilesRefreshAndApply": "Refresh and apply",
   "profilesRefreshed": "Subscription refreshed",
   "profilesRefreshFailed": "Failed to refresh subscription",
   "profilesAutoUpdate": "Auto-update",

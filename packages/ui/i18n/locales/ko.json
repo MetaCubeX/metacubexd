@@ -561,6 +561,7 @@
   "profilesImportFailed": "구독 가져오기에 실패했습니다",
   "profilesAdvanced": "고급",
   "profilesRefresh": "새로고침",
+  "profilesRefreshAndApply": "새로고침 후 적용",
   "profilesRefreshed": "구독을 새로고침했습니다",
   "profilesRefreshFailed": "구독 새로고침에 실패했습니다",
   "profilesAutoUpdate": "자동 업데이트",

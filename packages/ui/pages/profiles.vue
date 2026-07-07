@@ -39,6 +39,7 @@ const {
   duplicate,
   remove,
   refreshRemote,
+  refreshAndApply,
   save,
   saveMerge,
   saveScript,
@@ -255,6 +256,12 @@ const onRefresh = (id: string) =>
   // refreshRemote toasts its own success/failure (incl. the "not remote" case).
   withBusy(`refresh:${id}`, () => refreshRemote(id))
 
+// Refresh + apply: re-fetch the subscription and re-compose + restart so the
+// new nodes actually route (#2108). Separate from onRefresh, which only updates
+// storage. refreshAndApply toasts its own success/failure.
+const onRefreshAndApply = (id: string) =>
+  withBusy(`refresh-apply:${id}`, () => refreshAndApply(id))
+
 // Preset auto-update intervals (minutes). 0 disables; the AIO server scheduler
 // refreshes remote profiles whose interval has elapsed and re-activates the
 // active one so the new subscription takes effect (#2107). Desktop also ticks,
@@ -437,6 +444,15 @@ const onCopyShareUrl = async () => {
               @click="onRefresh(p.id)"
             >
               {{ t('profilesRefresh') }}
+            </Button>
+            <Button
+              v-if="p.type === 'remote'"
+              class="btn-success btn-xs"
+              :icon="IconRefresh"
+              :loading="isBusy(`refresh-apply:${p.id}`)"
+              @click="onRefreshAndApply(p.id)"
+            >
+              {{ t('profilesRefreshAndApply') }}
             </Button>
             <Button
               class="btn-xs"

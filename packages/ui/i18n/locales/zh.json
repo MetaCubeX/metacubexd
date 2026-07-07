@@ -561,6 +561,7 @@
   "profilesImportFailed": "导入订阅失败",
   "profilesAdvanced": "高级",
   "profilesRefresh": "刷新",
+  "profilesRefreshAndApply": "刷新并应用",
   "profilesRefreshed": "订阅已刷新",
   "profilesRefreshFailed": "刷新订阅失败",
   "profilesAutoUpdate": "自动更新",

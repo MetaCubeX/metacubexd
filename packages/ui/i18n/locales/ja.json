@@ -561,6 +561,7 @@
   "profilesImportFailed": "サブスクリプションのインポートに失敗しました",
   "profilesAdvanced": "詳細設定",
   "profilesRefresh": "更新",
+  "profilesRefreshAndApply": "更新して適用",
   "profilesRefreshed": "サブスクリプションを更新しました",
   "profilesRefreshFailed": "サブスクリプションの更新に失敗しました",
   "profilesAutoUpdate": "自動更新",

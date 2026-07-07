@@ -120,10 +120,17 @@ export function useControlApi() {
     activateProfile: (id: string) =>
       client.post(`profiles/${id}/activate`).json<KernelState>(),
     // Re-fetch a REMOTE subscription in place (agent overwrites content +
-    // subscriptionInfo + updatedAt, keeping the same id). The agent rejects this
-    // for non-remote profiles.
+    // subscriptionInfo + updatedAt, keeping the same id). Pure refresh — it does
+    // NOT touch the running config; use refreshAndActivateProfile to apply.
     refreshProfile: (id: string) =>
       client.post(`profiles/${id}/refresh`).json<ProfileMeta>(),
+    // Combined refresh + apply: re-fetch, compose into active.yaml, validate,
+    // and restart. The action users expect from "refresh and make it take
+    // effect" (#2108). Returns the refreshed meta and the resulting state.
+    refreshAndActivateProfile: (id: string) =>
+      client
+        .post(`profiles/${id}/refresh-and-activate`)
+        .json<{ meta: ProfileMeta; kernel: KernelState }>(),
     validateProfile: (id: string) =>
       client.post(`profiles/${id}/validate`).json<ValidateResult>(),
 

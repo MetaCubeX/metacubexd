@@ -97,6 +97,23 @@ export function useProfiles() {
       return false
     }
   }
+  // Refresh + apply: re-fetch the subscription AND re-compose it into the active
+  // config + restart the kernel so the new nodes/rules actually route (#2108).
+  // Distinct from refreshRemote (which only updates storage). A failed validation
+  // surfaces as a toast; the agent restores the prior config in that case.
+  const refreshAndApply = async (id: string): Promise<boolean> => {
+    try {
+      await api.refreshAndActivateProfile(id)
+      await refresh()
+      toast.success(t('profilesRefreshed'))
+      return true
+    } catch (e) {
+      toast.error(t('profilesRefreshFailed'), {
+        description: e instanceof Error ? e.message : String(e),
+      })
+      return false
+    }
+  }
   const save = async (id: string, content: string) => {
     await api.updateProfile(id, { content })
     await refresh()
@@ -201,6 +218,7 @@ export function useProfiles() {
     remove,
     importUrl,
     refreshRemote,
+    refreshAndApply,
     save,
     saveMerge,
     saveScript,

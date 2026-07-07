@@ -103,7 +103,8 @@ function makeDeps(token?: string) {
     features: ['profiles', 'logs-sse', 'kernel-control'],
   }))
   const homeDir = mkdtempSync(join(tmpdir(), 'mcxd-http-'))
-  return { supervisor, profiles, info, homeDir, token }
+  const activeConfigPath = join(homeDir, 'active.yaml')
+  return { supervisor, profiles, info, homeDir, activeConfigPath, token }
 }
 
 async function mount(deps: ReturnType<typeof makeDeps>) {
@@ -323,7 +324,7 @@ describe('createControlRouter — profiles + SSE', () => {
     expect(body.updatedAt).toBe(6)
   })
 
-  it('pOST /profiles/:id/refresh re-activates + restarts when the profile is the active base (#2108)', async () => {
+  it('pOST /api/control/profiles/:id/refresh is a pure re-fetch (no apply)', async () => {
     const deps = makeDeps()
     deps.profiles.getActiveId = vi.fn(async () => 'p1')
     srv = await mount(deps)
@@ -331,18 +332,49 @@ describe('createControlRouter — profiles + SSE', () => {
       method: 'POST',
     })
     expect(res.status).toBe(200)
-    expect(deps.profiles.setActive).toHaveBeenCalledWith('p1')
-    expect(deps.supervisor.restart).toHaveBeenCalledOnce()
+    expect(deps.profiles.refresh).toHaveBeenCalledWith('p1')
+    // Pure refresh never touches the running config — apply is a separate action.
+    expect(deps.profiles.setActive).not.toHaveBeenCalled()
+    expect(deps.supervisor.restart).not.toHaveBeenCalled()
   })
 
-  it('pOST /profiles/:id/refresh does NOT apply when the profile is not active (#2108)', async () => {
+  it('pOST /profiles/:id/refresh-and-activate refreshes, activates (validates), and restarts (#2108)', async () => {
     const deps = makeDeps()
-    deps.profiles.getActiveId = vi.fn(async () => 'other')
     srv = await mount(deps)
-    await fetch(`${srv.base}/api/control/profiles/p1/refresh`, {
-      method: 'POST',
-    })
-    expect(deps.profiles.setActive).not.toHaveBeenCalled()
+    const res = await fetch(
+      `${srv.base}/api/control/profiles/p1/refresh-and-activate`,
+      { method: 'POST' },
+    )
+    expect(res.status).toBe(200)
+    expect(deps.profiles.refresh).toHaveBeenCalledWith('p1')
+    expect(deps.profiles.setActive).toHaveBeenCalledWith('p1')
+    expect(deps.supervisor.validate).toHaveBeenCalledWith(deps.activeConfigPath)
+    expect(deps.supervisor.restart).toHaveBeenCalledOnce()
+    const body = (await res.json()) as {
+      meta: { id: string; type: string }
+      kernel: { status: string }
+    }
+    expect(body.meta.id).toBe('p1')
+    expect(body.meta.type).toBe('remote')
+    expect(body.kernel.status).toBe('running')
+  })
+
+  it('pOST /profiles/:id/refresh-and-activate returns 400 + restores prior when validation fails (#2109)', async () => {
+    const deps = makeDeps()
+    deps.profiles.getActiveId = vi.fn(async () => 'old')
+    deps.supervisor.validate = vi.fn(async () => ({
+      valid: false,
+      message: 'parse error near line 3',
+    }))
+    srv = await mount(deps)
+    const res = await fetch(
+      `${srv.base}/api/control/profiles/p1/refresh-and-activate`,
+      { method: 'POST' },
+    )
+    expect(res.status).toBe(400)
+    // New (bad) candidate composed, then prior profile restored.
+    expect(deps.profiles.setActive).toHaveBeenCalledWith('p1')
+    expect(deps.profiles.setActive).toHaveBeenCalledWith('old')
     expect(deps.supervisor.restart).not.toHaveBeenCalled()
   })
 
@@ -393,17 +425,36 @@ describe('createControlRouter — profiles + SSE', () => {
     expect(deps.supervisor.restart).toHaveBeenCalled()
   })
 
-  it('pOST /api/control/profiles/:id/activate sets active then returns KernelState', async () => {
+  it('pOST /api/control/profiles/:id/activate validates the composed config before restarting (#2109)', async () => {
     const deps = makeDeps()
     srv = await mount(deps)
     const res = await fetch(`${srv.base}/api/control/profiles/p1/activate`, {
       method: 'POST',
     })
     expect(deps.profiles.setActive).toHaveBeenCalledWith('p1')
+    expect(deps.supervisor.validate).toHaveBeenCalledWith(deps.activeConfigPath)
     expect(deps.supervisor.restart).toHaveBeenCalledOnce()
     expect(((await res.json()) as Record<string, unknown>).status).toBe(
       'running',
     )
+  })
+
+  it('pOST /api/control/profiles/:id/activate returns 400 + restores prior active when validation fails (#2109)', async () => {
+    const deps = makeDeps()
+    deps.profiles.getActiveId = vi.fn(async () => 'old')
+    deps.supervisor.validate = vi.fn(async () => ({
+      valid: false,
+      message: 'parse error near line 3',
+    }))
+    srv = await mount(deps)
+    const res = await fetch(`${srv.base}/api/control/profiles/p1/activate`, {
+      method: 'POST',
+    })
+    expect(res.status).toBe(400)
+    expect(deps.profiles.setActive).toHaveBeenCalledWith('p1')
+    // Prior profile restored so the bad candidate does not persist.
+    expect(deps.profiles.setActive).toHaveBeenCalledWith('old')
+    expect(deps.supervisor.restart).not.toHaveBeenCalled()
   })
 
   it('pOST /api/control/profiles/:id/validate materializes a temp candidate then returns { valid, message }', async () => {

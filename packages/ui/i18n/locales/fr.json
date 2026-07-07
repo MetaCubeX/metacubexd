@@ -561,6 +561,7 @@
   "profilesImportFailed": "Échec de l'importation de l'abonnement",
   "profilesAdvanced": "Avancé",
   "profilesRefresh": "Actualiser",
+  "profilesRefreshAndApply": "Actualiser et appliquer",
   "profilesRefreshed": "Abonnement actualisé",
   "profilesRefreshFailed": "Échec de l'actualisation de l'abonnement",
   "profilesAutoUpdate": "Mise à jour auto.",

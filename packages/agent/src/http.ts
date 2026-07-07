@@ -25,7 +25,6 @@ import {
   setResponseStatus,
 } from 'h3'
 import { fetchGeoAssets } from './kernel/geo'
-import { applyActiveRefresh } from './refresh-apply'
 import { TunPreconditionError } from './tun'
 import { createWebdavClient as defaultCreateWebdavClient } from './webdav'
 
@@ -177,6 +176,32 @@ export function createControlRouter(deps: ControlRouterDeps): App {
     }),
   )
 
+  // Validate a freshly composed active config BEFORE restarting, so an invalid
+  // candidate cannot replace the running config and brick the kernel across
+  // restarts (#2109). On failure, restore the prior state (previous active id,
+  // or the last-known-good .bak snapshot written by setActive when there was no
+  // prior active profile) and surface the validator's message as a clean 400.
+  async function safeActivate(id: string): Promise<KernelState> {
+    const previousActiveId = await profiles.getActiveId()
+    await profiles.setActive(id)
+    const validation = await supervisor.validate(activeConfigPath)
+    if (validation.valid) return supervisor.restart()
+    if (previousActiveId && previousActiveId !== id) {
+      // Re-compose the previously-active profile (best-effort — a failure here
+      // must not mask the original validation error).
+      await profiles.setActive(previousActiveId).catch(() => {})
+    } else {
+      // No prior profile to fall back to (first activation) or re-activating the
+      // same id: restore the pre-activation file from the .bak snapshot.
+      await profiles.rollback().catch(() => {})
+    }
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'profile validation failed',
+      data: { error: validation.message },
+    })
+  }
+
   // ---- Profiles ----
   router.get(
     `${PREFIX}/profiles`,
@@ -247,20 +272,31 @@ export function createControlRouter(deps: ControlRouterDeps): App {
     `${PREFIX}/profiles/:id/refresh`,
     defineEventHandler(async (event) => {
       const id = getRouterParam(event, 'id')!
+      // Pure refresh: re-fetch the remote subscription in place and return the
+      // updated meta. This does NOT touch the running config — pair it with
+      // activate, or use /refresh-and-activate for a combined apply (#2108).
+      return profiles.refresh(id)
+    }),
+  )
+  // Combined refresh + apply: re-fetch the subscription, compose it into
+  // active.yaml, validate, and restart — the action users expect from "refresh
+  // my subscription and make it take effect" (#2108). Returns both the refreshed
+  // meta and the resulting KernelState. Kept separate from /refresh so the pure
+  // re-fetch path keeps its stable ProfileMeta response shape.
+  router.post(
+    `${PREFIX}/profiles/:id/refresh-and-activate`,
+    defineEventHandler(async (event) => {
+      const id = getRouterParam(event, 'id')!
       const meta = await profiles.refresh(id)
-      // If this profile IS the active base, re-activate + restart so the
-      // refreshed subscription actually routes instead of sitting in a stored
-      // file while the kernel keeps the stale config (#2108).
-      await applyActiveRefresh(profiles, supervisor, id)
-      return meta
+      const kernel = await safeActivate(id)
+      return { meta, kernel }
     }),
   )
   router.post(
     `${PREFIX}/profiles/:id/activate`,
     defineEventHandler(async (event) => {
       const id = getRouterParam(event, 'id')!
-      await profiles.setActive(id)
-      return supervisor.restart()
+      return safeActivate(id)
     }),
   )
   router.post(

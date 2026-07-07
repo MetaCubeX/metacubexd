@@ -13,6 +13,7 @@ const api = {
   importProfile: vi.fn(),
   activateProfile: vi.fn(),
   refreshProfile: vi.fn(),
+  refreshAndActivateProfile: vi.fn(),
   validateProfile: vi.fn(),
 }
 vi.mock('../useControlApi', () => ({ useControlApi: () => api }))
@@ -343,6 +344,32 @@ describe('composables/useProfiles', () => {
       )
       const p = useProfiles()
       const ok = await p.refreshRemote('local1')
+      expect(toast.error).toHaveBeenCalled()
+      expect(ok).toBe(false)
+    })
+  })
+
+  describe('refreshAndApply', () => {
+    it('refreshes + applies, re-lists, toasts success, returns true (#2108)', async () => {
+      api.refreshAndActivateProfile.mockResolvedValue({
+        meta: meta('a'),
+        kernel: { status: 'running' },
+      })
+      api.listProfiles.mockResolvedValue([meta('a')])
+      const p = useProfiles()
+      const ok = await p.refreshAndApply('a')
+      expect(api.refreshAndActivateProfile).toHaveBeenCalledWith('a')
+      expect(api.listProfiles).toHaveBeenCalled()
+      expect(toast.success).toHaveBeenCalled()
+      expect(ok).toBe(true)
+    })
+
+    it('surfaces a failed apply (e.g. validation) via toast.error, returns false', async () => {
+      api.refreshAndActivateProfile.mockRejectedValue(
+        new Error('profile validation failed'),
+      )
+      const p = useProfiles()
+      const ok = await p.refreshAndApply('a')
       expect(toast.error).toHaveBeenCalled()
       expect(ok).toBe(false)
     })
