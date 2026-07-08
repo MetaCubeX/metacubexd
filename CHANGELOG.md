@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.267.0](https://github.com/MetaCubeX/metacubexd/compare/v1.266.1...v1.267.0) (2026-07-08)
+
+
+### Features
+
+* **agent:** persist an explicitly applied system-proxy bypass list ([dcd1f33](https://github.com/MetaCubeX/metacubexd/commit/dcd1f33366563f797e790a96cf02f4cb2324813c))
+* **desktop:** tray/menu overhaul, close-to-tray, on-disk logs, login item, update check ([68f9d31](https://github.com/MetaCubeX/metacubexd/commit/68f9d31246c729b7244476fad4dbc293d7918773))
+
 ## [1.266.1](https://github.com/MetaCubeX/metacubexd/compare/v1.266.0...v1.266.1) (2026-07-07)
 
 
