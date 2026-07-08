@@ -31,7 +31,7 @@ catalog:
   byte-size: ^9.0.1
   commitlint: ^21.2.0
   d3: ^7.9.0
-  daisyui: ^5.6.13
+  daisyui: ^5.6.14
   dayjs: ^1.11.21
   eslint: ^10.6.0
   eslint-plugin-format: ^2.0.1
@@ -53,13 +53,13 @@ catalog:
   typescript: ^6.0.3
   uqr: ^0.1.2
   vite: 8.1.3
-  vitest: ^4.1.9
+  vitest: ^4.1.10
   vue: ^3.5.39
   vue-router: ^5.1.0
   vue-sonner: ^2.0.9
   vue-tsc: ^3.3.6
   '@vite-pwa/nuxt': ^1.1.1
-  '@vitest/coverage-v8': ^4.1.9
+  '@vitest/coverage-v8': ^4.1.10
   jsdom: ^29.1.1
   # NEW-SUBSYSTEM deps (consumed by the future agent/server/desktop packages
   # in plans 02-05, NOT by packages/ui). These are brand-new catalog entries
@@ -70,7 +70,7 @@ catalog:
   tree-kill: ^1.2.2
   yaml: ^2.9.0
   nitropack: ^2.12.6
-  electron: ^43.0.0
+  electron: ^43.1.0
   electron-vite: ^5.0.0
   electron-builder: ^26.0.0
   # Flips Electron's runtime fuses on the packaged binary via an afterPack hook
