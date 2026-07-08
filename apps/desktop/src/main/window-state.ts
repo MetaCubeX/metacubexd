@@ -3,13 +3,18 @@ import type { FsLike } from './paths'
 /**
  * Persisted main-window geometry. `width`/`height` are always present; `x`/`y`
  * are optional so a first run (or a sanitized-away position) lets Electron
- * center the window on the primary display.
+ * center the window on the primary display. `maximized` restores the
+ * maximize state on reopen (width/height then hold the NORMAL bounds, from
+ * getNormalBounds, so un-maximizing lands where the user left it). `zoomLevel`
+ * carries the Chromium zoom (Cmd/Ctrl +/-) across sessions.
  */
 export interface WindowBounds {
   width: number
   height: number
   x?: number
   y?: number
+  maximized?: boolean
+  zoomLevel?: number
 }
 
 /**
@@ -34,6 +39,10 @@ export const MIN_WINDOW_BOUNDS = { width: 800, height: 600 } as const
 const MIN_SIZE = 1
 const MAX_SIZE = 100_000
 const MAX_POSITION_ABS = 1_000_000
+// Chromium's practical zoom-level range (level, not factor; 0 = 100%). A
+// persisted value outside this came from a corrupt file — drop it rather than
+// render the app microscopic/unusable.
+const MAX_ZOOM_LEVEL_ABS = 9
 
 function isSaneSize(value: unknown): value is number {
   return (
@@ -52,11 +61,21 @@ function isSanePosition(value: unknown): value is number {
   )
 }
 
+function isSaneZoomLevel(value: unknown): value is number {
+  return (
+    typeof value === 'number' &&
+    Number.isFinite(value) &&
+    Math.abs(value) <= MAX_ZOOM_LEVEL_ABS
+  )
+}
+
 /**
  * Clamp/replace invalid bounds against `defaults`. A NaN / non-positive /
  * absurdly-large width or height falls back to the default; a NaN / non-finite
  * / absurdly off-screen `x` or `y` is dropped entirely (so Electron centers the
- * window) rather than positioning it somewhere unreachable.
+ * window) rather than positioning it somewhere unreachable. `maximized` is kept
+ * only when literally `true`; `zoomLevel` only when a finite number inside
+ * Chromium's real range — anything else restores the 100% default.
  */
 export function sanitizeBounds(
   bounds: WindowBounds,
@@ -69,6 +88,10 @@ export function sanitizeBounds(
   if (isSanePosition(bounds.x) && isSanePosition(bounds.y)) {
     result.x = bounds.x
     result.y = bounds.y
+  }
+  if (bounds.maximized === true) result.maximized = true
+  if (isSaneZoomLevel(bounds.zoomLevel) && bounds.zoomLevel !== 0) {
+    result.zoomLevel = bounds.zoomLevel
   }
   return result
 }

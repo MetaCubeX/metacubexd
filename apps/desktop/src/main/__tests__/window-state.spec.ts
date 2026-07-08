@@ -147,4 +147,62 @@ describe('sanitizeBounds', () => {
       ),
     ).toEqual({ width: 800, height: 600 })
   })
+
+  it('keeps maximized only when literally true', () => {
+    expect(
+      sanitizeBounds({ width: 800, height: 600, maximized: true }, defaults)
+        .maximized,
+    ).toBe(true)
+    expect(
+      'maximized' in
+        sanitizeBounds({ width: 800, height: 600, maximized: false }, defaults),
+    ).toBe(false)
+    expect(
+      'maximized' in
+        sanitizeBounds(
+          { width: 800, height: 600, maximized: 'yes' as unknown as boolean },
+          defaults,
+        ),
+    ).toBe(false)
+  })
+
+  it('keeps a sane zoomLevel and drops garbage / out-of-range ones', () => {
+    expect(
+      sanitizeBounds({ width: 800, height: 600, zoomLevel: 2 }, defaults)
+        .zoomLevel,
+    ).toBe(2)
+    expect(
+      sanitizeBounds({ width: 800, height: 600, zoomLevel: -1.5 }, defaults)
+        .zoomLevel,
+    ).toBe(-1.5)
+    for (const bad of [Number.NaN, Number.POSITIVE_INFINITY, 50, -50]) {
+      expect(
+        'zoomLevel' in
+          sanitizeBounds({ width: 800, height: 600, zoomLevel: bad }, defaults),
+      ).toBe(false)
+    }
+  })
+
+  it('omits a zero (default) zoomLevel to keep the state file minimal', () => {
+    expect(
+      'zoomLevel' in
+        sanitizeBounds({ width: 800, height: 600, zoomLevel: 0 }, defaults),
+    ).toBe(false)
+  })
+})
+
+describe('maximized/zoom round-trip', () => {
+  it('persists and restores maximized + zoomLevel through save/load', () => {
+    const { fs } = fakeFs({})
+    const bounds: WindowBounds = {
+      width: 1440,
+      height: 900,
+      x: 10,
+      y: 20,
+      maximized: true,
+      zoomLevel: 1,
+    }
+    saveWindowState(fs, PATH, bounds)
+    expect(loadWindowState(fs, PATH, DEFAULT_WINDOW_BOUNDS)).toEqual(bounds)
+  })
 })

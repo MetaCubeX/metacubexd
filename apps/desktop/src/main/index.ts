@@ -10,13 +10,17 @@ import type { HelperKernelStartOptions } from './helper/server'
 import type { FsLike } from './paths'
 import { exec as nodeExec } from 'node:child_process'
 import {
+  appendFileSync,
   chmodSync,
   existsSync,
   mkdirSync,
   readFileSync,
+  renameSync,
+  statSync,
+  unlinkSync,
   writeFileSync,
 } from 'node:fs'
-import { join } from 'node:path'
+import { join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
 import {
@@ -27,6 +31,7 @@ import {
 import {
   app,
   BrowserWindow,
+  clipboard,
   dialog,
   globalShortcut,
   ipcMain,
@@ -48,16 +53,20 @@ import { createHelperInstaller } from './helper/installer'
 import { resolveHelperEntry } from './helper/paths'
 import { loadHotkeyBindings, registerHotkeys } from './hotkeys'
 import { createKernelManager } from './kernel-manager'
+import { createLogFileSink } from './log-file'
+import { createLoginItemController } from './login-item'
 import { createKernelCrashWatcher, createNotifier } from './notifier'
 import { bootstrapDataDir } from './paths'
+import { buildProxyEnvCommand } from './proxy-env'
 import { makeToken } from './secrets'
 import { createShutdownOrchestrator } from './shutdown-orchestrator'
 import { shouldStartHidden } from './startup'
 import { createSystemProxyController } from './sysproxy'
-import { readSysProxyBypass } from './sysproxy-config'
+import { readSysProxyBypass, writeSysProxyBypass } from './sysproxy-config'
 import { createSysproxyGuard } from './sysproxy-guard'
 import { createTray, trayIconPath } from './tray'
 import { createTunRuntime } from './tun-runtime'
+import { checkForUpdates } from './update-check'
 import { registerWindowControls } from './window-controls'
 import { applyWindowSecurity } from './window-security'
 import {
@@ -175,6 +184,20 @@ let tunController: TunController | null = null
 // when active. Built in boot() from the tun-runtime; backs both the UI
 // "recover network" action and the quit/crash paths.
 let tunTeardown: ReturnType<typeof createTunRuntime>['teardown'] | null = null
+// On-disk app event log (userData/logs/app.log): every notify() plus uncaught
+// errors, so post-mortem support has more than a vanished toast. Created in
+// boot(); notify() tolerates it being null before that.
+let appLog: ReturnType<typeof createLogFileSink> | null = null
+
+// Real fs adapter for the log sinks (recursive mkdir; byte-accurate size).
+const logFsAdapter = {
+  existsSync,
+  mkdirSync: (p: string) => void mkdirSync(p, { recursive: true }),
+  appendFileSync: (p: string, data: string) => appendFileSync(p, data, 'utf8'),
+  statSize: (p: string) => statSync(p).size,
+  renameSync,
+  unlinkSync,
+}
 
 function defaultConfigSource(): string {
   // packaged -> process.resourcesPath/default-config.yaml ; dev -> repo resources
@@ -234,10 +257,8 @@ async function boot(): Promise<void> {
   // bypass list is read from userData/sysproxy.json, falling back to the safe
   // defaults, and applied whenever enable() is called without an explicit list.
   // Module-level so the quit path can disable() it (anti-lockout).
-  const defaultBypass = readSysProxyBypass(
-    join(userData, 'sysproxy.json'),
-    fsAdapter,
-  )
+  const sysproxyConfigPath = join(userData, 'sysproxy.json')
+  let defaultBypass = readSysProxyBypass(sysproxyConfigPath, fsAdapter)
   const baseSystemProxy = createSystemProxyController({
     host: '127.0.0.1',
     port: mixedPort,
@@ -253,9 +274,29 @@ async function boot(): Promise<void> {
   sysproxyGuard = createSysproxyGuard({
     controller: { ...baseSystemProxy, enable: enableWithBypass },
   })
+  // An explicitly applied list (the control panel's "Apply") becomes the
+  // persisted default, so the guard's re-asserts, the tray toggle and the next
+  // boot all keep honoring it — previously the edit evaporated on any of those.
+  // Skips the write when nothing changed (the guard re-asserts every few
+  // seconds; it must not grind the disk).
+  const setDefaultBypass = (bypass: string[]): void => {
+    if (JSON.stringify(bypass) === JSON.stringify(defaultBypass)) return
+    // Persist BEFORE mutating the in-memory default: if the write fails (full
+    // disk, locked file) the memory stays in sync with disk, so re-Applying the
+    // same list still differs from the default and retries the write — updating
+    // memory first would make the equality guard swallow the retry silently.
+    try {
+      writeSysProxyBypass(sysproxyConfigPath, fsAdapter, bypass)
+    } catch (err) {
+      notify('Failed to save proxy bypass list', err)
+      return
+    }
+    defaultBypass = [...bypass]
+  }
   systemProxy = {
     ...baseSystemProxy,
     enable: async (bypass) => {
+      if (bypass && bypass.length > 0) setDefaultBypass(bypass)
       await enableWithBypass(bypass)
       // Begin watching only after the proxy is actually on. start() is
       // idempotent so the guard's own re-assert (which routes back through the
@@ -278,6 +319,16 @@ async function boot(): Promise<void> {
       sysproxyGuard?.stop()
       await baseSystemProxy.disableAutoProxy()
     },
+    // Before the first enable the base controller has seen no bypass yet and
+    // reports [] — surface the effective default list instead so the control
+    // panel's textarea opens pre-filled with what enable() would actually apply.
+    describe: () => {
+      const d = baseSystemProxy.describe()
+      return d.bypass.length > 0 ? d : { ...d, bypass: [...defaultBypass] }
+    },
+    // Route-level hook: /sysproxy POSTs record the applied list here even when
+    // the apply happens while the proxy is off (disable() takes no list).
+    setDefaultBypass,
   }
 
   // Kernel version management needs the supervisor that createAgent builds
@@ -524,6 +575,22 @@ async function boot(): Promise<void> {
     crashWatcher(state)
   })
 
+  // Persist kernel output + app events to userData/logs (size-rotated). The
+  // dashboard's SSE view only shows the live session; the files are what makes
+  // yesterday's crash diagnosable (Help > Open Logs Folder).
+  const logsDir = join(userData, 'logs')
+  const kernelLog = createLogFileSink({
+    dir: logsDir,
+    fileName: 'kernel.log',
+    fs: logFsAdapter,
+  })
+  appLog = createLogFileSink({
+    dir: logsDir,
+    fileName: 'app.log',
+    fs: logFsAdapter,
+  })
+  agent.supervisor.on('log', (l) => kernelLog.write(l.line, l.stream))
+
   // Drive subscription auto-update against the agent's profile store, surfacing
   // each refresh outcome as a notification. createAgent builds its own scheduler
   // (without onResult) but never starts it; the desktop owns the ticking here.
@@ -608,9 +675,29 @@ let saveWindowTimer: ReturnType<typeof setTimeout> | null = null
 
 function persistWindowBounds(immediate = false): void {
   if (!win || win.isDestroyed()) return
-  const bounds = win.getBounds()
-  const write = (): void =>
-    saveWindowState(fsAdapter, windowStatePath(), bounds)
+  // getNormalBounds: the UN-maximized geometry even while maximized, so a
+  // restore-from-maximize after relaunch lands where the user left the window
+  // (getBounds would bake the maximized rect in as the "normal" size).
+  const bounds = {
+    ...win.getNormalBounds(),
+    ...(win.isMaximized() ? { maximized: true } : {}),
+    // Carry the Chromium zoom (menu Cmd/Ctrl +/-) across sessions. Reading it
+    // here (resize/move debounce + close flush) needs no zoom-change event —
+    // the close flush always captures the final value.
+    ...(win.webContents.getZoomLevel() !== 0
+      ? { zoomLevel: win.webContents.getZoomLevel() }
+      : {}),
+  }
+  const write = (): void => {
+    try {
+      saveWindowState(fsAdapter, windowStatePath(), bounds)
+    } catch {
+      // Best-effort: a geometry write failure (full disk, locked/read-only
+      // userData) must never crash the app. From the debounced setTimeout an
+      // uncaught throw would hit process.on('uncaughtException') and exit(1) —
+      // tearing down the proxy on a routine window move.
+    }
+  }
   if (immediate) {
     if (saveWindowTimer) {
       clearTimeout(saveWindowTimer)
@@ -624,6 +711,30 @@ function persistWindowBounds(immediate = false): void {
     saveWindowTimer = null
     write()
   }, 300)
+}
+
+// Close-to-tray vs real quit. Mature proxy clients treat the window close
+// button as "hide to tray" — the app keeps proxying and the renderer stays
+// alive for an instant re-summon — and reserve real teardown for an explicit
+// quit (tray Quit / Cmd+Q / SIGTERM). before-quit flips this so the same close
+// event lets the window actually die on quit.
+let isQuitting = false
+
+// One-time (persisted) hint after the first close-to-tray, so a new user does
+// not mistake the hidden window for a quit — the classic tray-app confusion.
+function showCloseTipOnce(): void {
+  const marker = join(app.getPath('userData'), 'close-tip-shown')
+  if (existsSync(marker)) return
+  try {
+    writeFileSync(marker, '1', 'utf8')
+  } catch {
+    /* best-effort; worst case the tip shows again next time */
+  }
+  const where = process.platform === 'darwin' ? 'menu bar' : 'tray'
+  notify(
+    'MetaCubeXD is still running',
+    `The window was hidden to the ${where}; the proxy keeps running. Quit from the ${where} menu.`,
+  )
 }
 
 function createWindow(startHidden = false): void {
@@ -694,15 +805,55 @@ function createWindow(startHidden = false): void {
     win?.webContents.send('window:maximize-changed', win.isMaximized())
   win.on('maximize', sendMaximizeState)
   win.on('unmaximize', sendMaximizeState)
-  // On a hidden (login-launch) start, keep the window off-screen — the kernel
-  // still boots and the tray can summon it later. A normal launch shows it once
-  // the renderer is ready.
-  if (!startHidden) win.once('ready-to-show', () => win?.show())
+  // Re-apply the persisted maximize state, but tie it to the reveal. A normal
+  // launch maximizes in the ready-to-show handler right before the first paint
+  // (flicker-free). A hidden (login-launch) start must stay off-screen — the
+  // kernel still boots and the tray can summon it later — and maximize() shows
+  // a not-yet-displayed window, so defer it to the first real show or it would
+  // pop the window open at every login. Non-maximized hidden starts just wait.
+  if (!startHidden) {
+    win.once('ready-to-show', () => {
+      if (bounds.maximized) win?.maximize()
+      win?.show()
+    })
+  } else if (bounds.maximized) {
+    win.once('show', () => win?.maximize())
+  }
+  // Restore the persisted Chromium zoom once the document exists (setting it
+  // before the first load is overwritten by the navigation's default).
+  if (bounds.zoomLevel !== undefined) {
+    const zoom = bounds.zoomLevel
+    win.webContents.once('did-finish-load', () => {
+      win?.webContents.setZoomLevel(zoom)
+    })
+  }
   // Persist the geometry as the user resizes/moves; flush on close so the final
   // position is saved even if the debounce timer hadn't fired yet.
   win.on('resize', () => persistWindowBounds())
   win.on('move', () => persistWindowBounds())
-  win.on('close', () => persistWindowBounds(true))
+  // Close-to-tray: hide instead of destroy unless the app is quitting. Keeps
+  // the renderer alive (instant re-summon from tray/hotkey/dock) and preserves
+  // in-page state; the proxy keeps running either way. A fullscreen window
+  // must leave fullscreen first — hiding one leaves a dead black macOS Space.
+  win.on('close', (event) => {
+    persistWindowBounds(true)
+    if (isQuitting) return
+    event.preventDefault()
+    if (win?.isFullScreen()) {
+      win.once('leave-full-screen', () => win?.hide())
+      win.setFullScreen(false)
+    } else {
+      win?.hide()
+    }
+    showCloseTipOnce()
+  })
+  // Drop the reference once truly destroyed (quit path) so every window
+  // consumer (tray/hotkeys/deep links via focusWindow) recreates instead of
+  // calling into a destroyed object — that throw used to take down the app via
+  // the uncaughtException handler.
+  win.on('closed', () => {
+    win = null
+  })
   // Load over http from the same-origin control server (NOT file://) so web
   // workers (Monaco) and same-origin /api/control fetch/SSE work. boot() always
   // runs before createWindow(), so rendererUrl is set.
@@ -743,17 +894,23 @@ async function shutdownKernel(): Promise<void> {
   })
 }
 
+// Summon + focus the main window, recreating it when none exists (the quit
+// path destroys it; every other close is a hide). Never touches a destroyed
+// window — the tray/hotkey/deep-link/second-instance paths all route here.
 function focusWindow(): void {
-  if (!win) return
+  if (!win || win.isDestroyed()) {
+    createWindow()
+    return
+  }
   if (win.isMinimized()) win.restore()
   win.show()
   win.focus()
 }
 
-// Global-hotkey window toggle: hide when visible, otherwise summon + focus.
+// Global-hotkey window toggle: hide when visible, otherwise summon + focus
+// (recreating the window if needed).
 function toggleWindowVisibility(): void {
-  if (!win) return
-  if (win.isVisible() && !win.isMinimized()) {
+  if (win && !win.isDestroyed() && win.isVisible() && !win.isMinimized()) {
     win.hide()
   } else {
     focusWindow()
@@ -792,12 +949,50 @@ async function cycleProxyMode(): Promise<void> {
 
 // Wraps the Electron Notification constructor (dependency-injected in
 // notifier.ts so the crash/subscription notifications stay unit-testable).
-const notifier = createNotifier({ Notification })
+// Clicking any toast summons the dashboard — "Kernel stopped" is an implicit
+// "come look", not something to dismiss into the void.
+const notifier = createNotifier({ Notification, onClick: () => focusWindow() })
 
-// Show a desktop notification when supported (no-op headless/CI).
+// Show a desktop notification when supported (no-op headless/CI). Every
+// notification is also an app event worth keeping — mirror it into the on-disk
+// app log so a dismissed toast isn't the only record of a failure.
 function notify(title: string, body: unknown): void {
+  const text = body instanceof Error ? body.message : String(body)
+  appLog?.write(`${title}: ${text}`, 'notify')
   if (!Notification.isSupported()) return
-  notifier.notify(title, body instanceof Error ? body.message : String(body))
+  notifier.notify(title, text)
+}
+
+// Manual update check (Help > Check for Updates…). Explicit user action, so
+// the outcome always surfaces: a dialog when an update exists (with a Download
+// button), a notification when up to date or on failure. No auto-updating —
+// the app deliberately ships without an updater (publish: null).
+async function runUpdateCheck(): Promise<void> {
+  try {
+    const result = await checkForUpdates(fetch, app.getVersion())
+    if (!result.hasUpdate) {
+      notify(
+        'Up to date',
+        `MetaCubeXD ${result.current} is the latest version.`,
+      )
+      return
+    }
+    const opts: Electron.MessageBoxOptions = {
+      type: 'info',
+      message: `Update available: ${result.latest}`,
+      detail: `You are running ${result.current}. Download the new version from GitHub Releases.`,
+      buttons: ['Download', 'Later'],
+      defaultId: 0,
+      cancelId: 1,
+    }
+    const { response } =
+      win && !win.isDestroyed()
+        ? await dialog.showMessageBox(win, opts)
+        : await dialog.showMessageBox(opts)
+    if (response === 0) void shell.openExternal(result.releaseUrl)
+  } catch (err) {
+    notify('Update check failed', err)
+  }
 }
 
 // A deep link can arrive before boot() finishes (e.g. cold launch via the OS
@@ -838,10 +1033,28 @@ function handleDeepLinkFromArgv(argv: readonly string[]): void {
   }
 }
 
+// Windows toast notifications are attributed (and delivered) via the
+// AppUserModelID; without setting it to the installer's appId, packaged-app
+// notifications can silently not show. No-op elsewhere.
+if (process.platform === 'win32') {
+  app.setAppUserModelId('one.metacubex.desktop')
+}
+
 // Register the custom URL schemes so the OS routes clash:// / clashmeta://
-// links to this app (deep-link subscription import).
-app.setAsDefaultProtocolClient('clash')
-app.setAsDefaultProtocolClient('clashmeta')
+// links to this app (deep-link subscription import). Unpackaged dev runs
+// launch as `electron <app-path>` (process.defaultApp), where Windows/Linux
+// registration must pin the executable + app path or the OS routes the link
+// to a bare electron binary with no app. Packaged macOS additionally requires
+// the schemes in Info.plist — declared via `protocols` in electron-builder.yml.
+for (const scheme of ['clash', 'clashmeta']) {
+  if (process.defaultApp && process.argv[1]) {
+    app.setAsDefaultProtocolClient(scheme, process.execPath, [
+      resolve(process.argv[1]),
+    ])
+  } else {
+    app.setAsDefaultProtocolClient(scheme)
+  }
+}
 
 // macOS delivers deep links via open-url (not argv) — both at cold launch and
 // while running. boot() may not have finished yet; handleSubscriptionDeepLink
@@ -896,10 +1109,42 @@ if (!app.requestSingleInstanceLock()) {
     // Windows/Linux drives minimize/maximize/close through them). getWindow is
     // lazy so a later createWindow() (macOS reopen) is picked up automatically.
     registerWindowControls({ ipcMain, getWindow: () => win })
+    // Native About panel content (the macOS app-menu About role and the
+    // Help > About item on Windows/Linux both read from this).
+    app.setAboutPanelOptions({
+      applicationName: 'MetaCubeXD',
+      applicationVersion: app.getVersion(),
+      website: 'https://github.com/MetaCubeX/metacubexd',
+    })
+    // Cross-platform "open at login" (Electron login items on mac/win; XDG
+    // autostart entry on Linux, where setLoginItemSettings is a no-op). The
+    // AppImage path must outlive the transient mount, hence env.APPIMAGE.
+    const loginItem = createLoginItemController({
+      platform: process.platform,
+      app,
+      linux: {
+        fs: {
+          existsSync,
+          mkdirSync: (p) => void mkdirSync(p, { recursive: true }),
+          writeFileSync,
+          unlinkSync,
+        },
+        autostartDir: join(
+          // `||` not `??`: the XDG spec mandates an EMPTY XDG_CONFIG_HOME be
+          // treated as unset — `??` would keep '' and yield a relative
+          // `autostart/` dir in the cwd instead of ~/.config/autostart.
+          process.env.XDG_CONFIG_HOME || join(app.getPath('home'), '.config'),
+          'autostart',
+        ),
+        execPath: process.env.APPIMAGE ?? process.execPath,
+        name: 'metacubexd',
+      },
+    })
     tray = createTray({
-      getWindow: () => win,
+      showWindow: () => focusWindow(),
       startKernel: () => void agent?.supervisor.start(),
       stopKernel: () => void agent?.supervisor.stop(),
+      restartKernel: () => void agent?.supervisor.restart(),
       quit: () => app.quit(),
       iconPath: trayIconPath(),
       // boot() (runs above) sets these from the bound kernel state; fall back
@@ -909,9 +1154,82 @@ if (!app.requestSingleInstanceLock()) {
         secret: process.env.MCXD_CLASH_SECRET ?? '',
       },
       // boot() builds the OS proxy controller (anti-lockout disable() on quit
-      // lives in shutdownKernel). Passing it renders the tray "System proxy"
+      // lives in shutdownKernel). Passing it renders the tray "System Proxy"
       // checkbox; enable() applies the default bypass list (see boot()).
       ...(systemProxy ? { systemProxy } : {}),
+      // TUN toggle. enable() elevates + relaunches the kernel — only ever on an
+      // explicit tray click. Failures notify here (the tray re-syncs its
+      // checkbox from status() afterwards).
+      ...(tunController
+        ? {
+            tun: {
+              status: () => tunController!.status(),
+              enable: async () => {
+                try {
+                  await tunController!.enable({ stack: 'mixed' })
+                } catch (err) {
+                  notify('TUN enable failed', err)
+                  throw err
+                }
+              },
+              disable: async () => {
+                try {
+                  await tunController!.disable()
+                } catch (err) {
+                  notify('TUN disable failed', err)
+                  throw err
+                }
+              },
+            },
+          }
+        : {}),
+      // Live kernel state for the status line + Start/Stop/Restart enablement,
+      // kept fresh by the supervisor's own state events — plus the Profiles
+      // submenu (switch the active subscription without opening the window).
+      ...(agent
+        ? {
+            getKernelState: () => {
+              const s = agent!.supervisor.getState()
+              return s.version
+                ? { status: s.status, version: s.version }
+                : { status: s.status }
+            },
+            onKernelState: (cb: () => void) =>
+              agent!.supervisor.on('state', () => cb()),
+            profiles: {
+              list: async () =>
+                (await agent!.profiles.list()).map((p) => ({
+                  id: p.id,
+                  name: p.name,
+                })),
+              activeId: () => agent!.profiles.getActiveId(),
+              // Same sequence as the deep-link import path: validate + write
+              // the active config, then restart the kernel on it. Notifies
+              // both outcomes (the switch is invisible while the menu is
+              // closed) and rethrows so the tray re-syncs its radio state.
+              activate: async (id: string) => {
+                try {
+                  const metas = await agent!.profiles.list()
+                  await agent!.profiles.setActive(id)
+                  await agent!.supervisor.restart()
+                  const name = metas.find((m) => m.id === id)?.name ?? id
+                  notify('Profile activated', `${name} is now active.`)
+                } catch (err) {
+                  notify('Profile switch failed', err)
+                  throw err
+                }
+              },
+            },
+          }
+        : {}),
+      copyProxyCommand: () => {
+        const port = Number(process.env.MCXD_MIXED_PORT)
+        if (!Number.isFinite(port) || port <= 0) return
+        const cmd = buildProxyEnvCommand(process.platform, '127.0.0.1', port)
+        clipboard.writeText(cmd)
+        notify('Proxy command copied', cmd)
+      },
+      loginItem,
     })
     // Native application menu. Without it the OS never wires the standard
     // Cmd/Ctrl+C / V / A accelerators, so copy/paste silently fail in inputs
@@ -925,19 +1243,33 @@ if (!app.requestSingleInstanceLock()) {
             showWindow: () => focusWindow(),
             startKernel: () => void agent?.supervisor.start(),
             stopKernel: () => void agent?.supervisor.stop(),
+            restartKernel: () => void agent?.supervisor.restart(),
+            openExternal: (url) => void shell.openExternal(url),
+            openDataFolder: () => void shell.openPath(app.getPath('userData')),
+            openLogsFolder: () => {
+              // The sinks create it lazily on first write; make sure the
+              // folder exists so openPath never lands on a missing dir.
+              const dir = join(app.getPath('userData'), 'logs')
+              mkdirSync(dir, { recursive: true })
+              void shell.openPath(dir)
+            },
+            showAbout: () => app.showAboutPanel(),
+            checkForUpdates: () => void runUpdateCheck(),
           },
         }),
       ),
     )
 
-    app.on('activate', () => {
-      if (BrowserWindow.getAllWindows().length === 0) createWindow()
-    })
+    // macOS dock click (and Windows taskbar activate): summon the existing —
+    // possibly hidden — window instead of only reacting when none exists.
+    app.on('activate', () => focusWindow())
 
     // Register the global hotkeys (overridable via <userData>/hotkeys.json).
     // toggleSystemProxy/cycleProxyMode are async; the action signature is void
-    // so we fire-and-forget here (each notifies on failure).
-    registerHotkeys({
+    // so we fire-and-forget here (each notifies on failure). An accelerator
+    // that fails to register (owned by another app / a typo in hotkeys.json)
+    // is surfaced instead of dying silently.
+    const hotkeys = registerHotkeys({
       globalShortcut,
       bindings: loadHotkeyBindings(
         join(app.getPath('userData'), 'hotkeys.json'),
@@ -949,6 +1281,12 @@ if (!app.requestSingleInstanceLock()) {
         toggleWindow: () => toggleWindowVisibility(),
       },
     })
+    if (hotkeys.failed.length > 0) {
+      notify(
+        'Some hotkeys failed to register',
+        hotkeys.failed.map((f) => `${f.accelerator} (${f.action})`).join(', '),
+      )
+    }
 
     // Flush a deep link that arrived (and was queued) before the agent existed.
     if (pendingDeepLink) {
@@ -975,6 +1313,9 @@ if (!app.requestSingleInstanceLock()) {
   })
 
   app.on('before-quit', (event) => {
+    // Let the window really close from here on (the close handler otherwise
+    // intercepts and hides it — close-to-tray).
+    isQuitting = true
     if (shutdown.hasRun()) return
     event.preventDefault()
     void shutdown.runOnce().finally(() => app.quit())
@@ -999,10 +1340,16 @@ if (!app.requestSingleInstanceLock()) {
   // anti-lockout shutdown, then exit non-zero. unhandledRejection does not
   // terminate the process on Electron, so it is logged/notified only.
   process.on('uncaughtException', (err) => {
+    // Full stack into the app log (notify() only carries the message).
+    appLog?.write(String(err.stack ?? err), 'uncaught')
     notify('Unexpected error', err)
     void shutdown.runOnce().finally(() => process.exit(1))
   })
   process.on('unhandledRejection', (reason) => {
+    appLog?.write(
+      reason instanceof Error ? String(reason.stack ?? reason) : String(reason),
+      'unhandled-rejection',
+    )
     notify('Unhandled rejection', reason)
   })
 

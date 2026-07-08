@@ -34,3 +34,18 @@ export function readSysProxyBypass(path: string, fs: FsLike): string[] {
   }
   return [...DEFAULT_SYSPROXY_BYPASS]
 }
+
+/**
+ * Persist a bypass list to `userData/sysproxy.json` so an explicitly applied
+ * list (the control-panel "Apply") becomes the new default for every later
+ * enable — next boot's resume, the tray toggle, and the sysproxy guard's
+ * re-assert all read it back through {@link readSysProxyBypass}. Without this
+ * write the UI edit silently evaporated on the next toggle/restart.
+ */
+export function writeSysProxyBypass(
+  path: string,
+  fs: FsLike,
+  bypass: readonly string[],
+): void {
+  fs.writeFileSync(path, JSON.stringify({ bypass }))
+}

@@ -146,6 +146,59 @@ describe('registerHotkeys', () => {
     expect(gs.registered.has(DEFAULT_HOTKEYS.cycleProxyMode)).toBe(true)
     expect(gs.registered.has(DEFAULT_HOTKEYS.toggleWindow)).toBe(true)
   })
+
+  it('reports every successfully registered action', () => {
+    const gs = fakeGlobalShortcut()
+    const result = registerHotkeys({
+      globalShortcut: gs,
+      actions: makeActions(),
+    })
+    expect(result.registered).toEqual([
+      'toggleSystemProxy',
+      'cycleProxyMode',
+      'toggleWindow',
+    ])
+    expect(result.failed).toEqual([])
+  })
+
+  it('reports a conflict (register() -> false) as failed instead of silence', () => {
+    const gs = fakeGlobalShortcut()
+    // Simulate the OS rejecting one accelerator (owned by another app).
+    gs.register.mockImplementation(
+      (accelerator: string, callback: () => void) => {
+        if (accelerator === DEFAULT_HOTKEYS.cycleProxyMode) return false
+        gs.registered.set(accelerator, callback)
+        return true
+      },
+    )
+    const result = registerHotkeys({
+      globalShortcut: gs,
+      actions: makeActions(),
+    })
+    expect(result.failed).toEqual([
+      {
+        action: 'cycleProxyMode',
+        accelerator: DEFAULT_HOTKEYS.cycleProxyMode,
+      },
+    ])
+    expect(result.registered).toEqual(['toggleSystemProxy', 'toggleWindow'])
+  })
+
+  it('reports a register() throw (malformed accelerator) as failed, not a crash', () => {
+    const gs = fakeGlobalShortcut()
+    gs.register.mockImplementation((accelerator: string) => {
+      if (accelerator === 'Bogus+++') throw new Error('invalid accelerator')
+      return true
+    })
+    const result = registerHotkeys({
+      globalShortcut: gs,
+      actions: makeActions(),
+      bindings: { toggleWindow: 'Bogus+++' },
+    })
+    expect(result.failed).toEqual([
+      { action: 'toggleWindow', accelerator: 'Bogus+++' },
+    ])
+  })
 })
 
 describe('loadHotkeyBindings', () => {

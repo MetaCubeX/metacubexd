@@ -12,7 +12,25 @@ export interface AppMenuActions {
   startKernel: () => void
   /** Stop the mihomo kernel supervisor. */
   stopKernel: () => void
+  /** Restart the mihomo kernel supervisor. */
+  restartKernel: () => void
+  /** Open a URL in the system browser (shell.openExternal). */
+  openExternal: (url: string) => void
+  /** Reveal the userData dir (profiles/configs) in the OS file manager. */
+  openDataFolder: () => void
+  /** Reveal the rotated kernel/app log files in the OS file manager. */
+  openLogsFolder: () => void
+  /** Show the about panel (app.showAboutPanel; non-mac has no `about` role slot). */
+  showAbout: () => void
+  /** Query GitHub for a newer release and surface the result. */
+  checkForUpdates: () => void
 }
+
+/** Project links surfaced in the Help menu. */
+export const HELP_URLS = {
+  repository: 'https://github.com/MetaCubeX/metacubexd',
+  issues: 'https://github.com/MetaCubeX/metacubexd/issues',
+} as const
 
 export interface BuildAppMenuOptions {
   /** `process.platform` — drives the macOS vs non-macOS menu shape. */
@@ -53,6 +71,7 @@ export function buildAppMenu(
         { label: 'Show Window', click: () => actions.showWindow() },
         { label: 'Start Kernel', click: () => actions.startKernel() },
         { label: 'Stop Kernel', click: () => actions.stopKernel() },
+        { label: 'Restart Kernel', click: () => actions.restartKernel() },
         { type: 'separator' },
         { role: 'services' },
         { type: 'separator' },
@@ -91,6 +110,7 @@ export function buildAppMenu(
             { label: 'Show Window', click: () => actions.showWindow() },
             { label: 'Start Kernel', click: () => actions.startKernel() },
             { label: 'Stop Kernel', click: () => actions.stopKernel() },
+            { label: 'Restart Kernel', click: () => actions.restartKernel() },
             { type: 'separator' } as const,
           ]),
       { role: 'reload' },
@@ -113,6 +133,39 @@ export function buildAppMenu(
       submenu: [{ role: 'minimize' }, { role: 'zoom' }, { role: 'close' }],
     })
   }
+
+  // Help menu: project links + the userData escape hatch (support asks "send me
+  // your config" — Open Data Folder saves users spelunking for the path). macOS
+  // marks it role:'help' so the OS places it last and adds the search field;
+  // non-mac additionally hosts About here (no app menu to carry the role).
+  template.push({
+    label: 'Help',
+    ...(isMac ? { role: 'help' as const } : {}),
+    submenu: [
+      {
+        label: 'GitHub Repository',
+        click: () => actions.openExternal(HELP_URLS.repository),
+      },
+      {
+        label: 'Report an Issue',
+        click: () => actions.openExternal(HELP_URLS.issues),
+      },
+      { type: 'separator' },
+      { label: 'Open Data Folder', click: () => actions.openDataFolder() },
+      { label: 'Open Logs Folder', click: () => actions.openLogsFolder() },
+      { type: 'separator' },
+      {
+        label: 'Check for Updates…',
+        click: () => actions.checkForUpdates(),
+      },
+      ...(isMac
+        ? []
+        : [
+            { type: 'separator' } as const,
+            { label: 'About MetaCubeXD', click: () => actions.showAbout() },
+          ]),
+    ],
+  })
 
   return template
 }

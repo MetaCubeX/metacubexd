@@ -1,6 +1,10 @@
 import type { FsLike } from '../paths'
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_SYSPROXY_BYPASS, readSysProxyBypass } from '../sysproxy-config'
+import {
+  DEFAULT_SYSPROXY_BYPASS,
+  readSysProxyBypass,
+  writeSysProxyBypass,
+} from '../sysproxy-config'
 
 /** Build a fake FsLike from an in-memory map of path -> contents. */
 function fakeFs(files: Record<string, string>): FsLike {
@@ -12,7 +16,9 @@ function fakeFs(files: Record<string, string>): FsLike {
       if (v === undefined) throw new Error(`ENOENT: ${p}`)
       return v
     },
-    writeFileSync: () => {},
+    writeFileSync: (p, data) => {
+      files[p] = data
+    },
   }
 }
 
@@ -53,5 +59,21 @@ describe('readSysProxyBypass', () => {
   it('falls back to the defaults when bypass is not a string array', () => {
     const fs = fakeFs({ [PATH]: JSON.stringify({ bypass: 'nope' }) })
     expect(readSysProxyBypass(PATH, fs)).toEqual(DEFAULT_SYSPROXY_BYPASS)
+  })
+})
+
+describe('writeSysProxyBypass', () => {
+  const PATH = '/userData/sysproxy.json'
+
+  it('round-trips: a written list is what readSysProxyBypass returns', () => {
+    const fs = fakeFs({})
+    writeSysProxyBypass(PATH, fs, ['localhost', 'corp.internal'])
+    expect(readSysProxyBypass(PATH, fs)).toEqual(['localhost', 'corp.internal'])
+  })
+
+  it('overwrites a previously persisted list', () => {
+    const fs = fakeFs({ [PATH]: JSON.stringify({ bypass: ['old.example'] }) })
+    writeSysProxyBypass(PATH, fs, ['new.example'])
+    expect(readSysProxyBypass(PATH, fs)).toEqual(['new.example'])
   })
 })

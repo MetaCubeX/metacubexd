@@ -7,6 +7,12 @@ export interface NotifierDeps {
    * construction args without firing a real OS notification).
    */
   Notification: typeof Notification
+  /**
+   * Optional click handler wired onto every toast. The desktop wires this to
+   * summon + focus the main window — a user clicking "Kernel stopped" or
+   * "Subscription updated" expects the dashboard, not a dismissed toast.
+   */
+  onClick?: () => void
 }
 
 export interface Notifier {
@@ -18,10 +24,12 @@ export interface Notifier {
 // injected so the kernel-crash / subscription-update notifications can be unit
 // tested (the fake constructor records args) and never fire a real OS toast.
 export function createNotifier(deps: NotifierDeps): Notifier {
-  const { Notification: NotificationCtor } = deps
+  const { Notification: NotificationCtor, onClick } = deps
   return {
     notify(title, body) {
-      new NotificationCtor({ title, body }).show()
+      const n = new NotificationCtor({ title, body })
+      if (onClick) n.on('click', onClick)
+      n.show()
     },
   }
 }

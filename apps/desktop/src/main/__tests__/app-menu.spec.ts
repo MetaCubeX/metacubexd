@@ -12,6 +12,12 @@ function noopActions(): AppMenuActions {
     showWindow: vi.fn(),
     startKernel: vi.fn(),
     stopKernel: vi.fn(),
+    restartKernel: vi.fn(),
+    openExternal: vi.fn(),
+    openDataFolder: vi.fn(),
+    openLogsFolder: vi.fn(),
+    showAbout: vi.fn(),
+    checkForUpdates: vi.fn(),
   }
 }
 
@@ -92,7 +98,7 @@ describe('buildAppMenu', () => {
     expect(findSubmenu(template, 'Edit')).toBeTruthy()
   })
 
-  it('wires custom Show window / Start / Stop kernel items to the actions', () => {
+  it('wires custom Show window / Start / Stop / Restart kernel items to the actions', () => {
     const actions = noopActions()
     const template = buildAppMenu({ platform: 'darwin', actions })
     // Custom items live in the View submenu (or app menu); locate by label
@@ -103,14 +109,69 @@ describe('buildAppMenu', () => {
     const show = allItems.find((i) => i.label === 'Show Window')
     const start = allItems.find((i) => i.label === 'Start Kernel')
     const stop = allItems.find((i) => i.label === 'Stop Kernel')
+    const restart = allItems.find((i) => i.label === 'Restart Kernel')
     expect(show?.click).toBeTypeOf('function')
     expect(start?.click).toBeTypeOf('function')
     expect(stop?.click).toBeTypeOf('function')
+    expect(restart?.click).toBeTypeOf('function')
     ;(show!.click as () => void)()
     ;(start!.click as () => void)()
     ;(stop!.click as () => void)()
+    ;(restart!.click as () => void)()
     expect(actions.showWindow).toHaveBeenCalledTimes(1)
     expect(actions.startKernel).toHaveBeenCalledTimes(1)
     expect(actions.stopKernel).toHaveBeenCalledTimes(1)
+    expect(actions.restartKernel).toHaveBeenCalledTimes(1)
+  })
+
+  it('includes a Help menu with project links + folders + update check on every platform', () => {
+    for (const platform of ['darwin', 'win32', 'linux'] as const) {
+      const actions = noopActions()
+      const help = findSubmenu(buildAppMenu({ platform, actions }), 'Help')
+      expect(help).toBeTruthy()
+
+      const github = help!.find((i) => i.label === 'GitHub Repository')
+      const issues = help!.find((i) => i.label === 'Report an Issue')
+      const data = help!.find((i) => i.label === 'Open Data Folder')
+      const logs = help!.find((i) => i.label === 'Open Logs Folder')
+      const updates = help!.find((i) => i.label === 'Check for Updates…')
+      expect(github?.click).toBeTypeOf('function')
+      expect(issues?.click).toBeTypeOf('function')
+      expect(data?.click).toBeTypeOf('function')
+      expect(logs?.click).toBeTypeOf('function')
+      expect(updates?.click).toBeTypeOf('function')
+      ;(github!.click as () => void)()
+      ;(issues!.click as () => void)()
+      ;(data!.click as () => void)()
+      ;(logs!.click as () => void)()
+      ;(updates!.click as () => void)()
+      expect(actions.openExternal).toHaveBeenCalledWith(
+        'https://github.com/MetaCubeX/metacubexd',
+      )
+      expect(actions.openExternal).toHaveBeenCalledWith(
+        'https://github.com/MetaCubeX/metacubexd/issues',
+      )
+      expect(actions.openDataFolder).toHaveBeenCalledTimes(1)
+      expect(actions.openLogsFolder).toHaveBeenCalledTimes(1)
+      expect(actions.checkForUpdates).toHaveBeenCalledTimes(1)
+    }
+  })
+
+  it('hosts About in Help on non-mac (macOS keeps the app-menu about role)', () => {
+    const actions = noopActions()
+    const helpWin = findSubmenu(
+      buildAppMenu({ platform: 'win32', actions }),
+      'Help',
+    )
+    const about = helpWin!.find((i) => i.label === 'About MetaCubeXD')
+    expect(about?.click).toBeTypeOf('function')
+    ;(about!.click as () => void)()
+    expect(actions.showAbout).toHaveBeenCalledTimes(1)
+
+    const helpMac = findSubmenu(
+      buildAppMenu({ platform: 'darwin', actions: noopActions() }),
+      'Help',
+    )
+    expect(helpMac!.find((i) => i.label === 'About MetaCubeXD')).toBeUndefined()
   })
 })

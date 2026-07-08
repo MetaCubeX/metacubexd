@@ -12,16 +12,23 @@ function state(patch: Partial<KernelState>): KernelState {
 }
 
 // A fake Electron Notification constructor: records the options each
-// construction receives and whether show() was called, so the test can assert
-// against them without firing a real OS notification.
+// construction receives, whether show() was called, and any listeners wired
+// via on(), so the test can assert against them (and simulate a click)
+// without firing a real OS notification.
 function fakeNotification() {
   const constructed: Array<{ title?: string; body?: string }> = []
   const shown: Array<{ title?: string; body?: string }> = []
+  const listeners: Array<{ event: string; cb: () => void }> = []
   class FakeNotification {
     options: { title?: string; body?: string }
     constructor(options: { title?: string; body?: string }) {
       this.options = options
       constructed.push(options)
+    }
+
+    on(event: string, cb: () => void): this {
+      listeners.push({ event, cb })
+      return this
     }
 
     show(): void {
@@ -32,6 +39,13 @@ function fakeNotification() {
     Notification: FakeNotification as unknown as typeof Electron.Notification,
     constructed,
     shown,
+    listeners,
+    /** Simulate the user clicking the most recent toast. */
+    click: () =>
+      listeners
+        .filter((l) => l.event === 'click')
+        .at(-1)
+        ?.cb(),
   }
 }
 
@@ -75,6 +89,28 @@ describe('createNotifier', () => {
     expect(ctor).toHaveBeenCalledTimes(1)
     expect(ctor).toHaveBeenCalledWith({ title: 'T', body: 'B' })
     void fake
+  })
+
+  it('wires the injected onClick to every toast (clicking summons the window)', () => {
+    const fake = fakeNotification()
+    const onClick = vi.fn()
+    const notifier = createNotifier({
+      Notification: fake.Notification,
+      onClick,
+    })
+    notifier.notify('Kernel stopped', 'boom')
+    expect(fake.listeners).toEqual([
+      { event: 'click', cb: expect.any(Function) },
+    ])
+    fake.click()
+    expect(onClick).toHaveBeenCalledTimes(1)
+  })
+
+  it('wires no click listener when onClick is omitted', () => {
+    const fake = fakeNotification()
+    const notifier = createNotifier({ Notification: fake.Notification })
+    notifier.notify('A', 'b')
+    expect(fake.listeners).toEqual([])
   })
 })
 

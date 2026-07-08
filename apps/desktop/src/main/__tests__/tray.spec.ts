@@ -1,22 +1,19 @@
 import type { MenuItemConstructorOptions } from 'electron'
 import type { TrayDeps } from '../tray'
 
-import { app } from 'electron'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createTray } from '../tray'
 
 // --- electron mock -----------------------------------------------------------
 // Capture every menu template buildFromTemplate receives so we can inspect /
-// click items. The real electron module only fully works inside the Electron
-// runtime, so we stub the pieces tray.ts touches.
+// click items, and every Tray instance so tooltips are assertable. The real
+// electron module only fully works inside the Electron runtime, so we stub the
+// pieces tray.ts touches.
 const builtTemplates: MenuItemConstructorOptions[][] = []
+const trayInstances: Array<{ tooltips: string[] }> = []
 
 vi.mock('electron', () => {
   return {
-    app: {
-      getLoginItemSettings: () => ({ openAtLogin: false }),
-      setLoginItemSettings: vi.fn(),
-    },
     Menu: {
       buildFromTemplate: (template: MenuItemConstructorOptions[]) => {
         builtTemplates.push(template)
@@ -31,27 +28,51 @@ vi.mock('electron', () => {
       createEmpty: () => ({}),
     },
     Tray: class {
-      setToolTip = vi.fn()
+      tooltips: string[] = []
+      setToolTip = vi.fn((tip: string) => {
+        this.tooltips.push(tip)
+      })
+
       setContextMenu = vi.fn()
       on = vi.fn()
       destroy = vi.fn()
+      constructor() {
+        trayInstances.push(this)
+      }
     },
   }
 })
 
 const CLASH = { url: 'http://127.0.0.1:9090', secret: 's3cr3t' }
 
+function fakeLoginItem(initial = false): TrayDeps['loginItem'] & {
+  setEnabled: ReturnType<typeof vi.fn>
+} {
+  let enabled = initial
+  return {
+    isEnabled: () => enabled,
+    setEnabled: vi.fn((v: boolean) => {
+      enabled = v
+    }),
+  }
+}
+
 function baseDeps(fetchImpl: typeof fetch): TrayDeps {
   return {
-    getWindow: () => null,
+    showWindow: vi.fn(),
     startKernel: vi.fn(),
     stopKernel: vi.fn(),
+    restartKernel: vi.fn(),
     quit: vi.fn(),
     iconPath: '/x/tray.png',
     clash: CLASH,
+    loginItem: fakeLoginItem(),
     fetchImpl,
   }
 }
+
+const okFetch = () =>
+  vi.fn(async () => jsonResponse({ mode: 'rule' })) as unknown as typeof fetch
 
 /** Flatten the last-built template's labels (for "existing items" assertions). */
 function lastTemplate(): MenuItemConstructorOptions[] {
@@ -67,57 +88,143 @@ function findItem(
   return template.find((i) => i.label === label)
 }
 
-/** Locate the Proxy mode submenu's radio items. */
+/** Locate the Proxy Mode submenu's radio items. */
 function proxyModeItems(): MenuItemConstructorOptions[] {
-  const submenu = findItem(lastTemplate(), 'Proxy mode')?.submenu
-  if (!Array.isArray(submenu)) throw new Error('Proxy mode submenu missing')
+  const submenu = findItem(lastTemplate(), 'Proxy Mode')?.submenu
+  if (!Array.isArray(submenu)) throw new Error('Proxy Mode submenu missing')
   return submenu
 }
 
-describe('createTray proxy-mode submenu', () => {
-  beforeEach(() => {
-    builtTemplates.length = 0
-  })
+beforeEach(() => {
+  builtTemplates.length = 0
+  trayInstances.length = 0
+})
 
-  it('keeps the existing menu items', async () => {
-    const fetchImpl = vi.fn(async () =>
-      jsonResponse({ mode: 'rule' }),
-    ) as unknown as typeof fetch
-    createTray(baseDeps(fetchImpl))
+describe('createTray menu items', () => {
+  it('keeps the core menu items', async () => {
+    createTray(baseDeps(okFetch()))
     const t = lastTemplate()
-    expect(findItem(t, 'Show')).toBeTruthy()
-    expect(findItem(t, 'Start kernel')).toBeTruthy()
-    expect(findItem(t, 'Stop kernel')).toBeTruthy()
-    expect(findItem(t, 'Open at login')).toBeTruthy()
+    expect(findItem(t, 'Open Dashboard')).toBeTruthy()
+    expect(findItem(t, 'Start Kernel')).toBeTruthy()
+    expect(findItem(t, 'Stop Kernel')).toBeTruthy()
+    expect(findItem(t, 'Restart Kernel')).toBeTruthy()
+    expect(findItem(t, 'Open at Login')).toBeTruthy()
     expect(findItem(t, 'Quit')).toBeTruthy()
-    expect(findItem(t, 'Proxy mode')).toBeTruthy()
+    expect(findItem(t, 'Proxy Mode')).toBeTruthy()
   })
 
-  it('registers the login item with the --hidden arg so login-launch starts hidden', () => {
-    const fetchImpl = vi.fn(async () =>
-      jsonResponse({ mode: 'rule' }),
-    ) as unknown as typeof fetch
-    const setLoginItemSettings = vi.mocked(app.setLoginItemSettings)
-    setLoginItemSettings.mockClear()
-    createTray(baseDeps(fetchImpl))
+  it('wires Open Dashboard + kernel actions to the injected deps', () => {
+    const deps = baseDeps(okFetch())
+    createTray(deps)
+    ;(findItem(lastTemplate(), 'Open Dashboard')!.click as () => void)()
+    ;(findItem(lastTemplate(), 'Start Kernel')!.click as () => void)()
+    ;(findItem(lastTemplate(), 'Stop Kernel')!.click as () => void)()
+    ;(findItem(lastTemplate(), 'Restart Kernel')!.click as () => void)()
+    ;(findItem(lastTemplate(), 'Quit')!.click as () => void)()
+    expect(deps.showWindow).toHaveBeenCalledTimes(1)
+    expect(deps.startKernel).toHaveBeenCalledTimes(1)
+    expect(deps.stopKernel).toHaveBeenCalledTimes(1)
+    expect(deps.restartKernel).toHaveBeenCalledTimes(1)
+    expect(deps.quit).toHaveBeenCalledTimes(1)
+  })
 
-    const openAtLogin = findItem(lastTemplate(), 'Open at login')
-    expect(openAtLogin?.type).toBe('checkbox')
-    expect(openAtLogin?.click).toBeTypeOf('function')
+  it('delegates Open at Login to the injected login-item controller', () => {
+    const loginItem = fakeLoginItem()
+    createTray({ ...baseDeps(okFetch()), loginItem })
+
+    const item = findItem(lastTemplate(), 'Open at Login')
+    expect(item?.type).toBe('checkbox')
+    expect(item?.checked).toBe(false)
     // electron passes the toggled MenuItem; simulate checking the box.
-    ;(openAtLogin!.click as (i: unknown) => unknown)({ checked: true })
+    ;(item!.click as (i: unknown) => unknown)({ checked: true })
 
-    expect(setLoginItemSettings).toHaveBeenCalledWith({
-      openAtLogin: true,
-      args: ['--hidden'],
+    expect(loginItem.setEnabled).toHaveBeenCalledWith(true)
+    // The rebuilt menu reflects the new state.
+    expect(findItem(lastTemplate(), 'Open at Login')?.checked).toBe(true)
+  })
+})
+
+describe('createTray kernel status line', () => {
+  it('renders a disabled status line with version when getKernelState is given', () => {
+    createTray({
+      ...baseDeps(okFetch()),
+      getKernelState: () => ({ status: 'running', version: 'v1.19.2' }),
     })
+    const line = findItem(lastTemplate(), 'Kernel: running · v1.19.2')
+    expect(line).toBeTruthy()
+    expect(line?.enabled).toBe(false)
   })
 
+  it('omits the status line without getKernelState', () => {
+    createTray(baseDeps(okFetch()))
+    const hasLine = lastTemplate().some((i) =>
+      String(i.label ?? '').startsWith('Kernel:'),
+    )
+    expect(hasLine).toBe(false)
+  })
+
+  it('disables Start while running and Stop/Restart while stopped', () => {
+    createTray({
+      ...baseDeps(okFetch()),
+      getKernelState: () => ({ status: 'running' }),
+    })
+    expect(findItem(lastTemplate(), 'Start Kernel')?.enabled).toBe(false)
+    expect(findItem(lastTemplate(), 'Stop Kernel')?.enabled).toBe(true)
+    expect(findItem(lastTemplate(), 'Restart Kernel')?.enabled).toBe(true)
+
+    builtTemplates.length = 0
+    createTray({
+      ...baseDeps(okFetch()),
+      getKernelState: () => ({ status: 'stopped' }),
+    })
+    expect(findItem(lastTemplate(), 'Start Kernel')?.enabled).toBe(true)
+    expect(findItem(lastTemplate(), 'Stop Kernel')?.enabled).toBe(false)
+    expect(findItem(lastTemplate(), 'Restart Kernel')?.enabled).toBe(false)
+  })
+
+  it('keeps every action enabled when the state is unknown', () => {
+    createTray(baseDeps(okFetch()))
+    expect(findItem(lastTemplate(), 'Start Kernel')?.enabled).toBe(true)
+    expect(findItem(lastTemplate(), 'Stop Kernel')?.enabled).toBe(true)
+    expect(findItem(lastTemplate(), 'Restart Kernel')?.enabled).toBe(true)
+  })
+
+  it('rebuilds on kernel-state events (fresh status line)', () => {
+    let state = { status: 'stopped' }
+    let fire: (() => void) | null = null
+    createTray({
+      ...baseDeps(okFetch()),
+      getKernelState: () => state,
+      onKernelState: (cb) => {
+        fire = cb
+      },
+    })
+    expect(findItem(lastTemplate(), 'Kernel: stopped')).toBeTruthy()
+    state = { status: 'running' }
+    fire!()
+    expect(findItem(lastTemplate(), 'Kernel: running')).toBeTruthy()
+  })
+
+  it('reflects the health summary in the tooltip', () => {
+    createTray({
+      ...baseDeps(okFetch()),
+      getKernelState: () => ({ status: 'running' }),
+      systemProxy: {
+        isEnabled: vi.fn(async () => false),
+        enable: vi.fn(async () => {}),
+        disable: vi.fn(async () => {}),
+      },
+    })
+    const tooltips = trayInstances[0]!.tooltips
+    expect(tooltips.at(-1)).toBe(
+      'MetaCubeXD — kernel running · system proxy off',
+    )
+  })
+})
+
+describe('createTray proxy-mode submenu', () => {
   it('renders three radio mode items (Rule/Global/Direct)', () => {
-    const fetchImpl = vi.fn(async () =>
-      jsonResponse({ mode: 'rule' }),
-    ) as unknown as typeof fetch
-    createTray(baseDeps(fetchImpl))
+    createTray(baseDeps(okFetch()))
     const labels = proxyModeItems().map((i) => i.label)
     expect(labels).toEqual(['Rule', 'Global', 'Direct'])
     expect(proxyModeItems().every((i) => i.type === 'radio')).toBe(true)
@@ -177,7 +284,7 @@ describe('createTray proxy-mode submenu', () => {
     expect(() => createTray(baseDeps(fetchImpl))).not.toThrow()
     // menu still has the submenu after the failed fetch settles
     await vi.waitFor(() => {
-      expect(findItem(lastTemplate(), 'Proxy mode')).toBeTruthy()
+      expect(findItem(lastTemplate(), 'Proxy Mode')).toBeTruthy()
     })
   })
 })
@@ -185,37 +292,30 @@ describe('createTray proxy-mode submenu', () => {
 type FakeSystemProxy = NonNullable<TrayDeps['systemProxy']>
 
 describe('createTray system-proxy checkbox', () => {
-  beforeEach(() => {
-    builtTemplates.length = 0
-  })
-
-  const okFetch = () =>
-    vi.fn(async () => jsonResponse({ mode: 'rule' })) as unknown as typeof fetch
-
   function depsWithSysProxy(sysProxy: FakeSystemProxy): TrayDeps {
     return { ...baseDeps(okFetch()), systemProxy: sysProxy }
   }
 
-  it('omits the System proxy item when no controller is injected', () => {
+  it('omits the System Proxy item when no controller is injected', () => {
     createTray(baseDeps(okFetch()))
-    expect(findItem(lastTemplate(), 'System proxy')).toBeUndefined()
-    // Wave-1 items remain intact.
-    expect(findItem(lastTemplate(), 'Proxy mode')).toBeTruthy()
+    expect(findItem(lastTemplate(), 'System Proxy')).toBeUndefined()
+    // Core items remain intact.
+    expect(findItem(lastTemplate(), 'Proxy Mode')).toBeTruthy()
     expect(findItem(lastTemplate(), 'Quit')).toBeTruthy()
   })
 
-  it('renders a checkbox System proxy item when a controller is injected', () => {
+  it('renders a checkbox System Proxy item when a controller is injected', () => {
     const sysProxy: FakeSystemProxy = {
       isEnabled: vi.fn(async () => false),
       enable: vi.fn(async () => {}),
       disable: vi.fn(async () => {}),
     }
     createTray(depsWithSysProxy(sysProxy))
-    const item = findItem(lastTemplate(), 'System proxy')
+    const item = findItem(lastTemplate(), 'System Proxy')
     expect(item).toBeTruthy()
     expect(item?.type).toBe('checkbox')
     // Existing items still present.
-    expect(findItem(lastTemplate(), 'Proxy mode')).toBeTruthy()
+    expect(findItem(lastTemplate(), 'Proxy Mode')).toBeTruthy()
   })
 
   it('reflects isEnabled() === true as a checked box after rebuild', async () => {
@@ -227,7 +327,7 @@ describe('createTray system-proxy checkbox', () => {
     createTray(depsWithSysProxy(sysProxy))
     expect(sysProxy.isEnabled).toHaveBeenCalled()
     await vi.waitFor(() => {
-      const item = findItem(lastTemplate(), 'System proxy')
+      const item = findItem(lastTemplate(), 'System Proxy')
       expect(item?.checked).toBe(true)
     })
   })
@@ -245,14 +345,14 @@ describe('createTray system-proxy checkbox', () => {
     }
     createTray(depsWithSysProxy(sysProxy))
 
-    const item = findItem(lastTemplate(), 'System proxy')
+    const item = findItem(lastTemplate(), 'System Proxy')
     expect(item?.click).toBeTypeOf('function')
     await (item!.click as (i: unknown) => unknown)({})
 
     expect(sysProxy.enable).toHaveBeenCalledTimes(1)
     expect(sysProxy.disable).not.toHaveBeenCalled()
     await vi.waitFor(() => {
-      const next = findItem(lastTemplate(), 'System proxy')
+      const next = findItem(lastTemplate(), 'System Proxy')
       expect(next?.checked).toBe(true)
     })
   })
@@ -271,15 +371,15 @@ describe('createTray system-proxy checkbox', () => {
     createTray(depsWithSysProxy(sysProxy))
     // Wait for the initial isEnabled() to settle so the cached value is "on".
     await vi.waitFor(() => {
-      expect(findItem(lastTemplate(), 'System proxy')?.checked).toBe(true)
+      expect(findItem(lastTemplate(), 'System Proxy')?.checked).toBe(true)
     })
 
-    const item = findItem(lastTemplate(), 'System proxy')
+    const item = findItem(lastTemplate(), 'System Proxy')
     await (item!.click as (i: unknown) => unknown)({})
 
     expect(sysProxy.disable).toHaveBeenCalledTimes(1)
     await vi.waitFor(() => {
-      const next = findItem(lastTemplate(), 'System proxy')
+      const next = findItem(lastTemplate(), 'System Proxy')
       expect(next?.checked).toBe(false)
     })
   })
@@ -294,9 +394,202 @@ describe('createTray system-proxy checkbox', () => {
     }
     expect(() => createTray(depsWithSysProxy(sysProxy))).not.toThrow()
     await vi.waitFor(() => {
-      expect(findItem(lastTemplate(), 'System proxy')).toBeTruthy()
-      expect(findItem(lastTemplate(), 'Proxy mode')).toBeTruthy()
+      expect(findItem(lastTemplate(), 'System Proxy')).toBeTruthy()
+      expect(findItem(lastTemplate(), 'Proxy Mode')).toBeTruthy()
     })
+  })
+})
+
+type FakeTun = NonNullable<TrayDeps['tun']>
+
+describe('createTray TUN checkbox', () => {
+  it('omits the TUN Mode item when no controller is injected', () => {
+    createTray(baseDeps(okFetch()))
+    expect(findItem(lastTemplate(), 'TUN Mode')).toBeUndefined()
+  })
+
+  it('reflects status().enabled as the checkbox state', async () => {
+    const tun: FakeTun = {
+      status: vi.fn(async () => ({ enabled: true })),
+      enable: vi.fn(async () => {}),
+      disable: vi.fn(async () => {}),
+    }
+    createTray({ ...baseDeps(okFetch()), tun })
+    await vi.waitFor(() => {
+      expect(findItem(lastTemplate(), 'TUN Mode')?.checked).toBe(true)
+    })
+  })
+
+  it('calls enable() when toggled from off, disable() when toggled from on', async () => {
+    let enabled = false
+    const tun: FakeTun = {
+      status: vi.fn(async () => ({ enabled })),
+      enable: vi.fn(async () => {
+        enabled = true
+      }),
+      disable: vi.fn(async () => {
+        enabled = false
+      }),
+    }
+    createTray({ ...baseDeps(okFetch()), tun })
+
+    await (
+      findItem(lastTemplate(), 'TUN Mode')!.click as (i: unknown) => unknown
+    )({})
+    expect(tun.enable).toHaveBeenCalledTimes(1)
+    await vi.waitFor(() => {
+      expect(findItem(lastTemplate(), 'TUN Mode')?.checked).toBe(true)
+    })
+
+    await (
+      findItem(lastTemplate(), 'TUN Mode')!.click as (i: unknown) => unknown
+    )({})
+    expect(tun.disable).toHaveBeenCalledTimes(1)
+    await vi.waitFor(() => {
+      expect(findItem(lastTemplate(), 'TUN Mode')?.checked).toBe(false)
+    })
+  })
+
+  it('re-syncs with reality when enable() rejects (checkbox stays off)', async () => {
+    const tun: FakeTun = {
+      status: vi.fn(async () => ({ enabled: false })),
+      enable: vi.fn(async () => {
+        throw new Error('helper install declined')
+      }),
+      disable: vi.fn(async () => {}),
+    }
+    createTray({ ...baseDeps(okFetch()), tun })
+
+    await (
+      findItem(lastTemplate(), 'TUN Mode')!.click as (i: unknown) => unknown
+    )({})
+    await vi.waitFor(() => {
+      expect(findItem(lastTemplate(), 'TUN Mode')?.checked).toBe(false)
+    })
+  })
+})
+
+type FakeProfiles = NonNullable<TrayDeps['profiles']>
+
+describe('createTray profiles submenu', () => {
+  function profilesOf(
+    list: { id: string; name: string }[],
+    active: string | undefined,
+  ): FakeProfiles & { activate: ReturnType<typeof vi.fn> } {
+    return {
+      list: vi.fn(async () => list),
+      activeId: vi.fn(async () => active),
+      activate: vi.fn(async () => {}),
+    }
+  }
+
+  function profileItems(): MenuItemConstructorOptions[] {
+    const submenu = findItem(lastTemplate(), 'Profiles')?.submenu
+    if (!Array.isArray(submenu)) throw new Error('Profiles submenu missing')
+    return submenu
+  }
+
+  it('omits the submenu when no store is injected', () => {
+    createTray(baseDeps(okFetch()))
+    expect(findItem(lastTemplate(), 'Profiles')).toBeUndefined()
+  })
+
+  it('omits the submenu while the store has no profiles', async () => {
+    const profiles = profilesOf([], undefined)
+    createTray({ ...baseDeps(okFetch()), profiles })
+    await vi.waitFor(() => expect(profiles.list).toHaveBeenCalled())
+    expect(findItem(lastTemplate(), 'Profiles')).toBeUndefined()
+  })
+
+  it('renders radio items marking the active profile', async () => {
+    const profiles = profilesOf(
+      [
+        { id: 'a', name: 'Home' },
+        { id: 'b', name: 'Work' },
+      ],
+      'b',
+    )
+    createTray({ ...baseDeps(okFetch()), profiles })
+    await vi.waitFor(() => {
+      const items = profileItems()
+      expect(items.map((i) => i.label)).toEqual(['Home', 'Work'])
+      expect(items.every((i) => i.type === 'radio')).toBe(true)
+      expect(items.find((i) => i.label === 'Work')?.checked).toBe(true)
+      expect(items.find((i) => i.label === 'Home')?.checked).toBe(false)
+    })
+  })
+
+  it('activates the clicked profile and re-marks the selection', async () => {
+    const profiles = profilesOf(
+      [
+        { id: 'a', name: 'Home' },
+        { id: 'b', name: 'Work' },
+      ],
+      'a',
+    )
+    createTray({ ...baseDeps(okFetch()), profiles })
+    await vi.waitFor(() => expect(profileItems().length).toBe(2))
+
+    const work = profileItems().find((i) => i.label === 'Work')
+    await (work!.click as (i: unknown) => unknown)({})
+
+    expect(profiles.activate).toHaveBeenCalledWith('b')
+    await vi.waitFor(() => {
+      expect(profileItems().find((i) => i.label === 'Work')?.checked).toBe(true)
+    })
+  })
+
+  it('clicking the already-active profile is a no-op', async () => {
+    const profiles = profilesOf([{ id: 'a', name: 'Home' }], 'a')
+    createTray({ ...baseDeps(okFetch()), profiles })
+    await vi.waitFor(() => expect(profileItems().length).toBe(1))
+
+    await (profileItems()[0]!.click as (i: unknown) => unknown)({})
+    expect(profiles.activate).not.toHaveBeenCalled()
+  })
+
+  it('keeps the previous selection when activate() rejects', async () => {
+    const active = 'a'
+    const profiles: FakeProfiles = {
+      list: vi.fn(async () => [
+        { id: 'a', name: 'Home' },
+        { id: 'b', name: 'Work' },
+      ]),
+      activeId: vi.fn(async () => active),
+      activate: vi.fn(async () => {
+        throw new Error('validation failed')
+      }),
+    }
+    createTray({ ...baseDeps(okFetch()), profiles })
+    await vi.waitFor(() => expect(profileItems().length).toBe(2))
+
+    const work = profileItems().find((i) => i.label === 'Work')
+    await (work!.click as (i: unknown) => unknown)({})
+
+    // The rebuild + background refresh re-syncs against the store (still 'a').
+    await vi.waitFor(() => {
+      expect(profileItems().find((i) => i.label === 'Home')?.checked).toBe(true)
+      expect(profileItems().find((i) => i.label === 'Work')?.checked).toBe(
+        false,
+      )
+    })
+    void active
+  })
+})
+
+describe('createTray copy proxy command', () => {
+  it('omits the item when no copyProxyCommand is injected', () => {
+    createTray(baseDeps(okFetch()))
+    expect(findItem(lastTemplate(), 'Copy Proxy Command')).toBeUndefined()
+  })
+
+  it('invokes the injected copyProxyCommand on click', () => {
+    const copyProxyCommand = vi.fn()
+    createTray({ ...baseDeps(okFetch()), copyProxyCommand })
+    const item = findItem(lastTemplate(), 'Copy Proxy Command')
+    expect(item?.click).toBeTypeOf('function')
+    ;(item!.click as () => void)()
+    expect(copyProxyCommand).toHaveBeenCalledTimes(1)
   })
 })
 
