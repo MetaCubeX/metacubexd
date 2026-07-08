@@ -234,12 +234,20 @@ describe('createSupervisor — initial state', () => {
           status: 500,
         })) as unknown as typeof fetch,
     })
-    const startP = sup.start()
-    // Simulate the kernel crashing on startup.
-    setTimeout(() => proc.emitExit(1, null), 10)
-    const st = await startP
+    // Crash the process only once it has actually spawned (state carries a
+    // pid, so doStart has already wired its exit handler). A wall-clock
+    // setTimeout raced doStart's async config-inject: under load the exit fired
+    // before the listener was attached, was dropped, and the supervisor timed
+    // out reporting errored with NO exit code (flaky #242).
+    sup.on('state', (s) => {
+      if (s.status === 'starting' && s.pid !== undefined) {
+        queueMicrotask(() => proc.emitExit(1, null))
+      }
+    })
+    const st = await sup.start()
     expect(st.status).toBe('errored')
     expect(st.lastExitCode).toBe(1)
+    await sup.dispose()
   })
 })
 
