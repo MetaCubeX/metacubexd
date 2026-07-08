@@ -88,6 +88,11 @@ export interface SystemProxyController {
   setAutoProxy: (url: string) => Promise<void>
   disableAutoProxy: () => Promise<void>
   describe: () => { port: number; bypass: string[] }
+  // Optional: record `bypass` as the default list future enables apply (and the
+  // impl may persist it). The control route calls this for EVERY apply carrying
+  // a bypass — including one made while the proxy is off, which would otherwise
+  // evaporate because disable() takes no list.
+  setDefaultBypass?: (bypass: string[]) => void
 }
 
 export type ProfileType = 'local' | 'remote' | 'merge' | 'script'

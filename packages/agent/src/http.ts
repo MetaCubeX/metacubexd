@@ -509,6 +509,12 @@ export function createControlRouter(deps: ControlRouterDeps): App {
           mode?: 'fixed' | 'pac'
           pacUrl?: string
         }
+        // Record an explicitly applied bypass list as the new default FIRST, so
+        // it sticks even when this apply lands while the proxy is off (the
+        // disable() branch takes no list — without this the edit evaporated).
+        if (body.bypass && body.bypass.length > 0) {
+          systemProxy.setDefaultBypass?.(body.bypass)
+        }
         if (body.mode === 'pac') {
           if (body.enabled) {
             if (!body.pacUrl) {
