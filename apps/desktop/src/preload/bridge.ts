@@ -13,6 +13,11 @@ import type { IpcRenderer } from 'electron'
  *   window.*          — proxy to the main-process IPC channels registered by
  *                       window-controls.ts (custom title bar on Windows/Linux).
  */
+/** Payload the main process sends when Clash state changed outside the UI. */
+export interface BackendInvalidatePayload {
+  reason?: 'mode' | 'profile' | 'show' | string
+}
+
 export interface MetacubexdBridge {
   readonly isDesktop: true
   readonly platform: NodeJS.Platform
@@ -26,6 +31,13 @@ export interface MetacubexdBridge {
     /** Subscribe to native maximize/unmaximize; returns an unsubscribe fn. */
     onMaximizeChange: (cb: (maximized: boolean) => void) => () => void
   }
+  /**
+   * Subscribe to main-process "backend state changed" events (tray/hotkey mode
+   * switch, profile activate, window re-show). Returns an unsubscribe fn.
+   */
+  onBackendInvalidate: (
+    cb: (payload: BackendInvalidatePayload) => void,
+  ) => () => void
 }
 
 /** What buildMetacubexdBridge needs from the preload runtime (injected for tests). */
@@ -39,6 +51,9 @@ export interface BridgeDeps {
 
 /** The channel the main process forwards native maximize/unmaximize on. */
 const MAXIMIZE_CHANGED = 'window:maximize-changed'
+
+/** Main → renderer: Clash/config state changed outside the SPA mutation path. */
+export const BACKEND_INVALIDATE = 'backend:invalidate'
 
 /**
  * Build the renderer bridge object from the preload runtime. Pure (no
@@ -73,6 +88,14 @@ export function buildMetacubexdBridge({
         ipc.on(MAXIMIZE_CHANGED, handler)
         return () => ipc.removeListener(MAXIMIZE_CHANGED, handler)
       },
+    },
+    onBackendInvalidate: (cb: (payload: BackendInvalidatePayload) => void) => {
+      const handler = (
+        _event: unknown,
+        payload: BackendInvalidatePayload,
+      ): void => cb(payload ?? {})
+      ipc.on(BACKEND_INVALIDATE, handler)
+      return () => ipc.removeListener(BACKEND_INVALIDATE, handler)
     },
   }
 }

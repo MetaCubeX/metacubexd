@@ -106,4 +106,30 @@ describe('buildMetacubexdBridge', () => {
     )
     expect(listeners).toHaveLength(0)
   })
+
+  it('onBackendInvalidate forwards main-process events to the callback', () => {
+    const { bridge, listeners } = makeBridge()
+    const cb = vi.fn()
+    bridge.onBackendInvalidate(cb)
+
+    expect(listeners).toHaveLength(1)
+    const [channel, listener] = listeners[0]!
+    expect(channel).toBe('backend:invalidate')
+    listener({}, { reason: 'mode' })
+    expect(cb).toHaveBeenCalledWith({ reason: 'mode' })
+  })
+
+  it('onBackendInvalidate returns an unsubscribe that removes the listener', () => {
+    const { bridge, ipc, listeners } = makeBridge()
+    const unsub = bridge.onBackendInvalidate(vi.fn())
+    expect(listeners).toHaveLength(1)
+
+    unsub()
+
+    expect(ipc.removeListener).toHaveBeenCalledWith(
+      'backend:invalidate',
+      expect.any(Function),
+    )
+    expect(listeners).toHaveLength(0)
+  })
 })

@@ -77,6 +77,11 @@ export interface TrayDeps {
   copyProxyCommand?: () => void
   /** Cross-platform "open at login" controller (see login-item.ts). */
   loginItem: LoginItemController
+  /**
+   * Notify the renderer that Clash/config state changed outside the UI (e.g.
+   * after a successful mode switch). Optional — absent in unit tests / headless.
+   */
+  onBackendInvalidate?: () => void
   /** Injectable fetch for tests; defaults to the global fetch. */
   fetchImpl?: typeof fetch
 }
@@ -117,6 +122,9 @@ export function createTray(deps: TrayDeps): Tray {
     if (await setProxyMode(fetchImpl, deps.clash, mode)) {
       currentMode = mode
       rebuild()
+      // Tray mutates Clash directly — tell the open panel to drop its cached
+      // mode/proxy snapshot (#2117).
+      deps.onBackendInvalidate?.()
     }
   }
 

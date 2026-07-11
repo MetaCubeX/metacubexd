@@ -703,15 +703,14 @@ function persistWindowBounds(immediate = false): void {
   }, 300)
 }
 
-// Close-to-tray vs real quit. Mature proxy clients treat the window close
-// button as "hide to tray" — the app keeps proxying and the renderer stays
-// alive for an instant re-summon — and reserve real teardown for an explicit
-// quit (tray Quit / Cmd+Q / SIGTERM). before-quit flips this so the same close
-// event lets the window actually die on quit.
+// Close button / hotkey dismiss destroys the BrowserWindow so the Chromium
+// renderer exits (#2117). The kernel + tray keep proxying; tray/hotkey/dock
+// recreate the window via focusWindow(). before-quit still flips isQuitting so
+// we can skip the "still running" tip on a real quit.
 let isQuitting = false
 
-// One-time (persisted) hint after the first close-to-tray, so a new user does
-// not mistake the hidden window for a quit — the classic tray-app confusion.
+// One-time (persisted) hint after the first panel close, so a new user does
+// not mistake a destroyed window for a full quit — the classic tray-app confusion.
 function showCloseTipOnce(): void {
   const marker = join(app.getPath('userData'), 'close-tip-shown')
   if (existsSync(marker)) return
@@ -723,11 +722,17 @@ function showCloseTipOnce(): void {
   const where = process.platform === 'darwin' ? 'menu bar' : 'tray'
   notify(
     'MetaCubeXD is still running',
-    `The window was hidden to the ${where}; the proxy keeps running. Quit from the ${where} menu.`,
+    `The window was closed; the proxy keeps running in the ${where}. Quit from the ${where} menu.`,
   )
 }
 
-function createWindow(startHidden = false): void {
+/** Tell an open renderer to refetch Clash config/proxies (no-op if none). */
+function notifyBackendInvalidate(reason?: string): void {
+  if (!win || win.isDestroyed()) return
+  win.webContents.send('backend:invalidate', reason ? { reason } : {})
+}
+
+function createWindow(): void {
   const devIcon = devAppIcon()
   // Restore the persisted geometry (sanitized) so the window reopens where the
   // user left it; first run / corrupt state falls back to the default size.
@@ -795,20 +800,12 @@ function createWindow(startHidden = false): void {
     win?.webContents.send('window:maximize-changed', win.isMaximized())
   win.on('maximize', sendMaximizeState)
   win.on('unmaximize', sendMaximizeState)
-  // Re-apply the persisted maximize state, but tie it to the reveal. A normal
-  // launch maximizes in the ready-to-show handler right before the first paint
-  // (flicker-free). A hidden (login-launch) start must stay off-screen — the
-  // kernel still boots and the tray can summon it later — and maximize() shows
-  // a not-yet-displayed window, so defer it to the first real show or it would
-  // pop the window open at every login. Non-maximized hidden starts just wait.
-  if (!startHidden) {
-    win.once('ready-to-show', () => {
-      if (bounds.maximized) win?.maximize()
-      win?.show()
-    })
-  } else if (bounds.maximized) {
-    win.once('show', () => win?.maximize())
-  }
+  // Maximize (if persisted) then reveal — tied to ready-to-show so the first
+  // paint is already the correct size (no flash of the restored bounds).
+  win.once('ready-to-show', () => {
+    if (bounds.maximized) win?.maximize()
+    win?.show()
+  })
   // Restore the persisted Chromium zoom once the document exists (setting it
   // before the first load is overwritten by the navigation's default).
   if (bounds.zoomLevel !== undefined) {
@@ -821,26 +818,26 @@ function createWindow(startHidden = false): void {
   // position is saved even if the debounce timer hadn't fired yet.
   win.on('resize', () => persistWindowBounds())
   win.on('move', () => persistWindowBounds())
-  // Close-to-tray: hide instead of destroy unless the app is quitting. Keeps
-  // the renderer alive (instant re-summon from tray/hotkey/dock) and preserves
-  // in-page state; the proxy keeps running either way. A fullscreen window
-  // must leave fullscreen first — hiding one leaves a dead black macOS Space.
+  // Destroy on close so the Chromium renderer exits (#2117). Kernel + tray keep
+  // running; focusWindow() recreates the window on the next summon. A fullscreen
+  // window must leave fullscreen first — closing one mid-Space is messy on macOS.
   win.on('close', (event) => {
     persistWindowBounds(true)
-    if (isQuitting) return
-    event.preventDefault()
     if (win?.isFullScreen()) {
-      win.once('leave-full-screen', () => win?.hide())
+      event.preventDefault()
+      win.once('leave-full-screen', () => {
+        if (!win || win.isDestroyed()) return
+        win.close()
+      })
       win.setFullScreen(false)
-    } else {
-      win?.hide()
+      return
     }
-    showCloseTipOnce()
+    if (!isQuitting) showCloseTipOnce()
   })
-  // Drop the reference once truly destroyed (quit path) so every window
-  // consumer (tray/hotkeys/deep links via focusWindow) recreates instead of
-  // calling into a destroyed object — that throw used to take down the app via
-  // the uncaughtException handler.
+  // Drop the reference once destroyed so every window consumer
+  // (tray/hotkeys/deep links via focusWindow) recreates instead of calling into
+  // a destroyed object — that throw used to take down the app via the
+  // uncaughtException handler.
   win.on('closed', () => {
     win = null
   })
@@ -884,9 +881,9 @@ async function shutdownKernel(): Promise<void> {
   })
 }
 
-// Summon + focus the main window, recreating it when none exists (the quit
-// path destroys it; every other close is a hide). Never touches a destroyed
-// window — the tray/hotkey/deep-link/second-instance paths all route here.
+// Summon + focus the main window, recreating it when none exists (close and
+// quit both destroy it). Never touches a destroyed window — the
+// tray/hotkey/deep-link/second-instance paths all route here.
 function focusWindow(): void {
   if (!win || win.isDestroyed()) {
     createWindow()
@@ -895,13 +892,16 @@ function focusWindow(): void {
   if (win.isMinimized()) win.restore()
   win.show()
   win.focus()
+  // Window was already alive — push a soft refresh so tray/external Clash
+  // edits surface without a full remount (#2117).
+  notifyBackendInvalidate('show')
 }
 
-// Global-hotkey window toggle: hide when visible, otherwise summon + focus
-// (recreating the window if needed).
+// Global-hotkey window toggle: destroy when visible (free the renderer),
+// otherwise summon + focus (recreating the window if needed).
 function toggleWindowVisibility(): void {
   if (win && !win.isDestroyed() && win.isVisible() && !win.isMinimized()) {
-    win.hide()
+    win.close()
   } else {
     focusWindow()
   }
@@ -934,7 +934,9 @@ async function cycleProxyMode(): Promise<void> {
   const next = nextProxyMode(await getProxyMode(fetch, endpoint))
   if (!(await setProxyMode(fetch, endpoint, next))) {
     notify('Proxy mode switch failed', 'the kernel did not accept the change')
+    return
   }
+  notifyBackendInvalidate('mode')
 }
 
 // Wraps the Electron Notification constructor (dependency-injected in
@@ -1089,12 +1091,13 @@ if (!app.requestSingleInstanceLock()) {
       return
     }
     // Silent start: a login-launch (--hidden arg or OS wasOpenedAtLogin) boots
-    // the kernel but keeps the window hidden until summoned from the tray.
+    // the kernel but skips creating the BrowserWindow entirely so no Chromium
+    // renderer sits idle until the user summons the panel from the tray (#2117).
     const startHidden = shouldStartHidden(
       process.argv,
       app.getLoginItemSettings(),
     )
-    createWindow(startHidden)
+    if (!startHidden) createWindow()
     // Register the window-control IPC channels ONCE (the title bar on
     // Windows/Linux drives minimize/maximize/close through them). getWindow is
     // lazy so a later createWindow() (macOS reopen) is picked up automatically.
@@ -1204,6 +1207,7 @@ if (!app.requestSingleInstanceLock()) {
                   await agent!.supervisor.restart()
                   const name = metas.find((m) => m.id === id)?.name ?? id
                   notify('Profile activated', `${name} is now active.`)
+                  notifyBackendInvalidate('profile')
                 } catch (err) {
                   notify('Profile switch failed', err)
                   throw err
@@ -1220,6 +1224,7 @@ if (!app.requestSingleInstanceLock()) {
         notify('Proxy command copied', cmd)
       },
       loginItem,
+      onBackendInvalidate: () => notifyBackendInvalidate('mode'),
     })
     // Native application menu. Without it the OS never wires the standard
     // Cmd/Ctrl+C / V / A accelerators, so copy/paste silently fail in inputs
@@ -1303,8 +1308,7 @@ if (!app.requestSingleInstanceLock()) {
   })
 
   app.on('before-quit', (event) => {
-    // Let the window really close from here on (the close handler otherwise
-    // intercepts and hides it — close-to-tray).
+    // Mark quit so the close tip is skipped when the window is torn down.
     isQuitting = true
     if (shutdown.hasRun()) return
     event.preventDefault()

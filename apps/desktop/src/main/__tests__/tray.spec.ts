@@ -232,13 +232,21 @@ describe('createTray proxy-mode submenu', () => {
 
   it('pATCHes /configs with the mode + bearer auth when an item is clicked', async () => {
     const fetchImpl = vi.fn(async () => jsonResponse({ mode: 'rule' }))
-    createTray(baseDeps(fetchImpl as unknown as typeof fetch))
+    const onBackendInvalidate = vi.fn()
+    createTray({
+      ...baseDeps(fetchImpl as unknown as typeof fetch),
+      onBackendInvalidate,
+    })
     fetchImpl.mockClear()
 
     const global = proxyModeItems().find((i) => i.label === 'Global')
     expect(global?.click).toBeTypeOf('function')
     // electron passes the MenuItem as first arg; click ignores it here.
+    // click itself is sync (`void switchMode(...)`); wait for the PATCH + notify.
     await (global!.click as (i: unknown) => unknown)({})
+    await vi.waitFor(() => {
+      expect(onBackendInvalidate).toHaveBeenCalledTimes(1)
+    })
 
     expect(fetchImpl).toHaveBeenCalledWith(
       'http://127.0.0.1:9090/configs',
@@ -250,6 +258,25 @@ describe('createTray proxy-mode submenu', () => {
         body: JSON.stringify({ mode: 'global' }),
       }),
     )
+    expect(onBackendInvalidate).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not notify the UI when the mode PATCH fails', async () => {
+    const fetchImpl = vi.fn(async () => new Response(null, { status: 500 }))
+    const onBackendInvalidate = vi.fn()
+    createTray({
+      ...baseDeps(fetchImpl as unknown as typeof fetch),
+      onBackendInvalidate,
+    })
+    fetchImpl.mockClear()
+    onBackendInvalidate.mockClear()
+
+    const global = proxyModeItems().find((i) => i.label === 'Global')
+    await (global!.click as (i: unknown) => unknown)({})
+    await vi.waitFor(() => {
+      expect(fetchImpl).toHaveBeenCalled()
+    })
+    expect(onBackendInvalidate).not.toHaveBeenCalled()
   })
 
   it('marks the current mode (from GET /configs) as checked after rebuild', async () => {
