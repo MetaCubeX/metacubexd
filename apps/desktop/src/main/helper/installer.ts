@@ -24,8 +24,9 @@ export type ExecFn = (
 /**
  * Injected elevation runner: takes a single shell script and runs it with
  * administrator privileges (ONE prompt). Real impl: mac `osascript ... with
- * administrator privileges`, linux `pkexec`, win UAC `runas`. Tests record the
- * script and never prompt.
+ * administrator privileges`, linux `pkexec`, win UAC `Start-Process -Verb
+ * RunAs` (see `helper/elevate.ts`). Tests record the script and never prompt.
+ * The script itself is NOT privileged — elevate must wrap it.
  */
 export type ElevateFn = (
   script: string,

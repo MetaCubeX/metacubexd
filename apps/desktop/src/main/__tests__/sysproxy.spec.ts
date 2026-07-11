@@ -162,7 +162,7 @@ describe('createSystemProxyController', () => {
       await ctrl.enable()
 
       expect(calls).toContain(
-        `reg add "${KEY}" /v ProxyServer /t REG_SZ /d 127.0.0.1:7890 /f`,
+        `reg add "${KEY}" /v ProxyServer /t REG_SZ /d "127.0.0.1:7890" /f`,
       )
       expect(calls).toContain(
         `reg add "${KEY}" /v ProxyEnable /t REG_DWORD /d 1 /f`,
@@ -180,8 +180,34 @@ describe('createSystemProxyController', () => {
 
       await ctrl.enable(['localhost', '127.0.0.1'])
 
+      // /d MUST be quoted: cmd.exe treats <local> as redirection, and CIDR
+      // suffixes like /8 look like extra reg.exe switches when unquoted (#2116).
       expect(calls).toContain(
-        `reg add "${KEY}" /v ProxyOverride /t REG_SZ /d localhost;127.0.0.1;<local> /f`,
+        `reg add "${KEY}" /v ProxyOverride /t REG_SZ /d "localhost;127.0.0.1;<local>" /f`,
+      )
+    })
+
+    it('enable(bypass) quotes CIDR + <local> so reg/cmd cannot misparse /d (#2116)', async () => {
+      const { exec, calls } = makeExec()
+      const ctrl = createSystemProxyController({
+        host: '127.0.0.1',
+        port: 7890,
+        platform: 'win32',
+        exec,
+      })
+
+      await ctrl.enable([
+        'localhost',
+        '127.0.0.1',
+        '::1',
+        '10.0.0.0/8',
+        '172.16.0.0/12',
+        '192.168.0.0/16',
+        '<local>',
+      ])
+
+      expect(calls).toContain(
+        `reg add "${KEY}" /v ProxyOverride /t REG_SZ /d "localhost;127.0.0.1;::1;10.0.0.0/8;172.16.0.0/12;192.168.0.0/16;<local>;<local>" /f`,
       )
     })
 
@@ -400,8 +426,9 @@ describe('createSystemProxyController', () => {
 
         await ctrl.setAutoProxy(PAC_URL)
 
+        // Quote /d so URL query chars (&, ?) cannot be misparsed by cmd/reg.
         expect(calls).toContain(
-          `reg add "${KEY}" /v AutoConfigURL /t REG_SZ /d ${PAC_URL} /f`,
+          `reg add "${KEY}" /v AutoConfigURL /t REG_SZ /d "${PAC_URL}" /f`,
         )
         expect(calls).toContain(
           `reg add "${KEY}" /v ProxyEnable /t REG_DWORD /d 0 /f`,
@@ -420,6 +447,23 @@ describe('createSystemProxyController', () => {
         await ctrl.disableAutoProxy()
 
         expect(calls).toContain(`reg delete "${KEY}" /v AutoConfigURL /f`)
+      })
+
+      it('disableAutoProxy() tolerates a missing AutoConfigURL value', async () => {
+        const failing = vi.fn(async () => {
+          throw new Error(
+            'ERROR: The system was unable to find the specified registry key or value.',
+          )
+        })
+        const ctrl = createSystemProxyController({
+          host: '127.0.0.1',
+          port: 7890,
+          platform: 'win32',
+          exec: failing,
+        })
+
+        await expect(ctrl.disableAutoProxy()).resolves.toBeUndefined()
+        expect(failing).toHaveBeenCalled()
       })
 
       it('disable() also deletes AutoConfigURL (anti-lockout)', async () => {

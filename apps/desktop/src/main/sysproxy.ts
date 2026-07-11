@@ -113,15 +113,23 @@ export function createSystemProxyController(
   const WIN_KEY =
     'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings'
 
+  // Quote REG_SZ /d payloads for cmd.exe + reg.exe. Without quotes, CIDR
+  // suffixes (`/8`) look like extra reg switches and `<local>` is treated as
+  // input redirection — both make enable() throw a 500 on Windows (#2116).
+  // Embedded quotes use cmd's `""` escape (not bash-style `\"`).
+  function winRegSz(value: string): string {
+    return `"${value.replace(/"/g, '""')}"`
+  }
+
   async function winEnable(bypass: string[]): Promise<void> {
     await exec(
-      `reg add "${WIN_KEY}" /v ProxyServer /t REG_SZ /d ${host}:${port} /f`,
+      `reg add "${WIN_KEY}" /v ProxyServer /t REG_SZ /d ${winRegSz(`${host}:${port}`)} /f`,
     )
     await exec(`reg add "${WIN_KEY}" /v ProxyEnable /t REG_DWORD /d 1 /f`)
     if (bypass.length > 0) {
       const override = [...bypass, '<local>'].join(';')
       await exec(
-        `reg add "${WIN_KEY}" /v ProxyOverride /t REG_SZ /d ${override} /f`,
+        `reg add "${WIN_KEY}" /v ProxyOverride /t REG_SZ /d ${winRegSz(override)} /f`,
       )
     }
   }
@@ -135,17 +143,30 @@ export function createSystemProxyController(
   async function winSetAutoProxy(url: string): Promise<void> {
     // PAC and the fixed proxy are mutually exclusive in intent — point
     // AutoConfigURL at the PAC file and turn the manual proxy off.
-    await exec(`reg add "${WIN_KEY}" /v AutoConfigURL /t REG_SZ /d ${url} /f`)
+    await exec(
+      `reg add "${WIN_KEY}" /v AutoConfigURL /t REG_SZ /d ${winRegSz(url)} /f`,
+    )
     await exec(`reg add "${WIN_KEY}" /v ProxyEnable /t REG_DWORD /d 0 /f`)
   }
 
   async function winDisableAutoProxy(): Promise<void> {
-    await exec(`reg delete "${WIN_KEY}" /v AutoConfigURL /f`)
+    try {
+      await exec(`reg delete "${WIN_KEY}" /v AutoConfigURL /f`)
+    } catch (err) {
+      // Fresh installs often have no AutoConfigURL — treat missing as already
+      // cleared so disable()/quit never 500 on a clean machine.
+      const msg = err instanceof Error ? err.message : String(err)
+      if (!/unable to find/i.test(msg)) throw err
+    }
   }
 
   async function winIsEnabled(): Promise<boolean> {
-    const { stdout } = await exec(`reg query "${WIN_KEY}" /v ProxyEnable`)
-    return /ProxyEnable\s+REG_DWORD\s+0x1/i.test(stdout)
+    try {
+      const { stdout } = await exec(`reg query "${WIN_KEY}" /v ProxyEnable`)
+      return /ProxyEnable\s+REG_DWORD\s+0x1/i.test(stdout)
+    } catch {
+      return false
+    }
   }
 
   // ---- Linux (GNOME / gsettings only) ----

@@ -49,6 +49,7 @@ import { startControlServer, stopControlServer } from './control-server'
 import { parseSubscriptionDeepLink } from './deep-link'
 import { pickFreePorts } from './free-port'
 import { createHelperClient } from './helper/client'
+import { createHelperElevate } from './helper/elevate'
 import { createHelperInstaller } from './helper/installer'
 import { resolveHelperEntry } from './helper/paths'
 import { loadHotkeyBindings, registerHotkeys } from './hotkeys'
@@ -108,25 +109,14 @@ const helperExec = (cmd: string): Promise<{ stdout: string; stderr: string }> =>
 
 /**
  * Injected elevation runner: run the ONE privileged install/uninstall script
- * with administrator privileges. macOS goes through osascript (`do shell script
- * ... with administrator privileges`, ONE prompt); linux/win go through the
- * installer's own pkexec/UAC commands, so a plain elevated shell suffices. Only
- * ever invoked on an explicit user TUN enable — never at boot, never in tests.
+ * with administrator privileges (osascript / pkexec / UAC RunAs). Only ever
+ * invoked on an explicit user TUN enable — never at boot, never in tests.
+ * See `helper/elevate.ts` — a plain exec here was the #2116 Windows TUN 500.
  */
-const helperElevate = (
-  script: string,
-): Promise<{ stdout: string; stderr: string }> => {
-  if (process.platform === 'darwin') {
-    // Escape for embedding inside an AppleScript string literal.
-    const escaped = script.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
-    return execAsync(
-      `osascript -e 'do shell script "${escaped}" with administrator privileges'`,
-    )
-  }
-  // linux: the script already contains pkexec-eligible commands; win: runas/UAC.
-  // Run it through the platform shell; the script's own commands carry privilege.
-  return execAsync(script)
-}
+const helperElevate = createHelperElevate({
+  platform: process.platform,
+  exec: helperExec,
+})
 
 /**
  * Per-OS local socket / named-pipe path + root-owned secret-file path for the
