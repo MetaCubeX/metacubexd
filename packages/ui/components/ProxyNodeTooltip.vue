@@ -5,6 +5,7 @@ import {
   flip,
   offset,
   shift,
+  size,
   useFloating,
 } from '@floating-ui/vue'
 
@@ -30,6 +31,9 @@ const configStore = useConfigStore()
 const referenceEl = toRef(props, 'reference')
 const floating = ref<HTMLElement | null>(null)
 const floatingArrow = ref<HTMLElement | null>(null)
+// Constrain the scrollable body (not the floating root) so the arrow can sit
+// outside the box without being clipped by overflow-y-auto.
+const contentMaxHeight = ref<string>()
 
 const { floatingStyles, middlewareData, placement } = useFloating(
   referenceEl,
@@ -42,8 +46,20 @@ const { floatingStyles, middlewareData, placement } = useFloating(
     transform: false,
     middleware: [
       offset(10),
-      flip(),
+      // Flip/shift first so size measures the final placement's free space —
+      // without this, a tall history tooltip overflows the viewport and looks
+      // clipped against the cards beneath it.
+      flip({ padding: 8 }),
       shift({ padding: 8 }),
+      size({
+        padding: 8,
+        apply({ availableHeight }) {
+          // p-3 on the root → 12px top + 12px bottom; keep that out of the
+          // scrollport budget so the whole tooltip still fits the viewport.
+          const paddingY = 24
+          contentMaxHeight.value = `${Math.max(availableHeight - paddingY, 0)}px`
+        },
+      }),
       arrow({ element: floatingArrow }),
     ],
     whileElementsMounted: autoUpdate,
@@ -77,19 +93,24 @@ const arrowStyles = computed(() => {
       ref="floating"
       data-proxy-tooltip
       :style="floatingStyles"
-      class="animate-pop-in z-50 w-max max-w-80 rounded-xl bg-primary p-3 text-primary-content shadow-[0_10px_40px_color-mix(in_oklab,var(--color-base-content)_30%,transparent)]"
+      class="animate-pop-in z-70 w-max max-w-80 rounded-xl bg-primary p-3 text-primary-content shadow-[0_10px_40px_color-mix(in_oklab,var(--color-base-content)_30%,transparent)]"
       :class="configStore.enableTwemoji ? 'font-twemoji' : 'font-default'"
       @mouseenter="$emit('mouseEnter')"
       @mouseleave="$emit('mouseLeave')"
     >
-      <!-- Arrow -->
+      <!-- Arrow (outside the scrollport so overflow doesn't clip it) -->
       <div
         ref="floatingArrow"
         class="absolute size-2 rotate-45 bg-primary"
         :style="arrowStyles"
       />
 
-      <slot />
+      <div
+        class="[scrollbar-width:thin] [scrollbar-color:color-mix(in_oklab,var(--color-primary-content)_30%,transparent)_transparent] overflow-y-auto"
+        :style="{ maxHeight: contentMaxHeight }"
+      >
+        <slot />
+      </div>
     </div>
   </Teleport>
 </template>
