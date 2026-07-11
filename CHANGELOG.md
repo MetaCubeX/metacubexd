@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.267.2](https://github.com/MetaCubeX/metacubexd/compare/v1.267.1...v1.267.2) (2026-07-11)
+
+
+### Bug Fixes
+
+* **ui:** stop proxies page horizontal overflow in two-column layout ([046658c](https://github.com/MetaCubeX/metacubexd/commit/046658cf0f562487a358448088efa473de2af0c0))
+
 ## [1.267.1](https://github.com/MetaCubeX/metacubexd/compare/v1.267.0...v1.267.1) (2026-07-11)
 
 
