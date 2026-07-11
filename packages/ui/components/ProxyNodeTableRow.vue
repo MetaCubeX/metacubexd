@@ -26,7 +26,7 @@ const { proxyType, isUDP, runLatencyTest } = useProxyNode(
 
 <template>
   <div
-    class="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-colors"
+    class="flex min-w-0 cursor-pointer items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-colors"
     :class="
       isSelected
         ? 'bg-primary/15 text-base-content shadow-[inset_2px_0_var(--color-primary)]'

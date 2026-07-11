@@ -211,7 +211,7 @@ async function onRestartCore() {
       class="drawer-toggle"
     />
 
-    <div class="drawer-content flex h-full flex-col">
+    <div class="drawer-content flex h-full min-w-0 flex-col">
       <!-- Header/Navbar (mobile only) -->
       <header
         class="z-50 flex h-14 items-center gap-2 border-b border-[var(--sidebar-border)] bg-[color-mix(in_oklab,var(--color-base-300)_95%,transparent)] px-2 shadow-[0_4px_20px_color-mix(in_oklab,var(--color-base-content)_5%,transparent)] backdrop-blur-[12px] sm:px-4 lg:hidden"
@@ -240,8 +240,8 @@ async function onRestartCore() {
       </header>
 
       <!-- Page content slot -->
-      <div class="flex min-h-0 flex-1 flex-col p-2 sm:p-4">
-        <div class="flex min-h-0 flex-1 flex-col">
+      <div class="flex min-h-0 min-w-0 flex-1 flex-col p-2 sm:p-4">
+        <div class="flex min-h-0 min-w-0 flex-1 flex-col">
           <slot />
         </div>
 

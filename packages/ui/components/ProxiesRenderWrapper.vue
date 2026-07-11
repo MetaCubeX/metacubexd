@@ -11,15 +11,17 @@ defineExpose({ isTwoColumns })
 </script>
 
 <template>
-  <div v-if="isTwoColumns" class="flex gap-2">
-    <div class="isolate flex flex-1 flex-col gap-2">
+  <!-- min-w-0 lets each column shrink below content intrinsic width so long
+       node names truncate instead of forcing page-level horizontal scroll. -->
+  <div v-if="isTwoColumns" class="flex min-w-0 gap-2">
+    <div class="isolate flex min-w-0 flex-1 flex-col gap-2">
       <slot name="even" />
     </div>
-    <div class="isolate flex flex-1 flex-col gap-2">
+    <div class="isolate flex min-w-0 flex-1 flex-col gap-2">
       <slot name="odd" />
     </div>
   </div>
-  <div v-else class="isolate flex flex-col gap-2">
+  <div v-else class="isolate flex min-w-0 flex-col gap-2">
     <slot />
   </div>
 </template>

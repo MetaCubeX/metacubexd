@@ -375,17 +375,17 @@ const ProxyGroupTitle = defineComponent({
             'div',
             {
               class:
-                'badge badge-primary badge-sm inline-flex items-center gap-1',
+                'badge badge-primary badge-sm inline-flex max-w-full items-center gap-1',
             },
             [
               h(
                 'span',
-                { class: 'font-bold' },
+                { class: 'shrink-0 font-bold' },
                 formatProxyType(props.proxyGroup.type, t),
               ),
               props.proxyGroup.now?.length > 0 && [
-                h(IconChevronRight, { size: 18 }),
-                h('span', { class: 'whitespace-nowrap' }, props.proxyGroup.now),
+                h(IconChevronRight, { size: 18, class: 'shrink-0' }),
+                h('span', { class: 'min-w-0 truncate' }, props.proxyGroup.now),
               ],
             ],
           ),
@@ -700,7 +700,7 @@ const ProviderProxyNodes = defineComponent({
 </script>
 
 <template>
-  <div class="flex h-full min-h-0 flex-col gap-3">
+  <div class="flex h-full min-h-0 min-w-0 flex-col gap-3">
     <!-- First-run nudge: shown only when the agent is present and no base
          profile exists yet (self-gating; nothing in web mode). -->
     <OnboardingEmptyState context="proxies" />
@@ -868,7 +868,7 @@ const ProviderProxyNodes = defineComponent({
     <div
       v-if="activeTab === 'proxies'"
       ref="proxiesScrollEl"
-      class="min-h-0 flex-1 overflow-y-auto"
+      class="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto"
     >
       <!-- Loading skeleton: first load / refetch before anything resolves -->
       <div
@@ -981,7 +981,11 @@ const ProviderProxyNodes = defineComponent({
     </div>
 
     <!-- Proxy Providers Content -->
-    <div v-else ref="providersScrollEl" class="min-h-0 flex-1 overflow-y-auto">
+    <div
+      v-else
+      ref="providersScrollEl"
+      class="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto"
+    >
       <!-- Loading skeleton: first load before providers resolve -->
       <div
         v-if="
