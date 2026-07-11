@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.267.1](https://github.com/MetaCubeX/metacubexd/compare/v1.267.0...v1.267.1) (2026-07-11)
+
+
+### Bug Fixes
+
+* **desktop:** make Windows sysproxy and TUN elevation actually work ([d9558ac](https://github.com/MetaCubeX/metacubexd/commit/d9558ac63649d018811c478c0651e82ff3798b75))
+* **desktop:** sync panel after tray edits and free renderer on close ([726f4a7](https://github.com/MetaCubeX/metacubexd/commit/726f4a731b5b7d331ff6746719ff5c47a7e767af))
+* **ui:** keep proxy node latency tooltip inside the viewport ([1eee578](https://github.com/MetaCubeX/metacubexd/commit/1eee5782227d330ce1706e67e89ee9b8b47a14b6))
+
 ## [1.267.0](https://github.com/MetaCubeX/metacubexd/compare/v1.266.1...v1.267.0) (2026-07-08)
 
 
