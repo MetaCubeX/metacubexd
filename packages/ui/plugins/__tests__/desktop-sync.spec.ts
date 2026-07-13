@@ -23,10 +23,9 @@ vi.mock('~/composables/useQueries', () => ({
 async function runPlugin() {
   vi.resetModules()
   const mod = await import('../desktop-sync.client')
-  const plugin = mod.default as {
-    setup: () => void | Promise<void>
-  }
-  await plugin.setup()
+  const setup = mod.default.setup
+  if (!setup) throw new Error('desktop-sync plugin has no setup function')
+  await setup({} as never)
 }
 
 describe('plugins/desktop-sync.client', () => {
