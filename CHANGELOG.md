@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.267.3](https://github.com/MetaCubeX/metacubexd/compare/v1.267.2...v1.267.3) (2026-07-13)
+
+
+### Bug Fixes
+
+* **agent:** allow geo-backed profile validation ([c726025](https://github.com/MetaCubeX/metacubexd/commit/c726025b3bd258f5b132e614de6a6a0b29f09264))
+* **agent:** bound subscription profile fetches ([7d01428](https://github.com/MetaCubeX/metacubexd/commit/7d0142826b9603e010c8f1561aec54f3446a9680))
+* **ui:** align profile operation timeouts ([3fe4784](https://github.com/MetaCubeX/metacubexd/commit/3fe47845ac7ff7f78439c4edc2f713865ce3f3cb))
+* **ui:** surface profile validation details ([500bcb1](https://github.com/MetaCubeX/metacubexd/commit/500bcb1ef9a3cf52558a765d02d8a535dac9b787))
+
 ## [1.267.2](https://github.com/MetaCubeX/metacubexd/compare/v1.267.1...v1.267.2) (2026-07-11)
 
 
