@@ -125,14 +125,20 @@ settings before making the controller available outside the local machine.
 Download the installer for your platform from the
 [latest release](https://github.com/metacubex/metacubexd/releases/latest):
 
-| OS                    | Arch  | File                                                         |
-| :-------------------- | :---- | :----------------------------------------------------------- |
-| macOS (Apple Silicon) | arm64 | `MetaCubeXD-<version>-mac-arm64.dmg`                         |
-| macOS (Intel)         | x64   | `MetaCubeXD-<version>-mac-x64.dmg`                           |
-| Windows               | x64   | `MetaCubeXD-<version>-win-x64.exe`                           |
-| Windows               | arm64 | `MetaCubeXD-<version>-win-arm64.exe`                         |
-| Linux                 | x64   | `MetaCubeXD-<version>-linux-x86_64.AppImage` or `-amd64.deb` |
-| Linux                 | arm64 | `MetaCubeXD-<version>-linux-arm64.AppImage` or `-arm64.deb`  |
+| OS                    | Arch  | File                                         |
+| :-------------------- | :---- | :------------------------------------------- |
+| macOS (Apple Silicon) | arm64 | `MetaCubeXD-<version>-mac-arm64.dmg`         |
+| macOS (Intel)         | x64   | `MetaCubeXD-<version>-mac-x64.dmg`           |
+| Windows               | x64   | `MetaCubeXD-<version>-win-x64.exe`           |
+| Windows               | arm64 | `MetaCubeXD-<version>-win-arm64.exe`         |
+| Debian / Ubuntu       | x64   | `MetaCubeXD-<version>-linux-amd64.deb`       |
+| Debian / Ubuntu       | arm64 | `MetaCubeXD-<version>-linux-arm64.deb`       |
+| Fedora / RHEL / SUSE  | x64   | `MetaCubeXD-<version>-linux-x86_64.rpm`      |
+| Fedora / RHEL / SUSE  | arm64 | `MetaCubeXD-<version>-linux-aarch64.rpm`     |
+| Arch Linux            | x64   | `MetaCubeXD-<version>-linux-x64.pacman`      |
+| Arch Linux            | arm64 | `MetaCubeXD-<version>-linux-aarch64.pacman`  |
+| Other Linux           | x64   | `MetaCubeXD-<version>-linux-x86_64.AppImage` |
+| Other Linux           | arm64 | `MetaCubeXD-<version>-linux-arm64.AppImage`  |
 
 The desktop app **bundles its own mihomo kernel and auto-configures the local
 endpoint** — you don't enter any address. Manage profiles, edit configs, and
@@ -154,16 +160,35 @@ xattr -dr com.apple.quarantine /Applications/MetaCubeXD.app
 
 …or right-click the app → **Open** → **Open** in the confirmation dialog.
 
+MetaCubeXD can also be installed through the Homebrew cask in this repository:
+
+```shell
+brew tap metacubex/metacubexd https://github.com/MetaCubeX/metacubexd.git
+brew install --cask metacubexd
+```
+
 **Windows** — SmartScreen shows "Windows protected your PC". Click
 **More info** → **Run anyway**.
 
-**Linux** — make the AppImage executable, then run it:
+**Linux** — install the native package for your distribution, or make the
+AppImage executable and run it:
 
 ```shell
+# Debian / Ubuntu
+sudo apt install ./MetaCubeXD-*-linux-*.deb
+
+# Fedora / RHEL
+sudo dnf install ./MetaCubeXD-*-linux-*.rpm
+
+# openSUSE
+sudo zypper install ./MetaCubeXD-*-linux-*.rpm
+
+# Arch Linux and derivatives
+sudo pacman -U ./MetaCubeXD-*-linux-*.pacman
+
+# Distribution-independent AppImage
 chmod +x MetaCubeXD-*-linux-*.AppImage
 ./MetaCubeXD-*-linux-*.AppImage
-# or install the .deb:
-sudo dpkg -i MetaCubeXD-*-linux-*.deb
 ```
 
 > **System proxy and TUN are separate features.** System proxy changes the

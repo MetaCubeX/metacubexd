@@ -135,11 +135,11 @@ On each applicable platform, verify:
 
 Also cover platform-specific integration points:
 
-| Platform | Checks                                                                                                                                 |
-| -------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| macOS    | Gatekeeper/quarantine behavior, helper installation, and Apple Silicon/Intel when applicable                                           |
-| Windows  | SmartScreen/UAC, system-proxy registry writes, the TUN service, and x64/arm64 when applicable                                          |
-| Linux    | AppImage or Debian package launch, `pkexec`/systemd integration, desktop proxy settings, `/dev/net/tun`, and x64/arm64 when applicable |
+| Platform | Checks                                                                                                                                            |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| macOS    | Gatekeeper/quarantine behavior, helper installation, and Apple Silicon/Intel when applicable                                                      |
+| Windows  | SmartScreen/UAC, system-proxy registry writes, the TUN service, and x64/arm64 when applicable                                                     |
+| Linux    | AppImage, deb, rpm, or pacman package launch; `pkexec`/systemd integration; desktop proxy settings; `/dev/net/tun`; and x64/arm64 when applicable |
 
 Unsigned local packages are development artifacts. Do not present them as an
 official release or ask users to bypass platform security controls without a

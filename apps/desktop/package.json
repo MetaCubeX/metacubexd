@@ -4,6 +4,7 @@
   "description": "MetaCubeXD — the official Mihomo dashboard, desktop app",
   "homepage": "https://github.com/MetaCubeX/metacubexd",
   "author": "MetaCubeX",
+  "license": "MIT",
   "private": true,
   "type": "module",
   "main": "out/main/index.js",
@@ -30,6 +31,7 @@
     "vitest": "catalog:",
     "tsx": "catalog:",
     "@types/node": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "yaml": "catalog:"
   }
 }

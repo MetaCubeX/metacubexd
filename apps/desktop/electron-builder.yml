@@ -111,7 +111,26 @@ linux:
       arch:
         - x64
         - arm64
+    # Fedora, RHEL, openSUSE, and other RPM-based distributions.
+    - target: rpm
+      arch:
+        - x64
+        - arm64
+    # Arch Linux and derivatives. electron-builder emits a .pacman archive
+    # that can be installed directly with `pacman -U`.
+    - target: pacman
+      arch:
+        - x64
+        - arm64
   category: Network
-  # Required by the .deb (fpm) target.
+  # Required by the deb/rpm/pacman (fpm) targets.
   maintainer: MetaCubeX <maintainers@metacubex.one>
   artifactName: ${productName}-${version}-linux-${arch}.${ext}
+# Native package managers require/conventionally use a lowercase package
+# identifier; do not derive this from the mixed-case productName.
+deb:
+  packageName: metacubexd
+rpm:
+  packageName: metacubexd
+pacman:
+  packageName: metacubexd

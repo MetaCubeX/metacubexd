@@ -193,8 +193,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: macos-14, ebargs: '--mac --arm64' }
-          - { os: macos-15-intel, ebargs: '--mac --x64' }
+          - { os: macos-14, ebargs: '--mac --arm64', brew_arch: 'arm64' }
+          - { os: macos-15-intel, ebargs: '--mac --x64', brew_arch: 'x64' }
           - { os: windows-latest, ebargs: '--win --x64 --arm64' }
           - { os: ubuntu-latest, ebargs: '--linux --x64 --arm64' }
 
@@ -216,6 +216,11 @@ jobs:
 
       - name: install dependencies
         run: pnpm install
+
+      # electron-builder bundles fpm, but rpmbuild is supplied by the host.
+      - name: install RPM packaging tools
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y rpm
 
       - name: build ui (static, relative base for file://)
         run: pnpm --filter @metacubexd/ui generate
@@ -241,6 +246,13 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # Homebrew's `version :latest` cask needs a stable asset name. Keep the
+      # versioned DMG for direct downloads and publish this alias beside it.
+      - name: prepare Homebrew cask asset
+        if: runner.os == 'macOS'
+        run: cp apps/desktop/dist/MetaCubeXD-*-mac-${{ matrix.brew_arch }}.dmg apps/desktop/dist/MetaCubeXD-mac-${{ matrix.brew_arch }}.dmg
+        shell: bash
+
       - name: attach desktop installers to release
         uses: softprops/action-gh-release@v3
         with:
@@ -251,6 +263,8 @@ jobs:
             apps/desktop/dist/*.exe
             apps/desktop/dist/*.AppImage
             apps/desktop/dist/*.deb
+            apps/desktop/dist/*.rpm
+            apps/desktop/dist/*.pacman
 
   update-screenshots:
     needs: release-please

@@ -41,6 +41,7 @@ jobs:
       - name: Run unit tests
         run: |
           pnpm --filter @metacubexd/agent test
+          pnpm --filter @metacubexd/desktop test
           pnpm --filter @metacubexd/server test
           pnpm --filter @metacubexd/ui test:coverage
 
