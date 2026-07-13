@@ -56,16 +56,21 @@ describe('buildContentSecurityPolicy', () => {
   })
 
   it('keeps connect-src open for the kernel on another loopback port (ws/http)', () => {
-    expect(csp).toContain('connect-src')
-    expect(csp).toMatch(/connect-src[^;]*ws:/)
-    expect(csp).toMatch(/connect-src[^;]*http:/)
+    const connectDirective = csp
+      .split('; ')
+      .find((directive) => directive.startsWith('connect-src '))
+    expect(connectDirective).toContain('ws:')
+    expect(connectDirective).toContain('http:')
   })
 
   it('allows http: + https: images so plain-http proxy-group icons still render', () => {
     // `http:` can't match inside `https:` (the char after `http` there is `s`),
     // so these two assertions are independent.
-    expect(csp).toMatch(/img-src[^;]* http:/)
-    expect(csp).toMatch(/img-src[^;]* https:/)
+    const imageDirective = csp
+      .split('; ')
+      .find((directive) => directive.startsWith('img-src '))
+    expect(imageDirective?.split(' ')).toContain('http:')
+    expect(imageDirective?.split(' ')).toContain('https:')
   })
 
   it('locks down object-src, base-uri and framing', () => {

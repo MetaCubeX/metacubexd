@@ -51,18 +51,21 @@ describe('fetchGeoAssets', () => {
       return new Response(Buffer.from('ok'), { status: 200 })
     })
 
-    await expect(
-      fetchGeoAssets(dest, { fetch: fakeFetch as unknown as typeof fetch }),
-    ).rejects.toThrow(/geosite\.dat.*404|404.*geosite\.dat/)
+    const error = await fetchGeoAssets(dest, {
+      fetch: fakeFetch as unknown as typeof fetch,
+    }).catch((reason: unknown) => reason)
+    expect(error).toBeInstanceOf(Error)
+    expect((error as Error).message).toContain('geosite.dat')
+    expect((error as Error).message).toContain('404')
   })
 
   it('centralizes the canonical URLs in GEO_ASSET_URLS', () => {
-    expect(GEO_ASSET_URLS['geoip.dat']).toMatch(
-      /meta-rules-dat\/releases\/download\/latest\/geoip\.dat$/,
+    expect(GEO_ASSET_URLS['geoip.dat']).toBe(
+      'https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat',
     )
-    expect(GEO_ASSET_URLS['geosite.dat']).toMatch(
-      /meta-rules-dat\/releases\/download\/latest\/geosite\.dat$/,
+    expect(GEO_ASSET_URLS['geosite.dat']).toBe(
+      'https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat',
     )
-    expect(GEO_ASSET_URLS['country.mmdb']).toMatch(/country\.mmdb$/)
+    expect(GEO_ASSET_URLS['country.mmdb'].endsWith('/country.mmdb')).toBe(true)
   })
 })

@@ -112,7 +112,7 @@ defineExpose({
           {{ t('quickFilter') }}
         </ConfigTitle>
         <input
-          v-model="configStore.quickFilterRegex"
+          v-model="configStore.quickFilterText"
           type="text"
           class="w-full rounded-lg border border-base-content/15 bg-base-200/80 px-3 py-2 text-sm text-base-content transition-all duration-200 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
           placeholder="DIRECT|direct|dns-out"

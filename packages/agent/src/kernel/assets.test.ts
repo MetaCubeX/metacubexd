@@ -68,10 +68,10 @@ describe('mihomoAsset — all 6 (os,arch) combos', () => {
   })
 
   it('throws on unsupported os', () => {
-    expect(() => mihomoAsset('plan9', 'amd64')).toThrow(/unsupported os/i)
+    expect(() => mihomoAsset('plan9', 'amd64')).toThrow('unsupported os')
   })
 
   it('throws on unsupported arch', () => {
-    expect(() => mihomoAsset('linux', 'mips')).toThrow(/unsupported arch/i)
+    expect(() => mihomoAsset('linux', 'mips')).toThrow('unsupported arch')
   })
 })

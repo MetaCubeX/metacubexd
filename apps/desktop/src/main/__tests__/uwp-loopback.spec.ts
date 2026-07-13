@@ -74,9 +74,9 @@ describe('createUwpLoopback', () => {
       const { exec, calls } = makeExec()
       const uwp = createUwpLoopback({ platform: 'win32', exec })
 
-      await expect(uwp.exempt('')).rejects.toThrow(/package name/i)
-      await expect(uwp.exempt('   ')).rejects.toThrow(/package name/i)
-      await expect(uwp.remove('')).rejects.toThrow(/package name/i)
+      await expect(uwp.exempt('')).rejects.toThrow('package name')
+      await expect(uwp.exempt('   ')).rejects.toThrow('package name')
+      await expect(uwp.remove('')).rejects.toThrow('package name')
       expect(calls).toEqual([])
     })
   })
@@ -87,12 +87,12 @@ describe('createUwpLoopback', () => {
         const { exec, calls } = makeExec()
         const uwp = createUwpLoopback({ platform, exec })
 
-        await expect(uwp.list()).rejects.toThrow(/windows-only|win32/i)
+        await expect(uwp.list()).rejects.toThrow('Windows-only')
         await expect(uwp.exempt('SomePackage_abc')).rejects.toThrow(
-          /windows-only|win32/i,
+          'Windows-only',
         )
         await expect(uwp.remove('SomePackage_abc')).rejects.toThrow(
-          /windows-only|win32/i,
+          'Windows-only',
         )
         expect(calls).toEqual([])
       }
@@ -108,7 +108,7 @@ describe('createUwpLoopback', () => {
     if (process.platform === 'win32') {
       await expect(uwp.list()).resolves.toBeDefined()
     } else {
-      await expect(uwp.list()).rejects.toThrow(/windows-only|win32/i)
+      await expect(uwp.list()).rejects.toThrow('Windows-only')
     }
   })
 })

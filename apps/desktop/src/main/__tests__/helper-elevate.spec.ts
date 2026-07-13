@@ -1,7 +1,10 @@
 import { describe, expect, it, vi } from 'vitest'
 import { createHelperElevate } from '../helper/elevate'
 
-interface ExecResult { stdout: string; stderr: string }
+interface ExecResult {
+  stdout: string
+  stderr: string
+}
 
 function makeExec() {
   const calls: string[] = []
@@ -66,7 +69,7 @@ describe('createHelperElevate', () => {
       await elevate('systemctl enable --now metacubexd-helper')
 
       expect(calls).toHaveLength(1)
-      expect(calls[0]).toMatch(/^pkexec \/bin\/bash -c /)
+      expect(calls[0]?.startsWith('pkexec /bin/bash -c ')).toBe(true)
       expect(calls[0]).toContain('systemctl enable --now metacubexd-helper')
     })
   })
@@ -93,9 +96,10 @@ describe('createHelperElevate', () => {
         'C:\\Users\\me\\AppData\\Local\\Temp\\mcxd-elevate-test.cmd'
       expect(writes).toEqual([{ path: tmpPath, data: script }])
       expect(calls).toHaveLength(1)
-      expect(calls[0]).toMatch(/powershell/i)
-      expect(calls[0]).toMatch(/Start-Process/i)
-      expect(calls[0]).toMatch(/-Verb RunAs/i)
+      const command = calls[0]?.toLowerCase() ?? ''
+      expect(command).toContain('powershell')
+      expect(command).toContain('start-process')
+      expect(command).toContain('-verb runas')
       expect(calls[0]).toContain(tmpPath)
       // Temp script cleaned up after the elevated process returns.
       expect(unlinked).toContain(tmpPath)
@@ -113,7 +117,7 @@ describe('createHelperElevate', () => {
         tempName: () => 'mcxd-elevate-cancel.cmd',
       })
 
-      await expect(elevate('sc create x')).rejects.toThrow(/canceled/i)
+      await expect(elevate('sc create x')).rejects.toThrow('canceled')
       expect(unlinked).toContain(
         'C:\\Users\\me\\AppData\\Local\\Temp\\mcxd-elevate-cancel.cmd',
       )
@@ -127,6 +131,6 @@ describe('createHelperElevate', () => {
       exec,
       fs: makeFs().fs,
     })
-    await expect(elevate('echo hi')).rejects.toThrow(/unsupported platform/i)
+    await expect(elevate('echo hi')).rejects.toThrow('unsupported platform')
   })
 })

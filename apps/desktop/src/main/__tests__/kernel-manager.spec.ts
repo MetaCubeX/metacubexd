@@ -22,14 +22,12 @@ function makeSupervisor(version?: string) {
       version,
     }
   })
-  const getState = vi.fn(
-    (): KernelState => ({
-      status: version ? 'running' : 'stopped',
-      externalController: '127.0.0.1:9090',
-      secret: 's',
-      version,
-    }),
-  )
+  const getState = vi.fn((): KernelState => ({
+    status: version ? 'running' : 'stopped',
+    externalController: '127.0.0.1:9090',
+    secret: 's',
+    version,
+  }))
   const supervisor = {
     getState,
     setBinaryPath,
@@ -167,7 +165,7 @@ describe('createKernelManager', () => {
         listVersions: vi.fn(),
       })
 
-      await expect(mgr.switch('v1.19.27')).rejects.toThrow(/download failed/)
+      await expect(mgr.switch('v1.19.27')).rejects.toThrow('download failed')
       expect(writeOverride).not.toHaveBeenCalled()
       expect(setBinaryPath).not.toHaveBeenCalled()
       expect(restart).not.toHaveBeenCalled()

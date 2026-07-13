@@ -59,7 +59,10 @@ export interface LinuxAutostartOptions {
  * spec: quote the arg, backslash-escape the reserved characters inside).
  */
 export function desktopExecArg(arg: string): string {
-  return `"${arg.replace(/[\\"`$]/g, (c) => `\\${c}`)}"`
+  const reserved = new Set(['\\', '"', '`', '$'])
+  let escaped = ''
+  for (const char of arg) escaped += reserved.has(char) ? `\\${char}` : char
+  return `"${escaped}"`
 }
 
 /** Render the XDG autostart .desktop entry content. */

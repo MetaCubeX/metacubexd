@@ -52,7 +52,7 @@ describe('createPrivilegedKernel.start — spawn-path validation', () => {
     })
     await expect(
       kernel.start({ ...GOOD, binaryPath: 'mihomo' }),
-    ).rejects.toThrow(/absolute path/i)
+    ).rejects.toThrow('absolute path')
     expect(spawn).not.toHaveBeenCalled()
   })
 
@@ -62,11 +62,11 @@ describe('createPrivilegedKernel.start — spawn-path validation', () => {
       platform: 'linux',
     })
     await expect(kernel.start({ ...GOOD, homeDir: '../etc' })).rejects.toThrow(
-      /homeDir must be an absolute path/i,
+      'homeDir must be an absolute path',
     )
     await expect(
       kernel.start({ ...GOOD, configPath: 'config.yaml' }),
-    ).rejects.toThrow(/configPath must be an absolute path/i)
+    ).rejects.toThrow('configPath must be an absolute path')
   })
 
   it('rejects a binaryPath that does not exist', async () => {
@@ -78,7 +78,7 @@ describe('createPrivilegedKernel.start — spawn-path validation', () => {
       },
       platform: 'linux',
     })
-    await expect(kernel.start(GOOD)).rejects.toThrow(/does not exist/i)
+    await expect(kernel.start(GOOD)).rejects.toThrow('does not exist')
     expect(spawn).not.toHaveBeenCalled()
   })
 
@@ -87,7 +87,7 @@ describe('createPrivilegedKernel.start — spawn-path validation', () => {
       statPath: () => ({ isFile: false, mode: 0o755 }),
       platform: 'linux',
     })
-    await expect(kernel.start(GOOD)).rejects.toThrow(/not a regular file/i)
+    await expect(kernel.start(GOOD)).rejects.toThrow('not a regular file')
   })
 
   it('rejects a group/world-writable binary on POSIX (anti-planting)', async () => {
@@ -97,7 +97,7 @@ describe('createPrivilegedKernel.start — spawn-path validation', () => {
       statPath: () => ({ isFile: true, mode: 0o757 }),
       platform: 'linux',
     })
-    await expect(kernel.start(GOOD)).rejects.toThrow(/group\/world-writable/i)
+    await expect(kernel.start(GOOD)).rejects.toThrow('group/world-writable')
     expect(spawn).not.toHaveBeenCalled()
   })
 
@@ -125,7 +125,7 @@ describe('assertSafeKernelPaths', () => {
   it('throws for an empty binaryPath', () => {
     expect(() =>
       assertSafeKernelPaths({ ...GOOD, binaryPath: '' }, okStat, 'linux'),
-    ).toThrow(/absolute path/i)
+    ).toThrow('absolute path')
   })
 })
 
@@ -159,15 +159,15 @@ describe('resolveHelperSecret', () => {
       resolveHelperSecret(env, () => {
         throw new Error('EACCES')
       }),
-    ).toThrow(/cannot read MCXD_HELPER_SECRET_FILE/i)
+    ).toThrow('cannot read MCXD_HELPER_SECRET_FILE')
   })
 
   it('throws when the secret file is empty (no auth against a blank secret)', () => {
     const env = { MCXD_HELPER_SECRET_FILE: '/etc/mcxd/helper.secret' }
-    expect(() => resolveHelperSecret(env, () => '')).toThrow(/is empty/i)
+    expect(() => resolveHelperSecret(env, () => '')).toThrow('is empty')
   })
 
   it('throws when neither a file nor an inline secret is set', () => {
-    expect(() => resolveHelperSecret({}, readOk)).toThrow(/no shared secret/i)
+    expect(() => resolveHelperSecret({}, readOk)).toThrow('no shared secret')
   })
 })

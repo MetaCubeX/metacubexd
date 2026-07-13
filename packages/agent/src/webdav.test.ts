@@ -118,7 +118,7 @@ describe('createWebdavClient', () => {
       fetch,
     })
 
-    await expect(client.put('f.json', 'x')).rejects.toThrow(/403/)
+    await expect(client.put('f.json', 'x')).rejects.toThrow('403')
   })
 
   it('get() throws a clear error on a non-2xx response', async () => {
@@ -130,7 +130,7 @@ describe('createWebdavClient', () => {
       fetch,
     })
 
-    await expect(client.get('missing.json')).rejects.toThrow(/404/)
+    await expect(client.get('missing.json')).rejects.toThrow('404')
   })
 
   it('mkcol() tolerates 405 / 301 (collection already exists)', async () => {
@@ -154,6 +154,6 @@ describe('createWebdavClient', () => {
       password: 'pass',
       fetch,
     })
-    await expect(client.mkcol('dir')).rejects.toThrow(/500/)
+    await expect(client.mkcol('dir')).rejects.toThrow('500')
   })
 })

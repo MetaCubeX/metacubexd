@@ -545,10 +545,10 @@ describe('createSystemProxyController', () => {
           exec,
         })
         await expect(ctrl.setAutoProxy(PAC_URL)).rejects.toThrow(
-          /unsupported platform/i,
+          'unsupported platform',
         )
         await expect(ctrl.disableAutoProxy()).rejects.toThrow(
-          /unsupported platform/i,
+          'unsupported platform',
         )
       })
     })
@@ -591,9 +591,9 @@ describe('createSystemProxyController', () => {
         platform: 'aix' as NodeJS.Platform,
         exec,
       })
-      await expect(ctrl.enable()).rejects.toThrow(/unsupported platform/i)
-      await expect(ctrl.disable()).rejects.toThrow(/unsupported platform/i)
-      await expect(ctrl.isEnabled()).rejects.toThrow(/unsupported platform/i)
+      await expect(ctrl.enable()).rejects.toThrow('unsupported platform')
+      await expect(ctrl.disable()).rejects.toThrow('unsupported platform')
+      await expect(ctrl.isEnabled()).rejects.toThrow('unsupported platform')
     })
   })
 })

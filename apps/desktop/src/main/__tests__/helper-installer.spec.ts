@@ -68,13 +68,13 @@ describe('createHelperInstaller', () => {
       })
 
       await expect(installer.install(INSTALL_OPTS)).rejects.toThrow(
-        /unsupported platform/i,
+        'unsupported platform',
       )
       await expect(installer.uninstall()).rejects.toThrow(
-        /unsupported platform/i,
+        'unsupported platform',
       )
       await expect(installer.isInstalled()).rejects.toThrow(
-        /unsupported platform/i,
+        'unsupported platform',
       )
     })
   })
@@ -140,12 +140,11 @@ describe('createHelperInstaller', () => {
       expect(script).toContain(INSTALL_OPTS.secret)
       // Written under umask 077 so it is 0600 from the first byte (never briefly
       // world-readable between the write and the chmod).
-      expect(script).toMatch(/umask\s+0?77;[^\n]*printf[^\n]*helper\.secret/)
+      expect(script).toContain('(umask 077; printf')
+      expect(script).toContain('helper.secret)')
       // root-owned + 0600 (root-only): no other local user can read the secret.
-      expect(script).toMatch(/chown\s+root[: ]/)
-      expect(script).toMatch(
-        /chmod\s+0?600\s+\/etc\/metacubexd\/helper\.secret/,
-      )
+      expect(script).toContain('chown root:')
+      expect(script).toContain('chmod 0600 /etc/metacubexd/helper.secret')
       // Register the daemon with launchctl bootstrap system.
       expect(script).toContain(
         'launchctl bootstrap system /Library/LaunchDaemons/io.github.metacubexd.helper.plist',
@@ -254,11 +253,10 @@ describe('createHelperInstaller', () => {
       expect(script).toContain(INSTALL_OPTS.secret)
       // umask 077 so the secret file is 0600 from the first byte (no brief
       // world-readable window before the chmod).
-      expect(script).toMatch(/umask\s+0?77;[^\n]*printf[^\n]*helper\.secret/)
-      expect(script).toMatch(/chown\s+root[: ]/)
-      expect(script).toMatch(
-        /chmod\s+0?600\s+\/etc\/metacubexd\/helper\.secret/,
-      )
+      expect(script).toContain('(umask 077; printf')
+      expect(script).toContain('helper.secret)')
+      expect(script).toContain('chown root:')
+      expect(script).toContain('chmod 0600 /etc/metacubexd/helper.secret')
       expect(script).toContain('systemctl daemon-reload')
       expect(script).toContain('systemctl enable --now metacubexd-helper')
     })

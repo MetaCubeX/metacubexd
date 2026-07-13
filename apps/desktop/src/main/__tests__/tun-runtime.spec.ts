@@ -201,7 +201,7 @@ describe('createTunRuntime', () => {
       const runtime = makeRuntime(deps)
 
       await expect(runtime.deps.startPrivileged()).rejects.toThrow(
-        /privileged spawn failed/,
+        'privileged spawn failed',
       )
     })
   })
@@ -264,7 +264,7 @@ describe('createTunRuntime', () => {
       )
       const runtime = makeRuntime(deps)
 
-      await expect(runtime.deps.startPrivileged()).rejects.toThrow(/timed out/)
+      await expect(runtime.deps.startPrivileged()).rejects.toThrow('timed out')
       // A timeout / dropped socket is NOT a stale install — don't tear a healthy
       // service down on a transient blip.
       expect(deps.installer.uninstall).not.toHaveBeenCalled()

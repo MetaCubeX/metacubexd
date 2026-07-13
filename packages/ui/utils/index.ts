@@ -18,10 +18,19 @@ interface LatencyQualityMap {
 dayjs.extend(relativeTime)
 dayjs.extend(duration)
 
-// Version comparison helper
-const VERSION_PREFIX_RE = /^v/
-const VERSION_BUILDMETA_RE = /\+.*$/
-const PRERELEASE_NUMERIC_RE = /^\d+$/
+function isAsciiDigits(value: string): boolean {
+  if (!value) return false
+  for (const char of value) {
+    if (char < '0' || char > '9') return false
+  }
+  return true
+}
+
+function isAsciiLetter(char: string | undefined): boolean {
+  if (!char) return false
+  const lower = char.toLowerCase()
+  return lower >= 'a' && lower <= 'z'
+}
 
 // Compare two SemVer pre-release strings (the part after the first `-`) per the
 // SemVer precedence rules: identifiers are dot-separated and compared left to
@@ -39,8 +48,8 @@ function comparePrerelease(a: string, b: string): number {
     if (aId === undefined) return -1
     if (bId === undefined) return 1
 
-    const aIsNum = PRERELEASE_NUMERIC_RE.test(aId)
-    const bIsNum = PRERELEASE_NUMERIC_RE.test(bId)
+    const aIsNum = isAsciiDigits(aId)
+    const bIsNum = isAsciiDigits(bId)
 
     if (aIsNum && bIsNum) {
       const diff = Number(aId) - Number(bId)
@@ -59,9 +68,10 @@ function comparePrerelease(a: string, b: string): number {
 
 export function compareVersions(v1: string, v2: string): number {
   const parse = (v: string) => {
-    const cleaned = v
-      .replace(VERSION_PREFIX_RE, '')
-      .replace(VERSION_BUILDMETA_RE, '')
+    const withoutPrefix = v.startsWith('v') ? v.slice(1) : v
+    const buildIndex = withoutPrefix.indexOf('+')
+    const cleaned =
+      buildIndex === -1 ? withoutPrefix : withoutPrefix.slice(0, buildIndex)
     // Split on the FIRST `-` only — the whole remainder is the pre-release
     // string, which may itself contain `-` (e.g. `1.0.0-beta-1`).
     const dashIndex = cleaned.indexOf('-')
@@ -109,10 +119,8 @@ export function formatBytes(bytes: number) {
 }
 
 // URL helpers
-const URL_PROTOCOL_RE = /^https?:\/\//
-
 export function transformEndpointURL(url: string) {
-  return URL_PROTOCOL_RE.test(url)
+  return url.startsWith('http://') || url.startsWith('https://')
     ? url
     : `${typeof window !== 'undefined' ? window.location.protocol : 'http:'}//${url}`
 }
@@ -133,11 +141,8 @@ export function randomUUID(): string {
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
 }
 
-const IPV6_RE = /:.*:/
-const IPV4_RE = /\./
-
 export function formatIPv6(ip: string) {
-  if (IPV6_RE.test(ip) && !IPV4_RE.test(ip)) {
+  if (ip.indexOf(':') !== ip.lastIndexOf(':') && !ip.includes('.')) {
     return `[${ip}]`
   }
   return ip
@@ -472,7 +477,13 @@ export function parseNodeRegion(name: string): string | null {
   const flagCode = leadingFlagToCode(name)
   if (flagCode) return flagCode
 
-  const code = name.match(/^([A-Z]{2})[_\-\s]/i)?.[1]?.toUpperCase()
+  const separator = name[2]
+  const hasSeparator =
+    separator === '_' || separator === '-' || separator?.trim() === ''
+  const code =
+    isAsciiLetter(name[0]) && isAsciiLetter(name[1]) && hasSeparator
+      ? name.slice(0, 2).toUpperCase()
+      : undefined
   if (code && ISO_CODES.has(code)) return code
   return null
 }
@@ -613,7 +624,7 @@ export function splitLeadingFlag(name: string): { flag: string; rest: string } {
   const matched = name.match(LEADING_FLAG_RE)?.[0] ?? ''
   if (!matched) return { flag: '', rest: name }
   return {
-    flag: matched.replace(/\s+$/u, ''),
+    flag: matched.trimEnd(),
     rest: name.slice(matched.length),
   }
 }
@@ -828,15 +839,6 @@ export function getChartThemeColors() {
   }
 }
 
-// SVG encoder for proxy icons
-const SVG_QUOTE_RE = /"/g
-const SVG_PERCENT_RE = /%/g
-const SVG_HASH_RE = /#/g
-const SVG_LBRACE_RE = /\{/g
-const SVG_RBRACE_RE = /\}/g
-const SVG_LT_RE = /</g
-const SVG_GT_RE = />/g
-
 export function encodeSvg(svg: string) {
   return svg
     .replace(
@@ -845,13 +847,13 @@ export function encodeSvg(svg: string) {
         ? '<svg'
         : '<svg xmlns="http://www.w3.org/2000/svg"',
     )
-    .replace(SVG_QUOTE_RE, "'")
-    .replace(SVG_PERCENT_RE, '%25')
-    .replace(SVG_HASH_RE, '%23')
-    .replace(SVG_LBRACE_RE, '%7B')
-    .replace(SVG_RBRACE_RE, '%7D')
-    .replace(SVG_LT_RE, '%3C')
-    .replace(SVG_GT_RE, '%3E')
+    .replaceAll('"', "'")
+    .replaceAll('%', '%25')
+    .replaceAll('#', '%23')
+    .replaceAll('{', '%7B')
+    .replaceAll('}', '%7D')
+    .replaceAll('<', '%3C')
+    .replaceAll('>', '%3E')
 }
 
 // Resolve the active group for master-detail: keep `current` if it still exists,

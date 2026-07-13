@@ -64,7 +64,6 @@ export default antfu({
 
     // Other
     'no-alert': 'off',
-    'regexp/no-super-linear-backtracking': 'off',
     'antfu/top-level-function': 'off',
     'antfu/if-newline': 'off',
   },

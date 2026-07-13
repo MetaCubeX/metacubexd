@@ -59,7 +59,7 @@ export function resolveControlConfig(): ControlConfig {
 }
 
 function stripTrailingSlash(s: string): string {
-  return s.replace(/\/$/, '')
+  return s.endsWith('/') ? s.slice(0, -1) : s
 }
 
 export function useControlApi() {

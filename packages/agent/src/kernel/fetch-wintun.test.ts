@@ -40,7 +40,7 @@ describe('wintunZipEntry', () => {
   })
 
   it('throws on an unsupported arch', () => {
-    expect(() => wintunZipEntry('mips')).toThrow(/unsupported arch/i)
+    expect(() => wintunZipEntry('mips')).toThrow('unsupported arch')
   })
 })
 
@@ -83,6 +83,6 @@ describe('fetchWintun', () => {
         fetch: fakeFetch as unknown as typeof fetch,
         unzipEntry: async () => Buffer.from(''),
       }),
-    ).rejects.toThrow(/404/)
+    ).rejects.toThrow('404')
   })
 })

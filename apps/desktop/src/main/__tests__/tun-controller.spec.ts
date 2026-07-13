@@ -126,7 +126,7 @@ describe('createTunController', () => {
       const tun = createTunController(deps)
 
       await expect(tun.enable({ stack: 'gvisor' })).rejects.toThrow(
-        /elevation denied/,
+        'elevation denied',
       )
     })
 
@@ -138,7 +138,7 @@ describe('createTunController', () => {
       const tun = createTunController({ ...deps, precheck })
 
       await expect(tun.enable({ stack: 'gvisor' })).rejects.toThrow(
-        /no active profile/,
+        'no active profile',
       )
       // The precondition failed before the destructive sequence ran — the
       // sidecar is never stopped, so the user is left in a recoverable state.
@@ -245,7 +245,7 @@ describe('createTunController', () => {
 
       await tun.enable({ stack: 'gvisor' })
 
-      await expect(tun.disable()).rejects.toThrow(/section write failed/)
+      await expect(tun.disable()).rejects.toThrow('section write failed')
     })
   })
 
@@ -304,7 +304,7 @@ describe('createTunController', () => {
       deps.uninstall.mockRejectedValueOnce(new Error('pkexec denied'))
       const tun = createTunController(deps)
 
-      await expect(tun.uninstall!()).rejects.toThrow(/pkexec denied/)
+      await expect(tun.uninstall!()).rejects.toThrow('pkexec denied')
     })
   })
 })

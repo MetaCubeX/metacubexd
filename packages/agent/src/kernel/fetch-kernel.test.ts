@@ -93,7 +93,7 @@ describe('fetchKernel', () => {
       fetchKernel('linux', 'arm64', dest, {
         fetch: fakeFetch as unknown as typeof fetch,
       }),
-    ).rejects.toThrow(/404/)
+    ).rejects.toThrow('404')
   })
 
   it('never targets a legacy -go1xx asset name', async () => {
@@ -108,7 +108,7 @@ describe('fetchKernel', () => {
       (
         fakeFetch.mock.calls as unknown as [string][][]
       )[0]![0] as unknown as string,
-    ).not.toMatch(/-go\d/)
+    ).not.toContain('-go')
   })
 
   it('uses an injected version for the download URL', async () => {
@@ -200,6 +200,6 @@ describe('listMihomoVersions', () => {
     )
     await expect(
       listMihomoVersions({ fetch: fakeFetch as unknown as typeof fetch }),
-    ).rejects.toThrow(/403/)
+    ).rejects.toThrow('403')
   })
 })

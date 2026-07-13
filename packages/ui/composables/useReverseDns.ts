@@ -25,6 +25,33 @@ const inflight = new Map<string, Promise<string | null>>()
 // resolved so every consumer re-renders.
 const hostnameState = reactive<Record<string, string>>({})
 
+function isDecimalOctet(part: string): boolean {
+  if (part.length < 1 || part.length > 3) return false
+  for (const char of part) {
+    if (char < '0' || char > '9') return false
+  }
+  return Number(part) <= 255
+}
+
+function isHexGroup(group: string): boolean {
+  if (group.length < 1 || group.length > 4) return false
+  for (const char of group.toLowerCase()) {
+    const isDigit = char >= '0' && char <= '9'
+    const isHexLetter = char >= 'a' && char <= 'f'
+    if (!isDigit && !isHexLetter) return false
+  }
+  return true
+}
+
+function isLinkLocalV6(ip: string): boolean {
+  const firstGroup = ip.split(':', 1)[0]
+  return (
+    !!firstGroup &&
+    isHexGroup(firstGroup) &&
+    (Number.parseInt(firstGroup, 16) & 0xFFC0) === 0xFE80
+  )
+}
+
 // Writes into hostnameState are deferred to a microtask (deduped per IP) so they
 // never run synchronously during a render/computed.
 const pendingPromotions = new Set<string>()
@@ -45,15 +72,16 @@ export function isResolvableIP(ip: string | undefined): boolean {
 
   if (ip.includes(':')) {
     const lower = ip.split('%')[0]!.toLowerCase()
+    if (reverseNameV6(lower) === null) return false
     if (lower === '::' || lower === '::1') return false
-    if (/^fe[89ab]/.test(lower)) return false // fe80::/10 link-local
+    if (isLinkLocalV6(lower)) return false // fe80::/10 link-local
     return true
   }
 
   const parts = ip.split('.')
   if (parts.length !== 4) return false
   for (const part of parts) {
-    if (!/^\d{1,3}$/.test(part) || Number(part) > 255) return false
+    if (!isDecimalOctet(part)) return false
   }
   const a = Number(parts[0])
   const b = Number(parts[1])
@@ -67,7 +95,7 @@ function reverseNameV4(ip: string): string | null {
   const parts = ip.split('.')
   if (parts.length !== 4) return null
   for (const part of parts) {
-    if (!/^\d{1,3}$/.test(part) || Number(part) > 255) return null
+    if (!isDecimalOctet(part)) return null
   }
   return `${parts[3]}.${parts[2]}.${parts[1]}.${parts[0]}.in-addr.arpa`
 }
@@ -84,7 +112,7 @@ function reverseNameV6(ip: string): string | null {
   let groups: string[]
   if (halves.length === 2) {
     const missing = 8 - head.length - tail.length
-    if (missing < 0) return null
+    if (missing <= 0) return null
     const pad: string[] = []
     for (let i = 0; i < missing; i++) pad.push('0')
     groups = [...head, ...pad, ...tail]
@@ -95,7 +123,7 @@ function reverseNameV6(ip: string): string | null {
 
   let nibbles = ''
   for (const group of groups) {
-    if (!/^[0-9a-f]{1,4}$/i.test(group)) return null
+    if (!isHexGroup(group)) return null
     nibbles += group.padStart(4, '0').toLowerCase()
   }
   return `${nibbles.split('').reverse().join('.')}.ip6.arpa`
@@ -187,7 +215,7 @@ export function useReverseDns() {
       // response) is a negative result. Strip the trailing dot mihomo appends
       // (e.g. "iPhone." -> "iPhone").
       const data = result.Answer?.[0]?.data
-      return data ? data.replace(/\.$/, '') : null
+      return data ? (data.endsWith('.') ? data.slice(0, -1) : data) : null
     } catch {
       return null
     }

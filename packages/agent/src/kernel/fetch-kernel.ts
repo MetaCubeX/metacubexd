@@ -54,7 +54,25 @@ export async function fetchKernel(
 
 const RELEASES_URL = 'https://api.github.com/repos/MetaCubeX/mihomo/releases'
 // Keep `vX.Y...` tags; drop the rolling 'Prerelease-Alpha' and any non-version tags.
-const VERSION_TAG = /^v\d+\.\d+/
+
+function isAsciiDigits(value: string): boolean {
+  if (!value) return false
+  for (const char of value) {
+    if (char < '0' || char > '9') return false
+  }
+  return true
+}
+
+function isVersionTag(tag: string): boolean {
+  if (!tag.startsWith('v')) return false
+  const prereleaseIndex = tag.indexOf('-')
+  const core = tag.slice(
+    1,
+    prereleaseIndex === -1 ? undefined : prereleaseIndex,
+  )
+  const parts = core.split('.')
+  return parts.length >= 2 && parts.every(isAsciiDigits)
+}
 
 interface GithubRelease {
   tag_name?: string
@@ -64,8 +82,9 @@ interface GithubRelease {
 function compareTagsDesc(a: string, b: string): number {
   const parse = (t: string) =>
     t
-      .replace(/^v/, '')
-      .split(/[.-]/)
+      .slice(1)
+      .replaceAll('-', '.')
+      .split('.')
       .map((p) => Number.parseInt(p, 10))
   const pa = parse(a)
   const pb = parse(b)
@@ -104,6 +123,6 @@ export async function listMihomoVersions(
   const releases = (await res.json()) as GithubRelease[]
   return releases
     .map((r) => r.tag_name)
-    .filter((t): t is string => typeof t === 'string' && VERSION_TAG.test(t))
+    .filter((t): t is string => typeof t === 'string' && isVersionTag(t))
     .sort(compareTagsDesc)
 }

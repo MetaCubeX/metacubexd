@@ -42,6 +42,27 @@ function mkRule(partial: Partial<Rule> = {}): Rule {
   }
 }
 
+function isLowerHex(value: string): boolean {
+  if (!value) return false
+  for (const char of value) {
+    const isDigit = char >= '0' && char <= '9'
+    const isHexLetter = char >= 'a' && char <= 'f'
+    if (!isDigit && !isHexLetter) return false
+  }
+  return true
+}
+
+function isUUIDv4(value: string): boolean {
+  const parts = value.split('-')
+  return (
+    parts.length === 5 &&
+    parts.map((part) => part.length).join(',') === '8,4,4,4,12' &&
+    parts.every(isLowerHex) &&
+    parts[2]?.startsWith('4') === true &&
+    ['8', '9', 'a', 'b'].includes(parts[3]?.[0] ?? '')
+  )
+}
+
 describe('utils/index', () => {
   describe('transformEndpointURL', () => {
     it('returns URL as-is if it starts with http://', () => {
@@ -59,16 +80,15 @@ describe('utils/index', () => {
     it('prepends protocol for bare hostnames', () => {
       // In test environment, window.location.protocol may not be defined
       const result = transformEndpointURL('localhost:9090')
-      expect(result).toMatch(/^https?:\/\/localhost:9090$/)
+      const parsed = new URL(result)
+      expect(['http:', 'https:']).toContain(parsed.protocol)
+      expect(parsed.host).toBe('localhost:9090')
     })
   })
 
   describe('randomUUID', () => {
-    const UUID_V4_RE =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
-
     it('uses native crypto.randomUUID when available', () => {
-      expect(randomUUID()).toMatch(UUID_V4_RE)
+      expect(isUUIDv4(randomUUID())).toBe(true)
     })
 
     it('falls back to getRandomValues in non-secure contexts', () => {
@@ -78,7 +98,7 @@ describe('utils/index', () => {
       crypto.randomUUID = undefined
 
       try {
-        expect(randomUUID()).toMatch(UUID_V4_RE)
+        expect(isUUIDv4(randomUUID())).toBe(true)
       } finally {
         crypto.randomUUID = original
       }
@@ -357,7 +377,7 @@ describe('utils/index', () => {
       const svg = '<svg xmlns="http://www.w3.org/2000/svg"></svg>'
       const encoded = encodeSvg(svg)
       // Should not have duplicate xmlns
-      expect(encoded.match(/xmlns/g)?.length).toBe(1)
+      expect(encoded.split('xmlns')).toHaveLength(2)
     })
   })
 

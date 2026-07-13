@@ -169,7 +169,7 @@ WantedBy=multi-user.target`
  * Wrap in single quotes and escape embedded single quotes the standard way.
  */
 function shQuote(value: string): string {
-  return `'${value.replace(/'/g, `'\\''`)}'`
+  return `'${value.replaceAll("'", `'\\''`)}'`
 }
 
 /**
@@ -270,7 +270,9 @@ export function createHelperInstaller(
   async function linuxIsInstalled(): Promise<boolean> {
     try {
       const { stdout } = await exec(`systemctl is-enabled ${serviceName}`)
-      return /\benabled\b/.test(stdout)
+      return stdout
+        .split('\n')
+        .some((line) => line.trim().toLowerCase() === 'enabled')
     } catch (err) {
       if (
         typeof err === 'object' &&
@@ -323,7 +325,7 @@ export function createHelperInstaller(
   async function winIsInstalled(): Promise<boolean> {
     try {
       const { stdout } = await exec(`sc query ${serviceName}`)
-      return stdout.includes(serviceName) && !/FAILED\s+1060/i.test(stdout)
+      return stdout.includes(serviceName) && !stdout.includes('1060')
     } catch (err) {
       if (
         typeof err === 'object' &&

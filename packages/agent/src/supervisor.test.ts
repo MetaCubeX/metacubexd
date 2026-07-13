@@ -156,7 +156,11 @@ describe('createSupervisor — initial state', () => {
     // Non-conflicting profile content survives.
     expect(written).toContain('proxies: []')
     // mixed-port is only written when mixedPort is provided.
-    expect(written.match(/^external-controller:/gm)).toHaveLength(1)
+    expect(
+      written
+        .split('\n')
+        .filter((line) => line.startsWith('external-controller:')),
+    ).toHaveLength(1)
     await sup.dispose()
   })
 

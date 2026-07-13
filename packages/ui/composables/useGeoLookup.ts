@@ -18,6 +18,47 @@ const GEO_ENDPOINTS: Record<IPProvider, (ip: string) => string> = {
   'ipapi.is': (ip) => `https://api.ipapi.is/?q=${ip}`,
 }
 
+function isAsciiLetters(value: string): boolean {
+  if (!value) return false
+  for (const char of value.toLowerCase()) {
+    if (char < 'a' || char > 'z') return false
+  }
+  return true
+}
+
+function isDecimalOctet(part: string): boolean {
+  if (part.length < 1 || part.length > 3) return false
+  for (const char of part) {
+    if (char < '0' || char > '9') return false
+  }
+  return Number(part) <= 255
+}
+
+function isHexGroup(group: string): boolean {
+  if (group.length < 1 || group.length > 4) return false
+  for (const char of group.toLowerCase()) {
+    const isDigit = char >= '0' && char <= '9'
+    const isHexLetter = char >= 'a' && char <= 'f'
+    if (!isDigit && !isHexLetter) return false
+  }
+  return true
+}
+
+function parseIPv6FirstGroup(ip: string): number | null {
+  const noZone = ip.split('%')[0]!
+  const halves = noZone.split('::')
+  if (halves.length > 2) return null
+  const head = halves[0] ? halves[0].split(':') : []
+  const tail = halves.length === 2 && halves[1] ? halves[1].split(':') : []
+  if (halves.length === 2) {
+    if (8 - head.length - tail.length <= 0) return null
+  } else if (head.length !== 8) {
+    return null
+  }
+  if (![...head, ...tail].every(isHexGroup)) return null
+  return head[0] ? Number.parseInt(head[0], 16) : 0
+}
+
 function parseIPSB(data: Record<string, unknown>): GeoInfo {
   return {
     countryCode: data.country_code as string | undefined,
@@ -30,8 +71,7 @@ function parseIPSB(data: Record<string, unknown>): GeoInfo {
 
 function parseIPWhoIs(data: Record<string, unknown>): GeoInfo {
   const connection = data.connection as
-    | { asn?: number; org?: string }
-    | undefined
+    { asn?: number; org?: string } | undefined
   return {
     countryCode: data.country_code as string | undefined,
     country: data.country as string | undefined,
@@ -43,8 +83,7 @@ function parseIPWhoIs(data: Record<string, unknown>): GeoInfo {
 
 function parseIPAPI(data: Record<string, unknown>): GeoInfo {
   const location = data.location as
-    | { country_code?: string; country?: string; city?: string }
-    | undefined
+    { country_code?: string; country?: string; city?: string } | undefined
   const asn = data.asn as { asn?: number; org?: string } | undefined
   return {
     countryCode: location?.country_code,
@@ -72,7 +111,7 @@ function parseGeoResponse(
 // Convert an ISO 3166-1 alpha-2 country code to its flag emoji using regional
 // indicator symbols. Returns '' for invalid input.
 export function countryCodeToFlagEmoji(code: string | undefined): string {
-  if (!code || code.length !== 2 || !/^[a-z]{2}$/i.test(code)) return ''
+  if (!code || code.length !== 2 || !isAsciiLetters(code)) return ''
   const A = 0x1F1E6
   const base = 'A'.charCodeAt(0)
   const upper = code.toUpperCase()
@@ -90,9 +129,8 @@ function ipv4ToInt(ip: string): number | null {
   if (parts.length !== 4) return null
   let value = 0
   for (const part of parts) {
-    if (!/^\d{1,3}$/.test(part)) return null
+    if (!isDecimalOctet(part)) return null
     const n = Number(part)
-    if (n > 255) return null
     value = value * 256 + n
   }
   return value >>> 0
@@ -125,10 +163,12 @@ export function isPrivateOrReservedIP(ip: string | undefined): boolean {
 
   const lower = ip.toLowerCase()
   if (lower === '::1' || lower === '::') return true
+  const firstGroup = parseIPv6FirstGroup(lower)
+  if (firstGroup === null) return true
   // fc00::/7 (unique local) -> first hextet fc.. or fd..
-  if (/^f[cd][0-9a-f]{0,2}:/.test(lower)) return true
+  if ((firstGroup & 0xFE00) === 0xFC00) return true
   // fe80::/10 (link local)
-  if (/^fe[89ab][0-9a-f]?:/.test(lower)) return true
+  if ((firstGroup & 0xFFC0) === 0xFE80) return true
 
   return false
 }

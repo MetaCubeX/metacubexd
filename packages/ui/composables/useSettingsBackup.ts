@@ -54,10 +54,12 @@ export function useSettingsBackup() {
     const url = URL.createObjectURL(blob)
     const anchor = document.createElement('a')
     anchor.href = url
-    anchor.download = `metacubexd-settings-${new Date()
+    const timestamp = new Date()
       .toISOString()
       .slice(0, 19)
-      .replace(/[:T]/g, '-')}.json`
+      .replaceAll(':', '-')
+      .replace('T', '-')
+    anchor.download = `metacubexd-settings-${timestamp}.json`
     anchor.click()
     URL.revokeObjectURL(url)
   }

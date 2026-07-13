@@ -249,10 +249,7 @@ export function useGithubAPI() {
 
 // API Functions
 export type EndpointCheckError =
-  | 'mixed_content'
-  | 'auth_error'
-  | 'network_error'
-  | null
+  'mixed_content' | 'auth_error' | 'network_error' | null
 
 export function checkEndpointAPI(
   url: string,
@@ -599,25 +596,75 @@ export function useConfigActions() {
 // Release API
 const METACUBEX_MIHOMO_REPOSITORY_URL = 'repos/MetaCubeX/mihomo'
 const VERNESONG_MIHOMO_REPOSITORY_URL = 'repos/vernesong/mihomo'
-const BACKEND_VERSION_RE = /\b(alpha|beta|meta)-?(\S+)/i
-const VERNESONG_MIHOMO_RE = /-smart-/i
 
 type BackendReleaseChannel = 'alpha' | 'beta' | 'meta' | 'stable'
+
+function isAsciiWord(char: string | undefined): boolean {
+  if (!char) return false
+  const lower = char.toLowerCase()
+  return (
+    (lower >= 'a' && lower <= 'z') ||
+    (char >= '0' && char <= '9') ||
+    char === '_'
+  )
+}
+
+function backendVersionParts(currentVersion: string): {
+  channel: Exclude<BackendReleaseChannel, 'stable'> | undefined
+  suffix: string
+} {
+  const value = currentVersion.toLowerCase()
+  let best:
+    | {
+        index: number
+        channel: Exclude<BackendReleaseChannel, 'stable'>
+        suffix: string
+      }
+    | undefined
+
+  for (const channel of ['alpha', 'beta', 'meta'] as const) {
+    let index = value.indexOf(channel)
+    while (index !== -1) {
+      const hasBoundary = index === 0 || !isAsciiWord(value[index - 1])
+      let suffixStart = index + channel.length
+      if (value[suffixStart] === '-') suffixStart++
+      const hasSuffix =
+        suffixStart < value.length && value[suffixStart]!.trim() !== ''
+      if (hasBoundary && hasSuffix) {
+        let suffixEnd = suffixStart
+        while (suffixEnd < value.length && value[suffixEnd]!.trim() !== '') {
+          suffixEnd++
+        }
+        const candidate = {
+          index,
+          channel,
+          suffix: currentVersion.slice(suffixStart, suffixEnd),
+        }
+        if (!best || candidate.index < best.index) best = candidate
+        break
+      }
+      index = value.indexOf(channel, index + channel.length)
+    }
+  }
+
+  return best
+    ? { channel: best.channel, suffix: best.suffix }
+    : { channel: undefined, suffix: '' }
+}
 
 function resolveBackendReleaseTarget(currentVersion: string): {
   channel: BackendReleaseChannel
   repositoryURL: string
   versionSuffix: string
 } {
-  const match = BACKEND_VERSION_RE.exec(currentVersion)
-  const channel = match?.[1]?.toLowerCase() as BackendReleaseChannel | undefined
+  const { channel, suffix } = backendVersionParts(currentVersion)
 
   return {
     channel: channel ?? 'stable',
-    repositoryURL: VERNESONG_MIHOMO_RE.test(currentVersion)
+    repositoryURL: currentVersion.toLowerCase().includes('-smart-')
       ? VERNESONG_MIHOMO_REPOSITORY_URL
       : METACUBEX_MIHOMO_REPOSITORY_URL,
-    versionSuffix: match?.[2] ?? '',
+    versionSuffix: suffix,
   }
 }
 

@@ -38,7 +38,7 @@ describe('composables/useReachabilityBoard', () => {
       expect(names).toContain('Cloudflare')
       // Every preset has a usable url.
       for (const target of CONNECTIVITY_TARGETS) {
-        expect(target.url).toMatch(/^https?:\/\//)
+        expect(['http:', 'https:']).toContain(new URL(target.url).protocol)
       }
     })
 
@@ -49,7 +49,7 @@ describe('composables/useReachabilityBoard', () => {
       expect(names).toContain('OpenAI')
       expect(names).toContain('Gemini')
       for (const target of STREAMING_UNLOCK_TARGETS) {
-        expect(target.url).toMatch(/^https?:\/\//)
+        expect(['http:', 'https:']).toContain(new URL(target.url).protocol)
       }
     })
   })

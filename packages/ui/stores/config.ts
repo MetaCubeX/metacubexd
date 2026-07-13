@@ -156,8 +156,9 @@ export const useConfigStore = defineStore('config', () => {
   const logLevel = useLocalStorage<LOG_LEVEL>('logLevel', LOG_LEVEL.Info)
   const logMaxRows = useLocalStorage('logMaxRows', DEFAULT_LOGS_TABLE_MAX_ROWS)
 
-  // Quick filter regex for connections
-  const quickFilterRegex = useLocalStorage(
+  // Literal quick-filter terms for connections. Keep the legacy storage key so
+  // existing pipe-separated defaults and user preferences migrate in place.
+  const quickFilterText = useLocalStorage(
     'quickFilterRegex',
     'DIRECT|direct|dns-out',
   )
@@ -376,7 +377,7 @@ export const useConfigStore = defineStore('config', () => {
     connectionsTableColumnVisibility,
     connectionsTableColumnOrder,
     connectionsDisplayMode,
-    quickFilterRegex,
+    quickFilterText,
     // Logs
     logsTableSize,
     logLevel,

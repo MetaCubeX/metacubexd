@@ -5,7 +5,7 @@ import { renderTwoLineCell } from '../connectionCells'
 function findChildByClass(vnode: VNode, cls: string): VNode | null {
   if (
     typeof vnode.props?.class === 'string' &&
-    vnode.props.class.split(/\s+/).includes(cls)
+    vnode.props.class.split(' ').filter(Boolean).includes(cls)
   ) {
     return vnode
   }

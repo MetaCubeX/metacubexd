@@ -41,10 +41,11 @@ describe('useShareQr', () => {
 
       const svg = qrSvg('https://example.com/sub')
 
-      expect(svg).toMatch(/^<svg[\s>]/)
+      expect(svg.startsWith('<svg')).toBe(true)
+      expect([' ', '>']).toContain(svg[4])
       expect(svg).toContain('</svg>')
       // The matrix has at least one black module rendered as a rect/path.
-      expect(svg).toMatch(/<(rect|path)/)
+      expect(svg.includes('<rect') || svg.includes('<path')).toBe(true)
     })
 
     it('produces different output for different urls', () => {

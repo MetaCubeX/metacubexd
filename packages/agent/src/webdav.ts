@@ -18,7 +18,11 @@ export interface WebdavClient {
  * regardless of trailing/leading slashes on either side.
  */
 function joinUrl(base: string, path: string): string {
-  return `${base.replace(/\/+$/, '')}/${path.replace(/^\/+/, '')}`
+  let baseEnd = base.length
+  while (baseEnd > 0 && base[baseEnd - 1] === '/') baseEnd--
+  let pathStart = 0
+  while (path[pathStart] === '/') pathStart++
+  return `${base.slice(0, baseEnd)}/${path.slice(pathStart)}`
 }
 
 /**

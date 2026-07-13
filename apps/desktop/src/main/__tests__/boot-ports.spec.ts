@@ -20,6 +20,6 @@ describe('resolveBootPorts', () => {
   })
 
   it('throws when fewer than three ports are provided', () => {
-    expect(() => resolveBootPorts([1, 2])).toThrow(/three ports/i)
+    expect(() => resolveBootPorts([1, 2])).toThrow('three ports')
   })
 })

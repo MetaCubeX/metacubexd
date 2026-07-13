@@ -189,7 +189,7 @@ describe('createHelperClient', () => {
           homeDir: '/home',
           configPath: '/home/config.yaml',
         }),
-      ).rejects.toThrow(/secret/i)
+      ).rejects.toThrow('secret')
       // The injected kernel must NOT have been touched on auth failure.
       expect(kernel.start).not.toHaveBeenCalled()
     } finally {
@@ -235,7 +235,7 @@ describe('createHelperClient', () => {
       timeoutMs: 50,
     })
     try {
-      await expect(client.ping()).rejects.toThrow(/timeout|timed out/i)
+      await expect(client.ping()).rejects.toThrow('timed out')
     } finally {
       await client.close()
     }

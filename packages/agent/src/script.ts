@@ -31,6 +31,99 @@ export interface CreateScriptRunnerOptions {
 
 const DEFAULT_TIMEOUT_MS = 5000
 
+function isWhitespace(char: string | undefined): boolean {
+  return char !== undefined && char.trim() === ''
+}
+
+// Rewrite the first statement-level `export default` without treating text in
+// comments or string literals as code. This deliberately small scanner matches
+// the script profile contract more safely than a text pattern while avoiding a
+// parser dependency in the runtime package.
+function rewriteDefaultExport(code: string): string {
+  let statementBoundary = true
+  let quote: "'" | '"' | '`' | null = null
+  let escaped = false
+  let lineComment = false
+  let blockComment = false
+
+  for (let i = 0; i < code.length; i++) {
+    const char = code[i]!
+    const next = code[i + 1]
+
+    if (lineComment) {
+      if (char === '\n') {
+        lineComment = false
+        statementBoundary = true
+      }
+      continue
+    }
+    if (blockComment) {
+      if (char === '*' && next === '/') {
+        blockComment = false
+        i++
+      }
+      continue
+    }
+    if (quote) {
+      if (escaped) {
+        escaped = false
+      } else if (char === '\\') {
+        escaped = true
+      } else if (char === quote) {
+        quote = null
+      }
+      continue
+    }
+    if (char === '/' && next === '/') {
+      lineComment = true
+      i++
+      continue
+    }
+    if (char === '/' && next === '*') {
+      blockComment = true
+      i++
+      continue
+    }
+    if (char === "'" || char === '"' || char === '`') {
+      quote = char
+      statementBoundary = false
+      continue
+    }
+    if (isWhitespace(char)) {
+      if (char === '\n' || char === '\r') statementBoundary = true
+      continue
+    }
+    if (char === ';') {
+      statementBoundary = true
+      continue
+    }
+
+    if (statementBoundary && code.startsWith('export', i)) {
+      let cursor = i + 'export'.length
+      if (!isWhitespace(code[cursor])) {
+        statementBoundary = false
+        continue
+      }
+      while (isWhitespace(code[cursor])) cursor++
+      if (!code.startsWith('default', cursor)) {
+        statementBoundary = false
+        continue
+      }
+      cursor += 'default'.length
+      if (!isWhitespace(code[cursor])) {
+        statementBoundary = false
+        continue
+      }
+      while (isWhitespace(code[cursor])) cursor++
+      return `${code.slice(0, i)}module.exports = ${code.slice(cursor)}`
+    }
+
+    statementBoundary = false
+  }
+
+  return code
+}
+
 // Bootstrap that runs INSIDE the worker. Receives { code, input } via
 // workerData, evaluates the user code as a CommonJS-ish module (so both
 // `module.exports = fn` and `export default fn` work), calls the exported
@@ -44,14 +137,10 @@ const WORKER_BOOTSTRAP = `
 const { parentPort, workerData } = require('node:worker_threads')
 async function main() {
   const { code, input } = workerData
-  const transformed = String(code).replace(
-    /(^|[;\\n])\\s*export\\s+default\\s+/,
-    '$1module.exports = ',
-  )
   const moduleObj = { exports: {} }
   // Minimal surface: provide module/exports; do NOT forward require/fetch/fs.
   // eslint-disable-next-line no-new-func
-  const factory = new Function('module', 'exports', transformed)
+  const factory = new Function('module', 'exports', String(code))
   factory(moduleObj, moduleObj.exports)
   const fn = moduleObj.exports
   if (typeof fn !== 'function') {
@@ -74,15 +163,14 @@ main().then(
 `
 
 type WorkerReply =
-  | { ok: true; result: unknown }
-  | { ok: false; message: string }
+  { ok: true; result: unknown } | { ok: false; message: string }
 
 function runInWorker(timeoutMs: number): ScriptRun {
   return (code, input) =>
     new Promise<unknown>((resolve, reject) => {
       const worker = new Worker(WORKER_BOOTSTRAP, {
         eval: true,
-        workerData: { code, input },
+        workerData: { code: rewriteDefaultExport(code), input },
       })
       let settled = false
       const finish = (fn: () => void) => {

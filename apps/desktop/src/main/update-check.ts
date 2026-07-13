@@ -27,7 +27,8 @@ export interface UpdateCheckResult {
  * null when nothing numeric is parseable (never throws).
  */
 export function parseVersion(version: string): number[] | null {
-  const cleaned = version.trim().replace(/^v/i, '')
+  const trimmed = version.trim()
+  const cleaned = trimmed[0]?.toLowerCase() === 'v' ? trimmed.slice(1) : trimmed
   if (!cleaned) return null
   const segments = cleaned.split('.').map((s) => Number.parseInt(s, 10))
   if (segments.length === 0 || segments.some((n) => Number.isNaN(n))) {

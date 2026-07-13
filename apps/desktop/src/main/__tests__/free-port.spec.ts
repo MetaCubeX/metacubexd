@@ -20,6 +20,6 @@ describe('pickFreePorts', () => {
     const probe = async () => false // nothing free
     await expect(
       pickFreePorts(1, { start: 40000, probe, maxScan: 5 }),
-    ).rejects.toThrow(/no free port/i)
+    ).rejects.toThrow('no free port')
   })
 })

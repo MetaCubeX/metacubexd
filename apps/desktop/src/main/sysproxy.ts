@@ -13,6 +13,20 @@ export type ExecFn = (
 
 const defaultExec: ExecFn = promisify(nodeExec)
 
+function splitWhitespace(value: string): string[] {
+  const fields: string[] = []
+  let start = -1
+  for (let i = 0; i <= value.length; i++) {
+    const whitespace = i === value.length || value[i]!.trim() === ''
+    if (!whitespace && start === -1) start = i
+    if (whitespace && start !== -1) {
+      fields.push(value.slice(start, i))
+      start = -1
+    }
+  }
+  return fields
+}
+
 export interface SystemProxyControllerOptions {
   host: string
   port: number
@@ -105,7 +119,17 @@ export function createSystemProxyController(
     const first = services[0]
     if (!first) return false
     const { stdout } = await exec(`networksetup -getwebproxy "${first}"`)
-    return /Enabled:\s*Yes/i.test(stdout)
+    return stdout.split('\n').some((line) => {
+      const separator = line.indexOf(':')
+      if (separator === -1) return false
+      return (
+        line.slice(0, separator).trim().toLowerCase() === 'enabled' &&
+        line
+          .slice(separator + 1)
+          .trim()
+          .toLowerCase() === 'yes'
+      )
+    })
   }
 
   // ---- Windows (reg) ----
@@ -118,7 +142,7 @@ export function createSystemProxyController(
   // input redirection — both make enable() throw a 500 on Windows (#2116).
   // Embedded quotes use cmd's `""` escape (not bash-style `\"`).
   function winRegSz(value: string): string {
-    return `"${value.replace(/"/g, '""')}"`
+    return `"${value.replaceAll('"', '""')}"`
   }
 
   async function winEnable(bypass: string[]): Promise<void> {
@@ -156,14 +180,21 @@ export function createSystemProxyController(
       // Fresh installs often have no AutoConfigURL — treat missing as already
       // cleared so disable()/quit never 500 on a clean machine.
       const msg = err instanceof Error ? err.message : String(err)
-      if (!/unable to find/i.test(msg)) throw err
+      if (!msg.toLowerCase().includes('unable to find')) throw err
     }
   }
 
   async function winIsEnabled(): Promise<boolean> {
     try {
       const { stdout } = await exec(`reg query "${WIN_KEY}" /v ProxyEnable`)
-      return /ProxyEnable\s+REG_DWORD\s+0x1/i.test(stdout)
+      return stdout.split('\n').some((line) => {
+        const [name, type, value] = splitWhitespace(line)
+        return (
+          name?.toLowerCase() === 'proxyenable' &&
+          type?.toLowerCase() === 'reg_dword' &&
+          Number.parseInt(value ?? '', 16) === 1
+        )
+      })
     } catch {
       return false
     }

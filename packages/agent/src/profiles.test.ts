@@ -64,7 +64,7 @@ describe('createProfileStore — disk CRUD', () => {
   })
 
   it('read throws for a missing id', async () => {
-    await expect(store.read('nope')).rejects.toThrow(/not found/i)
+    await expect(store.read('nope')).rejects.toThrow('not found')
   })
 
   it('update changes name and/or content and bumps updatedAt', async () => {
@@ -84,7 +84,7 @@ describe('createProfileStore — disk CRUD', () => {
     await store.create({ name: 'home', content: 'a: 1\n' })
     await store.delete('id1')
     expect(await store.list()).toEqual([])
-    await expect(store.read('id1')).rejects.toThrow(/not found/i)
+    await expect(store.read('id1')).rejects.toThrow('not found')
   })
 
   it('duplicate copies content under a new id and a derived name', async () => {
@@ -170,7 +170,7 @@ describe('createProfileStore — import + active', () => {
       activeConfigPath: join(dir, '..', 'active.yaml'),
       fetch: fakeFetch,
     })
-    await expect(store.importFromUrl('https://x')).rejects.toThrow(/403/)
+    await expect(store.importFromUrl('https://x')).rejects.toThrow('403')
   })
 
   it('times out a stalled subscription fetch instead of hanging forever', async () => {
@@ -372,7 +372,7 @@ describe('createProfileStore — merge profiles', () => {
       content: 'mode: global\n',
       type: 'merge',
     })
-    await expect(store.setActive('id1')).rejects.toThrow(/merge/i)
+    await expect(store.setActive('id1')).rejects.toThrow('merge')
   })
 })
 
@@ -497,7 +497,7 @@ describe('createProfileStore — script profiles', () => {
       content: JSON.stringify({ key: 'mode', value: 'global' }),
       type: 'script',
     })
-    await expect(store.setActive('id1')).rejects.toThrow(/script/i)
+    await expect(store.setActive('id1')).rejects.toThrow('script')
   })
 })
 
@@ -591,7 +591,7 @@ describe('createProfileStore — refresh', () => {
       idGen: () => 'id1',
     })
     await store.create({ name: 'home', content: 'a: 1\n' })
-    await expect(store.refresh('id1')).rejects.toThrow(/remote|url/i)
+    await expect(store.refresh('id1')).rejects.toThrow('remote subscription')
   })
 
   it('refresh throws on non-200', async () => {
@@ -611,7 +611,7 @@ describe('createProfileStore — refresh', () => {
       idGen: () => 'id1',
     })
     await store.importFromUrl('https://sub.example/clash')
-    await expect(store.refresh('id1')).rejects.toThrow(/403/)
+    await expect(store.refresh('id1')).rejects.toThrow('403')
   })
 
   it('refresh throws for a missing id', async () => {
@@ -620,7 +620,7 @@ describe('createProfileStore — refresh', () => {
       dir,
       activeConfigPath: join(dir, '..', 'active.yaml'),
     })
-    await expect(store.refresh('nope')).rejects.toThrow(/not found/i)
+    await expect(store.refresh('nope')).rejects.toThrow('not found')
   })
 })
 

@@ -15,6 +15,10 @@ import {
 } from '~/components/connections/connectionsExport'
 import { connectionMatchesGlobalFilter } from '~/components/connections/globalFilter'
 import {
+  chainMatchesQuickFilter,
+  parseQuickFilterTerms,
+} from '~/components/connections/quickFilter'
+import {
   closeAllConnectionsAPI,
   closeSingleConnectionAPI,
 } from '~/composables/useApi'
@@ -63,15 +67,14 @@ const isClosingConnections = ref(false)
 // Helpers
 const formatBytes = (bytes: number) => byteSize(bytes).toString()
 
-const PROCESS_PATH_REGEX = /^.*[/\\](.*)$/
-
 // Cell value helpers
 function getProcess(conn: Connection) {
-  return (
-    conn.metadata.process ||
-    conn.metadata.processPath?.replace(PROCESS_PATH_REGEX, '$1') ||
-    '-'
+  const processPath = conn.metadata.processPath ?? ''
+  const separator = Math.max(
+    processPath.lastIndexOf('/'),
+    processPath.lastIndexOf('\\'),
   )
+  return conn.metadata.process || processPath.slice(separator + 1) || '-'
 }
 
 function getHost(conn: Connection) {
@@ -478,14 +481,12 @@ const filteredConnections = computed(() => {
       : connectionsStore.closedConnections
 
   // Apply quick filter
-  if (enableQuickFilter.value && configStore.quickFilterRegex) {
-    try {
-      const regex = new RegExp(configStore.quickFilterRegex, 'i')
+  if (enableQuickFilter.value && configStore.quickFilterText) {
+    const terms = parseQuickFilterTerms(configStore.quickFilterText)
+    if (terms.length > 0) {
       connections = connections.filter(
-        (conn) => !conn.chains.some((c) => regex.test(c)),
+        (conn) => !chainMatchesQuickFilter(conn.chains, terms),
       )
-    } catch {
-      // Invalid regex, ignore
     }
   }
 

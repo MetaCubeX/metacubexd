@@ -3,7 +3,7 @@ import type { Server, ServerResponse } from 'node:http'
 import { createReadStream } from 'node:fs'
 import { stat } from 'node:fs/promises'
 import { createServer } from 'node:http'
-import { extname, join, normalize } from 'node:path'
+import { extname, isAbsolute, join, relative, resolve } from 'node:path'
 import { toNodeListener } from 'h3'
 
 export interface ControlServer {
@@ -89,16 +89,26 @@ async function serveStatic(
   url: string,
   res: ServerResponse,
 ): Promise<void> {
-  const pathname = decodeURIComponent((url.split('?')[0] ?? '/').split('#')[0]!)
-  // Strip leading "../" segments before joining to block path traversal.
-  const rel = normalize(pathname).replace(/^(?:\.\.[/\\])+/, '')
+  let pathname: string
+  try {
+    pathname = decodeURIComponent(new URL(url, 'http://127.0.0.1').pathname)
+  } catch {
+    res.statusCode = 400
+    res.end('Bad Request')
+    return
+  }
   const indexHtml = join(rendererDir, 'index.html')
 
   if (pathname === '/' || pathname.endsWith('/')) {
     if (await sendFile(indexHtml, res)) return
   }
-  const candidate = join(rendererDir, rel)
-  if (candidate.startsWith(rendererDir) && (await sendFile(candidate, res))) {
+  const root = resolve(rendererDir)
+  const candidate = resolve(root, `.${pathname}`)
+  const pathFromRoot = relative(root, candidate)
+  const isInsideRoot =
+    pathFromRoot === '' ||
+    (!pathFromRoot.startsWith('..') && !isAbsolute(pathFromRoot))
+  if (isInsideRoot && (await sendFile(candidate, res))) {
     return
   }
   // SPA fallback: unknown non-asset path -> app shell (hash routing).
@@ -110,8 +120,20 @@ async function serveStatic(
 // Loopback dev-server origins (any port) the dev-CORS shim will reflect. Used
 // ONLY when allowDevCors is on, which the main process enables exclusively for
 // the unpackaged `dev:desktop` HMR flow — never in a packaged build.
-const LOOPBACK_ORIGIN =
-  /^https?:\/\/(?:localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/
+function isLoopbackOrigin(origin: string): boolean {
+  try {
+    const parsed = new URL(origin)
+    return (
+      parsed.origin === origin &&
+      (parsed.protocol === 'http:' || parsed.protocol === 'https:') &&
+      (parsed.hostname === 'localhost' ||
+        parsed.hostname === '127.0.0.1' ||
+        parsed.hostname === '[::1]')
+    )
+  } catch {
+    return false
+  }
+}
 
 /**
  * Bind the agent's h3 control router AND the static dashboard onto one Node http
@@ -139,7 +161,7 @@ export function startControlServer(
     // rides the Authorization header / a query param, never a cookie).
     if (allowDevCors) {
       const origin = req.headers.origin
-      if (origin && LOOPBACK_ORIGIN.test(origin)) {
+      if (origin && isLoopbackOrigin(origin)) {
         res.setHeader('access-control-allow-origin', origin)
         res.setHeader('vary', 'origin')
         res.setHeader(

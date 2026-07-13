@@ -409,9 +409,10 @@ export function createControlRouter(deps: ControlRouterDeps): App {
 
   // ---- WebDAV backup / restore (always available — credentials per-request) ----
   function backupPath(dir?: string): string {
-    return dir
-      ? `${dir.replace(/\/+$/, '')}/${BACKUP_FILENAME}`
-      : BACKUP_FILENAME
+    if (!dir) return BACKUP_FILENAME
+    let end = dir.length
+    while (end > 0 && dir[end - 1] === '/') end--
+    return `${dir.slice(0, end)}/${BACKUP_FILENAME}`
   }
 
   router.post(

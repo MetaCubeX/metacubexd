@@ -99,6 +99,25 @@ describe('apps/server middleware/auth -> isAuthorized', () => {
     ).toEqual({ ok: true })
   })
 
+  it('accepts whitespace between the scheme and token without accepting a prefix', () => {
+    expect(
+      isAuthorized({
+        path: '/api/control/info',
+        authHeader: `Bearer\t  ${TOKEN}`,
+        queryToken: undefined,
+        configuredToken: TOKEN,
+      }),
+    ).toEqual({ ok: true })
+    expect(
+      isAuthorized({
+        path: '/api/control/info',
+        authHeader: `BearerToken ${TOKEN}`,
+        queryToken: undefined,
+        configuredToken: TOKEN,
+      }).ok,
+    ).toBe(false)
+  })
+
   it('keeps /api/control/health public even when a token IS configured', () => {
     expect(
       isAuthorized({

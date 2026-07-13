@@ -10,13 +10,26 @@
 // (Packaging uses a separate static-renderer build: nuxt generate → copy into
 // apps/desktop/renderer; see .github/workflows/release.yml and copy:renderer.)
 import { spawn } from 'node:child_process'
+import { stripVTControlCharacters } from 'node:util'
 
 const children = []
 let shuttingDown = false
 let electronStarted = false
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
-// eslint-disable-next-line no-control-regex -- intentional: strip ANSI escape (ESC) color codes
-const stripAnsi = (s) => s.replace(/\x1B\[[0-9;]*m/g, '')
+const stripAnsi = (s) => stripVTControlCharacters(s)
+
+function findDevUrl(text) {
+  for (const prefix of ['http://localhost:', 'http://127.0.0.1:']) {
+    let start = text.indexOf(prefix)
+    while (start !== -1) {
+      let end = start + prefix.length
+      while (end < text.length && text[end] >= '0' && text[end] <= '9') end++
+      if (end > start + prefix.length) return text.slice(start, end)
+      start = text.indexOf(prefix, start + prefix.length)
+    }
+  }
+  return undefined
+}
 
 function killAll(code = 0) {
   if (shuttingDown) return
@@ -47,7 +60,7 @@ function spawnFiltered(pkg, env) {
 function pipe(stream, prefix, scan) {
   stream.on('data', (buf) => {
     const text = buf.toString()
-    process.stdout.write(text.replace(/^/gm, prefix))
+    process.stdout.write(prefix + text.replaceAll('\n', `\n${prefix}`))
     if (scan) scan(stripAnsi(text))
   })
 }
@@ -80,8 +93,8 @@ async function startElectron(devUrl) {
 const ui = spawnFiltered('@metacubexd/ui')
 const onUiOut = (clean) => {
   if (electronStarted) return
-  const m = clean.match(/http:\/\/(?:localhost|127\.0\.0\.1):\d+/)
-  if (m) void startElectron(m[0])
+  const devUrl = findDevUrl(clean)
+  if (devUrl) void startElectron(devUrl)
 }
 pipe(ui.stdout, '[ui] ', onUiOut)
 pipe(ui.stderr, '[ui] ', onUiOut)

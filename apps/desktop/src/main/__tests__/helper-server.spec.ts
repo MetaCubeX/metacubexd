@@ -227,7 +227,7 @@ describe('createHelperServer', () => {
     })
 
     expect(res.ok).toBe(false)
-    expect((res as { error: string }).error).toMatch(/secret/i)
+    expect((res as { error: string }).error.toLowerCase()).toContain('secret')
     // The injected kernel must NOT have been touched on auth failure.
     expect(kernel.start).not.toHaveBeenCalled()
   })
@@ -243,7 +243,7 @@ describe('createHelperServer', () => {
     })
 
     expect(res.ok).toBe(false)
-    expect((res as { error: string }).error).toMatch(/version/i)
+    expect((res as { error: string }).error.toLowerCase()).toContain('version')
     // The helper still reports ITS version so the client can detect the mismatch.
     expect(res.version).toBe(HELPER_PROTOCOL_VERSION)
   })

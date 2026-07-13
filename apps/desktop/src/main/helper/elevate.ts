@@ -51,12 +51,12 @@ const defaultFs: ElevateFs = {
 
 /** Escape a string for embedding inside a single-quoted bash literal. */
 function shSingleQuote(s: string): string {
-  return `'${s.replace(/'/g, `'\\''`)}'`
+  return `'${s.replaceAll("'", `'\\''`)}'`
 }
 
 /** Escape a path for embedding inside a PowerShell single-quoted string. */
 function psSingleQuote(s: string): string {
-  return `'${s.replace(/'/g, "''")}'`
+  return `'${s.replaceAll("'", "''")}'`
 }
 
 /**
@@ -75,7 +75,7 @@ export function createHelperElevate(
     switch (platform) {
       case 'darwin': {
         // Escape for embedding inside an AppleScript string literal.
-        const escaped = script.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+        const escaped = script.replaceAll('\\', '\\\\').replaceAll('"', '\\"')
         return exec(
           `osascript -e 'do shell script "${escaped}" with administrator privileges'`,
         )

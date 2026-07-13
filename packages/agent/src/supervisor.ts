@@ -186,10 +186,15 @@ export function createSupervisor(
     if (existsSync(opts.activeConfigPath)) {
       existing = await readFile(opts.activeConfigPath, 'utf8')
     }
-    const STRIP = /^(?:external-controller|secret|mixed-port)\s*:/
+    const managedKeys = new Set(['external-controller', 'secret', 'mixed-port'])
+    const isManagedTopLevelKey = (line: string): boolean => {
+      const separator = line.indexOf(':')
+      if (separator === -1) return false
+      return managedKeys.has(line.slice(0, separator).trimEnd())
+    }
     const kept = existing
       .split('\n')
-      .filter((line) => !STRIP.test(line))
+      .filter((line) => !isManagedTopLevelKey(line))
       .join('\n')
     const header = [
       `external-controller: ${state.externalController}`,

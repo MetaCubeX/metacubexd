@@ -39,8 +39,13 @@ const CSV_COLUMNS: Array<{
 // a comma, quote or newline, doubling any embedded quotes.
 function escapeCSVField(value: string | number): string {
   const s = String(value)
-  if (/[",\n\r]/.test(s)) {
-    return `"${s.replace(/"/g, '""')}"`
+  if (
+    s.includes(',') ||
+    s.includes('"') ||
+    s.includes('\n') ||
+    s.includes('\r')
+  ) {
+    return `"${s.replaceAll('"', '""')}"`
   }
   return s
 }
