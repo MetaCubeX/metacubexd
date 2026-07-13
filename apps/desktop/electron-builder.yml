@@ -99,6 +99,7 @@ nsis:
   perMachine: false
 linux:
   icon: build/icon.png
+  syncDesktopName: true
   extraResources:
     - from: resources/mihomo
       to: mihomo

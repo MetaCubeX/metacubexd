@@ -217,10 +217,11 @@ jobs:
       - name: install dependencies
         run: pnpm install
 
-      # electron-builder bundles fpm, but rpmbuild is supplied by the host.
-      - name: install RPM packaging tools
+      # electron-builder bundles fpm, but rpmbuild and bsdtar are supplied by
+      # the host. bsdtar is required to generate pacman's .MTREE metadata.
+      - name: install Linux packaging tools
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y rpm
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y rpm libarchive-tools
 
       - name: build ui (static, relative base for file://)
         run: pnpm --filter @metacubexd/ui generate

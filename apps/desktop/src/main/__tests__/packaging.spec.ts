@@ -12,6 +12,7 @@ interface BuilderConfig {
     packageName: string
   }
   linux: {
+    syncDesktopName: boolean
     target: LinuxTarget[]
   }
   pacman: {
@@ -46,15 +47,23 @@ describe('desktop distribution configuration', () => {
       rpm: ['x64', 'arm64'],
       pacman: ['x64', 'arm64'],
     })
+    expect(config.linux.syncDesktopName).toBe(true)
+
+    const packageJson = JSON.parse(
+      readFileSync(resolve(desktopRoot, 'package.json'), 'utf8'),
+    ) as { desktopName?: string }
+    expect(packageJson.desktopName).toBe('metacubexd')
   })
 
-  it('publishes native Linux packages and installs the RPM build tool', () => {
+  it('publishes native Linux packages and installs their host build tools', () => {
     const workflow = readFileSync(
       resolve(repositoryRoot, '.github/workflows/release.yml'),
       'utf8',
     )
 
-    expect(workflow).toContain('apt-get install --no-install-recommends -y rpm')
+    expect(workflow).toContain(
+      'apt-get install --no-install-recommends -y rpm libarchive-tools',
+    )
     for (const extension of ['deb', 'rpm', 'pacman']) {
       expect(workflow).toContain(`apps/desktop/dist/*.${extension}`)
     }
