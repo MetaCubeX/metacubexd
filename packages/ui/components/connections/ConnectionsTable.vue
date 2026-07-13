@@ -573,33 +573,31 @@ async function copyCell(
   }
 }
 
-/* Table cells - responsive layout */
+/* Table cells - responsive layout. On narrow screens each field gets a full
+   row, with its label and value aligned horizontally. The previous 2/3-column
+   layout left long values such as host, chains and flow with only half of the
+   card width, which made phone layouts wrap heavily and pair unrelated fields
+   according to the user's column order. */
 .conn-td {
-  width: 50%;
-  min-width: 50%;
+  display: grid;
+  grid-template-columns: minmax(5.5rem, 36%) minmax(0, 1fr);
+  align-items: start;
+  column-gap: 0.75rem;
+  width: 100%;
+  min-width: 0;
+  padding: 0.5rem 0.25rem;
+  text-align: left;
+  border-bottom: 1px solid
+    color-mix(in oklab, var(--color-base-content) 6%, transparent);
 }
 
-.conn-td:nth-child(2n) {
-  text-align: right;
-}
-
-@media (min-width: 640px) {
-  .conn-td {
-    width: 33.33%;
-    min-width: 33.33%;
-  }
-
-  .conn-td:nth-child(2n) {
-    text-align: left;
-  }
-
-  .conn-td:nth-child(3n) {
-    text-align: right;
-  }
+.conn-td:last-child {
+  border-bottom: none;
 }
 
 @media (min-width: 768px) {
   .conn-td {
+    display: table-cell;
     width: auto;
     min-width: 0;
     padding: 0.5rem 0.625rem; /* tighter vertical to make room for two lines */
@@ -612,6 +610,7 @@ async function copyCell(
 }
 
 .force-table .conn-td {
+  display: table-cell;
   width: auto;
   min-width: 0;
   padding: 0.5rem 0.625rem;
@@ -624,6 +623,40 @@ async function copyCell(
 
 .conn-td-label {
   color: color-mix(in oklab, var(--color-base-content) 50%, transparent);
+}
+
+@media (max-width: 767px) {
+  .conn-td-label {
+    justify-self: start;
+    width: 100%;
+    margin-bottom: 0;
+    line-height: 1.5;
+    text-align: left;
+  }
+
+  .conn-cell-wrap {
+    position: relative;
+    justify-self: stretch;
+    justify-content: flex-end;
+    width: 100%;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+
+  .conn-td--copyable .conn-cell-wrap {
+    padding-left: 1.25rem;
+  }
+
+  /* Keep the value's right edge aligned with non-copyable rows. The copy
+     affordance lives on the left of the value column instead of consuming
+     space after the text and pulling host/chains values inward. */
+  .conn-copy-btn {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    margin-left: 0;
+    transform: translateY(-50%);
+  }
 }
 
 .conn-empty {
