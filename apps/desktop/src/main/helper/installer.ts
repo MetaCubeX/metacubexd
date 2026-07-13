@@ -256,8 +256,20 @@ export function createHelperInstaller(
   }
 
   async function linuxIsInstalled(): Promise<boolean> {
-    const { stdout } = await exec(`systemctl is-enabled ${serviceName}`)
-    return /\benabled\b/.test(stdout)
+    try {
+      const { stdout } = await exec(`systemctl is-enabled ${serviceName}`)
+      return /\benabled\b/.test(stdout)
+    } catch (err) {
+      if (
+        typeof err === 'object' &&
+        err !== null &&
+        'code' in err &&
+        err.code === 4 // not-found
+      ) {
+        return false
+      }
+      throw err
+    }
   }
 
   // ---- Windows (sc + UAC runas) ----
