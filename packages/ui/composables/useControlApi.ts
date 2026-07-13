@@ -15,6 +15,15 @@ import type {
 // packages/ui/composables/useControlApi.ts
 import ky from 'ky'
 
+// Profile validation can trigger Mihomo's first-run GEO database download.
+// Keep ordinary control requests on the client's 15s default. These finite
+// budgets outlive the agent's 300s validator, 5s reap grace, kernel lifecycle,
+// and (for refresh+apply) bounded subscription fetch (#2118, #2121).
+const PROFILE_SUBSCRIPTION_TIMEOUT = 45_000
+const PROFILE_VALIDATE_TIMEOUT = 330_000
+const PROFILE_ACTIVATE_TIMEOUT = 360_000
+const PROFILE_REFRESH_AND_ACTIVATE_TIMEOUT = 390_000
+
 export interface ControlConfig {
   base: string
   token?: string
@@ -115,24 +124,41 @@ export function useControlApi() {
         .json<ProfileMeta>(),
     importProfile: (url: string, name?: string) =>
       client
-        .post('profiles/import', { json: { url, name } })
+        .post('profiles/import', {
+          json: { url, name },
+          timeout: PROFILE_SUBSCRIPTION_TIMEOUT,
+        })
         .json<ProfileMeta>(),
     activateProfile: (id: string) =>
-      client.post(`profiles/${id}/activate`).json<KernelState>(),
+      client
+        .post(`profiles/${id}/activate`, {
+          timeout: PROFILE_ACTIVATE_TIMEOUT,
+        })
+        .json<KernelState>(),
     // Re-fetch a REMOTE subscription in place (agent overwrites content +
     // subscriptionInfo + updatedAt, keeping the same id). Pure refresh — it does
     // NOT touch the running config; use refreshAndActivateProfile to apply.
     refreshProfile: (id: string) =>
-      client.post(`profiles/${id}/refresh`).json<ProfileMeta>(),
+      client
+        .post(`profiles/${id}/refresh`, {
+          timeout: PROFILE_SUBSCRIPTION_TIMEOUT,
+        })
+        .json<ProfileMeta>(),
     // Combined refresh + apply: re-fetch, compose into active.yaml, validate,
     // and restart. The action users expect from "refresh and make it take
     // effect" (#2108). Returns the refreshed meta and the resulting state.
     refreshAndActivateProfile: (id: string) =>
       client
-        .post(`profiles/${id}/refresh-and-activate`)
+        .post(`profiles/${id}/refresh-and-activate`, {
+          timeout: PROFILE_REFRESH_AND_ACTIVATE_TIMEOUT,
+        })
         .json<{ meta: ProfileMeta; kernel: KernelState }>(),
     validateProfile: (id: string) =>
-      client.post(`profiles/${id}/validate`).json<ValidateResult>(),
+      client
+        .post(`profiles/${id}/validate`, {
+          timeout: PROFILE_VALIDATE_TIMEOUT,
+        })
+        .json<ValidateResult>(),
 
     // System proxy (capability-gated 'system-proxy'). GET reflects the current
     // OS proxy state; POST { enabled, bypass? } toggles it and echoes the state.
