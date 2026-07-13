@@ -1,211 +1,169 @@
 # Copilot Instructions for metacubexd
 
-## Project Overview
+metacubexd is the official dashboard and managed runtime for the Mihomo proxy
+kernel. Keep changes inside the owning workspace and preserve the boundary
+between Mihomo's Clash API and metacubexd's Control API.
 
-metacubexd is the official Mihomo Dashboard - a web-based management interface for Mihomo (formerly Clash.Meta) proxy core. The dashboard provides real-time traffic monitoring, proxy management, connection tracking, and configuration capabilities.
+## Read First
 
-## Technology Stack
+- [CONTEXT.md](../CONTEXT.md) defines the project's domain language.
+- [packages/ui/PRODUCT.md](../packages/ui/PRODUCT.md) defines the product and its
+  users.
+- [packages/ui/DESIGN.md](../packages/ui/DESIGN.md) defines the UI design system.
+- [packages/agent/MANUAL.md](../packages/agent/MANUAL.md) contains real-kernel
+  smoke tests that are intentionally outside CI.
+- [README.md](../README.md) documents supported deployment forms.
 
-- **Framework**: Nuxt 4 (Vue 3) with TypeScript
-- **Language**: TypeScript with strict mode enabled
-- **Build Tool**: Nuxt with Vite
-- **Styling**: Tailwind CSS v4 with daisyUI v5 components
-- **State Management**: Pinia with @pinia/nuxt
-- **Data Fetching**: @tanstack/vue-query with ky HTTP client
-- **Routing**: Nuxt pages with hash-based routing (CSR mode)
-- **i18n**: Custom composable with support for English, Chinese, and Russian
-- **Utilities**: @vueuse/core and @vueuse/nuxt
-- **Tables**: @tanstack/vue-table
-- **Icons**: @tabler/icons-vue
-- **Tooltips/Popovers**: @floating-ui/vue
+## Monorepo Map
 
-## Important Vue/Nuxt Patterns
+This is a pnpm 10 workspace with four workspaces:
 
-### Component Structure
+| Workspace        | Responsibility                                                                                            |
+| ---------------- | --------------------------------------------------------------------------------------------------------- |
+| `packages/ui`    | Nuxt 4/Vue 3 dashboard shared by every runtime form                                                       |
+| `packages/agent` | Framework-neutral Control API, profile store, kernel supervisor, scheduler, and shared types              |
+| `apps/server`    | Nitro all-in-one server that serves the UI and mounts the agent                                           |
+| `apps/desktop`   | Electron shell, local control server, OS integration, privileged TUN helper, and bundled kernel packaging |
 
-```vue
-<script setup lang="ts">
-// 1. Type imports
-import type { Props } from '~/types'
+Do not move host-specific behavior into `packages/ui`. Put reusable lifecycle,
+profile, and Control API behavior in `packages/agent`; keep Docker/Nitro wiring in
+`apps/server` and Electron/OS wiring in `apps/desktop`.
 
-// 2. External imports
-import { IconReload } from '@tabler/icons-vue'
+## Runtime Forms
 
-// 3. Internal imports (composables, stores, utils)
-import { useRulesQuery } from '~/composables/useQueries'
+There are three runtime forms:
 
-// 4. Use stores and composables
-const configStore = useConfigStore()
-const { t } = useI18n()
+1. **Hosted panel**: the static UI connects directly to a user-managed Mihomo.
+   There is no Control Agent, so agent-only features remain hidden. The
+   standalone panel Docker image is another distribution of this form.
+2. **Desktop app**: Electron serves the bundled UI from a loopback control
+   server, runs a local Control Agent, and supervises a bundled Mihomo. The
+   preload bridge injects the per-launch Control and Clash endpoints.
+3. **All-in-one server**: Nitro serves the UI and `/api/control` on the control
+   port and supervises the bundled Mihomo in the same container. The Clash API
+   and mixed proxy remain separate ports.
 
-// 5. Define props and emits
-const props = defineProps<Props>()
-const emit = defineEmits<{
-  click: []
-}>()
+Default server ports are `8080` for UI + Control API, `9090` for the Clash API,
+and `7890` for the mixed proxy. Desktop ports are selected from free loopback
+ports at startup; never hard-code them in UI code.
 
-// 6. Reactive state and computed
-const isLoading = ref(false)
-const filteredData = computed(() => ...)
+## API Boundary
 
-// 7. Functions
-function handleClick() { ... }
-</script>
+- **Clash API** is Mihomo's `external-controller` HTTP/WebSocket surface. It owns
+  proxies, proxy groups, traffic, connections, rules, configs, version, and live
+  Clash log data. UI access is centered on `packages/ui/composables/useApi.ts`,
+  `useWebSocket.ts`, and the endpoint store.
+- **Control API** is metacubexd's `/api/control/**` surface. It owns kernel
+  lifecycle and subprocess logs, profiles, runtime config, subscriptions,
+  kernel/Geo asset management, WebDAV backup, System Proxy, and TUN. UI access
+  goes through `packages/ui/composables/useControlApi.ts`; features are gated by
+  the agent's advertised capabilities.
 
-<template>
-  <div>...</div>
-</template>
-```
+Do not send Clash API traffic through the Control API. In server mode the UI
+talks directly to the published Clash API port because Nitro does not proxy the
+required WebSocket streams. Do not confuse Clash WebSocket logs with the
+agent's kernel-process SSE logs.
 
-### Reactivity Rules
+## UI Stack and Conventions
 
-- Use `ref()` for primitive reactive values
-- Use `computed()` for derived values
-- Use `watch()` or `watchEffect()` for side effects
-- Access ref values with `.value` in script, directly in template
-- Use `v-if`, `v-for`, `v-show` for conditional rendering
+- Nuxt 4, Vue 3, strict TypeScript, CSR-only rendering, and hash routing.
+- Pinia owns shared client state; persistent state commonly uses VueUse
+  `useLocalStorage`.
+- TanStack Vue Query owns server-state queries and invalidation. Keep query keys
+  stable and invalidate affected data after mutations.
+- `ky` v2 is the HTTP client. This version uses `prefix`, not `prefixUrl`.
+- Tailwind CSS v4 and daisyUI v5 provide styling. Follow semantic daisyUI roles
+  and the design system rather than hard-coded theme colors.
+- Vue, Nuxt, VueUse, project composables, stores, utilities, constants, types,
+  and components are auto-imported according to `packages/ui/nuxt.config.ts`.
+- Use `<script setup lang="ts">`, explicit props/emits types, computed values for
+  derived state, and watchers only for side effects.
 
-### Pinia Store Pattern
-
-```typescript
-import { defineStore } from 'pinia'
-
-export const useConfigStore = defineStore('config', () => {
-  // State (use useLocalStorage for persistent state)
-  const theme = useLocalStorage<string>('theme', 'sunset')
-
-  // Computed
-  const isDark = computed(() => theme.value === 'sunset')
-
-  // Actions
-  function setTheme(newTheme: string) {
-    theme.value = newTheme
-  }
-
-  return { theme, isDark, setTheme }
-})
-```
-
-### TanStack Query Pattern
-
-```typescript
-import { useQuery, useMutation } from '@tanstack/vue-query'
-
-// Query
-const { data, isLoading, refetch } = useQuery({
-  queryKey: ['rules'],
-  queryFn: () => fetchRulesAPI(),
-})
-
-// Mutation
-const mutation = useMutation({
-  mutationFn: (name: string) => updateRuleProviderAPI(name),
-})
-```
-
-## Code Style Guidelines
-
-### Imports
-
-- Use path alias `~/` for imports from the project root
-- Group imports: types first, then external packages, then internal modules
-- Auto-imports are configured for Vue, Nuxt, and VueUse composables
-
-### TypeScript
-
-- Use strict TypeScript - avoid `any` types
-- Define explicit types for component props with `defineProps<Props>()`
-- Use enums from `~/constants` for predefined values
-- Use Zod for runtime validation when needed
-
-### Styling
-
-- Use Tailwind CSS utility classes
-- Use `twMerge` from tailwind-merge for conditional class merging
-- Prefer daisyUI component classes (btn, card, modal, etc.)
-- Support both light and dark themes via daisyUI themes
-- Use `tailwind-variants` for component variants if needed
-
-### ESLint Rules
-
-- Using @antfu/eslint-config with Vue and TypeScript
-- Unused variables with `_` prefix are allowed
-- Prettier is used for code formatting (separate from ESLint)
-- Console statements are allowed
-
-## Project Structure
-
-```
-├── pages/           # Nuxt page components (auto-routing)
-├── components/      # Reusable Vue components
-├── composables/     # Vue composables (useXxx)
-├── stores/          # Pinia stores
-├── layouts/         # Nuxt layouts
-├── middleware/      # Nuxt route middleware
-├── plugins/         # Nuxt plugins
-├── i18n/            # Internationalization dictionaries
-├── constants/       # Enums and constant values
-├── types/           # TypeScript type definitions
-├── utils/           # Utility functions
-├── assets/          # CSS and static assets
-└── public/          # Public static files
-```
-
-## Development Commands
-
-```bash
-pnpm dev          # Start development server
-pnpm dev:mock     # Start with mock data (no backend needed)
-pnpm build        # Production build
-pnpm generate     # Static site generation
-pnpm lint         # Run ESLint with auto-fix
-pnpm format       # Format code with Prettier
-pnpm test:e2e     # Run E2E tests with Playwright
-```
-
-## Component Conventions
-
-### File Naming
-
-- Components: PascalCase (e.g., `ProxyNodeCard.vue`)
-- Composables: camelCase with `use` prefix (e.g., `useI18n.ts`)
-- Stores: camelCase with `use` prefix (e.g., `useConfigStore`)
-- Pages: kebab-case or index files
-
-### UI Patterns
-
-- Use daisyUI modal pattern with `<dialog>` element and `Modal` component
-- Use `@tabler/icons-vue` for icons (e.g., `IconReload`)
-- Charts use Highcharts with custom `HighchartsAutoSize` wrapper
-- Tables use @tanstack/vue-table with `DataTable` component
-- Tooltips use @floating-ui/vue for positioning
+Do not assume Zod, `tailwind-merge`, `tailwind-variants`, or
+`@tanstack/vue-table` exists in this repository. Tables and conditional classes
+use project components and normal Vue/Tailwind patterns.
 
 ### Internationalization
 
-- All user-facing strings should use the `useI18n` composable
-- Add translations to `i18n/en.ts`, `i18n/zh.ts`, and `i18n/ru.ts`
-- Usage: `const { t } = useI18n(); t('key')`
+All user-facing UI text must use `useI18n()`. Keep the seven JSON locale files
+in `packages/ui/i18n/locales/` aligned:
 
-## Testing and Quality
+`en.json`, `fa.json`, `fr.json`, `ja.json`, `ko.json`, `ru.json`, `zh.json`.
 
-- Run `pnpm lint` before committing
-- Run `pnpm format` to auto-format code
-- Commits follow conventional commits format (commitlint configured)
-- Husky runs lint-staged on pre-commit
-- E2E tests use Playwright (`pnpm test:e2e`)
+Add the same key to every locale and preserve valid JSON. Do not create legacy
+TypeScript locale modules.
 
-## API Integration
+## Commands
 
-- Backend API calls go through the `ky` client configured in `composables/useApi.ts`
-- Use `useRequest()` to get a configured ky instance with auth headers
-- WebSocket connections use `composables/useWebSocket.ts`
-- The dashboard connects to Mihomo's external-controller API
-- Default backend URL: `http://127.0.0.1:9090`
-- Mock mode available via `MOCK_MODE=true` environment variable
+Run commands from the repository root unless noted.
 
-## Nuxt Configuration
+### Root scripts
 
-- SSR is disabled (CSR-only mode)
-- Hash-based routing enabled for compatibility
-- Auto-imports configured for composables, stores, utils, constants, and types
-- Components are auto-imported without path prefix
+```bash
+pnpm install       # install the workspace
+pnpm dev           # alias for dev:ui; pure-panel Nuxt development
+pnpm dev:ui        # Nuxt UI development server
+pnpm dev:server    # generate the UI, then start Nitro development
+pnpm dev:desktop   # fetch Mihomo and run Nuxt + Electron with renderer HMR
+pnpm build:ui      # nuxt generate -> packages/ui/.output/public
+pnpm build:server  # build the Nitro/agent workspace only
+pnpm build:desktop # electron-vite build only; does not package installers
+pnpm build         # build:ui, then build:server
+pnpm generate      # build:ui, then copy packages/ui/.output to root .output
+pnpm typecheck     # run workspace typecheck scripts
+pnpm lint          # runs available lint scripts; currently UI only and auto-fixes
+```
+
+Desktop installers require the additional renderer generation/copy, kernel
+staging, and `electron-builder` steps shown in `.github/workflows/release.yml`.
+The package-level `pnpm --filter @metacubexd/desktop package` script only invokes
+`electron-builder`; it assumes those prerequisites already exist.
+
+### Package checks
+
+```bash
+pnpm --filter @metacubexd/ui test:unit
+pnpm --filter @metacubexd/ui test:e2e
+pnpm --filter @metacubexd/ui typecheck
+pnpm --filter @metacubexd/agent test
+pnpm --filter @metacubexd/agent typecheck
+pnpm --filter @metacubexd/server test
+pnpm --filter @metacubexd/server typecheck
+pnpm --filter @metacubexd/desktop test
+pnpm --filter @metacubexd/desktop typecheck
+```
+
+Prefer a targeted Vitest invocation while iterating, then run the owning
+workspace's full test and typecheck scripts before handoff.
+
+## Test Locations
+
+- UI unit specs live beside their areas under `**/__tests__/**/*.spec.ts`; UI
+  browser-flow specs live in `packages/ui/e2e/`.
+- Agent tests live in `packages/agent/src/**/*.test.ts` and use injected process,
+  filesystem, fetch, and timer seams instead of a real kernel.
+- Server tests live under `apps/server/**/__tests__/`.
+- Desktop tests live under `apps/desktop/src/**/__tests__/` and must not perform
+  real elevation or OS changes.
+
+Add regression coverage in the workspace that owns the behavior. Use
+`packages/agent/MANUAL.md` only when real Mihomo or network behavior must be
+verified outside the deterministic test suite.
+
+## Editing and Quality Rules
+
+- Preserve strict TypeScript types and existing dependency-injection seams.
+- Keep Control API route and UI contract changes synchronized.
+- Route profile and kernel state changes through the agent/controller rather
+  than mutating them from a view.
+- `pnpm lint` invokes ESLint with `--fix`; inspect resulting changes and do not
+  run it casually across unrelated work.
+- Do not hand-edit generated output: `.nuxt/`, `.nitro/`, `.output/`,
+  `packages/ui/.output/`, `apps/server/.output/`, `apps/desktop/out/`,
+  `apps/desktop/renderer/`, or `apps/desktop/dist/`.
+- Do not hand-edit downloaded kernel artifacts in `apps/desktop/resources/`
+  (`mihomo`, `mihomo.exe`, `wintun.dll`, or `.mihomo-target`). The tracked
+  `default-config.yaml` is source and may be edited intentionally.
+- Do not edit `CHANGELOG.md`; release-please owns it.
+- Do not edit `pnpm-lock.yaml` manually; regenerate it through pnpm when a
+  dependency change is intentional.
