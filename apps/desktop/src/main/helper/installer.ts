@@ -220,8 +220,20 @@ export function createHelperInstaller(
   }
 
   async function darwinIsInstalled(): Promise<boolean> {
-    const { stdout } = await exec(`launchctl print system/${label}`)
-    return stdout.includes(label)
+    try {
+      const { stdout } = await exec(`launchctl print system/${label}`)
+      return stdout.includes(label)
+    } catch (err) {
+      if (
+        typeof err === 'object' &&
+        err !== null &&
+        'code' in err &&
+        err.code === 113 // service not found in the requested domain
+      ) {
+        return false
+      }
+      throw err
+    }
   }
 
   // ---- Linux (systemd + pkexec) ----
@@ -309,8 +321,20 @@ export function createHelperInstaller(
   }
 
   async function winIsInstalled(): Promise<boolean> {
-    const { stdout } = await exec(`sc query ${serviceName}`)
-    return stdout.includes(serviceName) && !/FAILED\s+1060/i.test(stdout)
+    try {
+      const { stdout } = await exec(`sc query ${serviceName}`)
+      return stdout.includes(serviceName) && !/FAILED\s+1060/i.test(stdout)
+    } catch (err) {
+      if (
+        typeof err === 'object' &&
+        err !== null &&
+        'code' in err &&
+        err.code === 1060 // ERROR_SERVICE_DOES_NOT_EXIST
+      ) {
+        return false
+      }
+      throw err
+    }
   }
 
   return {

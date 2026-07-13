@@ -6,23 +6,33 @@ interface ExecResult {
   stderr: string
 }
 
+type RunnerResponse = string | Error
+
+function commandError(code: number): Error & { code: number } {
+  return Object.assign(new Error(`command exited with code ${code}`), { code })
+}
+
 /**
  * A scripted mock for the injected `exec` (un-elevated queries) and `elevate`
  * (the ONE privileged script per install/uninstall). Both record every command
  * string issued and default to empty stdout, so NO test ever shells out to the
  * real OS, installs a service, or triggers an elevation prompt.
  */
-function makeRunners(responses: string[] = []) {
+function makeRunners(responses: RunnerResponse[] = []) {
   const execCalls: string[] = []
   const elevateCalls: string[] = []
   const queue = [...responses]
   const exec = vi.fn(async (cmd: string): Promise<ExecResult> => {
     execCalls.push(cmd)
-    return { stdout: queue.shift() ?? '', stderr: '' }
+    const response = queue.shift()
+    if (response instanceof Error) throw response
+    return { stdout: response ?? '', stderr: '' }
   })
   const elevate = vi.fn(async (script: string): Promise<ExecResult> => {
     elevateCalls.push(script)
-    return { stdout: queue.shift() ?? '', stderr: '' }
+    const response = queue.shift()
+    if (response instanceof Error) throw response
+    return { stdout: response ?? '', stderr: '' }
   })
   return { exec, elevate, execCalls, elevateCalls }
 }
@@ -70,7 +80,7 @@ describe('createHelperInstaller', () => {
   })
 
   describe('macOS (darwin)', () => {
-    function darwinInstaller(responses: string[] = []) {
+    function darwinInstaller(responses: RunnerResponse[] = []) {
       const runners = makeRunners(responses)
       const installer = createHelperInstaller({
         platform: 'darwin',
@@ -174,6 +184,17 @@ describe('createHelperInstaller', () => {
       const { installer } = darwinInstaller([''])
       expect(await installer.isInstalled()).toBe(false)
     })
+
+    it('isInstalled() reports false when launchctl exits because the daemon is absent', async () => {
+      const { installer } = darwinInstaller([commandError(113)])
+      expect(await installer.isInstalled()).toBe(false)
+    })
+
+    it('isInstalled() rethrows unexpected launchctl errors', async () => {
+      const error = commandError(1)
+      const { installer } = darwinInstaller([error])
+      await expect(installer.isInstalled()).rejects.toBe(error)
+    })
   })
 
   describe('linux (systemd)', () => {
@@ -269,7 +290,7 @@ describe('createHelperInstaller', () => {
   })
 
   describe('windows (win32)', () => {
-    function winInstaller(responses: string[] = []) {
+    function winInstaller(responses: RunnerResponse[] = []) {
       const runners = makeRunners(responses)
       const installer = createHelperInstaller({
         platform: 'win32',
@@ -339,6 +360,17 @@ describe('createHelperInstaller', () => {
         '[SC] EnumQueryServicesStatus:OpenService FAILED 1060',
       ])
       expect(await absent.installer.isInstalled()).toBe(false)
+    })
+
+    it('isInstalled() reports false when sc exits because the service is absent', async () => {
+      const { installer } = winInstaller([commandError(1060)])
+      expect(await installer.isInstalled()).toBe(false)
+    })
+
+    it('isInstalled() rethrows unexpected sc errors', async () => {
+      const error = commandError(5)
+      const { installer } = winInstaller([error])
+      await expect(installer.isInstalled()).rejects.toBe(error)
     })
   })
 
