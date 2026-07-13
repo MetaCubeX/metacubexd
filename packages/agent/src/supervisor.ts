@@ -45,6 +45,11 @@ function sleep(ms: number, now: () => number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms))
 }
 
+// Once validation times out, give the killed child a short bounded window to
+// emit exit before returning to callers that may delete its config file or
+// start another validator against the same homeDir.
+const VALIDATE_KILL_GRACE_MS = 5_000
+
 export function createSupervisor(
   opts: CreateSupervisorOptions,
   deps: SupervisorDeps = {},
@@ -62,6 +67,12 @@ export function createSupervisor(
 
   const startTimeoutMs = opts.startTimeoutMs ?? 10_000
   const stopTimeoutMs = opts.stopTimeoutMs ?? 5_000
+  // `mihomo -t` may synchronously download missing GEO data on a fresh homeDir.
+  // Mihomo gives each download up to 90s and may initialize multiple GEO assets
+  // sequentially, so the old 3s watchdog killed every first validation that
+  // referenced GEOIP/fallback-filter before the kernel could finish (#2118,
+  // #2121). Five minutes stays bounded without racing Mihomo's own downloads.
+  const validateTimeoutMs = opts.validateTimeoutMs ?? 300_000
   const mixedPort = opts.mixedPort
   const autoRestart = opts.autoRestart ?? true
   const maxRestarts = opts.maxRestarts ?? 3
@@ -341,17 +352,65 @@ export function createSupervisor(
         let out = ''
         proc.stdout?.on('data', (c: Buffer) => (out += c.toString()))
         proc.stderr?.on('data', (c: Buffer) => (out += c.toString()))
-        const t = setTimeout(() => {
-          if (proc.pid) killProcOf(proc, 'SIGKILL')
-          resolve({ valid: false, message: 'validate timeout' })
-        }, 3000)
+
+        let settled = false
+        let timeoutHandle: ReturnType<typeof setTimeout> | undefined
+        let killGraceHandle: ReturnType<typeof setTimeout> | undefined
+        let timedOut = false
+        const timeoutResult = () => {
+          const detail = out.trim()
+          return {
+            valid: false,
+            message: `validate timeout after ${validateTimeoutMs}ms${detail ? `\n${detail}` : ''}`,
+          }
+        }
+        const finish = (result: { valid: boolean; message: string }) => {
+          if (settled) return false
+          settled = true
+          if (timeoutHandle !== undefined) clearTimer(timeoutHandle)
+          if (killGraceHandle !== undefined) clearTimer(killGraceHandle)
+          resolve(result)
+          return true
+        }
+
+        timeoutHandle = setTimer(() => {
+          if (settled) return
+          // Set this BEFORE kill: a platform wrapper or test double may emit
+          // exit synchronously, and that exit must still report timeout rather
+          // than turn SIGKILL's exit code into a validation verdict.
+          timedOut = true
+          if (!proc.pid) {
+            finish(timeoutResult())
+            return
+          }
+          try {
+            killProcOf(proc, 'SIGKILL')
+          } catch (err) {
+            out += `\n${err instanceof Error ? err.message : String(err)}`
+            finish(timeoutResult())
+            return
+          }
+          // Usually exit settles the promise. If the OS/helper never reports
+          // it, release the caller after a bounded grace period rather than
+          // hanging forever.
+          if (!settled) {
+            killGraceHandle = setTimer(
+              () => finish(timeoutResult()),
+              VALIDATE_KILL_GRACE_MS,
+            )
+          }
+        }, validateTimeoutMs)
         proc.on('exit', (code: number | null) => {
-          clearTimeout(t)
-          resolve({ valid: code === 0, message: out.trim() })
+          finish(
+            timedOut
+              ? timeoutResult()
+              : { valid: code === 0, message: out.trim() },
+          )
         })
         proc.on('error', (err: Error) => {
-          clearTimeout(t)
-          resolve({ valid: false, message: err.message })
+          finish(
+            timedOut ? timeoutResult() : { valid: false, message: err.message },
+          )
         })
       })
     },

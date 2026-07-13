@@ -18,6 +18,7 @@ export interface SupervisorOptions {
   activeConfigPath: string // mihomo -f target (managed by ProfileStore)
   startTimeoutMs?: number // default 10_000
   stopTimeoutMs?: number // default 5_000
+  validateTimeoutMs?: number // default 300_000; first validation may download GEO data
   autoRestart?: boolean // crash watchdog; default true
   maxRestarts?: number // consecutive auto-restarts before giving up; default 3
   restartBackoffMs?: number // delay before each auto-restart; default 1_000

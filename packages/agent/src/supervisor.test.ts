@@ -463,6 +463,123 @@ describe('createSupervisor — stop / restart / tree-kill / mutex', () => {
     expect(r.valid).toBe(false)
     expect(r.message).toContain('parse error')
   })
+
+  it('gives sequential first-run GEO downloads a 300s validation window (#2118, #2121)', async () => {
+    const opts = baseOpts()
+    const proc = new FakeProc()
+    const setTimer = vi.fn(() => 1 as unknown as ReturnType<typeof setTimeout>)
+    const clearTimer = vi.fn()
+    const sup = createSupervisor(opts, {
+      spawn: (() => proc) as never,
+      fetch: ready200(),
+      setTimer,
+      clearTimer,
+    })
+
+    const result = sup.validate(opts.activeConfigPath)
+    expect(setTimer).toHaveBeenCalledWith(expect.any(Function), 300_000)
+    proc.emitExit(0, null)
+    await expect(result).resolves.toEqual({ valid: true, message: '' })
+    expect(clearTimer).toHaveBeenCalledOnce()
+  })
+
+  it('kills a timed-out validator and keeps its diagnostic output', async () => {
+    const opts = { ...baseOpts(), validateTimeoutMs: 25 }
+    const proc = new FakeProc()
+    const timers: Array<{ fn: () => void; ms: number }> = []
+    const sup = createSupervisor(opts, {
+      spawn: (() => proc) as never,
+      fetch: ready200(),
+      setTimer: ((fn: () => void, ms: number) => {
+        timers.push({ fn, ms })
+        return timers.length as unknown as ReturnType<typeof setTimeout>
+      }) as never,
+      clearTimer: vi.fn(),
+    })
+
+    const result = sup.validate(opts.activeConfigPath)
+    proc.stderr.emit(
+      'data',
+      Buffer.from("Can't find GeoIP.dat, start download"),
+    )
+    expect(timers[0]?.ms).toBe(25)
+    timers[0]?.fn()
+
+    // Timeout sends SIGKILL but does not release the caller while the validator
+    // may still own the candidate file or write GEO data in the shared homeDir.
+    let resolved = false
+    void result.then(() => {
+      resolved = true
+    })
+    await Promise.resolve()
+    expect(resolved).toBe(false)
+    expect(proc.killSignals).toEqual(['SIGKILL'])
+    expect(timers[1]?.ms).toBe(5_000)
+
+    proc.emitExit(null, 'SIGKILL')
+
+    const validation = await result
+    expect(validation.valid).toBe(false)
+    expect(validation.message).toContain('validate timeout after 25ms')
+    expect(validation.message).toContain('GeoIP.dat')
+  })
+
+  it('keeps the timeout verdict when kill emits exit synchronously', async () => {
+    const opts = { ...baseOpts(), validateTimeoutMs: 25 }
+    const proc = new FakeProc()
+    proc.kill = (signal?: string) => {
+      proc.killSignals.push(signal ?? 'SIGTERM')
+      proc.emitExit(0, signal ?? 'SIGTERM')
+      return true
+    }
+    let fireTimeout: (() => void) | undefined
+    const sup = createSupervisor(opts, {
+      spawn: (() => proc) as never,
+      fetch: ready200(),
+      setTimer: ((fn: () => void) => {
+        fireTimeout = fn
+        return 1 as unknown as ReturnType<typeof setTimeout>
+      }) as never,
+      clearTimer: vi.fn(),
+    })
+
+    const result = sup.validate(opts.activeConfigPath)
+    fireTimeout?.()
+
+    await expect(result).resolves.toMatchObject({
+      valid: false,
+      message: 'validate timeout after 25ms',
+    })
+  })
+
+  it('releases a timed-out validator after the kill grace if exit never arrives', async () => {
+    const opts = { ...baseOpts(), validateTimeoutMs: 25 }
+    const proc = new FakeProc()
+    proc.kill = (signal?: string) => {
+      proc.killSignals.push(signal ?? 'SIGTERM')
+      return true
+    }
+    const timers: Array<{ fn: () => void; ms: number }> = []
+    const sup = createSupervisor(opts, {
+      spawn: (() => proc) as never,
+      fetch: ready200(),
+      setTimer: ((fn: () => void, ms: number) => {
+        timers.push({ fn, ms })
+        return timers.length as unknown as ReturnType<typeof setTimeout>
+      }) as never,
+      clearTimer: vi.fn(),
+    })
+
+    const result = sup.validate(opts.activeConfigPath)
+    timers[0]?.fn()
+    expect(timers[1]?.ms).toBe(5_000)
+    timers[1]?.fn()
+
+    await expect(result).resolves.toMatchObject({
+      valid: false,
+      message: 'validate timeout after 25ms',
+    })
+  })
 })
 
 describe('createSupervisor — crash auto-restart watchdog', () => {
