@@ -173,6 +173,27 @@ describe('createProfileStore — import + active', () => {
     await expect(store.importFromUrl('https://x')).rejects.toThrow(/403/)
   })
 
+  it('times out a stalled subscription fetch instead of hanging forever', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'mcxd-profiles-timeout-'))
+    const fakeFetch = (async (_url: string, init?: RequestInit) =>
+      new Promise<Response>((_resolve, reject) => {
+        const signal = init?.signal
+        signal?.addEventListener('abort', () => reject(signal.reason), {
+          once: true,
+        })
+      })) as unknown as typeof fetch
+    const store = createProfileStore({
+      dir,
+      activeConfigPath: join(dir, '..', 'active.yaml'),
+      fetch: fakeFetch,
+      subscriptionTimeoutMs: 10,
+    })
+
+    await expect(store.importFromUrl('https://x')).rejects.toThrow(
+      'subscription fetch timed out after 10ms',
+    )
+  })
+
   it('getActiveId is undefined until setActive; setActive writes activeConfigPath', async () => {
     const dir = mkdtempSync(join(tmpdir(), 'mcxd-profiles-act-'))
     const activeConfigPath = join(dir, 'active', 'config.yaml')

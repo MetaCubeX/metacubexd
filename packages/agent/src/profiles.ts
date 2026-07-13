@@ -11,6 +11,8 @@ export interface ProfileStoreOptions {
   dir: string
   activeConfigPath: string
   fetch?: typeof fetch
+  // Bounds subscription import/refresh network I/O; default 30_000.
+  subscriptionTimeoutMs?: number
   idGen?: () => string
   // Runs enabled 'script' profiles during setActive. Injected so tests use a
   // fake (no real worker). Absent runner => script profiles are skipped.
@@ -24,6 +26,7 @@ interface StateFile {
 export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
   const { dir, activeConfigPath, scriptRunner } = opts
   const doFetch = opts.fetch ?? fetch
+  const subscriptionTimeoutMs = opts.subscriptionTimeoutMs ?? 30_000
   const idGen = opts.idGen ?? (() => randomUUID())
   const indexPath = join(dir, 'index.json')
   const statePath = join(dir, 'state.json')
@@ -88,15 +91,28 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
     content: string
     subscriptionInfo: ProfileMeta['subscriptionInfo'] | undefined
   }> {
-    const res = await doFetch(url, { headers: { 'User-Agent': userAgent } })
-    if (!res.ok) {
-      throw new Error(`fetch failed ${res.status} for ${url}`)
+    const signal = AbortSignal.timeout(subscriptionTimeoutMs)
+    try {
+      const res = await doFetch(url, {
+        headers: { 'User-Agent': userAgent },
+        signal,
+      })
+      if (!res.ok) {
+        throw new Error(`fetch failed ${res.status} for ${url}`)
+      }
+      const content = await res.text()
+      const subscriptionInfo = parseSubscriptionUserinfo(
+        res.headers.get('subscription-userinfo'),
+      )
+      return { content, subscriptionInfo }
+    } catch (err) {
+      if (signal.aborted) {
+        throw new Error(
+          `subscription fetch timed out after ${subscriptionTimeoutMs}ms for ${url}`,
+        )
+      }
+      throw err
     }
-    const content = await res.text()
-    const subscriptionInfo = parseSubscriptionUserinfo(
-      res.headers.get('subscription-userinfo'),
-    )
-    return { content, subscriptionInfo }
   }
 
   const store: ProfileStore = {
