@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.268.2](https://github.com/MetaCubeX/metacubexd/compare/v1.268.1...v1.268.2) (2026-07-13)
+
+
+### Bug Fixes
+
+* **desktop:** handle linux helper not found ([#2126](https://github.com/MetaCubeX/metacubexd/issues/2126)) ([cad64d7](https://github.com/MetaCubeX/metacubexd/commit/cad64d7e6d8c9ccfd282fa90fead37664097368c))
+* **desktop:** handle missing helper service probes ([ba77600](https://github.com/MetaCubeX/metacubexd/commit/ba77600d041a789ffee9fad7caa8cf2b4f28ee48)), closes [#2127](https://github.com/MetaCubeX/metacubexd/issues/2127) [#2128](https://github.com/MetaCubeX/metacubexd/issues/2128)
+* **proxies:** reuse successful provider latency history ([4f2ddc6](https://github.com/MetaCubeX/metacubexd/commit/4f2ddc6c648060605768cea937e85e8db9b86495))
+
 ## [1.268.1](https://github.com/MetaCubeX/metacubexd/compare/v1.268.0...v1.268.1) (2026-07-13)
 
 
