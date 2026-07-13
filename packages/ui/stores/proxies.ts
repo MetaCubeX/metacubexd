@@ -138,19 +138,25 @@ export const useProxiesStore = defineStore('proxies', () => {
     return undefined
   }
 
-  // Non-empty latency series for the requested url, else any non-empty series
-  // the node recorded under another url — mirrors findPositiveLatency so the
-  // stability bar matches the pill.
+  const hasSuccessfulLatency = (history: Proxy['history'] | undefined) =>
+    history?.some(({ delay }) => delay > 0) ?? false
+
+  // Successful latency series for the requested url, else any successful
+  // series the node recorded under another url. A non-empty series can still
+  // contain only failed probes (delay 0); treating that as usable makes the
+  // stability bar stay gray while the pill falls back to a provider reading.
+  // If nothing succeeded anywhere, keep the requested failure history so the
+  // UI can still show those attempts.
   const pickLatencyHistory = (
     histories: Record<string, Proxy['history'] | undefined>,
     finalTestUrl: string,
   ) => {
     const exact = histories[finalTestUrl]
-    if (exact?.length) return exact
+    if (hasSuccessfulLatency(exact)) return exact
     for (const series of Object.values(histories)) {
-      if (series?.length) return series
+      if (hasSuccessfulLatency(series)) return series
     }
-    return undefined
+    return exact?.length ? exact : undefined
   }
 
   const replaceNodeLatency = (

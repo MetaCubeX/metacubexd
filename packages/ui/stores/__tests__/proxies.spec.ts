@@ -523,6 +523,66 @@ describe('stores/proxies latency state', () => {
       { time: '2026-05-19T13:17:31.000Z', delay: 506 },
     ])
   })
+
+  it('reuses successful provider history when the proxy view history contains only failed probes', async () => {
+    const store = useProxiesStore()
+    apiMocks.fetchProxiesAPI.mockResolvedValue({
+      proxies: {
+        'node-a': proxy({
+          name: 'node-a',
+          type: 'vless',
+          extra: {
+            'https://latency.test/provider': {
+              history: [{ time: '2026-05-19T13:17:31.000Z', delay: 506 }],
+            },
+          },
+          // A failed global health check is still a non-empty history. It must
+          // not hide the successful provider series from the stability bar.
+          history: [
+            { time: '2026-05-19T13:16:31.000Z', delay: 0 },
+            { time: '2026-05-19T13:17:31.000Z', delay: 0 },
+          ],
+        }),
+      },
+    })
+
+    await store.fetchProxies()
+    await nextTick()
+
+    expect(store.getLatencyByName('node-a', null)).toBe(506)
+    expect(store.getLatencyHistoryByName('node-a', null)).toEqual([
+      { time: '2026-05-19T13:17:31.000Z', delay: 506 },
+    ])
+  })
+
+  it('keeps the requested test url history when it has a successful probe', async () => {
+    const store = useProxiesStore()
+    apiMocks.fetchProxiesAPI.mockResolvedValue({
+      proxies: {
+        'node-a': proxy({
+          name: 'node-a',
+          type: 'vless',
+          extra: {
+            'https://latency.test/provider': {
+              history: [{ time: '2026-05-19T13:18:31.000Z', delay: 506 }],
+            },
+          },
+          history: [
+            { time: '2026-05-19T13:17:31.000Z', delay: 88 },
+            { time: '2026-05-19T13:18:31.000Z', delay: 0 },
+          ],
+        }),
+      },
+    })
+
+    await store.fetchProxies()
+    await nextTick()
+
+    expect(store.getLatencyHistoryByName('node-a', null)).toEqual([
+      { time: '2026-05-19T13:17:31.000Z', delay: 88 },
+      { time: '2026-05-19T13:18:31.000Z', delay: 0 },
+    ])
+  })
 })
 
 describe('stores/proxies read model', () => {
