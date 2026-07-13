@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.268.1](https://github.com/MetaCubeX/metacubexd/compare/v1.268.0...v1.268.1) (2026-07-13)
+
+
+### Bug Fixes
+
+* **desktop:** repair Linux package release ([3ded5cf](https://github.com/MetaCubeX/metacubexd/commit/3ded5cf92c9ff06fd1f05a8247748702c2deadea))
+
 ## [1.268.0](https://github.com/MetaCubeX/metacubexd/compare/v1.267.3...v1.268.0) (2026-07-13)
 
 
