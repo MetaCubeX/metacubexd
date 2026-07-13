@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.268.0](https://github.com/MetaCubeX/metacubexd/compare/v1.267.3...v1.268.0) (2026-07-13)
+
+
+### Features
+
+* **desktop:** add native Linux and Homebrew packages ([8d1e98f](https://github.com/MetaCubeX/metacubexd/commit/8d1e98ffae128f5ee41a8fa4754004cdd023c89c)), closes [#2123](https://github.com/MetaCubeX/metacubexd/issues/2123)
+
 ## [1.267.3](https://github.com/MetaCubeX/metacubexd/compare/v1.267.2...v1.267.3) (2026-07-13)
 
 
