@@ -83,26 +83,48 @@ components:
     padding: '0.25rem 0.375rem'
 ---
 
-# Design System: MetaCubeXD
+# MetaCubeXD Design System
 
 ## 1. Overview
 
 **Creative North Star: "The Instrument Console"**
 
-MetaCubeXD is a precision instrument you operate, not a page you read. Controls press down and settle back with a physical, elastic recoil; live readouts — traffic, latency, connection counts — glow against a deep, cool-slate panel and update in place without shuffling the layout. Every value is legible at a glance, and every action reports itself. The dashboard shipped default is `sunset`: a dark theme where a warm terracotta primary and a violet accent sit on near-black slate, so the readouts feel lit rather than printed. This is a tool in the hands of someone who already knows what they're doing.
+MetaCubeXD should read like a precision instrument: live values remain stable and
+legible, controls give immediate feedback, and state changes never depend on
+decoration alone. The default `sunset` theme provides the reference palette, but
+the implementation is built on daisyUI semantic roles so it remains correct
+across all 32 selectable themes and user overrides.
 
-The system's identity lives in two layers. The **color layer is theme-swappable**: it rides entirely on daisyUI's semantic roles (primary, accent, base, the state colors) across 32 curated themes plus per-token user overrides — so a token's _role_ is normative, never a specific hex. The **motion and interaction layer is the project's own committed voice**: a small elastic-physics vocabulary (springy hover lifts, a tactile press that scales to 0.96, expo-out settles) applied only where it reports state or action. Density is earned through hierarchy and tabular alignment, never by cramming.
-
-It explicitly rejects two things. It is **not a bloated enterprise admin console** — no personality-free grids of stacked controls, no dense-but-unreadable back-office. And it is **not a flashy gradient-heavy consumer app** — no decorative gradients, no glow-for-glow's-sake, no motion as ornament. Warmth and life come from the accent, the type, and the physical feedback, not from surface decoration.
-
-**Key Characteristics:**
+**Key characteristics:**
 
 - Dark-default (`sunset`), theme-swappable across 32 daisyUI themes; the semantic role is the contract.
 - Elastic-physics motion, applied only to real controls and state changes.
 - Information-dense but hierarchy-first; tabular numerics for live-updating figures.
 - Full parity across desktop and mobile; keyboard-reachable with visible focus rings.
 
-## 2. Colors
+Product users, jobs, scope, and brand principles live in
+[PRODUCT.md](./PRODUCT.md). This document specifies visual and interaction
+implementation and should not duplicate the product brief.
+
+## 2. Sources of Truth
+
+The YAML front matter above is a portable token reference for the default
+`sunset` presentation. It is documentation, not a runtime input. When this file
+and the implementation disagree, the running code is authoritative and this
+document should be updated in the same change.
+
+- [`assets/css/main.css`](./assets/css/main.css) owns global typography, motion,
+  elevation, focus, reduced-motion behavior, and daisyUI theme enablement.
+- [`constants/index.ts`](./constants/index.ts) owns the 32 themes exposed by the
+  theme selector.
+- [`utils/index.ts`](./utils/index.ts) owns latency-band classification and its
+  current color classes; [`stores/config.ts`](./stores/config.ts) owns
+  user-configurable thresholds.
+- Components own their final structure, responsive behavior, and accessibility
+  semantics. Reusable behavior should be implemented there or in shared CSS,
+  then reflected here.
+
+## 3. Colors
 
 A dark, cool-slate foundation carrying one warm accent (terracotta) with violet and rose supporting hues, plus a full semantic-state set — all expressed as daisyUI roles that re-resolve under every theme.
 
@@ -114,7 +136,7 @@ A dark, cool-slate foundation carrying one warm accent (terracotta) with violet 
 
 - **Console Rose** (`oklch(72.537% 0.177 2.72)`): secondary emphasis and occasional category accents. Used sparingly; it never competes with Terracotta Signal for "the primary action."
 
-### Tertiary
+### Accent
 
 - **Signal Violet** (`oklch(71.294% 0.166 299.844)`): the accent role — highlights, charts, the occasional distinct affordance. The third voice, not a fourth surface.
 
@@ -124,7 +146,7 @@ A dark, cool-slate foundation carrying one warm accent (terracotta) with violet 
 - **Panel Text** (`oklch(77.383% 0.043 245.096)`): base-content. The default readout/label color; light blue-gray, tuned to clear 4.5:1 on base-100.
 - **Neutral Surface** (`oklch(26% 0.019 237.69)`): the `neutral` role for muted chips and inert fills.
 
-### Semantic State (color-blind-safe rule applies — see Do's and Don'ts)
+### Semantic states
 
 - **Info Cyan** (`oklch(85.559% 0.085 206.015)`), **Success Green** (`oklch(85.56% 0.085 144.778)`), **Warning Amber** (`oklch(85.569% 0.084 74.427)`), **Error Salmon** (`oklch(85.511% 0.078 16.886)`): status and feedback. High-lightness so they stay legible as text on the dark base.
 
@@ -134,7 +156,7 @@ A dark, cool-slate foundation carrying one warm accent (terracotta) with violet 
 
 **The One Signal Rule.** Terracotta Signal marks the _one_ primary action or current selection on a surface. If two things on screen are both terracotta-primary, one of them is wrong.
 
-## 3. Typography
+## 4. Typography
 
 **Display / Body / Label Font:** Ubuntu (with `PingFang SC`, `Hiragino Sans GB`, `Microsoft YaHei`, `Noto Sans CJK SC`, `system-ui` CJK + system fallbacks). One family across the whole product.
 **Flag glyphs:** `Twemoji Mozilla`, scoped by `unicode-range` to regional-indicator flag codepoints only — it is never the primary family for body text.
@@ -153,13 +175,19 @@ A dark, cool-slate foundation carrying one warm accent (terracotta) with violet 
 
 **The Tabular-Numerics Rule.** Any figure that updates live — download/upload speeds, latency, connection counts — uses `font-variant-numeric: tabular-nums` so columns don't twitch as digits change. This is mandatory in `ConnectionsTable` and every live readout.
 
-## 4. Elevation
+## 5. Elevation
 
-Flat at rest, lifted by state. daisyUI runs with `--depth: 0` and `--noise: 0`, so surfaces are separated tonally (the base-100/200/300 ramp), not by resting shadows. Depth is a _response_: it appears on hover, on drag, and on floating layers (modals, tooltips, dropdowns). A three-step lift vocabulary encodes this, tuned in `oklab` off `--color-base-content` so it reads correctly under both light and dark themes.
+Flat at rest, lifted by state. The reference `sunset` theme uses
+`--depth: 0` and `--noise: 0`; other selectable daisyUI themes may define
+different values. Project-owned surfaces still use the base-100/200/300 tonal
+ramp rather than resting shadows. Depth is a _response_: it appears on hover,
+drag, and floating layers (modals, tooltips, dropdowns). A three-step lift
+vocabulary encodes this, tuned in `oklab` from `--color-base-content` so it
+works under light and dark themes.
 
 ### Shadow Vocabulary
 
-- **Lift 1** (`--lift-1`): resting elevation for subtle floating chips / small hovers.
+- **Lift 1** (`--lift-1`): low elevation for subtle floating chips and hover states.
 - **Lift 2** (`--lift-2`): the standard hover elevation — cards and pressables translate up 2px into this shadow.
 - **Lift 3** (`--lift-3`): pronounced float for dragged items and prominent overlays.
 - **Inner Highlight** (`--inner-highlight`): a 1px inset top-edge highlight ("light catch") that gives pressable surfaces an ambient-lit edge.
@@ -168,7 +196,7 @@ Flat at rest, lifted by state. daisyUI runs with `--depth: 0` and `--noise: 0`, 
 
 **The Flat-By-Default Rule.** Surfaces carry no shadow at rest. A shadow that isn't reporting hover, drag, or float-layer state is decoration — remove it. Tonal layering (base-100 → 200 → 300) does the resting separation.
 
-## 5. Components
+## 6. Components
 
 ### Buttons
 
@@ -185,7 +213,8 @@ Flat at rest, lifted by state. daisyUI runs with `--depth: 0` and `--noise: 0`, 
 
 ### Cards / Panels
 
-- **Corner Style:** box radius (`1rem` / 16px; `rounded-xl`/`rounded-2xl`).
+- **Corner Style:** box radius (`1rem` / 16px; `rounded-2xl`). Use
+  `rounded-xl` only for deliberately more compact panels.
 - **Background:** `base-200` lifted one tonal step above the `base-100` canvas; recessed toolbars use `base-300`.
 - **Shadow Strategy:** flat at rest; `.lift-hover` raises interactive cards 2px into `--lift-2`. Never nest a card inside a card.
 - **Border:** daisyUI `--border: 1px` where a divider is needed; tonal step often carries separation alone.
@@ -205,9 +234,9 @@ Flat at rest, lifted by state. daisyUI runs with `--depth: 0` and `--noise: 0`, 
 
 **The Consistent-Affordance Rule.** The same action wears the same component everywhere. One button shape, one form-control vocabulary, one icon family (`@tabler/icons-vue`). If "test latency" looks different on two screens, one is wrong.
 
-## 6. Do's and Don'ts
+## 7. Implementation Guidelines
 
-### Do:
+### Do
 
 - **Do** bind color to daisyUI roles (`bg-primary`, `text-error`, `var(--color-base-content)`) so every surface survives a theme switch and honors user color overrides.
 - **Do** verify body text clears ≥4.5:1 (large/bold ≥3:1) **under every enabled theme**, not just `sunset` — placeholders included. All 32 themes ship; all 32 must read.
@@ -216,11 +245,9 @@ Flat at rest, lifted by state. daisyUI runs with `--depth: 0` and `--noise: 0`, 
 - **Do** keep the mobile surface at full capability — the bottom nav and responsive tables are the design, not a downgrade.
 - **Do** keep depth a response: flat at rest, `--lift-*` on hover/drag/float only.
 
-### Don't:
+### Don't
 
 - **Don't** hardcode hex or raw Tailwind palette colors (`text-red-500`, `text-yellow-500`, `text-green-600`) for themeable UI — they don't re-resolve across themes and break user overrides. _(The latency bands currently do this; treat it as debt, migrate to semantic `error/warning/success`.)_
 - **Don't** signal status by hue alone. Latency/health/up-down must pair red/amber/green with shape, icon, position, or a number so a color-blind user can still read it. Green-vs-red is not an accessible status system.
-- **Don't** build it like a **bloated enterprise admin console** — no personality-free stacks of controls, no dense-but-unreadable back-office grids.
-- **Don't** build it like a **flashy gradient-heavy consumer app** — no decorative gradients, no `background-clip: text` gradient headings, no glow or glassmorphism as default, no motion as ornament.
 - **Don't** nest cards inside cards, or reach for a modal first — exhaust inline and progressive alternatives.
 - **Don't** introduce a second type family or a display font for UI labels; weight and size on Ubuntu carry the hierarchy.
