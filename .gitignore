@@ -33,8 +33,5 @@ dist
 
 coverage
 
-# superpowers brainstorm visual companion
-.superpowers/
-
 # impeccable working dir (critique snapshots, render sidecar)
 .impeccable/
