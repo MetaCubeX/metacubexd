@@ -451,6 +451,10 @@ describe('createControlRouter — profiles + SSE', () => {
       method: 'POST',
     })
     expect(res.status).toBe(400)
+    expect(await res.json()).toMatchObject({
+      statusMessage: 'profile validation failed',
+      data: { error: 'parse error near line 3' },
+    })
     expect(deps.profiles.setActive).toHaveBeenCalledWith('p1')
     // Prior profile restored so the bad candidate does not persist.
     expect(deps.profiles.setActive).toHaveBeenCalledWith('old')

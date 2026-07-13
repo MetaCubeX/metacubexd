@@ -366,11 +366,18 @@ describe('composables/useProfiles', () => {
 
     it('surfaces a failed apply (e.g. validation) via toast.error, returns false', async () => {
       api.refreshAndActivateProfile.mockRejectedValue(
-        new Error('profile validation failed'),
+        Object.assign(new Error('Request failed with status code 400'), {
+          data: {
+            statusMessage: 'profile validation failed',
+            data: { error: 'GEOIP database download failed' },
+          },
+        }),
       )
       const p = useProfiles()
       const ok = await p.refreshAndApply('a')
-      expect(toast.error).toHaveBeenCalled()
+      expect(toast.error).toHaveBeenCalledWith('profilesRefreshFailed', {
+        description: 'GEOIP database download failed',
+      })
       expect(ok).toBe(false)
     })
   })

@@ -11,6 +11,7 @@ import {
   IconTrash,
 } from '@tabler/icons-vue'
 import { toast } from 'vue-sonner'
+import { controlErrorMessage } from '~/utils/controlError'
 
 const { t, locale } = useI18n()
 const { hasFeature, ready } = useControlInfo()
@@ -84,7 +85,7 @@ onMounted(() => {
     refresh().catch((err) => {
       console.error('[profiles] initial load failed', err)
       toast.error(t('profilesActionFailed'), {
-        description: err instanceof Error ? err.message : String(err),
+        description: controlErrorMessage(err),
       })
     })
 })
@@ -93,7 +94,7 @@ onMounted(() => {
 // (the merge/script setters self-toast and never reach here).
 const notifyError = (e: unknown) =>
   toast.error(t('profilesActionFailed'), {
-    description: e instanceof Error ? e.message : String(e),
+    description: controlErrorMessage(e),
   })
 
 // Honour prefers-reduced-motion for the one-shot editor scroll: a JS

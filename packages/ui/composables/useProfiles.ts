@@ -6,6 +6,7 @@ import type {
   ValidateResult,
 } from '~/types/control'
 import { toast } from 'vue-sonner'
+import { controlErrorMessage } from '~/utils/controlError'
 import { useControlApi } from './useControlApi'
 
 // `useI18n` is auto-imported by @nuxtjs/i18n (no explicit import). In unit
@@ -92,7 +93,7 @@ export function useProfiles() {
       return true
     } catch (e) {
       toast.error(t('profilesRefreshFailed'), {
-        description: e instanceof Error ? e.message : String(e),
+        description: controlErrorMessage(e),
       })
       return false
     }
@@ -109,7 +110,7 @@ export function useProfiles() {
       return true
     } catch (e) {
       toast.error(t('profilesRefreshFailed'), {
-        description: e instanceof Error ? e.message : String(e),
+        description: controlErrorMessage(e),
       })
       return false
     }
@@ -158,7 +159,7 @@ export function useProfiles() {
       await recompose()
     } catch (e) {
       toast.error(t('profilesMergeUpdateFailed'), {
-        description: e instanceof Error ? e.message : String(e),
+        description: controlErrorMessage(e),
       })
     }
   }
@@ -171,7 +172,7 @@ export function useProfiles() {
       await recompose()
     } catch (e) {
       toast.error(t('profilesMergeUpdateFailed'), {
-        description: e instanceof Error ? e.message : String(e),
+        description: controlErrorMessage(e),
       })
     }
   }
@@ -185,7 +186,7 @@ export function useProfiles() {
       await recompose()
     } catch (e) {
       toast.error(t('profilesScriptUpdateFailed'), {
-        description: e instanceof Error ? e.message : String(e),
+        description: controlErrorMessage(e),
       })
     }
   }
@@ -198,7 +199,7 @@ export function useProfiles() {
       await recompose()
     } catch (e) {
       toast.error(t('profilesScriptUpdateFailed'), {
-        description: e instanceof Error ? e.message : String(e),
+        description: controlErrorMessage(e),
       })
     }
   }
