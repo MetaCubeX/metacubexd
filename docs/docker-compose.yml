@@ -1,23 +1,47 @@
-version: '3'
+# All-in-one server example for a trusted LAN. Published ports bind to every
+# host interface; do not expose them directly to the public internet. Use a
+# firewall and a TLS reverse proxy for access outside the trusted network.
+#
+# Before `docker compose up -d`, create a `.env` file containing two different,
+# strong random values:
+#   CONTROL_TOKEN=...
+#   CLASH_SECRET=...
 
 services:
   metacubexd:
+    image: ghcr.io/metacubex/metacubexd-server:latest
     container_name: metacubexd
-    image: ghcr.io/metacubex/metacubexd
-    restart: always
+    restart: unless-stopped
+    environment:
+      CONTROL_TOKEN: '${CONTROL_TOKEN:?Set CONTROL_TOKEN in .env}'
+      CLASH_SECRET: '${CLASH_SECRET:?Set CLASH_SECRET in .env}'
+      CONTROL_PORT: '8080'
+      CLASH_API_PORT: '9090'
+      MIXED_PORT: '7890'
+      TZ: '${TZ:-UTC}'
     ports:
-      - '80:80'
-
-  # optional
-  meta:
-    container_name: meta
-    image: docker.io/metacubex/mihomo:Alpha
-    restart: always
-    pid: host
-    ipc: host
-    network_mode: host
-    cap_add:
-      - ALL
+      - '8080:8080' # dashboard UI + /api/control agent API
+      - '9090:9090' # Mihomo external-controller API + WebSocket
+      - '7890:7890' # mixed HTTP/SOCKS proxy port
     volumes:
-      - /dev/net/tun:/dev/net/tun
-      - ./config.yaml:/root/.config/mihomo
+      # Profiles, active config, kernel downloads, and caches must be writable.
+      - 'metacubexd-data:/data'
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:8080/api/control/health']
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+
+    # TUN is an advanced Linux-only override. It grants network-administration
+    # capability and makes the container share the host network namespace.
+    # Remove `ports:` (Docker ignores it in host-network mode), uncomment the
+    # three settings below, and enable `tun:` in the active Mihomo profile.
+    # network_mode: host
+    # cap_add:
+    #   - NET_ADMIN
+    # devices:
+    #   - '/dev/net/tun:/dev/net/tun'
+
+volumes:
+  metacubexd-data: {}
