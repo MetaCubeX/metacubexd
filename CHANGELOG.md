@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.268.3](https://github.com/MetaCubeX/metacubexd/compare/v1.268.2...v1.268.3) (2026-07-13)
+
+
+### Bug Fixes
+
+* **connections:** align mobile connection details ([9bbab26](https://github.com/MetaCubeX/metacubexd/commit/9bbab261589a5c720f0007f12022c721eee44328))
+
 ## [1.268.2](https://github.com/MetaCubeX/metacubexd/compare/v1.268.1...v1.268.2) (2026-07-13)
 
 
