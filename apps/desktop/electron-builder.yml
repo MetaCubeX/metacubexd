@@ -98,7 +98,10 @@ nsis:
   allowToChangeInstallationDirectory: true
   perMachine: false
 linux:
-  icon: build/icon.png
+  # Native packages install this set into the matching hicolor size buckets.
+  # A single 1024px PNG only produced hicolor/1024x1024, which some Linux
+  # desktops do not consider when resolving the Icon=metacubexd entry.
+  icon: build/icons
   syncDesktopName: true
   extraResources:
     - from: resources/mihomo
