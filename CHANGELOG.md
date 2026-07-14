@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.268.4](https://github.com/MetaCubeX/metacubexd/compare/v1.268.3...v1.268.4) (2026-07-14)
+
+
+### Bug Fixes
+
+* **desktop:** ship Linux icon sizes ([d61af62](https://github.com/MetaCubeX/metacubexd/commit/d61af626eb071bb849948b4471666cae071ea362)), closes [#2131](https://github.com/MetaCubeX/metacubexd/issues/2131)
+
 ## [1.268.3](https://github.com/MetaCubeX/metacubexd/compare/v1.268.2...v1.268.3) (2026-07-13)
 
 
