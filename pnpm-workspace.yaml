@@ -8,32 +8,32 @@ packages:
 catalog:
   '@antfu/eslint-config': ^9.1.0
   '@commitlint/config-conventional': ^21.2.0
-  '@floating-ui/vue': ^2.0.0
+  '@floating-ui/vue': ^2.0.1
   '@nuxt/fonts': ^0.14.0
-  '@nuxtjs/i18n': ^10.4.0
+  '@nuxtjs/i18n': ^10.4.1
   '@nuxtjs/tailwindcss': ^6.14.0
-  '@pinia/nuxt': ^0.11.3
+  '@pinia/nuxt': ^1.0.0
   '@playwright/test': ^1.61.1
-  '@prettier/plugin-oxc': ^0.2.0
+  '@prettier/plugin-oxc': ^0.2.1
   '@tabler/icons-vue': ^3.44.0
   '@tailwindcss/typography': ^0.5.20
   '@tailwindcss/vite': ^4.3.2
   '@tanstack/vue-query': ^5.101.2
-  '@tanstack/vue-virtual': ^3.13.31
+  '@tanstack/vue-virtual': ^3.13.32
   '@types/byte-size': ^8.1.2
   '@types/d3': ^7.4.3
   '@types/markdown-it': ^14.1.2
-  '@types/node': ^26.1.0
+  '@types/node': ^26.1.1
   '@types/sortablejs': ^1.15.9
   '@vueuse/core': ^14.3.0
   '@vueuse/integrations': ^14.3.0
   '@vueuse/nuxt': ^14.3.0
   byte-size: ^9.0.1
-  commitlint: ^21.2.0
+  commitlint: ^21.2.1
   d3: ^7.9.0
-  daisyui: ^5.6.14
+  daisyui: ^5.6.18
   dayjs: ^1.11.21
-  eslint: ^10.6.0
+  eslint: ^10.7.0
   eslint-plugin-format: ^2.0.1
   highcharts: ^13.0.0
   husky: ^9.1.7
@@ -42,22 +42,22 @@ catalog:
   markdown-it: ^14.3.0
   match-sorter: ^8.3.0
   nuxt: 4.4.8
-  pinia: ^3.0.4
+  pinia: ^4.0.0
   playwright: ^1.61.1
-  prettier: ^3.9.4
+  prettier: ^3.9.5
   prettier-plugin-tailwindcss: ^0.8.0
   sort-package-json: ^4.0.0
   sortablejs: ^1.15.7
   tailwindcss: ^4.3.2
-  tsx: ^4.23.0
-  typescript: ^6.0.3
+  tsx: ^4.23.1
+  typescript: ^7.0.2
   uqr: ^0.1.2
-  vite: 8.1.3
+  vite: 8.1.4
   vitest: ^4.1.10
   vue: ^3.5.39
   vue-router: ^5.1.0
   vue-sonner: ^2.0.9
-  vue-tsc: ^3.3.6
+  vue-tsc: ^3.3.7
   '@vite-pwa/nuxt': ^1.1.1
   '@vitest/coverage-v8': ^4.1.10
   jsdom: ^29.1.1
@@ -70,7 +70,7 @@ catalog:
   tree-kill: ^1.2.2
   yaml: ^2.9.0
   nitropack: ^2.12.6
-  electron: ^43.1.0
+  electron: ^43.1.1
   electron-vite: ^5.0.0
   electron-builder: ^26.0.0
   # Flips Electron's runtime fuses on the packaged binary via an afterPack hook
@@ -92,12 +92,12 @@ catalog:
   # Dependabot is configured to ignore this package (.github/dependabot.yml).
   monaco-editor: 0.52.2
   monaco-yaml: ^5.5.1
-  meta-json-schema: ^1.19.27
+  meta-json-schema: ^1.19.28
 
 # overrides MUST live only at the workspace root (pnpm 10/11). This is the
 # merge of OLD package.json#pnpm.overrides + the OLD workspace override.
 # CONFLICT RESOLUTION (see spec §2): the old package.json pinned
-# vite: 8.1.3 in BOTH dependencies and pnpm.overrides, but the old
+# vite: 8.1.4 in BOTH dependencies and pnpm.overrides, but the old
 # pnpm-workspace.yaml override 'vite: npm:rolldown-vite@latest' WON at install
 # time — the project already runs on rolldown-vite. Keep ONLY rolldown-vite
 # here; drop the 8.0.16 pin. (The 8.0.16 entry survives in the catalog above
