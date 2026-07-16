@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.269.0](https://github.com/MetaCubeX/metacubexd/compare/v1.268.5...v1.269.0) (2026-07-16)
+
+
+### Features
+
+* add visual profile configuration editor ([fddcf21](https://github.com/MetaCubeX/metacubexd/commit/fddcf21fd38e0ff0855cca1dde08eded8243d25e))
+
 ## [1.268.5](https://github.com/MetaCubeX/metacubexd/compare/v1.268.4...v1.268.5) (2026-07-16)
 
 
