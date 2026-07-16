@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.268.5](https://github.com/MetaCubeX/metacubexd/compare/v1.268.4...v1.268.5) (2026-07-16)
+
+
+### Bug Fixes
+
+* address release and profile reliability issues ([2dc9212](https://github.com/MetaCubeX/metacubexd/commit/2dc9212715ec66385e168fa090dc93d5db8f4c00))
+
 ## [1.268.4](https://github.com/MetaCubeX/metacubexd/compare/v1.268.3...v1.268.4) (2026-07-14)
 
 
