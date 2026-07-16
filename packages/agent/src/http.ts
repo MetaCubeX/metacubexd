@@ -1,4 +1,6 @@
 import type { App, H3Event } from 'h3'
+import type { ConfigPatchV1 } from '@metacubexd/config-editor'
+import type { ProfileConfigEditor } from './profile-editor'
 import type {
   KernelLogLine,
   KernelManager,
@@ -25,7 +27,12 @@ import {
   setResponseStatus,
 } from 'h3'
 import { fetchGeoAssets } from './kernel/geo'
+import { ConfigPatchConflictError } from './merge'
 import { SubscriptionFetchError } from './profiles'
+import {
+  ProfileEditorConflictError,
+  ProfileEditorValidationError,
+} from './profile-editor'
 import { TunPreconditionError } from './tun'
 import { createWebdavClient as defaultCreateWebdavClient } from './webdav'
 
@@ -59,6 +66,7 @@ interface WebdavCredentials {
 export interface ControlRouterDeps {
   supervisor: MihomoSupervisor
   profiles: ProfileStore
+  profileEditor?: ProfileConfigEditor // capability-gated visual profile editor
   info: () => unknown
   homeDir: string // writable dir for materializing validate candidate files
   activeConfigPath: string // file the kernel runs with -f (supervisor-injected at spawn)
@@ -79,6 +87,7 @@ export function createControlRouter(deps: ControlRouterDeps): App {
   const {
     supervisor,
     profiles,
+    profileEditor,
     info,
     homeDir,
     activeConfigPath,
@@ -202,7 +211,18 @@ export function createControlRouter(deps: ControlRouterDeps): App {
   // prior active profile) and surface the validator's message as a clean 400.
   async function safeActivate(id: string): Promise<KernelState> {
     const previousActiveId = await profiles.getActiveId()
-    await profiles.setActive(id)
+    try {
+      await profiles.setActive(id)
+    } catch (error) {
+      if (error instanceof ConfigPatchConflictError) {
+        throw createError({
+          statusCode: 409,
+          statusMessage: 'profile editor conflict',
+          data: { error: error.message, conflicts: error.conflicts },
+        })
+      }
+      throw error
+    }
     const validation = await supervisor.validate(activeConfigPath)
     if (validation.valid) return supervisor.restart()
     if (previousActiveId && previousActiveId !== id) {
@@ -258,6 +278,13 @@ export function createControlRouter(deps: ControlRouterDeps): App {
         enabled?: boolean
         // minutes; remote-only. 0 disables auto-update; omit leaves it untouched.
         updateInterval?: number
+      }
+      const meta = (await profiles.list()).find((item) => item.id === id)
+      if (meta?.managedBy === 'visual-editor') {
+        throw createError({
+          statusCode: 403,
+          statusMessage: 'managed visual editor overlays are read-only',
+        })
       }
       return profiles.update(id, body)
     }),
@@ -336,6 +363,79 @@ export function createControlRouter(deps: ControlRouterDeps): App {
       }
     }),
   )
+
+  // ---- Visual profile editor (Agent only) ----
+  if (profileEditor) {
+    const readEditorPatch = async (event: H3Event): Promise<ConfigPatchV1> => {
+      const body = (await readBody(event)) as { patch?: ConfigPatchV1 }
+      if (body.patch?.version !== 1 || !Array.isArray(body.patch.operations)) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: 'invalid visual editor patch',
+        })
+      }
+      return body.patch
+    }
+    const withEditorError = async <T>(action: () => Promise<T>): Promise<T> => {
+      try {
+        return await action()
+      } catch (error) {
+        if (error instanceof ProfileEditorConflictError) {
+          throw createError({
+            statusCode: 409,
+            statusMessage: 'profile editor conflict',
+            data: { error: error.message, conflicts: error.conflicts },
+          })
+        }
+        if (error instanceof ProfileEditorValidationError) {
+          throw createError({
+            statusCode: 400,
+            statusMessage: 'profile editor validation failed',
+            data: {
+              error: error.message,
+              diagnostics: error.diagnostics,
+              validatorMessage: error.validatorMessage,
+            },
+          })
+        }
+        throw error
+      }
+    }
+
+    router.get(
+      `${PREFIX}/profiles/:id/editor`,
+      defineEventHandler((event) => {
+        const id = getRouterParam(event, 'id')!
+        return withEditorError(() => profileEditor.open(id))
+      }),
+    )
+    router.post(
+      `${PREFIX}/profiles/:id/editor/preview`,
+      defineEventHandler(async (event) => {
+        const id = getRouterParam(event, 'id')!
+        const patch = await readEditorPatch(event)
+        return withEditorError(() => profileEditor.preview(id, patch))
+      }),
+    )
+    router.put(
+      `${PREFIX}/profiles/:id/editor`,
+      defineEventHandler(async (event) => {
+        const id = getRouterParam(event, 'id')!
+        const patch = await readEditorPatch(event)
+        return withEditorError(() => profileEditor.apply(id, patch))
+      }),
+    )
+    router.delete(
+      `${PREFIX}/profiles/:id/editor/overlay`,
+      defineEventHandler(async (event) => {
+        const id = getRouterParam(event, 'id')!
+        const kernel = await withEditorError(() =>
+          profileEditor.resetManagedOverlay(id),
+        )
+        return kernel ?? { ok: true }
+      }),
+    )
+  }
 
   // ---- Active config ----
   router.get(
@@ -489,7 +589,14 @@ export function createControlRouter(deps: ControlRouterDeps): App {
       const bundle = JSON.parse(raw) as {
         version: number
         profiles: Array<{
-          meta: { name: string; type?: string }
+          meta: {
+            id?: string
+            name: string
+            type?: string
+            baseProfileId?: string
+            managedBy?: 'visual-editor'
+            editorStatus?: 'clean' | 'conflicted'
+          }
           content: string
         }>
         uiSettings?: unknown
@@ -497,7 +604,14 @@ export function createControlRouter(deps: ControlRouterDeps): App {
       // Recreate via profiles.create so each restored profile gets a fresh id
       // (avoids clashing with any existing local ids).
       let restored = 0
-      for (const p of bundle.profiles ?? []) {
+      const restoredIds = new Map<string, string>()
+      const ordinary = (bundle.profiles ?? []).filter(
+        (profile) => profile.meta.managedBy !== 'visual-editor',
+      )
+      const managed = (bundle.profiles ?? []).filter(
+        (profile) => profile.meta.managedBy === 'visual-editor',
+      )
+      for (const p of [...ordinary, ...managed]) {
         // Preserve composition types (merge/script) so restored overlays/scripts
         // still apply; 'remote' is intentionally restored as 'local' (keep the
         // captured content, no network re-fetch).
@@ -505,7 +619,18 @@ export function createControlRouter(deps: ControlRouterDeps): App {
           p.meta.type === 'merge' || p.meta.type === 'script'
             ? p.meta.type
             : 'local'
-        await profiles.create({ name: p.meta.name, content: p.content, type })
+        const mappedBaseId = p.meta.baseProfileId
+          ? restoredIds.get(p.meta.baseProfileId)
+          : undefined
+        const created = await profiles.create({
+          name: p.meta.name,
+          content: p.content,
+          type,
+          ...(mappedBaseId ? { baseProfileId: mappedBaseId } : {}),
+          ...(p.meta.managedBy ? { managedBy: p.meta.managedBy } : {}),
+          ...(p.meta.editorStatus ? { editorStatus: p.meta.editorStatus } : {}),
+        })
+        if (p.meta.id) restoredIds.set(p.meta.id, created.id)
         restored += 1
       }
       return { ok: true, restored, uiSettings: bundle.uiSettings }

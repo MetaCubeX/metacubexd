@@ -23,6 +23,7 @@
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "@metacubexd/config-editor": "workspace:*",
     "@floating-ui/vue": "catalog:",
     "@nuxt/fonts": "catalog:",
     "@nuxtjs/i18n": "catalog:",

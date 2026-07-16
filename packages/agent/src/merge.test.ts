@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { parse } from 'yaml'
-import { mergeConfigs } from './merge'
+import { diffDocument } from '@metacubexd/config-editor'
+import { mergeConfigs, visualPatchContent } from './merge'
 
 // mergeConfigs returns YAML; parse the output to assert on structure rather
 // than brittle string formatting.
@@ -146,5 +147,13 @@ append-proxy-groups:
 
   it('throws on a non-object overlay', () => {
     expect(() => mergeConfigs('mode: rule\n', ['- a\n'])).toThrow()
+  })
+
+  it('applies visual patch overlays without leaking their directive', () => {
+    const base = 'proxies:\n  - { name: one, type: direct }\n'
+    const draft = 'proxies:\n  - { name: one, type: reject }\n'
+    const out = merged(base, visualPatchContent(diffDocument(base, draft)))
+    expect(out.proxies).toEqual([{ name: 'one', type: 'reject' }])
+    expect(out).not.toHaveProperty('x-metacubexd-visual-patch')
   })
 })

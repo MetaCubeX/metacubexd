@@ -38,6 +38,9 @@ export interface ProfileMeta {
   // minutes; remote-only. Drives the AIO server's auto-update scheduler (0 or
   // undefined => auto-update off). SHARED CONTRACTS.
   updateInterval?: number
+  baseProfileId?: string
+  managedBy?: 'visual-editor'
+  editorStatus?: 'clean' | 'conflicted'
   updatedAt: number
   subscriptionInfo?: ProfileSubscriptionInfo
 }
@@ -53,7 +56,34 @@ export type ControlFeature =
   | 'webdav-backup'
   | 'runtime-config'
   | 'config-sections'
+  | 'visual-config-editor'
   | 'tun'
+
+export interface ProfileEditorSnapshot {
+  profile: ProfileMeta
+  active: boolean
+  revision: string
+  editableYaml: string
+  composedYaml: string
+  schemaVersion: string
+  composition: ProfileMeta[]
+  diagnostics: Array<{
+    path: Array<string | number>
+    code: string
+    message: string
+    severity: 'error' | 'warning'
+  }>
+  conflicts: Array<{
+    operation: import('@metacubexd/config-editor').ConfigPatchOperation
+    path: Array<string | number>
+    reason: 'changed' | 'missing' | 'duplicate' | 'invalid-target'
+    current?: unknown
+  }>
+}
+
+export interface ProfileEditorPreview extends ProfileEditorSnapshot {
+  patch: import('@metacubexd/config-editor').ConfigPatchV1
+}
 export interface ControlInfo {
   hasAgent: boolean
   version: string

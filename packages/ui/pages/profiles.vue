@@ -2,6 +2,7 @@
 <script setup lang="ts">
 import type { ProfileMeta } from '~/types/control'
 import {
+  IconBraces,
   IconCopy,
   IconPencil,
   IconPlayerPlay,
@@ -14,6 +15,7 @@ import { toast } from 'vue-sonner'
 import { controlErrorMessage } from '~/utils/controlError'
 
 const { t, locale } = useI18n()
+const router = useRouter()
 const { hasFeature, ready } = useControlInfo()
 const kernelStore = useKernelStore()
 const { isShareable, qrSvg } = useShareQr()
@@ -381,6 +383,12 @@ const onCopyShareUrl = async () => {
               >
                 {{ t('profilesActive') }}
               </span>
+              <span
+                v-if="p.editorStatus === 'conflicted'"
+                class="badge badge-sm badge-warning"
+              >
+                {{ t('visualEditorConflicts') }}
+              </span>
               <span class="badge badge-ghost badge-sm">{{ p.type }}</span>
             </div>
           </div>
@@ -429,6 +437,14 @@ const onCopyShareUrl = async () => {
           </div>
 
           <div class="mt-3 flex flex-wrap gap-2">
+            <Button
+              v-if="hasFeature('visual-config-editor')"
+              class="btn-primary btn-xs"
+              :icon="IconBraces"
+              @click="router.push(`/profiles/${p.id}/edit`)"
+            >
+              {{ t('visualEditor') }}
+            </Button>
             <Button
               class="btn-xs"
               :icon="IconPencil"
@@ -567,7 +583,15 @@ const onCopyShareUrl = async () => {
                 class="rounded-xl border border-base-content/10 bg-base-200 p-4"
               >
                 <div class="flex items-center justify-between gap-2">
-                  <span class="font-semibold">{{ m.name }}</span>
+                  <span class="flex min-w-0 items-center gap-2 font-semibold">
+                    <span class="truncate">{{ m.name }}</span>
+                    <span
+                      v-if="m.managedBy === 'visual-editor'"
+                      class="badge badge-xs badge-primary"
+                    >
+                      {{ t('visualEditorManaged') }}
+                    </span>
+                  </span>
                   <label class="flex items-center gap-2 text-sm">
                     <span class="text-base-content/60">{{
                       t('profilesMergeEnabled')
@@ -576,7 +600,10 @@ const onCopyShareUrl = async () => {
                       type="checkbox"
                       class="toggle toggle-primary toggle-sm"
                       :checked="m.enabled !== false"
-                      :disabled="isBusy(`toggle:${m.id}`)"
+                      :disabled="
+                        isBusy(`toggle:${m.id}`) ||
+                        m.managedBy === 'visual-editor'
+                      "
                       :aria-label="t('profilesMergeEnabled')"
                       @change="onToggleMerge(m.id, $event)"
                     />
@@ -585,6 +612,7 @@ const onCopyShareUrl = async () => {
 
                 <div class="mt-3 flex flex-wrap gap-2">
                   <Button
+                    v-if="m.managedBy !== 'visual-editor'"
                     class="btn-xs"
                     :icon="IconPencil"
                     :loading="isBusy(`edit:${m.id}`)"

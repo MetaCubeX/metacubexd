@@ -1,4 +1,30 @@
+import type {
+  ConfigPatchConflict,
+  ConfigPatchV1,
+} from '@metacubexd/config-editor'
+import { applyPatch } from '@metacubexd/config-editor'
 import { parse, stringify } from 'yaml'
+
+export const VISUAL_PATCH_KEY = 'x-metacubexd-visual-patch'
+
+export class ConfigPatchConflictError extends Error {
+  constructor(readonly conflicts: ConfigPatchConflict[]) {
+    super('visual editor patch conflicts with the base profile')
+    this.name = 'ConfigPatchConflictError'
+  }
+}
+
+export function visualPatchContent(patch: ConfigPatchV1): string {
+  return stringify({ [VISUAL_PATCH_KEY]: patch })
+}
+
+export function parseVisualPatch(content: string): ConfigPatchV1 | undefined {
+  const parsed = parse(content) as unknown
+  if (!isPlainObject(parsed)) return undefined
+  const patch = parsed[VISUAL_PATCH_KEY]
+  if (!isPlainObject(patch) || patch.version !== 1) return undefined
+  return patch as unknown as ConfigPatchV1
+}
 
 // Directive keys consumed by an overlay to prepend/append into a base array
 // (Clash Verge merge convention). They are never emitted to the output.
@@ -60,16 +86,36 @@ function mergeOne(acc: PlainObject, overlay: PlainObject): void {
  * at the top level.
  */
 export function mergeConfigs(base: string, overlays: string[]): string {
-  const acc = parse(base) as unknown
-  if (!isPlainObject(acc)) {
+  const parsedBase = parse(base) as unknown
+  if (!isPlainObject(parsedBase)) {
     throw new Error('mergeConfigs: base config must be a YAML mapping')
   }
+  let acc: PlainObject = parsedBase
   overlays.forEach((overlay, i) => {
     const parsed = parse(overlay) as unknown
     if (!isPlainObject(parsed)) {
       throw new Error(`mergeConfigs: overlay #${i} must be a YAML mapping`)
     }
-    mergeOne(acc, parsed)
+    const visualPatch = parsed[VISUAL_PATCH_KEY]
+    const ordinary = Object.fromEntries(
+      Object.entries(parsed).filter(([key]) => key !== VISUAL_PATCH_KEY),
+    )
+    mergeOne(acc, ordinary)
+    if (visualPatch !== undefined) {
+      if (!isPlainObject(visualPatch) || visualPatch.version !== 1) {
+        throw new Error(
+          `mergeConfigs: overlay #${i} has an invalid visual patch`,
+        )
+      }
+      const result = applyPatch(
+        stringify(acc),
+        visualPatch as unknown as ConfigPatchV1,
+      )
+      if (result.conflicts.length) {
+        throw new ConfigPatchConflictError(result.conflicts)
+      }
+      acc = result.document.data
+    }
   })
   return stringify(acc)
 }

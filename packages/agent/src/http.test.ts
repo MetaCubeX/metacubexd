@@ -9,6 +9,7 @@ import { toNodeListener } from 'h3'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createControlRouter } from './http'
 import { SubscriptionFetchError } from './profiles'
+import { ProfileEditorConflictError } from './profile-editor'
 import { TunPreconditionError } from './tun'
 
 function fakeState(over: Partial<KernelState> = {}): KernelState {
@@ -278,6 +279,28 @@ describe('createControlRouter — profiles + SSE', () => {
     expect(deps.profiles.update).toHaveBeenCalledWith('p1', { name: 'renamed' })
   })
 
+  it('rejects direct edits to managed visual overlays', async () => {
+    const deps = makeDeps()
+    deps.profiles.list.mockResolvedValue([
+      {
+        id: 'p1',
+        name: 'managed',
+        type: 'merge',
+        managedBy: 'visual-editor',
+        baseProfileId: 'base',
+        updatedAt: 1,
+      },
+    ])
+    srv = await mount(deps)
+    const res = await fetch(`${srv.base}/api/control/profiles/p1`, {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ content: 'broken: true\n' }),
+    })
+    expect(res.status).toBe(403)
+    expect(deps.profiles.update).not.toHaveBeenCalled()
+  })
+
   it('dELETE /api/control/profiles/:id returns 204', async () => {
     const deps = makeDeps()
     srv = await mount(deps)
@@ -499,6 +522,99 @@ describe('createControlRouter — profiles + SSE', () => {
     )[0]![0] as unknown as string
     expect(validatedPath).toBe(join(deps.homeDir, '.validate-p1.yaml'))
     expect(validatedPath).not.toBe('p1')
+  })
+
+  it('exposes visual profile editor open/preview/apply/reset routes', async () => {
+    const deps = makeDeps()
+    const snapshot = {
+      profile: { id: 'p1', name: 'home', type: 'local' as const, updatedAt: 1 },
+      active: false,
+      revision: 'rev',
+      editableYaml: 'mode: rule\n',
+      composedYaml: 'mode: rule\n',
+      schemaVersion: 'schema',
+      composition: [],
+      diagnostics: [],
+      conflicts: [],
+    }
+    const profileEditor = {
+      open: vi.fn(async () => snapshot),
+      preview: vi.fn(async () => ({
+        ...snapshot,
+        patch: { version: 1 as const, baseRevision: 'rev', operations: [] },
+      })),
+      apply: vi.fn(async () => ({
+        profile: snapshot.profile,
+        activeId: 'p1',
+        revision: 'rev',
+        kernel: fakeState({ status: 'running' }),
+      })),
+      resetManagedOverlay: vi.fn(async () => undefined),
+    }
+    srv = await mount({ ...deps, profileEditor } as never)
+    expect(
+      await fetch(`${srv.base}/api/control/profiles/p1/editor`).then(
+        (r) => r.status,
+      ),
+    ).toBe(200)
+    const body = {
+      patch: { version: 1, baseRevision: 'rev', operations: [] },
+    }
+    expect(
+      await fetch(`${srv.base}/api/control/profiles/p1/editor/preview`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(body),
+      }).then((r) => r.status),
+    ).toBe(200)
+    expect(
+      await fetch(`${srv.base}/api/control/profiles/p1/editor`, {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(body),
+      }).then((r) => r.status),
+    ).toBe(200)
+    expect(
+      await fetch(`${srv.base}/api/control/profiles/p1/editor/overlay`, {
+        method: 'DELETE',
+      }).then((r) => r.status),
+    ).toBe(200)
+    expect(
+      await fetch(`${srv.base}/api/control/profiles/p1/editor/preview`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({}),
+      }).then((r) => r.status),
+    ).toBe(400)
+  })
+
+  it('maps visual editor conflicts to HTTP 409', async () => {
+    const deps = makeDeps()
+    const conflict = {
+      operation: {
+        op: 'set' as const,
+        target: { path: ['mode'] },
+        expectedHash: 'old',
+        value: 'global' as const,
+      },
+      path: ['mode'],
+      reason: 'changed' as const,
+      current: 'direct' as const,
+    }
+    const profileEditor = {
+      open: vi.fn(async () => {
+        throw new ProfileEditorConflictError([conflict])
+      }),
+      preview: vi.fn(),
+      apply: vi.fn(),
+      resetManagedOverlay: vi.fn(),
+    }
+    srv = await mount({ ...deps, profileEditor } as never)
+    const res = await fetch(`${srv.base}/api/control/profiles/p1/editor`)
+    expect(res.status).toBe(409)
+    expect((await res.json()) as object).toMatchObject({
+      data: { conflicts: [expect.objectContaining({ reason: 'changed' })] },
+    })
   })
 
   it('gET /api/control/kernel/logs streams text/event-stream and pushes a state event', async () => {

@@ -4,6 +4,8 @@ import type {
   KernelState,
   KernelVersions,
   ProfileDetail,
+  ProfileEditorPreview,
+  ProfileEditorSnapshot,
   ProfileMeta,
   SystemProxyState,
   TunStatus,
@@ -12,6 +14,7 @@ import type {
   WebdavCredentials,
   WebdavRestoreResult,
 } from '~/types/control'
+import type { ConfigPatchV1 } from '@metacubexd/config-editor'
 // packages/ui/composables/useControlApi.ts
 import ky from 'ky'
 
@@ -159,6 +162,31 @@ export function useControlApi() {
           timeout: PROFILE_VALIDATE_TIMEOUT,
         })
         .json<ValidateResult>(),
+
+    getProfileEditor: (id: string) =>
+      client.get(`profiles/${id}/editor`).json<ProfileEditorSnapshot>(),
+    previewProfileEditor: (id: string, patch: ConfigPatchV1) =>
+      client
+        .post(`profiles/${id}/editor/preview`, { json: { patch } })
+        .json<ProfileEditorPreview>(),
+    applyProfileEditor: (id: string, patch: ConfigPatchV1) =>
+      client
+        .put(`profiles/${id}/editor`, {
+          json: { patch },
+          timeout: PROFILE_ACTIVATE_TIMEOUT,
+        })
+        .json<{
+          profile: ProfileMeta
+          activeId: string
+          revision: string
+          kernel: KernelState
+        }>(),
+    resetProfileEditorOverlay: (id: string) =>
+      client
+        .delete(`profiles/${id}/editor/overlay`, {
+          timeout: PROFILE_ACTIVATE_TIMEOUT,
+        })
+        .json<KernelState | { ok: true }>(),
 
     // System proxy (capability-gated 'system-proxy'). GET reflects the current
     // OS proxy state; POST { enabled, bypass? } toggles it and echoes the state.

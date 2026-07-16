@@ -2,10 +2,17 @@ import type { ScriptRunner } from './script'
 import type { ProfileMeta, ProfileStore } from './types'
 import { randomUUID } from 'node:crypto'
 import { existsSync } from 'node:fs'
-import { copyFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import {
+  copyFile,
+  mkdir,
+  readFile,
+  rename,
+  rm,
+  writeFile,
+} from 'node:fs/promises'
 import { join } from 'node:path'
 import { parse, stringify } from 'yaml'
-import { isPlainObject, mergeConfigs } from './merge'
+import { ConfigPatchConflictError, isPlainObject, mergeConfigs } from './merge'
 
 export interface ProfileStoreOptions {
   dir: string
@@ -44,6 +51,16 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
     await mkdir(dir, { recursive: true })
   }
 
+  async function atomicWrite(path: string, content: string): Promise<void> {
+    const temporary = `${path}.${randomUUID()}.tmp`
+    await writeFile(temporary, content)
+    try {
+      await rename(temporary, path)
+    } finally {
+      await rm(temporary, { force: true })
+    }
+  }
+
   async function readIndex(): Promise<ProfileMeta[]> {
     if (!existsSync(indexPath)) return []
     return JSON.parse(await readFile(indexPath, 'utf8')) as ProfileMeta[]
@@ -51,7 +68,7 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
 
   async function writeIndex(list: ProfileMeta[]): Promise<void> {
     await ensureDir()
-    await writeFile(indexPath, `${JSON.stringify(list, null, 2)}\n`)
+    await atomicWrite(indexPath, `${JSON.stringify(list, null, 2)}\n`)
   }
 
   async function readState(): Promise<StateFile> {
@@ -61,7 +78,7 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
 
   async function writeState(s: StateFile): Promise<void> {
     await ensureDir()
-    await writeFile(statePath, `${JSON.stringify(s, null, 2)}\n`)
+    await atomicWrite(statePath, `${JSON.stringify(s, null, 2)}\n`)
   }
 
   async function findMeta(id: string): Promise<ProfileMeta> {
@@ -137,15 +154,42 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
 
     async create(i) {
       await ensureDir()
+      const current = await readIndex()
+      if (i.managedBy === 'visual-editor') {
+        if (i.type !== 'merge' || !i.baseProfileId) {
+          throw new Error(
+            'visual editor overlays must be scoped merge profiles',
+          )
+        }
+        if (
+          current.some(
+            (meta) =>
+              meta.managedBy === 'visual-editor' &&
+              meta.baseProfileId === i.baseProfileId,
+          )
+        ) {
+          throw new Error(
+            `visual editor overlay already exists for ${i.baseProfileId}`,
+          )
+        }
+      }
       const id = idGen()
       const meta: ProfileMeta = {
         id,
         name: i.name,
         type: i.type ?? 'local',
+        ...(i.baseProfileId ? { baseProfileId: i.baseProfileId } : {}),
+        ...(i.managedBy ? { managedBy: i.managedBy } : {}),
+        ...(i.editorStatus ? { editorStatus: i.editorStatus } : {}),
         updatedAt: Date.now(),
       }
-      await writeFile(profilePath(id), i.content ?? '')
-      await writeIndex([...(await readIndex()), meta])
+      await atomicWrite(profilePath(id), i.content ?? '')
+      try {
+        await writeIndex([...current, meta])
+      } catch (error) {
+        await rm(profilePath(id), { force: true }).catch(() => {})
+        throw error
+      }
       return meta
     },
 
@@ -153,20 +197,48 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
       const list = await readIndex()
       const meta = list.find((m) => m.id === id)
       if (!meta) throw new Error(`profile not found: ${id}`)
-      if (p.content != null) await writeFile(profilePath(id), p.content)
+      if (p.content != null) await atomicWrite(profilePath(id), p.content)
       if (p.name != null) meta.name = p.name
       if (p.enabled != null) meta.enabled = p.enabled
       // 0 is meaningful (disables auto-update) so distinguish it from omitted.
       if (p.updateInterval != null) meta.updateInterval = p.updateInterval
-      meta.updatedAt = Date.now()
+      if (p.editorStatus === null) delete meta.editorStatus
+      else if (p.editorStatus !== undefined) meta.editorStatus = p.editorStatus
+      // Editor status is derived metadata; changing it must not reset the
+      // subscription refresh schedule.
+      if (
+        p.name != null ||
+        p.content != null ||
+        p.enabled != null ||
+        p.updateInterval != null
+      ) {
+        meta.updatedAt = Date.now()
+      }
       await writeIndex(list)
       return meta
     },
 
     async delete(id) {
-      await findMeta(id)
-      await rm(profilePath(id), { force: true })
-      await writeIndex((await readIndex()).filter((m) => m.id !== id))
+      const list = await readIndex()
+      const removed = list.find((meta) => meta.id === id)
+      if (!removed) throw new Error(`profile not found: ${id}`)
+      const removedIds = new Set([
+        id,
+        ...list
+          .filter((meta) => meta.baseProfileId === id)
+          .map((meta) => meta.id),
+      ])
+      await Promise.all(
+        [...removedIds].map((removedId) =>
+          rm(profilePath(removedId), { force: true }),
+        ),
+      )
+      const retained = list.filter((m) => !removedIds.has(m.id))
+      if (removed.managedBy === 'visual-editor' && removed.baseProfileId) {
+        const base = retained.find((meta) => meta.id === removed.baseProfileId)
+        if (base) base.editorStatus = 'clean'
+      }
+      await writeIndex(retained)
       const state = await readState()
       if (state.activeId === id) {
         delete state.activeId
@@ -184,7 +256,7 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
         type: 'local',
         updatedAt: Date.now(),
       }
-      await writeFile(profilePath(newId), content)
+      await atomicWrite(profilePath(newId), content)
       await writeIndex([...(await readIndex()), meta])
       return meta
     },
@@ -206,7 +278,7 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
         updatedAt: Date.now(),
         ...(subscriptionInfo ? { subscriptionInfo } : {}),
       }
-      await writeFile(profilePath(id), content)
+      await atomicWrite(profilePath(id), content)
       await writeIndex([...(await readIndex()), meta])
       return meta
     },
@@ -224,9 +296,18 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
         userAgent,
       )
       // Overwrite the SAME file in place — keep the same id (no orphan).
-      await writeFile(profilePath(id), content)
+      await atomicWrite(profilePath(id), content)
       meta.updatedAt = Date.now()
       if (subscriptionInfo) meta.subscriptionInfo = subscriptionInfo
+      try {
+        await store.compose(id)
+        meta.editorStatus = 'clean'
+      } catch (error) {
+        if (!(error instanceof ConfigPatchConflictError)) throw error
+        // Keep the refreshed source on disk, but mark it conflicted. Activation
+        // will refuse to replace the running config until the user resolves it.
+        meta.editorStatus = 'conflicted'
+      }
       await writeIndex(list)
       return meta
     },
@@ -236,26 +317,74 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
     },
 
     async setActive(id) {
+      const { content } = await store.compose(id)
+      await mkdir(join(activeConfigPath, '..'), { recursive: true })
+      // Snapshot the previous active config so /kernel/rollback can restore it.
+      if (existsSync(activeConfigPath)) {
+        await copyFile(activeConfigPath, `${activeConfigPath}.bak`)
+      }
+      await atomicWrite(activeConfigPath, content)
+      await writeState({ activeId: id })
+    },
+
+    async compose(id, overrides) {
       const base = await findMeta(id)
       if (base.type === 'merge' || base.type === 'script') {
         throw new Error(
           `setActive: profile ${id} is a ${base.type} overlay and cannot be the active base`,
         )
       }
-      const baseContent = await readFile(profilePath(id), 'utf8')
+      const baseContent =
+        overrides?.profileContent ?? (await readFile(profilePath(id), 'utf8'))
       const index = await readIndex()
+      const managed = index.filter(
+        (meta) =>
+          meta.managedBy === 'visual-editor' && meta.baseProfileId === id,
+      )
+      if (managed.length > 1) {
+        throw new Error(`multiple visual editor overlays found for ${id}`)
+      }
       // Collect enabled merge overlays in index order (undefined enabled == on).
       const overlays: string[] = []
       // Collect enabled script profiles in index order (undefined enabled == on).
       // A runner is required to apply them; without one, scripts are skipped.
       const scripts: string[] = []
+      const composition: ProfileMeta[] = []
+      let managedOverrideApplied = false
       for (const meta of index) {
         if (meta.enabled === false) continue
         if (meta.type === 'merge') {
-          overlays.push(await readFile(profilePath(meta.id), 'utf8'))
+          // A scoped overlay only applies to its owning base; legacy overlays
+          // have no scope and retain their global behavior.
+          if (meta.baseProfileId && meta.baseProfileId !== id) continue
+          const content =
+            meta.managedBy === 'visual-editor' &&
+            meta.baseProfileId === id &&
+            overrides?.managedOverlayContent !== undefined
+              ? overrides.managedOverlayContent
+              : await readFile(profilePath(meta.id), 'utf8')
+          if (
+            meta.managedBy === 'visual-editor' &&
+            meta.baseProfileId === id &&
+            overrides?.managedOverlayContent !== undefined
+          ) {
+            managedOverrideApplied = true
+          }
+          overlays.push(content)
+          composition.push(meta)
         } else if (meta.type === 'script' && scriptRunner) {
           scripts.push(await readFile(profilePath(meta.id), 'utf8'))
+          composition.push(meta)
         }
+      }
+      // Previewing the first visual edit has no on-disk managed overlay yet.
+      // Apply the supplied candidate as the final merge layer, matching where
+      // the newly-created managed profile will be appended in the index.
+      if (
+        overrides?.managedOverlayContent !== undefined &&
+        !managedOverrideApplied
+      ) {
+        overlays.push(overrides.managedOverlayContent)
       }
       // Compose pipeline: base -> merge overlays -> script transforms.
       // No overlays AND no scripts -> write the base verbatim (preserve
@@ -270,16 +399,7 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
         }
         content = stringify(obj)
       }
-      await mkdir(join(activeConfigPath, '..'), { recursive: true })
-      // Snapshot the previous active config so /kernel/rollback can restore it
-      // when the new config bricks the kernel. The supervisor has not injected
-      // its header into the in-memory `content` yet, but rollback feeds the file
-      // straight back into restart() which re-injects — so the header round-trips.
-      if (existsSync(activeConfigPath)) {
-        await copyFile(activeConfigPath, `${activeConfigPath}.bak`)
-      }
-      await writeFile(activeConfigPath, content)
-      await writeState({ activeId: id })
+      return { content, composition }
     },
 
     async rollback() {
@@ -300,7 +420,7 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
       // Empty body => the supervisor's injectClashConfig writes just its managed
       // header (external-controller/secret/mixed-port) and mihomo runs on its
       // defaults — enough for the dashboard to reconnect and re-import a profile.
-      await writeFile(activeConfigPath, '')
+      await atomicWrite(activeConfigPath, '')
       await writeState({})
     },
 

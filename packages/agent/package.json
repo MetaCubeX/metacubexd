@@ -31,6 +31,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@metacubexd/config-editor": "workspace:*",
     "h3": "catalog:",
     "tree-kill": "catalog:",
     "yaml": "catalog:"

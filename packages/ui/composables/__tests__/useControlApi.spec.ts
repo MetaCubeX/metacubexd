@@ -202,6 +202,26 @@ describe('composables/useControlApi methods', () => {
     })
   })
 
+  it('uses the visual profile editor routes', async () => {
+    const api = useControlApi()
+    const patch = { version: 1 as const, baseRevision: 'rev', operations: [] }
+    await api.getProfileEditor('id1')
+    await api.previewProfileEditor('id1', patch)
+    await api.applyProfileEditor('id1', patch)
+    await api.resetProfileEditorOverlay('id1')
+    expect(get).toHaveBeenCalledWith('profiles/id1/editor')
+    expect(post).toHaveBeenCalledWith('profiles/id1/editor/preview', {
+      json: { patch },
+    })
+    expect(put).toHaveBeenCalledWith('profiles/id1/editor', {
+      json: { patch },
+      timeout: 360_000,
+    })
+    expect(del).toHaveBeenCalledWith('profiles/id1/editor/overlay', {
+      timeout: 360_000,
+    })
+  })
+
   it('logsUrl() returns the SSE URL with ?token=', () => {
     const url = useControlApi().logsUrl()
     expect(url).toBe('http://x/api/control/kernel/logs?token=t')

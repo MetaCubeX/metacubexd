@@ -262,6 +262,70 @@ describe('createProfileStore — merge profiles', () => {
     expect(meta.type).toBe('local')
   })
 
+  it('only applies scoped merge overlays to their owning base', async () => {
+    await store.create({ name: 'a', content: 'mode: rule\n' })
+    await store.create({ name: 'b', content: 'mode: direct\n' })
+    await store.create({
+      name: 'a overlay',
+      type: 'merge',
+      baseProfileId: 'id1',
+      managedBy: 'visual-editor',
+      content: 'log-level: debug\n',
+    })
+
+    expect((await store.compose('id1')).content).toContain('log-level: debug')
+    expect((await store.compose('id2')).content).not.toContain('log-level')
+  })
+
+  it('enforces one managed visual overlay per base', async () => {
+    await store.create({ name: 'a', content: 'mode: rule\n' })
+    await store.create({
+      name: 'managed',
+      type: 'merge',
+      baseProfileId: 'id1',
+      managedBy: 'visual-editor',
+    })
+    await expect(
+      store.create({
+        name: 'duplicate',
+        type: 'merge',
+        baseProfileId: 'id1',
+        managedBy: 'visual-editor',
+      }),
+    ).rejects.toThrow('already exists')
+  })
+
+  it('clears the base conflict marker when its managed overlay is deleted', async () => {
+    await store.create({
+      name: 'a',
+      content: 'mode: rule\n',
+      editorStatus: 'conflicted',
+    })
+    await store.create({
+      name: 'managed',
+      type: 'merge',
+      baseProfileId: 'id1',
+      managedBy: 'visual-editor',
+    })
+    await store.delete('id2')
+    expect(await store.list()).toEqual([
+      expect.objectContaining({ id: 'id1', editorStatus: 'clean' }),
+    ])
+  })
+
+  it('deleting a base also deletes its scoped managed overlays', async () => {
+    await store.create({ name: 'a', content: 'mode: rule\n' })
+    await store.create({
+      name: 'managed',
+      type: 'merge',
+      baseProfileId: 'id1',
+      managedBy: 'visual-editor',
+    })
+    await store.delete('id1')
+    expect(await store.list()).toEqual([])
+    await expect(store.read('id2')).rejects.toThrow('not found')
+  })
+
   it('update can toggle the enabled flag', async () => {
     await store.create({ name: 'overlay', content: 'a: 1\n', type: 'merge' })
     const updated = await store.update('id1', { enabled: false })

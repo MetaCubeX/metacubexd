@@ -7,6 +7,7 @@ import type {
 import { createControlRouter } from './http'
 import { MIHOMO_VERSION } from './kernel/assets'
 import { createProfileStore } from './profiles'
+import { createProfileConfigEditor } from './profile-editor'
 import { applyActiveRefresh } from './refresh-apply'
 import { createProfileScheduler } from './scheduler'
 import { createSupervisor } from './supervisor'
@@ -20,6 +21,18 @@ export { fetchKernel, listMihomoVersions } from './kernel/fetch-kernel'
 export { fetchGeoAssets, GEO_ASSET_URLS } from './kernel/geo'
 export { mergeConfigs } from './merge'
 export { createProfileStore } from './profiles'
+export {
+  createProfileConfigEditor,
+  ProfileEditorConflictError,
+  ProfileEditorValidationError,
+} from './profile-editor'
+export type {
+  ProfileConfigEditor,
+  ProfileConfigEditorOptions,
+  ProfileEditorApplyResult,
+  ProfileEditorPreview,
+  ProfileEditorSnapshot,
+} from './profile-editor'
 export { applyActiveRefresh } from './refresh-apply'
 export { createProfileScheduler } from './scheduler'
 export type {
@@ -62,6 +75,11 @@ export function createAgent(opts: CreateAgentOptions) {
     activeConfigPath: opts.activeConfigPath,
   })
   const supervisor = createSupervisor(opts)
+  const profileEditor = createProfileConfigEditor({
+    profiles,
+    supervisor,
+    homeDir: opts.homeDir,
+  })
   const { systemProxy, kernelManager, tunController } = opts
   const info = (): AgentInfo => ({
     hasAgent: true,
@@ -88,6 +106,7 @@ export function createAgent(opts: CreateAgentOptions) {
       'runtime-config',
       // Config-section editor reads/writes top-level keys of the active profile.
       'config-sections',
+      'visual-config-editor',
       ...(systemProxy ? ['system-proxy'] : []),
       ...(kernelManager ? ['kernel-version'] : []),
       ...(tunController ? ['tun'] : []),
@@ -96,6 +115,7 @@ export function createAgent(opts: CreateAgentOptions) {
   const router = createControlRouter({
     supervisor,
     profiles,
+    profileEditor,
     info,
     homeDir: opts.homeDir,
     activeConfigPath: opts.activeConfigPath,
@@ -128,6 +148,7 @@ export function createAgent(opts: CreateAgentOptions) {
   return {
     supervisor,
     profiles,
+    profileEditor,
     router,
     info,
     scheduler,

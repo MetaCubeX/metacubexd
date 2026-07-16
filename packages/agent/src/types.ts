@@ -106,6 +106,11 @@ export interface ProfileMeta {
   url?: string
   userAgent?: string
   updateInterval?: number // minutes; only meaningful for remote profiles
+  // Managed merge overlays may be scoped to one base profile. Legacy merges
+  // omit this field and remain global.
+  baseProfileId?: string
+  managedBy?: 'visual-editor'
+  editorStatus?: 'clean' | 'conflicted'
   updatedAt: number
   subscriptionInfo?: {
     upload: number
@@ -122,6 +127,9 @@ export interface ProfileStore {
     name: string
     content?: string
     type?: 'local' | 'merge' | 'script'
+    baseProfileId?: string
+    managedBy?: 'visual-editor'
+    editorStatus?: 'clean' | 'conflicted'
   }) => Promise<ProfileMeta>
   update: (
     id: string,
@@ -132,6 +140,7 @@ export interface ProfileStore {
       // minutes; only meaningful for remote profiles (drives the scheduler).
       // 0 disables auto-update; omit leaves the stored value untouched.
       updateInterval?: number
+      editorStatus?: 'clean' | 'conflicted' | null
     },
   ) => Promise<ProfileMeta>
   delete: (id: string) => Promise<void>
@@ -140,6 +149,12 @@ export interface ProfileStore {
   refresh: (id: string) => Promise<ProfileMeta> // re-fetch a remote profile in place
   getActiveId: () => Promise<string | undefined>
   setActive: (id: string) => Promise<void> // validate + write activeConfigPath
+  // Compose a base with its enabled merge/script layers. Overrides are used by
+  // the visual editor to preview without mutating disk.
+  compose: (
+    id: string,
+    overrides?: { profileContent?: string; managedOverlayContent?: string },
+  ) => Promise<{ content: string; composition: ProfileMeta[] }>
   // Restore the last-known-good active config (activeConfigPath.bak written by
   // the previous setActive). Returns false when no backup exists (#2109).
   rollback: () => Promise<boolean>
