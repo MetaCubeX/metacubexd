@@ -3,6 +3,7 @@
 import type { ProfileMeta } from '~/types/control'
 import { IconClipboard, IconDownload, IconFileUpload } from '@tabler/icons-vue'
 import { toast } from 'vue-sonner'
+import { controlErrorMessage } from '~/utils/controlError'
 
 // Shared subscription-import experience used by BOTH the first-run wizard
 // (variant="wizard", chrome-less inside the overlay) and the /profiles page
@@ -62,7 +63,7 @@ const afterImport = async (meta: ProfileMeta) => {
 }
 
 const reportError = (e: unknown) => {
-  errorMessage.value = e instanceof Error ? e.message : String(e)
+  errorMessage.value = controlErrorMessage(e)
   toast.error(t('profilesImportFailed'), { description: errorMessage.value })
 }
 

@@ -25,10 +25,29 @@ import {
   setResponseStatus,
 } from 'h3'
 import { fetchGeoAssets } from './kernel/geo'
+import { SubscriptionFetchError } from './profiles'
 import { TunPreconditionError } from './tun'
 import { createWebdavClient as defaultCreateWebdavClient } from './webdav'
 
 const BACKUP_FILENAME = 'metacubexd-backup.json'
+
+async function withSubscriptionHttpError<T>(
+  action: () => Promise<T>,
+): Promise<T> {
+  try {
+    return await action()
+  } catch (error) {
+    if (error instanceof SubscriptionFetchError) {
+      const message = `Subscription provider returned HTTP ${error.upstreamStatus}`
+      throw createError({
+        statusCode: error.upstreamStatus,
+        statusMessage: message,
+        data: { error: message, upstreamStatus: error.upstreamStatus },
+      })
+    }
+    throw error
+  }
+}
 
 interface WebdavCredentials {
   url: string
@@ -265,7 +284,9 @@ export function createControlRouter(deps: ControlRouterDeps): App {
     `${PREFIX}/profiles/import`,
     defineEventHandler(async (event) => {
       const body = (await readBody(event)) as { url: string; name?: string }
-      return profiles.importFromUrl(body.url, body.name)
+      return withSubscriptionHttpError(() =>
+        profiles.importFromUrl(body.url, body.name),
+      )
     }),
   )
   router.post(
@@ -275,7 +296,7 @@ export function createControlRouter(deps: ControlRouterDeps): App {
       // Pure refresh: re-fetch the remote subscription in place and return the
       // updated meta. This does NOT touch the running config — pair it with
       // activate, or use /refresh-and-activate for a combined apply (#2108).
-      return profiles.refresh(id)
+      return withSubscriptionHttpError(() => profiles.refresh(id))
     }),
   )
   // Combined refresh + apply: re-fetch the subscription, compose it into
@@ -287,7 +308,7 @@ export function createControlRouter(deps: ControlRouterDeps): App {
     `${PREFIX}/profiles/:id/refresh-and-activate`,
     defineEventHandler(async (event) => {
       const id = getRouterParam(event, 'id')!
-      const meta = await profiles.refresh(id)
+      const meta = await withSubscriptionHttpError(() => profiles.refresh(id))
       const kernel = await safeActivate(id)
       return { meta, kernel }
     }),

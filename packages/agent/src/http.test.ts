@@ -8,6 +8,7 @@ import { join } from 'node:path'
 import { toNodeListener } from 'h3'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createControlRouter } from './http'
+import { SubscriptionFetchError } from './profiles'
 import { TunPreconditionError } from './tun'
 
 function fakeState(over: Partial<KernelState> = {}): KernelState {
@@ -308,6 +309,28 @@ describe('createControlRouter — profiles + SSE', () => {
       'https://sub',
       'sub',
     )
+  })
+
+  it('pOST /api/control/profiles/import preserves an upstream 429 response (#2138)', async () => {
+    const deps = makeDeps()
+    deps.profiles.importFromUrl.mockRejectedValue(
+      new SubscriptionFetchError(429),
+    )
+    srv = await mount(deps)
+    const res = await fetch(`${srv.base}/api/control/profiles/import`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ url: 'https://sub.example/limited' }),
+    })
+
+    expect(res.status).toBe(429)
+    expect(await res.json()).toMatchObject({
+      statusCode: 429,
+      data: {
+        error: 'Subscription provider returned HTTP 429',
+        upstreamStatus: 429,
+      },
+    })
   })
 
   it('pOST /api/control/profiles/:id/refresh returns the updated meta', async () => {

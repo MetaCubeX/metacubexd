@@ -3,6 +3,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useProfiles } from '../useProfiles'
 
+const { invalidateQueries } = vi.hoisted(() => ({
+  invalidateQueries: vi.fn(),
+}))
+vi.mock('@tanstack/vue-query', () => ({
+  useQueryClient: () => ({ invalidateQueries }),
+}))
+vi.mock('../useQueries', () => ({ queryKeys: { config: ['config'] } }))
+
 const api = {
   listProfiles: vi.fn(),
   createProfile: vi.fn(),
@@ -143,6 +151,19 @@ describe('composables/useProfiles', () => {
     const state = await p.activate('a')
     expect(state.status).toBe('running')
     expect(api.listProfiles).toHaveBeenCalled()
+  })
+
+  it('activate() invalidates the cached runtime config mode (#2137)', async () => {
+    api.activateProfile.mockResolvedValue({
+      status: 'running',
+      externalController: '127.0.0.1:9090',
+      secret: 's',
+    })
+    const p = useProfiles()
+
+    await p.activate('a')
+
+    expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['config'] })
   })
 
   it('activate() drops active connections so the new profile takes effect immediately', async () => {

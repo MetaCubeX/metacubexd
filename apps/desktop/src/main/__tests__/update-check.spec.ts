@@ -101,9 +101,42 @@ describe('checkForUpdates', () => {
     expect(fetchImpl).toHaveBeenCalledWith(
       'https://api.github.com/repos/MetaCubeX/metacubexd/releases/latest',
       expect.objectContaining({
-        headers: { accept: 'application/vnd.github+json' },
+        headers: { Accept: 'application/vnd.github+json' },
         signal: expect.any(AbortSignal),
       }),
+    )
+  })
+
+  it('sends a bearer token when GitHub authentication is configured (#2135)', async () => {
+    const fetchImpl = vi.fn(async () =>
+      ok({ tag_name: 'v1.0.0' }),
+    ) as unknown as typeof fetch
+
+    await checkForUpdates(fetchImpl, '1.0.0', {
+      githubToken: 'github-token',
+    })
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'https://api.github.com/repos/MetaCubeX/metacubexd/releases/latest',
+      expect.objectContaining({
+        headers: {
+          Accept: 'application/vnd.github+json',
+          Authorization: 'Bearer github-token',
+        },
+      }),
+    )
+  })
+
+  it('keeps accepting a custom API URL as the legacy third argument', async () => {
+    const fetchImpl = vi.fn(async () =>
+      ok({ tag_name: 'v1.0.0' }),
+    ) as unknown as typeof fetch
+
+    await checkForUpdates(fetchImpl, '1.0.0', 'https://github.example/latest')
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'https://github.example/latest',
+      expect.any(Object),
     )
   })
 })

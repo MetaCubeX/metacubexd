@@ -32,6 +32,7 @@ describe('apps/server lib/supervisor', () => {
     delete process.env.MIHOMO_BIN
     delete process.env.CLASH_SECRET
     delete process.env.CONTROL_TOKEN
+    delete process.env.GITHUB_TOKEN
     const { serverEnv } = await import('../supervisor')
     const env = serverEnv()
     expect(env.controlPort).toBe(8080)
@@ -39,6 +40,7 @@ describe('apps/server lib/supervisor', () => {
     expect(env.mixedPort).toBe(7890)
     expect(env.dataDir).toBe('/data')
     expect(env.mihomoBin).toBe('/usr/local/bin/mihomo')
+    expect(env.githubToken).toBe('')
   })
 
   it('honours overridden ports/paths from env', async () => {
@@ -47,6 +49,7 @@ describe('apps/server lib/supervisor', () => {
     process.env.MIXED_PORT = '17890'
     process.env.DATA_DIR = '/srv/data'
     process.env.MIHOMO_BIN = '/opt/mihomo'
+    process.env.GITHUB_TOKEN = 'github-token'
     const { serverEnv } = await import('../supervisor')
     const env = serverEnv()
     expect(env.controlPort).toBe(18080)
@@ -54,6 +57,7 @@ describe('apps/server lib/supervisor', () => {
     expect(env.mixedPort).toBe(17890)
     expect(env.dataDir).toBe('/srv/data')
     expect(env.mihomoBin).toBe('/opt/mihomo')
+    expect(env.githubToken).toBe('github-token')
   })
 
   it('builds the agent exactly once with env-derived options (singleton)', async () => {

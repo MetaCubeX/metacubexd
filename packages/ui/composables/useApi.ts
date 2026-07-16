@@ -235,10 +235,26 @@ export function useRequest() {
 }
 
 export function useGithubAPI() {
+  const runtimeConfig = useRuntimeConfig()
   const headers = new Headers()
+  headers.set('Accept', 'application/vnd.github+json')
 
-  if (import.meta.env.VITE_APP_GH_TOKEN) {
-    headers.set('Authorization', `Bearer ${import.meta.env.VITE_APP_GH_TOKEN}`)
+  const browserConfig =
+    typeof window !== 'undefined'
+      ? (window as unknown as {
+          __METACUBEXD_CONFIG__?: { githubToken?: string }
+          metacubexd?: { githubToken?: string }
+        })
+      : undefined
+  const injectedToken =
+    browserConfig?.metacubexd?.githubToken ||
+    browserConfig?.__METACUBEXD_CONFIG__?.githubToken
+  const token =
+    injectedToken ||
+    (runtimeConfig.public.githubToken as string | undefined) ||
+    import.meta.env.VITE_APP_GH_TOKEN
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`)
   }
 
   return ky.create({

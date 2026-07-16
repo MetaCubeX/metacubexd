@@ -10,6 +10,7 @@ export interface ServerEnv {
   mihomoBin: string
   controlToken: string
   clashSecret: string
+  githubToken: string
 }
 
 function int(value: string | undefined, fallback: number): number {
@@ -27,6 +28,7 @@ export function serverEnv(): ServerEnv {
     mihomoBin: process.env.MIHOMO_BIN ?? '/usr/local/bin/mihomo',
     controlToken: process.env.CONTROL_TOKEN ?? '',
     clashSecret: process.env.CLASH_SECRET ?? '',
+    githubToken: process.env.GITHUB_TOKEN ?? '',
   }
 }
 

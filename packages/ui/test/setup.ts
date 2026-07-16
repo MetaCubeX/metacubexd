@@ -29,6 +29,14 @@ vi.stubGlobal('effectScope', effectScope)
 vi.stubGlobal('toValue', toValue)
 vi.stubGlobal('useLocalStorage', useLocalStorage)
 vi.stubGlobal('useSessionStorage', useSessionStorage)
+vi.stubGlobal('useRuntimeConfig', () => ({
+  public: {
+    appVersion: '0.0.0',
+    defaultBackendURL: '',
+    githubToken: '',
+    mockMode: false,
+  },
+}))
 
 function createStorageMock() {
   let store: Record<string, string> = {}

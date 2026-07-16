@@ -21,6 +21,7 @@ export interface BackendInvalidatePayload {
 export interface MetacubexdBridge {
   readonly isDesktop: true
   readonly platform: NodeJS.Platform
+  readonly githubToken?: string
   readonly control: { base?: string; token?: string }
   readonly endpoint: { url?: string; secret?: string }
   readonly window: {
@@ -68,6 +69,7 @@ export function buildMetacubexdBridge({
   return {
     isDesktop: true,
     platform,
+    githubToken: env.GITHUB_TOKEN,
     control: {
       base: env.MCXD_CONTROL_BASE,
       token: env.MCXD_CONTROL_TOKEN,

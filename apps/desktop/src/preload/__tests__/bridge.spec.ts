@@ -49,7 +49,9 @@ describe('buildMetacubexdBridge', () => {
       MCXD_CONTROL_TOKEN: 'tok',
       MCXD_CLASH_URL: 'http://127.0.0.1:2',
       MCXD_CLASH_SECRET: 'sec',
+      GITHUB_TOKEN: 'github-token',
     })
+    expect(bridge.githubToken).toBe('github-token')
     expect(bridge.control).toEqual({
       base: 'http://127.0.0.1:1/api/control',
       token: 'tok',
@@ -62,6 +64,7 @@ describe('buildMetacubexdBridge', () => {
 
   it('leaves control/endpoint fields undefined when the env is unset', () => {
     const { bridge } = makeBridge({})
+    expect(bridge.githubToken).toBeUndefined()
     expect(bridge.control).toEqual({ base: undefined, token: undefined })
     expect(bridge.endpoint).toEqual({ url: undefined, secret: undefined })
   })

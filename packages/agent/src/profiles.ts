@@ -23,6 +23,14 @@ interface StateFile {
   activeId?: string
 }
 
+/** Known HTTP failure returned by a remote subscription provider. */
+export class SubscriptionFetchError extends Error {
+  constructor(readonly upstreamStatus: number) {
+    super(`subscription provider returned HTTP ${upstreamStatus}`)
+    this.name = 'SubscriptionFetchError'
+  }
+}
+
 export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
   const { dir, activeConfigPath, scriptRunner } = opts
   const doFetch = opts.fetch ?? fetch
@@ -98,7 +106,9 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
         signal,
       })
       if (!res.ok) {
-        throw new Error(`fetch failed ${res.status} for ${url}`)
+        // Keep the provider status without echoing a potentially credentialed
+        // subscription URL into logs or API responses (#2138).
+        throw new SubscriptionFetchError(res.status)
       }
       const content = await res.text()
       const subscriptionInfo = parseSubscriptionUserinfo(

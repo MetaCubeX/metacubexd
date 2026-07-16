@@ -106,14 +106,18 @@ function compareTagsDesc(a: string, b: string): number {
  * Filters to semantic-version tags only. `fetch` is injectable for tests.
  */
 export async function listMihomoVersions(
-  deps: { fetch?: typeof fetch } = {},
+  deps: { fetch?: typeof fetch; githubToken?: string } = {},
 ): Promise<string[]> {
   const doFetch = deps.fetch ?? fetch
+  const headers: Record<string, string> = {
+    'User-Agent': 'metacubexd-agent',
+    Accept: 'application/vnd.github+json',
+  }
+  if (deps.githubToken) {
+    headers.Authorization = `Bearer ${deps.githubToken}`
+  }
   const res = await doFetch(RELEASES_URL, {
-    headers: {
-      'User-Agent': 'metacubexd-agent',
-      Accept: 'application/vnd.github+json',
-    },
+    headers,
   })
   if (!res.ok) {
     throw new Error(

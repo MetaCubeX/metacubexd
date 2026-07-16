@@ -27,4 +27,23 @@ describe('controlErrorMessage', () => {
     ).toBe('profile validation failed')
     expect(controlErrorMessage(new Error('network down'))).toBe('network down')
   })
+
+  it('surfaces the structured subscription provider status (#2138)', () => {
+    const error = Object.assign(
+      new Error('Request failed with status code 429'),
+      {
+        data: {
+          statusCode: 429,
+          data: {
+            error: 'Subscription provider returned HTTP 429',
+            upstreamStatus: 429,
+          },
+        },
+      },
+    )
+
+    expect(controlErrorMessage(error)).toBe(
+      'Subscription provider returned HTTP 429',
+    )
+  })
 })

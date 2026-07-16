@@ -10,6 +10,8 @@ const entrypoint = readFileSync(
 describe('docker-entrypoint', () => {
   it('does not mutate Nitro public assets at container startup', () => {
     expect(entrypoint).toContain('NUXT_PUBLIC_DEFAULT_BACKEND_URL')
+    expect(entrypoint).toContain('NUXT_PUBLIC_GITHUB_TOKEN')
+    expect(entrypoint).toContain('GITHUB_TOKEN')
     expect(entrypoint).not.toContain('/app/.output/public/config.js')
   })
 })

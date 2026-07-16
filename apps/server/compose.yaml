@@ -7,6 +7,7 @@ services:
     environment:
       CONTROL_TOKEN: 'change-me-control'
       CLASH_SECRET: 'change-me-clash'
+      GITHUB_TOKEN: '' # optional: raises the GitHub Releases API rate limit
       CONTROL_PORT: '8080'
       CLASH_API_PORT: '9090'
       MIXED_PORT: '7890'

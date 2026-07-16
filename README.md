@@ -255,6 +255,7 @@ services:
     environment:
       CONTROL_TOKEN: 'change-me-control'
       CLASH_SECRET: 'change-me-clash'
+      GITHUB_TOKEN: '' # optional read-only token for Releases API checks
       CONTROL_PORT: '8080'
       CLASH_API_PORT: '9090'
       MIXED_PORT: '7890'
@@ -283,7 +284,9 @@ docker compose pull && docker compose up -d
 > dashboard can call `/api/control`; consequently, that token is **not** access
 > control for the dashboard itself. Set `CONTROL_TOKEN`, but also restrict access
 > with host/network ACLs or an authenticated reverse proxy before exposing the
-> dashboard beyond a trusted LAN. Protect the Clash API and mixed proxy port too.
+> dashboard beyond a trusted LAN. An optional `GITHUB_TOKEN` is also exposed to
+> the browser for authenticated Releases checks, so use a narrowly scoped token.
+> Protect the Clash API and mixed proxy port too.
 > See [Security Policy](./.github/SECURITY.md).
 
 Open `http://<host>:8080` for the dashboard. The control agent unlocks the
@@ -310,6 +313,7 @@ configuration.
 | :--------------- | :----------------------- | :----------------------------------------------------------------------------------------------------------------------------------- |
 | `CONTROL_TOKEN`  | **required for control** | Bearer token for `/api/control/**`; also accepted as `?token=` for SSE. Without it, protected control routes fail closed with `503`. |
 | `CLASH_SECRET`   | _(none)_                 | Secret for mihomo's Clash API (`external-controller`). Set one and use it as the UI endpoint's **Secret**.                           |
+| `GITHUB_TOKEN`   | _(none)_                 | Optional read-only token for authenticated GitHub Releases checks. Omit it to keep anonymous requests.                               |
 | `CONTROL_PORT`   | `8080`                   | Port serving the dashboard UI + control agent API.                                                                                   |
 | `CLASH_API_PORT` | `9090`                   | Port for mihomo's Clash API + WebSocket. The UI endpoint targets this port.                                                          |
 | `MIXED_PORT`     | `7890`                   | mihomo mixed (HTTP + SOCKS) proxy port.                                                                                              |

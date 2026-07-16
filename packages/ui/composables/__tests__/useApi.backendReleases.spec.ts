@@ -26,7 +26,43 @@ function responseJson(value: unknown) {
 describe('composables/useApi backend release helpers', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    delete (
+      window as unknown as {
+        __METACUBEXD_CONFIG__?: { githubToken?: string }
+      }
+    ).__METACUBEXD_CONFIG__
+    delete (window as unknown as { metacubexd?: { githubToken?: string } })
+      .metacubexd
     kyCreate.mockReturnValue({ get: githubGet })
+  })
+
+  it('uses the runtime GitHub token and media type headers when configured (#2135)', async () => {
+    ;(
+      window as unknown as {
+        __METACUBEXD_CONFIG__: { githubToken: string }
+      }
+    ).__METACUBEXD_CONFIG__ = { githubToken: 'runtime-token' }
+    githubGet.mockReturnValue(
+      responseJson({ tag_name: 'v1.0.0', body: 'notes' }),
+    )
+
+    await backendReleaseAPI('v1.0.0')
+
+    const options = kyCreate.mock.calls[0]?.[0] as { headers: Headers }
+    expect(options.headers.get('Accept')).toBe('application/vnd.github+json')
+    expect(options.headers.get('Authorization')).toBe('Bearer runtime-token')
+  })
+
+  it('keeps GitHub release requests anonymous when no token is configured', async () => {
+    githubGet.mockReturnValue(
+      responseJson({ tag_name: 'v1.0.0', body: 'notes' }),
+    )
+
+    await backendReleaseAPI('v1.0.0')
+
+    const options = kyCreate.mock.calls[0]?.[0] as { headers: Headers }
+    expect(options.headers.get('Accept')).toBe('application/vnd.github+json')
+    expect(options.headers.has('Authorization')).toBe(false)
   })
 
   it('keeps regular alpha builds on the MetaCubeX/mihomo release feed', async () => {

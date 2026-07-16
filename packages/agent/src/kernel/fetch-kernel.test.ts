@@ -194,6 +194,24 @@ describe('listMihomoVersions', () => {
     expect(seenHeaders['User-Agent']).toBeTruthy()
   })
 
+  it('authenticates GitHub release requests when a token is configured (#2135)', async () => {
+    let seenHeaders: Record<string, string> = {}
+    const fakeFetch = vi.fn(async (_url: string, init?: RequestInit) => {
+      seenHeaders = (init?.headers ?? {}) as Record<string, string>
+      return new Response(JSON.stringify(releasesPayload()), { status: 200 })
+    })
+
+    await listMihomoVersions({
+      fetch: fakeFetch as unknown as typeof fetch,
+      githubToken: 'github-token',
+    })
+
+    expect(seenHeaders).toMatchObject({
+      Accept: 'application/vnd.github+json',
+      Authorization: 'Bearer github-token',
+    })
+  })
+
   it('throws on a non-200 response', async () => {
     const fakeFetch = vi.fn(
       async () => new Response('rate limited', { status: 403 }),

@@ -40,6 +40,7 @@ export default defineNuxtConfig({
       appVersion: pkg.version,
       mockMode: process.env.MOCK_MODE === 'true',
       defaultBackendURL: '',
+      githubToken: '',
     },
   },
 
@@ -215,10 +216,11 @@ export default defineNuxtConfig({
           tagPosition: 'head',
           defer: false,
           async: false,
-          onerror: "window.__METACUBEXD_CONFIG__={defaultBackendURL:''}",
+          onerror:
+            "window.__METACUBEXD_CONFIG__={defaultBackendURL:'',githubToken:''}",
         },
         {
-          innerHTML: `window.__METACUBEXD_CONFIG__ = window.__METACUBEXD_CONFIG__ || { defaultBackendURL: '' }`,
+          innerHTML: `window.__METACUBEXD_CONFIG__ = window.__METACUBEXD_CONFIG__ || { defaultBackendURL: '', githubToken: '' }`,
         },
       ],
     },

@@ -36,6 +36,8 @@ export interface KernelManagerOptions {
   fetchKernel?: FetchKernelFn
   /** Injected version lister; defaults to the agent's listMihomoVersions. */
   listVersions?: ListVersionsFn
+  /** Optional token for authenticated GitHub Releases metadata requests. */
+  githubToken?: string
   /** Injected override writer; defaults to fs.writeFile (utf8). */
   writeOverride?: WriteOverrideFn
 }
@@ -53,7 +55,9 @@ const defaultWriteOverride: WriteOverrideFn = (path, binPath) =>
  */
 export function createKernelManager(opts: KernelManagerOptions): KernelManager {
   const fetchKernel = opts.fetchKernel ?? defaultFetchKernel
-  const listVersions = opts.listVersions ?? listMihomoVersions
+  const listVersions =
+    opts.listVersions ??
+    (() => listMihomoVersions({ githubToken: opts.githubToken }))
   const writeOverride = opts.writeOverride ?? defaultWriteOverride
 
   return {

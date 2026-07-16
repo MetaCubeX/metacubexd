@@ -5,7 +5,9 @@ import type {
   ProfileMeta,
   ValidateResult,
 } from '~/types/control'
+import { useQueryClient } from '@tanstack/vue-query'
 import { toast } from 'vue-sonner'
+import { queryKeys } from '~/composables/useQueries'
 import { controlErrorMessage } from '~/utils/controlError'
 import { useControlApi } from './useControlApi'
 
@@ -19,6 +21,7 @@ declare function useProxiesStore(): { closeAllConnections: () => Promise<void> }
 
 export function useProfiles() {
   const api = useControlApi()
+  const queryClient = useQueryClient()
   const proxiesStore = useProxiesStore()
   const { t } = useI18n()
   const profiles = ref<ProfileMeta[]>([])
@@ -105,6 +108,7 @@ export function useProfiles() {
   const refreshAndApply = async (id: string): Promise<boolean> => {
     try {
       await api.refreshAndActivateProfile(id)
+      await queryClient.invalidateQueries({ queryKey: queryKeys.config })
       await refresh()
       toast.success(t('profilesRefreshed'))
       return true
@@ -132,6 +136,10 @@ export function useProfiles() {
   const activate = async (id: string): Promise<KernelState> => {
     const state = await api.activateProfile(id)
     activeBaseId.value = id
+    // Profile activation restarts mihomo with a potentially different `mode`.
+    // Invalidate the shared /configs query so the config page cannot keep
+    // rendering its pre-activation cached mode while the sidebar is live (#2137).
+    await queryClient.invalidateQueries({ queryKey: queryKeys.config })
     await refresh()
     // A profile switch can re-route any connection, so drop the existing ones
     // (when the user opted into autoCloseConns) for the change to take effect
@@ -148,6 +156,7 @@ export function useProfiles() {
       return
     }
     await api.activateProfile(activeBaseId.value)
+    await queryClient.invalidateQueries({ queryKey: queryKeys.config })
   }
 
   // Enable/disable a merge overlay, then re-compose the active config so the

@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { parse } from 'yaml'
-import { createProfileStore } from './profiles'
+import { createProfileStore, SubscriptionFetchError } from './profiles'
 
 function tmpDir() {
   return mkdtempSync(join(tmpdir(), 'mcxd-profiles-'))
@@ -161,7 +161,7 @@ describe('createProfileStore — import + active', () => {
     expect(meta.name).toBe('https://sub.example/clash')
   })
 
-  it('importFromUrl throws on non-200', async () => {
+  it('importFromUrl preserves a non-200 provider status without exposing its URL', async () => {
     const dir = mkdtempSync(join(tmpdir(), 'mcxd-profiles-imp3-'))
     const fakeFetch = (async () =>
       new Response('nope', { status: 403 })) as unknown as typeof fetch
@@ -170,7 +170,12 @@ describe('createProfileStore — import + active', () => {
       activeConfigPath: join(dir, '..', 'active.yaml'),
       fetch: fakeFetch,
     })
-    await expect(store.importFromUrl('https://x')).rejects.toThrow('403')
+    const error = await store
+      .importFromUrl('https://x?token=secret')
+      .catch((reason: unknown) => reason)
+    expect(error).toBeInstanceOf(SubscriptionFetchError)
+    expect(error).toMatchObject({ upstreamStatus: 403 })
+    expect((error as Error).message).not.toContain('token=secret')
   })
 
   it('times out a stalled subscription fetch instead of hanging forever', async () => {

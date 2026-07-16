@@ -182,6 +182,46 @@ describe('createSupervisor — initial state', () => {
     await sup.dispose()
   })
 
+  it('removes only listener fields that collide with the managed mixed port (#2136)', async () => {
+    const opts = baseOpts()
+    writeFileSync(
+      opts.activeConfigPath,
+      [
+        'port: 7890',
+        'socks-port: 7891',
+        'redir-port: 7890 # same managed port',
+        'tproxy-port: 7892',
+        'listeners:',
+        '  - name: nested',
+        '    port: 7890',
+        'proxies: []',
+        '',
+      ].join('\n'),
+    )
+    const proc = new FakeProc()
+    const sup = createSupervisor(
+      { ...opts, mixedPort: 7890 },
+      {
+        spawn: (() => proc) as never,
+        fetch: (async () =>
+          new Response(JSON.stringify({ version: '1' }), {
+            status: 200,
+          })) as unknown as typeof fetch,
+      },
+    )
+
+    await sup.start()
+
+    const written = readFileSync(opts.activeConfigPath, 'utf8').split('\n')
+    expect(written).toContain('mixed-port: 7890')
+    expect(written).not.toContain('port: 7890')
+    expect(written).not.toContain('redir-port: 7890 # same managed port')
+    expect(written).toContain('socks-port: 7891')
+    expect(written).toContain('tproxy-port: 7892')
+    expect(written).toContain('    port: 7890')
+    await sup.dispose()
+  })
+
   it('emits log lines from stdout/stderr', async () => {
     const opts = baseOpts()
     const proc = new FakeProc()

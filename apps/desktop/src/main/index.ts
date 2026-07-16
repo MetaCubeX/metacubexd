@@ -410,6 +410,7 @@ async function boot(): Promise<void> {
     arch: process.arch,
     kernelsDir: join(userData, 'kernels'),
     overridePath,
+    githubToken: process.env.GITHUB_TOKEN,
   })
 
   // Wire the REAL TUN runtime (B-3): the B-1 state machine driving the B-2 helper
@@ -961,7 +962,9 @@ function notify(title: string, body: unknown): void {
 // the app deliberately ships without an updater (publish: null).
 async function runUpdateCheck(): Promise<void> {
   try {
-    const result = await checkForUpdates(fetch, app.getVersion())
+    const result = await checkForUpdates(fetch, app.getVersion(), {
+      githubToken: process.env.GITHUB_TOKEN,
+    })
     if (!result.hasUpdate) {
       notify(
         'Up to date',

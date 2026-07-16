@@ -11,6 +11,7 @@ import { randomBytes } from 'node:crypto'
 import { existsSync } from 'node:fs'
 import { readFile, writeFile } from 'node:fs/promises'
 import treeKillDefault from 'tree-kill'
+import { parse } from 'yaml'
 
 export interface SupervisorDeps {
   spawn?: (cmd: string, args: string[], opts?: object) => ChildProcess
@@ -181,20 +182,39 @@ export function createSupervisor(
   // We rewrite the active YAML in place: strip any top-level external-controller/
   // secret/mixed-port lines the profile carried, then prepend our managed values
   // so state.externalController/secret (and the optional mixedPort) are authoritative.
+  // A managed mixed port must also be the sole listener on that number: mihomo
+  // otherwise keeps the earlier port/socks-port listener and silently reports
+  // mixed-port=0 at runtime even though active.yaml still says 7890 (#2136).
   async function injectClashConfig(): Promise<void> {
     let existing = ''
     if (existsSync(opts.activeConfigPath)) {
       existing = await readFile(opts.activeConfigPath, 'utf8')
     }
     const managedKeys = new Set(['external-controller', 'secret', 'mixed-port'])
-    const isManagedTopLevelKey = (line: string): boolean => {
+    const listenerPortKeys = new Set([
+      'port',
+      'socks-port',
+      'redir-port',
+      'tproxy-port',
+    ])
+    const shouldStripTopLevelKey = (line: string): boolean => {
       const separator = line.indexOf(':')
       if (separator === -1) return false
-      return managedKeys.has(line.slice(0, separator).trimEnd())
+      // trimEnd deliberately preserves leading indentation: nested keys with
+      // these names belong to their own mapping and must remain untouched.
+      const key = line.slice(0, separator).trimEnd()
+      if (managedKeys.has(key)) return true
+      if (mixedPort == null || !listenerPortKeys.has(key)) return false
+      try {
+        return parse(line.slice(separator + 1)) === mixedPort
+      } catch {
+        // Leave malformed/user-authored YAML for mihomo's validator to report.
+        return false
+      }
     }
     const kept = existing
       .split('\n')
-      .filter((line) => !isManagedTopLevelKey(line))
+      .filter((line) => !shouldStripTopLevelKey(line))
       .join('\n')
     const header = [
       `external-controller: ${state.externalController}`,
