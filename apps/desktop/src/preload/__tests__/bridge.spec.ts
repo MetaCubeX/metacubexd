@@ -135,4 +135,24 @@ describe('buildMetacubexdBridge', () => {
     )
     expect(listeners).toHaveLength(0)
   })
+
+  it('proxies the settings surface to its ipc channels', async () => {
+    const { bridge, ipc } = makeBridge()
+    await bridge.settings.get()
+    await bridge.settings.set({ showTraySpeed: false })
+    expect(ipc.invoke).toHaveBeenCalledWith('desktop:get-settings')
+    expect(ipc.invoke).toHaveBeenCalledWith('desktop:set-settings', {
+      showTraySpeed: false,
+    })
+  })
+
+  it('proxies the hotkeys surface to its ipc channels', async () => {
+    const { bridge, ipc } = makeBridge()
+    await bridge.hotkeys.get()
+    await bridge.hotkeys.set({ toggleWindow: 'Ctrl+X' })
+    expect(ipc.invoke).toHaveBeenCalledWith('desktop:get-hotkeys')
+    expect(ipc.invoke).toHaveBeenCalledWith('desktop:set-hotkeys', {
+      toggleWindow: 'Ctrl+X',
+    })
+  })
 })

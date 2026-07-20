@@ -1,9 +1,14 @@
-import type { ProxyMode } from './clash-config'
+import type { ProxyGroupInfo, ProxyMode } from './clash-config'
 import type { LoginItemController } from './login-item'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { Menu, nativeImage, Tray } from 'electron'
-import { getProxyMode, setProxyMode } from './clash-config'
+import {
+  getProxyMode,
+  listProxyGroups,
+  selectProxyNode,
+  setProxyMode,
+} from './clash-config'
 
 export type { ProxyMode }
 
@@ -78,6 +83,12 @@ export interface TrayDeps {
   /** Cross-platform "open at login" controller (see login-item.ts). */
   loginItem: LoginItemController
   /**
+   * Read the last formatted speed line (`↑ 12K ↓ 1.2M`) for the tooltip; null
+   * hides it. Fed by the traffic poller in index.ts — the tray itself never
+   * polls. Optional so headless/unit setups omit it.
+   */
+  getSpeedLine?: () => string | null
+  /**
    * Notify the renderer that Clash/config state changed outside the UI (e.g.
    * after a successful mode switch). Optional — absent in unit tests / headless.
    */
@@ -106,6 +117,8 @@ export function createTray(deps: TrayDeps): Tray {
   // instantly from the previous state while the async refresh runs.
   let profileList: { id: string; name: string }[] = []
   let activeProfileId: string | undefined
+  // Last known selection-bearing Proxy Groups; cached for the same reason.
+  let proxyGroups: ProxyGroupInfo[] = []
   const image = nativeImage.createFromPath(deps.iconPath)
   // On macOS the icon is a monochrome template the system tints to match the
   // light/dark menu bar; other platforms render the white wireframe as-is.
@@ -202,6 +215,34 @@ export function createTray(deps: TrayDeps): Tray {
         /* best-effort; keep cached/previous state */
       }
     })()
+  }
+
+  // Background refresh of the selection-bearing Proxy Groups. listProxyGroups
+  // resolves null on any failure, keeping the cached list.
+  const refreshGroups = () => {
+    void (async () => {
+      const groups = await listProxyGroups(fetchImpl, deps.clash)
+      if (!groups) return
+      const changed = JSON.stringify(groups) !== JSON.stringify(proxyGroups)
+      if (changed) {
+        proxyGroups = groups
+        rebuild()
+      }
+    })()
+  }
+
+  // Pin a Proxy Group's selected node. Optimistic: the reopened menu shows the
+  // new selection immediately; a rejected PUT leaves the cache untouched and
+  // the background refresh re-syncs with the kernel's reality.
+  const switchGroupNode = async (group: string, node: string) => {
+    if (await selectProxyNode(fetchImpl, deps.clash, group, node)) {
+      const cached = proxyGroups.find((g) => g.name === group)
+      if (cached) cached.now = node
+      rebuild()
+      // Tray mutates Clash directly — tell the open panel to drop its cached
+      // proxy snapshot (#2117).
+      deps.onBackendInvalidate?.()
+    }
   }
 
   // Switch the active profile; the injected activate owns the restart + error
@@ -322,6 +363,24 @@ export function createTray(deps: TrayDeps): Tray {
           click: () => void switchMode(mode),
         })),
       },
+      // Per-group node switcher — only when the kernel reported
+      // selection-bearing groups (an empty submenu teaches nothing).
+      ...(proxyGroups.length > 0
+        ? ([
+            {
+              label: 'Proxy Groups',
+              submenu: proxyGroups.map((g) => ({
+                label: g.name,
+                submenu: g.all.map((node) => ({
+                  label: node,
+                  type: 'radio' as const,
+                  checked: node === g.now,
+                  click: () => void switchGroupNode(g.name, node),
+                })),
+              })),
+            },
+          ] as const)
+        : []),
       // Only rendered when an OS system-proxy controller was injected.
       ...(deps.systemProxy
         ? ([
@@ -374,15 +433,18 @@ export function createTray(deps: TrayDeps): Tray {
     if (deps.systemProxy)
       segments.push(sysProxyEnabled ? 'system proxy on' : 'system proxy off')
     if (deps.tun && tunEnabled) segments.push('TUN on')
+    const speedLine = deps.getSpeedLine?.()
+    if (speedLine) segments.push(speedLine)
     tray.setToolTip(
       segments.length ? `MetaCubeXD — ${segments.join(' · ')}` : 'MetaCubeXD',
     )
-    // Re-sync the current mode + system-proxy/TUN/profile state in the
+    // Re-sync the current mode + system-proxy/TUN/profile/group state in the
     // background (don't block the first paint).
     refreshMode()
     refreshSysProxy()
     refreshTun()
     refreshProfiles()
+    refreshGroups()
   }
 
   rebuild()

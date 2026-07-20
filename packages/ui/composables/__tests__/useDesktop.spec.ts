@@ -55,4 +55,20 @@ describe('composables/useDesktop', () => {
 
     expect(minimize).toHaveBeenCalledTimes(1)
   })
+
+  it('exposes null settings/hotkeys surfaces in web mode', () => {
+    const { settings, hotkeys } = useDesktop()
+    expect(settings).toBeNull()
+    expect(hotkeys).toBeNull()
+  })
+
+  it('passes the bridge settings/hotkeys surfaces through', () => {
+    const settings = { get: vi.fn(), set: vi.fn() }
+    const hotkeys = { get: vi.fn(), set: vi.fn() }
+    setBridge({ isDesktop: true, platform: 'darwin', settings, hotkeys })
+
+    const desktop = useDesktop()
+    expect(desktop.settings).toBe(settings)
+    expect(desktop.hotkeys).toBe(hotkeys)
+  })
 })

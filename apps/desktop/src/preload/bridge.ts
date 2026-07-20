@@ -18,6 +18,28 @@ export interface BackendInvalidatePayload {
   reason?: 'mode' | 'profile' | 'show' | string
 }
 
+/**
+ * Desktop-shell settings as the renderer sees them (mirrors
+ * main/desktop-settings.ts DesktopSettings — kept structurally identical, but
+ * declared here so preload never imports main-process code).
+ */
+export interface DesktopSettingsPayload {
+  silentUpdateCheck: boolean
+  tunAutoRestore: boolean
+  showTraySpeed: boolean
+}
+
+/**
+ * Hotkey bindings payload (mirrors main/desktop-ipc.ts HotkeysPayload): the
+ * current per-action accelerators, the defaults (for a Reset control), and
+ * which accelerators failed to register on the last apply.
+ */
+export interface HotkeysSettingsPayload {
+  bindings: Record<string, string>
+  defaults: Record<string, string>
+  failed: { action: string; accelerator: string }[]
+}
+
 export interface MetacubexdBridge {
   readonly isDesktop: true
   readonly platform: NodeJS.Platform
@@ -39,6 +61,18 @@ export interface MetacubexdBridge {
   onBackendInvalidate: (
     cb: (payload: BackendInvalidatePayload) => void,
   ) => () => void
+  /** Desktop-shell settings (silent update check, TUN auto-restore, …). */
+  readonly settings: {
+    get: () => Promise<DesktopSettingsPayload>
+    set: (
+      patch: Partial<DesktopSettingsPayload>,
+    ) => Promise<DesktopSettingsPayload>
+  }
+  /** Global-hotkey bindings (read + apply with live re-registration). */
+  readonly hotkeys: {
+    get: () => Promise<HotkeysSettingsPayload>
+    set: (bindings: Record<string, string>) => Promise<HotkeysSettingsPayload>
+  }
 }
 
 /** What buildMetacubexdBridge needs from the preload runtime (injected for tests). */
@@ -98,6 +132,24 @@ export function buildMetacubexdBridge({
       ): void => cb(payload ?? {})
       ipc.on(BACKEND_INVALIDATE, handler)
       return () => ipc.removeListener(BACKEND_INVALIDATE, handler)
+    },
+    settings: {
+      get: () =>
+        ipc.invoke('desktop:get-settings') as Promise<DesktopSettingsPayload>,
+      set: (patch) =>
+        ipc.invoke(
+          'desktop:set-settings',
+          patch,
+        ) as Promise<DesktopSettingsPayload>,
+    },
+    hotkeys: {
+      get: () =>
+        ipc.invoke('desktop:get-hotkeys') as Promise<HotkeysSettingsPayload>,
+      set: (bindings) =>
+        ipc.invoke(
+          'desktop:set-hotkeys',
+          bindings,
+        ) as Promise<HotkeysSettingsPayload>,
     },
   }
 }

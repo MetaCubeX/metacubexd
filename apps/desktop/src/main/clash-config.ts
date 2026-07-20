@@ -82,3 +82,99 @@ export function nextProxyMode(current: ProxyMode | null): ProxyMode {
   const idx = current ? PROXY_MODE_CYCLE.indexOf(current) : -1
   return PROXY_MODE_CYCLE[(idx + 1) % PROXY_MODE_CYCLE.length]!
 }
+
+/** A selection-bearing Proxy Group as the tray submenu renders it. */
+export interface ProxyGroupInfo {
+  name: string
+  type: string
+  /** The currently selected member (the group's `now`). */
+  now: string
+  /** Candidate member names in config order. */
+  all: string[]
+}
+
+/** Group types whose selection can be pinned via PUT /proxies/:name. */
+const SELECTABLE_GROUP_TYPES = new Set(['selector', 'urltest', 'fallback'])
+
+/** The raw per-proxy shape `/proxies` returns (only the fields we read). */
+interface RawProxyEntry {
+  name?: string
+  type?: string
+  now?: string
+  all?: unknown
+  hidden?: boolean
+}
+
+/**
+ * GET the selection-bearing Proxy Groups (Selector/URLTest/Fallback with a
+ * `now` and a non-empty member list; hidden groups skipped). Returns null on
+ * any failure so callers keep their cached list rather than flicker to empty.
+ * `/proxies` returns an unordered object — the GLOBAL group's `all` carries the
+ * config order, so when present it orders the result (GLOBAL itself excluded:
+ * it duplicates every node and only matters in global mode).
+ */
+export async function listProxyGroups(
+  fetchImpl: typeof fetch,
+  { url, secret }: ClashEndpoint,
+  timeoutMs = DEFAULT_TIMEOUT_MS,
+): Promise<ProxyGroupInfo[] | null> {
+  try {
+    const res = await fetchImpl(`${url}/proxies`, {
+      headers: authHeaders(secret),
+      signal: AbortSignal.timeout(timeoutMs),
+    })
+    if (!res.ok) return null
+    const body = (await res.json()) as {
+      proxies?: Record<string, RawProxyEntry>
+    }
+    const proxies = body.proxies
+    if (!proxies || typeof proxies !== 'object') return null
+    const groups: ProxyGroupInfo[] = []
+    for (const [name, entry] of Object.entries(proxies)) {
+      if (name === 'GLOBAL' || entry.hidden) continue
+      const type = entry.type?.toLowerCase() ?? ''
+      if (!SELECTABLE_GROUP_TYPES.has(type)) continue
+      if (typeof entry.now !== 'string' || !Array.isArray(entry.all)) continue
+      const all = entry.all.filter((m): m is string => typeof m === 'string')
+      if (all.length === 0) continue
+      groups.push({ name, type: entry.type ?? '', now: entry.now, all })
+    }
+    const order = proxies.GLOBAL?.all
+    if (Array.isArray(order)) {
+      const index = new Map(order.map((n, i) => [n, i] as const))
+      groups.sort(
+        (a, b) =>
+          (index.get(a.name) ?? Number.MAX_SAFE_INTEGER) -
+          (index.get(b.name) ?? Number.MAX_SAFE_INTEGER),
+      )
+    }
+    return groups
+  } catch {
+    return null
+  }
+}
+
+/**
+ * PUT the selected member of a Proxy Group. Resolves whether the kernel
+ * accepted it; never throws — a wedged kernel resolves false. Bounded by
+ * `timeoutMs` (default 3s).
+ */
+export async function selectProxyNode(
+  fetchImpl: typeof fetch,
+  { url, secret }: ClashEndpoint,
+  group: string,
+  node: string,
+  timeoutMs = DEFAULT_TIMEOUT_MS,
+): Promise<boolean> {
+  try {
+    const res = await fetchImpl(`${url}/proxies/${encodeURIComponent(group)}`, {
+      method: 'PUT',
+      headers: { ...authHeaders(secret), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: node }),
+      signal: AbortSignal.timeout(timeoutMs),
+    })
+    return res.ok
+  } catch {
+    return false
+  }
+}

@@ -46,6 +46,9 @@ const ACTION_KEYS: readonly (keyof HotkeyActions)[] = [
   'toggleWindow',
 ]
 
+/** The action list, exported for the settings IPC/UI to iterate. */
+export const HOTKEY_ACTION_KEYS = ACTION_KEYS
+
 /** One accelerator that could not be registered (taken by another app / invalid). */
 export interface FailedHotkey {
   action: keyof HotkeyActions
@@ -93,6 +96,36 @@ export function registerHotkeys(
     else result.failed.push({ action, accelerator })
   }
   return result
+}
+
+/**
+ * Sanitize an unknown-typed bindings patch (it crosses the IPC boundary) into a
+ * full HotkeyBindings: known actions with string values only, merged over the
+ * defaults. An empty string survives — it means "disable this hotkey".
+ */
+export function sanitizeHotkeyBindings(patch: unknown): HotkeyBindings {
+  const result: HotkeyBindings = { ...DEFAULT_HOTKEYS }
+  if (patch && typeof patch === 'object') {
+    const overrides = patch as Record<string, unknown>
+    for (const action of ACTION_KEYS) {
+      const value = overrides[action]
+      if (typeof value === 'string') result[action] = value.trim()
+    }
+  }
+  return result
+}
+
+/**
+ * Persist the bindings to `<userData>/hotkeys.json` (the same file
+ * {@link loadHotkeyBindings} reads). The full record is written so the file is
+ * self-describing and hand-editable.
+ */
+export function saveHotkeyBindings(
+  path: string,
+  fs: FsLike,
+  bindings: HotkeyBindings,
+): void {
+  fs.writeFileSync(path, `${JSON.stringify(bindings, null, 2)}\n`)
 }
 
 /**

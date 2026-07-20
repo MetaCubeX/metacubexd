@@ -281,12 +281,17 @@ describe('createTray proxy-mode submenu', () => {
 
   it('marks the current mode (from GET /configs) as checked after rebuild', async () => {
     let resolveFetch: (r: Response) => void = () => {}
-    const fetchImpl = vi.fn(
-      () =>
-        new Promise<Response>((res) => {
-          resolveFetch = res
-        }),
-    ) as unknown as typeof fetch
+    // URL-aware: only the /configs GET uses the controllable deferred; the
+    // /proxies GET (background group refresh) resolves immediately so it can't
+    // race the single resolver.
+    const fetchImpl = vi.fn((url: string) => {
+      if (String(url).endsWith('/proxies')) {
+        return Promise.resolve(jsonResponse({ proxies: {} }))
+      }
+      return new Promise<Response>((res) => {
+        resolveFetch = res
+      })
+    }) as unknown as typeof fetch
 
     createTray(baseDeps(fetchImpl))
     // The initial rebuild fires a GET to learn the current mode.
@@ -617,6 +622,89 @@ describe('createTray copy proxy command', () => {
     expect(item?.click).toBeTypeOf('function')
     ;(item!.click as () => void)()
     expect(copyProxyCommand).toHaveBeenCalledTimes(1)
+  })
+})
+
+/** A URL-aware fetch: /configs -> mode, /proxies -> the given groups map. */
+function proxiesFetch(proxies: Record<string, unknown>): typeof fetch {
+  return vi.fn(async (url: string) => {
+    if (String(url).endsWith('/proxies')) return jsonResponse({ proxies })
+    return jsonResponse({ mode: 'rule' })
+  }) as unknown as typeof fetch
+}
+
+describe('createTray proxy-groups submenu', () => {
+  const GROUPS = {
+    GLOBAL: { type: 'Selector', now: 'Auto', all: ['Auto'] },
+    Auto: { type: 'Selector', now: 'HK', all: ['HK', 'JP'] },
+  }
+
+  it('omits the submenu when the kernel reports no selectable groups', async () => {
+    createTray(baseDeps(okFetch()))
+    // Let the background refreshGroups() settle (okFetch has no `proxies`).
+    await vi.waitFor(() => {
+      expect(findItem(lastTemplate(), 'Proxy Mode')).toBeTruthy()
+    })
+    expect(findItem(lastTemplate(), 'Proxy Groups')).toBeUndefined()
+  })
+
+  it('renders a per-group submenu with the selected node checked', async () => {
+    createTray({ ...baseDeps(okFetch()), fetchImpl: proxiesFetch(GROUPS) })
+    await vi.waitFor(() => {
+      expect(findItem(lastTemplate(), 'Proxy Groups')).toBeTruthy()
+    })
+    const groups = findItem(lastTemplate(), 'Proxy Groups')?.submenu
+    if (!Array.isArray(groups)) throw new Error('Proxy Groups submenu missing')
+    const auto = groups.find((g) => g.label === 'Auto')
+    const nodes = auto?.submenu
+    if (!Array.isArray(nodes)) throw new Error('Auto submenu missing')
+    expect(nodes.map((n) => n.label)).toEqual(['HK', 'JP'])
+    expect(nodes.find((n) => n.label === 'HK')?.checked).toBe(true)
+    expect(nodes.find((n) => n.label === 'JP')?.checked).toBe(false)
+  })
+
+  it('sends a PUT for the selected node and invalidates the panel on click', async () => {
+    const fetchImpl = vi.fn(async (url: string) => {
+      if (String(url).endsWith('/proxies'))
+        return jsonResponse({ proxies: GROUPS })
+      return jsonResponse({ mode: 'rule' })
+    }) as unknown as typeof fetch
+    const onBackendInvalidate = vi.fn()
+    createTray({ ...baseDeps(okFetch()), fetchImpl, onBackendInvalidate })
+    await vi.waitFor(() => {
+      expect(findItem(lastTemplate(), 'Proxy Groups')).toBeTruthy()
+    })
+    const groups = findItem(lastTemplate(), 'Proxy Groups')!
+      .submenu as MenuItemConstructorOptions[]
+    const jp = (
+      groups.find((g) => g.label === 'Auto')!
+        .submenu as MenuItemConstructorOptions[]
+    ).find((n) => n.label === 'JP')
+    await (jp!.click as (i: unknown) => unknown)({})
+    await vi.waitFor(() => {
+      expect(onBackendInvalidate).toHaveBeenCalled()
+    })
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'http://127.0.0.1:9090/proxies/Auto',
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({ name: 'JP' }),
+      }),
+    )
+  })
+})
+
+describe('createTray speed line', () => {
+  it('appends the injected speed line to the tooltip', () => {
+    createTray({ ...baseDeps(okFetch()), getSpeedLine: () => '↑ 1.0K ↓ 2.0M' })
+    const tip = trayInstances.at(-1)?.tooltips.at(-1)
+    expect(tip).toContain('↑ 1.0K ↓ 2.0M')
+  })
+
+  it('omits the speed segment when the getter returns null', () => {
+    createTray({ ...baseDeps(okFetch()), getSpeedLine: () => null })
+    const tip = trayInstances.at(-1)?.tooltips.at(-1)
+    expect(tip).toBe('MetaCubeXD')
   })
 })
 

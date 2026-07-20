@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+  IconAdjustments,
   IconCloudUp,
   IconCpu,
   IconDeviceDesktop,
@@ -14,6 +15,7 @@ useHead({ title: computed(() => t('controlCenter')) })
 const router = useRouter()
 const endpointStore = useEndpointStore()
 const { hasAgent, hasFeature, ready } = useControlInfo()
+const { isDesktop, settings: desktopSettingsBridge } = useDesktop()
 
 // The control center only exists in desktop/server (agent) mode. If a web user
 // lands here directly (a hash URL or a stale defaultPage), bounce to the
@@ -36,6 +38,9 @@ const showKernel = computed(
     hasFeature('logs-sse'),
 )
 const showSystem = computed(() => hasFeature('system-proxy'))
+// Desktop-shell settings need the desktop preload bridge (never the web/server
+// forms) — gate on the bridge surface, not an agent feature flag.
+const showDesktop = computed(() => isDesktop && !!desktopSettingsBridge)
 const showConfig = computed(
   () => hasFeature('config-sections') || hasFeature('runtime-config'),
 )
@@ -89,6 +94,15 @@ const showBackup = computed(() => hasFeature('webdav-backup'))
           {{ t('controlCenterSystem') }}
         </h2>
         <SystemProxyControlPanel />
+      </section>
+
+      <!-- Desktop shell: silent update check, TUN auto-restore, tray, hotkeys -->
+      <section v-if="showDesktop" class="cc-fade-in flex flex-col gap-4">
+        <h2 class="cc-section-title">
+          <IconAdjustments :size="16" />
+          {{ t('controlCenterDesktop') }}
+        </h2>
+        <DesktopSettingsPanel />
       </section>
 
       <!-- Configuration: profile network sections + live runtime config -->

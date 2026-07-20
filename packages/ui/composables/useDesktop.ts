@@ -16,6 +16,33 @@ interface MetacubexdBridge {
   isDesktop?: boolean
   platform?: string
   window?: Partial<DesktopWindowControls>
+  settings?: DesktopSettingsBridge
+  hotkeys?: DesktopHotkeysBridge
+}
+
+// Desktop-shell settings surface (see apps/desktop/src/preload/bridge.ts —
+// kept structurally identical here; the UI never imports desktop code).
+export interface DesktopShellSettings {
+  silentUpdateCheck: boolean
+  tunAutoRestore: boolean
+  showTraySpeed: boolean
+}
+
+export interface DesktopSettingsBridge {
+  get: () => Promise<DesktopShellSettings>
+  set: (patch: Partial<DesktopShellSettings>) => Promise<DesktopShellSettings>
+}
+
+/** Global-hotkey bindings payload mirrored from the preload bridge. */
+export interface DesktopHotkeysPayload {
+  bindings: Record<string, string>
+  defaults: Record<string, string>
+  failed: { action: string; accelerator: string }[]
+}
+
+export interface DesktopHotkeysBridge {
+  get: () => Promise<DesktopHotkeysPayload>
+  set: (bindings: Record<string, string>) => Promise<DesktopHotkeysPayload>
 }
 
 const NOOP_CONTROLS: DesktopWindowControls = {
@@ -48,5 +75,10 @@ export function useDesktop() {
     ...(bridge?.window ?? {}),
   }
 
-  return { isDesktop, platform, isMac, windowControls }
+  // Settings/hotkeys stay null on the web (and on an older preload) so the
+  // Desktop settings panel can gate itself on their presence.
+  const settings = bridge?.settings ?? null
+  const hotkeys = bridge?.hotkeys ?? null
+
+  return { isDesktop, platform, isMac, windowControls, settings, hotkeys }
 }

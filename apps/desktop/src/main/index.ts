@@ -7,6 +7,7 @@ import type { Tray } from 'electron'
 import type { ControlServer } from './control-server'
 import type { HelperInstallOptions } from './helper/installer'
 import type { HelperKernelStartOptions } from './helper/server'
+import type {FailedHotkey} from './hotkeys';
 import type { FsLike } from './paths'
 import { exec as nodeExec } from 'node:child_process'
 import {
@@ -47,12 +48,26 @@ import { getProxyMode, nextProxyMode, setProxyMode } from './clash-config'
 import { runShutdownCleanup } from './cleanup'
 import { startControlServer, stopControlServer } from './control-server'
 import { parseSubscriptionDeepLink } from './deep-link'
+import { registerDesktopIpc } from './desktop-ipc'
+import {
+  DEFAULT_DESKTOP_SETTINGS,
+  loadDesktopSettings,
+  mergeDesktopSettings,
+  saveDesktopSettings,
+} from './desktop-settings'
 import { pickFreePorts } from './free-port'
 import { createHelperClient } from './helper/client'
 import { createHelperElevate } from './helper/elevate'
 import { createHelperInstaller } from './helper/installer'
 import { resolveHelperEntry } from './helper/paths'
-import { loadHotkeyBindings, registerHotkeys } from './hotkeys'
+import {
+  DEFAULT_HOTKEYS,
+  
+  loadHotkeyBindings,
+  registerHotkeys,
+  sanitizeHotkeyBindings,
+  saveHotkeyBindings
+} from './hotkeys'
 import { createKernelManager } from './kernel-manager'
 import { createLogFileSink } from './log-file'
 import { createLoginItemController } from './login-item'
@@ -61,10 +76,12 @@ import { bootstrapDataDir } from './paths'
 import { buildProxyEnvCommand } from './proxy-env'
 import { makeToken } from './secrets'
 import { createShutdownOrchestrator } from './shutdown-orchestrator'
+import { runSilentUpdateCheck } from './silent-update'
 import { shouldStartHidden } from './startup'
 import { createSystemProxyController } from './sysproxy'
 import { readSysProxyBypass, writeSysProxyBypass } from './sysproxy-config'
 import { createSysproxyGuard } from './sysproxy-guard'
+import { createTrafficPoller, formatTraySpeed } from './traffic-poller'
 import { createTray, trayIconPath } from './tray'
 import { createTunRuntime } from './tun-runtime'
 import { checkForUpdates } from './update-check'
@@ -178,6 +195,16 @@ let tunTeardown: ReturnType<typeof createTunRuntime>['teardown'] | null = null
 // errors, so post-mortem support has more than a vanished toast. Created in
 // boot(); notify() tolerates it being null before that.
 let appLog: ReturnType<typeof createLogFileSink> | null = null
+// Desktop-shell settings (silent update check, TUN auto-restore, tray speed),
+// loaded in boot() from userData/desktop-settings.json and mutated through the
+// desktop:set-settings IPC channel.
+let desktopSettings = { ...DEFAULT_DESKTOP_SETTINGS }
+let desktopSettingsPath: string | null = null
+// Live tray speed: the /traffic stream poller + its last formatted line. The
+// poller runs while showTraySpeed is on; macOS additionally paints the line
+// into the menu-bar title every sample.
+let trafficPoller: ReturnType<typeof createTrafficPoller> | null = null
+let lastSpeedLine: string | null = null
 
 // Real fs adapter for the log sinks (recursive mkdir; byte-accurate size).
 const logFsAdapter = {
@@ -213,6 +240,12 @@ function devAppIcon(): Electron.NativeImage | null {
 async function boot(): Promise<void> {
   const userData = app.getPath('userData')
   const paths = bootstrapDataDir(userData, defaultConfigSource(), fsAdapter)
+
+  // Desktop-shell settings (silent update check / TUN auto-restore / tray
+  // speed). Loaded up front — the TUN cold-start path below already branches
+  // on tunAutoRestore.
+  desktopSettingsPath = join(userData, 'desktop-settings.json')
+  desktopSettings = loadDesktopSettings(desktopSettingsPath, fsAdapter)
 
   // Resolve mihomo binary (user override read from a settings file if present).
   const overridePath = join(userData, 'mihomo-bin-override.txt')
@@ -437,17 +470,20 @@ async function boot(): Promise<void> {
         }
         return s
       })()
+  // Hoisted out of createTunRuntime so the TUN auto-restore gate below can
+  // probe isInstalled() (cheap, un-elevated) without a second installer.
+  const helperInstaller = createHelperInstaller({
+    platform: process.platform,
+    exec: helperExec,
+    elevate: helperElevate,
+    paths: {
+      label: HELPER_LABEL,
+      serviceName: HELPER_SERVICE_NAME,
+      secretPath: tunPaths.secretFile,
+    },
+  })
   const tunRuntime = createTunRuntime({
-    installer: createHelperInstaller({
-      platform: process.platform,
-      exec: helperExec,
-      elevate: helperElevate,
-      paths: {
-        label: HELPER_LABEL,
-        serviceName: HELPER_SERVICE_NAME,
-        secretPath: tunPaths.secretFile,
-      },
-    }),
+    installer: helperInstaller,
     // Lazily dial the helper IPC socket only on the privileged relaunch —
     // createHelperClient connects at construction, and the helper isn't listening
     // until it's installed. Forward the runtime's disconnect handler so an
@@ -527,21 +563,28 @@ async function boot(): Promise<void> {
   realTunController = tunRuntime.controller
   tunTeardown = tunRuntime.teardown
 
-  // Cold-start restore prompt: if the last session ended in TUN mode, surface a
-  // notification rather than auto-elevating (an unattended boot must never pop a
-  // privilege prompt). The renderer re-enables TUN through /api/control/tun on
-  // the user's confirmation (B-4 UI). Best-effort read; a missing/corrupt file
-  // means "was sidecar", so nothing to prompt.
+  // Cold-start restore: if the last session ended in TUN mode, either queue an
+  // automatic re-enable (opt-in setting; runs after the kernel starts and ONLY
+  // when the helper service is already installed, so an unattended boot never
+  // pops a privilege prompt) or surface a notification for the manual path.
+  // Best-effort read; a missing/corrupt file means "was sidecar".
+  let tunRestoreStack: string | null = null
   try {
     if (existsSync(tunStatePath)) {
       const last = JSON.parse(readFileSync(tunStatePath, 'utf8')) as {
         mode?: string
+        stack?: string
       }
       if (last.mode === 'tun') {
-        notify(
-          'TUN mode was active',
-          'Re-enable TUN from the dashboard to resume routing all traffic.',
-        )
+        if (desktopSettings.tunAutoRestore) {
+          tunRestoreStack =
+            typeof last.stack === 'string' ? last.stack : 'mixed'
+        } else {
+          notify(
+            'TUN mode was active',
+            'Re-enable TUN from the dashboard to resume routing all traffic.',
+          )
+        }
       }
     }
   } catch (err) {
@@ -630,6 +673,21 @@ async function boot(): Promise<void> {
   // Loopback proxy port for Wave 2 system-proxy wiring.
   process.env.MCXD_MIXED_PORT = String(mixedPort)
 
+  // Tray speed: stream the Clash /traffic endpoint and keep the last formatted
+  // line for the tooltip; macOS additionally paints it into the menu-bar title
+  // every sample (monospaced digits so the width doesn't jitter). Started only
+  // while the setting is on; the settings IPC toggles it live.
+  trafficPoller = createTrafficPoller({
+    endpoint: { url: `http://127.0.0.1:${clashPort}`, secret: clashSecret },
+    onSample: (sample) => {
+      lastSpeedLine = formatTraySpeed(sample)
+      if (process.platform === 'darwin') {
+        tray?.setTitle(lastSpeedLine, { fontType: 'monospacedDigit' })
+      }
+    },
+  })
+  if (desktopSettings.showTraySpeed) trafficPoller.start()
+
   // Start the kernel WITHOUT blocking boot()/window creation. The renderer
   // already tolerates a not-yet-running kernel (its backend websockets retry
   // once it comes up), so the window shows immediately while the kernel boots in
@@ -650,6 +708,28 @@ async function boot(): Promise<void> {
         if (await sp.isEnabled()) await sp.enable()
       } catch (err) {
         notify('System proxy failed to resume', err)
+      }
+      // TUN auto-restore (opt-in, queued above): only when the helper service
+      // is ALREADY installed — enable() then reaches the running root/admin
+      // service over its socket without any elevation prompt. A missing
+      // service falls back to the manual-path notification.
+      if (tunRestoreStack !== null) {
+        try {
+          if (await helperInstaller.isInstalled()) {
+            await tunRuntime.controller.enable({ stack: tunRestoreStack })
+            notify(
+              'TUN mode restored',
+              'Routing all traffic through TUN again.',
+            )
+          } else {
+            notify(
+              'TUN mode was active',
+              'Re-enable TUN from the dashboard to resume routing all traffic.',
+            )
+          }
+        } catch (err) {
+          notify('TUN auto-restore failed', err)
+        }
       }
     })
     .catch((err) => notify('Kernel failed to start', err))
@@ -851,6 +931,9 @@ function createWindow(): void {
 async function shutdownKernel(): Promise<void> {
   // Halt subscription auto-update ticking so no refresh fires mid-shutdown.
   profileScheduler?.stop()
+  // Stop streaming /traffic — the kernel is about to go away and a reconnect
+  // loop during teardown is just noise.
+  trafficPoller?.stop()
   // Anti-lockout: if TUN mode is active, tear it down (back to sidecar) before
   // the kernel stops so we never leave the machine routing into a dead TUN
   // device. recoverNetwork() is a no-op in sidecar mode and never throws; in TUN
@@ -1227,6 +1310,8 @@ if (!app.requestSingleInstanceLock()) {
         notify('Proxy command copied', cmd)
       },
       loginItem,
+      // Last formatted /traffic sample for the tooltip (poller in boot()).
+      getSpeedLine: () => lastSpeedLine,
       onBackendInvalidate: () => notifyBackendInvalidate('mode'),
     })
     // Native application menu. Without it the OS never wires the standard
@@ -1266,24 +1351,108 @@ if (!app.requestSingleInstanceLock()) {
     // toggleSystemProxy/cycleProxyMode are async; the action signature is void
     // so we fire-and-forget here (each notifies on failure). An accelerator
     // that fails to register (owned by another app / a typo in hotkeys.json)
-    // is surfaced instead of dying silently.
-    const hotkeys = registerHotkeys({
-      globalShortcut,
-      bindings: loadHotkeyBindings(
-        join(app.getPath('userData'), 'hotkeys.json'),
-        fsAdapter,
-      ),
-      actions: {
-        toggleSystemProxy: () => void toggleSystemProxy(),
-        cycleProxyMode: () => void cycleProxyMode(),
-        toggleWindow: () => toggleWindowVisibility(),
-      },
-    })
-    if (hotkeys.failed.length > 0) {
+    // is surfaced instead of dying silently. applyHotkeys re-registers from
+    // scratch so the settings panel's saves take effect live.
+    const hotkeysPath = join(app.getPath('userData'), 'hotkeys.json')
+    const hotkeyActions = {
+      toggleSystemProxy: () => void toggleSystemProxy(),
+      cycleProxyMode: () => void cycleProxyMode(),
+      toggleWindow: () => toggleWindowVisibility(),
+    }
+    let hotkeyBindings = loadHotkeyBindings(hotkeysPath, fsAdapter)
+    let hotkeyFailed: FailedHotkey[] = []
+    const applyHotkeys = (bindings: typeof hotkeyBindings): void => {
+      globalShortcut.unregisterAll()
+      const result = registerHotkeys({
+        globalShortcut,
+        bindings,
+        actions: hotkeyActions,
+      })
+      hotkeyBindings = bindings
+      hotkeyFailed = result.failed
+    }
+    applyHotkeys(hotkeyBindings)
+    if (hotkeyFailed.length > 0) {
       notify(
         'Some hotkeys failed to register',
-        hotkeys.failed.map((f) => `${f.accelerator} (${f.action})`).join(', '),
+        hotkeyFailed.map((f) => `${f.accelerator} (${f.action})`).join(', '),
       )
+    }
+
+    // Desktop-settings + hotkeys IPC (the dashboard's Desktop panel). The
+    // setters own persistence and live side effects: toggling the tray speed
+    // starts/stops the /traffic poller, saving hotkeys re-registers them.
+    registerDesktopIpc({
+      ipcMain,
+      settings: {
+        get: () => ({ ...desktopSettings }),
+        set: (patch) => {
+          const next = mergeDesktopSettings(desktopSettings, patch)
+          const speedToggled =
+            next.showTraySpeed !== desktopSettings.showTraySpeed
+          desktopSettings = next
+          if (desktopSettingsPath) {
+            try {
+              saveDesktopSettings(desktopSettingsPath, fsAdapter, next)
+            } catch (err) {
+              notify('Failed to save desktop settings', err)
+            }
+          }
+          if (speedToggled) {
+            if (next.showTraySpeed) {
+              trafficPoller?.start()
+            } else {
+              trafficPoller?.stop()
+              lastSpeedLine = null
+              if (process.platform === 'darwin') tray?.setTitle('')
+            }
+          }
+          return { ...desktopSettings }
+        },
+      },
+      hotkeys: {
+        get: () => ({
+          bindings: { ...hotkeyBindings },
+          defaults: { ...DEFAULT_HOTKEYS },
+          failed: [...hotkeyFailed],
+        }),
+        set: (patch) => {
+          const bindings = sanitizeHotkeyBindings(patch)
+          try {
+            saveHotkeyBindings(hotkeysPath, fsAdapter, bindings)
+          } catch (err) {
+            notify('Failed to save hotkeys', err)
+          }
+          applyHotkeys(bindings)
+          return {
+            bindings: { ...hotkeyBindings },
+            defaults: { ...DEFAULT_HOTKEYS },
+            failed: [...hotkeyFailed],
+          }
+        },
+      },
+    })
+
+    // Silent update check (opt-out via the Desktop settings panel): delayed so
+    // it never competes with boot, throttled + de-duplicated inside
+    // runSilentUpdateCheck (24h between checks; one notification per release).
+    // Notification-only — the app still never self-updates.
+    if (desktopSettings.silentUpdateCheck) {
+      setTimeout(() => {
+        void runSilentUpdateCheck({
+          check: () =>
+            checkForUpdates(fetch, app.getVersion(), {
+              githubToken: process.env.GITHUB_TOKEN,
+            }),
+          statePath: join(app.getPath('userData'), 'update-check-state.json'),
+          fs: fsAdapter,
+          notifyUpdate: (r) =>
+            notify(
+              'Update available',
+              `MetaCubeXD ${r.latest} is out (you run ${r.current}). Download it from GitHub Releases.`,
+            ),
+        })
+      }, 15_000)
     }
 
     // Flush a deep link that arrived (and was queued) before the agent existed.
