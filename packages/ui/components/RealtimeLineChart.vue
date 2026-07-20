@@ -16,12 +16,15 @@ interface Props {
   isLoading?: boolean
   initialData?: [number, number][][]
   valueMode?: 'bytes' | 'number'
+  /** Whether the values represent a rate (e.g. traffic in bytes/s) */
+  isRate?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   isLoading: false,
   initialData: () => [],
   valueMode: 'bytes',
+  isRate: false,
 })
 
 // Expose methods for parent component to add data points
@@ -34,7 +37,7 @@ const formatValue = (value: number, withSuffix = false) => {
   if (props.valueMode === 'number') {
     return String(value)
   }
-  return withSuffix
+  return withSuffix && props.isRate
     ? `${byteSize(value).toString()}/s`
     : byteSize(value).toString()
 }

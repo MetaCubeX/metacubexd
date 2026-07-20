@@ -539,6 +539,7 @@ watch(
           :series-config="trafficSeriesConfig"
           :initial-data="trafficInitialData"
           :is-loading="!globalStore.latestTraffic"
+          is-rate
         />
       </div>
 
