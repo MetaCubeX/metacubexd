@@ -10,6 +10,13 @@ import type {
   ProfileEditorSnapshot,
 } from '~/types/control'
 import {
+  applyPatch,
+  diffDocument,
+  hashConfigValue,
+  openDocument,
+  replaceDocumentData,
+} from '@metacubexd/config-editor'
+import {
   IconAlertTriangle,
   IconArrowLeft,
   IconBraces,
@@ -25,13 +32,6 @@ import {
   IconSettings,
   IconTrash,
 } from '@tabler/icons-vue'
-import {
-  applyPatch,
-  diffDocument,
-  hashConfigValue,
-  openDocument,
-  replaceDocumentData,
-} from '@metacubexd/config-editor'
 import { toast } from 'vue-sonner'
 import {
   configGeneralKeys,

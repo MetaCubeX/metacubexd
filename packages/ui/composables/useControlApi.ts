@@ -1,3 +1,4 @@
+import type { ConfigPatchV1 } from '@metacubexd/config-editor'
 import type {
   ControlInfo,
   GeoUpdateResult,
@@ -14,7 +15,6 @@ import type {
   WebdavCredentials,
   WebdavRestoreResult,
 } from '~/types/control'
-import type { ConfigPatchV1 } from '@metacubexd/config-editor'
 // packages/ui/composables/useControlApi.ts
 import ky from 'ky'
 

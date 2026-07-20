@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest'
 import { schemaSections } from '@metacubexd/config-editor'
+import { describe, expect, it } from 'vitest'
 import {
   configGeneralKeys,
   configSectionSchema,

@@ -51,7 +51,9 @@ function matchesValue(schema: ConfigJsonSchema, value: unknown): boolean {
       if (type === 'integer') return Number.isInteger(value)
       if (type === 'number') return typeof value === 'number'
       if (type === 'null') return value === null
-      return typeof value === type
+      if (type === 'string') return typeof value === 'string'
+      if (type === 'boolean') return typeof value === 'boolean'
+      return false
     })
     if (!typeMatches) return false
   }

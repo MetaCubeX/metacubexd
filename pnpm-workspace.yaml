@@ -8,6 +8,10 @@ packages:
 catalog:
   '@antfu/eslint-config': ^9.1.0
   '@commitlint/config-conventional': ^21.2.0
+  # Flips Electron's runtime fuses on the packaged binary via an afterPack hook
+  # (scripts/after-pack.cjs). Already present transitively under electron-builder;
+  # pinned here so the desktop package can require() it directly.
+  '@electron/fuses': ^2.1.3
   '@floating-ui/vue': ^2.0.1
   '@nuxt/fonts': ^0.14.0
   '@nuxtjs/i18n': ^10.4.1
@@ -25,6 +29,8 @@ catalog:
   '@types/markdown-it': ^14.1.2
   '@types/node': ^26.1.1
   '@types/sortablejs': ^1.15.9
+  '@vite-pwa/nuxt': ^1.1.1
+  '@vitest/coverage-v8': ^4.1.10
   '@vueuse/core': ^14.3.0
   '@vueuse/integrations': ^14.3.0
   '@vueuse/nuxt': ^14.3.0
@@ -33,50 +39,25 @@ catalog:
   d3: ^7.9.0
   daisyui: ^5.6.18
   dayjs: ^1.11.21
+  electron: ^43.1.1
+  electron-builder: ^26.0.0
+  electron-vite: ^5.0.0
   eslint: ^10.7.0
   eslint-plugin-format: ^2.0.1
-  highcharts: ^13.0.0
-  husky: ^9.1.7
-  ky: ^2.0.2
-  lint-staged: ^17.0.8
-  markdown-it: ^14.3.0
-  match-sorter: ^8.3.0
-  nuxt: 4.4.8
-  pinia: ^4.0.0
-  playwright: ^1.61.1
-  prettier: ^3.9.5
-  prettier-plugin-tailwindcss: ^0.8.0
-  sort-package-json: ^4.0.0
-  sortablejs: ^1.15.7
-  tailwindcss: ^4.3.2
-  tsx: ^4.23.1
-  typescript: ^7.0.2
-  uqr: ^0.1.2
-  vite: 8.1.4
-  vitest: ^4.1.10
-  vue: ^3.5.39
-  vue-router: ^5.1.0
-  vue-sonner: ^2.0.9
-  vue-tsc: ^3.3.7
-  '@vite-pwa/nuxt': ^1.1.1
-  '@vitest/coverage-v8': ^4.1.10
-  jsdom: ^29.1.1
   # NEW-SUBSYSTEM deps (consumed by the future agent/server/desktop packages
   # in plans 02-05, NOT by packages/ui). These are brand-new catalog entries
   # for brand-new packages — they do NOT bump any existing dependency, so the
   # "ZERO version bumps" rule still holds (it forbids changing the version of
   # an already-present dep, not adding a new one). Versions come from spec §1.
   h3: ^1.15.11
-  tree-kill: ^1.2.2
-  yaml: ^2.9.0
-  nitropack: ^2.12.6
-  electron: ^43.1.1
-  electron-vite: ^5.0.0
-  electron-builder: ^26.0.0
-  # Flips Electron's runtime fuses on the packaged binary via an afterPack hook
-  # (scripts/after-pack.cjs). Already present transitively under electron-builder;
-  # pinned here so the desktop package can require() it directly.
-  '@electron/fuses': ^2.1.3
+  highcharts: ^13.0.0
+  husky: ^9.1.7
+  jsdom: ^29.1.1
+  ky: ^2.0.2
+  lint-staged: ^17.0.8
+  markdown-it: ^14.3.0
+  match-sorter: ^8.3.0
+  meta-json-schema: ^1.19.28
   # PINNED, do not bump past 0.52.x. monaco-yaml@5.5.1 (latest) pulls
   # monaco-worker-manager@2.0.1 (latest), which calls the OLD
   # editor.createWebWorker({ moduleId, label, createData }) API. monaco-editor
@@ -92,7 +73,28 @@ catalog:
   # Dependabot is configured to ignore this package (.github/dependabot.yml).
   monaco-editor: 0.52.2
   monaco-yaml: ^5.5.1
-  meta-json-schema: ^1.19.28
+  nitropack: ^2.12.6
+  nuxt: 4.4.8
+  pinia: ^4.0.2
+  playwright: ^1.61.1
+  prettier: ^3.9.5
+  prettier-plugin-tailwindcss: ^0.8.0
+  sort-package-json: ^4.0.0
+  sortablejs: ^1.15.7
+  tailwindcss: ^4.3.2
+  tree-kill: ^1.2.2
+  tsx: ^4.23.1
+  typescript: ^6.0.3
+  uqr: ^0.1.2
+  vite: 8.1.4
+  vitest: ^4.1.10
+  vue: ^3.5.39
+  vue-router: ^5.1.0
+  vue-sonner: ^2.0.9
+  vue-tsc: ^3.3.7
+  yaml: ^2.9.0
+
+neverBuiltDependencies: []
 
 # overrides MUST live only at the workspace root (pnpm 10/11). This is the
 # merge of OLD package.json#pnpm.overrides + the OLD workspace override.
@@ -128,11 +130,9 @@ overrides:
   tar: '>=7.5.15'
   'undici@6': ^6.27.0
   'undici@7': ^7.28.0
-  yaml: '>=2.9.0'
   # Pin the exact rolldown-vite version (was '@latest'). @latest is a moving
   # target — only the lockfile kept a fresh install from pulling a newer pre-1.0
   # rolldown-vite that could silently change electron-vite's main/helper
   # bundling. Bump deliberately, as a reviewed change.
   vite: 'npm:rolldown-vite@7.3.1'
-
-neverBuiltDependencies: []
+  yaml: '>=2.9.0'
