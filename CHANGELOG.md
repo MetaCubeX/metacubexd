@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.269.1](https://github.com/MetaCubeX/metacubexd/compare/v1.269.0...v1.269.1) (2026-07-20)
+
+
+### Bug Fixes
+
+* **deps:** restore toolchain compatibility by reverting typescript to ^6.0.3 ([bc8c374](https://github.com/MetaCubeX/metacubexd/commit/bc8c374d6810b1436eaed5f5283c16e5c20f888b))
+* memory chart unit should be MB instead of MB/s ([bc76c56](https://github.com/MetaCubeX/metacubexd/commit/bc76c56623d7edf31274394c4ccf052b4f9c18b3)), closes [#2143](https://github.com/MetaCubeX/metacubexd/issues/2143)
+
 ## [1.269.0](https://github.com/MetaCubeX/metacubexd/compare/v1.268.5...v1.269.0) (2026-07-16)
 
 
