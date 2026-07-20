@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.270.0](https://github.com/MetaCubeX/metacubexd/compare/v1.269.1...v1.270.0) (2026-07-20)
+
+
+### Features
+
+* **desktop:** tray speed & node switch, silent update, hotkey settings, TUN auto-restore ([2f303bb](https://github.com/MetaCubeX/metacubexd/commit/2f303bbf98ebc71ddc4d75ee056ffba40b4fa565))
+
 ## [1.269.1](https://github.com/MetaCubeX/metacubexd/compare/v1.269.0...v1.269.1) (2026-07-20)
 
 
