@@ -1,0 +1,1 @@
+import{Yn as e,qn as t}from"./C2K8xpbk.js";function n(){if(!(typeof window>`u`))return window.metacubexd}function r(r){let i=n(),a=i?.isDesktop?i.onBackendInvalidate?.(()=>r()):void 0;return a?(t()&&e(a),a):()=>{}}export{r as t};

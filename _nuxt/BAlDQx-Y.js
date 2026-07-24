@@ -1,0 +1,1 @@
+import{a as e}from"./C2K8xpbk.js";var t=e(`outline`,`device-desktop`,`DeviceDesktop`,[[`path`,{d:`M3 5a1 1 0 0 1 1 -1h16a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-10`,key:`svg-0`}],[`path`,{d:`M7 20h10`,key:`svg-1`}],[`path`,{d:`M9 16v4`,key:`svg-2`}],[`path`,{d:`M15 16v4`,key:`svg-3`}]]);export{t};
