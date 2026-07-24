@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.270.1](https://github.com/MetaCubeX/metacubexd/compare/v1.270.0...v1.270.1) (2026-07-24)
+
+
+### Bug Fixes
+
+* tray/UI sync, TUN enable reliability, latency bar alignment ([#2148](https://github.com/MetaCubeX/metacubexd/issues/2148) [#2149](https://github.com/MetaCubeX/metacubexd/issues/2149) [#2150](https://github.com/MetaCubeX/metacubexd/issues/2150)) ([173a565](https://github.com/MetaCubeX/metacubexd/commit/173a56536b5a5f15a9fa3758f0a56ea2577464d3))
+
 ## [1.270.0](https://github.com/MetaCubeX/metacubexd/compare/v1.269.1...v1.270.0) (2026-07-20)
 
 
