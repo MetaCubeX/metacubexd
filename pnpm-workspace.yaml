@@ -109,7 +109,6 @@ neverBuiltDependencies: []
 overrides:
   '@isaacs/brace-expansion': '>=5.0.1'
   '@nuxt/devtools-kit': 3.2.4
-  '@unhead/vue': 2.1.15
   'brace-expansion@^1': '>=1.1.15'
   'brace-expansion@^2': '>=2.1.1'
   defu: 6.1.7

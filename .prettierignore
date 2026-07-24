@@ -1,3 +1,4 @@
 auto-imports.d.ts
 dist
 CHANGELOG.md
+pnpm-lock.yaml
