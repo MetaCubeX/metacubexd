@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.270.2](https://github.com/MetaCubeX/metacubexd/compare/v1.270.1...v1.270.2) (2026-07-24)
+
+
+### Bug Fixes
+
+* **ui:** drop obsolete @unhead/vue override that broke nuxt 4.5.0 build ([4b9f798](https://github.com/MetaCubeX/metacubexd/commit/4b9f7983a29ba798a5a3943baa5e8fff0594cb59))
+
 ## [1.270.1](https://github.com/MetaCubeX/metacubexd/compare/v1.270.0...v1.270.1) (2026-07-24)
 
 
