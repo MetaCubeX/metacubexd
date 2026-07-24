@@ -223,6 +223,20 @@ export function formatProxyType(
   return lt
 }
 
+// The canonical Running Mode order shared by the tray and every UI surface
+// (rule -> global -> direct), matching the conventional severity ladder the
+// tray already uses. The kernel's `mode-list` arrives in arbitrary order, so
+// every UI control normalizes through this to stay consistent with the tray
+// (#2148).
+const CANONICAL_MODE_ORDER = ['rule', 'global', 'direct'] as const
+
+export function orderProxyModes(modes: string[] | undefined): string[] {
+  const input = modes ?? []
+  const ordered = CANONICAL_MODE_ORDER.filter((m) => input.includes(m))
+  const extras = input.filter((m) => !CANONICAL_MODE_ORDER.includes(m as never))
+  return [...ordered, ...extras]
+}
+
 export type LatencyBand = 'good' | 'medium' | 'slow' | 'not-connected'
 
 // The single Latency Band ladder. getLatencyClassName, ProxyPreviewBar and

@@ -38,7 +38,7 @@ describe('composables/useGeneralConfig', () => {
     expect(g.form.socksPort).toBe(7892)
     expect(g.form.redirPort).toBe(7893)
     expect(g.form.tproxyPort).toBe(7894)
-    expect(g.modes.value).toEqual(['rule', 'direct', 'global', 'script'])
+    expect(g.modes.value).toEqual(['rule', 'global', 'direct', 'script'])
   })
 
   it('syncFromConfig coerces missing ports to 0 and tolerates an empty config', () => {
@@ -50,7 +50,8 @@ describe('composables/useGeneralConfig', () => {
     expect(g.form.interfaceName).toBe('')
     expect(g.form.mixedPort).toBe(0)
     expect(g.form.tproxyPort).toBe(0)
-    expect(g.modes.value).toEqual(['rule', 'direct', 'global'])
+    // Canonical order (rule -> global -> direct), matching the tray. (#2148)
+    expect(g.modes.value).toEqual(['rule', 'global', 'direct'])
   })
 
   it('syncFromConfig honors the legacy UnifiedDelay fallback when unified-delay is absent', () => {

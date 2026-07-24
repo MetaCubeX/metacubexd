@@ -130,6 +130,29 @@ describe('createTunController', () => {
       )
     })
 
+    it('relaunches the sidecar (undoes the tun block) when startPrivileged fails after stopKernel, so the kernel is not left dead (#2149)', async () => {
+      const deps = makeDeps()
+      deps.startPrivileged.mockRejectedValueOnce(
+        new Error('connect ENOENT helper.sock'),
+      )
+      const tun = createTunController(deps)
+
+      await expect(tun.enable({ stack: 'gvisor' })).rejects.toThrow(
+        'connect ENOENT helper.sock',
+      )
+
+      // The kernel was stopped, then the privileged relaunch failed — recovery
+      // must remove the injected tun block AND relaunch the sidecar so traffic
+      // keeps flowing instead of leaving the backend offline.
+      expect(deps.stopKernel).toHaveBeenCalledTimes(1)
+      expect(deps.injectTun).toHaveBeenCalledTimes(1)
+      expect(deps.startPrivileged).toHaveBeenCalledTimes(1)
+      expect(deps.removeTun).toHaveBeenCalledTimes(1)
+      expect(deps.startSidecar).toHaveBeenCalledTimes(1)
+      // The failed enable must NOT flip the controller into TUN state.
+      expect(await tun.status()).toEqual({ enabled: false, mode: 'sidecar' })
+    })
+
     it('runs precheck BEFORE any teardown — a rejecting precheck aborts the enable without touching the kernel', async () => {
       const deps = makeDeps()
       const precheck = vi.fn(async () => {

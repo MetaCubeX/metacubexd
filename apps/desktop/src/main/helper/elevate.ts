@@ -91,9 +91,18 @@ export function createHelperElevate(
         // elevation and `sc create` / HKLM writes fail with Access Denied.
         const tmpPath = fs.join(fs.tmpdir(), tempName())
         fs.writeFileSync(tmpPath, script)
+        // Resolve PowerShell by ABSOLUTE path. Electron sometimes spawns the
+        // elevate with a reduced PATH (and some installs omit System32 from the
+        // user PATH), so the bare `powershell` lookup fails with "'powershell'
+        // is not recognized as an internal or external command", breaking every
+        // helper install + TUN enable (#2149). The canonical binary lives under
+        // %SystemRoot%\System32\WindowsPowerShell\v1.0.
+        const root =
+          process.env.SystemRoot || process.env.WINDIR || 'C:\\Windows'
+        const powershell = `${root}\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`
         try {
           return await exec(
-            `powershell -NoProfile -NonInteractive -Command "Start-Process -FilePath 'cmd.exe' -ArgumentList '/c',${psSingleQuote(tmpPath)} -Verb RunAs -Wait -WindowStyle Hidden"`,
+            `"${powershell}" -NoProfile -NonInteractive -Command "Start-Process -FilePath 'cmd.exe' -ArgumentList '/c',${psSingleQuote(tmpPath)} -Verb RunAs -Wait -WindowStyle Hidden"`,
           )
         } finally {
           try {

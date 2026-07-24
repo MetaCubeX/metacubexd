@@ -3,6 +3,7 @@ import type { SystemProxyState } from '~/types/control'
 import { toast } from 'vue-sonner'
 import { useControlApi } from './useControlApi'
 import { useControlInfo } from './useControlInfo'
+import { onControlInvalidate } from './useControlSync'
 
 // `useI18n` is auto-imported by @nuxtjs/i18n (no explicit import). In unit
 // tests it is provided as a global stub via test/setup.ts.
@@ -33,6 +34,13 @@ export function useSystemProxy() {
   const port = ref(0)
   const bypassText = ref('')
   const loading = ref(false)
+
+  // Re-sync from the agent when system proxy is toggled from outside the SPA
+  // (the tray checkbox routes through the Control API, not this composable).
+  // (#2148)
+  onControlInvalidate(() => {
+    void load()
+  })
 
   const sync = (s: SystemProxyState) => {
     enabled.value = s.enabled

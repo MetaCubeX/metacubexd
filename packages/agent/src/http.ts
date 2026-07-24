@@ -1,5 +1,5 @@
-import type { App, H3Event } from 'h3'
 import type { ConfigPatchV1 } from '@metacubexd/config-editor'
+import type { App, H3Event } from 'h3'
 import type { ProfileConfigEditor } from './profile-editor'
 import type {
   KernelLogLine,
@@ -28,11 +28,11 @@ import {
 } from 'h3'
 import { fetchGeoAssets } from './kernel/geo'
 import { ConfigPatchConflictError } from './merge'
-import { SubscriptionFetchError } from './profiles'
 import {
   ProfileEditorConflictError,
   ProfileEditorValidationError,
 } from './profile-editor'
+import { SubscriptionFetchError } from './profiles'
 import { TunPreconditionError } from './tun'
 import { createWebdavClient as defaultCreateWebdavClient } from './webdav'
 
@@ -242,9 +242,19 @@ export function createControlRouter(deps: ControlRouterDeps): App {
   }
 
   // ---- Profiles ----
+  // Attach an `active` flag to each entry so the UI can persistently mark the
+  // currently-active base profile (the store tracks activeId in state.json but
+  // the raw list never exposed it, so the badge vanished after every reload
+  // (#2148)). Derived here — never persisted into index.json.
   router.get(
     `${PREFIX}/profiles`,
-    defineEventHandler(() => profiles.list()),
+    defineEventHandler(async () => {
+      const [list, activeId] = await Promise.all([
+        profiles.list(),
+        profiles.getActiveId(),
+      ])
+      return list.map((p) => ({ ...p, active: p.id === activeId }))
+    }),
   )
   router.post(
     `${PREFIX}/profiles`,

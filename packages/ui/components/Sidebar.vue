@@ -25,6 +25,7 @@ import {
   useConfigQuery,
   useUpdateConfigMutation,
 } from '~/composables/useQueries'
+import { orderProxyModes } from '~/utils'
 
 const route = useRoute()
 const { t } = useI18n()
@@ -65,15 +66,16 @@ const { data: backendConfig } = useConfigQuery()
 const updateConfigMutation = useUpdateConfigMutation()
 
 const currentMode = ref('')
-const modes = ref<string[]>(['rule', 'direct', 'global'])
+const modes = ref<string[]>(['rule', 'global', 'direct'])
 
 watch(
   backendConfig,
   (config) => {
     if (config) {
       currentMode.value = config.mode || 'rule'
-      modes.value = config['mode-list'] ||
-        config.modes || ['rule', 'direct', 'global']
+      modes.value = orderProxyModes(
+        config['mode-list'] || config.modes || ['rule', 'global', 'direct'],
+      )
     }
   },
   { immediate: true },

@@ -3,6 +3,7 @@ import type { TunStatus } from '~/types/control'
 import { toast } from 'vue-sonner'
 import { useControlApi } from './useControlApi'
 import { useControlInfo } from './useControlInfo'
+import { onControlInvalidate } from './useControlSync'
 
 // `useI18n` is auto-imported by @nuxtjs/i18n (no explicit import). In unit
 // tests it is provided as a global stub via test/setup.ts.
@@ -28,6 +29,12 @@ export function useTun() {
   // Default to the safe sidecar state until the first GET resolves.
   const status = ref<TunStatus>({ enabled: false, mode: 'sidecar' })
   const busy = ref(false)
+
+  // Re-sync from the agent when TUN is toggled from outside the SPA (the tray
+  // checkbox routes through the Control API, not this composable). (#2148)
+  onControlInvalidate(() => {
+    void load()
+  })
 
   const load = async () => {
     busy.value = true

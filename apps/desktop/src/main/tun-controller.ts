@@ -118,8 +118,20 @@ export function createTunController(opts: TunControllerOptions): TunController {
       if (precheck) await precheck()
 
       await stopKernel()
-      await injectTun(buildTunConfig({ stack }))
-      await startPrivileged()
+      try {
+        await injectTun(buildTunConfig({ stack }))
+        await startPrivileged()
+      } catch (err) {
+        // startPrivileged (elevation / helper install / privileged spawn) or
+        // injectTun failed AFTER the kernel was stopped — without this recovery
+        // the kernel stayed down, so a failed TUN enable took the whole backend
+        // offline ("backend stops working"). Undo the injected `tun:` block and
+        // relaunch the unprivileged sidecar so traffic flows again. Best-effort:
+        // a recovery failure must never mask the original error. (#2149)
+        await removeTun().catch(() => {})
+        await startSidecar().catch(() => {})
+        throw err
+      }
 
       state = { enabled: true, mode: 'tun', stack }
       if (persist) await persist(state)

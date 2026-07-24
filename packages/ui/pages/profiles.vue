@@ -12,6 +12,7 @@ import {
   IconTrash,
 } from '@tabler/icons-vue'
 import { toast } from 'vue-sonner'
+import { onControlInvalidate } from '~/composables/useControlSync'
 import { controlErrorMessage } from '~/utils/controlError'
 
 const { t, locale } = useI18n()
@@ -90,6 +91,14 @@ onMounted(() => {
         description: controlErrorMessage(err),
       })
     })
+})
+
+// Re-sync the active marker + list when a profile is activated from outside the
+// SPA (tray submenu, AIO scheduler). desktop-sync invalidates vue-query caches,
+// but this list lives in a local ref, so reload it on backend invalidate. A
+// no-op on web builds (no bridge). (#2148)
+onControlInvalidate(() => {
+  if (hasFeature('profiles')) void refresh()
 })
 
 // Uniform failure feedback for the actions whose composable methods rethrow

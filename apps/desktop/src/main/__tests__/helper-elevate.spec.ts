@@ -98,6 +98,9 @@ describe('createHelperElevate', () => {
       expect(calls).toHaveLength(1)
       const command = calls[0]?.toLowerCase() ?? ''
       expect(command).toContain('powershell')
+      // Resolved by absolute path — a bare `powershell` lookup fails when
+      // Electron spawns with a reduced PATH (#2149).
+      expect(command).toContain('\\system32\\windowspowershell\\v1.0\\')
       expect(command).toContain('start-process')
       expect(command).toContain('-verb runas')
       expect(calls[0]).toContain(tmpPath)

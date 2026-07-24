@@ -1,5 +1,6 @@
 // packages/ui/composables/useGeneralConfig.ts
 import type { Config } from '~/types'
+import { orderProxyModes } from '~/utils'
 
 // Caller supplies the configs PATCH mutation (useUpdateConfigMutation) so the
 // composable stays unit-testable without mounting a component / hitting net.
@@ -46,7 +47,7 @@ export function useGeneralConfig(options: UseGeneralConfigOptions) {
     tproxyPort: 0,
   })
 
-  const modes = ref<string[]>(['rule', 'direct', 'global'])
+  const modes = ref<string[]>(['rule', 'global', 'direct'])
 
   function syncFromConfig(config: Config | null | undefined) {
     if (!config) return
@@ -60,8 +61,10 @@ export function useGeneralConfig(options: UseGeneralConfigOptions) {
     form.socksPort = config['socks-port'] || 0
     form.redirPort = config['redir-port'] || 0
     form.tproxyPort = config['tproxy-port'] || 0
-    modes.value = config['mode-list'] ||
-      (config as any).modes || ['rule', 'direct', 'global']
+    modes.value = orderProxyModes(
+      config['mode-list'] ||
+        (config as any).modes || ['rule', 'global', 'direct'],
+    )
   }
 
   function save(key: keyof Config, value: unknown) {

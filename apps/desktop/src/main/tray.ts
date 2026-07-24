@@ -274,6 +274,10 @@ export function createTray(deps: TrayDeps): Tray {
         sysProxyEnabled = true
       }
       rebuild()
+      // The toggle mutated control-owned state — tell the open panel to re-read
+      // it so its checkbox converges instead of waiting for a focus refresh.
+      // (#2148)
+      deps.onBackendInvalidate?.()
     } catch {
       /* best-effort; leave previous state */
     }
@@ -298,6 +302,9 @@ export function createTray(deps: TrayDeps): Tray {
       /* best-effort; refreshTun below re-syncs with reality */
     }
     rebuild()
+    // The toggle mutated control-owned state — tell the open panel to re-read it
+    // so its checkbox converges. (#2148)
+    deps.onBackendInvalidate?.()
   }
 
   const rebuild = () => {
@@ -450,6 +457,18 @@ export function createTray(deps: TrayDeps): Tray {
   rebuild()
   // Keep the status line + enablement fresh as the kernel starts/stops/crashes.
   deps.onKernelState?.(rebuild)
+  // The menu otherwise only rebuilds on a tray click / kernel event, so a mode,
+  // group, system-proxy or TUN change made in the panel (or by an external
+  // Clash client) would never reach the cached tray state. Re-run the live
+  // probes on a light cadence — each is a no-op unless the state actually
+  // changed, so the menu converges without flicker. (#2148)
+  setInterval(() => {
+    refreshMode()
+    refreshSysProxy()
+    refreshTun()
+    refreshProfiles()
+    refreshGroups()
+  }, 5000)
   tray.on('click', () => deps.showWindow())
   return tray
 }

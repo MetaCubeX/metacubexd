@@ -82,6 +82,26 @@ describe('composables/useProfiles', () => {
     expect(p.profiles.value.map((m) => m.id)).toEqual(['a', 'b'])
   })
 
+  it('refresh() seeds activeBaseId from the agent `active` flag (#2148)', async () => {
+    api.listProfiles.mockResolvedValue([
+      { ...meta('a'), active: false },
+      { ...meta('b'), active: true },
+    ])
+    const p = useProfiles()
+    await p.refresh()
+    expect(p.activeBaseId.value).toBe('b')
+  })
+
+  it('refresh() ignores merge/script profiles when seeding activeBaseId', async () => {
+    api.listProfiles.mockResolvedValue([
+      { ...mergeMeta('m'), active: true },
+      { ...meta('a'), active: false },
+    ])
+    const p = useProfiles()
+    await p.refresh()
+    expect(p.activeBaseId.value).toBeUndefined()
+  })
+
   it('create() then re-lists', async () => {
     api.createProfile.mockResolvedValue(meta('c'))
     const p = useProfiles()

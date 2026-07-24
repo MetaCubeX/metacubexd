@@ -43,6 +43,10 @@ export interface ProfileMeta {
   editorStatus?: 'clean' | 'conflicted'
   updatedAt: number
   subscriptionInfo?: ProfileSubscriptionInfo
+  // Derived (not stored): true on the base profile the agent recorded as the
+  // active one in state.json. Lets the profiles page persistently mark the
+  // active card instead of losing the badge on reload (#2148).
+  active?: boolean
 }
 
 // GET /api/control/info

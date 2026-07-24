@@ -42,14 +42,29 @@ export function useProfiles() {
   )
 
   // The last activated non-merge base — needed to re-compose the active config
-  // after a merge overlay is toggled or edited. Undefined until the user
-  // activates a base this session (the agent does not expose the active id).
+  // after a merge overlay is toggled or edited. Seeded from the agent's recorded
+  // active id (GET /profiles carries an `active` flag on the active base) so the
+  // badge survives a reload instead of resetting to "none active" each session
+  // (#2148).
   const activeBaseId = ref<string | undefined>(undefined)
 
   const refresh = async () => {
     loading.value = true
     try {
       profiles.value = await api.listProfiles()
+      // Sync the active marker from the source of truth so activation done
+      // outside this page (tray, AIO scheduler, a prior session) is reflected.
+      const active = profiles.value.find(
+        (p) => p.active && p.type !== 'merge' && p.type !== 'script',
+      )
+      if (active) {
+        activeBaseId.value = active.id
+      } else if (profiles.value.some((p) => p.active === false)) {
+        // The backend explicitly reports no active base (entries carry the
+        // `active` flag, none true) — clear the marker. Skip when the flag is
+        // absent entirely (older backends) so a known-active id is preserved.
+        activeBaseId.value = undefined
+      }
     } finally {
       loading.value = false
     }
