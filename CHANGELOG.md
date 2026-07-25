@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.270.4](https://github.com/MetaCubeX/metacubexd/compare/v1.270.3...v1.270.4) (2026-07-25)
+
+
+### Bug Fixes
+
+* document DEFAULT_BACKEND_URL and seed script profile template ([#2155](https://github.com/MetaCubeX/metacubexd/issues/2155)) ([d552032](https://github.com/MetaCubeX/metacubexd/commit/d552032d7cf13c5e2352c27a7f0a5dd61a0c82a0))
+
 ## [1.270.3](https://github.com/MetaCubeX/metacubexd/compare/v1.270.2...v1.270.3) (2026-07-25)
 
 
