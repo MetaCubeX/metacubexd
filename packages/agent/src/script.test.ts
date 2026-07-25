@@ -75,4 +75,28 @@ describe('createScriptRunner — default worker runner', () => {
     const code = `export default 123`
     await expect(runner.run(code, {})).rejects.toThrow('function')
   })
+
+  it('runs the dashboard-provided default script template unchanged (#2155)', async () => {
+    // Mirrors DEFAULT_SCRIPT_CONTENT in packages/ui/constants/index.ts. New
+    // script profiles ship with this so users don't start from an empty file
+    // and discover the (config) => config contract by trial and error.
+    const runner = createScriptRunner()
+    const code = `// Script profile: transform the parsed mihomo config and return the result.
+// The export MUST be a function (config) => config — a "main()" function
+// (Clash Verge / FlClash style) will NOT work here. Return the config
+// unchanged to start; mutate or replace it as needed.
+//
+// Example: force the routing mode to "rule".
+//   export default (config) => {
+//     config.mode = 'rule'
+//     return config
+//   }
+export default (config) => {
+  return config
+}
+`
+    const input = { mode: 'global', 'mixed-port': 7890 }
+    const out = (await runner.run(code, input)) as Record<string, unknown>
+    expect(out).toEqual(input)
+  })
 })

@@ -116,6 +116,22 @@ docker run -d --name metacubexd -p 127.0.0.1:8080:80 \
   ghcr.io/metacubex/metacubexd:latest
 ```
 
+##### Pre-fill the backend address
+
+Set `DEFAULT_BACKEND_URL` to pre-populate the connect form (and skip the
+"no backend detected" prompt on first load). The container's entrypoint maps it
+to the Nuxt runtime config, so it ships in every served HTML response without
+rebuilding the image:
+
+```shell
+docker run -d --name metacubexd -p 127.0.0.1:8080:80 \
+  -e DEFAULT_BACKEND_URL=http://192.168.1.10:9090 \
+  ghcr.io/metacubex/metacubexd:latest
+```
+
+The URL is only a default — users can still edit it on the connect screen, and
+saved endpoints take precedence on later visits.
+
 For a safe starting point for the separately managed kernel, see the
 [minimal Mihomo configuration example](./docs/config.yaml). Review its network
 settings before making the controller available outside the local machine.

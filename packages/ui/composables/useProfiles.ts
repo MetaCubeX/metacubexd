@@ -8,6 +8,7 @@ import type {
 import { useQueryClient } from '@tanstack/vue-query'
 import { toast } from 'vue-sonner'
 import { queryKeys } from '~/composables/useQueries'
+import { DEFAULT_SCRIPT_CONTENT } from '~/constants'
 import { controlErrorMessage } from '~/utils/controlError'
 import { useControlApi } from './useControlApi'
 
@@ -83,8 +84,12 @@ export function useProfiles() {
     await create({ name, type: 'merge' })
   }
   // Mint a new script transform (JS run after merges during composition).
+  // Seed it with a working identity transform so the contract is obvious:
+  // unlike Clash Verge / FlClash (which expose `main()`), mihomo's script
+  // profile must export a function (config) => config — without this, a newly
+  // created script is an empty file that errors on first compose (#2155).
   const createScript = async (name: string) => {
-    await create({ name, type: 'script' })
+    await create({ name, type: 'script', content: DEFAULT_SCRIPT_CONTENT })
   }
   const duplicate = async (id: string, name?: string) => {
     await api.duplicateProfile(id, name)

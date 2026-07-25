@@ -286,13 +286,16 @@ describe('composables/useProfiles', () => {
   })
 
   describe('script profiles', () => {
-    it('createScript() POSTs { name, type: "script" } then re-lists', async () => {
+    it('createScript() POSTs { name, type: "script", content } with a working template then re-lists', async () => {
       api.createProfile.mockResolvedValue(scriptMeta('s'))
       const p = useProfiles()
       await p.createScript('transform')
+      // Seed a working function export so the contract is obvious — Clash
+      // Verge / FlClash's main() style errors here (#2155).
       expect(api.createProfile).toHaveBeenCalledWith({
         name: 'transform',
         type: 'script',
+        content: expect.stringContaining('export default (config)'),
       })
       expect(api.listProfiles).toHaveBeenCalled()
     })

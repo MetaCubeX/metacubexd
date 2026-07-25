@@ -35,6 +35,26 @@ export const themes = [
 
 export const FALLBACK_BACKEND_URL = 'http://127.0.0.1:9090'
 
+// Seed content for a newly-created script profile. mihomo's script runner expects
+// a function exported as `export default (config) => config` (or
+// `module.exports = (config) => config`), NOT a `main()` function like Clash
+// Verge / FlClash. Shipping a working identity transform gives users a runnable
+// starting point and documents the contract at the same time (#2155).
+export const DEFAULT_SCRIPT_CONTENT = `// Script profile: transform the parsed mihomo config and return the result.
+// The export MUST be a function (config) => config — a "main()" function
+// (Clash Verge / FlClash style) will NOT work here. Return the config
+// unchanged to start; mutate or replace it as needed.
+//
+// Example: force the routing mode to "rule".
+//   export default (config) => {
+//     config.mode = 'rule'
+//     return config
+//   }
+export default (config) => {
+  return config
+}
+`
+
 export enum ROUTES {
   Overview = '/overview',
   Proxies = '/proxies',
