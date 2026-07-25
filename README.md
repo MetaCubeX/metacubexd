@@ -554,11 +554,11 @@ package tests, local packaging guidance, and required desktop smoke tests.
 
 ## ⭐ Star History
 
-<a href="https://star-history.com/#metacubex/metacubexd&Date">
+<a href="https://www.star-history.com/?type=date&repos=metacubex%2Fmetacubexd">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=metacubex/metacubexd&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=metacubex/metacubexd&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=metacubex/metacubexd&type=Date" width="600" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=metacubex/metacubexd&type=date&theme=dark&legend=top-left&sealed_token=y8ymtTGGXU4kD4y73ntZnKB8Fql7wwZCjWtL_wonCFSqCy0Vq4p1xCX98szzdGzsbJL7sLhjB7tPTr8BlQ-Hkvk6sgnhkrtWmjlUiizNkJfRo8SlflehNw" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=metacubex/metacubexd&type=date&legend=top-left&sealed_token=y8ymtTGGXU4kD4y73ntZnKB8Fql7wwZCjWtL_wonCFSqCy0Vq4p1xCX98szzdGzsbJL7sLhjB7tPTr8BlQ-Hkvk6sgnhkrtWmjlUiizNkJfRo8SlflehNw" />
+    <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=metacubex/metacubexd&type=date&legend=top-left&sealed_token=y8ymtTGGXU4kD4y73ntZnKB8Fql7wwZCjWtL_wonCFSqCy0Vq4p1xCX98szzdGzsbJL7sLhjB7tPTr8BlQ-Hkvk6sgnhkrtWmjlUiizNkJfRo8SlflehNw" />
   </picture>
 </a>
 
