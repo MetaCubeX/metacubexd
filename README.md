@@ -1,12 +1,44 @@
+<div align="center">
+
 # metacubexd
 
 **Mihomo Dashboard, The Official One, XD**
 
+A modern, beautiful, and fully-featured web dashboard for [Mihomo](https://github.com/MetaCubeX/mihomo) (Clash Meta).
+
+[![stars](https://img.shields.io/github/stars/metacubex/metacubexd?style=for-the-badge&color=orange)](https://github.com/metacubex/metacubexd/stargazers)
+[![downloads](https://img.shields.io/github/downloads/metacubex/metacubexd/total?style=for-the-badge)](https://github.com/metacubex/metacubexd/releases)
+[![build](https://img.shields.io/github/actions/workflow/status/metacubex/metacubexd/release.yml?style=for-the-badge)](https://github.com/metacubex/metacubexd/actions)
+[![license](https://img.shields.io/github/license/metacubex/metacubexd?style=for-the-badge)](./LICENSE)
 [![pr-closed](https://img.shields.io/github/issues-pr-closed/metacubex/metacubexd?style=for-the-badge)](https://github.com/metacubex/metacubexd/pulls)
 [![last-commit](https://img.shields.io/github/last-commit/metacubex/metacubexd?style=for-the-badge)](https://github.com/metacubex/metacubexd/commits)
-[![build](https://img.shields.io/github/actions/workflow/status/metacubex/metacubexd/release.yml?style=for-the-badge)](https://github.com/metacubex/metacubexd/actions)
-[![downloads](https://img.shields.io/github/downloads/metacubex/metacubexd/total?style=for-the-badge)](https://github.com/metacubex/metacubexd/releases)
-[![license](https://img.shields.io/github/license/metacubex/metacubexd?style=for-the-badge)](./LICENSE)
+
+**[Live Demo](https://d.metacubex.one)** · **[Download Desktop App](https://github.com/metacubex/metacubexd/releases/latest)** · **[Docker Quick Start](#3-all-in-one-server-docker)**
+
+</div>
+
+---
+
+## ⚡ Quick Start
+
+**Just want to try it?** Open **https://d.metacubex.one** and enter your mihomo address + secret.
+
+**Self-host with Docker in 30 seconds:**
+
+```shell
+docker run -d --name metacubexd -p 8080:80 ghcr.io/metacubex/metacubexd:latest
+# Open http://localhost:8080
+```
+
+**Full all-in-one (UI + kernel + agent):**
+
+```shell
+curl -O https://raw.githubusercontent.com/metacubex/metacubexd/main/docs/docker-compose.yml
+# Edit .env with your secrets, then:
+docker compose up -d
+```
+
+---
 
 ## ✨ Features
 
@@ -18,6 +50,8 @@
 - 🎨 32 selectable themes with user color overrides
 - 📱 Fully responsive design for mobile devices
 - 🌐 Seven languages: English, 简体中文, Русский, 日本語, 한국어, Français, فارسی
+- 🖥️ Cross-platform desktop app with bundled kernel
+- 🐳 All-in-one Docker server with built-in agent
 
 ## 🖼️ Preview
 
@@ -517,6 +551,24 @@ package tests, local packaging guidance, and required desktop smoke tests.
 - [Agent manual smoke tests](./packages/agent/MANUAL.md)
 - [All-in-one server Compose example](./docs/docker-compose.yml)
 - [Example mihomo configuration](./docs/config.yaml)
+
+## ⭐ Star History
+
+<a href="https://star-history.com/#metacubex/metacubexd&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=metacubex/metacubexd&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=metacubex/metacubexd&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=metacubex/metacubexd&type=Date" width="600" />
+  </picture>
+</a>
+
+## 👥 Contributors
+
+Thanks to all the people who contribute to metacubexd!
+
+<a href="https://github.com/metacubex/metacubexd/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=metacubex/metacubexd" alt="Contributors" />
+</a>
 
 ## 📄 License
 

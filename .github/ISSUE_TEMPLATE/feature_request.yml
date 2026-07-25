@@ -1,0 +1,69 @@
+name: Feature Request
+description: Suggest a new feature or enhancement
+title: '[Feature] '
+labels: ['enhancement']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement! Please describe the feature clearly.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Feature Area
+      description: Which part of metacubexd does this relate to?
+      options:
+        - Dashboard UI (general)
+        - Proxy management
+        - Connection tracking
+        - Rules / DNS
+        - Config editor / Profiles
+        - Desktop app
+        - Docker server
+        - i18n / Localization
+        - Theming / Appearance
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What problem does this feature solve? Is this related to a frustration?
+      placeholder: I'm always frustrated when...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like to see.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Any alternative solutions or features you've considered.
+
+  - type: textarea
+    id: mockups
+    attributes:
+      label: Mockups / References
+      description: |
+        Attach mockups, screenshots of other tools, or links for reference.
+        **Do NOT include tokens, subscription URLs, or credentials.**
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have searched existing issues and this feature has not been requested before.
+          required: true
+        - label: I am willing to help implement this feature.
+          required: false

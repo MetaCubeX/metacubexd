@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question / Discussion
+    url: https://github.com/MetaCubeX/metacubexd/discussions
+    about: Ask questions, share tips, or start a general discussion.
+  - name: Mihomo Documentation
+    url: https://wiki.metacubex.one
+    about: Check the Mihomo wiki for kernel configuration help.
+  - name: Security Vulnerability
+    url: https://github.com/MetaCubeX/metacubexd/security/advisories/new
+    about: Report security issues privately — never in a public issue.
