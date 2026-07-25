@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.270.5](https://github.com/MetaCubeX/metacubexd/compare/v1.270.4...v1.270.5) (2026-07-25)
+
+
+### Bug Fixes
+
+* **server:** honor DEFAULT_BACKEND_URL in the all-in-one image ([#2155](https://github.com/MetaCubeX/metacubexd/issues/2155)) ([08947ed](https://github.com/MetaCubeX/metacubexd/commit/08947ed9c1c4448d223b5cf1baa576138ec8b0f8))
+
 ## [1.270.4](https://github.com/MetaCubeX/metacubexd/compare/v1.270.3...v1.270.4) (2026-07-25)
 
 
