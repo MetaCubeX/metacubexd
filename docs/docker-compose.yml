@@ -16,6 +16,8 @@ services:
       CONTROL_TOKEN: '${CONTROL_TOKEN:?Set CONTROL_TOKEN in .env}'
       CLASH_SECRET: '${CLASH_SECRET:?Set CLASH_SECRET in .env}'
       GITHUB_TOKEN: '${GITHUB_TOKEN:-}'
+      # Optional: pre-fill the connect form's backend address (#2155).
+      DEFAULT_BACKEND_URL: '${DEFAULT_BACKEND_URL:-}'
       CONTROL_PORT: '8080'
       CLASH_API_PORT: '9090'
       MIXED_PORT: '7890'

@@ -272,6 +272,8 @@ services:
       CONTROL_TOKEN: 'change-me-control'
       CLASH_SECRET: 'change-me-clash'
       GITHUB_TOKEN: '' # optional read-only token for Releases API checks
+      # optional: pre-fill the connect form's backend address
+      # DEFAULT_BACKEND_URL: 'http://<host>:9090'
       CONTROL_PORT: '8080'
       CLASH_API_PORT: '9090'
       MIXED_PORT: '7890'
@@ -325,17 +327,18 @@ configuration.
 
 #### Environment variables
 
-| Variable         | Default                  | Purpose                                                                                                                              |
-| :--------------- | :----------------------- | :----------------------------------------------------------------------------------------------------------------------------------- |
-| `CONTROL_TOKEN`  | **required for control** | Bearer token for `/api/control/**`; also accepted as `?token=` for SSE. Without it, protected control routes fail closed with `503`. |
-| `CLASH_SECRET`   | _(none)_                 | Secret for mihomo's Clash API (`external-controller`). Set one and use it as the UI endpoint's **Secret**.                           |
-| `GITHUB_TOKEN`   | _(none)_                 | Optional read-only token for authenticated GitHub Releases checks. Omit it to keep anonymous requests.                               |
-| `CONTROL_PORT`   | `8080`                   | Port serving the dashboard UI + control agent API.                                                                                   |
-| `CLASH_API_PORT` | `9090`                   | Port for mihomo's Clash API + WebSocket. The UI endpoint targets this port.                                                          |
-| `MIXED_PORT`     | `7890`                   | mihomo mixed (HTTP + SOCKS) proxy port.                                                                                              |
-| `DATA_DIR`       | `/data`                  | Writable profiles, active configuration, geo data, and runtime caches.                                                               |
-| `MIHOMO_BIN`     | `/usr/local/bin/mihomo`  | Absolute path to the mihomo executable used by the server.                                                                           |
-| `TZ`             | _(container default)_    | Timezone for logs/scheduling, e.g. `Asia/Shanghai`.                                                                                  |
+| Variable              | Default                  | Purpose                                                                                                                              |
+| :-------------------- | :----------------------- | :----------------------------------------------------------------------------------------------------------------------------------- |
+| `CONTROL_TOKEN`       | **required for control** | Bearer token for `/api/control/**`; also accepted as `?token=` for SSE. Without it, protected control routes fail closed with `503`. |
+| `CLASH_SECRET`        | _(none)_                 | Secret for mihomo's Clash API (`external-controller`). Set one and use it as the UI endpoint's **Secret**.                           |
+| `GITHUB_TOKEN`        | _(none)_                 | Optional read-only token for authenticated GitHub Releases checks. Omit it to keep anonymous requests.                               |
+| `DEFAULT_BACKEND_URL` | _(none)_                 | Optional URL that pre-fills the connect form's backend address, e.g. `http://<host>:9090`. Saved endpoints still take precedence.    |
+| `CONTROL_PORT`        | `8080`                   | Port serving the dashboard UI + control agent API.                                                                                   |
+| `CLASH_API_PORT`      | `9090`                   | Port for mihomo's Clash API + WebSocket. The UI endpoint targets this port.                                                          |
+| `MIXED_PORT`          | `7890`                   | mihomo mixed (HTTP + SOCKS) proxy port.                                                                                              |
+| `DATA_DIR`            | `/data`                  | Writable profiles, active configuration, geo data, and runtime caches.                                                               |
+| `MIHOMO_BIN`          | `/usr/local/bin/mihomo`  | Absolute path to the mihomo executable used by the server.                                                                           |
+| `TZ`                  | _(container default)_    | Timezone for logs/scheduling, e.g. `Asia/Shanghai`.                                                                                  |
 
 The named volume mounts `/data`, which holds your profiles, the active config,
 and the kernel's geo / fake-ip caches. It **must be writable** — a read-only

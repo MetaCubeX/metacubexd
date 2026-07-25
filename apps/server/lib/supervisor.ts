@@ -11,6 +11,7 @@ export interface ServerEnv {
   controlToken: string
   clashSecret: string
   githubToken: string
+  defaultBackendURL: string
 }
 
 function int(value: string | undefined, fallback: number): number {
@@ -29,6 +30,7 @@ export function serverEnv(): ServerEnv {
     controlToken: process.env.CONTROL_TOKEN ?? '',
     clashSecret: process.env.CLASH_SECRET ?? '',
     githubToken: process.env.GITHUB_TOKEN ?? '',
+    defaultBackendURL: process.env.DEFAULT_BACKEND_URL ?? '',
   }
 }
 

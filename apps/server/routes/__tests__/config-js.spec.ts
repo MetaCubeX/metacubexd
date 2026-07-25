@@ -21,11 +21,15 @@ async function start() {
 describe('apps/server routes/config.js -> control token injection (#2074)', () => {
   const original = process.env.CONTROL_TOKEN
   const originalGithubToken = process.env.GITHUB_TOKEN
+  const originalDefaultBackendURL = process.env.DEFAULT_BACKEND_URL
   afterEach(() => {
     if (original === undefined) delete process.env.CONTROL_TOKEN
     else process.env.CONTROL_TOKEN = original
     if (originalGithubToken === undefined) delete process.env.GITHUB_TOKEN
     else process.env.GITHUB_TOKEN = originalGithubToken
+    if (originalDefaultBackendURL === undefined)
+      delete process.env.DEFAULT_BACKEND_URL
+    else process.env.DEFAULT_BACKEND_URL = originalDefaultBackendURL
   })
 
   it('injects CONTROL_TOKEN into window.__METACUBEXD_CONFIG__ as no-store JS', async () => {
@@ -73,6 +77,28 @@ describe('apps/server routes/config.js -> control token injection (#2074)', () =
     try {
       const body = await (await fetch(`${base}/config.js`)).text()
       expect(body).not.toContain('githubToken')
+    } finally {
+      await new Promise<void>((r) => server.close(() => r()))
+    }
+  })
+
+  it('injects DEFAULT_BACKEND_URL as the connect-form default (#2155)', async () => {
+    process.env.DEFAULT_BACKEND_URL = 'http://192.168.1.10:9090'
+    const { server, base } = await start()
+    try {
+      const body = await (await fetch(`${base}/config.js`)).text()
+      expect(body).toContain('"defaultBackendURL":"http://192.168.1.10:9090"')
+    } finally {
+      await new Promise<void>((r) => server.close(() => r()))
+    }
+  })
+
+  it('defaults defaultBackendURL to empty when DEFAULT_BACKEND_URL is unset', async () => {
+    delete process.env.DEFAULT_BACKEND_URL
+    const { server, base } = await start()
+    try {
+      const body = await (await fetch(`${base}/config.js`)).text()
+      expect(body).toContain('"defaultBackendURL":""')
     } finally {
       await new Promise<void>((r) => server.close(() => r()))
     }

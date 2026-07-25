@@ -11,9 +11,12 @@ import { serverEnv } from '../lib/supervisor'
 // unlocks without the user hand-entering anything (#2074). GITHUB_TOKEN is also
 // injected when configured so Releases requests can use authenticated limits
 // (#2135); operators must therefore treat dashboard access as token access.
+// DEFAULT_BACKEND_URL pre-fills the connect form (#2155) — unlike the panel
+// container's NUXT_PUBLIC_* mapping, the UI here is statically generated, so
+// this dynamic route is the only runtime channel that can carry the value.
 export default defineEventHandler((event) => {
-  const { controlToken, githubToken } = serverEnv()
-  const config: Record<string, unknown> = { defaultBackendURL: '' }
+  const { controlToken, githubToken, defaultBackendURL } = serverEnv()
+  const config: Record<string, unknown> = { defaultBackendURL }
   if (controlToken) config.controlToken = controlToken
   if (githubToken) config.githubToken = githubToken
   setHeader(event, 'content-type', 'text/javascript; charset=utf-8')
