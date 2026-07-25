@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.270.3](https://github.com/MetaCubeX/metacubexd/compare/v1.270.2...v1.270.3) (2026-07-25)
+
+
+### Bug Fixes
+
+* **agent:** wire script runner into profile store so script profiles apply ([7dc525f](https://github.com/MetaCubeX/metacubexd/commit/7dc525f149f5478ef9ac38f24f377a938edadfbd)), closes [#2153](https://github.com/MetaCubeX/metacubexd/issues/2153)
+* **deps:** revert typescript to ^6.0.3 to restore eslint/vue-tsc toolchain ([6c4a756](https://github.com/MetaCubeX/metacubexd/commit/6c4a756435ced256db4dcb06d1b1d333d1e27676))
+
 ## [1.270.2](https://github.com/MetaCubeX/metacubexd/compare/v1.270.1...v1.270.2) (2026-07-24)
 
 
