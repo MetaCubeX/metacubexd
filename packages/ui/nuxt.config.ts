@@ -206,7 +206,7 @@ export default defineNuxtConfig({
         // and log "Manifest: Line 1, column 1, Syntax error" in the console.
         ...(isDev || pwaDisabled
           ? []
-          : [{ rel: 'manifest', href: 'manifest.webmanifest' }]),
+          : [{ rel: 'manifest' as const, href: 'manifest.webmanifest' }]),
       ],
       script: [
         {
