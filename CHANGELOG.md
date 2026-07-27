@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.270.6](https://github.com/MetaCubeX/metacubexd/compare/v1.270.5...v1.270.6) (2026-07-27)
+
+
+### Bug Fixes
+
+* **ui:** restore mobile config access and stop proxy popover from following scroll ([ebc664f](https://github.com/MetaCubeX/metacubexd/commit/ebc664ffd93d33ebd7c0b7586f2225ddc5909623))
+
 ## [1.270.5](https://github.com/MetaCubeX/metacubexd/compare/v1.270.4...v1.270.5) (2026-07-25)
 
 
