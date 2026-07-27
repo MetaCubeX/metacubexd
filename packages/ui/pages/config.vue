@@ -256,11 +256,11 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
 </script>
 
 <template>
-  <!-- p-1: overflow-y-auto forces overflow-x to compute to auto, which clips
-       the config-card box-shadow ring on the left/right edges; padding on all
-       sides also gives the first/last card's top/bottom ring room (gap-4 only
-       spaces the inner edges). -->
   <div class="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-1">
+    <!-- p-1: overflow-y-auto forces overflow-x to compute to auto, which clips
+         the config-card box-shadow ring on the left/right edges; padding on all
+         sides also gives the first/last card's top/bottom ring room (gap-4 only
+         spaces the inner edges). -->
     <!-- Loading State -->
     <div
       v-if="isLoading && !isError"
@@ -300,11 +300,11 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
           </p>
         </div>
         <div class="flex gap-2">
-          <button class="btn btn-sm btn-primary" @click="$router.go(0)">
+          <button class="btn btn-primary btn-sm" @click="$router.go(0)">
             {{ t('retry') }}
           </button>
           <button
-            class="btn btn-outline btn-sm btn-info"
+            class="btn btn-outline btn-info btn-sm"
             @click="switchEndpoint"
           >
             {{ t('switchEndpoint') }}
@@ -336,42 +336,73 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
               />
             </svg>
           </div>
-          <div>
+          <div class="min-w-0">
             <h1 class="text-xl font-bold tracking-tight">{{ t('config') }}</h1>
-            <p class="text-xs opacity-60">
-              {{ endpointStore.currentEndpoint?.url }}
-            </p>
+            <button
+              class="flex max-w-full items-center gap-1 text-xs opacity-60 transition-colors hover:opacity-100"
+              :title="t('switchEndpoint')"
+              @click="switchEndpoint"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="size-3 shrink-0"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5" />
+              </svg>
+              <span class="truncate">{{
+                endpointStore.currentEndpoint?.url
+              }}</span>
+            </button>
           </div>
         </div>
         <Versions
+          horizontal
           :frontend-version="frontendVersion"
           :backend-version="backendVersion || ''"
         />
       </div>
 
       <!-- Mobile Section Tabs -->
-      <div class="flex gap-1 rounded-lg bg-base-200 p-1 sm:hidden">
+      <div
+        class="flex gap-1 rounded-lg border border-base-content/10 bg-base-200 p-1 sm:hidden"
+      >
         <button
-          class="tab"
-          :class="{ 'tab-active': activeSection === 'core' }"
+          class="press-tactile flex min-w-0 flex-1 cursor-pointer items-center justify-center rounded-md border-none bg-transparent px-1.5 py-1.5 text-xs font-medium text-base-content/70 transition-colors duration-200 hover:text-base-content"
+          :class="
+            activeSection === 'core'
+              ? 'bg-primary/15 text-primary hover:text-primary'
+              : ''
+          "
           @click="activeSection = 'core'"
         >
-          {{ t('coreConfig') }}
+          <span class="truncate">{{ t('coreConfig') }}</span>
         </button>
         <button
-          class="tab"
-          :class="{ 'tab-active': activeSection === 'xd' }"
+          class="press-tactile flex min-w-0 flex-1 cursor-pointer items-center justify-center rounded-md border-none bg-transparent px-1.5 py-1.5 text-xs font-medium text-base-content/70 transition-colors duration-200 hover:text-base-content"
+          :class="
+            activeSection === 'xd'
+              ? 'bg-primary/15 text-primary hover:text-primary'
+              : ''
+          "
           @click="activeSection = 'xd'"
         >
-          {{ t('xdConfig') }}
+          <span class="truncate">{{ t('xdConfig') }}</span>
         </button>
         <button
           v-if="!isSingBox"
-          class="tab"
-          :class="{ 'tab-active': activeSection === 'tools' }"
+          class="press-tactile flex min-w-0 flex-1 cursor-pointer items-center justify-center rounded-md border-none bg-transparent px-1.5 py-1.5 text-xs font-medium text-base-content/70 transition-colors duration-200 hover:text-base-content"
+          :class="
+            activeSection === 'tools'
+              ? 'bg-primary/15 text-primary hover:text-primary'
+              : ''
+          "
           @click="activeSection = 'tools'"
         >
-          {{ t('dnsQuery') }}
+          <span class="truncate">{{ t('dnsQuery') }}</span>
         </button>
       </div>
 
@@ -517,7 +548,7 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                   id="interface-name"
                   v-model="generalConfig.form.interfaceName"
                   type="text"
-                  class="input-bordered input input-sm w-32"
+                  class="input-bordered input w-32 input-sm"
                   @change="
                     generalConfig.save(
                       'interface-name',
@@ -613,7 +644,7 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
 
                   <Button
                     v-if="tunConfig.showRecoverButton.value"
-                    class="btn-outline btn-sm btn-error"
+                    class="btn-outline btn-error btn-sm"
                     :loading="tunConfig.busy.value"
                     @click="onRecoverNetwork"
                   >
@@ -635,7 +666,7 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
 
                   <Button
                     v-if="tunConfig.showUninstallButton.value"
-                    class="self-start text-error btn-ghost btn-xs"
+                    class="self-start btn-ghost text-error btn-xs"
                     :loading="tunConfig.busy.value"
                     @click="onUninstallHelper"
                   >
@@ -694,7 +725,7 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                     id="device-name"
                     v-model="tunForm.tunDevice"
                     type="text"
-                    class="input-bordered input input-sm w-32"
+                    class="input-bordered input w-32 input-sm"
                     @change="saveTun({ device: tunForm.tunDevice })"
                   />
                 </div>
@@ -716,7 +747,7 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                       :id="port.key"
                       v-model.number="generalConfig.form[port.key]"
                       type="number"
-                      class="input-bordered input input-sm w-full font-mono"
+                      class="input-bordered input w-full font-mono input-sm"
                       :placeholder="t('port', { name: port.label })"
                       @change="
                         generalConfig.save(
@@ -946,13 +977,13 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                   @change="onUploadBackground"
                 />
                 <Button
-                  class="flex-1 btn-outline btn-sm btn-primary"
+                  class="flex-1 btn-outline btn-primary btn-sm"
                   @click="backgroundFileInput?.click()"
                 >
                   {{ t('uploadImage') }}
                 </Button>
                 <Button
-                  class="btn-outline btn-sm btn-error"
+                  class="btn-outline btn-error btn-sm"
                   @click="onClearBackground"
                 >
                   {{ t('clearAll') }}
@@ -1183,7 +1214,7 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                   type="number"
                   min="1"
                   max="60"
-                  class="input-bordered input input-sm w-20 text-center"
+                  class="input-bordered input w-20 text-center input-sm"
                 />
               </div>
 
@@ -1553,7 +1584,7 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
                     id="dns-fake-ip-range"
                     v-model="dnsSettings.form.fakeIpRange"
                     type="text"
-                    class="input-bordered input input-sm w-full font-mono"
+                    class="input-bordered input w-full font-mono input-sm"
                     placeholder="198.18.0.1/16"
                   />
                 </fieldset>

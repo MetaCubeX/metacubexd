@@ -22,12 +22,16 @@ interface Props {
   frontendVersion?: string
   backendVersion?: string
   collapsed?: boolean
+  // Side-by-side badges on mobile, stacked from sm up — for page headers like
+  // /config where the default one-per-row grid renders as two full-width slabs.
+  horizontal?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   frontendVersion: '',
   backendVersion: '',
   collapsed: false,
+  horizontal: false,
 })
 
 // Get versions from runtime config and queries if not provided
@@ -314,7 +318,11 @@ watch(
 </script>
 
 <template>
-  <div v-if="!collapsed" class="mx-2 grid grid-cols-1 gap-2 pt-1 md:mx-0">
+  <div
+    v-if="!collapsed"
+    class="mx-2 grid grid-cols-1 gap-2 pt-1 md:mx-0"
+    :class="horizontal ? 'grid-cols-2 sm:grid-cols-1' : ''"
+  >
     <!-- Frontend Version -->
     <button
       ref="frontendReference"

@@ -94,6 +94,12 @@ const {
 const reference = ref<HTMLElement | null>(null)
 const isTooltipOpen = ref(false)
 
+// Touch-primary devices: the floating popover is `strategy: fixed` and
+// re-anchors on scroll, so it rides along with the list and covers the node
+// cards — leaving no way to tap another node (#popover-follows-scroll). Skip
+// the popover entirely on mobile; taps just select the node.
+const isTouchDevice = useMediaQuery('(pointer: coarse)')
+
 let openTimeout: ReturnType<typeof setTimeout> | null = null
 let closeTimeout: ReturnType<typeof setTimeout> | null = null
 
@@ -109,6 +115,7 @@ function clearTimeouts() {
 }
 
 function openTooltip() {
+  if (isTouchDevice.value) return
   acquireSingletonPopover(closeTooltip)
   isTooltipOpen.value = true
   document.addEventListener('click', onDocumentClick, true)
