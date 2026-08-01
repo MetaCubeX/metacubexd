@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type {MobileNavReselectDetail} from '~/constants';
 import {
   IconChartAreaLine,
   IconFileStack,
@@ -11,6 +12,11 @@ import {
   IconSettings,
   IconX,
 } from '@tabler/icons-vue'
+import {
+  MOBILE_NAV_RESELECT_EVENT,
+  
+  ROUTES
+} from '~/constants'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -48,6 +54,17 @@ const secondaryItems = computed(() => {
 })
 
 const isActive = (href: string) => route.path === href
+
+function onPrimaryNavClick(href: string, event: MouseEvent) {
+  if (href !== ROUTES.Proxies || !isActive(href)) return
+
+  event.preventDefault()
+  window.dispatchEvent(
+    new CustomEvent<MobileNavReselectDetail>(MOBILE_NAV_RESELECT_EVENT, {
+      detail: { path: href },
+    }),
+  )
+}
 
 // FAB popup state
 const popupOpen = ref(false)
@@ -153,6 +170,7 @@ onMounted(() => {
               ? 'text-primary'
               : 'text-base-content/60 hover:text-base-content'
           "
+          @click="onPrimaryNavClick(nav.href, $event)"
         >
           <!-- Active background glow -->
           <div
@@ -235,6 +253,7 @@ onMounted(() => {
               ? 'text-primary'
               : 'text-base-content/60 hover:text-base-content'
           "
+          @click="onPrimaryNavClick(nav.href, $event)"
         >
           <!-- Active background glow -->
           <div

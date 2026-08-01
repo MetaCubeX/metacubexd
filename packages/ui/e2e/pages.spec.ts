@@ -271,6 +271,109 @@ describe('e2E Page Tests', () => {
         currentPage.getByRole('button', { name: 'Test All' }).isVisible(),
       ).resolves.toBe(true)
     })
+
+    it('should scroll the active proxy tab to top on mobile', async () => {
+      const currentPage = getPage(page)
+      await currentPage.setViewportSize({ width: 390, height: 844 })
+
+      try {
+        await gotoAppPath(currentPage, '/proxies')
+
+        const proxyScrollContainer = currentPage.getByTestId(
+          'proxies-scroll-container',
+        )
+        await currentPage.getByTitle('Expand All').click()
+        await expect
+          .poll(
+            () =>
+              proxyScrollContainer.evaluate(
+                (el) => el.scrollHeight - el.clientHeight,
+              ),
+            { timeout: ELEMENT_TIMEOUT },
+          )
+          .toBeGreaterThan(360)
+
+        await expect(
+          currentPage.getByTestId('scroll-to-top').count(),
+        ).resolves.toBe(0)
+        await proxyScrollContainer.evaluate((el) => {
+          el.scrollTop = 360
+          el.dispatchEvent(new Event('scroll'))
+        })
+
+        const scrollToTopButton = currentPage.getByTestId('scroll-to-top')
+        await expect
+          .poll(() => scrollToTopButton.isVisible(), {
+            timeout: ELEMENT_TIMEOUT,
+          })
+          .toBe(true)
+
+        // Reduced-motion users should jump immediately instead of animating.
+        await currentPage.emulateMedia({ reducedMotion: 'reduce' })
+        await scrollToTopButton.click()
+        await expect(
+          proxyScrollContainer.evaluate((el) => el.scrollTop),
+        ).resolves.toBe(0)
+        await currentPage.emulateMedia({ reducedMotion: 'no-preference' })
+
+        // The providers tab owns a separate scroll container. Re-selecting the
+        // active Proxies item in the mobile nav should scroll that container.
+        await currentPage
+          .locator('button')
+          .filter({ hasText: 'Proxy Providers' })
+          .click()
+        await currentPage.getByText('Provider A', { exact: true }).click()
+        await currentPage.getByText('Provider B', { exact: true }).click()
+
+        const providerScrollContainer = currentPage.getByTestId(
+          'providers-scroll-container',
+        )
+        await expect
+          .poll(
+            () =>
+              providerScrollContainer.evaluate(
+                (el) => el.scrollHeight - el.clientHeight,
+              ),
+            { timeout: ELEMENT_TIMEOUT },
+          )
+          .toBeGreaterThan(320)
+        await providerScrollContainer.evaluate((el) => {
+          el.scrollTop = 320
+          el.dispatchEvent(new Event('scroll'))
+        })
+
+        const mobileNav = currentPage.getByRole('navigation', {
+          name: 'Mobile bottom navigation',
+        })
+        await mobileNav.locator('a[href="#/proxies"]').click()
+        await expect
+          .poll(() => providerScrollContainer.evaluate((el) => el.scrollTop), {
+            timeout: ELEMENT_TIMEOUT,
+          })
+          .toBe(0)
+
+        // The floating control remains a mobile-only affordance.
+        await providerScrollContainer.evaluate((el) => {
+          el.scrollTop = 320
+          el.dispatchEvent(new Event('scroll'))
+        })
+        await expect
+          .poll(() => scrollToTopButton.isVisible(), {
+            timeout: ELEMENT_TIMEOUT,
+          })
+          .toBe(true)
+        await currentPage.setViewportSize({ width: 1024, height: 844 })
+        await expect(scrollToTopButton.isVisible()).resolves.toBe(false)
+
+        // Inactive bottom-nav items preserve their normal navigation behavior.
+        await currentPage.setViewportSize({ width: 390, height: 844 })
+        await mobileNav.locator('a[href="#/overview"]').click()
+        await expectHashPath(currentPage, '/overview')
+      } finally {
+        await currentPage.emulateMedia({ reducedMotion: 'no-preference' })
+        await currentPage.setViewportSize({ width: 1920, height: 1080 })
+      }
+    })
   })
 
   describe('connections Page', () => {

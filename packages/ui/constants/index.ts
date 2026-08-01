@@ -65,6 +65,12 @@ export enum ROUTES {
   Setup = '/setup',
 }
 
+export const MOBILE_NAV_RESELECT_EVENT = 'mobile-nav:reselect'
+
+export interface MobileNavReselectDetail {
+  path: string
+}
+
 export const CHART_MAX_XAXIS = 30
 
 export enum LATENCY_QUALITY_MAP_HTTP {

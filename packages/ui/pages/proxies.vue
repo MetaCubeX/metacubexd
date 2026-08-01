@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type {MobileNavReselectDetail} from '~/constants';
 import type {
   ProxyNodeWithProvider,
   ProxyProvider,
@@ -6,6 +7,7 @@ import type {
 } from '~/types'
 import {
   IconActivity,
+  IconArrowUp,
   IconBrandSpeedtest,
   IconChevronRight,
   IconChevronsDown,
@@ -28,7 +30,12 @@ import ProxyNodePreview from '~/components/ProxyNodePreview.vue'
 import ProxyNodeTableRow from '~/components/ProxyNodeTableRow.vue'
 import SubscriptionInfo from '~/components/SubscriptionInfo.vue'
 import { useBatchLatencyTest } from '~/composables/useBatchLatencyTest'
-import { PROXIES_DISPLAY_MODE } from '~/constants'
+import {
+  MOBILE_NAV_RESELECT_EVENT,
+  
+  PROXIES_DISPLAY_MODE,
+  ROUTES
+} from '~/constants'
 import {
   encodeSvg,
   filterProxiesByAvailability,
@@ -65,8 +72,43 @@ const providersWrapper = ref<{ isTwoColumns: boolean }>()
 // when a large group is expanded (the main cause of jank with many nodes).
 const PROXIES_INITIAL_RENDER_COUNT = 50
 const PROXIES_RENDER_STEP = 50
+const SCROLL_TO_TOP_THRESHOLD = 300
 const proxiesScrollEl = ref<HTMLElement | null>(null)
 const providersScrollEl = ref<HTMLElement | null>(null)
+const showScrollToTop = ref(false)
+
+const activeScrollEl = computed(() =>
+  activeTab.value === 'proxies'
+    ? proxiesScrollEl.value
+    : providersScrollEl.value,
+)
+
+function updateScrollToTopVisibility(event: Event) {
+  showScrollToTop.value =
+    (event.currentTarget as HTMLElement).scrollTop > SCROLL_TO_TOP_THRESHOLD
+}
+
+function scrollActiveListToTop() {
+  const scrollEl = activeScrollEl.value
+  if (!scrollEl) return
+
+  const prefersReducedMotion = window.matchMedia(
+    '(prefers-reduced-motion: reduce)',
+  ).matches
+  scrollEl.scrollTo({
+    top: 0,
+    behavior: prefersReducedMotion ? 'auto' : 'smooth',
+  })
+}
+
+function onMobileNavReselect(event: Event) {
+  const detail = (event as CustomEvent<MobileNavReselectDetail>).detail
+  if (detail?.path === ROUTES.Proxies) scrollActiveListToTop()
+}
+
+watch(activeTab, () => {
+  showScrollToTop.value = false
+})
 
 const formatBytes = (bytes: number) => byteSize(bytes).toString()
 
@@ -213,6 +255,11 @@ const sortedNamesByProvider = computed(() => {
 // Fetch proxies on mount
 onMounted(() => {
   proxiesStore.fetchProxies()
+  window.addEventListener(MOBILE_NAV_RESELECT_EVENT, onMobileNavReselect)
+})
+
+onUnmounted(() => {
+  window.removeEventListener(MOBILE_NAV_RESELECT_EVENT, onMobileNavReselect)
 })
 
 // Enable window focus refetch for proxies data
@@ -700,7 +747,7 @@ const ProviderProxyNodes = defineComponent({
 </script>
 
 <template>
-  <div class="flex h-full min-h-0 min-w-0 flex-col gap-3">
+  <div class="relative flex h-full min-h-0 min-w-0 flex-col gap-3">
     <!-- First-run nudge: shown only when the agent is present and no base
          profile exists yet (self-gating; nothing in web mode). -->
     <OnboardingEmptyState context="proxies" />
@@ -868,7 +915,9 @@ const ProviderProxyNodes = defineComponent({
     <div
       v-if="activeTab === 'proxies'"
       ref="proxiesScrollEl"
+      data-testid="proxies-scroll-container"
       class="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto"
+      @scroll.passive="updateScrollToTopVisibility"
     >
       <!-- Loading skeleton: first load / refetch before anything resolves -->
       <div
@@ -984,7 +1033,9 @@ const ProviderProxyNodes = defineComponent({
     <div
       v-else
       ref="providersScrollEl"
+      data-testid="providers-scroll-container"
       class="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto"
+      @scroll.passive="updateScrollToTopVisibility"
     >
       <!-- Loading skeleton: first load before providers resolve -->
       <div
@@ -1085,6 +1136,24 @@ const ProviderProxyNodes = defineComponent({
         </template>
       </ProxiesRenderWrapper>
     </div>
+
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="translate-y-2 scale-90 opacity-0"
+      leave-active-class="transition duration-150 ease-in"
+      leave-to-class="translate-y-2 scale-90 opacity-0"
+    >
+      <Button
+        v-if="showScrollToTop"
+        data-testid="scroll-to-top"
+        class="absolute right-[max(0.75rem,env(safe-area-inset-right))] bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-30 flex size-11 items-center justify-center rounded-full border border-primary/30 bg-primary text-primary-content shadow-lg shadow-primary/25 hover:-translate-y-0.5 hover:bg-primary/90 lg:hidden"
+        :aria-label="t('backToTop')"
+        :title="t('backToTop')"
+        @click="scrollActiveListToTop"
+      >
+        <IconArrowUp :size="20" />
+      </Button>
+    </Transition>
 
     <!-- Settings Modal -->
     <Modal ref="settingsModal" :title="t('proxiesSettings')">
