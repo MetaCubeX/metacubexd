@@ -1,0 +1,2 @@
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["./9vJWEpDp.js","./DLvf9lie.js","./entry.CQ_5E0zn.css"])))=>i.map(i=>d[i]);
+import{dr as e,on as t}from"./DLvf9lie.js";var n=null;function r(){return n||=t(()=>import(`./9vJWEpDp.js`).then(e(1)),__vite__mapDeps([0,1,2]),import.meta.url).then(e=>{let t=e.default;return t.setOptions({time:{timezone:void 0}}),t}),n}export{r as t};
