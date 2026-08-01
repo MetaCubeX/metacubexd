@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.271.0](https://github.com/MetaCubeX/metacubexd/compare/v1.270.6...v1.271.0) (2026-08-01)
+
+
+### Features
+
+* **proxies:** add mobile scroll-to-top ([9ca5eb0](https://github.com/MetaCubeX/metacubexd/commit/9ca5eb065bfd49d8248d55754d6b7ed7deb54581))
+
+
+### Bug Fixes
+
+* **ui:** add managed rules and proxies CRUD ([#2161](https://github.com/MetaCubeX/metacubexd/issues/2161)) ([fd6fc0a](https://github.com/MetaCubeX/metacubexd/commit/fd6fc0a9ffa0413abc8f3f30e00c3975f95ae510))
+* **ui:** prevent mobile document overscroll ([a7c0497](https://github.com/MetaCubeX/metacubexd/commit/a7c049765970b91bcb17f7b46d5a38aec6805aa5))
+
 ## [1.270.6](https://github.com/MetaCubeX/metacubexd/compare/v1.270.5...v1.270.6) (2026-07-27)
 
 
