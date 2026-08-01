@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {MobileNavReselectDetail} from '~/constants';
+import type { MobileNavReselectDetail } from '~/constants'
 import type {
   ProxyNodeWithProvider,
   ProxyProvider,
@@ -12,6 +12,7 @@ import {
   IconChevronRight,
   IconChevronsDown,
   IconChevronsUp,
+  IconEdit,
   IconGlobe,
   IconPinnedOff,
   IconReload,
@@ -32,9 +33,8 @@ import SubscriptionInfo from '~/components/SubscriptionInfo.vue'
 import { useBatchLatencyTest } from '~/composables/useBatchLatencyTest'
 import {
   MOBILE_NAV_RESELECT_EVENT,
-  
   PROXIES_DISPLAY_MODE,
-  ROUTES
+  ROUTES,
 } from '~/constants'
 import {
   encodeSvg,
@@ -53,6 +53,7 @@ const proxiesStore = useProxiesStore()
 const connectionsStore = useConnectionsStore()
 const configStore = useConfigStore()
 const nodeRecommendationStore = useNodeRecommendationStore()
+const { hasFeature } = useControlInfo()
 
 // Batch latency test
 const {
@@ -64,6 +65,7 @@ const {
 const activeTab = ref<'proxies' | 'proxyProviders'>('proxies')
 const settingsModal = ref<{ open: () => void; close: () => void }>()
 const connectivityModal = ref<{ open: () => void; close: () => void }>()
+const proxyConfigEditor = ref<{ open: () => Promise<void> | void }>()
 const proxyGroupsWrapper = ref<{ isTwoColumns: boolean }>()
 const providersWrapper = ref<{ isTwoColumns: boolean }>()
 
@@ -104,6 +106,10 @@ function scrollActiveListToTop() {
 function onMobileNavReselect(event: Event) {
   const detail = (event as CustomEvent<MobileNavReselectDetail>).detail
   if (detail?.path === ROUTES.Proxies) scrollActiveListToTop()
+}
+
+async function onProxyConfigSaved() {
+  await proxiesStore.fetchProxies()
 }
 
 watch(activeTab, () => {
@@ -806,6 +812,16 @@ const ProviderProxyNodes = defineComponent({
           <IconChevronsDown v-else :size="18" />
         </Button>
 
+        <!-- Edit managed proxy definitions -->
+        <Button
+          v-if="activeTab === 'proxies' && hasFeature('visual-config-editor')"
+          class="flex h-9 w-9 items-center justify-center rounded-[0.625rem] border border-primary/20 bg-primary/10 text-primary transition-all duration-200 hover:bg-primary/20"
+          :title="t('editProxies')"
+          @click="proxyConfigEditor?.open()"
+        >
+          <IconEdit :size="16" />
+        </Button>
+
         <!-- Test All Groups Button -->
         <Button
           v-if="activeTab === 'proxies'"
@@ -1342,6 +1358,8 @@ const ProviderProxyNodes = defineComponent({
 
       <ConnectivityBoard />
     </Modal>
+
+    <ProxyConfigEditor ref="proxyConfigEditor" @saved="onProxyConfigSaved" />
   </div>
 </template>
 

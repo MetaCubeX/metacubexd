@@ -39,6 +39,11 @@ import {
   defaultForSchema,
 } from '~/utils/configSchema'
 import { controlErrorMessage } from '~/utils/controlError'
+import {
+  PROXY_GROUP_TYPES,
+  PROXY_PROTOCOL_FIELDS,
+  PROXY_TYPES,
+} from '~/utils/routingResources'
 
 type ResourceKind = 'proxy' | 'provider' | 'group' | 'rule-provider'
 type LooseObject = Record<string, any>
@@ -106,47 +111,6 @@ const SETTINGS_SECTIONS = [
   'sniffer',
   'clash-for-android',
 ]
-const PROXY_TYPES = [
-  'ss',
-  'ssr',
-  'http',
-  'socks5',
-  'vmess',
-  'vless',
-  'trojan',
-  'hysteria2',
-  'tuic',
-  'wireguard',
-  'ssh',
-  'snell',
-  'anytls',
-  'direct',
-  'reject',
-  'pass',
-]
-const GROUP_TYPES = [
-  'select',
-  'url-test',
-  'fallback',
-  'load-balance',
-  'relay',
-  'smart',
-]
-const PROTOCOL_FIELDS: Record<string, string[]> = {
-  ss: ['cipher', 'password', 'udp', 'udp-over-tcp'],
-  ssr: ['cipher', 'password', 'obfs', 'protocol'],
-  http: ['username', 'password', 'tls', 'skip-cert-verify'],
-  socks5: ['username', 'password', 'tls', 'udp'],
-  vmess: ['uuid', 'alterId', 'cipher', 'tls', 'network', 'servername'],
-  vless: ['uuid', 'flow', 'tls', 'network', 'servername'],
-  trojan: ['password', 'tls', 'sni', 'skip-cert-verify'],
-  hysteria2: ['password', 'sni', 'skip-cert-verify', 'up', 'down'],
-  tuic: ['uuid', 'password', 'sni', 'skip-cert-verify'],
-  wireguard: ['private-key', 'public-key', 'ip', 'mtu'],
-  ssh: ['username', 'password', 'private-key', 'host-key-algorithms'],
-  snell: ['psk', 'version', 'obfs-opts'],
-  anytls: ['password', 'client-fingerprint', 'sni', 'skip-cert-verify'],
-}
 
 const dirty = computed(
   () =>
@@ -203,7 +167,7 @@ const commonResourceFields = computed(() => {
     'type',
     'server',
     'port',
-    ...(PROTOCOL_FIELDS[String(resourceDraft.value.type)] ?? []),
+    ...(PROXY_PROTOCOL_FIELDS[String(resourceDraft.value.type)] ?? []),
   ]
 })
 
@@ -1132,7 +1096,7 @@ if (import.meta.client) {
                 v-for="option in resourceKind === 'proxy'
                   ? PROXY_TYPES
                   : resourceKind === 'group'
-                    ? GROUP_TYPES
+                    ? PROXY_GROUP_TYPES
                     : ['http', 'file', 'inline']"
                 :key="option"
                 :value="option"

@@ -1,8 +1,8 @@
 import type { MihomoSupervisor } from './types'
-import { diffDocument } from '@metacubexd/config-editor'
 import { mkdtempSync, readFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { diffDocument } from '@metacubexd/config-editor'
 import { describe, expect, it, vi } from 'vitest'
 import { createProfileConfigEditor } from './profile-editor'
 import { createProfileStore } from './profiles'
@@ -37,7 +37,11 @@ describe('profile config editor', () => {
       activeConfigPath: join(home, 'active.yaml'),
       idGen: () => 'local',
     })
-    await profiles.create({ name: 'local', content: 'mode: rule\n' })
+    await profiles.create({
+      name: 'local',
+      content:
+        'proxies:\n  - { name: node, type: direct }\nproxy-groups:\n  - { name: group, type: select, proxies: [node] }\n',
+    })
     const sup = supervisor()
     const editor = createProfileConfigEditor({
       profiles,
@@ -45,19 +49,24 @@ describe('profile config editor', () => {
       homeDir: home,
     })
     const opened = await editor.open('local')
-    const patch = diffDocument(opened.editableYaml, 'mode: global\n')
+    const draft =
+      'proxies:\n  - { name: node, type: reject }\nproxy-groups:\n  - { name: group, type: fallback, proxies: [node], url: https://example.test }\n'
+    const patch = diffDocument(opened.editableYaml, draft)
     const preview = await editor.preview('local', patch)
-    expect(preview.editableYaml).toContain('mode: global')
+    expect(preview.editableYaml).toContain('type: reject')
+    expect(preview.editableYaml).toContain('type: fallback')
 
     const result = await editor.apply('local', patch)
     expect(result.activeId).toBe('local')
-    expect(await profiles.read('local')).toContain('mode: global')
+    expect(await profiles.read('local')).toContain('type: reject')
+    expect(await profiles.read('local')).toContain('type: fallback')
     expect(sup.restart).toHaveBeenCalledTimes(1)
   })
 
   it('stores remote edits in one scoped managed merge and detects refresh conflicts', async () => {
     const home = mkdtempSync(join(tmpdir(), 'mcxd-editor-remote-'))
-    let remote = 'proxies:\n  - { name: node, type: direct }\n'
+    let remote =
+      'proxies:\n  - { name: node, type: direct }\nproxy-groups:\n  - { name: group, type: select, proxies: [node] }\n'
     const profiles = createProfileStore({
       dir: join(home, 'profiles'),
       activeConfigPath: join(home, 'active.yaml'),
@@ -68,13 +77,15 @@ describe('profile config editor', () => {
       })(),
     })
     await profiles.importFromUrl('https://example.test/sub', 'remote')
+    const sup = supervisor()
     const editor = createProfileConfigEditor({
       profiles,
-      supervisor: supervisor(),
+      supervisor: sup,
       homeDir: home,
     })
     const opened = await editor.open('id1')
-    const draft = 'proxies:\n  - { name: node, type: reject }\n'
+    const draft =
+      'proxies:\n  - { name: node, type: reject }\nproxy-groups:\n  - { name: group, type: fallback, proxies: [node], url: https://example.test }\n'
     await editor.apply('id1', diffDocument(opened.editableYaml, draft))
 
     expect(await profiles.read('id1')).toBe(remote)
@@ -88,8 +99,11 @@ describe('profile config editor', () => {
       }),
     ])
     expect((await profiles.compose('id1')).content).toContain('type: reject')
+    expect((await profiles.compose('id1')).content).toContain('type: fallback')
+    expect(sup.restart).toHaveBeenCalledTimes(1)
 
-    remote = 'proxies:\n  - { name: node, type: ss, server: upstream }\n'
+    remote =
+      'proxies:\n  - { name: node, type: ss, server: upstream }\nproxy-groups:\n  - { name: group, type: select, proxies: [node] }\n'
     await profiles.refresh('id1')
     const conflicted = await editor.open('id1')
     expect(conflicted.profile.editorStatus).toBe('conflicted')
@@ -134,6 +148,40 @@ describe('profile config editor', () => {
     expect(await profiles.read('id2')).toBe('mode: direct\n')
     expect(await profiles.getActiveId()).toBe('id1')
     expect(readFileSync(activeConfigPath, 'utf8')).toBe('mode: rule\n')
+  })
+
+  it('leaves the profile and active config untouched when validation fails', async () => {
+    const home = mkdtempSync(join(tmpdir(), 'mcxd-editor-validation-'))
+    const activeConfigPath = join(home, 'active.yaml')
+    const profiles = createProfileStore({
+      dir: join(home, 'profiles'),
+      activeConfigPath,
+      idGen: () => 'local',
+    })
+    await profiles.create({ name: 'local', content: 'mode: rule\n' })
+    await profiles.setActive('local')
+    const sup = supervisor()
+    vi.mocked(sup.validate).mockResolvedValue({
+      valid: false,
+      message: 'invalid configuration',
+    })
+    const editor = createProfileConfigEditor({
+      profiles,
+      supervisor: sup,
+      homeDir: home,
+    })
+    const opened = await editor.open('local')
+
+    await expect(
+      editor.apply(
+        'local',
+        diffDocument(opened.editableYaml, 'mode: global\n'),
+      ),
+    ).rejects.toThrow('invalid configuration')
+    expect(await profiles.read('local')).toBe('mode: rule\n')
+    expect(await profiles.getActiveId()).toBe('local')
+    expect(readFileSync(activeConfigPath, 'utf8')).toBe('mode: rule\n')
+    expect(sup.restart).not.toHaveBeenCalled()
   })
 
   it('restores a managed remote overlay when the restart fails', async () => {

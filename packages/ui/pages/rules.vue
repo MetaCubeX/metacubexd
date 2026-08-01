@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import type { RuleEntry } from '~/composables/useRuleEditor'
 import type { RULES_ORDERING_TYPE } from '~/constants'
 import type { Rule, RuleProvider } from '~/types'
 import {
+  IconAlertTriangle,
   IconArrowsSort,
+  IconChevronDown,
+  IconChevronUp,
   IconEdit,
+  IconExternalLink,
   IconFilter,
   IconFilterOff,
   IconGripVertical,
@@ -35,6 +38,7 @@ import {
 } from '~/utils'
 
 const { t, locale } = useI18n()
+const router = useRouter()
 
 const configStore = useConfigStore()
 
@@ -221,31 +225,28 @@ const providersTotalSize = computed(() =>
   providersVirtualizer.value.getTotalSize(),
 )
 
-// ---- GUI rule editor (desktop, gated on the config-sections feature) -------
+// ---- GUI rule editor (managed runtimes, backed by profile patches) ---------
 // Additive: the read-only list above (hit counts etc.) is untouched. Local
 // edits are batched and persisted with a SINGLE PUT so the kernel restarts once.
 const ruleEditor = useRuleEditor()
-const editorModalRef = ref<{ open: () => void; close: () => void }>()
+const editorModalRef = ref<{
+  open: () => void
+  close: (force?: boolean) => void
+}>()
 const editorSaving = ref(false)
 const dragIndex = ref<number | null>(null)
 
 async function openRuleEditor() {
-  await ruleEditor.load()
   editorModalRef.value?.open()
+  await ruleEditor.load()
 }
 
 function addRuleEntry() {
-  ruleEditor.add({ type: '', payload: '', policy: '' })
+  ruleEditor.add('')
 }
 
-function updateRuleField(
-  index: number,
-  field: keyof Pick<RuleEntry, 'type' | 'payload' | 'policy'>,
-  value: string,
-) {
-  const current = ruleEditor.rules.value[index]
-  if (!current) return
-  ruleEditor.update(index, { ...current, [field]: value })
+function updateRuleLine(index: number, value: string) {
+  ruleEditor.update(index, value)
 }
 
 function onRuleDragStart(index: number) {
@@ -265,12 +266,21 @@ async function saveRuleEditor() {
     const ok = await ruleEditor.save()
     if (!ok) return
     toast.success(t('rulesEditorSaved'))
-    editorModalRef.value?.close()
+    editorModalRef.value?.close(true)
     // Kernel restarted with the new rules — refresh the read-only view.
     await refetchRules()
   } finally {
     editorSaving.value = false
   }
+}
+
+function confirmRuleEditorClose() {
+  return !ruleEditor.dirty.value || confirm(t('routingEditorDiscardConfirm'))
+}
+
+async function openFullEditor() {
+  editorModalRef.value?.close(true)
+  await router.push(ruleEditor.fullEditorPath.value)
 }
 </script>
 
@@ -659,30 +669,90 @@ async function saveRuleEditor() {
       </div>
     </template>
 
-    <!-- GUI rule editor modal (desktop, config-sections feature). Additive — the
-         read-only list above is unchanged. -->
+    <!-- Managed Profile rule editor. The hosted panel keeps its runtime-only
+         list and never renders this capability-gated surface. -->
     <Modal
       v-if="ruleEditor.available.value"
       ref="editorModalRef"
       :title="t('editRules')"
+      :before-close="confirmRuleEditorClose"
     >
       <template #icon>
         <IconEdit :size="20" />
       </template>
 
-      <div class="flex flex-col gap-2">
+      <div
+        v-if="ruleEditor.loading.value"
+        class="flex min-h-40 items-center justify-center"
+      >
+        <span class="loading loading-ring text-primary" />
+      </div>
+
+      <div
+        v-else-if="ruleEditor.state.value === 'no-active-profile'"
+        class="flex flex-col items-center gap-3 py-8 text-center"
+      >
+        <IconAlertTriangle :size="32" class="text-warning" />
+        <p class="text-sm text-base-content/70">
+          {{ t('routingEditorNoActiveProfile') }}
+        </p>
+        <Button class="btn-primary btn-sm" @click="openFullEditor">
+          {{ t('profiles') }}
+        </Button>
+      </div>
+
+      <div
+        v-else-if="ruleEditor.state.value === 'conflict'"
+        class="flex flex-col items-center gap-3 py-8 text-center"
+      >
+        <IconAlertTriangle :size="32" class="text-warning" />
+        <p class="text-sm text-base-content/70">
+          {{ t('routingEditorConflictHint') }}
+        </p>
+        <Button
+          class="btn-sm btn-warning"
+          :icon="IconExternalLink"
+          @click="openFullEditor"
+        >
+          {{ t('routingEditorResolveConflict') }}
+        </Button>
+      </div>
+
+      <div
+        v-else-if="ruleEditor.state.value === 'error'"
+        class="py-8 text-center text-sm text-error"
+      >
+        {{ t('rulesEditorLoadFailed') }}
+      </div>
+
+      <div v-else class="flex flex-col gap-2">
         <p class="text-xs text-base-content/60">
           {{ t('rulesEditorHint') }}
         </p>
 
+        <ul
+          v-if="ruleEditor.diagnostics.value.length"
+          class="rounded-lg border border-warning/30 bg-warning/10 p-3 text-xs"
+        >
+          <li
+            v-for="(diagnostic, index) in ruleEditor.diagnostics.value"
+            :key="index"
+            :class="
+              diagnostic.severity === 'error' ? 'text-error' : 'text-warning'
+            "
+          >
+            {{ diagnostic.path.join('.') }} — {{ diagnostic.message }}
+          </li>
+        </ul>
+
         <!-- Column headers -->
         <div
-          class="grid grid-cols-[auto_1fr_1.4fr_1fr_auto] items-center gap-2 px-1 text-xs font-medium text-base-content/50"
+          class="grid grid-cols-[auto_minmax(0,1fr)_auto_auto_auto] items-center gap-2 px-1 text-xs font-medium text-base-content/50"
         >
           <span class="w-4" />
-          <span>{{ t('type') }}</span>
-          <span>{{ t('payload') }}</span>
-          <span>{{ t('policy') }}</span>
+          <span>{{ t('rules') }}</span>
+          <span class="w-7" />
+          <span class="w-7" />
           <span class="w-7" />
         </div>
 
@@ -690,7 +760,7 @@ async function saveRuleEditor() {
         <div
           v-for="(entry, index) in ruleEditor.rules.value"
           :key="index"
-          class="grid grid-cols-[auto_1fr_1.4fr_1fr_auto] items-center gap-2 rounded-lg border border-base-content/8 bg-base-200/50 p-1.5"
+          class="grid grid-cols-[auto_minmax(0,1fr)_auto_auto_auto] items-center gap-2 rounded-lg border border-base-content/8 bg-base-200/50 p-1.5"
           :class="{ 'opacity-50': dragIndex === index }"
           draggable="true"
           @dragstart="onRuleDragStart(index)"
@@ -702,41 +772,29 @@ async function saveRuleEditor() {
             <IconGripVertical :size="16" />
           </span>
           <input
-            :value="entry.type"
-            class="input-bordered input input-sm w-full rounded-md text-xs"
-            :placeholder="t('type')"
+            :value="entry"
+            class="input-bordered input min-w-0 flex-1 rounded-md font-mono text-xs input-sm"
+            :placeholder="t('routingEditorRulePlaceholder')"
             @input="
-              updateRuleField(
-                index,
-                'type',
-                ($event.target as HTMLInputElement).value,
-              )
+              updateRuleLine(index, ($event.target as HTMLInputElement).value)
             "
           />
-          <input
-            :value="entry.payload"
-            class="input-bordered input input-sm w-full rounded-md text-xs"
-            :placeholder="t('payload')"
-            @input="
-              updateRuleField(
-                index,
-                'payload',
-                ($event.target as HTMLInputElement).value,
-              )
-            "
-          />
-          <input
-            :value="entry.policy"
-            class="input-bordered input input-sm w-full rounded-md text-xs"
-            :placeholder="t('policy')"
-            @input="
-              updateRuleField(
-                index,
-                'policy',
-                ($event.target as HTMLInputElement).value,
-              )
-            "
-          />
+          <Button
+            class="flex h-7 w-7 items-center justify-center rounded-md text-base-content/50 transition-colors hover:bg-primary/15 hover:text-primary disabled:opacity-30"
+            :title="t('moveUp')"
+            :disabled="index === 0"
+            @click="ruleEditor.move(index, index - 1)"
+          >
+            <IconChevronUp :size="16" />
+          </Button>
+          <Button
+            class="flex h-7 w-7 items-center justify-center rounded-md text-base-content/50 transition-colors hover:bg-primary/15 hover:text-primary disabled:opacity-30"
+            :title="t('moveDown')"
+            :disabled="index === ruleEditor.rules.value.length - 1"
+            @click="ruleEditor.move(index, index + 1)"
+          >
+            <IconChevronDown :size="16" />
+          </Button>
           <Button
             class="flex h-7 w-7 items-center justify-center rounded-md text-base-content/50 transition-colors hover:bg-error/15 hover:text-error"
             :title="t('delete')"
@@ -762,7 +820,7 @@ async function saveRuleEditor() {
         </Button>
       </div>
 
-      <template #actions>
+      <template v-if="ruleEditor.state.value === 'ready'" #actions>
         <Button
           class="rounded-lg border border-base-content/10 px-4 py-1.5 text-sm text-base-content/70 transition-colors hover:bg-base-content/5"
           :disabled="editorSaving"

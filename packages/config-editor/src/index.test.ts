@@ -3,7 +3,9 @@ import {
   applyPatch,
   ConfigDocumentError,
   diffDocument,
+  findResourceReferences,
   openDocument,
+  splitRuleFields,
   validateDocument,
 } from './index'
 
@@ -101,6 +103,95 @@ describe('config editor document', () => {
     )
     expect(result.conflicts).toEqual([
       expect.objectContaining({ reason: 'missing' }),
+    ])
+  })
+
+  it('splits logical and quoted rules only at top-level commas', () => {
+    expect(
+      splitRuleFields(
+        'AND,((DOMAIN,one.test),(NETWORK,UDP)),Proxy Group,no-resolve',
+      ),
+    ).toEqual([
+      'AND',
+      '((DOMAIN,one.test),(NETWORK,UDP))',
+      'Proxy Group',
+      'no-resolve',
+    ])
+    expect(splitRuleFields('DOMAIN,"one,two.test",DIRECT')).toEqual([
+      'DOMAIN',
+      '"one,two.test"',
+      'DIRECT',
+    ])
+  })
+
+  it('finds named proxy references across routing and network sections', () => {
+    const data = openDocument(`
+proxies:
+  - { name: chained, type: direct, dialer-proxy: target }
+proxy-groups:
+  - { name: group, type: select, proxies: [target] }
+proxy-providers:
+  remote: { type: http, url: https://example.test, proxy: target }
+rule-providers:
+  rules: { type: http, url: https://example.test, proxy: target }
+listeners:
+  - { name: inbound, type: mixed, port: 7890, proxy: target }
+tunnels:
+  - { network: tcp, address: 127.0.0.1:1, target: example.test:2, proxy: target }
+ntp: { enable: true, dialer-proxy: target }
+sub-rules:
+  child:
+    - MATCH,target
+rules:
+  - AND,((DOMAIN,one.test),(NETWORK,UDP)),target
+  - SUB-RULE,(NETWORK,TCP),target
+`).data
+    expect(
+      findResourceReferences(data, 'target').map((item) => item.kind),
+    ).toEqual([
+      'proxy-group-member',
+      'rule-policy',
+      'rule-policy',
+      'dialer-proxy',
+      'dialer-proxy',
+      'provider-proxy',
+      'provider-proxy',
+      'listener-proxy',
+      'tunnel-proxy',
+    ])
+  })
+
+  it('does not treat unrelated same-name strings as proxy references', () => {
+    const data = openDocument(`
+proxies:
+  - { name: target, type: direct, server: target }
+hosts: { target: 127.0.0.1 }
+rules:
+  - DOMAIN,target,DIRECT
+`).data
+    expect(findResourceReferences(data, 'target')).toEqual([])
+  })
+
+  it('validates missing references in sub-rules and dialer fields', () => {
+    const diagnostics = validateDocument({
+      proxies: [{ name: 'node', type: 'direct', 'dialer-proxy': 'missing' }],
+      'sub-rules': { child: ['MATCH,missing'] },
+      rules: ['SUB-RULE,(NETWORK,TCP),absent', 'MATCH,GLOBAL'],
+    })
+    expect(diagnostics).toEqual([
+      expect.objectContaining({
+        path: ['sub-rules', 'child', 0],
+        severity: 'warning',
+      }),
+      expect.objectContaining({
+        path: ['proxies', 0, 'dialer-proxy'],
+        severity: 'error',
+      }),
+      expect.objectContaining({
+        path: ['rules', 0],
+        message: 'Unknown sub-rule: absent',
+        severity: 'error',
+      }),
     ])
   })
 })

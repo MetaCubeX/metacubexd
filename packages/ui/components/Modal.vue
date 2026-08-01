@@ -3,9 +3,14 @@ import { IconX } from '@tabler/icons-vue'
 
 interface Props {
   title?: string
+  size?: 'md' | 'xl'
+  beforeClose?: () => boolean
 }
 
-defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  size: 'md',
+  beforeClose: undefined,
+})
 
 const emit = defineEmits<{
   close: []
@@ -48,7 +53,8 @@ function open() {
   })
 }
 
-function close() {
+function close(force = false) {
+  if (!force && props.beforeClose && !props.beforeClose()) return
   isOpen.value = false
   cancelCloseTimer()
   // Wait for the exit transition to finish before unmounting the dialog.
@@ -63,6 +69,14 @@ function close() {
   )
 }
 
+function requestClose() {
+  close(false)
+}
+
+const modalSizeClass = computed(() =>
+  props.size === 'xl' ? 'max-w-6xl' : 'max-w-2xl',
+)
+
 defineExpose({ open, close })
 </script>
 
@@ -76,11 +90,11 @@ defineExpose({ open, close })
       '--modal-border':
         'color-mix(in oklab, var(--color-base-content) 10%, transparent)',
     }"
-    @cancel.prevent="close"
+    @cancel.prevent="requestClose"
   >
     <div
-      class="modal-shell flex max-h-[90vh] w-[95%] max-w-2xl flex-col overflow-hidden rounded-2xl p-0 sm:w-11/12"
-      :class="isOpen ? 'is-open' : ''"
+      class="modal-shell flex max-h-[90vh] w-[95%] flex-col overflow-hidden rounded-2xl p-0 sm:w-11/12"
+      :class="[isOpen ? 'is-open' : '', modalSizeClass]"
       :style="{
         background: 'var(--color-base-100)',
         border: '1px solid var(--modal-border)',
@@ -105,13 +119,14 @@ defineExpose({ open, close })
         </div>
 
         <button
+          type="button"
           class="modal-close flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-transparent"
           :style="{
             border: '1px solid var(--modal-border)',
             color:
               'color-mix(in oklab, var(--color-base-content) 60%, transparent)',
           }"
-          @click="close"
+          @click="requestClose"
         >
           <IconX :size="18" />
         </button>
@@ -146,8 +161,9 @@ defineExpose({ open, close })
       :class="isOpen ? 'is-open' : ''"
     >
       <button
+        type="button"
         class="absolute inset-0 h-full w-full cursor-pointer border-none bg-transparent"
-        @click="close"
+        @click="requestClose"
       />
     </form>
   </dialog>

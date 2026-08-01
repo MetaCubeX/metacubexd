@@ -113,6 +113,20 @@ export interface ApplyPatchResult {
   applied: number
 }
 
+export type ConfigResourceReferenceKind =
+  | 'proxy-group-member'
+  | 'rule-policy'
+  | 'dialer-proxy'
+  | 'provider-proxy'
+  | 'listener-proxy'
+  | 'tunnel-proxy'
+
+export interface ConfigResourceReference {
+  path: Array<string | number>
+  kind: ConfigResourceReferenceKind
+  name: string
+}
+
 export class ConfigDocumentError extends Error {
   constructor(
     message: string,
@@ -166,7 +180,7 @@ function canonical(value: unknown): string {
 /** Stable, browser-safe FNV-1a hash; used for optimistic concurrency, not crypto. */
 export function hashConfigValue(value: unknown): string {
   const input = canonical(value)
-  let hash = 0x811c9dc5
+  let hash = 2_166_136_261
   for (let i = 0; i < input.length; i++) {
     hash ^= input.charCodeAt(i)
     hash = Math.imul(hash, 0x01000193)
@@ -730,8 +744,10 @@ function resourceNames(data: ConfigObject): Set<string> {
     'DIRECT',
     'REJECT',
     'REJECT-DROP',
+    'REJECT-TINYGIF',
     'PASS',
     'COMPATIBLE',
+    'GLOBAL',
   ])
   for (const section of ['proxies', 'proxy-groups'] as const) {
     const entries = data[section]
@@ -747,6 +763,171 @@ function resourceNames(data: ConfigObject): Set<string> {
 function mapNames(data: ConfigObject, section: string): Set<string> {
   const value = data[section]
   return isObject(value) ? new Set(Object.keys(value)) : new Set()
+}
+
+/**
+ * Split a Mihomo rule at top-level commas only. Logical rules contain nested
+ * comma-separated expressions, and quoted payloads may contain commas too, so
+ * a bare String.split(',') corrupts both their policy lookup and round-trips.
+ */
+export function splitRuleFields(rule: string): string[] {
+  const fields: string[] = []
+  let field = ''
+  let depth = 0
+  let quote: '"' | "'" | null = null
+  let escaped = false
+
+  for (const character of rule) {
+    if (escaped) {
+      field += character
+      escaped = false
+      continue
+    }
+    if (character === '\\') {
+      field += character
+      escaped = true
+      continue
+    }
+    if (quote) {
+      field += character
+      if (character === quote) quote = null
+      continue
+    }
+    if (character === '"' || character === "'") {
+      quote = character
+      field += character
+      continue
+    }
+    if (character === '(' || character === '[' || character === '{') {
+      depth++
+      field += character
+      continue
+    }
+    if (character === ')' || character === ']' || character === '}') {
+      depth = Math.max(0, depth - 1)
+      field += character
+      continue
+    }
+    if (character === ',' && depth === 0) {
+      fields.push(field.trim())
+      field = ''
+      continue
+    }
+    field += character
+  }
+  fields.push(field.trim())
+  return fields
+}
+
+function rulePolicy(rule: string): string | undefined {
+  const fields = splitRuleFields(rule)
+  const type = fields[0]?.toUpperCase()
+  if (type === 'MATCH') return fields[1]
+  // SUB-RULE's final field is a sub-rule collection name, not a proxy policy.
+  if (type === 'SUB-RULE') return undefined
+  return fields[2]
+}
+
+function collectRuleReferences(
+  rules: ConfigValue | undefined,
+  path: Array<string | number>,
+): ConfigResourceReference[] {
+  if (!Array.isArray(rules)) return []
+  return rules.flatMap((rule, index) => {
+    if (typeof rule !== 'string') return []
+    const policy = rulePolicy(rule)
+    return policy
+      ? [{ path: [...path, index], kind: 'rule-policy' as const, name: policy }]
+      : []
+  })
+}
+
+function collectKeyReferences(
+  value: ConfigValue | undefined,
+  path: Array<string | number>,
+  key: string,
+  kind: ConfigResourceReferenceKind,
+): ConfigResourceReference[] {
+  if (Array.isArray(value)) {
+    return value.flatMap((item, index) =>
+      collectKeyReferences(item, [...path, index], key, kind),
+    )
+  }
+  if (!isObject(value)) return []
+
+  const references: ConfigResourceReference[] = []
+  for (const [field, child] of Object.entries(value)) {
+    const childPath = [...path, field]
+    if (field === key && typeof child === 'string') {
+      references.push({ path: childPath, kind, name: child })
+    }
+    references.push(...collectKeyReferences(child, childPath, key, kind))
+  }
+  return references
+}
+
+/** Return every named proxy/proxy-group reference in a config document. */
+export function listResourceReferences(
+  data: ConfigObject,
+): ConfigResourceReference[] {
+  const references: ConfigResourceReference[] = []
+  const groups = data['proxy-groups']
+  if (Array.isArray(groups)) {
+    groups.forEach((group, groupIndex) => {
+      if (!isObject(group) || !Array.isArray(group.proxies)) return
+      group.proxies.forEach((name, memberIndex) => {
+        if (typeof name !== 'string') return
+        references.push({
+          path: ['proxy-groups', groupIndex, 'proxies', memberIndex],
+          kind: 'proxy-group-member',
+          name,
+        })
+      })
+    })
+  }
+
+  references.push(...collectRuleReferences(data.rules, ['rules']))
+  const subRules = data['sub-rules']
+  if (isObject(subRules)) {
+    for (const [name, rules] of Object.entries(subRules)) {
+      references.push(...collectRuleReferences(rules, ['sub-rules', name]))
+    }
+  }
+
+  // dialer-proxy has the same named-resource meaning wherever Mihomo accepts
+  // it (nodes, providers, overrides and NTP), so scan it across the document.
+  references.push(
+    ...collectKeyReferences(data, [], 'dialer-proxy', 'dialer-proxy'),
+  )
+  for (const section of ['proxy-providers', 'rule-providers'] as const) {
+    references.push(
+      ...collectKeyReferences(
+        data[section],
+        [section],
+        'proxy',
+        'provider-proxy',
+      ),
+    )
+  }
+  references.push(
+    ...collectKeyReferences(
+      data.listeners,
+      ['listeners'],
+      'proxy',
+      'listener-proxy',
+    ),
+    ...collectKeyReferences(data.tunnels, ['tunnels'], 'proxy', 'tunnel-proxy'),
+  )
+  return references
+}
+
+export function findResourceReferences(
+  data: ConfigObject,
+  name: string,
+): ConfigResourceReference[] {
+  return listResourceReferences(data).filter(
+    (reference) => reference.name === name,
+  )
 }
 
 export function validateDocument(data: ConfigObject): ConfigDiagnostic[] {
@@ -795,20 +976,6 @@ export function validateDocument(data: ConfigObject): ConfigDiagnostic[] {
         })
       }
       if (section === 'proxy-groups') {
-        for (const field of ['proxies'] as const) {
-          const references = entry[field]
-          if (!Array.isArray(references)) continue
-          references.forEach((reference, refIndex) => {
-            if (typeof reference === 'string' && !names.has(reference)) {
-              diagnostics.push({
-                path: [section, index, field, refIndex],
-                code: 'missing-reference',
-                message: `Unknown proxy or group: ${reference}`,
-                severity: 'error',
-              })
-            }
-          })
-        }
         const providers = entry.use
         if (Array.isArray(providers)) {
           providers.forEach((reference, refIndex) => {
@@ -829,35 +996,58 @@ export function validateDocument(data: ConfigObject): ConfigDiagnostic[] {
     })
   }
 
-  const rules = data.rules
-  if (Array.isArray(rules)) {
-    rules.forEach((rule, index) => {
+  for (const reference of listResourceReferences(data)) {
+    if (names.has(reference.name)) continue
+    diagnostics.push({
+      path: reference.path,
+      code: 'missing-reference',
+      message: `Unknown proxy or group: ${reference.name}`,
+      // Composite rules are parsed at top-level only. Keep their policy
+      // diagnostics advisory and let Mihomo's validator remain authoritative.
+      severity: reference.kind === 'rule-policy' ? 'warning' : 'error',
+    })
+  }
+
+  const ruleCollections: Array<{
+    path: Array<string | number>
+    rules: ConfigValue | undefined
+  }> = [{ path: ['rules'], rules: data.rules }]
+  const subRules = data['sub-rules']
+  if (isObject(subRules)) {
+    for (const [name, rules] of Object.entries(subRules)) {
+      ruleCollections.push({ path: ['sub-rules', name], rules })
+    }
+  }
+  for (const collection of ruleCollections) {
+    if (!Array.isArray(collection.rules)) continue
+    collection.rules.forEach((rule, index) => {
       if (typeof rule !== 'string' || !rule.includes(',')) {
         diagnostics.push({
-          path: ['rules', index],
+          path: [...collection.path, index],
           code: 'invalid-rule',
           message: 'Rule must be a comma-separated string',
           severity: 'error',
         })
         return
       }
-      const parts = rule.split(',').map((part) => part.trim())
-      const policy = parts[0] === 'MATCH' ? parts[1] : parts[2]
-      if (policy && !names.has(policy)) {
-        diagnostics.push({
-          path: ['rules', index],
-          code: 'missing-reference',
-          message: `Unknown rule policy: ${policy}`,
-          // Composite rules have their policy at a different position. Keep
-          // this advisory and let Mihomo's validator remain authoritative.
-          severity: 'warning',
-        })
-      }
+      const parts = splitRuleFields(rule)
       if (parts[0] === 'RULE-SET' && parts[1] && !ruleProviders.has(parts[1])) {
         diagnostics.push({
-          path: ['rules', index],
+          path: [...collection.path, index],
           code: 'missing-reference',
           message: `Unknown rule provider: ${parts[1]}`,
+          severity: 'error',
+        })
+      }
+      if (
+        parts[0]?.toUpperCase() === 'SUB-RULE' &&
+        parts[2] &&
+        (!isObject(subRules) || !(parts[2] in subRules))
+      ) {
+        diagnostics.push({
+          path: [...collection.path, index],
+          code: 'missing-reference',
+          message: `Unknown sub-rule: ${parts[2]}`,
           severity: 'error',
         })
       }
