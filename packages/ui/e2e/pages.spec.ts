@@ -565,20 +565,125 @@ describe('e2E Page Tests', () => {
   })
 
   describe('mobile Viewport', () => {
-    it('should render correctly on mobile viewport', async () => {
-      const currentPage = getPage(page)
-      await currentPage.setViewportSize({ width: 390, height: 844 })
-      await gotoAppPath(currentPage, '/overview')
+    async function configureMobileLayout(
+      currentPage: Page,
+      useMobileBottomNav: boolean,
+      height: number,
+    ) {
+      await currentPage.setViewportSize({ width: 390, height })
+      await currentPage.evaluate((enabled) => {
+        localStorage.setItem('useMobileBottomNav', String(enabled))
+      }, useMobileBottomNav)
+      await currentPage.reload({ waitUntil: 'domcontentloaded' })
+      await currentPage.waitForLoadState('networkidle')
+    }
 
-      // Check that page still renders - look for main content (stat cards or rounded elements)
-      await currentPage.waitForSelector('.overview-stat-card', {
-        timeout: ELEMENT_TIMEOUT,
+    async function restoreDesktopLayout(currentPage: Page) {
+      await currentPage.evaluate(() => {
+        localStorage.setItem('useMobileBottomNav', 'true')
+        document.body.style.paddingBottom = ''
       })
-      const mainContent = currentPage.locator('.overview-stat-card')
-      await expect(mainContent.count()).resolves.toBeGreaterThan(0)
-
-      // Reset viewport for other tests
       await currentPage.setViewportSize({ width: 1920, height: 1080 })
+      await currentPage.reload({ waitUntil: 'domcontentloaded' })
+    }
+
+    it('should keep the document viewport locked with either mobile navigation', async () => {
+      const currentPage = getPage(page)
+
+      try {
+        for (const useMobileBottomNav of [true, false]) {
+          await configureMobileLayout(currentPage, useMobileBottomNav, 844)
+          await gotoAppPath(currentPage, '/overview')
+          await currentPage.waitForSelector('.overview-stat-card', {
+            timeout: ELEMENT_TIMEOUT,
+          })
+
+          const viewportState = await currentPage.evaluate(() => {
+            const nuxtRoot = document.querySelector<HTMLElement>('#__nuxt')
+            if (!nuxtRoot) throw new Error('Nuxt root was not rendered')
+
+            const roots = [document.documentElement, document.body, nuxtRoot]
+            const overflowY = roots.map(
+              (element) => getComputedStyle(element).overflowY,
+            )
+            const heights = roots.map((element) => element.clientHeight)
+
+            // Recreate the kind of incidental body growth that previously let
+            // the mobile document move independently from its page scrollport.
+            document.body.style.paddingBottom = '5rem'
+            window.scrollTo(0, document.documentElement.scrollHeight)
+            const windowScrollY = window.scrollY
+            document.body.style.paddingBottom = ''
+            window.scrollTo(0, 0)
+
+            return {
+              heights,
+              overflowY,
+              viewportHeight: window.innerHeight,
+              windowScrollY,
+            }
+          })
+
+          expect(viewportState.overflowY).toEqual([
+            'hidden',
+            'hidden',
+            'hidden',
+          ])
+          expect(viewportState.heights).toEqual([
+            viewportState.viewportHeight,
+            viewportState.viewportHeight,
+            viewportState.viewportHeight,
+          ])
+          expect(viewportState.windowScrollY).toBe(0)
+        }
+      } finally {
+        await restoreDesktopLayout(currentPage)
+      }
+    })
+
+    it('should scroll page content without moving the header on a short viewport', async () => {
+      const currentPage = getPage(page)
+
+      try {
+        for (const useMobileBottomNav of [true, false]) {
+          await configureMobileLayout(currentPage, useMobileBottomNav, 500)
+          await gotoAppPath(currentPage, '/overview')
+          await currentPage.waitForSelector('.overview-stat-card', {
+            timeout: ELEMENT_TIMEOUT,
+          })
+
+          const scrollState = await currentPage.evaluate(() => {
+            const firstCard = document.querySelector('.overview-stat-card')
+            const scrollport =
+              firstCard?.closest<HTMLElement>('.overflow-y-auto')
+            const header = document.querySelector<HTMLElement>('header')
+            if (!scrollport || !header) {
+              throw new Error(
+                'Mobile header or overview scrollport was missing',
+              )
+            }
+
+            const headerTopBefore = header.getBoundingClientRect().top
+            const maxScroll = scrollport.scrollHeight - scrollport.clientHeight
+            scrollport.scrollTop = Math.min(200, maxScroll)
+
+            return {
+              headerTopAfter: header.getBoundingClientRect().top,
+              headerTopBefore,
+              maxScroll,
+              scrollTop: scrollport.scrollTop,
+              windowScrollY: window.scrollY,
+            }
+          })
+
+          expect(scrollState.maxScroll).toBeGreaterThan(0)
+          expect(scrollState.scrollTop).toBeGreaterThan(0)
+          expect(scrollState.headerTopAfter).toBe(scrollState.headerTopBefore)
+          expect(scrollState.windowScrollY).toBe(0)
+        }
+      } finally {
+        await restoreDesktopLayout(currentPage)
+      }
     })
   })
 })

@@ -74,7 +74,7 @@ const hasEndpoint = computed(
 <template>
   <div
     ref="rootElement"
-    class="relative flex h-screen flex-col overscroll-y-none antialiased"
+    class="relative flex h-full flex-col overflow-hidden antialiased"
     :class="[
       configStore.enableTwemoji ? 'font-twemoji' : 'font-default',
       appearance.hasBackground.value ? '' : 'bg-base-100',

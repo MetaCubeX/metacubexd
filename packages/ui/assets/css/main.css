@@ -55,6 +55,18 @@
   scrollbar-color: transparent transparent;
 }
 
+/* The application shell owns the viewport; individual pages, drawers, and
+   dialogs provide their own scrollports. Lock the document-level height and
+   overflow so touch momentum cannot chain into the page and move the mobile
+   header out of view. */
+html,
+body,
+#__nuxt {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior-y: none;
+}
+
 ::-webkit-scrollbar {
   background: transparent;
   display: none;
