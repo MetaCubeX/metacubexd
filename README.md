@@ -554,11 +554,11 @@ package tests, local packaging guidance, and required desktop smoke tests.
 
 ## ⭐ Star History
 
-<a href="https://star-history.com/#metacubex/metacubexd&Date">
+<a href="https://star-history.dera.page/#metacubex/metacubexd&Date">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=metacubex/metacubexd&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=metacubex/metacubexd&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=metacubex/metacubexd&type=Date" width="600" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://star-history.dera.page/svg?repos=metacubex/metacubexd&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://star-history.dera.page/svg?repos=metacubex/metacubexd&type=Date" />
+    <img alt="Star History Chart" src="https://star-history.dera.page/svg?repos=metacubex/metacubexd&type=Date" width="600" />
   </picture>
 </a>
 
