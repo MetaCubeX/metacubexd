@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.272.0](https://github.com/MetaCubeX/metacubexd/compare/v1.271.0...v1.272.0) (2026-08-15)
+
+
+### Features
+
+* **proxies:** refine desktop proxy navigation ([35a46a5](https://github.com/MetaCubeX/metacubexd/commit/35a46a5bd305c8533bf0f8f003362f03a0568adf))
+
 ## [1.271.0](https://github.com/MetaCubeX/metacubexd/compare/v1.270.6...v1.271.0) (2026-08-01)
 
 
