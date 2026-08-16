@@ -3,6 +3,7 @@
   "pwaUpdateReload": "再読み込み",
   "lastHour": "過去1時間",
   "lastDay": "過去1日",
+  "lastWeek": "過去1週間",
   "lastMonth": "過去1ヶ月",
   "customRange": "カスタム範囲",
   "forever": "すべて",

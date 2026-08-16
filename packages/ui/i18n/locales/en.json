@@ -3,6 +3,7 @@
   "pwaUpdateReload": "Reload",
   "lastHour": "Last Hour",
   "lastDay": "Last Day",
+  "lastWeek": "Last Week",
   "lastMonth": "Last Month",
   "customRange": "Custom Range",
   "forever": "Forever",

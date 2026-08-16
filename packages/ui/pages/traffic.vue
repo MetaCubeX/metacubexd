@@ -49,6 +49,7 @@ const activeView = useLocalStorage<DataUsageType>(
 const timeRangeOptions = computed(() => [
   { label: t('lastHour'), value: 3600000 },
   { label: t('lastDay'), value: 86400000 },
+  { label: t('lastWeek'), value: 604800000 },
   { label: t('lastMonth'), value: 2592000000 },
   { label: t('customRange'), value: -1 },
 ])
@@ -57,6 +58,7 @@ const retentionOptions = computed(() => [
   { label: t('forever'), value: -1 },
   { label: t('lastHour'), value: 3600000 },
   { label: t('lastDay'), value: 86400000 },
+  { label: t('lastWeek'), value: 604800000 },
   { label: t('lastMonth'), value: 2592000000 },
 ])
 const selectedDataRetention = useLocalStorage('traffic_data_retention', -1)

@@ -3,6 +3,7 @@
   "pwaUpdateReload": "刷新",
   "lastHour": "上一小时",
   "lastDay": "最近一天",
+  "lastWeek": "最近一周",
   "lastMonth": "最近一月",
   "customRange": "自定义时间",
   "forever": "永久保存",
