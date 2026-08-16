@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.273.0](https://github.com/MetaCubeX/metacubexd/compare/v1.272.0...v1.273.0) (2026-08-16)
+
+
+### Features
+
+* **ui:** add last-week traffic range ([#2177](https://github.com/MetaCubeX/metacubexd/issues/2177)) ([32a75fb](https://github.com/MetaCubeX/metacubexd/commit/32a75fb8eaa7bb99f596f5f71b25c3007d27690f))
+
 ## [1.272.0](https://github.com/MetaCubeX/metacubexd/compare/v1.271.0...v1.272.0) (2026-08-15)
 
 
