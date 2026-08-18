@@ -7,7 +7,7 @@ packages:
 # (dependencies + devDependencies). ZERO version bumps in this migration.
 catalog:
   '@antfu/eslint-config': ^9.3.0
-  '@commitlint/config-conventional': ^21.2.0
+  '@commitlint/config-conventional': ^21.2.2
   # Flips Electron's runtime fuses on the packaged binary via an afterPack hook
   # (scripts/after-pack.cjs). Already present transitively under electron-builder;
   # pinned here so the desktop package can require() it directly.
@@ -16,7 +16,7 @@ catalog:
   '@nuxt/fonts': ^0.14.0
   '@nuxtjs/i18n': ^10.6.0
   '@nuxtjs/tailwindcss': ^6.14.0
-  '@pinia/nuxt': ^1.0.1
+  '@pinia/nuxt': ^1.0.2
   '@playwright/test': ^1.62.1
   '@prettier/plugin-oxc': ^0.2.2
   '@tabler/icons-vue': ^3.46.0
@@ -35,9 +35,9 @@ catalog:
   '@vueuse/integrations': ^14.4.0
   '@vueuse/nuxt': ^14.4.0
   byte-size: ^9.0.1
-  commitlint: ^21.2.1
+  commitlint: ^21.2.2
   d3: ^7.9.0
-  daisyui: ^5.7.16
+  daisyui: ^5.7.17
   dayjs: ^1.11.21
   electron: ^43.3.0
   electron-builder: ^26.0.0
@@ -75,7 +75,7 @@ catalog:
   monaco-yaml: ^5.5.1
   nitropack: ^2.12.6
   nuxt: 4.5.2
-  pinia: ^4.0.2
+  pinia: ^4.0.3
   playwright: ^1.62.1
   prettier: ^3.9.6
   prettier-plugin-tailwindcss: ^0.8.1
@@ -91,7 +91,7 @@ catalog:
   vue: ^3.5.41
   vue-router: ^5.2.0
   vue-sonner: ^2.0.9
-  vue-tsc: ^3.3.9
+  vue-tsc: ^3.3.10
   yaml: ^2.9.0
 
 neverBuiltDependencies: []
