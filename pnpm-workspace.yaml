@@ -22,27 +22,27 @@ catalog:
   '@tabler/icons-vue': ^3.46.0
   '@tailwindcss/typography': ^0.5.20
   '@tailwindcss/vite': ^4.3.3
-  '@tanstack/vue-query': ^5.101.4
-  '@tanstack/vue-virtual': ^3.13.35
+  '@tanstack/vue-query': ^5.102.8
+  '@tanstack/vue-virtual': ^3.13.36
   '@types/byte-size': ^8.1.2
   '@types/d3': ^7.4.3
   '@types/markdown-it': ^14.1.2
-  '@types/node': ^26.2.0
+  '@types/node': ^26.4.0
   '@types/sortablejs': ^1.15.9
   '@vite-pwa/nuxt': ^1.1.1
-  '@vitest/coverage-v8': ^4.1.10
+  '@vitest/coverage-v8': ^4.1.11
   '@vueuse/core': ^14.4.0
   '@vueuse/integrations': ^14.4.0
   '@vueuse/nuxt': ^14.4.0
   byte-size: ^9.0.1
   commitlint: ^21.2.2
   d3: ^7.9.0
-  daisyui: ^5.7.17
-  dayjs: ^1.11.21
-  electron: ^43.3.0
+  daisyui: ^5.7.22
+  dayjs: ^1.11.23
+  electron: ^44.0.0
   electron-builder: ^26.0.0
   electron-vite: ^5.0.0
-  eslint: ^10.8.1
+  eslint: ^10.9.1
   eslint-plugin-format: ^2.0.1
   # NEW-SUBSYSTEM deps (consumed by the future agent/server/desktop packages
   # in plans 02-05, NOT by packages/ui). These are brand-new catalog entries
@@ -50,14 +50,14 @@ catalog:
   # "ZERO version bumps" rule still holds (it forbids changing the version of
   # an already-present dep, not adding a new one). Versions come from spec §1.
   h3: ^1.15.11
-  highcharts: ^13.0.0
+  highcharts: ^13.0.2
   husky: ^9.1.7
   jsdom: ^30.0.1
-  ky: ^2.0.2
-  lint-staged: ^17.3.0
-  markdown-it: ^15.0.0
+  ky: ^2.1.0
+  lint-staged: ^17.4.1
+  markdown-it: ^15.0.1
   match-sorter: ^8.3.0
-  meta-json-schema: ^1.19.29
+  meta-json-schema: ^1.19.30
   # PINNED, do not bump past 0.52.x. monaco-yaml@5.5.1 (latest) pulls
   # monaco-worker-manager@2.0.1 (latest), which calls the OLD
   # editor.createWebWorker({ moduleId, label, createData }) API. monaco-editor
@@ -86,12 +86,12 @@ catalog:
   tsx: ^4.23.11
   typescript: ^7.0.2
   uqr: ^0.1.2
-  vite: 8.2.1
-  vitest: ^4.1.10
-  vue: ^3.5.41
-  vue-router: ^5.2.0
+  vite: 8.2.2
+  vitest: ^4.1.11
+  vue: ^3.5.42
+  vue-router: ^5.3.0
   vue-sonner: ^2.0.9
-  vue-tsc: ^3.3.10
+  vue-tsc: ^3.3.11
   yaml: ^2.9.0
 
 neverBuiltDependencies: []
@@ -99,7 +99,7 @@ neverBuiltDependencies: []
 # overrides MUST live only at the workspace root (pnpm 10/11). This is the
 # merge of OLD package.json#pnpm.overrides + the OLD workspace override.
 # CONFLICT RESOLUTION (see spec §2): the old package.json pinned
-# vite: 8.2.1 in BOTH dependencies and pnpm.overrides, but the old
+# vite: 8.2.2 in BOTH dependencies and pnpm.overrides, but the old
 # pnpm-workspace.yaml override 'vite: npm:rolldown-vite@latest' WON at install
 # time — the project already runs on rolldown-vite. Keep ONLY rolldown-vite
 # here; drop the 8.0.16 pin. (The 8.0.16 entry survives in the catalog above
