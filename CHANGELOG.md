@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.273.1](https://github.com/MetaCubeX/metacubexd/compare/v1.273.0...v1.273.1) (2026-09-10)
+
+
+### Bug Fixes
+
+* **desktop:** repair native TUN helper startup and recovery ([81b9f81](https://github.com/MetaCubeX/metacubexd/commit/81b9f81d2664a03cb74fb92f33a5f5cdb3dc2255)), closes [#2149](https://github.com/MetaCubeX/metacubexd/issues/2149)
+
 ## [1.273.0](https://github.com/MetaCubeX/metacubexd/compare/v1.272.0...v1.273.0) (2026-08-16)
 
 
