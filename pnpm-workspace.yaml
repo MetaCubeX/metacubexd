@@ -55,7 +55,7 @@ catalog:
   jsdom: ^30.0.1
   ky: ^2.0.2
   lint-staged: ^17.3.0
-  markdown-it: ^15.0.0
+  markdown-it: ^15.0.1
   match-sorter: ^8.3.0
   meta-json-schema: ^1.19.29
   # PINNED, do not bump past 0.52.x. monaco-yaml@5.5.1 (latest) pulls

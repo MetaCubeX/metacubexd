@@ -127,8 +127,8 @@ catalogs:
       specifier: ^17.3.0
       version: 17.3.0
     markdown-it:
-      specifier: ^15.0.0
-      version: 15.0.0
+      specifier: ^15.0.1
+      version: 15.0.2
     match-sorter:
       specifier: ^8.3.0
       version: 8.3.0
@@ -397,7 +397,7 @@ importers:
         version: 2.0.2
       markdown-it:
         specifier: 'catalog:'
-        version: 15.0.0
+        version: 15.0.2
       match-sorter:
         specifier: 'catalog:'
         version: 8.3.0
@@ -6849,8 +6849,8 @@ packages:
     resolution: {integrity: sha512-hXdUTZYIVOt1Ex//jAQi+wTZZpUpwBj/0QsOzqegb3rGMMeJiSEu5xLHnYfBrRV4RH2+OCSOO95Is/7x1WJ4bw==}
     engines: {node: '>=10'}
 
-  markdown-it@15.0.0:
-    resolution: {integrity: sha512-Lf8ajvVNdRpzSNB4VegxNy7gjs8gU35l4b4+ET49LrQC5PKYwLZ72u60LeJ9gv3qiaesuYjJWCyVeQmv/QWKQw==}
+  markdown-it@15.0.2:
+    resolution: {integrity: sha512-q4IGxMv56jCqT4OCRCADBoDP3LO4MhmTXjFbphHPXs4g3j9Xg5RDnxqN8IF/3vIWEU+VCnUq+7JUg/cfy2E6Qw==}
     hasBin: true
 
   markdown-table@3.0.4:
@@ -16511,7 +16511,7 @@ snapshots:
     dependencies:
       semver: 7.8.5
 
-  markdown-it@15.0.0:
+  markdown-it@15.0.2:
     dependencies:
       argparse: 3.0.0
       entities: 8.0.0
