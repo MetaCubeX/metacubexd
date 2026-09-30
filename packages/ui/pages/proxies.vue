@@ -111,10 +111,35 @@ function scrollActiveListToTop() {
   proxyMasterDetail.value?.scrollToTop(behavior)
 }
 
+// Live ProxyNodes instances keyed by group name. Jump-to-current uses them to
+// grow a group's render window on demand, so the selected node is always
+// mounted before we look it up — independent of the progressive window state.
+const proxyNodesByGroup = new Map<
+  string,
+  { revealProxy: (proxyName: string) => void }
+>()
+
+function setProxyNodesRef(groupName: string, instance: unknown) {
+  const revealProxy = (instance as { revealProxy?: unknown } | null)
+    ?.revealProxy
+  if (typeof revealProxy === 'function') {
+    proxyNodesByGroup.set(groupName, {
+      revealProxy: revealProxy as (proxyName: string) => void,
+    })
+    return
+  }
+  proxyNodesByGroup.delete(groupName)
+}
+
 async function scrollToSelectedProxy(proxyGroup: ProxyType) {
   // ProxyNodes is lazily mounted by Collapse, so reveal the group before
   // looking up its selected node.
   proxiesStore.collapsedMap[proxyGroup.name] = true
+  await nextTick()
+
+  // The progressive window may not include the selected node yet (e.g. right
+  // after a per-group search restarted it), so grow it before scrolling.
+  proxyNodesByGroup.get(proxyGroup.name)?.revealProxy(proxyGroup.now)
   await nextTick()
 
   const candidates =
@@ -279,6 +304,22 @@ const sortedNamesByGroup = computed(() => {
   return map
 })
 
+// Per-group node search. Persisted in the config store and keyed by group
+// name, so every group keeps its own independent query. The two searches
+// intersect: sortedNamesByGroup is already filtered by the global
+// proxiesGroupNameFilter, so applying the group keyword on top narrows further.
+// Providers keep the global filter only.
+const filteredNamesByGroup = computed(() => {
+  const map: Record<string, string[]> = {}
+  for (const proxyGroup of renderProxies.value) {
+    map[proxyGroup.name] = filterProxiesByName(
+      sortedNamesByGroup.value[proxyGroup.name] ?? [],
+      configStore.proxyGroupSearchQueries[proxyGroup.name] ?? '',
+    )
+  }
+  return map
+})
+
 const sortedNamesByProvider = computed(() => {
   const map: Record<string, string[]> = {}
   for (const provider of proxiesStore.proxyProviders) {
@@ -310,6 +351,136 @@ watch(
   ),
 )
 
+// Per-group search box, rendered beside the title actions so it stays visible
+// while the group is collapsed. Uses the same global-filter-aware list the
+// group renders so the empty state matches what is actually visible.
+const ProxyGroupSearch = defineComponent({
+  props: {
+    proxyGroup: { type: Object as () => ProxyType, required: true },
+  },
+  setup(props) {
+    const isExpanded = ref(false)
+    const inputRef = ref<HTMLInputElement | null>(null)
+    const query = computed({
+      get: () =>
+        configStore.proxyGroupSearchQueries[props.proxyGroup.name] ?? '',
+      set: (value: string) => {
+        configStore.proxyGroupSearchQueries[props.proxyGroup.name] = value
+      },
+    })
+    const showInput = computed(() => isExpanded.value || query.value.length > 0)
+
+    const hasNoMatch = computed(
+      () =>
+        query.value.trim().length > 0 &&
+        (filteredNamesByGroup.value[props.proxyGroup.name] ?? []).length === 0,
+    )
+
+    return () =>
+      h(
+        'div',
+        {
+          class: showInput.value
+            ? 'flex w-24 max-w-full min-w-0 flex-col gap-1.5 select-text sm:w-32 lg:w-40'
+            : 'flex shrink-0',
+          // The title row owns collapse; keep every interaction with the
+          // search control out of that click handler.
+          onClick: (event: MouseEvent) => event.stopPropagation(),
+          onFocusout: (event: FocusEvent) => {
+            // Removing the search button to reveal the input can itself fire
+            // focusout. Only collapse when the input actually loses focus.
+            if (
+              event.target === inputRef.value &&
+              !(event.currentTarget as HTMLElement).contains(
+                event.relatedTarget as Node | null,
+              )
+            ) {
+              isExpanded.value = false
+            }
+          },
+        },
+        showInput.value
+          ? [
+              h(
+                'div',
+                {
+                  class:
+                    'flex h-9 items-center gap-2 rounded-lg border border-base-content/10 bg-base-100/60 px-2.5 transition-colors duration-200 focus-within:border-primary/40',
+                },
+                [
+                  h(IconSearch, { size: 14, class: 'shrink-0 opacity-50' }),
+                  h('input', {
+                    ref: inputRef,
+                    value: query.value,
+                    type: 'text',
+                    inputmode: 'search',
+                    role: 'searchbox',
+                    class:
+                      'min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:opacity-50',
+                    placeholder: t('filterNodesByName'),
+                    'aria-label': `${t('filterNodesByName')}: ${props.proxyGroup.name}`,
+                    'data-testid': 'proxy-group-search',
+                    'data-proxy-group': props.proxyGroup.name,
+                    onInput: (event: Event) => {
+                      query.value = (event.target as HTMLInputElement).value
+                    },
+                  }),
+                  query.value.length > 0 &&
+                    h(
+                      Button,
+                      {
+                        class:
+                          'flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-base-content/45 transition-colors duration-200 hover:bg-base-content/10 hover:text-base-content',
+                        title: t('clear'),
+                        'aria-label': t('clear'),
+                        'data-testid': 'proxy-group-search-clear',
+                        'data-proxy-group': props.proxyGroup.name,
+                        onClick: () => {
+                          query.value = ''
+                          isExpanded.value = false
+                        },
+                      },
+                      { default: () => h(IconX, { size: 14 }) },
+                    ),
+                ],
+              ),
+              hasNoMatch.value &&
+                h(
+                  'p',
+                  {
+                    class: 'px-0.5 text-xs leading-4 text-base-content/45',
+                    role: 'status',
+                    'data-testid': 'proxy-group-search-empty',
+                    'data-proxy-group': props.proxyGroup.name,
+                  },
+                  // Reuse an existing localized key; a dedicated "no matching
+                  // nodes" string still needs locale parity before it can be added.
+                  t('noData'),
+                ),
+            ]
+          : [
+              h(
+                Button,
+                {
+                  class:
+                    'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-base-content/8 bg-base-content/6 text-base-content/60 transition-all duration-200 hover:border-primary/30 hover:bg-primary/15 hover:text-primary',
+                  title: t('filterNodesByName'),
+                  'aria-label': `${t('filterNodesByName')}: ${props.proxyGroup.name}`,
+                  'data-testid': 'proxy-group-search-toggle',
+                  'data-proxy-group': props.proxyGroup.name,
+                  onClick: async () => {
+                    isExpanded.value = true
+                    await nextTick()
+                    inputRef.value?.focus()
+                  },
+                },
+                { default: () => h(IconSearch, { size: 18 }) },
+              ),
+            ],
+      )
+  },
+})
+
 // ProxyGroupTitle component
 const ProxyGroupTitle = defineComponent({
   props: {
@@ -338,12 +509,15 @@ const ProxyGroupTitle = defineComponent({
         h(
           'div',
           {
-            class: 'flex items-center justify-between gap-2 w-full flex-nowrap',
+            class: 'flex min-w-0 w-full items-center justify-between gap-2',
           },
           [
             h(
               'div',
-              { class: 'flex flex-wrap items-center gap-2 flex-1 min-w-0' },
+              {
+                class:
+                  'flex min-w-0 flex-1 basis-0 flex-wrap items-center gap-2',
+              },
               [
                 // Icon support
                 props.proxyGroup.icon &&
@@ -384,97 +558,105 @@ const ProxyGroupTitle = defineComponent({
                 ),
               ],
             ),
-            h('div', { class: 'flex items-center gap-1.5 shrink-0' }, [
-              // Desktop quick navigation to the selected node in this group.
-              h(
-                Button,
-                {
-                  class:
-                    'hidden sm:flex items-center justify-center w-9 h-9 rounded-lg bg-base-content/6 border border-base-content/8 text-base-content/60 transition-all duration-200 hover:bg-primary/15 hover:border-primary/30 hover:text-primary hover:-translate-y-px hover:shadow-lg hover:shadow-primary/15 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-40',
-                  disabled: !hasVisibleCurrentProxy.value,
-                  title: t('jumpToCurrent'),
-                  'aria-label': `${t('jumpToCurrent')}: ${props.proxyGroup.name}`,
-                  'data-testid': 'jump-to-current',
-                  'data-proxy-group': props.proxyGroup.name,
-                  onClick: (e: MouseEvent) => {
-                    e.stopPropagation()
-                    scrollToSelectedProxy(props.proxyGroup)
-                  },
-                },
-                {
-                  default: () => h(IconTarget, { size: 18 }),
-                },
-              ),
-              // Switch to Recommended button
-              hasRecommendation.value &&
+            h(
+              'div',
+              {
+                class:
+                  'flex min-w-0 flex-[2] basis-0 flex-wrap items-start justify-end gap-1.5',
+              },
+              [
+                h(ProxyGroupSearch, { proxyGroup: props.proxyGroup }),
+                // Desktop quick navigation to the selected node in this group.
                 h(
                   Button,
                   {
                     class:
-                      'flex items-center justify-center w-9 h-9 rounded-lg bg-warning/10 border border-warning/20 text-warning transition-all duration-200 hover:bg-warning/20 hover:border-warning/40 hover:-translate-y-px hover:shadow-lg hover:shadow-warning/15 active:translate-y-0',
-                    title:
-                      t(
-                        'recommendation.switchToRecommended',
-                        'Switch to Recommended: ',
-                      ) + recommendedNode.value,
+                      'hidden shrink-0 sm:flex items-center justify-center w-9 h-9 rounded-lg bg-base-content/6 border border-base-content/8 text-base-content/60 transition-all duration-200 hover:bg-primary/15 hover:border-primary/30 hover:text-primary hover:-translate-y-px hover:shadow-lg hover:shadow-primary/15 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-40',
+                    disabled: !hasVisibleCurrentProxy.value,
+                    title: t('jumpToCurrent'),
+                    'aria-label': `${t('jumpToCurrent')}: ${props.proxyGroup.name}`,
+                    'data-testid': 'jump-to-current',
+                    'data-proxy-group': props.proxyGroup.name,
                     onClick: (e: MouseEvent) => {
                       e.stopPropagation()
-                      switchToRecommended(props.proxyGroup)
+                      scrollToSelectedProxy(props.proxyGroup)
                     },
                   },
                   {
-                    default: () => h(IconWand, { size: 18 }),
+                    default: () => h(IconTarget, { size: 18 }),
                   },
                 ),
-              // Unfix button — only shown when this automatic group has a manual
-              // pin (mihomo reports it via `fixed`). Clicking restores auto-select.
-              !!props.proxyGroup.fixed &&
-                h(
-                  Button,
-                  {
-                    class:
-                      'flex items-center justify-center w-9 h-9 rounded-lg bg-warning/10 border border-warning/20 text-warning transition-all duration-200 hover:bg-warning/20 hover:border-warning/40 hover:-translate-y-px hover:shadow-lg hover:shadow-warning/15 active:translate-y-0',
-                    title: t('unfixProxy'),
-                    onClick: (e: MouseEvent) => {
-                      e.stopPropagation()
-                      proxiesStore.unfixProxyInGroup(props.proxyGroup.name)
-                    },
-                  },
-                  {
-                    default: () => h(IconPinnedOff, { size: 18 }),
-                  },
-                ),
-              h(
-                Button,
-                {
-                  class:
-                    'flex items-center justify-center w-9 h-9 rounded-lg bg-base-content/6 border border-base-content/8 text-base-content/60 transition-all duration-200 hover:bg-primary/15 hover:border-primary/30 hover:text-primary hover:-translate-y-px hover:shadow-lg hover:shadow-primary/15 active:translate-y-0 disabled:bg-success/15 disabled:border-success/30 disabled:cursor-not-allowed disabled:opacity-100',
-                  disabled:
-                    proxiesStore.proxyGroupLatencyTestingMap[
-                      props.proxyGroup.name
-                    ],
-                  onClick: async (e: MouseEvent) => {
-                    e.stopPropagation()
-                    await proxiesStore.proxyGroupLatencyTest(
-                      props.proxyGroup.name,
-                    )
-                    autoSwitchAfterTest([props.proxyGroup])
-                  },
-                },
-                {
-                  default: () =>
-                    h(IconBrandSpeedtest, {
-                      size: 18,
-                      class: {
-                        'animate-pulse text-success':
-                          proxiesStore.proxyGroupLatencyTestingMap[
-                            props.proxyGroup.name
-                          ],
+                // Switch to Recommended button
+                hasRecommendation.value &&
+                  h(
+                    Button,
+                    {
+                      class:
+                        'flex shrink-0 items-center justify-center w-9 h-9 rounded-lg bg-warning/10 border border-warning/20 text-warning transition-all duration-200 hover:bg-warning/20 hover:border-warning/40 hover:-translate-y-px hover:shadow-lg hover:shadow-warning/15 active:translate-y-0',
+                      title:
+                        t(
+                          'recommendation.switchToRecommended',
+                          'Switch to Recommended: ',
+                        ) + recommendedNode.value,
+                      onClick: (e: MouseEvent) => {
+                        e.stopPropagation()
+                        switchToRecommended(props.proxyGroup)
                       },
-                    }),
-                },
-              ),
-            ]),
+                    },
+                    {
+                      default: () => h(IconWand, { size: 18 }),
+                    },
+                  ),
+                // Unfix button — only shown when this automatic group has a manual
+                // pin (mihomo reports it via `fixed`). Clicking restores auto-select.
+                !!props.proxyGroup.fixed &&
+                  h(
+                    Button,
+                    {
+                      class:
+                        'flex shrink-0 items-center justify-center w-9 h-9 rounded-lg bg-warning/10 border border-warning/20 text-warning transition-all duration-200 hover:bg-warning/20 hover:border-warning/40 hover:-translate-y-px hover:shadow-lg hover:shadow-warning/15 active:translate-y-0',
+                      title: t('unfixProxy'),
+                      onClick: (e: MouseEvent) => {
+                        e.stopPropagation()
+                        proxiesStore.unfixProxyInGroup(props.proxyGroup.name)
+                      },
+                    },
+                    {
+                      default: () => h(IconPinnedOff, { size: 18 }),
+                    },
+                  ),
+                h(
+                  Button,
+                  {
+                    class:
+                      'flex shrink-0 items-center justify-center w-9 h-9 rounded-lg bg-base-content/6 border border-base-content/8 text-base-content/60 transition-all duration-200 hover:bg-primary/15 hover:border-primary/30 hover:text-primary hover:-translate-y-px hover:shadow-lg hover:shadow-primary/15 active:translate-y-0 disabled:bg-success/15 disabled:border-success/30 disabled:cursor-not-allowed disabled:opacity-100',
+                    disabled:
+                      proxiesStore.proxyGroupLatencyTestingMap[
+                        props.proxyGroup.name
+                      ],
+                    onClick: async (e: MouseEvent) => {
+                      e.stopPropagation()
+                      await proxiesStore.proxyGroupLatencyTest(
+                        props.proxyGroup.name,
+                      )
+                      autoSwitchAfterTest([props.proxyGroup])
+                    },
+                  },
+                  {
+                    default: () =>
+                      h(IconBrandSpeedtest, {
+                        size: 18,
+                        class: {
+                          'animate-pulse text-success':
+                            proxiesStore.proxyGroupLatencyTestingMap[
+                              props.proxyGroup.name
+                            ],
+                        },
+                      }),
+                  },
+                ),
+              ],
+            ),
           ],
         ),
         h('div', { class: 'flex flex-col gap-2.5 pt-1' }, [
@@ -534,17 +716,44 @@ const ProxyNodes = defineComponent({
   props: {
     proxyGroup: { type: Object as () => ProxyType, required: true },
     sortedProxyNames: { type: Array as () => string[], required: true },
+    searchQuery: { type: String, default: '' },
   },
-  setup(props) {
+  setup(props, { expose }) {
     const recommendedNode = computed(() => getRecommendedNode(props.proxyGroup))
     const renderCount = ref(PROXIES_INITIAL_RENDER_COUNT)
     const loadMoreSentinel = ref<HTMLElement | null>(null)
 
-    // Keep the currently selected node within the rendered window, otherwise
-    // it could be hidden below the fold after expanding the group.
+    // Grow the render window so `proxyName` is mounted. Jump-to-current calls
+    // this because a query change deliberately restarts the window and may
+    // leave the selected node outside of it.
+    function revealProxy(proxyName: string) {
+      const index = props.sortedProxyNames.indexOf(proxyName)
+      if (index < 0 || index < renderCount.value) return
+      renderCount.value = Math.min(
+        props.sortedProxyNames.length,
+        index + PROXIES_RENDER_STEP,
+      )
+    }
+
+    expose({ revealProxy })
+
+    // A new search query replaces the rendered list: restart the progressive
+    // window so typing or clearing a search never mounts hundreds of nodes in
+    // one frame (jump-to-current grows it again on demand). Otherwise keep the
+    // currently selected node within the rendered window, otherwise it could
+    // be hidden below the fold after expanding the group.
     watch(
-      () => [props.sortedProxyNames, props.proxyGroup.now] as const,
-      ([names, now]) => {
+      () =>
+        [
+          props.sortedProxyNames,
+          props.proxyGroup.now,
+          props.searchQuery,
+        ] as const,
+      ([names, now, query], previous) => {
+        if (previous && previous[2] !== query) {
+          renderCount.value = PROXIES_INITIAL_RENDER_COUNT
+          return
+        }
         const index = names.indexOf(now)
         if (index >= renderCount.value) {
           renderCount.value = index + PROXIES_RENDER_STEP
@@ -947,7 +1156,9 @@ const ProviderProxyNodes = defineComponent({
         <input
           v-model="configStore.proxiesGroupNameFilter"
           class="w-full bg-transparent text-sm outline-none placeholder:opacity-50"
-          type="search"
+          type="text"
+          inputmode="search"
+          role="searchbox"
           :placeholder="t('filterNodesByName')"
         />
         <Button
@@ -1034,13 +1245,19 @@ const ProviderProxyNodes = defineComponent({
                 <ProxyGroupTitle
                   :proxy-group="proxyGroup"
                   :sorted-proxy-names="
-                    sortedNamesByGroup[proxyGroup.name] || []
+                    filteredNamesByGroup[proxyGroup.name] || []
                   "
                 />
               </template>
               <ProxyNodes
+                :ref="(el) => setProxyNodesRef(proxyGroup.name, el)"
                 :proxy-group="proxyGroup"
-                :sorted-proxy-names="sortedNamesByGroup[proxyGroup.name] || []"
+                :sorted-proxy-names="
+                  filteredNamesByGroup[proxyGroup.name] || []
+                "
+                :search-query="
+                  configStore.proxyGroupSearchQueries[proxyGroup.name] || ''
+                "
               />
             </Collapse>
           </template>
@@ -1062,13 +1279,19 @@ const ProviderProxyNodes = defineComponent({
                 <ProxyGroupTitle
                   :proxy-group="proxyGroup"
                   :sorted-proxy-names="
-                    sortedNamesByGroup[proxyGroup.name] || []
+                    filteredNamesByGroup[proxyGroup.name] || []
                   "
                 />
               </template>
               <ProxyNodes
+                :ref="(el) => setProxyNodesRef(proxyGroup.name, el)"
                 :proxy-group="proxyGroup"
-                :sorted-proxy-names="sortedNamesByGroup[proxyGroup.name] || []"
+                :sorted-proxy-names="
+                  filteredNamesByGroup[proxyGroup.name] || []
+                "
+                :search-query="
+                  configStore.proxyGroupSearchQueries[proxyGroup.name] || ''
+                "
               />
             </Collapse>
           </template>
@@ -1088,13 +1311,19 @@ const ProviderProxyNodes = defineComponent({
                 <ProxyGroupTitle
                   :proxy-group="proxyGroup"
                   :sorted-proxy-names="
-                    sortedNamesByGroup[proxyGroup.name] || []
+                    filteredNamesByGroup[proxyGroup.name] || []
                   "
                 />
               </template>
               <ProxyNodes
+                :ref="(el) => setProxyNodesRef(proxyGroup.name, el)"
                 :proxy-group="proxyGroup"
-                :sorted-proxy-names="sortedNamesByGroup[proxyGroup.name] || []"
+                :sorted-proxy-names="
+                  filteredNamesByGroup[proxyGroup.name] || []
+                "
+                :search-query="
+                  configStore.proxyGroupSearchQueries[proxyGroup.name] || ''
+                "
               />
             </Collapse>
           </template>
