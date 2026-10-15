@@ -203,8 +203,8 @@ describe('composables/useTunConfig', () => {
     available = false
     const patch = vi.fn()
     const c = useTunConfig({ patch })
-    await c.onStackChange('LWIP')
-    expect(patch).toHaveBeenCalledWith({ stack: 'LWIP' })
+    await c.onStackChange('Mips')
+    expect(patch).toHaveBeenCalledWith({ stack: 'Mips' })
     expect(tun.enable).not.toHaveBeenCalled()
   })
 

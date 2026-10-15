@@ -1,5 +1,5 @@
 // Pure builder for the mihomo `tun:` config block. The stack (mixed / gvisor /
-// system / lwip) comes from the UI; the rest are the safe defaults that make a
+// system / mips) comes from the UI; the rest are the safe defaults that make a
 // privileged TUN device actually route everything without leaking:
 //   - auto-route + auto-detect-interface: mihomo wires the routes/interface
 //   - dns-hijack ['any:53']: capture all plaintext DNS through the tunnel

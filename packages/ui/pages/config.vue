@@ -112,7 +112,7 @@ const isSingBox = computed(() => isSingBoxVersion(backendVersion.value))
 const enhancedModes = ['fake-ip', 'redir-host']
 
 // TUN stack options
-const tunStacks = ['Mixed', 'gVisor', 'System', 'LWIP']
+const tunStacks = ['Mixed', 'gVisor', 'System', 'Mips']
 
 // TUN section wiring. On desktop (capability 'tun') flipping TUN cannot go
 // through the unprivileged Clash-API PATCH — it must route through
