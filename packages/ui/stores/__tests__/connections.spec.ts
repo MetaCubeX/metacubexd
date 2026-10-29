@@ -1,6 +1,6 @@
 import type { WsMsg } from '~/types'
 import { createPinia, setActivePinia } from 'pinia'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { nextTick, reactive } from 'vue'
 import { useConnectionsStore } from '../connections'
 
@@ -35,7 +35,7 @@ vi.stubGlobal('localStorage', localStorageMock)
 
 const mockGlobalStore = { clearChartHistory: vi.fn() }
 const mockEndpointStore = reactive({ selectedEndpoint: 'endpoint-a' })
-const mockConfigStore = { enableDataUsageTracking: true }
+const mockConfigStore = reactive({ enableDataUsageTracking: true })
 
 vi.stubGlobal('useGlobalStore', () => mockGlobalStore)
 vi.stubGlobal('useEndpointStore', () => mockEndpointStore)
@@ -66,14 +66,22 @@ function makeMsg(
   return { uploadTotal, downloadTotal, connections } as unknown as WsMsg
 }
 
-describe('stores/connections restart detection vs endpoint switch', () => {
-  beforeEach(() => {
-    setActivePinia(createPinia())
-    vi.clearAllMocks()
-    localStorageMock.clear()
-    mockEndpointStore.selectedEndpoint = 'endpoint-a'
-  })
+beforeEach(() => {
+  vi.useFakeTimers()
+  vi.setSystemTime(new Date('2026-01-01T12:00:00Z'))
+  setActivePinia(createPinia())
+  vi.clearAllMocks()
+  localStorageMock.clear()
+  mockEndpointStore.selectedEndpoint = 'endpoint-a'
+  mockConfigStore.enableDataUsageTracking = true
+})
 
+afterEach(() => {
+  vi.clearAllTimers()
+  vi.useRealTimers()
+})
+
+describe('stores/connections restart detection vs endpoint switch', () => {
   it('does not wipe usage history or chart when switching endpoints', async () => {
     const store = useConnectionsStore()
 
@@ -91,7 +99,7 @@ describe('stores/connections restart detection vs endpoint switch', () => {
     expect(mockGlobalStore.clearChartHistory).not.toHaveBeenCalled()
   })
 
-  it('still detects a real kernel restart on the same endpoint', () => {
+  it('still detects a real kernel restart on the same endpoint', async () => {
     const store = useConnectionsStore()
 
     store.updateFromWsMsg(makeMsg(1000, 2000, [makeConn('c1', 500, 1000)]))
@@ -100,5 +108,148 @@ describe('stores/connections restart detection vs endpoint switch', () => {
 
     expect(dbMock.clearAll).toHaveBeenCalled()
     expect(mockGlobalStore.clearChartHistory).toHaveBeenCalled()
+
+    store.updateFromWsMsg(makeMsg(20, 40, [makeConn('c1', 15, 30)]))
+    await vi.advanceTimersByTimeAsync(30000)
+    expect(dbMock.addLogs).toHaveBeenCalledExactlyOnceWith([
+      expect.objectContaining({ upload: 10, download: 20 }),
+    ])
+  })
+})
+
+describe('stores/connections data usage baselines', () => {
+  it('records only increments after the initial connection snapshot', async () => {
+    const store = useConnectionsStore()
+
+    store.updateFromWsMsg(makeMsg(1000, 2000, [makeConn('c1', 500, 1000)]))
+    await vi.advanceTimersByTimeAsync(30000)
+    expect(dbMock.addLogs).not.toHaveBeenCalled()
+
+    store.updateFromWsMsg(makeMsg(1010, 2020, [makeConn('c1', 510, 1020)]))
+    await vi.advanceTimersByTimeAsync(30000)
+    expect(dbMock.addLogs).toHaveBeenCalledExactlyOnceWith([
+      expect.objectContaining({ upload: 10, download: 20 }),
+    ])
+  })
+
+  it('counts a new connection after an empty initial snapshot', async () => {
+    const store = useConnectionsStore()
+
+    store.updateFromWsMsg(makeMsg(1000, 2000, []))
+    store.updateFromWsMsg(makeMsg(1010, 2020, [makeConn('c1', 10, 20)]))
+    await vi.advanceTimersByTimeAsync(30000)
+
+    expect(dbMock.addLogs).toHaveBeenCalledExactlyOnceWith([
+      expect.objectContaining({ upload: 10, download: 20 }),
+    ])
+  })
+
+  it('includes the initial bytes of connections opened after tracking starts', async () => {
+    const store = useConnectionsStore()
+
+    store.updateFromWsMsg(makeMsg(1000, 2000, [makeConn('c1', 500, 1000)]))
+    store.updateFromWsMsg(
+      makeMsg(1020, 2040, [makeConn('c1', 510, 1020), makeConn('c2', 10, 20)]),
+    )
+    await vi.advanceTimersByTimeAsync(30000)
+
+    expect(dbMock.addLogs).toHaveBeenCalledExactlyOnceWith([
+      expect.objectContaining({ upload: 20, download: 40 }),
+    ])
+  })
+
+  it('does not replay accumulated bytes after recreating the dashboard store', async () => {
+    const firstStore = useConnectionsStore()
+    firstStore.updateFromWsMsg(makeMsg(1000, 2000, [makeConn('c1', 500, 1000)]))
+    firstStore.updateFromWsMsg(makeMsg(1010, 2020, [makeConn('c1', 510, 1020)]))
+    await vi.advanceTimersByTimeAsync(30000)
+
+    setActivePinia(createPinia())
+    const reloadedStore = useConnectionsStore()
+    reloadedStore.updateFromWsMsg(
+      makeMsg(1010, 2020, [makeConn('c1', 510, 1020)]),
+    )
+    await vi.advanceTimersByTimeAsync(30000)
+
+    expect(dbMock.addLogs).toHaveBeenCalledTimes(1)
+    expect(dbMock.clearAll).not.toHaveBeenCalled()
+
+    reloadedStore.updateFromWsMsg(
+      makeMsg(1020, 2040, [makeConn('c1', 520, 1040)]),
+    )
+    await vi.advanceTimersByTimeAsync(30000)
+    expect(dbMock.addLogs).toHaveBeenLastCalledWith([
+      expect.objectContaining({ upload: 10, download: 20 }),
+    ])
+  })
+
+  it('baselines existing connections when switching endpoints', async () => {
+    const store = useConnectionsStore()
+    store.updateFromWsMsg(makeMsg(1000, 2000, [makeConn('c1', 500, 1000)]))
+
+    mockEndpointStore.selectedEndpoint = 'endpoint-b'
+    await nextTick()
+    store.updateFromWsMsg(makeMsg(100, 200, [makeConn('c2', 50, 100)]))
+    store.updateFromWsMsg(makeMsg(110, 220, [makeConn('c2', 60, 120)]))
+    await vi.advanceTimersByTimeAsync(30000)
+
+    expect(dbMock.addLogs).toHaveBeenCalledExactlyOnceWith([
+      expect.objectContaining({ upload: 10, download: 20 }),
+    ])
+    expect(dbMock.clearAll).not.toHaveBeenCalled()
+  })
+
+  it('keeps the new baseline while clearing persisted history asynchronously', async () => {
+    const store = useConnectionsStore()
+    store.updateFromWsMsg(makeMsg(1000, 2000, [makeConn('c1', 500, 1000)]))
+    store.updateFromWsMsg(makeMsg(1010, 2020, [makeConn('c1', 510, 1020)]))
+
+    let finishClear!: () => void
+    dbMock.clearAll.mockReturnValueOnce(
+      new Promise<void>((resolve) => {
+        finishClear = resolve
+      }),
+    )
+    const clearing = store.clearDataUsage()
+    store.updateFromWsMsg(makeMsg(1020, 2040, [makeConn('c1', 520, 1040)]))
+    finishClear()
+    await clearing
+    store.updateFromWsMsg(makeMsg(1030, 2060, [makeConn('c1', 530, 1060)]))
+    await vi.advanceTimersByTimeAsync(30000)
+
+    expect(dbMock.addLogs).toHaveBeenCalledExactlyOnceWith([
+      expect.objectContaining({ upload: 10, download: 20 }),
+    ])
+  })
+
+  it('does not backfill traffic transferred while tracking was disabled', async () => {
+    const store = useConnectionsStore()
+    store.updateFromWsMsg(makeMsg(1000, 2000, [makeConn('c1', 500, 1000)]))
+
+    mockConfigStore.enableDataUsageTracking = false
+    store.updateFromWsMsg(makeMsg(1100, 2200, [makeConn('c1', 600, 1200)]))
+    mockConfigStore.enableDataUsageTracking = true
+    store.updateFromWsMsg(makeMsg(1200, 2400, [makeConn('c1', 700, 1400)]))
+    store.updateFromWsMsg(makeMsg(1210, 2420, [makeConn('c1', 710, 1420)]))
+    await vi.advanceTimersByTimeAsync(30000)
+
+    expect(dbMock.addLogs).toHaveBeenCalledExactlyOnceWith([
+      expect.objectContaining({ upload: 10, download: 20 }),
+    ])
+  })
+
+  it('resets the baseline when tracking is toggled between snapshots', async () => {
+    const store = useConnectionsStore()
+    store.updateFromWsMsg(makeMsg(1000, 2000, [makeConn('c1', 500, 1000)]))
+
+    mockConfigStore.enableDataUsageTracking = false
+    mockConfigStore.enableDataUsageTracking = true
+    store.updateFromWsMsg(makeMsg(1200, 2400, [makeConn('c1', 700, 1400)]))
+    store.updateFromWsMsg(makeMsg(1210, 2420, [makeConn('c1', 710, 1420)]))
+    await vi.advanceTimersByTimeAsync(30000)
+
+    expect(dbMock.addLogs).toHaveBeenCalledExactlyOnceWith([
+      expect.objectContaining({ upload: 10, download: 20 }),
+    ])
   })
 })
