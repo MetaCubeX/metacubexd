@@ -46,3 +46,14 @@ jobs:
 
       - name: run e2e tests
         run: pnpm --filter @metacubexd/ui test:e2e
+
+      - name: verify screenshot generation
+        run: |
+          pnpm --filter @metacubexd/ui screenshot
+          for viewport in pc mobile; do
+            for page in overview proxies connections rules logs config; do
+              test -s "$OUTPUT_DIR/$viewport/$page.png"
+            done
+          done
+        env:
+          OUTPUT_DIR: ${{ runner.temp }}/metacubexd-screenshots

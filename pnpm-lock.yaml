@@ -212,7 +212,7 @@ overrides:
   picomatch: '>=4.0.4'
   rollup: '>=4.60.4'
   serialize-javascript: '>=7.0.5'
-  srvx: '>=0.11.16'
+  srvx@0: '>=0.11.16 <1'
   tar: '>=7.5.15'
   undici@6: ^6.27.0
   undici@7: ^7.28.0
@@ -4883,7 +4883,7 @@ packages:
   crossws@0.4.16:
     resolution: {integrity: sha512-gKc2u346c6tZazImz8/4KkRRKW6cEHot3Z3+gzKNSkfHTWkYrXeiidMKYN0JnHqeszIs5++iDaVzP/pWl/efpw==}
     peerDependencies:
-      srvx: '>=0.11.16'
+      srvx: '>=0.11.16 <1'
     peerDependenciesMeta:
       srvx:
         optional: true
@@ -8261,6 +8261,16 @@ packages:
     engines: {node: '>=20.16.0'}
     hasBin: true
 
+  srvx@1.0.5:
+    resolution: {integrity: sha512-KvSKRpgPG/oaq3cyT614OQ2bAa7DynuGamivCZeoZzIUULOdbQz6wUtnnVuC4+DCx2Zglzo8v5gBYmWIWYhDxA==}
+    engines: {node: '>=20.16.0'}
+    hasBin: true
+
+  srvx@1.0.8:
+    resolution: {integrity: sha512-ngFS/J6St4PJfHRHGjr78xkPPtbyXtdMOLNE4x/XZunEK3OhV7aGUWMHf9WTUEy6wm1U0W4okkd82ZFFWRVQTw==}
+    engines: {node: '>=20.16.0'}
+    hasBin: true
+
   standard-as-callback@2.1.0:
     resolution: {integrity: sha512-qoRRSyROncaz1z0mvYqIE4lCd9p2R90i6GxW3uZv5ucSu8tU7B5HXUP1gG8pVZsYNVaXjk8ClXHPttLyxAL48A==}
 
@@ -11214,7 +11224,7 @@ snapshots:
       pkg-types: 2.4.0
       rc9: 3.1.0
       scule: 1.3.0
-      srvx: 0.11.16
+      srvx: 1.0.8
       std-env: 4.3.0
       tinyclip: 1.0.3
       tinyexec: 1.3.1
@@ -11703,7 +11713,7 @@ snapshots:
       nuxt: 4.6.3(bc89b597aa5e67d48c09c50451d72f9c)
       pathe: 2.0.3
       rou3: 0.9.2
-      srvx: 0.11.16
+      srvx: 1.0.5
       ufo: 1.6.4
       ultrahtml: 1.7.0
       vite: rolldown-vite@7.3.1(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@26.6.5)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.23.15)(yaml@2.9.0)
@@ -18262,7 +18272,12 @@ snapshots:
   sprintf-js@1.1.3:
     optional: true
 
-  srvx@0.11.16: {}
+  srvx@0.11.16:
+    optional: true
+
+  srvx@1.0.5: {}
+
+  srvx@1.0.8: {}
 
   standard-as-callback@2.1.0: {}
 
