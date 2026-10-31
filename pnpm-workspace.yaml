@@ -126,7 +126,7 @@ overrides:
   picomatch: '>=4.0.4'
   rollup: '>=4.60.4'
   serialize-javascript: '>=7.0.5'
-  srvx: '>=0.11.16'
+  'srvx@0': '>=0.11.16 <1'
   tar: '>=7.5.15'
   'undici@6': ^6.27.0
   'undici@7': ^7.28.0

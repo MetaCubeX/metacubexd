@@ -193,7 +193,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: macos-14, ebargs: '--mac --arm64', brew_arch: 'arm64' }
+          - { os: macos-15, ebargs: '--mac --arm64', brew_arch: 'arm64' }
           - { os: macos-15-intel, ebargs: '--mac --x64', brew_arch: 'x64' }
           - { os: windows-latest, ebargs: '--win --x64 --arm64' }
           - { os: ubuntu-latest, ebargs: '--linux --x64 --arm64' }
@@ -295,10 +295,12 @@ jobs:
         run: pnpm --filter @metacubexd/ui exec playwright install chromium
 
       - name: build with mock mode
-        run: pnpm --filter @metacubexd/ui generate:mock
+        run: pnpm --filter @metacubexd/ui build:mock
 
       - name: generate screenshots
         run: pnpm --filter @metacubexd/ui screenshot
+        env:
+          OUTPUT_DIR: ${{ github.workspace }}/docs
 
       - name: commit and push screenshots
         run: |
