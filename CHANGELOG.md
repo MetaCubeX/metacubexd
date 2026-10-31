@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.274.2](https://github.com/MetaCubeX/metacubexd/compare/v1.274.1...v1.274.2) (2026-10-31)
+
+
+### Bug Fixes
+
+* harden profile updates and desktop lifecycle ([220e127](https://github.com/MetaCubeX/metacubexd/commit/220e127205de9f6fda293f229217237c26ff247e))
+
 ## [1.274.1](https://github.com/MetaCubeX/metacubexd/compare/v1.274.0...v1.274.1) (2026-10-31)
 
 
