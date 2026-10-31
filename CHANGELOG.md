@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.274.0](https://github.com/MetaCubeX/metacubexd/compare/v1.273.1...v1.274.0) (2026-10-31)
+
+
+### Features
+
+* **proxies:** add persistent per-group node search ([#2204](https://github.com/MetaCubeX/metacubexd/issues/2204)) ([dbc9ee8](https://github.com/MetaCubeX/metacubexd/commit/dbc9ee8261a7652d741ac0d03fc33f84d7d4638a))
+
+
+### Bug Fixes
+
+* **ui:** avoid replaying connection totals in data usage ([#2227](https://github.com/MetaCubeX/metacubexd/issues/2227)) ([75470e8](https://github.com/MetaCubeX/metacubexd/commit/75470e81f035e2207db5cf94ad70fe902eb0bd13))
+
 ## [1.273.1](https://github.com/MetaCubeX/metacubexd/compare/v1.273.0...v1.273.1) (2026-09-10)
 
 
