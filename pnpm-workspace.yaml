@@ -74,7 +74,7 @@ catalog:
   monaco-editor: 0.52.2
   monaco-yaml: ^5.5.1
   nitropack: ^2.12.6
-  nuxt: 4.5.2
+  nuxt: 4.6.3
   pinia: ^4.0.3
   playwright: ^1.62.1
   prettier: ^3.9.6
