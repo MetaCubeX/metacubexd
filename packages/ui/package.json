@@ -52,7 +52,7 @@
     "pinia": "catalog:",
     "sortablejs": "catalog:",
     "tailwindcss": "catalog:",
-    "typescript": "catalog:",
+    "typescript": "npm:@typescript/typescript6@~6.0.2",
     "uqr": "catalog:",
     "vite": "catalog:",
     "vue": "catalog:",
