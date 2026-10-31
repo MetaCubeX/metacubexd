@@ -18,6 +18,7 @@
     "preview": "nuxt preview --host",
     "screenshot": "tsx scripts/screenshot.ts",
     "test:e2e": "vitest run e2e/",
+    "test:static": "tsx scripts/check-static-build.ts",
     "test:unit": "vitest run --exclude='e2e/**'",
     "test:coverage": "vitest run --coverage --exclude='e2e/**'",
     "typecheck": "vue-tsc --noEmit"

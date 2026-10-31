@@ -57,3 +57,9 @@ jobs:
           done
         env:
           OUTPUT_DIR: ${{ runner.temp }}/metacubexd-screenshots
+
+      - name: generate static release artifact
+        run: NUXT_APP_BASE_URL='./' pnpm --filter @metacubexd/ui generate
+
+      - name: verify static release at root and subdirectory
+        run: pnpm --filter @metacubexd/ui test:static
