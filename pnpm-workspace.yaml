@@ -49,7 +49,7 @@ catalog:
   # for brand-new packages — they do NOT bump any existing dependency, so the
   # "ZERO version bumps" rule still holds (it forbids changing the version of
   # an already-present dep, not adding a new one). Versions come from spec §1.
-  h3: ^1.15.11
+  h3: ^2.0.8
   highcharts: ^13.0.0
   husky: ^9.1.7
   jsdom: ^30.0.1
@@ -86,20 +86,20 @@ catalog:
   tsx: ^4.23.11
   typescript: ^7.0.2
   uqr: ^0.1.2
-  vite: 8.1.6
+  vite: 8.3.5
   vitest: ^4.1.10
   vue: ^3.5.41
   vue-router: ^5.2.0
   vue-sonner: ^2.0.9
   vue-tsc: ^3.3.10
-  yaml: ^2.9.0
+  yaml: ^2.9.1
 
 neverBuiltDependencies: []
 
 # overrides MUST live only at the workspace root (pnpm 10/11). This is the
 # merge of OLD package.json#pnpm.overrides + the OLD workspace override.
 # CONFLICT RESOLUTION (see spec §2): the old package.json pinned
-# vite: 8.1.6 in BOTH dependencies and pnpm.overrides, but the old
+# vite: 8.3.5 in BOTH dependencies and pnpm.overrides, but the old
 # pnpm-workspace.yaml override 'vite: npm:rolldown-vite@latest' WON at install
 # time — the project already runs on rolldown-vite. Keep ONLY rolldown-vite
 # here; drop the 8.0.16 pin. (The 8.0.16 entry survives in the catalog above
