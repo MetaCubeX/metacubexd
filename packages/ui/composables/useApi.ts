@@ -1,3 +1,4 @@
+import type { Options } from 'ky'
 import type {
   BackendVersion,
   Config,
@@ -198,7 +199,17 @@ function getMockData(url: string): unknown {
   return {}
 }
 
-export function useRequest() {
+// Expose the JSON contract shared by mock responses and Ky's response promises.
+interface RequestResponse {
+  json: <T = unknown>() => Promise<T>
+}
+
+type RequestClient = Record<
+  'get' | 'post' | 'put' | 'patch' | 'delete',
+  (url: string, options?: Options) => RequestResponse
+>
+
+export function useRequest(): RequestClient {
   const endpointStore = useEndpointStore()
   const endpoint = endpointStore.currentEndpoint
 

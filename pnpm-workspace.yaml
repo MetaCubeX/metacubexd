@@ -84,6 +84,7 @@ catalog:
   tailwindcss: ^4.3.3
   tree-kill: ^1.2.2
   tsx: ^4.23.15
+  # UI uses the TypeScript 6 API alias for vue-tsc and typescript-eslint.
   typescript: ^7.0.2
   uqr: ^0.1.2
   vite: 8.3.5
