@@ -228,6 +228,14 @@ describe('createHelperServer', () => {
     expect(res.type).toBe('getVersion')
     expect(res.ok).toBe(true)
     expect(res.version).toBe('7')
+    expect(res).toMatchObject({ instanceId: expect.any(String) })
+    expect(
+      await roundTrip(socketPath, {
+        type: 'getVersion',
+        secret: SECRET,
+        version: HELPER_PROTOCOL_VERSION,
+      }),
+    ).toMatchObject({ instanceId: res.ok ? res.instanceId : undefined })
   })
 
   it('allows an authenticated version probe from a different protocol version', async () => {
@@ -247,6 +255,7 @@ describe('createHelperServer', () => {
       type: 'getVersion',
       ok: true,
       version: HELPER_PROTOCOL_VERSION,
+      instanceId: expect.any(String),
     })
     expect(
       await roundTrip(socketPath, {
@@ -254,7 +263,12 @@ describe('createHelperServer', () => {
         secret: 'WRONG',
         version: 'older-version',
       }),
-    ).toMatchObject({ ok: false, error: 'helper: shared secret mismatch' })
+    ).toEqual({
+      type: 'getVersion',
+      ok: false,
+      version: HELPER_PROTOCOL_VERSION,
+      error: 'helper: shared secret mismatch',
+    })
   })
 
   it('dispatches startKernel to the injected kernel and returns its result', async () => {

@@ -10,7 +10,7 @@ import {
   rm,
   writeFile,
 } from 'node:fs/promises'
-import { join } from 'node:path'
+import { join, resolve } from 'node:path'
 import { parse, stringify } from 'yaml'
 import { ConfigPatchConflictError, isPlainObject, mergeConfigs } from './merge'
 
@@ -28,6 +28,27 @@ export interface ProfileStoreOptions {
 
 interface StateFile {
   activeId?: string
+}
+
+// Stores for the same directory share a write queue. Atomic rename protects a
+// single file, but an index read/modify/write must also be one transaction.
+const writes = new Map<string, Promise<void>>()
+
+function withProfileWrite<T>(
+  dir: string,
+  action: () => Promise<T>,
+): Promise<T> {
+  const key = resolve(dir)
+  const result = (writes.get(key) ?? Promise.resolve()).then(action)
+  const settled = result.then(
+    () => {},
+    () => {},
+  )
+  writes.set(key, settled)
+  void settled.then(() => {
+    if (writes.get(key) === settled) writes.delete(key)
+  })
+  return result
 }
 
 /** Known HTTP failure returned by a remote subscription provider. */
@@ -79,6 +100,15 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
   async function writeState(s: StateFile): Promise<void> {
     await ensureDir()
     await atomicWrite(statePath, `${JSON.stringify(s, null, 2)}\n`)
+  }
+
+  async function writeActive(id: string, content: string): Promise<void> {
+    await mkdir(join(activeConfigPath, '..'), { recursive: true })
+    if (existsSync(activeConfigPath)) {
+      await copyFile(activeConfigPath, `${activeConfigPath}.bak`)
+    }
+    await atomicWrite(activeConfigPath, content)
+    await writeState({ activeId: id })
   }
 
   async function findMeta(id: string): Promise<ProfileMeta> {
@@ -135,7 +165,7 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
     } catch (err) {
       if (signal.aborted) {
         throw new Error(
-          `subscription fetch timed out after ${subscriptionTimeoutMs}ms for ${url}`,
+          `subscription fetch timed out after ${subscriptionTimeoutMs}ms`,
         )
       }
       throw err
@@ -268,48 +298,64 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
         url,
         userAgent,
       )
-      const id = idGen()
-      const meta: ProfileMeta = {
-        id,
-        name: name ?? url,
-        type: 'remote',
-        url,
-        userAgent,
-        updatedAt: Date.now(),
-        ...(subscriptionInfo ? { subscriptionInfo } : {}),
-      }
-      await atomicWrite(profilePath(id), content)
-      await writeIndex([...(await readIndex()), meta])
-      return meta
+      return withProfileWrite(dir, async () => {
+        const id = idGen()
+        const meta: ProfileMeta = {
+          id,
+          name: name ?? url,
+          type: 'remote',
+          url,
+          userAgent,
+          updatedAt: Date.now(),
+          ...(subscriptionInfo ? { subscriptionInfo } : {}),
+        }
+        await atomicWrite(profilePath(id), content)
+        await writeIndex([...(await readIndex()), meta])
+        return meta
+      })
     },
 
     async refresh(id) {
-      const list = await readIndex()
-      const meta = list.find((m) => m.id === id)
-      if (!meta) throw new Error(`profile not found: ${id}`)
+      const meta = await findMeta(id)
       if (meta.type !== 'remote' || !meta.url) {
         throw new Error(`refresh: profile ${id} is not a remote subscription`)
       }
+      const previousContent = await readFile(profilePath(id), 'utf8')
       const userAgent = meta.userAgent ?? 'clash.meta'
       const { content, subscriptionInfo } = await fetchSubscription(
         meta.url,
         userAgent,
       )
-      // Overwrite the SAME file in place — keep the same id (no orphan).
-      await atomicWrite(profilePath(id), content)
-      meta.updatedAt = Date.now()
-      if (subscriptionInfo) meta.subscriptionInfo = subscriptionInfo
-      try {
-        await store.compose(id)
-        meta.editorStatus = 'clean'
-      } catch (error) {
-        if (!(error instanceof ConfigPatchConflictError)) throw error
-        // Keep the refreshed source on disk, but mark it conflicted. Activation
-        // will refuse to replace the running config until the user resolves it.
-        meta.editorStatus = 'conflicted'
-      }
-      await writeIndex(list)
-      return meta
+      // Network I/O does not hold the queue. Re-read and change only this record
+      // under the same lock as every other mutation, preserving intervening
+      // additions, removals and metadata edits from the UI or another store.
+      return withProfileWrite(dir, async () => {
+        const list = await readIndex()
+        const current = list.find((item) => item.id === id)
+        if (!current) throw new Error(`profile not found: ${id}`)
+        if (
+          current.type !== 'remote' ||
+          current.url !== meta.url ||
+          (current.userAgent ?? 'clash.meta') !== userAgent ||
+          (await readFile(profilePath(id), 'utf8')) !== previousContent
+        ) {
+          throw new Error(
+            'profile changed while the subscription was refreshing',
+          )
+        }
+        await atomicWrite(profilePath(id), content)
+        current.updatedAt = Date.now()
+        if (subscriptionInfo) current.subscriptionInfo = subscriptionInfo
+        try {
+          await store.compose(id)
+          current.editorStatus = 'clean'
+        } catch (error) {
+          if (!(error instanceof ConfigPatchConflictError)) throw error
+          current.editorStatus = 'conflicted'
+        }
+        await writeIndex(list)
+        return current
+      })
     },
 
     async getActiveId() {
@@ -318,13 +364,15 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
 
     async setActive(id) {
       const { content } = await store.compose(id)
-      await mkdir(join(activeConfigPath, '..'), { recursive: true })
-      // Snapshot the previous active config so /kernel/rollback can restore it.
-      if (existsSync(activeConfigPath)) {
-        await copyFile(activeConfigPath, `${activeConfigPath}.bak`)
-      }
-      await atomicWrite(activeConfigPath, content)
-      await writeState({ activeId: id })
+      await writeActive(id, content)
+    },
+
+    async setActiveIfCurrent(id, validatedContent) {
+      if ((await readState()).activeId !== id) return false
+      const { content } = await store.compose(id)
+      if (content !== validatedContent) return false
+      await writeActive(id, validatedContent)
+      return true
     },
 
     async compose(id, overrides) {
@@ -446,5 +494,20 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
     },
   }
 
-  return store
+  return {
+    ...store,
+    create: (...args) => withProfileWrite(dir, () => store.create(...args)),
+    update: (...args) => withProfileWrite(dir, () => store.update(...args)),
+    delete: (...args) => withProfileWrite(dir, () => store.delete(...args)),
+    duplicate: (...args) =>
+      withProfileWrite(dir, () => store.duplicate(...args)),
+    setActive: (...args) =>
+      withProfileWrite(dir, () => store.setActive(...args)),
+    setActiveIfCurrent: (...args) =>
+      withProfileWrite(dir, () => store.setActiveIfCurrent(...args)),
+    rollback: () => withProfileWrite(dir, () => store.rollback()),
+    resetActive: () => withProfileWrite(dir, () => store.resetActive()),
+    setSection: (...args) =>
+      withProfileWrite(dir, () => store.setSection(...args)),
+  }
 }

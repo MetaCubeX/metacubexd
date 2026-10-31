@@ -4,12 +4,152 @@ import {
   ConfigDocumentError,
   diffDocument,
   findResourceReferences,
+  hashConfigValue,
   openDocument,
   splitRuleFields,
   validateDocument,
 } from './index'
 
 describe('config editor document', () => {
+  it.each(['__proto__', 'constructor', 'prototype'])(
+    'rejects %s paths before any patch operation can mutate a prototype',
+    (segment) => {
+      const patch = {
+        version: 1 as const,
+        baseRevision: '',
+        operations: [
+          {
+            op: 'set' as const,
+            target: { path: [segment, 'mcxdPolluted'] },
+            expectedHash: hashConfigValue(undefined),
+            value: 'polluted',
+          },
+        ],
+      }
+      try {
+        expect(() => applyPatch('mode: rule\n', patch)).toThrow(
+          'Invalid configuration patch',
+        )
+        expect(Object.hasOwn(Object.prototype, 'mcxdPolluted')).toBe(false)
+      } finally {
+        Reflect.deleteProperty(Object.prototype, 'mcxdPolluted')
+      }
+    },
+  )
+
+  it('never follows an inherited object when creating a patch parent', () => {
+    const inherited = { marker: 'untouched' }
+    // Simulate a polluted environment; always remove the property in finally.
+    // eslint-disable-next-line no-extend-native
+    Object.defineProperty(Object.prototype, 'mcxdInherited', {
+      value: inherited,
+      configurable: true,
+    })
+    try {
+      const result = applyPatch('mode: rule\n', {
+        version: 1,
+        baseRevision: '',
+        operations: [
+          {
+            op: 'set',
+            target: { path: ['mcxdInherited', 'marker'] },
+            expectedHash: hashConfigValue(undefined),
+            value: 'local',
+          },
+        ],
+      })
+      expect(result.conflicts).toEqual([])
+      expect(result.document.data.mcxdInherited).toEqual({ marker: 'local' })
+      expect(inherited.marker).toBe('untouched')
+    } finally {
+      Reflect.deleteProperty(Object.prototype, 'mcxdInherited')
+    }
+  })
+
+  it.each([
+    'remove',
+    'upsert',
+    'delete',
+    'order',
+    'sequence-replace',
+    'sequence-delete',
+    'sequence-insert',
+    'sequence-order',
+  ])('rejects unsafe paths for %s operations as well as set', (op) => {
+    expect(() =>
+      applyPatch('mode: rule\n', {
+        version: 1,
+        baseRevision: '',
+        operations: [
+          {
+            op,
+            target: { path: ['dns', '__proto__'], key: 'name', id: 'item' },
+            expectedHash: hashConfigValue(undefined),
+            value: { name: 'item' },
+            ids: [],
+            previousIds: [],
+          },
+        ],
+      } as never),
+    ).toThrow('Invalid configuration patch')
+  })
+
+  it('can add a map entry whose name matches an inherited method', () => {
+    const base = 'hosts: {}\n'
+    const draft = 'hosts:\n  toString: 127.0.0.1\n'
+    const result = applyPatch(base, diffDocument(base, draft))
+    expect(result.conflicts).toEqual([])
+    expect(result.document.data.hosts).toEqual({ toString: '127.0.0.1' })
+  })
+
+  it.each([
+    null,
+    { version: 1, baseRevision: '', operations: [null] },
+    {
+      version: 1,
+      baseRevision: '',
+      operations: [
+        { op: 'unknown', target: { path: ['mode'] }, expectedHash: '' },
+      ],
+    },
+    {
+      version: 1,
+      baseRevision: '',
+      operations: [
+        { op: 'set', target: { path: [] }, expectedHash: '', value: 'global' },
+      ],
+    },
+    {
+      version: 1,
+      baseRevision: '',
+      operations: [
+        { op: 'set', target: { path: [1] }, expectedHash: '', value: 'global' },
+      ],
+    },
+    {
+      version: 1,
+      baseRevision: '',
+      operations: [{ op: 'set', target: { path: ['mode'] }, expectedHash: '' }],
+    },
+    {
+      version: 1,
+      baseRevision: '',
+      operations: [
+        {
+          op: 'order',
+          target: { path: ['proxies'], key: 'name' },
+          expectedHash: '',
+          ids: [1],
+          previousIds: [],
+        },
+      ],
+    },
+  ])('rejects malformed patch input before execution: %j', (patch) => {
+    expect(() => applyPatch('mode: rule\n', patch as never)).toThrow(
+      'Invalid configuration patch',
+    )
+  })
+
   it('rejects invalid YAML and non-mapping roots', () => {
     expect(() => openDocument('dns: [')).toThrow(ConfigDocumentError)
     expect(() => openDocument('- one\n- two\n')).toThrow(ConfigDocumentError)

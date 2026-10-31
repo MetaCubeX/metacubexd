@@ -1,6 +1,7 @@
 import type { Config, Proxy, ProxyProvider, Rule, RuleProvider } from '~/types'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { toggleRuleDisabledAPI, useRequest } from './useApi'
+import { createManagedEndpointCheck } from '~/utils/managedEndpoint'
+import { toggleRuleDisabledAPI, useMockMode, useRequest } from './useApi'
 import { useControlApi } from './useControlApi'
 import { useControlInfo } from './useControlInfo'
 
@@ -281,25 +282,49 @@ export function useUpdateConfigMutation() {
   const queryClient = useQueryClient()
   const controlApi = useControlApi()
   const { hasFeature } = useControlInfo()
+  const endpointStore = useEndpointStore()
+  const isManagedEndpoint = createManagedEndpointCheck(
+    controlApi.getKernelStatus,
+  )
 
   return useMutation({
-    mutationFn: ({
+    mutationFn: async ({
       key,
       value,
     }: {
       key: keyof Config
       value: Partial<Config[keyof Config]>
-    }) =>
-      applyConfigPatch(key, value, {
+    }) => {
+      const request = createRequest()
+      if (useMockMode()) {
+        await request.patch('configs', { json: { [key]: value } })
+        return
+      }
+      const selectedId = endpointStore.selectedEndpoint
+      const endpoint = endpointStore.currentEndpoint
+      if (!endpoint) throw new Error('No endpoint selected')
+      const connection = { url: endpoint.url, secret: endpoint.secret }
+      const stillSelected = () =>
+        endpointStore.selectedEndpoint === selectedId &&
+        endpointStore.currentEndpoint?.url === connection.url &&
+        endpointStore.currentEndpoint?.secret === connection.secret
+      const persist =
+        hasFeature('config-sections') && (await isManagedEndpoint(connection))
+      if (!stillSelected())
+        throw new Error('Endpoint changed while saving configuration')
+      await applyConfigPatch(key, value, {
         patch: async (json) => {
-          await createRequest().patch('configs', { json })
+          await request.patch('configs', { json })
         },
-        // Evaluated per-save (NOT at setup): the /info probe is async, so a
-        // setup-time read could miss the agent and skip persistence forever.
-        persist: hasFeature('config-sections')
-          ? (body) => controlApi.setConfigSection({ ...body, restart: false })
+        persist: persist
+          ? (body) => {
+              if (!stillSelected())
+                throw new Error('Endpoint changed while saving configuration')
+              return controlApi.setConfigSection({ ...body, restart: false })
+            }
           : undefined,
-      }),
+      })
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.config })
     },

@@ -54,6 +54,62 @@ function meta(p: Partial<ProfileMeta> & { id: string }): ProfileMeta {
 }
 
 describe('createProfileScheduler', () => {
+  it('waits for refreshed config application before reporting success', async () => {
+    const { store } = fakeProfiles([meta({ id: 'a', updateInterval: 1 })])
+    const timers = fakeTimers()
+    let release!: () => void
+    const pending = new Promise<void>((resolve) => {
+      release = resolve
+    })
+    const apply = vi.fn(() => pending)
+    const onResult = vi.fn()
+    const scheduler = createProfileScheduler({
+      profiles: store,
+      now: () => 100_000,
+      setTimer: timers.setTimer,
+      clearTimer: timers.clearTimer,
+      apply,
+      onResult,
+    })
+    scheduler.start()
+    timers.tick()
+    await new Promise((resolve) => setImmediate(resolve))
+    expect(apply).toHaveBeenCalledWith('a')
+    expect(onResult).not.toHaveBeenCalled()
+    expect(timers.setTimer).toHaveBeenCalledTimes(1)
+    release()
+    await new Promise((resolve) => setImmediate(resolve))
+    expect(onResult).toHaveBeenCalledWith({ id: 'a', ok: true })
+    scheduler.stop()
+  })
+
+  it('reports application failure once and continues refreshing other profiles', async () => {
+    const { store } = fakeProfiles([
+      meta({ id: 'bad', updateInterval: 1 }),
+      meta({ id: 'good', updateInterval: 1 }),
+    ])
+    const timers = fakeTimers()
+    const onResult = vi.fn()
+    const scheduler = createProfileScheduler({
+      profiles: store,
+      now: () => 100_000,
+      setTimer: timers.setTimer,
+      clearTimer: timers.clearTimer,
+      apply: async (id) => {
+        if (id === 'bad') throw new Error('invalid candidate')
+      },
+      onResult,
+    })
+    scheduler.start()
+    timers.tick()
+    await new Promise((resolve) => setImmediate(resolve))
+    expect(onResult.mock.calls).toEqual([
+      [{ id: 'bad', ok: false, error: 'invalid candidate' }],
+      [{ id: 'good', ok: true }],
+    ])
+    scheduler.stop()
+  })
+
   it('refreshes a due remote profile on tick', async () => {
     const { store, refresh } = fakeProfiles([
       meta({ id: 'a', type: 'remote', updateInterval: 60, updatedAt: 0 }),

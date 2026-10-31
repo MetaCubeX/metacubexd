@@ -199,6 +199,30 @@ describe('createProfileStore — import + active', () => {
     )
   })
 
+  it('does not expose subscription credentials in a timeout error', async () => {
+    const dir = tmpDir()
+    const store = createProfileStore({
+      dir,
+      activeConfigPath: join(dir, 'active.yaml'),
+      subscriptionTimeoutMs: 10,
+      fetch: async (_url, init) =>
+        new Promise<Response>((_resolve, reject) => {
+          init?.signal?.addEventListener('abort', () =>
+            reject(init.signal?.reason),
+          )
+        }),
+    })
+    const error = await store
+      .importFromUrl(
+        'https://user:password@example.test/sub?token=private-token',
+      )
+      .catch((reason: unknown) => reason)
+    expect(error).toBeInstanceOf(Error)
+    expect((error as Error).message).toBe(
+      'subscription fetch timed out after 10ms',
+    )
+  })
+
   it('getActiveId is undefined until setActive; setActive writes activeConfigPath', async () => {
     const dir = mkdtempSync(join(tmpdir(), 'mcxd-profiles-act-'))
     const activeConfigPath = join(dir, 'active', 'config.yaml')
@@ -571,6 +595,121 @@ describe('createProfileStore — script profiles', () => {
 })
 
 describe('createProfileStore — refresh', () => {
+  it('preserves concurrent edits and additions while fetching a subscription', async () => {
+    const dir = tmpDir()
+    let n = 0
+    let resume!: () => void
+    let entered!: () => void
+    const started = new Promise<void>((resolve) => {
+      entered = resolve
+    })
+    const pending = new Promise<void>((resolve) => {
+      resume = resolve
+    })
+    let fetching = false
+    const options = {
+      dir,
+      activeConfigPath: join(dir, 'active.yaml'),
+      idGen: () => `id${++n}`,
+    }
+    const store = createProfileStore({
+      ...options,
+      fetch: async () => {
+        if (fetching) {
+          entered()
+          await pending
+        }
+        return new Response('mode: rule\n')
+      },
+    })
+    const secondStore = createProfileStore(options)
+    const remote = await store.importFromUrl('https://example.test/sub', 'old')
+    fetching = true
+    const refresh = store.refresh(remote.id)
+    await started
+    await secondStore.update(remote.id, {
+      name: 'renamed',
+      updateInterval: 120,
+    })
+    const added = await secondStore.create({
+      name: 'new',
+      content: 'mode: direct\n',
+    })
+    resume()
+    await refresh
+    expect(await store.list()).toEqual([
+      expect.objectContaining({
+        id: remote.id,
+        name: 'renamed',
+        updateInterval: 120,
+      }),
+      expect.objectContaining({ id: added.id, name: 'new' }),
+    ])
+  })
+
+  it('serializes concurrent index mutations across stores for the same directory', async () => {
+    const dir = tmpDir()
+    let n = 0
+    const options = {
+      dir,
+      activeConfigPath: join(dir, 'active.yaml'),
+      idGen: () => `id${++n}`,
+    }
+    const stores = [createProfileStore(options), createProfileStore(options)]
+    const created = await Promise.all(
+      Array.from({ length: 20 }, (_, index) =>
+        stores[index % 2]!.create({
+          name: `profile ${index}`,
+          content: 'mode: rule\n',
+        }),
+      ),
+    )
+    expect((await stores[0]!.list()).map((meta) => meta.id).sort()).toEqual(
+      created.map((meta) => meta.id).sort(),
+    )
+  })
+
+  it.each(['edit', 'delete'] as const)(
+    'does not overwrite or recreate a profile after a concurrent %s',
+    async (change) => {
+      const dir = tmpDir()
+      let pending = false
+      let resume!: () => void
+      let entered!: () => void
+      const started = new Promise<void>((resolve) => {
+        entered = resolve
+      })
+      const gate = new Promise<void>((resolve) => {
+        resume = resolve
+      })
+      const store = createProfileStore({
+        dir,
+        activeConfigPath: join(dir, 'active.yaml'),
+        idGen: () => 'remote',
+        fetch: async () => {
+          if (pending) {
+            entered()
+            await gate
+          }
+          return new Response('mode: global\n')
+        },
+      })
+      const remote = await store.importFromUrl('https://example.test/sub')
+      pending = true
+      const refresh = store.refresh(remote.id)
+      await started
+      if (change === 'delete') await store.delete(remote.id)
+      else await store.update(remote.id, { content: 'mode: direct\n' })
+      const rejected = expect(refresh).rejects.toThrow(
+        change === 'delete' ? 'profile not found' : 'profile changed',
+      )
+      resume()
+      await rejected
+      if (change === 'delete') expect(await store.list()).toEqual([])
+      else expect(await store.read(remote.id)).toBe('mode: direct\n')
+    },
+  )
+
   it('refresh re-fetches in place: same id, overwritten content, new subscriptionInfo + updatedAt', async () => {
     const dir = mkdtempSync(join(tmpdir(), 'mcxd-profiles-ref-'))
     const activeConfigPath = join(dir, '..', 'active.yaml')

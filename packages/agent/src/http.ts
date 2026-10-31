@@ -13,6 +13,10 @@ import type {
 import { readFile as defaultReadFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import {
+  assertConfigPatch,
+  ConfigPatchValidationError,
+} from '@metacubexd/config-editor'
+import {
   createApp,
   createError,
   createEventStream,
@@ -377,19 +381,29 @@ export function createControlRouter(deps: ControlRouterDeps): App {
   // ---- Visual profile editor (Agent only) ----
   if (profileEditor) {
     const readEditorPatch = async (event: H3Event): Promise<ConfigPatchV1> => {
-      const body = (await readBody(event)) as { patch?: ConfigPatchV1 }
-      if (body.patch?.version !== 1 || !Array.isArray(body.patch.operations)) {
+      const body = (await readBody(event)) as { patch?: unknown } | null
+      const patch = body?.patch
+      try {
+        assertConfigPatch(patch)
+      } catch (error) {
+        if (!(error instanceof ConfigPatchValidationError)) throw error
         throw createError({
           statusCode: 400,
           statusMessage: 'invalid visual editor patch',
         })
       }
-      return body.patch
+      return patch
     }
     const withEditorError = async <T>(action: () => Promise<T>): Promise<T> => {
       try {
         return await action()
       } catch (error) {
+        if (error instanceof ConfigPatchValidationError) {
+          throw createError({
+            statusCode: 400,
+            statusMessage: 'invalid visual editor patch',
+          })
+        }
         if (error instanceof ProfileEditorConflictError) {
           throw createError({
             statusCode: 409,

@@ -68,6 +68,7 @@ Package tests are intentionally explicit:
 ```shell
 pnpm --filter @metacubexd/ui test:unit
 pnpm --filter @metacubexd/ui test:e2e
+pnpm --filter @metacubexd/config-editor test
 pnpm --filter @metacubexd/agent test
 pnpm --filter @metacubexd/server test
 pnpm --filter @metacubexd/desktop test

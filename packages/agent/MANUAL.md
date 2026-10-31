@@ -140,6 +140,21 @@ Expected: the active id and YAML are printed, with no metadata or front matter
 leaked into the active config. The disposable profile directory is then
 removed.
 
+## Subscription refresh behavior
+
+Automatic subscription refresh validates a separate composed candidate before
+replacing the active config or restarting the kernel. A failed validation leaves
+the running config and kernel untouched. If the user changes the active profile
+or edits its composition during validation, the automatic apply is skipped.
+The scheduler waits for application before reporting the refresh result; failed
+application is reported as a failure instead of a successful update.
+
+Profile writes share an in-process queue for each profile directory. Refresh
+downloads do not block editing; their commit preserves concurrent metadata and
+other profiles, and rejects a result if its source was edited or deleted while
+the download was pending. This is not a lock between separate agent processes:
+one agent process should own a profile directory.
+
 ## Cleanup
 
 Steps 2 and 3 clean up their own temporary directories. Step 1 intentionally

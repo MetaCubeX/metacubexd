@@ -36,6 +36,7 @@ export type {
 } from './profile-editor'
 export { createProfileStore } from './profiles'
 export { applyActiveRefresh } from './refresh-apply'
+export type { ApplyActiveRefreshOptions } from './refresh-apply'
 export { createProfileScheduler } from './scheduler'
 export type {
   ProfileRefreshResult,
@@ -137,22 +138,12 @@ export function createAgent(opts: CreateAgentOptions) {
   // — the server boot plugin starts it (the desktop builds its own scheduler so
   // it can surface per-refresh notifications, and does NOT start this one).
   //
-  // Auto-update should take effect, not just refresh a stored file: when a
-  // scheduled refresh hits the ACTIVE base, re-compose + restart so the running
-  // kernel actually picks up the new subscription (#2107). Best-effort and
-  // fire-and-forget (the scheduler never awaits onResult) — a failing apply must
-  // not wedge the tick loop; the next tick retries.
+  // Validate and conditionally apply the active subscription before completing
+  // its refresh result. The scheduler awaits this work and isolates failures.
   const scheduler = createProfileScheduler({
     profiles,
-    onResult: (r) => {
-      if (!r.ok) return
-      // Auto-update should take effect, not just refresh a stored file: when a
-      // scheduled refresh hits the ACTIVE base, re-compose + restart so the
-      // running kernel picks up the new subscription (#2107). Best-effort and
-      // fire-and-forget (the scheduler never awaits onResult) — a failing apply
-      // must not wedge the tick loop; the next tick retries.
-      void applyActiveRefresh(profiles, supervisor, r.id).catch(() => {})
-    },
+    apply: (id) =>
+      applyActiveRefresh(profiles, supervisor, id, { homeDir: opts.homeDir }),
   })
   return {
     supervisor,

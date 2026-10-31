@@ -216,9 +216,7 @@ export function createHelperClient(
     reportDisconnect(err)
   })
   socket.on('close', () => {
-    if (pending.length > 0) {
-      failAll(fatal ?? new Error('helper: connection closed'))
-    }
+    failAll(fatal ?? new Error('helper: connection closed'))
     // The connection is gone; tell the owner unless we ended it ourselves.
     reportDisconnect(fatal)
   })

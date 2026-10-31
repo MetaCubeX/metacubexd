@@ -24,11 +24,7 @@ import {
 import { join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
-import {
-  createAgent,
-  createProfileScheduler,
-  TunPreconditionError,
-} from '@metacubexd/agent'
+import { createAgent, TunPreconditionError } from '@metacubexd/agent'
 import {
   app,
   BrowserWindow,
@@ -72,6 +68,7 @@ import { createLogFileSink } from './log-file'
 import { createLoginItemController } from './login-item'
 import { createKernelCrashWatcher, createNotifier } from './notifier'
 import { bootstrapDataDir } from './paths'
+import { createDesktopProfileScheduler } from './profile-scheduler'
 import { buildProxyEnvCommand } from './proxy-env'
 import { makeToken } from './secrets'
 import { createShutdownOrchestrator } from './shutdown-orchestrator'
@@ -175,7 +172,8 @@ let agent: ReturnType<typeof createAgent> | null = null
 let controlServer: ControlServer | null = null
 // Subscription auto-update scheduler; created + started in boot() with an
 // onResult callback that notifies success/failure. Stopped on shutdown.
-let profileScheduler: ReturnType<typeof createProfileScheduler> | null = null
+let profileScheduler: ReturnType<typeof createDesktopProfileScheduler> | null =
+  null
 // OS system-proxy controller, configured in boot() for the managed mixed port.
 // Kept module-level so the quit/cleanup path can disable() it (anti-lockout).
 let systemProxy: SystemProxyController | null = null
@@ -627,15 +625,15 @@ async function boot(): Promise<void> {
   })
   agent.supervisor.on('log', (l) => kernelLog.write(l.line, l.stream))
 
-  // Drive subscription auto-update against the agent's profile store, surfacing
-  // each refresh outcome as a notification. createAgent builds its own scheduler
-  // (without onResult) but never starts it; the desktop owns the ticking here.
-  profileScheduler = createProfileScheduler({
+  // Validate and apply refreshed active subscriptions before reporting success.
+  // Desktop owns the scheduler so it can restart the current kernel owner and
+  // preserve TUN mode; the agent's server scheduler is not started here.
+  profileScheduler = createDesktopProfileScheduler({
     profiles: agent.profiles,
-    onResult: (r) => {
-      if (r.ok) notify('Subscription updated', `${r.id} refreshed.`)
-      else notify('Subscription update failed', r.error ?? r.id)
-    },
+    supervisor: agent.supervisor,
+    tunController: tunRuntime.controller,
+    homeDir: paths.homeDir,
+    notify,
   })
   profileScheduler.start()
 

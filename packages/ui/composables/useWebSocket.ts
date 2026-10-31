@@ -34,12 +34,22 @@ export function useBackendWebSocket() {
 
   // Auto-reconnect bookkeeping
   let reconnectTimer: ReturnType<typeof setTimeout> | null = null
+  let connectionRequested = false
+  let generation = 0
+  const endpointIdentity = () =>
+    JSON.stringify([
+      endpointStore.selectedEndpoint,
+      endpointStore.currentEndpoint?.url,
+      endpointStore.currentEndpoint?.secret,
+    ])
 
   // Close a socket WITHOUT triggering its auto-reconnect handler. Used for
   // intentional teardown (reconnect, unmount), so we don't reconnect a socket
   // we closed on purpose.
   const closeWs = (ws: WebSocket | null) => {
     if (!ws) return
+    ws.onmessage = null
+    ws.onerror = null
     ws.onclose = null
     ws.close()
   }
@@ -72,8 +82,13 @@ export function useBackendWebSocket() {
     if (secret) params.set('token', secret)
 
     const ws = new WebSocket(`${wsUrl}/${path}?${params.toString()}`)
+    const ownGeneration = generation
+    const ownEndpoint = endpointIdentity()
+    const isCurrent = () =>
+      ownGeneration === generation && ownEndpoint === endpointIdentity()
 
     ws.onmessage = (event) => {
+      if (!isCurrent()) return
       try {
         const data = JSON.parse(event.data)
         onMessage(data)
@@ -83,10 +98,12 @@ export function useBackendWebSocket() {
     }
 
     ws.onerror = (error) => {
+      if (!isCurrent()) return
       console.error(`WebSocket error for ${path}:`, error)
     }
 
     ws.onclose = () => {
+      if (!isCurrent()) return
       scheduleReconnect()
     }
 
@@ -96,6 +113,7 @@ export function useBackendWebSocket() {
   // Connect to all WebSocket endpoints
   const connect = () => {
     disconnect()
+    connectionRequested = true
 
     // In mock mode, use mock data instead of WebSocket
     if (useMockMode()) {
@@ -218,6 +236,8 @@ export function useBackendWebSocket() {
 
   // Disconnect all WebSockets
   const disconnect = () => {
+    connectionRequested = false
+    generation++
     // Cancel any pending reconnect — this is an intentional teardown.
     if (reconnectTimer) {
       clearTimeout(reconnectTimer)
@@ -254,7 +274,12 @@ export function useBackendWebSocket() {
     params.set('level', configStore.logLevel)
 
     const ws = new WebSocket(`${wsUrl}/logs?${params.toString()}`)
+    const ownGeneration = generation
+    const ownEndpoint = endpointIdentity()
+    const isCurrent = () =>
+      ownGeneration === generation && ownEndpoint === endpointIdentity()
     ws.onmessage = (event) => {
+      if (!isCurrent()) return
       try {
         const data = JSON.parse(event.data) as Log
         logsStore.addLog(data)
@@ -264,6 +289,7 @@ export function useBackendWebSocket() {
     }
 
     ws.onclose = () => {
+      if (!isCurrent()) return
       scheduleReconnect()
     }
 
@@ -277,6 +303,19 @@ export function useBackendWebSocket() {
   }
 
   if (getCurrentScope()) {
+    watch(
+      endpointIdentity,
+      () => {
+        const reconnect = connectionRequested
+        disconnect()
+        globalStore.setLatestTraffic(null)
+        globalStore.setLatestMemory(null)
+        globalStore.clearChartHistory()
+        logsStore.clearLogs()
+        if (reconnect) connect()
+      },
+      { flush: 'sync' },
+    )
     onScopeDispose(disconnect)
   }
 

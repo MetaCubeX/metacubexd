@@ -14,9 +14,12 @@ export interface ProfileSchedulerDeps {
   now?: () => number // default Date.now
   setTimer?: (fn: () => void, ms: number) => ReturnType<typeof setTimeout>
   clearTimer?: (handle: ReturnType<typeof setTimeout>) => void
+  // Optional validated application after a refresh. Its failure belongs to the
+  // same result, and the next tick must not overlap it.
+  apply?: (id: string) => Promise<void>
   // Optional: called after each refresh attempt with its outcome. Must not break
   // existing consumers — absence simply skips the notification.
-  onResult?: (result: ProfileRefreshResult) => void
+  onResult?: (result: ProfileRefreshResult) => void | Promise<void>
 }
 
 export interface ProfileScheduler {
@@ -30,7 +33,7 @@ export interface ProfileScheduler {
 export function createProfileScheduler(
   deps: ProfileSchedulerDeps,
 ): ProfileScheduler {
-  const { profiles, onResult } = deps
+  const { profiles, apply, onResult } = deps
   const tickMs = deps.tickMs ?? 60_000
   const now = deps.now ?? Date.now
   const setTimer = deps.setTimer ?? ((fn, ms) => setTimeout(fn, ms))
@@ -49,16 +52,24 @@ export function createProfileScheduler(
       if (now() - meta.updatedAt < interval * 60_000) continue
       // Best-effort: one failing refresh must not abort the rest. The outcome
       // (success/failure) is surfaced to onResult when provided.
+      let result: ProfileRefreshResult
       try {
         await profiles.refresh(meta.id)
-        onResult?.({ id: meta.id, ok: true })
+        await apply?.(meta.id)
+        result = { id: meta.id, ok: true }
       } catch (err) {
-        // swallow — next tick will retry; report the failure to onResult.
-        onResult?.({
+        result = {
           id: meta.id,
           ok: false,
           error: err instanceof Error ? err.message : String(err),
-        })
+        }
+      }
+      // A broken notification consumer must not abort remaining subscriptions
+      // or report the same outcome a second time.
+      try {
+        await onResult?.(result)
+      } catch {
+        /* best-effort notification */
       }
     }
   }

@@ -18,7 +18,15 @@ function makeExec(responses: string[] = []) {
     calls.push(cmd)
     return { stdout: queue.shift() ?? '', stderr: '' }
   })
-  return { exec, calls }
+  const execFile = vi.fn((file: string, args: string[]) => {
+    // Human-readable recording only; no shell is involved in this test runner.
+    const rendered =
+      args.length > 1
+        ? `${args[0]} "${args[1]}"${args.length > 2 ? ` ${args.slice(2).join(' ')}` : ''}`
+        : args.join(' ')
+    return exec(`${file} ${rendered}`)
+  })
+  return { exec, execFile, calls }
 }
 
 const DARWIN_SERVICES = [
@@ -35,12 +43,13 @@ describe('createSystemProxyController', () => {
 
   describe('macOS (darwin)', () => {
     it('enable() sets web/secureweb/socks proxy + state on every enabled service', async () => {
-      const { exec, calls } = makeExec([DARWIN_SERVICES])
+      const { exec, execFile, calls } = makeExec([DARWIN_SERVICES])
       const ctrl = createSystemProxyController({
         host: '127.0.0.1',
         port: 7890,
         platform: 'darwin',
         exec,
+        execFile,
       })
 
       await ctrl.enable()
@@ -73,12 +82,13 @@ describe('createSystemProxyController', () => {
     })
 
     it('enable(bypass) sets the proxy bypass domains per service', async () => {
-      const { exec, calls } = makeExec([DARWIN_SERVICES])
+      const { exec, execFile, calls } = makeExec([DARWIN_SERVICES])
       const ctrl = createSystemProxyController({
         host: '127.0.0.1',
         port: 7890,
         platform: 'darwin',
         exec,
+        execFile,
       })
 
       await ctrl.enable(['localhost', '127.0.0.1', '*.local'])
@@ -92,12 +102,13 @@ describe('createSystemProxyController', () => {
     })
 
     it('disable() turns the three proxy states off for every enabled service', async () => {
-      const { exec, calls } = makeExec([DARWIN_SERVICES])
+      const { exec, execFile, calls } = makeExec([DARWIN_SERVICES])
       const ctrl = createSystemProxyController({
         host: '127.0.0.1',
         port: 7890,
         platform: 'darwin',
         exec,
+        execFile,
       })
 
       await ctrl.disable()
@@ -115,7 +126,7 @@ describe('createSystemProxyController', () => {
     })
 
     it('isEnabled() parses the first service web proxy state', async () => {
-      const { exec, calls } = makeExec([
+      const { exec, execFile, calls } = makeExec([
         DARWIN_SERVICES,
         'Enabled: Yes\nServer: 127.0.0.1\nPort: 7890\nAuthenticated Proxy Enabled: 0',
       ])
@@ -124,6 +135,7 @@ describe('createSystemProxyController', () => {
         port: 7890,
         platform: 'darwin',
         exec,
+        execFile,
       })
 
       await expect(ctrl.isEnabled()).resolves.toBe(true)
@@ -131,7 +143,7 @@ describe('createSystemProxyController', () => {
     })
 
     it('isEnabled() returns false when the first service web proxy is off', async () => {
-      const { exec } = makeExec([
+      const { exec, execFile } = makeExec([
         DARWIN_SERVICES,
         'Enabled: No\nServer: \nPort: 0',
       ])
@@ -140,6 +152,7 @@ describe('createSystemProxyController', () => {
         port: 7890,
         platform: 'darwin',
         exec,
+        execFile,
       })
 
       await expect(ctrl.isEnabled()).resolves.toBe(false)
@@ -151,12 +164,13 @@ describe('createSystemProxyController', () => {
       'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings'
 
     it('enable() writes ProxyServer + ProxyEnable=1', async () => {
-      const { exec, calls } = makeExec()
+      const { exec, execFile, calls } = makeExec()
       const ctrl = createSystemProxyController({
         host: '127.0.0.1',
         port: 7890,
         platform: 'win32',
         exec,
+        execFile,
       })
 
       await ctrl.enable()
@@ -170,12 +184,13 @@ describe('createSystemProxyController', () => {
     })
 
     it('enable(bypass) writes ProxyOverride joined by ; including <local>', async () => {
-      const { exec, calls } = makeExec()
+      const { exec, execFile, calls } = makeExec()
       const ctrl = createSystemProxyController({
         host: '127.0.0.1',
         port: 7890,
         platform: 'win32',
         exec,
+        execFile,
       })
 
       await ctrl.enable(['localhost', '127.0.0.1'])
@@ -188,12 +203,13 @@ describe('createSystemProxyController', () => {
     })
 
     it('enable(bypass) quotes CIDR + <local> so reg/cmd cannot misparse /d (#2116)', async () => {
-      const { exec, calls } = makeExec()
+      const { exec, execFile, calls } = makeExec()
       const ctrl = createSystemProxyController({
         host: '127.0.0.1',
         port: 7890,
         platform: 'win32',
         exec,
+        execFile,
       })
 
       await ctrl.enable([
@@ -212,12 +228,13 @@ describe('createSystemProxyController', () => {
     })
 
     it('disable() writes ProxyEnable=0', async () => {
-      const { exec, calls } = makeExec()
+      const { exec, execFile, calls } = makeExec()
       const ctrl = createSystemProxyController({
         host: '127.0.0.1',
         port: 7890,
         platform: 'win32',
         exec,
+        execFile,
       })
 
       await ctrl.disable()
@@ -228,7 +245,7 @@ describe('createSystemProxyController', () => {
     })
 
     it('isEnabled() queries ProxyEnable and parses 0x1', async () => {
-      const { exec, calls } = makeExec([
+      const { exec, execFile, calls } = makeExec([
         '\r\nHKEY_CURRENT_USER\\...\\Internet Settings\r\n    ProxyEnable    REG_DWORD    0x1\r\n',
       ])
       const ctrl = createSystemProxyController({
@@ -236,6 +253,7 @@ describe('createSystemProxyController', () => {
         port: 7890,
         platform: 'win32',
         exec,
+        execFile,
       })
 
       await expect(ctrl.isEnabled()).resolves.toBe(true)
@@ -243,12 +261,15 @@ describe('createSystemProxyController', () => {
     })
 
     it('isEnabled() returns false for 0x0', async () => {
-      const { exec } = makeExec(['\r\n    ProxyEnable    REG_DWORD    0x0\r\n'])
+      const { exec, execFile } = makeExec([
+        '\r\n    ProxyEnable    REG_DWORD    0x0\r\n',
+      ])
       const ctrl = createSystemProxyController({
         host: '127.0.0.1',
         port: 7890,
         platform: 'win32',
         exec,
+        execFile,
       })
 
       await expect(ctrl.isEnabled()).resolves.toBe(false)
@@ -257,12 +278,13 @@ describe('createSystemProxyController', () => {
 
   describe('linux (GNOME/gsettings)', () => {
     it('enable() sets manual mode + http/https/socks host+port', async () => {
-      const { exec, calls } = makeExec()
+      const { exec, execFile, calls } = makeExec()
       const ctrl = createSystemProxyController({
         host: '127.0.0.1',
         port: 7890,
         platform: 'linux',
         exec,
+        execFile,
       })
 
       await ctrl.enable()
@@ -291,12 +313,13 @@ describe('createSystemProxyController', () => {
     })
 
     it('enable(bypass) sets ignore-hosts as a gsettings array literal', async () => {
-      const { exec, calls } = makeExec()
+      const { exec, execFile, calls } = makeExec()
       const ctrl = createSystemProxyController({
         host: '127.0.0.1',
         port: 7890,
         platform: 'linux',
         exec,
+        execFile,
       })
 
       await ctrl.enable(['localhost', '127.0.0.1'])
@@ -307,12 +330,13 @@ describe('createSystemProxyController', () => {
     })
 
     it('disable() sets mode none', async () => {
-      const { exec, calls } = makeExec()
+      const { exec, execFile, calls } = makeExec()
       const ctrl = createSystemProxyController({
         host: '127.0.0.1',
         port: 7890,
         platform: 'linux',
         exec,
+        execFile,
       })
 
       await ctrl.disable()
@@ -323,12 +347,13 @@ describe('createSystemProxyController', () => {
     })
 
     it('isEnabled() returns true when mode is manual', async () => {
-      const { exec, calls } = makeExec(["'manual'\n"])
+      const { exec, execFile, calls } = makeExec(["'manual'\n"])
       const ctrl = createSystemProxyController({
         host: '127.0.0.1',
         port: 7890,
         platform: 'linux',
         exec,
+        execFile,
       })
 
       await expect(ctrl.isEnabled()).resolves.toBe(true)
@@ -336,12 +361,13 @@ describe('createSystemProxyController', () => {
     })
 
     it('isEnabled() returns false when mode is none', async () => {
-      const { exec } = makeExec(["'none'\n"])
+      const { exec, execFile } = makeExec(["'none'\n"])
       const ctrl = createSystemProxyController({
         host: '127.0.0.1',
         port: 7890,
         platform: 'linux',
         exec,
+        execFile,
       })
 
       await expect(ctrl.isEnabled()).resolves.toBe(false)
@@ -353,12 +379,13 @@ describe('createSystemProxyController', () => {
 
     describe('macOS (darwin)', () => {
       it('setAutoProxy() points autoproxyurl + turns autoproxystate on per enabled service', async () => {
-        const { exec, calls } = makeExec([DARWIN_SERVICES])
+        const { exec, execFile, calls } = makeExec([DARWIN_SERVICES])
         const ctrl = createSystemProxyController({
           host: '127.0.0.1',
           port: 7890,
           platform: 'darwin',
           exec,
+          execFile,
         })
 
         await ctrl.setAutoProxy(PAC_URL)
@@ -375,12 +402,13 @@ describe('createSystemProxyController', () => {
       })
 
       it('disableAutoProxy() turns autoproxystate off per enabled service', async () => {
-        const { exec, calls } = makeExec([DARWIN_SERVICES])
+        const { exec, execFile, calls } = makeExec([DARWIN_SERVICES])
         const ctrl = createSystemProxyController({
           host: '127.0.0.1',
           port: 7890,
           platform: 'darwin',
           exec,
+          execFile,
         })
 
         await ctrl.disableAutoProxy()
@@ -393,12 +421,13 @@ describe('createSystemProxyController', () => {
       })
 
       it('disable() also clears PAC (anti-lockout) per enabled service', async () => {
-        const { exec, calls } = makeExec([DARWIN_SERVICES])
+        const { exec, execFile, calls } = makeExec([DARWIN_SERVICES])
         const ctrl = createSystemProxyController({
           host: '127.0.0.1',
           port: 7890,
           platform: 'darwin',
           exec,
+          execFile,
         })
 
         await ctrl.disable()
@@ -416,12 +445,13 @@ describe('createSystemProxyController', () => {
         'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings'
 
       it('setAutoProxy() writes AutoConfigURL (REG_SZ) and clears ProxyEnable', async () => {
-        const { exec, calls } = makeExec()
+        const { exec, execFile, calls } = makeExec()
         const ctrl = createSystemProxyController({
           host: '127.0.0.1',
           port: 7890,
           platform: 'win32',
           exec,
+          execFile,
         })
 
         await ctrl.setAutoProxy(PAC_URL)
@@ -436,12 +466,13 @@ describe('createSystemProxyController', () => {
       })
 
       it('disableAutoProxy() deletes AutoConfigURL', async () => {
-        const { exec, calls } = makeExec()
+        const { exec, execFile, calls } = makeExec()
         const ctrl = createSystemProxyController({
           host: '127.0.0.1',
           port: 7890,
           platform: 'win32',
           exec,
+          execFile,
         })
 
         await ctrl.disableAutoProxy()
@@ -467,12 +498,13 @@ describe('createSystemProxyController', () => {
       })
 
       it('disable() also deletes AutoConfigURL (anti-lockout)', async () => {
-        const { exec, calls } = makeExec()
+        const { exec, execFile, calls } = makeExec()
         const ctrl = createSystemProxyController({
           host: '127.0.0.1',
           port: 7890,
           platform: 'win32',
           exec,
+          execFile,
         })
 
         await ctrl.disable()
@@ -483,12 +515,13 @@ describe('createSystemProxyController', () => {
 
     describe('linux (GNOME/gsettings)', () => {
       it('setAutoProxy() sets auto mode + autoconfig-url', async () => {
-        const { exec, calls } = makeExec()
+        const { exec, execFile, calls } = makeExec()
         const ctrl = createSystemProxyController({
           host: '127.0.0.1',
           port: 7890,
           platform: 'linux',
           exec,
+          execFile,
         })
 
         await ctrl.setAutoProxy(PAC_URL)
@@ -502,12 +535,13 @@ describe('createSystemProxyController', () => {
       })
 
       it('disableAutoProxy() sets mode none', async () => {
-        const { exec, calls } = makeExec()
+        const { exec, execFile, calls } = makeExec()
         const ctrl = createSystemProxyController({
           host: '127.0.0.1',
           port: 7890,
           platform: 'linux',
           exec,
+          execFile,
         })
 
         await ctrl.disableAutoProxy()
@@ -518,12 +552,13 @@ describe('createSystemProxyController', () => {
       })
 
       it('disable() clears PAC by setting mode none (anti-lockout)', async () => {
-        const { exec, calls } = makeExec()
+        const { exec, execFile, calls } = makeExec()
         const ctrl = createSystemProxyController({
           host: '127.0.0.1',
           port: 7890,
           platform: 'linux',
           exec,
+          execFile,
         })
 
         await ctrl.disable()
@@ -537,12 +572,13 @@ describe('createSystemProxyController', () => {
 
     describe('unknown platform', () => {
       it('throws on setAutoProxy / disableAutoProxy', async () => {
-        const { exec } = makeExec()
+        const { exec, execFile } = makeExec()
         const ctrl = createSystemProxyController({
           host: '127.0.0.1',
           port: 7890,
           platform: 'aix' as NodeJS.Platform,
           exec,
+          execFile,
         })
         await expect(ctrl.setAutoProxy(PAC_URL)).rejects.toThrow(
           'unsupported platform',
@@ -556,23 +592,25 @@ describe('createSystemProxyController', () => {
 
   describe('describe()', () => {
     it('reports the configured port and empty bypass before any enable', () => {
-      const { exec } = makeExec()
+      const { exec, execFile } = makeExec()
       const ctrl = createSystemProxyController({
         host: '127.0.0.1',
         port: 7890,
         platform: 'darwin',
         exec,
+        execFile,
       })
       expect(ctrl.describe()).toEqual({ port: 7890, bypass: [] })
     })
 
     it('reports the last applied bypass after enable(bypass)', async () => {
-      const { exec } = makeExec([DARWIN_SERVICES])
+      const { exec, execFile } = makeExec([DARWIN_SERVICES])
       const ctrl = createSystemProxyController({
         host: '127.0.0.1',
         port: 7890,
         platform: 'darwin',
         exec,
+        execFile,
       })
       await ctrl.enable(['localhost', '*.local'])
       expect(ctrl.describe()).toEqual({
@@ -584,12 +622,13 @@ describe('createSystemProxyController', () => {
 
   describe('unknown platform', () => {
     it('throws a clear error on construction-driven operations', async () => {
-      const { exec } = makeExec()
+      const { exec, execFile } = makeExec()
       const ctrl = createSystemProxyController({
         host: '127.0.0.1',
         port: 7890,
         platform: 'aix' as NodeJS.Platform,
         exec,
+        execFile,
       })
       await expect(ctrl.enable()).rejects.toThrow('unsupported platform')
       await expect(ctrl.disable()).rejects.toThrow('unsupported platform')

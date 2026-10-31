@@ -148,7 +148,10 @@ export interface ProfileStore {
   importFromUrl: (url: string, name?: string) => Promise<ProfileMeta> // UA 'clash.meta'
   refresh: (id: string) => Promise<ProfileMeta> // re-fetch a remote profile in place
   getActiveId: () => Promise<string | undefined>
-  setActive: (id: string) => Promise<void> // validate + write activeConfigPath
+  setActive: (id: string) => Promise<void> // compose + write activeConfigPath
+  // Commit previously validated content only if the same profile is still
+  // active and its composition has not changed while validation was running.
+  setActiveIfCurrent: (id: string, validatedContent: string) => Promise<boolean>
   // Compose a base with its enabled merge/script layers. Overrides are used by
   // the visual editor to preview without mutating disk.
   compose: (

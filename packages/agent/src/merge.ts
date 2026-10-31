@@ -55,7 +55,9 @@ function asArray(value: unknown): unknown[] {
 // - directive keys -> splice into the corresponding base array; never emitted
 function mergeOne(acc: PlainObject, overlay: PlainObject): void {
   for (const [key, value] of Object.entries(overlay)) {
-    const directive = DIRECTIVES[key]
+    const directive = Object.hasOwn(DIRECTIVES, key)
+      ? DIRECTIVES[key]
+      : undefined
     if (directive) {
       // Treat a missing/non-array base value as an empty array.
       const baseArr = asArray(acc[directive.target])
@@ -66,12 +68,18 @@ function mergeOne(acc: PlainObject, overlay: PlainObject): void {
           : [...baseArr, ...extra]
       continue
     }
-    const existing = acc[key]
+    const existing = Object.hasOwn(acc, key) ? acc[key] : undefined
     if (isPlainObject(existing) && isPlainObject(value)) {
       mergeOne(existing, value)
     } else {
       // scalars and plain (non-directive) arrays replace wholesale
-      acc[key] = value
+      // Treat prototype-named YAML keys as data, never as inherited setters.
+      Object.defineProperty(acc, key, {
+        value,
+        enumerable: true,
+        configurable: true,
+        writable: true,
+      })
     }
   }
 }

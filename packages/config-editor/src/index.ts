@@ -137,6 +137,115 @@ export class ConfigDocumentError extends Error {
   }
 }
 
+export class ConfigPatchValidationError extends Error {
+  constructor() {
+    super('Invalid configuration patch')
+    this.name = 'ConfigPatchValidationError'
+  }
+}
+
+const UNSAFE_PATH_SEGMENTS = new Set(['__proto__', 'prototype', 'constructor'])
+
+function isConfigValue(value: unknown): value is ConfigValue {
+  if (value === null || typeof value === 'boolean' || typeof value === 'string')
+    return true
+  if (typeof value === 'number') return Number.isFinite(value)
+  if (Array.isArray(value)) return value.every(isConfigValue)
+  return isObject(value) && Object.values(value).every(isConfigValue)
+}
+
+/** Validate the complete untrusted patch before applying any operation. */
+export function assertConfigPatch(
+  patch: unknown,
+): asserts patch is ConfigPatchV1 {
+  function invalid(): never {
+    throw new ConfigPatchValidationError()
+  }
+  if (
+    !isObject(patch) ||
+    patch.version !== 1 ||
+    typeof patch.baseRevision !== 'string' ||
+    !Array.isArray(patch.operations)
+  )
+    invalid()
+  for (const operation of patch.operations) {
+    if (
+      !isObject(operation) ||
+      !isObject(operation.target) ||
+      typeof operation.expectedHash !== 'string'
+    )
+      invalid()
+    const { target } = operation
+    if (
+      !Array.isArray(target.path) ||
+      target.path.length === 0 ||
+      !target.path.every(
+        (part) =>
+          typeof part === 'string' &&
+          part.length > 0 &&
+          !UNSAFE_PATH_SEGMENTS.has(part),
+      )
+    )
+      invalid()
+    if (
+      target.key !== undefined &&
+      (typeof target.key !== 'string' ||
+        !target.key ||
+        UNSAFE_PATH_SEGMENTS.has(target.key))
+    )
+      invalid()
+    if (target.id !== undefined && typeof target.id !== 'string') invalid()
+
+    switch (operation.op) {
+      case 'set':
+      case 'sequence-replace':
+      case 'sequence-insert':
+        if (
+          !Object.hasOwn(operation, 'value') ||
+          !isConfigValue(operation.value)
+        )
+          invalid()
+        if (operation.op !== 'set' && typeof target.id !== 'string') invalid()
+        if (
+          operation.op === 'sequence-insert' &&
+          operation.beforeId !== undefined &&
+          typeof operation.beforeId !== 'string'
+        )
+          invalid()
+        break
+      case 'remove':
+        break
+      case 'upsert':
+      case 'delete':
+        if (typeof target.key !== 'string' || typeof target.id !== 'string')
+          invalid()
+        if (
+          operation.op === 'upsert' &&
+          (!isObject(operation.value) || !isConfigValue(operation.value))
+        )
+          invalid()
+        break
+      case 'order':
+      case 'sequence-order':
+        if (operation.op === 'order' && typeof target.key !== 'string')
+          invalid()
+        if (
+          !Array.isArray(operation.ids) ||
+          !operation.ids.every((id) => typeof id === 'string') ||
+          !Array.isArray(operation.previousIds) ||
+          !operation.previousIds.every((id) => typeof id === 'string')
+        )
+          invalid()
+        break
+      case 'sequence-delete':
+        if (typeof target.id !== 'string') invalid()
+        break
+      default:
+        invalid()
+    }
+  }
+}
+
 const NAMED_ARRAYS: Record<string, string> = {
   proxies: 'name',
   'proxy-groups': 'name',
@@ -153,6 +262,19 @@ const NAMED_MAPS = new Set([
 
 function isObject(value: unknown): value is ConfigObject {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function ownValue(object: ConfigObject, key: string): ConfigValue | undefined {
+  return Object.hasOwn(object, key) ? object[key] : undefined
+}
+
+function setOwn(object: ConfigObject, key: string, value: ConfigValue): void {
+  Object.defineProperty(object, key, {
+    value,
+    enumerable: true,
+    writable: true,
+    configurable: true,
+  })
 }
 
 function clone<T extends ConfigValue>(value: T): T {
@@ -226,7 +348,7 @@ function getAtPath(
   let current: ConfigValue | undefined = root
   for (const segment of path) {
     if (current === undefined || !isObject(current)) return undefined
-    current = current[segment]
+    current = ownValue(current, segment)
     if (current === undefined) return undefined
   }
   return current
@@ -235,10 +357,10 @@ function getAtPath(
 function ensureParent(root: ConfigObject, path: string[]): ConfigObject | null {
   let current: ConfigObject = root
   for (const segment of path.slice(0, -1)) {
-    const next = current[segment]
+    const next = ownValue(current, segment)
     if (next === undefined) {
       const created: ConfigObject = {}
-      current[segment] = created
+      setOwn(current, segment, created)
       current = created
     } else if (isObject(next)) {
       current = next
@@ -327,7 +449,7 @@ function namedMapDiff(
 ): ConfigPatchOperation[] {
   const operations: ConfigPatchOperation[] = []
   for (const [id, previous] of Object.entries(before)) {
-    const next = after[id]
+    const next = ownValue(after, id)
     if (next === undefined) {
       operations.push({
         op: 'remove',
@@ -344,7 +466,7 @@ function namedMapDiff(
     }
   }
   for (const [id, next] of Object.entries(after)) {
-    if (before[id] !== undefined) continue
+    if (ownValue(before, id) !== undefined) continue
     operations.push({
       op: 'set',
       target: { path: [section, id] },
@@ -453,10 +575,12 @@ export function diffDocument(
   ])
 
   for (const key of keys) {
-    const previous = before.data[key]
-    const next = after.data[key]
+    const previous = ownValue(before.data, key)
+    const next = ownValue(after.data, key)
     if (valuesEqual(previous, next)) continue
-    const semanticKey = NAMED_ARRAYS[key]
+    const semanticKey = Object.hasOwn(NAMED_ARRAYS, key)
+      ? NAMED_ARRAYS[key]
+      : undefined
     if (semanticKey && Array.isArray(previous) && Array.isArray(next)) {
       const semantic = namedArrayDiff(key, semanticKey, previous, next)
       if (semantic) {
@@ -500,7 +624,8 @@ export function replaceDocumentData(
   const touched = new Set<string>()
   const keys = new Set([...Object.keys(current.data), ...Object.keys(nextData)])
   for (const key of keys) {
-    if (!valuesEqual(current.data[key], nextData[key])) touched.add(key)
+    if (!valuesEqual(ownValue(current.data, key), ownValue(nextData, key)))
+      touched.add(key)
   }
   return openDocument(stringifyTouched(current.yaml, nextData, touched))
 }
@@ -526,7 +651,7 @@ function applyNamedOperation(
       const parent = ensureParent(root, operation.target.path)
       const field = operation.target.path.at(-1)
       if (!parent || !field) return conflict(operation, 'invalid-target')
-      parent[field] = [clone(operation.value)]
+      setOwn(parent, field, [clone(operation.value)])
       return
     }
     return conflict(operation, 'invalid-target', collection)
@@ -536,7 +661,7 @@ function applyNamedOperation(
     .filter(
       ({ value }) =>
         isObject(value) &&
-        String(value[operation.target.key]) === operation.target.id,
+        String(ownValue(value, operation.target.key)) === operation.target.id,
     )
   if (matches.length > 1) return conflict(operation, 'duplicate')
   const match = matches[0]
@@ -567,7 +692,10 @@ function applyOrderOperation(
   }
   const keyed = new Map<string, ConfigValue>()
   for (const value of collection) {
-    if (!isObject(value) || typeof value[operation.target.key] !== 'string') {
+    if (
+      !isObject(value) ||
+      typeof ownValue(value, operation.target.key) !== 'string'
+    ) {
       return conflict(operation, 'invalid-target', collection)
     }
     const id = String(value[operation.target.key])
@@ -684,8 +812,9 @@ function stringifyTouched(
   })
   if (!isMap(doc.contents)) return sourceYaml
   for (const key of touched) {
-    if (data[key] === undefined) doc.delete(key)
-    else doc.set(key, doc.createNode(data[key]))
+    const value = ownValue(data, key)
+    if (value === undefined) doc.delete(key)
+    else doc.set(key, doc.createNode(value))
   }
   return String(doc)
 }
@@ -694,11 +823,7 @@ export function applyPatch(
   current: ConfigDocument | string,
   patch: ConfigPatchV1,
 ): ApplyPatchResult {
-  if (patch.version !== 1) {
-    throw new Error(
-      `Unsupported configuration patch version: ${String(patch.version)}`,
-    )
-  }
+  assertConfigPatch(patch)
   const source = typeof current === 'string' ? openDocument(current) : current
   const data = clone(source.data)
   const conflicts: ConfigPatchConflict[] = []
@@ -727,7 +852,7 @@ export function applyPatch(
         } else if (operation.op === 'remove') {
           delete parent[field]
         } else {
-          parent[field] = clone(operation.value)
+          setOwn(parent, field, clone(operation.value))
         }
       }
     }

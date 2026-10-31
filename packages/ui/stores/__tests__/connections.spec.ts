@@ -34,7 +34,10 @@ const localStorageMock = (() => {
 vi.stubGlobal('localStorage', localStorageMock)
 
 const mockGlobalStore = { clearChartHistory: vi.fn() }
-const mockEndpointStore = reactive({ selectedEndpoint: 'endpoint-a' })
+const mockEndpointStore = reactive({
+  selectedEndpoint: 'endpoint-a',
+  currentEndpoint: { url: 'http://localhost:9090', secret: 'secret' },
+})
 const mockConfigStore = reactive({ enableDataUsageTracking: true })
 
 vi.stubGlobal('useGlobalStore', () => mockGlobalStore)
@@ -73,6 +76,10 @@ beforeEach(() => {
   vi.clearAllMocks()
   localStorageMock.clear()
   mockEndpointStore.selectedEndpoint = 'endpoint-a'
+  mockEndpointStore.currentEndpoint = {
+    url: 'http://localhost:9090',
+    secret: 'secret',
+  }
   mockConfigStore.enableDataUsageTracking = true
 })
 
@@ -82,6 +89,26 @@ afterEach(() => {
 })
 
 describe('stores/connections restart detection vs endpoint switch', () => {
+  it.each(['id', 'url', 'secret'])(
+    'clears visible connections when the endpoint %s changes',
+    async (field) => {
+      const store = useConnectionsStore()
+      store.updateFromWsMsg(makeMsg(1000, 2000, [makeConn('old', 500, 1000)]))
+      if (field === 'id') mockEndpointStore.selectedEndpoint = 'endpoint-b'
+      if (field === 'url')
+        mockEndpointStore.currentEndpoint.url = 'http://other.invalid:9090'
+      if (field === 'secret')
+        mockEndpointStore.currentEndpoint.secret = 'rotated'
+      await nextTick()
+
+      expect(store.latestConnectionMsg).toBeNull()
+      expect(store.allConnections).toEqual([])
+      expect(store.activeConnections).toEqual([])
+      expect(store.closedConnections).toEqual([])
+      expect(dbMock.clearAll).not.toHaveBeenCalled()
+    },
+  )
+
   it('does not wipe usage history or chart when switching endpoints', async () => {
     const store = useConnectionsStore()
 

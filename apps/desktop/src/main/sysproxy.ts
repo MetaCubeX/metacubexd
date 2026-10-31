@@ -1,5 +1,5 @@
 import type { SystemProxyController } from '@metacubexd/agent/types'
-import { exec as nodeExec } from 'node:child_process'
+import { exec as nodeExec, execFile as nodeExecFile } from 'node:child_process'
 import { promisify } from 'node:util'
 
 /**
@@ -12,6 +12,13 @@ export type ExecFn = (
 ) => Promise<{ stdout: string; stderr: string }>
 
 const defaultExec: ExecFn = promisify(nodeExec)
+
+export type ExecFileFn = (
+  file: string,
+  args: string[],
+) => Promise<{ stdout: string; stderr: string }>
+
+const defaultExecFile: ExecFileFn = promisify(nodeExecFile)
 
 function splitWhitespace(value: string): string[] {
   const fields: string[] = []
@@ -34,6 +41,8 @@ export interface SystemProxyControllerOptions {
   platform?: NodeJS.Platform
   /** Injected runner; defaults to promisify(child_process.exec). */
   exec?: ExecFn
+  /** Argument-array runner for macOS: values never pass through a shell. */
+  execFile?: ExecFileFn
 }
 
 /**
@@ -51,6 +60,8 @@ export function createSystemProxyController(
   const { host, port } = opts
   const platform = opts.platform ?? process.platform
   const exec = opts.exec ?? defaultExec
+  const execFile = opts.execFile ?? defaultExecFile
+  const networksetup = (...args: string[]) => execFile('networksetup', args)
 
   // Last applied bypass list, surfaced via describe().
   let lastBypass: string[] = []
@@ -62,7 +73,7 @@ export function createSystemProxyController(
   // List enabled network services, skipping the informational header line and
   // any '*'-prefixed (disabled) service.
   async function darwinEnabledServices(): Promise<string[]> {
-    const { stdout } = await exec('networksetup -listallnetworkservices')
+    const { stdout } = await networksetup('-listallnetworkservices')
     return stdout
       .split('\n')
       .slice(1) // drop the "An asterisk (*) denotes..." header
@@ -72,45 +83,58 @@ export function createSystemProxyController(
 
   async function darwinEnable(bypass: string[]): Promise<void> {
     const services = await darwinEnabledServices()
-    for (const svc of services) {
-      await exec(`networksetup -setwebproxy "${svc}" ${host} ${port}`)
-      await exec(`networksetup -setsecurewebproxy "${svc}" ${host} ${port}`)
-      await exec(`networksetup -setsocksfirewallproxy "${svc}" ${host} ${port}`)
-      await exec(`networksetup -setwebproxystate "${svc}" on`)
-      await exec(`networksetup -setsecurewebproxystate "${svc}" on`)
-      await exec(`networksetup -setsocksfirewallproxystate "${svc}" on`)
-      if (bypass.length > 0) {
-        await exec(
-          `networksetup -setproxybypassdomains "${svc}" ${bypass.join(' ')}`,
-        )
+    const touched: string[] = []
+    try {
+      for (const svc of services) {
+        touched.push(svc)
+        await networksetup('-setwebproxy', svc, host, String(port))
+        await networksetup('-setsecurewebproxy', svc, host, String(port))
+        await networksetup('-setsocksfirewallproxy', svc, host, String(port))
+        if (bypass.length > 0) {
+          await networksetup('-setproxybypassdomains', svc, ...bypass)
+        }
+        await networksetup('-setwebproxystate', svc, 'on')
+        await networksetup('-setsecurewebproxystate', svc, 'on')
+        await networksetup('-setsocksfirewallproxystate', svc, 'on')
       }
+    } catch (error) {
+      // A later service/command can fail after earlier ones enabled the proxy.
+      // Release every touched listener so a rejected enable is not half applied.
+      for (const svc of touched) {
+        for (const kind of ['web', 'secureweb', 'socksfirewall']) {
+          await networksetup(`-set${kind}proxystate`, svc, 'off').catch(
+            () => {},
+          )
+        }
+      }
+      throw error
     }
   }
 
   async function darwinDisable(): Promise<void> {
     const services = await darwinEnabledServices()
     for (const svc of services) {
-      await exec(`networksetup -setwebproxystate "${svc}" off`)
-      await exec(`networksetup -setsecurewebproxystate "${svc}" off`)
-      await exec(`networksetup -setsocksfirewallproxystate "${svc}" off`)
+      await networksetup('-setwebproxystate', svc, 'off')
+      await networksetup('-setsecurewebproxystate', svc, 'off')
+      await networksetup('-setsocksfirewallproxystate', svc, 'off')
       // Anti-lockout: also clear any PAC/auto-config so quit/disable can never
       // leave the machine pointing at a dead loopback PAC URL.
-      await exec(`networksetup -setautoproxystate "${svc}" off`)
+      await networksetup('-setautoproxystate', svc, 'off')
     }
   }
 
   async function darwinSetAutoProxy(url: string): Promise<void> {
     const services = await darwinEnabledServices()
     for (const svc of services) {
-      await exec(`networksetup -setautoproxyurl "${svc}" ${url}`)
-      await exec(`networksetup -setautoproxystate "${svc}" on`)
+      await networksetup('-setautoproxyurl', svc, url)
+      await networksetup('-setautoproxystate', svc, 'on')
     }
   }
 
   async function darwinDisableAutoProxy(): Promise<void> {
     const services = await darwinEnabledServices()
     for (const svc of services) {
-      await exec(`networksetup -setautoproxystate "${svc}" off`)
+      await networksetup('-setautoproxystate', svc, 'off')
     }
   }
 
@@ -118,7 +142,7 @@ export function createSystemProxyController(
     const services = await darwinEnabledServices()
     const first = services[0]
     if (!first) return false
-    const { stdout } = await exec(`networksetup -getwebproxy "${first}"`)
+    const { stdout } = await networksetup('-getwebproxy', first)
     return stdout.split('\n').some((line) => {
       const separator = line.indexOf(':')
       if (separator === -1) return false
@@ -246,17 +270,20 @@ export function createSystemProxyController(
   return {
     describe,
     async enable(bypass = []) {
-      lastBypass = bypass
       switch (platform) {
         case 'darwin':
-          return darwinEnable(bypass)
+          await darwinEnable(bypass)
+          break
         case 'win32':
-          return winEnable(bypass)
+          await winEnable(bypass)
+          break
         case 'linux':
-          return linuxEnable(bypass)
+          await linuxEnable(bypass)
+          break
         default:
           return unsupported()
       }
+      lastBypass = [...bypass]
     },
     async disable() {
       switch (platform) {

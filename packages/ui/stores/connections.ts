@@ -330,15 +330,25 @@ export const useConnectionsStore = defineStore('connections', () => {
   // kernel restart and trigger clearDataUsage() + clearChartHistory(),
   // destroying the user's accumulated usage history. On endpoint change reset
   // the restart-detection and per-connection baselines. The new backend's
-  // first message establishes a baseline without wiping history or the chart.
+  // first message establishes a baseline without wiping persisted usage. Clear
+  // visible connections too, so they cannot appear to belong to the new host.
   const endpointStore = useEndpointStore()
   watch(
-    () => endpointStore.selectedEndpoint,
+    () => [
+      endpointStore.selectedEndpoint,
+      endpointStore.currentEndpoint?.url,
+      endpointStore.currentEndpoint?.secret,
+    ],
     () => {
       lastUploadTotal = 0
       lastDownloadTotal = 0
       resetDataUsageBaseline()
+      latestConnectionMsg.value = null
+      allConnections.value = []
+      activeConnections.value = []
+      closedConnections.value = []
     },
+    { flush: 'sync' },
   )
 
   // Reset synchronously even if tracking is toggled off and on between

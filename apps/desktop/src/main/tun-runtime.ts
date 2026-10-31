@@ -1,8 +1,7 @@
-import type { TunController } from '@metacubexd/agent/types'
 import type { HelperClient } from './helper/client'
 import type { HelperInstaller, HelperInstallOptions } from './helper/installer'
 import type { HelperKernelStartOptions } from './helper/server'
-import type { PersistFn } from './tun-controller'
+import type { DesktopTunController, PersistFn } from './tun-controller'
 import type { TunTeardown } from './tun-teardown'
 import { HelperVersionMismatchError } from './helper/client'
 import { createTunController } from './tun-controller'
@@ -113,7 +112,7 @@ export interface TunRuntime {
     stopKernel: () => Promise<void>
   }
   /** The wired desktop TunController (feature `'tun'` is gated on this). */
-  controller: TunController
+  controller: DesktopTunController
   /** Safe-teardown helper shared by the UI recover action + quit/crash paths. */
   teardown: TunTeardown
   /**
@@ -173,6 +172,12 @@ export function createTunRuntime(opts: CreateTunRuntimeOptions): TunRuntime {
   let backend: 'sidecar' | 'tun' = 'sidecar'
   // The live helper-IPC connection while in TUN mode (null in sidecar mode).
   let client: HelperClient | null = null
+  let clientDisconnected = false
+  let ownerInstanceId: string | undefined
+  const instanceIds = new WeakMap<HelperClient, string>()
+  // A confirmed stop may precede a failed config write/sidecar launch. Retain
+  // that acknowledgement so a retry does not require an already-closed client.
+  let helperKernelStopped = false
 
   async function injectTun(tun: Record<string, unknown>): Promise<void> {
     await setSection('tun', tun)
@@ -209,7 +214,16 @@ export function createTunRuntime(opts: CreateTunRuntimeOptions): TunRuntime {
     for (let attempt = 0; ; attempt++) {
       const candidate = connectTracked()
       try {
-        await candidate.getVersion()
+        const version = await candidate.getVersion()
+        if (
+          version.ok &&
+          typeof version.instanceId === 'string' &&
+          version.instanceId
+        ) {
+          instanceIds.set(candidate, version.instanceId)
+        } else {
+          instanceIds.delete(candidate)
+        }
         return candidate
       } catch (err) {
         await candidate.close()
@@ -249,6 +263,9 @@ export function createTunRuntime(opts: CreateTunRuntimeOptions): TunRuntime {
       throw err
     }
     client = thisClient
+    ownerInstanceId = instanceIds.get(thisClient)
+    clientDisconnected = false
+    helperKernelStopped = false
     backend = 'tun'
   }
 
@@ -260,6 +277,7 @@ export function createTunRuntime(opts: CreateTunRuntimeOptions): TunRuntime {
    */
   function handleHelperDisconnect(source: HelperClient): void {
     if (backend !== 'tun' || client !== source) return
+    clientDisconnected = true
     onHelperDisconnect?.()
   }
 
@@ -268,12 +286,52 @@ export function createTunRuntime(opts: CreateTunRuntimeOptions): TunRuntime {
       // The privileged kernel is owned by the helper — stop it over IPC, then
       // drop the connection (the server's anti-residual teardown also stops the
       // kernel the moment we disconnect).
+      if (helperKernelStopped) return
       if (!client) throw new Error('tun-runtime: no helper client to stop')
-      await client.stopKernel()
-      await client.close()
+      const previous = client
+      try {
+        if (clientDisconnected) {
+          await stopThroughNewConnection()
+        } else {
+          try {
+            await previous.stopKernel()
+          } catch (error) {
+            // A disconnect may arrive while the stop request is in flight.
+            // Only retry on a new connection when that drop was observed;
+            // a live helper's rejection (e.g. SIGKILL timeout) is authoritative.
+            if (!clientDisconnected) throw error
+            await stopThroughNewConnection()
+          }
+        }
+        helperKernelStopped = true
+      } finally {
+        if (helperKernelStopped) await previous.close()
+      }
       client = null
     } else {
       await supervisor.stop()
+    }
+  }
+
+  async function stopThroughNewConnection(): Promise<void> {
+    // Losing IPC does not prove the privileged child exited. Reconnect and get
+    // an acknowledged stop before starting a sidecar. If the service is gone or
+    // cannot confirm the stop, preserve TUN ownership and report the failure.
+    if (!ownerInstanceId) {
+      throw new Error(
+        'helper: cannot confirm the previous kernel stopped because this helper has no instance identity',
+      )
+    }
+    const recovery = await connectReady()
+    try {
+      if (instanceIds.get(recovery) !== ownerInstanceId) {
+        throw new Error(
+          'helper: instance changed after disconnect; cannot confirm the previous kernel stopped',
+        )
+      }
+      await recovery.stopKernel()
+    } finally {
+      await recovery.close()
     }
   }
 

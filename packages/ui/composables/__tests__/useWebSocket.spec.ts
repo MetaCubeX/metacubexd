@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { effectScope } from 'vue'
+import { effectScope, nextTick, reactive } from 'vue'
 import { useBackendWebSocket } from '../useWebSocket'
 
 const mockUseMockMode = vi.fn()
@@ -30,12 +30,16 @@ class MockWebSocket {
   }
 }
 
-const mockEndpointStore = {
+const mockEndpointStore = reactive({
+  selectedEndpoint: 'endpoint-a',
   currentEndpoint: {
+    url: 'http://localhost:9090',
     secret: 'secret',
   },
-  wsEndpointURL: 'ws://localhost:9090',
-}
+  get wsEndpointURL() {
+    return this.currentEndpoint.url.replace(/^http/, 'ws')
+  },
+})
 
 const mockConnectionsStore = {
   updateFromWsMsg: vi.fn(),
@@ -47,10 +51,12 @@ const mockGlobalStore = {
   addTrafficDataPoint: vi.fn(),
   addMemoryDataPoint: vi.fn(),
   addConnectionCountDataPoint: vi.fn(),
+  clearChartHistory: vi.fn(),
 }
 
 const mockLogsStore = {
   addLog: vi.fn(),
+  clearLogs: vi.fn(),
 }
 
 const mockConfigStore = {
@@ -87,6 +93,11 @@ describe('composables/useWebSocket', () => {
     mockUseMockMode.mockReturnValue(false)
     mockHasFeature = () => false
     mockKernelState = null
+    mockEndpointStore.selectedEndpoint = 'endpoint-a'
+    mockEndpointStore.currentEndpoint = {
+      url: 'http://localhost:9090',
+      secret: 'secret',
+    }
   })
 
   it('closes existing sockets before reconnecting', () => {
@@ -129,6 +140,67 @@ describe('composables/useWebSocket', () => {
     reconnectLogs()
 
     expect(MockWebSocket.instances).toHaveLength(0)
+  })
+
+  it.each(['id', 'url', 'secret'])(
+    'reconnects and clears live data when the endpoint %s changes',
+    async (field) => {
+      const scope = effectScope()
+      scope.run(() => useBackendWebSocket().connect())
+      const previous = [...MockWebSocket.instances]
+      const oldMessage = previous[0]!.onmessage
+      const oldClose = previous[0]!.onclose
+      if (field === 'id') mockEndpointStore.selectedEndpoint = 'endpoint-b'
+      if (field === 'url') {
+        mockEndpointStore.currentEndpoint.url = 'http://other.invalid:9090'
+      }
+      if (field === 'secret')
+        mockEndpointStore.currentEndpoint.secret = 'rotated'
+      oldMessage?.({ data: '{"connections":[]}' } as MessageEvent<string>)
+      expect(mockConnectionsStore.updateFromWsMsg).not.toHaveBeenCalled()
+      await nextTick()
+
+      expect(MockWebSocket.instances).toHaveLength(8)
+      for (const socket of previous) expect(socket.close).toHaveBeenCalledOnce()
+      expect(mockGlobalStore.setLatestTraffic).toHaveBeenCalledWith(null)
+      expect(mockGlobalStore.setLatestMemory).toHaveBeenCalledWith(null)
+      expect(mockGlobalStore.clearChartHistory).toHaveBeenCalledOnce()
+      expect(mockLogsStore.clearLogs).toHaveBeenCalledOnce()
+      if (field === 'url')
+        expect(MockWebSocket.instances[4]!.url).toContain(
+          'ws://other.invalid:9090/',
+        )
+      if (field === 'secret')
+        expect(MockWebSocket.instances[4]!.url).toContain('token=rotated')
+      oldMessage?.({ data: '{"connections":[]}' } as MessageEvent<string>)
+      oldClose?.(new Event('close'))
+      expect(mockConnectionsStore.updateFromWsMsg).not.toHaveBeenCalled()
+      scope.stop()
+    },
+  )
+
+  it('keeps an intentionally disconnected session closed after an endpoint change', async () => {
+    const scope = effectScope()
+    scope.run(() => {
+      const session = useBackendWebSocket()
+      session.connect()
+      session.disconnect()
+    })
+    mockEndpointStore.selectedEndpoint = 'endpoint-b'
+    await nextTick()
+    expect(MockWebSocket.instances).toHaveLength(4)
+    scope.stop()
+  })
+
+  it('retains the stopped-kernel gate when an endpoint changes', async () => {
+    mockHasFeature = (f) => f === 'kernel-control'
+    mockKernelState = { status: 'stopped' }
+    const scope = effectScope()
+    scope.run(() => useBackendWebSocket().connect())
+    mockEndpointStore.selectedEndpoint = 'endpoint-b'
+    await nextTick()
+    expect(MockWebSocket.instances).toHaveLength(0)
+    scope.stop()
   })
 
   it('reconnects after an unexpected socket close (e.g. Restart Core)', async () => {

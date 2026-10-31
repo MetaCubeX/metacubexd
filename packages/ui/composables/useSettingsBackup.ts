@@ -11,6 +11,7 @@ const EXCLUDED_KEYS = new Set([
   'endpointList',
   'selectedEndpoint',
   'geoIPCache',
+  'webdavBackupConfig',
 ])
 const EXCLUDED_PREFIXES = ['bing', 'vue-query']
 

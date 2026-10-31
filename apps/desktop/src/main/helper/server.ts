@@ -4,6 +4,7 @@ import type {
   HelperResponse,
   StartKernelRequest,
 } from './protocol'
+import { randomUUID } from 'node:crypto'
 import { chmod, lstat, unlink } from 'node:fs/promises'
 import { connect, createServer } from 'node:net'
 import {
@@ -11,6 +12,10 @@ import {
   HELPER_PROTOCOL_VERSION,
   parseMessages,
 } from './protocol'
+
+// Stable for this process, different after a service restart. This is not an
+// authentication secret and is only returned after the request authenticates.
+const PROCESS_INSTANCE_ID = randomUUID()
 
 /** Result of a privileged kernel start/status query, mirrored back over IPC. */
 export interface HelperKernelResult {
@@ -186,8 +191,14 @@ export async function createHelperServer(
     try {
       switch (req.type) {
         case 'ping':
-        case 'getVersion':
           return { type: req.type, ok: true, version }
+        case 'getVersion':
+          return {
+            type: req.type,
+            ok: true,
+            version,
+            instanceId: PROCESS_INSTANCE_ID,
+          }
         case 'startKernel': {
           const { binaryPath, homeDir, configPath } = req as StartKernelRequest
           const result = await kernel.start({ binaryPath, homeDir, configPath })

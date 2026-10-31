@@ -78,7 +78,14 @@ export interface TunControllerOptions {
  * we never redundantly stop/restart the kernel. Errors from the injected deps
  * propagate untouched (no silent swallowing).
  */
-export function createTunController(opts: TunControllerOptions): TunController {
+export interface DesktopTunController extends TunController {
+  /** Restart the current owner atomically with respect to user mode changes. */
+  restart: () => Promise<void>
+}
+
+export function createTunController(
+  opts: TunControllerOptions,
+): DesktopTunController {
   const {
     injectTun,
     removeTun,
@@ -94,6 +101,13 @@ export function createTunController(opts: TunControllerOptions): TunController {
     mode: 'sidecar',
   }
 
+  let pending = Promise.resolve()
+  function transition(action: () => Promise<void>): Promise<void> {
+    const result = pending.then(action)
+    pending = result.catch(() => {})
+    return result
+  }
+
   // Shared teardown so uninstall() can reuse the exact disable sequence without
   // depending on `this` through the agent's controller delegate. Idempotent.
   async function disableImpl(): Promise<void> {
@@ -105,38 +119,51 @@ export function createTunController(opts: TunControllerOptions): TunController {
     if (persist) await persist(state)
   }
 
-  const controller: TunController = {
-    async enable({ stack }) {
-      // Idempotent: already in TUN -> no redundant stop/inject/relaunch.
-      if (state.mode === 'tun') return
+  async function enableImpl({ stack }: { stack: string }): Promise<void> {
+    // Idempotent: already in TUN -> no redundant stop/inject/relaunch.
+    if (state.mode === 'tun') return
 
-      // Validate preconditions BEFORE the destructive teardown. injectTun writes
-      // the `tun:` block into the ACTIVE profile, so without one the enable was
-      // doomed — but it used to fail mid-sequence (after stopKernel), leaving the
-      // kernel down and TUN never up. Gate it up front so a failed enable is a
-      // clean no-op the user can recover from.
-      if (precheck) await precheck()
+    // Validate preconditions BEFORE the destructive teardown. injectTun writes
+    // the `tun:` block into the ACTIVE profile, so without one the enable was
+    // doomed — but it used to fail mid-sequence (after stopKernel), leaving the
+    // kernel down and TUN never up. Gate it up front so a failed enable is a
+    // clean no-op the user can recover from.
+    if (precheck) await precheck()
 
-      await stopKernel()
-      try {
-        await injectTun(buildTunConfig({ stack }))
-        await startPrivileged()
-      } catch (err) {
-        // startPrivileged (elevation / helper install / privileged spawn) or
-        // injectTun failed AFTER the kernel was stopped — without this recovery
-        // the kernel stayed down, so a failed TUN enable took the whole backend
-        // offline ("backend stops working"). Undo the injected `tun:` block and
-        // relaunch the unprivileged sidecar so traffic flows again. Best-effort:
-        // a recovery failure must never mask the original error. (#2149)
-        await removeTun().catch(() => {})
-        await startSidecar().catch(() => {})
-        throw err
-      }
+    await stopKernel()
+    try {
+      await injectTun(buildTunConfig({ stack }))
+      await startPrivileged()
+    } catch (err) {
+      // startPrivileged (elevation / helper install / privileged spawn) or
+      // injectTun failed AFTER the kernel was stopped — without this recovery
+      // the kernel stayed down, so a failed TUN enable took the whole backend
+      // offline ("backend stops working"). Undo the injected `tun:` block and
+      // relaunch the unprivileged sidecar so traffic flows again. Best-effort:
+      // a recovery failure must never mask the original error. (#2149)
+      await removeTun().catch(() => {})
+      await startSidecar().catch(() => {})
+      throw err
+    }
 
-      state = { enabled: true, mode: 'tun', stack }
-      if (persist) await persist(state)
-    },
-    disable: disableImpl,
+    state = { enabled: true, mode: 'tun', stack }
+    if (persist) await persist(state)
+  }
+
+  const controller: DesktopTunController = {
+    enable: (options) => transition(() => enableImpl(options)),
+    disable: () => transition(disableImpl),
+    restart: () =>
+      transition(async () => {
+        if (state.mode === 'tun') {
+          const stack = state.stack ?? 'mixed'
+          await disableImpl()
+          await enableImpl({ stack })
+        } else {
+          await stopKernel()
+          await startSidecar()
+        }
+      }),
     async status() {
       return { ...state }
     },
@@ -148,10 +175,11 @@ export function createTunController(opts: TunControllerOptions): TunController {
   // service that is still owning the kernel, then removes it.
   if (opts.uninstall) {
     const removeService = opts.uninstall
-    controller.uninstall = async () => {
-      await disableImpl()
-      await removeService()
-    }
+    controller.uninstall = () =>
+      transition(async () => {
+        await disableImpl()
+        await removeService()
+      })
   }
 
   return controller

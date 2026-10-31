@@ -74,6 +74,8 @@ interface ResponseEnvelope {
 /** A successful response (optionally carrying running state for `status`). */
 export interface HelperOkResponse extends ResponseEnvelope {
   ok: true
+  /** Successful getVersion only: non-secret identity of this helper process. */
+  instanceId?: string
   /** Present for `status`: whether the privileged kernel is running. */
   running?: boolean
 }

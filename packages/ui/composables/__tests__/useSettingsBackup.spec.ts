@@ -24,6 +24,32 @@ describe('composables/useSettingsBackup object export/import', () => {
     expect(bundle.settings.endpointList).toBeUndefined()
   })
 
+  it('never exports persisted WebDAV credentials', () => {
+    localStorage.setItem(
+      'webdavBackupConfig',
+      JSON.stringify({
+        url: 'https://dav.example.invalid',
+        username: 'test-user',
+        password: 'test-password',
+      }),
+    )
+
+    expect(
+      useSettingsBackup().exportSettings().settings.webdavBackupConfig,
+    ).toBeUndefined()
+  })
+
+  it('does not overwrite local WebDAV credentials from an older backup', () => {
+    localStorage.setItem('webdavBackupConfig', 'local-credentials')
+    const count = useSettingsBackup().applySettings({
+      app: 'metacubexd',
+      settings: { theme: 'light', webdavBackupConfig: 'backup-credentials' },
+    })
+
+    expect(count).toBe(1)
+    expect(localStorage.getItem('webdavBackupConfig')).toBe('local-credentials')
+  })
+
   it('applySettings() writes a bundle back to localStorage and returns the count', () => {
     const count = useSettingsBackup().applySettings({
       app: 'metacubexd',
