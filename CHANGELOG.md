@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.274.1](https://github.com/MetaCubeX/metacubexd/compare/v1.274.0...v1.274.1) (2026-10-31)
+
+
+### Bug Fixes
+
+* **ui:** prevent redirect-only static builds with relative base URL ([a67a665](https://github.com/MetaCubeX/metacubexd/commit/a67a66537b14dc3566d586f289d8ddfe4b19db60))
+
 ## [1.274.0](https://github.com/MetaCubeX/metacubexd/compare/v1.273.1...v1.274.0) (2026-10-31)
 
 
