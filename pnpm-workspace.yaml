@@ -30,7 +30,7 @@ catalog:
   '@types/node': ^26.2.0
   '@types/sortablejs': ^1.15.9
   '@vite-pwa/nuxt': ^1.1.1
-  '@vitest/coverage-v8': ^4.1.10
+  '@vitest/coverage-v8': ^5.0.5
   '@vueuse/core': ^14.4.0
   '@vueuse/integrations': ^14.4.0
   '@vueuse/nuxt': ^14.4.0
@@ -39,7 +39,7 @@ catalog:
   d3: ^7.9.0
   daisyui: ^5.7.17
   dayjs: ^1.11.21
-  electron: ^43.3.0
+  electron: ^43.8.1
   electron-builder: ^26.0.0
   electron-vite: ^5.0.0
   eslint: ^10.8.1
@@ -55,7 +55,7 @@ catalog:
   jsdom: ^30.0.1
   ky: ^2.0.2
   lint-staged: ^17.3.0
-  markdown-it: ^15.0.0
+  markdown-it: ^15.0.3
   match-sorter: ^8.3.0
   meta-json-schema: ^1.19.29
   # PINNED, do not bump past 0.52.x. monaco-yaml@5.5.1 (latest) pulls
@@ -74,7 +74,7 @@ catalog:
   monaco-editor: 0.52.2
   monaco-yaml: ^5.5.1
   nitropack: ^2.12.6
-  nuxt: 4.5.2
+  nuxt: 4.6.3
   pinia: ^4.0.3
   playwright: ^1.62.1
   prettier: ^3.9.6
@@ -86,7 +86,7 @@ catalog:
   tsx: ^4.23.11
   typescript: ^7.0.2
   uqr: ^0.1.2
-  vite: 8.2.1
+  vite: 8.1.6
   vitest: ^5.0.5
   vue: ^3.5.41
   vue-router: ^5.2.0
@@ -99,7 +99,7 @@ neverBuiltDependencies: []
 # overrides MUST live only at the workspace root (pnpm 10/11). This is the
 # merge of OLD package.json#pnpm.overrides + the OLD workspace override.
 # CONFLICT RESOLUTION (see spec §2): the old package.json pinned
-# vite: 8.2.1 in BOTH dependencies and pnpm.overrides, but the old
+# vite: 8.1.6 in BOTH dependencies and pnpm.overrides, but the old
 # pnpm-workspace.yaml override 'vite: npm:rolldown-vite@latest' WON at install
 # time — the project already runs on rolldown-vite. Keep ONLY rolldown-vite
 # here; drop the 8.0.16 pin. (The 8.0.16 entry survives in the catalog above
