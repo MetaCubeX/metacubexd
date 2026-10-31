@@ -30,7 +30,7 @@ catalog:
   '@types/node': ^26.2.0
   '@types/sortablejs': ^1.15.9
   '@vite-pwa/nuxt': ^1.1.1
-  '@vitest/coverage-v8': ^4.1.10
+  '@vitest/coverage-v8': ^5.0.5
   '@vueuse/core': ^14.4.0
   '@vueuse/integrations': ^14.4.0
   '@vueuse/nuxt': ^14.4.0
@@ -87,7 +87,7 @@ catalog:
   typescript: ^7.0.2
   uqr: ^0.1.2
   vite: 8.1.6
-  vitest: ^4.1.10
+  vitest: ^5.0.5
   vue: ^3.5.41
   vue-router: ^5.2.0
   vue-sonner: ^2.0.9
