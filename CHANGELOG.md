@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.274.3](https://github.com/MetaCubeX/metacubexd/compare/v1.274.2...v1.274.3) (2026-10-31)
+
+
+### Bug Fixes
+
+* **connections:** prevent live table flicker and layout shifts ([710f395](https://github.com/MetaCubeX/metacubexd/commit/710f39506ef58b7a6d94ce0afde4576dc3fb4d5e))
+
 ## [1.274.2](https://github.com/MetaCubeX/metacubexd/compare/v1.274.1...v1.274.2) (2026-10-31)
 
 
