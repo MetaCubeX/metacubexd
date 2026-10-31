@@ -1,5 +1,6 @@
 import type { ChildProcess } from 'node:child_process'
 import type { BrowserContext, Page } from 'playwright'
+import type { Connection } from '../types'
 // Page-based e2e tests for metacubexd dashboard
 // Usage: pnpm test:e2e
 import { spawn } from 'node:child_process'
@@ -203,6 +204,12 @@ describe('e2E Page Tests', () => {
     })
     // Reload to apply localStorage changes to Pinia store
     await page.reload({ waitUntil: 'domcontentloaded' })
+    // The index page redirects on mount. Let it finish before a test changes
+    // the hash, otherwise the initial redirect can overwrite that navigation.
+    await page.waitForURL('**/#/overview', { timeout: ELEMENT_TIMEOUT })
+    await page.waitForSelector('.overview-stat-card', {
+      timeout: ELEMENT_TIMEOUT,
+    })
   }, 120000)
 
   afterAll(async () => {
@@ -515,6 +522,224 @@ describe('e2E Page Tests', () => {
       await expect(table.locator('thead').innerText()).resolves.toContain(
         'HOST',
       )
+    })
+
+    it('keeps live connection rows, column widths and scroll positions stable', async () => {
+      if (!browser || !context) throw new Error('Browser was not initialized')
+      const isolatedContext = await browser.newContext({
+        storageState: await context.storageState(),
+        viewport: { width: 1024, height: 680 },
+      })
+      const livePage = await isolatedContext.newPage()
+
+      interface RegressionState {
+        store: { activeConnections: Connection[] }
+        config: { connectionsDisplayMode: 'auto' | 'table' | 'card' }
+        fixtures: Connection[]
+        nodes: Map<string, { row: Element; cells: Element[] }>
+      }
+      type RegressionWindow = Window & {
+        connectionRegression: RegressionState
+      }
+
+      async function settle() {
+        await livePage.evaluate(
+          () =>
+            new Promise<void>((resolve) => {
+              requestAnimationFrame(() =>
+                requestAnimationFrame(() => resolve()),
+              )
+            }),
+        )
+      }
+
+      async function update(bytes: number, append = false) {
+        await livePage.evaluate(
+          ({ bytes, append }) => {
+            const state = (window as unknown as RegressionWindow)
+              .connectionRegression
+            const fixtures = [...state.fixtures]
+            if (append) {
+              fixtures.push({
+                ...fixtures[0]!,
+                id: 'live-030',
+                metadata: { ...fixtures[0]!.metadata, host: 'live-030.test' },
+              })
+            }
+            state.store.activeConnections = fixtures.reverse().map((conn) => ({
+              ...conn,
+              download: bytes * 10,
+              upload: bytes * 2,
+              downloadSpeed: bytes,
+              uploadSpeed: bytes,
+            }))
+          },
+          { bytes, append },
+        )
+        await settle()
+      }
+
+      async function measure(remember = false) {
+        return livePage.evaluate((remember) => {
+          const state = (window as unknown as RegressionWindow)
+            .connectionRegression
+          const container = document.querySelector('.conn-table-container')!
+          const scroll = container.parentElement!
+          const rows = Array.from(
+            container.querySelectorAll('.conn-data-row, .conn-card'),
+          )
+          const rowStates = rows.map((row) => {
+            const id = row.textContent!.match(/live-\d{3}/)![0]
+            const cells = Array.from(
+              row.querySelectorAll('.conn-cell-wrap, .conn-primary'),
+            )
+            const previous = state.nodes.get(id)
+            const reused =
+              previous?.row === row &&
+              previous.cells.length === cells.length &&
+              previous.cells.every((cell, i) => cell === cells[i])
+            if (remember) state.nodes.set(id, { row, cells })
+            const style = getComputedStyle(row)
+            return {
+              id,
+              reused,
+              animation: style.animationName,
+              opacity: style.opacity,
+              transform: style.transform,
+            }
+          })
+          return {
+            rows: rowStates,
+            headers: Array.from(container.querySelectorAll('th'), (header) => {
+              const bounds = header.getBoundingClientRect()
+              return { x: bounds.x, width: bounds.width }
+            }),
+            scrollTop: scroll.scrollTop,
+            scrollLeft: scroll.scrollLeft,
+            scrollWidth: scroll.scrollWidth,
+            clientWidth: scroll.clientWidth,
+            tableWidth: container
+              .querySelector('table')
+              ?.getBoundingClientRect().width,
+            viewportOverflow: document.documentElement.scrollWidth > innerWidth,
+          }
+        }, remember)
+      }
+
+      function expectStableRows(
+        snapshot: Awaited<ReturnType<typeof measure>>,
+        count: number,
+      ) {
+        expect(snapshot.rows.map((row) => row.id)).toEqual(
+          Array.from(
+            { length: count },
+            (_, i) => `live-${String(i).padStart(3, '0')}`,
+          ),
+        )
+        expect(snapshot.rows.slice(0, 30).every((row) => row.reused)).toBe(true)
+        expect(
+          snapshot.rows.every(
+            (row) =>
+              row.animation === 'none' &&
+              row.opacity === '1' &&
+              row.transform === 'none',
+          ),
+        ).toBe(true)
+      }
+
+      try {
+        await isolatedContext.addInitScript(() => {
+          localStorage.setItem('connectionsTableSortColumn', 'ConnectTime')
+          localStorage.setItem('connectionsTableSortDesc', 'true')
+          localStorage.setItem('connectionsTableGrouping', 'null')
+          localStorage.setItem('connectionsTablePageSize', '50')
+          localStorage.setItem('connectionsDisplayMode', 'table')
+          localStorage.setItem('showConnectionGeoIP', 'false')
+        })
+        await gotoAppPath(livePage, '/connections')
+        await livePage.waitForSelector('.conn-data-row')
+        await livePage.evaluate(() => {
+          const root = document.querySelector('#__nuxt') as Element & {
+            __vue_app__: {
+              config: {
+                globalProperties: { $pinia: { _s: Map<string, unknown> } }
+              }
+            }
+          }
+          const stores = root.__vue_app__.config.globalProperties.$pinia._s
+          const store = stores.get('connections') as RegressionState['store']
+          const config = stores.get('config') as RegressionState['config']
+          const original = store.activeConnections[0]!
+          const fixtures = Array.from({ length: 30 }, (_, i) => {
+            const id = `live-${String(i).padStart(3, '0')}`
+            return {
+              ...original,
+              id,
+              start: '2026-11-01T00:00:00.000Z',
+              download: 0,
+              upload: 0,
+              downloadSpeed: 0,
+              uploadSpeed: 0,
+              metadata: { ...original.metadata, host: `${id}.test` },
+            }
+          })
+          ;(window as unknown as RegressionWindow).connectionRegression = {
+            store,
+            config,
+            fixtures,
+            nodes: new Map(),
+          }
+          store.activeConnections = fixtures
+        })
+        await settle()
+        await livePage
+          .locator('.conn-table-container')
+          .evaluate((container) => {
+            container.parentElement!.scrollTop = 120
+            container.parentElement!.scrollLeft = 60
+          })
+        const desktop = await measure(true)
+        expect(desktop.scrollTop).toBeGreaterThan(0)
+        expect(desktop.scrollLeft).toBeGreaterThan(0)
+
+        for (const bytes of [12, 9999, 1e12]) {
+          await update(bytes)
+          const refreshed = await measure()
+          expectStableRows(refreshed, 30)
+          expect(refreshed.headers).toEqual(desktop.headers)
+          expect(refreshed.scrollTop).toBe(desktop.scrollTop)
+          expect(refreshed.scrollLeft).toBe(desktop.scrollLeft)
+        }
+        await update(1e12, true)
+        expectStableRows(await measure(), 31)
+
+        await livePage.setViewportSize({ width: 390, height: 844 })
+        for (const mode of ['card', 'auto', 'table'] as const) {
+          await livePage.evaluate((mode) => {
+            ;(
+              window as unknown as RegressionWindow
+            ).connectionRegression.config.connectionsDisplayMode = mode
+          }, mode)
+          await settle()
+          const before = await measure(true)
+          await update(1, true)
+          const after = await measure()
+          expectStableRows(after, 31)
+          expect(after.headers).toEqual(before.headers)
+          expect(after.scrollTop).toBe(before.scrollTop)
+          expect(after.scrollLeft).toBe(before.scrollLeft)
+          expect(after.viewportOverflow).toBe(false)
+          if (mode === 'auto') {
+            expect(after.scrollWidth).toBeLessThanOrEqual(after.clientWidth + 1)
+          }
+          if (mode === 'table') {
+            expect(after.tableWidth).toBe(before.tableWidth)
+            expect(after.tableWidth).toBeGreaterThan(after.clientWidth)
+          }
+        }
+      } finally {
+        await isolatedContext.close()
+      }
     })
   })
 

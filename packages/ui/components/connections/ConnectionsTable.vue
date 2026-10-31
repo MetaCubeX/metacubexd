@@ -94,6 +94,31 @@ const displayMode = computed(() => configStore.connectionsDisplayMode)
 const isCardMode = computed(() => displayMode.value === 'card')
 const isForceTable = computed(() => displayMode.value === 'table')
 
+// Size columns independently of live cell content. Automatic table layout
+// redistributes every column when a speed gains a digit or changes units.
+// em keeps the widths proportional to the configured table text size.
+const COLUMN_WIDTHS: Partial<Record<CONNECTIONS_TABLE_ACCESSOR_KEY, number>> = {
+  close: 6,
+  ID: 26,
+  host: 22,
+  sniffHost: 22,
+  rule: 24,
+  chains: 24,
+  connectTime: 14,
+  hostProcess: 22,
+  ruleChains: 26,
+  traffic: 24,
+  flow: 22,
+}
+
+function columnWidth(col: ConnectionColumn): number {
+  return COLUMN_WIDTHS[col.id] ?? 14
+}
+
+const tableStyle = computed(() => ({
+  '--conn-table-width': `${props.columns.reduce((sum, col) => sum + columnWidth(col), 0)}em`,
+}))
+
 // Columns rendered in the card main row (host / process / action).
 // The remaining visible columns are concatenated into the aux line.
 const MAIN_ROW_COLUMN_IDS = new Set(['close', 'host', 'process', 'hostProcess'])
@@ -270,7 +295,15 @@ async function copyCell(
       v-if="!isCardMode"
       class="table w-full border-collapse"
       :class="[tableSizeClass, isForceTable ? 'force-table' : '']"
+      :style="tableStyle"
     >
+      <colgroup>
+        <col
+          v-for="col in columns"
+          :key="col.id"
+          :style="{ width: `${columnWidth(col)}em` }"
+        />
+      </colgroup>
       <!-- Desktop header - hidden on mobile unless force-table -->
       <thead
         class="md:table-header-group"
@@ -321,7 +354,7 @@ async function copyCell(
       </thead>
       <tbody>
         <template
-          v-for="(row, index) in rowModel"
+          v-for="row in rowModel"
           :key="row.type === 'group' ? `group-${row.key}` : row.original.id"
         >
           <!-- Group header row -->
@@ -351,8 +384,7 @@ async function copyCell(
           <!-- Data row - card style on mobile, table row on desktop -->
           <tr
             v-else
-            class="conn-data-row cursor-pointer transition-all duration-200"
-            :style="{ animationDelay: `${(index % 20) * 12}ms` }"
+            class="conn-data-row cursor-pointer transition-colors duration-200"
             @click="emit('rowClick', row.original)"
           >
             <td
@@ -375,10 +407,12 @@ async function copyCell(
                   :title="geoTooltip(row.original)"
                   >{{ geoFlag(row.original) }}</span
                 >
-                <component
-                  :is="CellRenderer"
-                  :render="() => col.render(row.original)"
-                />
+                <div class="conn-cell-content">
+                  <component
+                    :is="CellRenderer"
+                    :render="() => col.render(row.original)"
+                  />
+                </div>
                 <button
                   v-if="isCopyableColumn(col)"
                   class="conn-copy-btn"
@@ -401,7 +435,7 @@ async function copyCell(
     <!-- Card mode: column-driven double-line cards -->
     <div v-else class="conn-cards">
       <template
-        v-for="(row, index) in rowModel"
+        v-for="row in rowModel"
         :key="row.type === 'group' ? `group-${row.key}` : row.original.id"
       >
         <!-- Group header card -->
@@ -418,12 +452,7 @@ async function copyCell(
           <span class="conn-card-group-count">({{ row.subRows.length }})</span>
         </div>
         <!-- Connection card -->
-        <div
-          v-else
-          class="conn-card"
-          :style="{ animationDelay: `${(index % 20) * 12}ms` }"
-          @click="emit('rowClick', row.original)"
-        >
+        <div v-else class="conn-card" @click="emit('rowClick', row.original)">
           <div class="conn-card__main">
             <span class="conn-card__host">
               <span
@@ -477,6 +506,42 @@ async function copyCell(
   border-bottom: 1px solid var(--conn-border);
 }
 
+/* daisyUI sets these sizes on rows only; also size the table so the em-based
+   column widths scale with its contents. Header typography stays independent. */
+.table-xs {
+  font-size: 0.6875rem;
+}
+
+.table-sm {
+  font-size: 0.75rem;
+}
+
+.table-md {
+  font-size: 0.875rem;
+}
+
+.table-lg {
+  font-size: 1.125rem;
+}
+
+@media (min-width: 768px) {
+  .table {
+    table-layout: fixed;
+    min-width: var(--conn-table-width);
+  }
+}
+
+.force-table {
+  table-layout: fixed;
+  min-width: var(--conn-table-width);
+}
+
+@media (max-width: 767px) {
+  .table:not(.force-table) colgroup {
+    display: none;
+  }
+}
+
 .conn-group-btn {
   color: color-mix(in oklab, var(--color-base-content) 50%, transparent);
 }
@@ -515,7 +580,6 @@ async function copyCell(
   margin: 0.25rem;
   border-radius: 0.5rem;
   background: var(--color-base-100);
-  animation: fadeIn 0.3s ease-out backwards;
 }
 
 .conn-data-row:hover {
@@ -560,17 +624,6 @@ async function copyCell(
 .force-table .conn-data-row:hover {
   background: color-mix(in oklab, var(--color-base-content) 5%, transparent);
   box-shadow: none;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 /* Table cells - responsive layout. On narrow screens each field gets a full
@@ -676,8 +729,25 @@ async function copyCell(
 .conn-cell-wrap {
   display: inline-flex;
   align-items: center;
+  width: 100%;
   min-width: 0;
   max-width: 100%;
+}
+
+.conn-cell-content {
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .conn-cell-content {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.force-table .conn-cell-content {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .conn-copy-btn {
@@ -738,7 +808,6 @@ async function copyCell(
     color-mix(in oklab, var(--color-base-content) 8%, transparent);
   border-radius: 0.5rem;
   cursor: pointer;
-  animation: fadeIn 0.3s ease-out backwards;
   transition:
     transform var(--dur-base, 220ms)
       var(--ease-spring-soft, cubic-bezier(0.5, 1.25, 0.5, 1)),

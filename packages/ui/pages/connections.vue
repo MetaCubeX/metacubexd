@@ -13,6 +13,7 @@ import {
   connectionsToCSV,
   connectionsToJSON,
 } from '~/components/connections/connectionsExport'
+import { sortConnections } from '~/components/connections/connectionSort'
 import { connectionMatchesGlobalFilter } from '~/components/connections/globalFilter'
 import {
   chainMatchesQuickFilter,
@@ -509,48 +510,7 @@ const filteredConnections = computed(() => {
     )
   }
 
-  // Sort
-  const sorted = [...connections].sort((a, b) => {
-    let comparison = 0
-    switch (sortColumn.value) {
-      case 'ConnectTime':
-        comparison = new Date(a.start).getTime() - new Date(b.start).getTime()
-        break
-      case 'DlSpeed':
-        comparison = a.downloadSpeed - b.downloadSpeed
-        break
-      case 'UlSpeed':
-        comparison = a.uploadSpeed - b.uploadSpeed
-        break
-      case 'Download':
-        comparison = a.download - b.download
-        break
-      case 'Upload':
-        comparison = a.upload - b.upload
-        break
-      case 'Host':
-        comparison = (a.metadata.host || '').localeCompare(
-          b.metadata.host || '',
-        )
-        break
-      case 'Type':
-        comparison = a.metadata.type.localeCompare(b.metadata.type)
-        break
-      case 'Process':
-        comparison = (a.metadata.process || '').localeCompare(
-          b.metadata.process || '',
-        )
-        break
-      case 'SourceIP':
-        comparison = (a.metadata.sourceIP || '').localeCompare(
-          b.metadata.sourceIP || '',
-        )
-        break
-    }
-    return sortDesc.value ? -comparison : comparison
-  })
-
-  return sorted
+  return sortConnections(connections, sortColumn.value, sortDesc.value)
 })
 
 // Pagination
