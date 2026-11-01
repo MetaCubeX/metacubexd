@@ -651,5 +651,16 @@
   "visualEditorDiagnostics": "配置诊断",
   "visualEditorManaged": "托管",
   "quality": "质量",
-  "sortDefault": "默认"
+  "sortDefault": "默认",
+  "trafficStats": "流量统计",
+  "statsDisabled": "后端未开启流量统计",
+  "domainFilter": "域名过滤",
+  "matchSuffix": "后缀匹配",
+  "matchExact": "精确匹配",
+  "autoRefresh": "自动刷新",
+  "lastSeen": "最近活跃",
+  "conns": "连接数",
+  "apply": "应用",
+  "refresh": "刷新",
+  "loading": "加载中"
 }
