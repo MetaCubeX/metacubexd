@@ -651,5 +651,16 @@
   "visualEditorDiagnostics": "Configuration diagnostics",
   "visualEditorManaged": "Managed",
   "quality": "Quality",
-  "sortDefault": "Default"
+  "sortDefault": "Default",
+  "trafficStats": "Traffic Stats",
+  "statsDisabled": "Traffic statistics is disabled on the backend",
+  "domainFilter": "Domain filter",
+  "matchSuffix": "Suffix match",
+  "matchExact": "Exact match",
+  "autoRefresh": "Auto refresh",
+  "lastSeen": "Last seen",
+  "conns": "Conns",
+  "apply": "Apply",
+  "refresh": "Refresh",
+  "loading": "Loading"
 }
