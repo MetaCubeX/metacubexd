@@ -91,11 +91,11 @@ import {
   saveWindowState,
 } from './window-state'
 
-// ESM has no CommonJS `__dirname`; electron-vite bundles main as ESM under
-// `"type": "module"`, so derive it from import.meta.url (the bundled
-// out/main/index.js location). All `join(__dirname, ...)` paths below resolve
-// exactly as the CJS equivalent did, in both dev and packaged (asar) layouts.
-const __dirname = fileURLToPath(new URL('.', import.meta.url))
+// ESM has no CommonJS `__dirname`, and electron-vite's `vite:esm-shim` plugin
+// injects a top-level `__dirname` shim into ESM chunks, so use a distinct
+// identifier derived from import.meta.url (the bundled out/main/index.js
+// location) to avoid a duplicate declaration in the output bundle.
+const mainDir = fileURLToPath(new URL('.', import.meta.url))
 
 // Real fs adapter for bootstrapDataDir (recursive mkdir is idempotent).
 const fsAdapter: FsLike = {
@@ -650,7 +650,7 @@ async function boot(): Promise<void> {
 
   // The control server also serves the renderer (same origin as /api/control)
   // from the dir where copy:renderer / electron-builder stage the nuxt output.
-  const rendererDir = join(__dirname, '..', '..', 'renderer')
+  const rendererDir = join(mainDir, '..', '..', 'renderer')
   controlServer = await startControlServer(
     agent.router,
     controlPort,
@@ -852,7 +852,7 @@ function createWindow(): void {
     // uses the dock icon set in whenReady). Packaged builds use the bundle icon.
     ...(devIcon ? { icon: devIcon } : {}),
     webPreferences: {
-      preload: join(__dirname, '..', 'preload', 'index.js'),
+      preload: join(mainDir, '..', 'preload', 'index.js'),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false,

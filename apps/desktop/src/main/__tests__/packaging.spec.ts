@@ -118,4 +118,13 @@ describe('desktop distribution configuration', () => {
     expect(workflow).toContain(stableDmgAsset)
     expect(cask).toContain('MetaCubeXD-mac-#{arch}.dmg')
   })
+
+  it('avoids redeclaring __dirname or __filename in main process ESM sources', () => {
+    for (const relPath of ['src/main/index.ts', 'src/main/tray.ts']) {
+      const source = readFileSync(resolve(desktopRoot, relPath), 'utf8')
+      expect(source).not.toMatch(
+        /^\s*(?:const|let|var)\s+__(?:dirname|filename)\b/m,
+      )
+    }
+  })
 })

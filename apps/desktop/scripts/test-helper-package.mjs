@@ -2,7 +2,7 @@
 // tests cannot catch imports that work in out/ but are missing beside app.asar.
 // No elevation, service installation, or mihomo process is involved.
 import assert from 'node:assert/strict'
-import { spawn } from 'node:child_process'
+import { execFileSync, spawn } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
 import { once } from 'node:events'
 import {
@@ -29,6 +29,9 @@ const builderRequire = createRequire(require.resolve('electron-builder'))
 const { getFileMatchers } = builderRequire('app-builder-lib/out/fileMatcher.js')
 const electron = require('electron')
 const appDir = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+// Verify the bundled main-process entry parses cleanly as an ES module (guards
+// against duplicate top-level identifiers when electron-vite injects CJS shims).
+execFileSync(process.execPath, ['--check', join(appDir, 'out/main/index.js')])
 const config = parse(
   await readFile(join(appDir, 'electron-builder.yml'), 'utf8'),
 )
