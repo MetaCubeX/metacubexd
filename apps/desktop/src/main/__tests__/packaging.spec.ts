@@ -23,6 +23,9 @@ interface BuilderConfig {
   rpm: {
     packageName: string
   }
+  toolsets?: {
+    appimage?: string
+  }
 }
 
 const desktopRoot = resolve(import.meta.dirname, '../../..')
@@ -66,6 +69,7 @@ describe('desktop distribution configuration', () => {
       rpm: ['x64', 'arm64'],
       pacman: ['x64', 'arm64'],
     })
+    expect(config.toolsets?.appimage).toBe('1.0.3')
     expect(config.linux.syncDesktopName).toBe(true)
 
     const packageJson = JSON.parse(

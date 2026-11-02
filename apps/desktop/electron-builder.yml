@@ -100,6 +100,11 @@ nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
   perMachine: false
+toolsets:
+  # Use electron-builder's static AppImage runtime instead of the legacy
+  # FUSE 2 default ("0.0.0"), so AppImages launch on modern Linux distros that
+  # ship fuse3 without libfuse2 (#2226).
+  appimage: '1.0.3'
 linux:
   # Native packages install this set into the matching hicolor size buckets.
   # A single 1024px PNG only produced hicolor/1024x1024, which some Linux
