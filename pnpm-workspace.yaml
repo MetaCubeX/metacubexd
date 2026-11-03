@@ -13,21 +13,21 @@ catalog:
   # pinned here so the desktop package can require() it directly.
   '@electron/fuses': ^2.1.3
   '@floating-ui/vue': ^2.0.1
-  '@nuxt/fonts': ^1.1.0
+  '@nuxt/fonts': ^1.2.0
   '@nuxtjs/i18n': ^10.6.0
   '@nuxtjs/tailwindcss': ^6.14.0
   '@pinia/nuxt': ^1.0.3
   '@playwright/test': ^1.64.1
   '@prettier/plugin-oxc': ^0.2.3
-  '@tabler/icons-vue': ^3.49.0
+  '@tabler/icons-vue': ^3.50.0
   '@tailwindcss/typography': ^0.5.20
   '@tailwindcss/vite': ^4.3.3
-  '@tanstack/vue-query': ^5.104.5
-  '@tanstack/vue-virtual': ^3.13.48
+  '@tanstack/vue-query': ^5.105.0
+  '@tanstack/vue-virtual': ^3.13.50
   '@types/byte-size': ^8.1.2
   '@types/d3': ^7.4.3
-  '@types/markdown-it': ^14.1.2
-  '@types/node': ^26.6.5
+  '@types/markdown-it': ^14.2.0
+  '@types/node': ^26.6.6
   '@types/sortablejs': ^1.15.9
   '@vite-pwa/nuxt': ^1.1.1
   '@vitest/coverage-v8': ^5.0.5
@@ -39,17 +39,17 @@ catalog:
   d3: ^7.9.0
   daisyui: ^5.7.50
   dayjs: ^1.11.23
-  electron: ^45.0.0
+  electron: ^45.2.1
   electron-builder: ^26.18.0
   electron-vite: ^6.0.0
-  eslint: ^10.13.0
+  eslint: ^10.14.0
   eslint-plugin-format: ^2.0.1
   # NEW-SUBSYSTEM deps (consumed by the future agent/server/desktop packages
   # in plans 02-05, NOT by packages/ui). These are brand-new catalog entries
   # for brand-new packages — they do NOT bump any existing dependency, so the
   # "ZERO version bumps" rule still holds (it forbids changing the version of
   # an already-present dep, not adding a new one). Versions come from spec §1.
-  h3: ^1.15.11
+  h3: ^2.0.8
   highcharts: ^13.1.1
   husky: ^9.1.7
   jsdom: ^30.1.3
@@ -57,7 +57,7 @@ catalog:
   lint-staged: ^17.6.0
   markdown-it: ^15.0.3
   match-sorter: ^8.3.0
-  meta-json-schema: ^1.19.32
+  meta-json-schema: ^1.19.33
   # PINNED, do not bump past 0.52.x. monaco-yaml@5.5.1 (latest) pulls
   # monaco-worker-manager@2.0.1 (latest), which calls the OLD
   # editor.createWebWorker({ moduleId, label, createData }) API. monaco-editor
@@ -92,7 +92,7 @@ catalog:
   vue: ^3.5.44
   vue-router: ^5.4.0
   vue-sonner: ^2.0.9
-  vue-tsc: ^3.3.13
+  vue-tsc: ^3.3.14
   yaml: ^2.9.1
 
 neverBuiltDependencies: []
@@ -119,7 +119,7 @@ overrides:
   # range is 0.27.3–0.28.0; the unrelated 0.25.12 (< floor) is left untouched.
   'esbuild@0.27': 0.28.1
   'esbuild@0.28': 0.28.1
-  h3: ^1.15.11
+  h3: ^2.0.8
   'js-yaml@4': ^4.2.0
   koa: '>=3.2.1'
   node-forge: '>=1.4.0'
