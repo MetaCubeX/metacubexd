@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.274.4](https://github.com/MetaCubeX/metacubexd/compare/v1.274.3...v1.274.4) (2026-11-04)
+
+
+### Bug Fixes
+
+* **desktop:** avoid duplicate __dirname declaration in main bundle ([#2241](https://github.com/MetaCubeX/metacubexd/issues/2241)) ([62aa58f](https://github.com/MetaCubeX/metacubexd/commit/62aa58ffaf912c51045d50d68f405e056d00ef84))
+* **desktop:** use static AppImage runtime toolset to avoid libfuse2 dependency ([#2242](https://github.com/MetaCubeX/metacubexd/issues/2242)) ([42788e2](https://github.com/MetaCubeX/metacubexd/commit/42788e2238e3df35c264b3e5e5686f7a88ffe23b))
+
 ## [1.274.3](https://github.com/MetaCubeX/metacubexd/compare/v1.274.2...v1.274.3) (2026-10-31)
 
 
