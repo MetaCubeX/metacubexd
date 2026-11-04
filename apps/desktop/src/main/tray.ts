@@ -481,9 +481,9 @@ export function createTray(deps: TrayDeps): Tray {
  */
 export function trayIconPath(): string {
   const file = process.platform === 'darwin' ? 'trayTemplate.png' : 'tray.png'
-  // ESM: no CJS __dirname. Derive from import.meta.url (bundled into
-  // out/main/index.js → ../../resources). Function-local so it never collides
-  // with the main module's own __dirname after bundling.
-  const __dirname = fileURLToPath(new URL('.', import.meta.url))
-  return join(__dirname, '..', '..', 'resources', file)
+  // ESM: derive the bundle directory from import.meta.url (bundled into
+  // out/main/index.js → ../../resources) without using the `__dirname`
+  // identifier that electron-vite's ESM shim injects at the chunk top level.
+  const mainDir = fileURLToPath(new URL('.', import.meta.url))
+  return join(mainDir, '..', '..', 'resources', file)
 }
