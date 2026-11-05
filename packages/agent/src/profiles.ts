@@ -1,3 +1,4 @@
+import type { ConfigObject } from '@metacubexd/config-editor'
 import type { ScriptRunner } from './script'
 import type { ProfileMeta, ProfileStore } from './types'
 import { randomUUID } from 'node:crypto'
@@ -11,8 +12,21 @@ import {
   writeFile,
 } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
+import {
+  applyPatch,
+  diffDocument,
+  openDocument,
+  replaceDocumentData,
+} from '@metacubexd/config-editor'
 import { parse, stringify } from 'yaml'
-import { ConfigPatchConflictError, isPlainObject, mergeConfigs } from './merge'
+import {
+  ConfigPatchConflictError,
+  isPlainObject,
+  mergeConfigs,
+  parseVisualPatch,
+  visualOverlayName,
+  visualPatchContent,
+} from './merge'
 
 export interface ProfileStoreOptions {
   dir: string
@@ -170,6 +184,26 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
       }
       throw err
     }
+  }
+
+  // A refresh replaces a remote base, so its section edits are kept as visual
+  // editor overrides: the base plus the patch in its managed overlay.
+  async function editableRemote(id: string) {
+    const list = await readIndex()
+    const overlay = list.find(
+      (meta) =>
+        meta.type === 'merge' &&
+        meta.managedBy === 'visual-editor' &&
+        meta.baseProfileId === id,
+    )
+    const baseYaml = await readFile(profilePath(id), 'utf8')
+    const stored = overlay
+      ? parseVisualPatch(await readFile(profilePath(overlay.id), 'utf8'))
+      : undefined
+    const { document, conflicts } = stored
+      ? applyPatch(baseYaml, stored)
+      : { document: openDocument(baseYaml), conflicts: [] }
+    return { overlay, baseYaml, document, conflicts }
   }
 
   const store: ProfileStore = {
@@ -473,7 +507,14 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
     },
 
     async getSection(id, key) {
-      await findMeta(id)
+      const meta = await findMeta(id)
+      if (meta.type === 'remote') {
+        const { document } = await editableRemote(id)
+        const value = Object.hasOwn(document.data, key)
+          ? document.data[key]
+          : undefined
+        return value === undefined ? null : value
+      }
       const parsed = parse(await readFile(profilePath(id), 'utf8')) as unknown
       if (!isPlainObject(parsed)) return null
       const value = parsed[key]
@@ -481,7 +522,41 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
     },
 
     async setSection(id, key, value) {
-      await findMeta(id)
+      const meta = await findMeta(id)
+      if (meta.type === 'remote') {
+        const { overlay, baseYaml, document, conflicts } =
+          await editableRemote(id)
+        if (conflicts.length) throw new ConfigPatchConflictError(conflicts)
+        const data: ConfigObject = Object.fromEntries(
+          Object.entries(document.data).filter(([name]) => name !== key),
+        )
+        if (value != null) {
+          Object.defineProperty(data, key, {
+            value,
+            enumerable: true,
+            configurable: true,
+            writable: true,
+          })
+        }
+        const patch = diffDocument(
+          baseYaml,
+          replaceDocumentData(document, data),
+        )
+        const content = visualPatchContent(patch)
+        if (overlay) {
+          await store.update(overlay.id, { content, editorStatus: 'clean' })
+        } else if (patch.operations.length) {
+          await store.create({
+            name: visualOverlayName(meta.name),
+            type: 'merge',
+            content,
+            baseProfileId: id,
+            managedBy: 'visual-editor',
+            editorStatus: 'clean',
+          })
+        }
+        return
+      }
       const parsed = parse(await readFile(profilePath(id), 'utf8')) as unknown
       // Empty / non-mapping content seeds a fresh top-level mapping.
       const doc: Record<string, unknown> = isPlainObject(parsed) ? parsed : {}

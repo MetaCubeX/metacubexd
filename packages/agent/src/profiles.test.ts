@@ -914,3 +914,89 @@ describe('createProfileStore — config sections', () => {
     expect(after).toEqual({ mode: 'global' })
   })
 })
+
+describe('createProfileStore — config sections on a remote profile', () => {
+  let dir: string
+  let activeConfigPath: string
+  let body: string
+  let store: ProfileStore
+
+  beforeEach(() => {
+    dir = tmpDir()
+    activeConfigPath = join(dir, 'active', 'config.yaml')
+    body = 'mode: rule\nallow-lan: false\nproxies: []\n'
+    const fakeFetch = (async () =>
+      new Response(body, { status: 200 })) as unknown as typeof fetch
+    let n = 0
+    store = createProfileStore({
+      dir,
+      activeConfigPath,
+      fetch: fakeFetch,
+      idGen: () => `id${++n}`,
+    })
+  })
+
+  const activeConfig = () =>
+    parse(readFileSync(activeConfigPath, 'utf8')) as Record<string, unknown>
+
+  it('keeps section changes across a subscription refresh', async () => {
+    const remote = await store.importFromUrl('https://sub.example/clash')
+    await store.setSection(remote.id, 'allow-lan', true)
+    await store.setSection(remote.id, 'mode', 'global')
+    await store.setSection(remote.id, 'proxies', null)
+    await store.setActive(remote.id)
+    expect(activeConfig()).toEqual({ mode: 'global', 'allow-lan': true })
+
+    body =
+      'mode: rule\nallow-lan: false\nproxies: []\nrules:\n  - MATCH,DIRECT\n'
+    const refreshed = await store.refresh(remote.id)
+    expect(refreshed.editorStatus).toBe('clean')
+    // The base keeps the downloaded subscription; the changes live in the
+    // profile's managed overlay.
+    expect(await store.read(remote.id)).toBe(body)
+    await store.setActive(remote.id)
+    expect(activeConfig()).toEqual({
+      mode: 'global',
+      'allow-lan': true,
+      rules: ['MATCH,DIRECT'],
+    })
+    expect(await store.getSection(remote.id, 'allow-lan')).toBe(true)
+    expect(await store.getSection(remote.id, 'proxies')).toBeNull()
+  })
+
+  it('writes into the visual editor overlay and reuses it', async () => {
+    const remote = await store.importFromUrl('https://sub.example/clash')
+    await store.setSection(remote.id, 'allow-lan', true)
+    await store.setSection(remote.id, 'mode', 'direct')
+    const overlays = (await store.list()).filter(
+      (meta) => meta.managedBy === 'visual-editor',
+    )
+    expect(overlays).toEqual([
+      expect.objectContaining({
+        type: 'merge',
+        baseProfileId: remote.id,
+        editorStatus: 'clean',
+      }),
+    ])
+    // Setting a key back to the subscription's value drops that override.
+    await store.setSection(remote.id, 'allow-lan', false)
+    await store.setActive(remote.id)
+    expect(activeConfig()).toEqual({
+      mode: 'direct',
+      'allow-lan': false,
+      proxies: [],
+    })
+  })
+
+  it('refuses to write while the stored overrides conflict', async () => {
+    const remote = await store.importFromUrl('https://sub.example/clash')
+    await store.setSection(remote.id, 'mode', 'global')
+    body = 'mode: direct\nallow-lan: false\nproxies: []\n'
+    const refreshed = await store.refresh(remote.id)
+    expect(refreshed.editorStatus).toBe('conflicted')
+    await expect(
+      store.setSection(remote.id, 'allow-lan', true),
+    ).rejects.toThrow('conflicts')
+    expect(await store.getSection(remote.id, 'allow-lan')).toBe(false)
+  })
+})

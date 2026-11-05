@@ -14,6 +14,10 @@ export class ConfigPatchConflictError extends Error {
   }
 }
 
+export function visualOverlayName(baseName: string): string {
+  return `${baseName} · Visual overrides`
+}
+
 export function visualPatchContent(patch: ConfigPatchV1): string {
   return stringify({ [VISUAL_PATCH_KEY]: patch })
 }
