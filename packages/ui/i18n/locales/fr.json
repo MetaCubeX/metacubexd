@@ -234,6 +234,7 @@
   "tunEnableFailed": "Échec de l'activation du mode TUN",
   "tunDisableSuccess": "Mode TUN désactivé — réseau restauré",
   "tunDisableFailed": "Échec de la désactivation du mode TUN",
+  "tunSaveFailed": "Échec de l'enregistrement des paramètres TUN",
   "tunRecoverNetwork": "Restaurer le réseau",
   "tunInstallNote": "L'activation de TUN installe un assistant privilégié et demande une autorisation administrateur. Une version non signée affichera un avertissement « éditeur inconnu » — c'est normal.",
   "tunNeedsProfile": "Importez un abonnement avant d'activer le mode TUN.",

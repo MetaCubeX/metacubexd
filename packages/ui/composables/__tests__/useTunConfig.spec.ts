@@ -1,7 +1,18 @@
 // packages/ui/composables/__tests__/useTunConfig.spec.ts
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useTunConfig } from '../useTunConfig'
+import {
+  normalizeTunStack,
+  TUN_STACKS,
+  tunStackOptions,
+  useTunConfig,
+} from '../useTunConfig'
+
+// Remote save errors surface via toast.
+const { toast } = vi.hoisted(() => ({
+  toast: { success: vi.fn(), error: vi.fn() },
+}))
+vi.mock('vue-sonner', () => ({ toast }))
 
 // useTun is the desktop control composable wired in B4-T1. Stub it so we can
 // drive `available` / `status` and assert enable/disable are called.
@@ -203,9 +214,36 @@ describe('composables/useTunConfig', () => {
     available = false
     const patch = vi.fn()
     const c = useTunConfig({ patch })
-    await c.onStackChange('LWIP')
-    expect(patch).toHaveBeenCalledWith({ stack: 'LWIP' })
+    await c.onStackChange('Mips')
+    expect(patch).toHaveBeenCalledWith({ stack: 'Mips' })
     expect(tun.enable).not.toHaveBeenCalled()
+  })
+
+  it('remote: a saved stack change resolves true without a toast', async () => {
+    available = false
+    const c = useTunConfig({ patch: vi.fn().mockResolvedValue(undefined) })
+    await expect(c.onStackChange('gVisor')).resolves.toBe(true)
+    expect(toast.error).not.toHaveBeenCalled()
+  })
+
+  it('remote: a refused stack change surfaces the error and resolves false', async () => {
+    available = false
+    const patch = vi.fn().mockRejectedValue(new Error('invalid tun stack'))
+    const c = useTunConfig({ patch })
+    await expect(c.onStackChange('Mips')).resolves.toBe(false)
+    expect(toast.error).toHaveBeenCalledWith('tunSaveFailed', {
+      description: 'invalid tun stack',
+    })
+  })
+
+  it('remote: a refused toggle surfaces the error and resolves false', async () => {
+    available = false
+    const patch = vi.fn().mockRejectedValue(new Error('Bad Request'))
+    const c = useTunConfig({ patch })
+    await expect(c.onToggle(true, 'gVisor')).resolves.toBe(false)
+    expect(toast.error).toHaveBeenCalledWith('tunSaveFailed', {
+      description: 'Bad Request',
+    })
   })
 
   it('remote: never shows the recover-network/uninstall buttons or the install note', () => {
@@ -221,5 +259,30 @@ describe('composables/useTunConfig', () => {
     const c = useTunConfig({ patch: vi.fn() })
     c.init()
     expect(tun.load).not.toHaveBeenCalled()
+  })
+})
+
+describe('tun stack options', () => {
+  it('offers only stacks mihomo accepts (no lwIP)', () => {
+    expect(TUN_STACKS).toEqual(['Mixed', 'gVisor', 'System', 'Mips'])
+    expect(TUN_STACKS.map((s) => s.toLowerCase())).not.toContain('lwip')
+  })
+
+  it('matches the reported stack case-insensitively', () => {
+    expect(normalizeTunStack('Mips')).toBe('Mips')
+    expect(normalizeTunStack('mips')).toBe('Mips')
+    expect(normalizeTunStack('gvisor')).toBe('gVisor')
+    expect(normalizeTunStack('SYSTEM')).toBe('System')
+  })
+
+  it('falls back to Mixed when no stack is reported', () => {
+    expect(normalizeTunStack(undefined)).toBe('Mixed')
+    expect(normalizeTunStack('')).toBe('Mixed')
+  })
+
+  it('keeps an unknown stack visible as an extra option', () => {
+    expect(normalizeTunStack('future')).toBe('future')
+    expect(tunStackOptions('future')).toEqual([...TUN_STACKS, 'future'])
+    expect(tunStackOptions('gVisor')).toEqual(TUN_STACKS)
   })
 })
