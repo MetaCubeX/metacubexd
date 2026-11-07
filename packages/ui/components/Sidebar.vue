@@ -4,6 +4,7 @@ import { autoUpdate, flip, offset, shift, useFloating } from '@floating-ui/vue'
 import {
   IconBolt,
   IconChartAreaLine,
+  IconChartBar,
   IconChevronsLeft,
   IconChevronsRight,
   IconFileCode,
@@ -40,6 +41,7 @@ const navItems = computed(() => {
     { href: '/rules', name: t('rules'), icon: IconRuler },
     { href: '/connections', name: t('connections'), icon: IconNetwork },
     { href: '/traffic', name: t('dataUsage'), icon: IconChartAreaLine },
+    { href: '/traffic-stats', name: t('trafficStats'), icon: IconChartBar },
     { href: '/logs', name: t('logs'), icon: IconFileStack },
     { href: '/config', name: t('config'), icon: IconSettings },
   ]
