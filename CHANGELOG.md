@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.274.5](https://github.com/MetaCubeX/metacubexd/compare/v1.274.4...v1.274.5) (2026-11-07)
+
+
+### Bug Fixes
+
+* **agent:** keep config section edits on remote profiles across refresh ([#2246](https://github.com/MetaCubeX/metacubexd/issues/2246)) ([c5eec85](https://github.com/MetaCubeX/metacubexd/commit/c5eec85e90b33500756104e7732369ae7a25cc0d)), closes [#2215](https://github.com/MetaCubeX/metacubexd/issues/2215)
+* **ui:** offer only TUN stacks mihomo accepts ([#2247](https://github.com/MetaCubeX/metacubexd/issues/2247)) ([ca41801](https://github.com/MetaCubeX/metacubexd/commit/ca4180166ba19401b6a5b3cabcdb7553600d706f)), closes [#2196](https://github.com/MetaCubeX/metacubexd/issues/2196)
+
 ## [1.274.4](https://github.com/MetaCubeX/metacubexd/compare/v1.274.3...v1.274.4) (2026-11-04)
 
 
