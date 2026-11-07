@@ -234,6 +234,7 @@
   "tunEnableFailed": "Failed to enable TUN mode",
   "tunDisableSuccess": "TUN mode disabled — network restored",
   "tunDisableFailed": "Failed to disable TUN mode",
+  "tunSaveFailed": "Failed to save TUN settings",
   "tunRecoverNetwork": "Recover Network",
   "tunInstallNote": "Enabling TUN installs a privileged helper and prompts for administrator authorization. An unsigned build will show an \"unknown publisher\" warning — this is expected.",
   "tunNeedsProfile": "Import a subscription before enabling TUN mode.",

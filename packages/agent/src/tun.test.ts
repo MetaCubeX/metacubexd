@@ -14,10 +14,10 @@ describe('buildTunConfig', () => {
     })
   })
 
-  it('passes the stack through verbatim (mixed/system/lwip)', () => {
+  it('passes the stack through verbatim (mixed/system/mips)', () => {
     expect(buildTunConfig({ stack: 'mixed' }).stack).toBe('mixed')
     expect(buildTunConfig({ stack: 'system' }).stack).toBe('system')
-    expect(buildTunConfig({ stack: 'lwip' }).stack).toBe('lwip')
+    expect(buildTunConfig({ stack: 'mips' }).stack).toBe('mips')
   })
 
   it('includes device only when provided', () => {

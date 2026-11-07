@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DNSQuery } from '~/types'
+import type { Config, DNSQuery } from '~/types'
 import { useMutation } from '@tanstack/vue-query'
 import { useConfigActions, useRequest } from '~/composables/useApi'
 import { PORT_FIELDS, useGeneralConfig } from '~/composables/useGeneralConfig'
@@ -8,6 +8,11 @@ import {
   useUpdateConfigMutation,
   useVersionQuery,
 } from '~/composables/useQueries'
+import {
+  normalizeTunStack,
+  tunStackOptions,
+  useTunConfig,
+} from '~/composables/useTunConfig'
 
 const { t } = useI18n()
 const nodeRecommendationStore = useNodeRecommendationStore()
@@ -111,16 +116,14 @@ const isSingBox = computed(() => isSingBoxVersion(backendVersion.value))
 
 const enhancedModes = ['fake-ip', 'redir-host']
 
-// TUN stack options
-const tunStacks = ['Mixed', 'gVisor', 'System', 'LWIP']
-
 // TUN section wiring. On desktop (capability 'tun') flipping TUN cannot go
 // through the unprivileged Clash-API PATCH — it must route through
 // /api/control/tun so the agent installs/elevates the privileged helper and
 // privileged-restarts mihomo. On a plain remote backend the capability is
 // absent and we keep the existing PATCH behaviour (the `patch` callback).
 const tunConfig = useTunConfig({
-  patch: (value) => saveTun(value),
+  patch: (value) =>
+    updateConfigMutation.mutateAsync({ key: 'tun', value: value as any }),
 })
 onMounted(() => tunConfig.init())
 
@@ -128,14 +131,18 @@ async function onTunToggle() {
   // In desktop mode onToggle drives the privileged enable/disable and syncs its
   // own status; keep the local checkbox in lock-step with the resolved state so
   // a rejected/cancelled elevation does not leave the toggle stuck "on".
-  await tunConfig.onToggle(tunForm.tunEnable, tunForm.tunStack)
+  const saved = await tunConfig.onToggle(tunForm.tunEnable, tunForm.tunStack)
   if (tunConfig.desktopMode.value) {
     tunForm.tunEnable = tunConfig.enabled.value
+  } else if (saved === false && backendConfig.value) {
+    syncTunForm(backendConfig.value)
   }
 }
 
-function onTunStackChange() {
-  void tunConfig.onStackChange(tunForm.tunStack)
+async function onTunStackChange() {
+  const saved = await tunConfig.onStackChange(tunForm.tunStack)
+  // A refused stack must not stay selected as if it had been applied.
+  if (saved === false && backendConfig.value) syncTunForm(backendConfig.value)
 }
 
 async function onRecoverNetwork() {
@@ -203,6 +210,19 @@ const tunForm = reactive({
   tunDevice: '',
 })
 
+// Keep the current stack selectable even if it is not a known option.
+const tunStacks = computed(() => tunStackOptions(tunForm.tunStack))
+
+function syncTunForm(config: Config) {
+  // On desktop the live TUN enable is owned by /api/control/tun (watch below);
+  // only seed it from the Clash config on a remote backend.
+  if (!tunConfig.desktopMode.value) {
+    tunForm.tunEnable = config.tun?.enable || false
+  }
+  tunForm.tunStack = normalizeTunStack(config.tun?.stack)
+  tunForm.tunDevice = config.tun?.device || ''
+}
+
 // Hydrate the domain composables + the TUN adapter from the loaded config.
 watch(
   backendConfig,
@@ -210,13 +230,7 @@ watch(
     if (!config) return
     generalConfig.syncFromConfig(config)
     dnsSettings.syncFromConfig(config)
-    // On desktop the live TUN enable is owned by /api/control/tun (watch below);
-    // only seed it from the Clash config on a remote backend.
-    if (!tunConfig.desktopMode.value) {
-      tunForm.tunEnable = config.tun?.enable || false
-    }
-    tunForm.tunStack = config.tun?.stack || 'Mixed'
-    tunForm.tunDevice = config.tun?.device || ''
+    syncTunForm(config)
   },
   { immediate: true },
 )
@@ -228,7 +242,7 @@ watch(
   ([enabled, stack]) => {
     if (!tunConfig.desktopMode.value) return
     tunForm.tunEnable = enabled
-    if (stack) tunForm.tunStack = stack
+    if (stack) tunForm.tunStack = normalizeTunStack(stack)
   },
 )
 
