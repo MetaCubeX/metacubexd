@@ -134,10 +134,11 @@ export const useConnectionsStore = defineStore('connections', () => {
       }
     }
 
-    // Trim to latest window
+    // merged is newest first (active, then just closed, then older closed),
+    // so trim from the end to drop the oldest closed connections.
     const limit = activeConns.length + CONNECTIONS_TABLE_MAX_CLOSED_ROWS
     allConnections.value =
-      limit > 0 && merged.length > limit ? merged.slice(-limit) : merged
+      limit > 0 && merged.length > limit ? merged.slice(0, limit) : merged
   }
 
   const diffClosedConnections = (
@@ -230,7 +231,8 @@ export const useConnectionsStore = defineStore('connections', () => {
       const closedConns = diffClosedConnections(activeIds, allConnections.value)
       activeConnections.value = activeConns
       closedConnections.value = closedConns.slice(
-        -CONNECTIONS_TABLE_MAX_CLOSED_ROWS,
+        0,
+        CONNECTIONS_TABLE_MAX_CLOSED_ROWS,
       )
     }
   }

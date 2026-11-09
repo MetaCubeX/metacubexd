@@ -2,6 +2,7 @@ import type { WsMsg } from '~/types'
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { nextTick, reactive } from 'vue'
+import { CONNECTIONS_TABLE_MAX_CLOSED_ROWS } from '~/constants'
 import { useConnectionsStore } from '../connections'
 
 const dbMock = vi.hoisted(() => ({
@@ -278,5 +279,41 @@ describe('stores/connections data usage baselines', () => {
     expect(dbMock.addLogs).toHaveBeenCalledExactlyOnceWith([
       expect.objectContaining({ upload: 10, download: 20 }),
     ])
+  })
+})
+
+describe('stores/connections closed connections window', () => {
+  // Every snapshot has one long-lived connection and one short one that is
+  // closed by the next snapshot, like a client making request after request.
+  const runShortConnections = (count: number) => {
+    const store = useConnectionsStore()
+    for (let i = 0; i < count; i++) {
+      store.updateFromWsMsg(
+        makeMsg(i, i, [makeConn('hold', 0, 0), makeConn(`c${i}`, 0, 0)]),
+      )
+    }
+    store.updateFromWsMsg(makeMsg(count, count, [makeConn('hold', 0, 0)]))
+    return store
+  }
+
+  it('keeps the most recently closed connections once the limit is reached', () => {
+    const count = CONNECTIONS_TABLE_MAX_CLOSED_ROWS + 50
+    const store = runShortConnections(count)
+    const closedIds = store.closedConnections.map((c) => c.id)
+
+    expect(closedIds).toHaveLength(CONNECTIONS_TABLE_MAX_CLOSED_ROWS)
+    expect(closedIds[0]).toBe(`c${count - 1}`)
+    expect(closedIds.at(-1)).toBe(
+      `c${count - CONNECTIONS_TABLE_MAX_CLOSED_ROWS}`,
+    )
+  })
+
+  it('keeps active connections in the merged list', () => {
+    const store = runShortConnections(CONNECTIONS_TABLE_MAX_CLOSED_ROWS + 50)
+
+    expect(store.allConnections[0]?.id).toBe('hold')
+    expect(store.allConnections).toHaveLength(
+      CONNECTIONS_TABLE_MAX_CLOSED_ROWS + 1,
+    )
   })
 })
