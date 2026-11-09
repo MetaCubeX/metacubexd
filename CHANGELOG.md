@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.274.6](https://github.com/MetaCubeX/metacubexd/compare/v1.274.5...v1.274.6) (2026-11-09)
+
+
+### Bug Fixes
+
+* **ui:** keep the most recent closed connections ([#2250](https://github.com/MetaCubeX/metacubexd/issues/2250)) ([aa52345](https://github.com/MetaCubeX/metacubexd/commit/aa523456de02641788e0a75df133990f35b8c01a))
+
 ## [1.274.5](https://github.com/MetaCubeX/metacubexd/compare/v1.274.4...v1.274.5) (2026-11-07)
 
 
