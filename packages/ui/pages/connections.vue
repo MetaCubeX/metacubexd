@@ -24,7 +24,12 @@ import {
   closeSingleConnectionAPI,
 } from '~/composables/useApi'
 import { CONNECTIONS_TABLE_ACCESSOR_KEY } from '~/constants'
-import { formatIPv6, formatTimeFromNow, gapLeadingFlag } from '~/utils'
+import {
+  formatHostPort,
+  formatIPv6,
+  formatTimeFromNow,
+  gapLeadingFlag,
+} from '~/utils'
 import { renderTwoLineCell } from '~/utils/connectionCells'
 
 const { t, locale } = useI18n()
@@ -388,11 +393,17 @@ const allColumns: ConnectionColumn[] = [
     sortable: true,
     sortId: 'SourceIP',
     render: (conn: Connection) => {
-      const primary = `${getSourceLabel(conn)}:${conn.metadata.sourcePort}`
+      const primary = formatHostPort(
+        getSourceLabel(conn),
+        conn.metadata.sourcePort,
+      )
       const dest = getDestinationLabel(conn)
       const aux = dest ? `→ ${dest}` : ''
       const rawDest = getDestination(conn)
-      const rawSource = `${conn.metadata.sourceIP || t('inner')}:${conn.metadata.sourcePort}`
+      const rawSource = formatHostPort(
+        conn.metadata.sourceIP || t('inner'),
+        conn.metadata.sourcePort,
+      )
       return renderTwoLineCell(
         primary,
         aux,
@@ -403,7 +414,7 @@ const allColumns: ConnectionColumn[] = [
     renderText: (conn: Connection) => {
       const dest = getDestination(conn)
       const destText = dest ? ` → ${dest}` : ''
-      return `${getSourceIP(conn)}:${conn.metadata.sourcePort}${destText}`
+      return `${formatHostPort(getSourceIP(conn), conn.metadata.sourcePort)}${destText}`
     },
     groupValue: (conn: Connection) => getSourceIP(conn),
   },

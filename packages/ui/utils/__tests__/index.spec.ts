@@ -12,6 +12,7 @@ import {
   filterRules,
   filterSpecialProxyType,
   formatDuration,
+  formatHostPort,
   formatIPv6,
   formatProxyType,
   fuzzyFilter,
@@ -117,6 +118,20 @@ describe('utils/index', () => {
 
     it('returns hostnames unchanged', () => {
       expect(formatIPv6('localhost')).toBe('localhost')
+    })
+  })
+
+  describe('formatHostPort', () => {
+    it('brackets an IPv6 address before the port', () => {
+      expect(formatHostPort('2403:300:a33:4000::21', '123')).toBe(
+        '[2403:300:a33:4000::21]:123',
+      )
+      expect(formatHostPort('::1', 53)).toBe('[::1]:53')
+    })
+
+    it('leaves IPv4 addresses and hostnames as they are', () => {
+      expect(formatHostPort('192.168.1.1', '443')).toBe('192.168.1.1:443')
+      expect(formatHostPort('example.com', '443')).toBe('example.com:443')
     })
   })
 
