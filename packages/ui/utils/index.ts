@@ -148,6 +148,10 @@ export function formatIPv6(ip: string) {
   return ip
 }
 
+export function formatHostPort(host: string, port: string | number) {
+  return `${formatIPv6(host)}:${port}`
+}
+
 // Time helpers
 export function formatTimeFromNow(
   time: number | string,
