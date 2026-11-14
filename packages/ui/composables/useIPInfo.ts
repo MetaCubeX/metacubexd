@@ -4,6 +4,7 @@ import type {
   IPProvider,
   IPSBResponse,
   IPWhoIsResponse,
+  VPNDetectionResponse,
 } from '~/types/network'
 import ky from 'ky'
 
@@ -12,6 +13,7 @@ const IP_ENDPOINTS: Record<IPProvider, string> = {
   'ip.sb': 'https://api.ip.sb/geoip',
   'ipwho.is': 'https://ipwho.is/',
   'ipapi.is': 'https://api.ipapi.is/',
+  'vpndetection.io': 'https://api.vpndetection.io/myip',
 }
 
 // Parse IP.SB response
@@ -60,6 +62,20 @@ function parseIPAPIResponse(data: IPAPIResponse): IPInfo {
   }
 }
 
+// Parse VPNDetection response; Tor exits and privacy relays count as proxies
+function parseVPNDetectionResponse(data: VPNDetectionResponse): IPInfo {
+  return {
+    ip: data.ip,
+    country: data.location?.country_name,
+    countryCode: data.location?.country,
+    asn: data.asn?.asn,
+    org: data.asn?.name,
+    isProxy: data.is_tor || data.is_relay,
+    isVPN: data.is_vpn,
+    timezone: data.location?.timezone,
+  }
+}
+
 // Fetch IP information from a specific provider
 export async function fetchIPInfo(provider: IPProvider): Promise<IPInfo> {
   const url = IP_ENDPOINTS[provider]
@@ -72,6 +88,8 @@ export async function fetchIPInfo(provider: IPProvider): Promise<IPInfo> {
       return parseIPWhoIsResponse(response as IPWhoIsResponse)
     case 'ipapi.is':
       return parseIPAPIResponse(response as IPAPIResponse)
+    case 'vpndetection.io':
+      return parseVPNDetectionResponse(response as VPNDetectionResponse)
     default:
       throw new Error(`Unknown IP provider: ${provider}`)
   }
