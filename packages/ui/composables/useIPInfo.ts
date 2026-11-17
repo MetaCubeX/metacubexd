@@ -1,20 +1,31 @@
 import type {
   IPAPIResponse,
   IPInfo,
-  IPProvider,
   IPSBResponse,
   IPWhoIsResponse,
   VPNDetectionResponse,
 } from '~/types/network'
 import ky from 'ky'
 
+export type CurrentIPProvider =
+  'ip.sb' | 'ipwho.is' | 'ipapi.is' | 'ipinfo.io' | 'vpndetection.io'
+
 // IP query endpoints
-const IP_ENDPOINTS: Record<IPProvider, string> = {
+const IP_ENDPOINTS: Record<CurrentIPProvider, string> = {
   'ip.sb': 'https://api.ip.sb/geoip',
   'ipwho.is': 'https://ipwho.is/',
   'ipapi.is': 'https://api.ipapi.is/',
+  'ipinfo.io': 'https://ipinfo.io/json',
   'vpndetection.io': 'https://api.vpndetection.io/myip',
 }
+
+const IP_PROVIDER_ORDER: CurrentIPProvider[] = [
+  'ip.sb',
+  'ipinfo.io',
+  'ipwho.is',
+  'ipapi.is',
+  'vpndetection.io',
+]
 
 // Parse IP.SB response
 function parseIPSBResponse(data: IPSBResponse): IPInfo {
@@ -62,6 +73,23 @@ function parseIPAPIResponse(data: IPAPIResponse): IPInfo {
   }
 }
 
+function parseIPInfoResponse(data: {
+  ip: string
+  country?: string
+  city?: string
+  region?: string
+  org?: string
+}): IPInfo {
+  return {
+    ip: data.ip,
+    country: data.country,
+    countryCode: data.country,
+    city: data.city,
+    region: data.region,
+    org: data.org,
+  }
+}
+
 // Parse VPNDetection response; Tor exits and privacy relays count as proxies
 function parseVPNDetectionResponse(data: VPNDetectionResponse): IPInfo {
   return {
@@ -77,44 +105,84 @@ function parseVPNDetectionResponse(data: VPNDetectionResponse): IPInfo {
 }
 
 // Fetch IP information from a specific provider
-export async function fetchIPInfo(provider: IPProvider): Promise<IPInfo> {
+export async function fetchIPInfo(
+  provider: CurrentIPProvider,
+): Promise<IPInfo> {
   const url = IP_ENDPOINTS[provider]
-  const response = await ky.get(url, { timeout: 10000 }).json()
+  const response = await ky
+    .get(url, { timeout: 5000, cache: 'no-store' })
+    .json()
 
+  let info: IPInfo
   switch (provider) {
     case 'ip.sb':
-      return parseIPSBResponse(response as IPSBResponse)
+      info = parseIPSBResponse(response as IPSBResponse)
+      break
     case 'ipwho.is':
-      return parseIPWhoIsResponse(response as IPWhoIsResponse)
+      info = parseIPWhoIsResponse(response as IPWhoIsResponse)
+      break
     case 'ipapi.is':
-      return parseIPAPIResponse(response as IPAPIResponse)
+      info = parseIPAPIResponse(response as IPAPIResponse)
+      break
+    case 'ipinfo.io':
+      info = parseIPInfoResponse(
+        response as {
+          ip: string
+          country?: string
+          city?: string
+          region?: string
+          org?: string
+        },
+      )
+      break
     case 'vpndetection.io':
-      return parseVPNDetectionResponse(response as VPNDetectionResponse)
+      info = parseVPNDetectionResponse(response as VPNDetectionResponse)
+      break
     default:
       throw new Error(`Unknown IP provider: ${provider}`)
   }
+
+  if (typeof info.ip !== 'string' || !info.ip) {
+    throw new Error(`Invalid IP response from ${provider}`)
+  }
+  return info
 }
 
 // Composable for IP information
 export function useIPInfo() {
-  const currentProvider = ref<IPProvider>('ip.sb')
+  const currentProvider = ref<CurrentIPProvider>('ip.sb')
   const ipInfo = ref<IPInfo | null>(null)
   const isLoading = ref(false)
   const error = ref<string | null>(null)
+  let requestId = 0
 
-  async function fetchIP(provider?: IPProvider) {
+  async function fetchIP(provider?: CurrentIPProvider) {
     const targetProvider = provider ?? currentProvider.value
+    const currentRequest = ++requestId
     isLoading.value = true
     error.value = null
 
     try {
-      ipInfo.value = await fetchIPInfo(targetProvider)
-      currentProvider.value = targetProvider
-    } catch (e) {
-      error.value = e instanceof Error ? e.message : 'Failed to fetch IP info'
+      for (const candidate of [
+        targetProvider,
+        ...IP_PROVIDER_ORDER.filter((item) => item !== targetProvider),
+      ]) {
+        if (currentRequest !== requestId) return
+        try {
+          const result = await fetchIPInfo(candidate)
+          if (currentRequest !== requestId) return
+          ipInfo.value = result
+          currentProvider.value = candidate
+          return
+        } catch {
+          // Try the next provider when this endpoint is unavailable.
+        }
+      }
+      if (currentRequest !== requestId) return
+      error.value = 'All IP information providers failed'
       ipInfo.value = null
     } finally {
-      isLoading.value = false
+      if (currentRequest === requestId) isLoading.value = false
     }
   }
 
