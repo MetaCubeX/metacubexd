@@ -3,6 +3,7 @@ import type { Connection } from '~/types'
 import { IconNetwork } from '@tabler/icons-vue'
 import byteSize from 'byte-size'
 import dayjs from 'dayjs'
+import { formatHostPort } from '~/utils'
 
 const props = defineProps<{
   connection: Connection | null
@@ -141,7 +142,10 @@ defineExpose({
           <div class="text-base-content/60">{{ t('source') }}</div>
           <div class="min-w-0 font-mono break-all text-base-content">
             {{
-              `${connection.metadata.sourceIP}:${connection.metadata.sourcePort}`
+              formatHostPort(
+                connection.metadata.sourceIP,
+                connection.metadata.sourcePort,
+              )
             }}<span v-if="sourceHostname" class="text-base-content/60">
               ({{ sourceHostname }})</span
             >
@@ -149,9 +153,10 @@ defineExpose({
           <div class="text-base-content/60">{{ t('destination') }}</div>
           <div class="min-w-0 font-mono break-all text-base-content">
             {{
-              connection.metadata.destinationIP
-                ? `${connection.metadata.destinationIP}:${connection.metadata.destinationPort}`
-                : `${connection.metadata.host}:${connection.metadata.destinationPort}`
+              formatHostPort(
+                connection.metadata.destinationIP || connection.metadata.host,
+                connection.metadata.destinationPort,
+              )
             }}
           </div>
           <div class="text-base-content/60">{{ t('remoteDestination') }}</div>
@@ -190,7 +195,10 @@ defineExpose({
           <div class="min-w-0 font-mono break-all text-base-content">
             {{
               connection.metadata.inboundIP
-                ? `${connection.metadata.inboundIP}:${connection.metadata.inboundPort}`
+                ? formatHostPort(
+                    connection.metadata.inboundIP,
+                    connection.metadata.inboundPort,
+                  )
                 : '-'
             }}
           </div>
