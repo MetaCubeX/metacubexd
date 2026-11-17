@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.275.2](https://github.com/MetaCubeX/metacubexd/compare/v1.275.1...v1.275.2) (2026-11-17)
+
+
+### Bug Fixes
+
+* **ci:** revert h3 to v1 and migrate PWA config to generateSW ([7fddf0c](https://github.com/MetaCubeX/metacubexd/commit/7fddf0c70ef7c02d0c057fde516271d770de7655))
+
 ## [1.275.1](https://github.com/MetaCubeX/metacubexd/compare/v1.275.0...v1.275.1) (2026-11-17)
 
 
