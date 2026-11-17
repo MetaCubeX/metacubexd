@@ -119,7 +119,6 @@ overrides:
   # range is 0.27.3–0.28.0; the unrelated 0.25.12 (< floor) is left untouched.
   'esbuild@0.27': 0.28.1
   'esbuild@0.28': 0.28.1
-  h3: ^2.0.8
   'js-yaml@4': ^4.2.0
   koa: '>=3.2.1'
   node-forge: '>=1.4.0'
