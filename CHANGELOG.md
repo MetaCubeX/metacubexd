@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.275.0](https://github.com/MetaCubeX/metacubexd/compare/v1.274.6...v1.275.0) (2026-11-17)
+
+
+### Features
+
+* **ui:** add VPNDetection as an IP info provider ([#2257](https://github.com/MetaCubeX/metacubexd/issues/2257)) ([62bd42d](https://github.com/MetaCubeX/metacubexd/commit/62bd42d651ddd450ff91b21faf3de1a0353aaea2))
+
+
+### Bug Fixes
+
+* **ui:** bracket IPv6 addresses before the port ([#2256](https://github.com/MetaCubeX/metacubexd/issues/2256)) ([62ca6c9](https://github.com/MetaCubeX/metacubexd/commit/62ca6c99a50be857991eee27aee5e757ab63ea39)), closes [#2255](https://github.com/MetaCubeX/metacubexd/issues/2255)
+
 ## [1.274.6](https://github.com/MetaCubeX/metacubexd/compare/v1.274.5...v1.274.6) (2026-11-09)
 
 

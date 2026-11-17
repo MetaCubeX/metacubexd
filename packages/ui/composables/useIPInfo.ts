@@ -3,14 +3,12 @@ import type {
   IPInfo,
   IPSBResponse,
   IPWhoIsResponse,
+  VPNDetectionResponse,
 } from '~/types/network'
 import ky from 'ky'
 
 export type CurrentIPProvider =
-  | 'ip.sb'
-  | 'ipwho.is'
-  | 'ipapi.is'
-  | 'ipinfo.io'
+  'ip.sb' | 'ipwho.is' | 'ipapi.is' | 'ipinfo.io' | 'vpndetection.io'
 
 // IP query endpoints
 const IP_ENDPOINTS: Record<CurrentIPProvider, string> = {
@@ -18,6 +16,7 @@ const IP_ENDPOINTS: Record<CurrentIPProvider, string> = {
   'ipwho.is': 'https://ipwho.is/',
   'ipapi.is': 'https://api.ipapi.is/',
   'ipinfo.io': 'https://ipinfo.io/json',
+  'vpndetection.io': 'https://api.vpndetection.io/myip',
 }
 
 const IP_PROVIDER_ORDER: CurrentIPProvider[] = [
@@ -25,6 +24,7 @@ const IP_PROVIDER_ORDER: CurrentIPProvider[] = [
   'ipinfo.io',
   'ipwho.is',
   'ipapi.is',
+  'vpndetection.io',
 ]
 
 // Parse IP.SB response
@@ -90,10 +90,28 @@ function parseIPInfoResponse(data: {
   }
 }
 
+// Parse VPNDetection response; Tor exits and privacy relays count as proxies
+function parseVPNDetectionResponse(data: VPNDetectionResponse): IPInfo {
+  return {
+    ip: data.ip,
+    country: data.location?.country_name,
+    countryCode: data.location?.country,
+    asn: data.asn?.asn,
+    org: data.asn?.name,
+    isProxy: data.is_tor || data.is_relay,
+    isVPN: data.is_vpn,
+    timezone: data.location?.timezone,
+  }
+}
+
 // Fetch IP information from a specific provider
-export async function fetchIPInfo(provider: CurrentIPProvider): Promise<IPInfo> {
+export async function fetchIPInfo(
+  provider: CurrentIPProvider,
+): Promise<IPInfo> {
   const url = IP_ENDPOINTS[provider]
-  const response = await ky.get(url, { timeout: 5000, cache: 'no-store' }).json()
+  const response = await ky
+    .get(url, { timeout: 5000, cache: 'no-store' })
+    .json()
 
   let info: IPInfo
   switch (provider) {
@@ -107,13 +125,18 @@ export async function fetchIPInfo(provider: CurrentIPProvider): Promise<IPInfo> 
       info = parseIPAPIResponse(response as IPAPIResponse)
       break
     case 'ipinfo.io':
-      info = parseIPInfoResponse(response as {
-        ip: string
-        country?: string
-        city?: string
-        region?: string
-        org?: string
-      })
+      info = parseIPInfoResponse(
+        response as {
+          ip: string
+          country?: string
+          city?: string
+          region?: string
+          org?: string
+        },
+      )
+      break
+    case 'vpndetection.io':
+      info = parseVPNDetectionResponse(response as VPNDetectionResponse)
       break
     default:
       throw new Error(`Unknown IP provider: ${provider}`)

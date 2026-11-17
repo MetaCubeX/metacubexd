@@ -13,6 +13,7 @@ const providers: { value: CurrentIPProvider; label: string }[] = [
   { value: 'ipinfo.io', label: 'ipinfo.io' },
   { value: 'ipwho.is', label: 'ipwho.is' },
   { value: 'ipapi.is', label: 'ipapi.is' },
+  { value: 'vpndetection.io', label: 'VPNDetection' },
 ]
 
 // Fetch IP info on mount
