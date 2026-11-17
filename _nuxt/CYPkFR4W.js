@@ -1,0 +1,1 @@
+import{Pn as e,er as t,ln as n}from"./Bu0z1LIk.js";import{t as r}from"./CjdTf5Rz.js";var i=e({setup(){if(r){let e=t({link:[]});n(e);let{webManifest:i}=r;if(i){let{href:t,useCredentials:n}=i;n?e.value.link.push({rel:`manifest`,href:t,crossorigin:`use-credentials`}):e.value.link.push({rel:`manifest`,href:t})}}return()=>null}});export{i as default};
