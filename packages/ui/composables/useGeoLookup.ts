@@ -16,6 +16,7 @@ const GEO_ENDPOINTS: Record<IPProvider, (ip: string) => string> = {
   'ip.sb': (ip) => `https://api.ip.sb/geoip/${ip}`,
   'ipwho.is': (ip) => `https://ipwho.is/${ip}`,
   'ipapi.is': (ip) => `https://api.ipapi.is/?q=${ip}`,
+  'vpndetection.io': (ip) => `https://api.vpndetection.io/${ip}`,
 }
 
 function isAsciiLetters(value: string): boolean {
@@ -94,6 +95,18 @@ function parseIPAPI(data: Record<string, unknown>): GeoInfo {
   }
 }
 
+function parseVPNDetection(data: Record<string, unknown>): GeoInfo {
+  const location = data.location as
+    { country?: string; country_name?: string } | undefined
+  const asn = data.asn as { asn?: number; name?: string } | undefined
+  return {
+    countryCode: location?.country,
+    country: location?.country_name,
+    asn: asn?.asn,
+    org: asn?.name,
+  }
+}
+
 function parseGeoResponse(
   provider: IPProvider,
   data: Record<string, unknown>,
@@ -105,6 +118,8 @@ function parseGeoResponse(
       return parseIPWhoIs(data)
     case 'ipapi.is':
       return parseIPAPI(data)
+    case 'vpndetection.io':
+      return parseVPNDetection(data)
   }
 }
 

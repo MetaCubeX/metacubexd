@@ -96,6 +96,25 @@ export interface IPAPIResponse {
   }
 }
 
+// VPNDetection (api.vpndetection.io) response, keyless
+export interface VPNDetectionResponse {
+  ip: string
+  is_vpn: boolean
+  is_tor: boolean
+  is_relay: boolean
+  location?: {
+    country: string
+    country_name: string
+    timezone: string
+  }
+  asn?: {
+    asn: number
+    name: string
+    domain: string
+    type: string
+  }
+}
+
 // Unified IP info structure
 export interface IPInfo {
   ip: string
@@ -114,7 +133,7 @@ export interface IPInfo {
 }
 
 // IP Provider type
-export type IPProvider = 'ip.sb' | 'ipwho.is' | 'ipapi.is'
+export type IPProvider = 'ip.sb' | 'ipwho.is' | 'ipapi.is' | 'vpndetection.io'
 
 // Network latency result
 export interface LatencyResult {
