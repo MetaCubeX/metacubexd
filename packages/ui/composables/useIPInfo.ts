@@ -93,7 +93,7 @@ function parseIPInfoResponse(data: {
 // Fetch IP information from a specific provider
 export async function fetchIPInfo(provider: CurrentIPProvider): Promise<IPInfo> {
   const url = IP_ENDPOINTS[provider]
-  const response = await ky.get(url, { timeout: 5000 }).json()
+  const response = await ky.get(url, { timeout: 5000, cache: 'no-store' }).json()
 
   let info: IPInfo
   switch (provider) {
