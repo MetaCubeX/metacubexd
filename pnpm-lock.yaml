@@ -112,8 +112,8 @@ catalogs:
       specifier: ^2.0.1
       version: 2.0.1
     h3:
-      specifier: ^2.0.8
-      version: 2.0.8
+      specifier: ^1.15.11
+      version: 1.15.11
     highcharts:
       specifier: ^13.1.1
       version: 13.1.1
@@ -245,7 +245,7 @@ importers:
         version: link:../../packages/agent
       h3:
         specifier: 'catalog:'
-        version: 2.0.8(crossws@0.4.16(srvx@0.11.16))
+        version: 1.15.11
     devDependencies:
       '@electron/fuses':
         specifier: 'catalog:'
@@ -282,7 +282,7 @@ importers:
         version: link:../../packages/agent
       h3:
         specifier: 'catalog:'
-        version: 2.0.8(crossws@0.4.16(srvx@0.11.16))
+        version: 1.15.11
       nitropack:
         specifier: 'catalog:'
         version: 2.13.6(@parcel/watcher@2.5.6)(oxc-parser@0.158.0)(rolldown@1.2.15)(srvx@0.11.16)(vite@8.0.16(@types/node@26.6.6)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.0))
@@ -304,7 +304,7 @@ importers:
         version: link:../config-editor
       h3:
         specifier: 'catalog:'
-        version: 2.0.8(crossws@0.4.16(srvx@0.11.16))
+        version: 1.15.11
       tree-kill:
         specifier: 'catalog:'
         version: 1.2.2

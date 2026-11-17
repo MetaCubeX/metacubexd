@@ -75,6 +75,8 @@ export default defineNuxtConfig({
     disable: pwaDisabled,
     registerType: 'prompt',
     includeAssets: ['favicon.svg'],
+    // Top-level in @vite-pwa/nuxt v2 (removed from the generateSW options type).
+    maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
     manifest: {
       name: 'MetaCubeXD',
       short_name: 'MetaCubeXD',
@@ -91,7 +93,7 @@ export default defineNuxtConfig({
         },
       ],
     },
-    workbox: {
+    generateSW: {
       // Precache the built app shell only (relative paths keep subdirectory
       // deployments working). Backend API responses are dynamic and
       // cross-origin, so they are intentionally left uncached.
@@ -119,7 +121,6 @@ export default defineNuxtConfig({
         // of precache. Its chunk name contains "monaco".
         '**/monaco-*.js',
       ],
-      maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       // Keep skipWaiting/clientsClaim off to prevent iOS Safari refresh loops (#1740).
       skipWaiting: false,
       clientsClaim: false,

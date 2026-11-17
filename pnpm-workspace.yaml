@@ -49,7 +49,7 @@ catalog:
   # for brand-new packages — they do NOT bump any existing dependency, so the
   # "ZERO version bumps" rule still holds (it forbids changing the version of
   # an already-present dep, not adding a new one). Versions come from spec §1.
-  h3: ^2.0.8
+  h3: ^1.15.11
   highcharts: ^13.1.1
   husky: ^9.1.7
   jsdom: ^31.0.1
