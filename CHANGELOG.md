@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.275.1](https://github.com/MetaCubeX/metacubexd/compare/v1.275.0...v1.275.1) (2026-11-17)
+
+
+### Bug Fixes
+
+* **deps:** drop global h3 override that broke nitropack ([3549c69](https://github.com/MetaCubeX/metacubexd/commit/3549c69934201e4bc4a333356c56de9a94e9e49e))
+* **ui:** fall back across current IP providers ([#2259](https://github.com/MetaCubeX/metacubexd/issues/2259)) ([54a0adf](https://github.com/MetaCubeX/metacubexd/commit/54a0adf6d1e911a90e5e883d07001d8da6a4cbff))
+
 ## [1.275.0](https://github.com/MetaCubeX/metacubexd/compare/v1.274.6...v1.275.0) (2026-11-17)
 
 
