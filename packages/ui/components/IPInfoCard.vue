@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { IPProvider } from '~/types/network'
+import type { CurrentIPProvider } from '~/composables/useIPInfo'
 
 import { IconRefresh, IconWorld } from '@tabler/icons-vue'
 import { useIPInfo } from '~/composables/useIPInfo'
@@ -8,8 +8,9 @@ const { t } = useI18n()
 
 const { currentProvider, ipInfo, isLoading, error, fetchIP } = useIPInfo()
 
-const providers: { value: IPProvider; label: string }[] = [
+const providers: { value: CurrentIPProvider; label: string }[] = [
   { value: 'ip.sb', label: 'IP.SB' },
+  { value: 'ipinfo.io', label: 'ipinfo.io' },
   { value: 'ipwho.is', label: 'ipwho.is' },
   { value: 'ipapi.is', label: 'ipapi.is' },
 ]
@@ -21,7 +22,7 @@ onMounted(() => {
 
 function handleProviderChange(event: Event) {
   const target = event.target as HTMLSelectElement
-  fetchIP(target.value as IPProvider)
+  fetchIP(target.value as CurrentIPProvider)
 }
 </script>
 
