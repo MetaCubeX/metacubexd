@@ -85,10 +85,15 @@ export function useAppearance() {
   }))
 
   // Custom font stack: chosen family first, then the default CJK-aware fallback.
+  // This inline stack overrides the .font-twemoji class, so keep Twemoji in front
+  // when it is enabled. Its @font-face only covers flag code points.
   const FONT_FALLBACK = `'Ubuntu', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', system-ui, sans-serif`
-  const rootFontFamily = computed(() =>
-    configStore.fontFamily ? `${configStore.fontFamily}, ${FONT_FALLBACK}` : '',
-  )
+  const rootFontFamily = computed(() => {
+    if (!configStore.fontFamily)
+      return ''
+    const stack = `${configStore.fontFamily}, ${FONT_FALLBACK}`
+    return configStore.enableTwemoji ? `'Twemoji Mozilla', ${stack}` : stack
+  })
 
   // Apply / remove custom theme color overrides on <html>.
   function applyCustomThemeColors() {
