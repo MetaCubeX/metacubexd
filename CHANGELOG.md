@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.276.0](https://github.com/MetaCubeX/metacubexd/compare/v1.275.2...v1.276.0) (2026-11-21)
+
+
+### Features
+
+* **ui:** add InternetData as an IP info provider ([#2261](https://github.com/MetaCubeX/metacubexd/issues/2261)) ([97b922d](https://github.com/MetaCubeX/metacubexd/commit/97b922d42ed489896e1935e7255913fdf962c7bd))
+
+
+### Bug Fixes
+
+* **ui:** keep Twemoji flags when a custom font is selected ([#2268](https://github.com/MetaCubeX/metacubexd/issues/2268)) ([dd27ccf](https://github.com/MetaCubeX/metacubexd/commit/dd27ccf8f5f4cc5899437bc84f24de4588559f06))
+
 ## [1.275.2](https://github.com/MetaCubeX/metacubexd/compare/v1.275.1...v1.275.2) (2026-11-17)
 
 
