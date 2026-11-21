@@ -48,3 +48,39 @@ describe('fetchIPInfo with vpndetection.io', () => {
     })
   })
 })
+
+describe('fetchIPInfo with internetdata.io', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('reads the caller IP, country, ASN and company', async () => {
+    vi.mocked(ky.get).mockReturnValue({
+      json: vi.fn().mockResolvedValue({
+        ip: '8.8.8.8',
+        location: {
+          country: 'US',
+          country_name: 'United States',
+          timezone: 'America/Los_Angeles',
+        },
+        asn: { asn: 15169, name: 'Google LLC', domain: 'google.com' },
+        company: { name: 'Google LLC', domain: 'google.com' },
+      }),
+    } as unknown as ReturnType<typeof ky.get>)
+
+    const info = await fetchIPInfo('internetdata.io')
+
+    expect(ky.get).toHaveBeenCalledWith(
+      'https://api.internetdata.io/myip',
+      expect.anything(),
+    )
+    expect(info).toEqual({
+      ip: '8.8.8.8',
+      country: 'United States',
+      countryCode: 'US',
+      asn: 15169,
+      org: 'Google LLC',
+      timezone: 'America/Los_Angeles',
+    })
+  })
+})

@@ -115,6 +115,29 @@ export interface VPNDetectionResponse {
   }
 }
 
+// InternetData (api.internetdata.io) response, keyless
+export interface InternetDataResponse {
+  ip: string
+  location?: {
+    country?: string
+    country_name?: string
+    region?: string
+    city?: string
+    latitude?: number
+    longitude?: number
+    timezone?: string
+  }
+  asn?: {
+    asn: number
+    name: string
+    domain: string
+  }
+  company?: {
+    name: string
+    domain: string
+  }
+}
+
 // Unified IP info structure
 export interface IPInfo {
   ip: string
@@ -133,7 +156,12 @@ export interface IPInfo {
 }
 
 // IP Provider type
-export type IPProvider = 'ip.sb' | 'ipwho.is' | 'ipapi.is' | 'vpndetection.io'
+export type IPProvider =
+  | 'ip.sb'
+  | 'ipwho.is'
+  | 'ipapi.is'
+  | 'vpndetection.io'
+  | 'internetdata.io'
 
 // Network latency result
 export interface LatencyResult {

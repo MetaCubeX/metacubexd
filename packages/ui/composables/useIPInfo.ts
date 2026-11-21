@@ -1,4 +1,5 @@
 import type {
+  InternetDataResponse,
   IPAPIResponse,
   IPInfo,
   IPSBResponse,
@@ -8,7 +9,12 @@ import type {
 import ky from 'ky'
 
 export type CurrentIPProvider =
-  'ip.sb' | 'ipwho.is' | 'ipapi.is' | 'ipinfo.io' | 'vpndetection.io'
+  | 'ip.sb'
+  | 'ipwho.is'
+  | 'ipapi.is'
+  | 'ipinfo.io'
+  | 'vpndetection.io'
+  | 'internetdata.io'
 
 // IP query endpoints
 const IP_ENDPOINTS: Record<CurrentIPProvider, string> = {
@@ -17,6 +23,7 @@ const IP_ENDPOINTS: Record<CurrentIPProvider, string> = {
   'ipapi.is': 'https://api.ipapi.is/',
   'ipinfo.io': 'https://ipinfo.io/json',
   'vpndetection.io': 'https://api.vpndetection.io/myip',
+  'internetdata.io': 'https://api.internetdata.io/myip',
 }
 
 const IP_PROVIDER_ORDER: CurrentIPProvider[] = [
@@ -25,6 +32,7 @@ const IP_PROVIDER_ORDER: CurrentIPProvider[] = [
   'ipwho.is',
   'ipapi.is',
   'vpndetection.io',
+  'internetdata.io',
 ]
 
 // Parse IP.SB response
@@ -104,6 +112,22 @@ function parseVPNDetectionResponse(data: VPNDetectionResponse): IPInfo {
   }
 }
 
+// Parse InternetData response; region, city and coordinates come with a key
+function parseInternetDataResponse(data: InternetDataResponse): IPInfo {
+  return {
+    ip: data.ip,
+    country: data.location?.country_name,
+    countryCode: data.location?.country,
+    city: data.location?.city,
+    region: data.location?.region,
+    asn: data.asn?.asn,
+    org: data.company?.name ?? data.asn?.name,
+    latitude: data.location?.latitude,
+    longitude: data.location?.longitude,
+    timezone: data.location?.timezone,
+  }
+}
+
 // Fetch IP information from a specific provider
 export async function fetchIPInfo(
   provider: CurrentIPProvider,
@@ -137,6 +161,9 @@ export async function fetchIPInfo(
       break
     case 'vpndetection.io':
       info = parseVPNDetectionResponse(response as VPNDetectionResponse)
+      break
+    case 'internetdata.io':
+      info = parseInternetDataResponse(response as InternetDataResponse)
       break
     default:
       throw new Error(`Unknown IP provider: ${provider}`)
