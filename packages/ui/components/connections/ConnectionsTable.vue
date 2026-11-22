@@ -10,6 +10,7 @@ import {
   IconZoomInFilled,
   IconZoomOutFilled,
 } from '@tabler/icons-vue'
+import { copyText } from '~/utils/clipboard'
 
 // Column definition interface
 export interface ConnectionColumn {
@@ -276,11 +277,7 @@ async function copyCell(
   event.stopPropagation()
   const value = getCopyValue(col, conn)
   if (!value) return
-  try {
-    await navigator.clipboard.writeText(value)
-  } catch {
-    return
-  }
+  if (!(await copyText(value))) return
   copiedCellKey.value = cellKey(col, conn)
   if (copiedTimer) clearTimeout(copiedTimer)
   copiedTimer = setTimeout(() => {
@@ -459,8 +456,9 @@ async function copyCell(
                 v-if="geoFlag(row.original)"
                 class="conn-geo-flag"
                 :title="geoTooltip(row.original)"
-                >{{ geoFlag(row.original) }}</span
-              >{{ getCardHostText(row.original, props.columns) }}</span
+                >{{ geoFlag(row.original) }}</span>{{
+                getCardHostText(row.original, props.columns)
+              }}</span
             >
             <span class="conn-card__process">{{
               getCardProcessText(row.original, props.columns)
