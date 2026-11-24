@@ -22,24 +22,24 @@ catalog:
   '@tabler/icons-vue': ^3.52.0
   '@tailwindcss/typography': ^0.5.20
   '@tailwindcss/vite': ^4.3.5
-  '@tanstack/vue-query': ^5.107.1
+  '@tanstack/vue-query': ^5.108.2
   '@tanstack/vue-virtual': ^3.13.52
   '@types/byte-size': ^8.1.2
   '@types/d3': ^7.4.3
   '@types/markdown-it': ^14.2.0
   '@types/node': ^26.6.6
   '@types/sortablejs': ^1.15.9
-  '@vite-pwa/nuxt': ^2.0.1
-  '@vitest/coverage-v8': ^5.1.0
+  '@vite-pwa/nuxt': ^2.0.3
+  '@vitest/coverage-v8': ^5.1.1
   '@vueuse/core': ^15.0.0
   '@vueuse/integrations': ^15.0.0
   '@vueuse/nuxt': ^15.0.0
   byte-size: ^9.0.2
   commitlint: ^21.2.4
   d3: ^7.9.2
-  daisyui: ^5.8.0
+  daisyui: ^5.8.2
   dayjs: ^1.11.23
-  electron: ^45.3.2
+  electron: ^45.4.1
   electron-builder: ^26.18.0
   electron-vite: ^6.0.0
   eslint: ^10.15.0
@@ -49,12 +49,12 @@ catalog:
   # for brand-new packages — they do NOT bump any existing dependency, so the
   # "ZERO version bumps" rule still holds (it forbids changing the version of
   # an already-present dep, not adding a new one). Versions come from spec §1.
-  h3: ^1.15.11
+  h3: ^2.0.8
   highcharts: ^13.1.1
   husky: ^9.1.7
   jsdom: ^31.0.1
   ky: ^2.2.0
-  lint-staged: ^17.6.0
+  lint-staged: ^17.6.1
   markdown-it: ^15.0.3
   match-sorter: ^8.3.1
   meta-json-schema: ^1.19.33
@@ -88,8 +88,8 @@ catalog:
   typescript: ^7.0.2
   uqr: ^0.1.2
   vite: 8.3.8
-  vitest: ^5.1.0
-  vue: ^3.5.45
+  vitest: ^5.1.1
+  vue: ^3.5.46
   vue-router: ^5.5.1
   vue-sonner: ^2.0.9
   vue-tsc: ^3.3.14
