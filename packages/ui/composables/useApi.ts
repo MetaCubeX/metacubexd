@@ -698,7 +698,11 @@ function resolveBackendReleaseTarget(currentVersion: string): {
 function isStableRelease(release: ReleaseAPIResponse) {
   const tagName = release.tag_name.toLowerCase()
 
-  return !tagName.includes('alpha') && !tagName.includes('prerelease')
+  return (
+    !release.prerelease &&
+    !tagName.includes('alpha') &&
+    !tagName.includes('prerelease')
+  )
 }
 
 function isAlphaRelease(release: ReleaseAPIResponse) {
@@ -709,20 +713,134 @@ function isAlphaRelease(release: ReleaseAPIResponse) {
 
 interface ReleaseAPIResponse {
   tag_name: string
-  body: string
+  body: string | null
   assets: { name: string }[]
   published_at: string
+  draft: boolean
+  prerelease: boolean
+}
+
+const RELEASE_CACHE_TTL = 60 * 60 * 1000
+interface ReleaseCacheEntry {
+  expiresAt: number
+  releases: Promise<ReleaseAPIResponse[]>
+}
+const releaseCache = new Map<string, ReleaseCacheEntry>()
+
+let githubCooldown: { until: number; error: unknown } | undefined
+
+function isRelease(value: unknown): value is ReleaseAPIResponse {
+  if (!value || typeof value !== 'object') return false
+  const release = value as ReleaseAPIResponse
+  return (
+    typeof release.tag_name === 'string' &&
+    (release.body === null || typeof release.body === 'string') &&
+    typeof release.published_at === 'string' &&
+    typeof release.draft === 'boolean' &&
+    typeof release.prerelease === 'boolean' &&
+    Array.isArray(release.assets) &&
+    release.assets.every((asset) => asset && typeof asset.name === 'string')
+  )
+}
+
+async function cachedReleaseRequest(
+  githubAPI: ReturnType<typeof useGithubAPI>,
+  path: string,
+  count?: number,
+) {
+  const url = count === undefined ? path : `${path}?per_page=${count}`
+  const cached = releaseCache.get(url)
+  if (cached && cached.expiresAt > Date.now()) return cached.releases
+  if (githubCooldown && githubCooldown.until > Date.now())
+    throw githubCooldown.error
+
+  // GitHub sets max-age=60. Reuse the HTTP cache for an hour, then refresh it.
+  let expiresAt = 0
+  try {
+    expiresAt = Number(sessionStorage.getItem(url)) || 0
+  } catch {
+    // Storage is optional when browsing with persistence disabled.
+  }
+  const reuse =
+    expiresAt > Date.now() && expiresAt <= Date.now() + RELEASE_CACHE_TTL
+  const request = githubAPI
+    .get(url, { cache: reuse ? 'force-cache' : 'reload', retry: 0 })
+    .json<ReleaseAPIResponse | ReleaseAPIResponse[]>()
+    .then((response) => {
+      const data = (Array.isArray(response) ? response : [response]).filter(
+        (release) => !release?.draft,
+      )
+      if (!data.every(isRelease))
+        throw new Error('Invalid GitHub releases response')
+      if (!reuse) {
+        expiresAt = Date.now() + RELEASE_CACHE_TTL
+        try {
+          sessionStorage.setItem(url, String(expiresAt))
+        } catch {
+          // The in-memory cache still covers this page load.
+        }
+      }
+      entry.expiresAt = expiresAt
+      return data
+    })
+    .catch((error) => {
+      releaseCache.delete(url)
+      const response = error?.response as Response | undefined
+      if (response && (response.status === 403 || response.status === 429)) {
+        const headers = response.headers
+        const retryAfter = Number(headers.get('retry-after')) * 1000
+        const reset =
+          headers.get('x-ratelimit-remaining') === '0'
+            ? Number(headers.get('x-ratelimit-reset')) * 1000
+            : 0
+        githubCooldown = {
+          until: Math.max(
+            githubCooldown?.until ?? 0,
+            reset || 0,
+            Date.now() + (retryAfter || 60_000),
+          ),
+          error,
+        }
+      }
+      throw error
+    })
+  // Share the pending request; its one-hour lifetime starts on success.
+  const entry = { expiresAt: Infinity, releases: request }
+  releaseCache.set(url, entry)
+  return request
+}
+
+async function latestStableRelease(
+  githubAPI: ReturnType<typeof useGithubAPI>,
+  repositoryURL: string,
+) {
+  const releases = await cachedReleaseRequest(
+    githubAPI,
+    `${repositoryURL}/releases`,
+    20,
+  )
+  // shortcut: use list order for latest stable; use /latest if a repo pins older releases.
+  return (
+    releases.find(
+      (release) =>
+        isStableRelease(release) && /^v?\d+\.\d+\.\d+$/.test(release.tag_name),
+    ) ??
+    (
+      await cachedReleaseRequest(githubAPI, `${repositoryURL}/releases/latest`)
+    )[0]
+  )
 }
 
 export async function frontendReleaseAPI(currentVersion: string) {
-  const githubAPI = useGithubAPI()
-  const { tag_name, body } = await githubAPI
-    .get(`repos/MetaCubeX/metacubexd/releases/latest`)
-    .json<ReleaseAPIResponse>()
+  const release = await latestStableRelease(
+    useGithubAPI(),
+    'repos/MetaCubeX/metacubexd',
+  )
+  if (!release) return { isUpdateAvailable: false }
 
   return {
-    isUpdateAvailable: compareVersions(tag_name, currentVersion) > 0,
-    changelog: body,
+    isUpdateAvailable: compareVersions(release.tag_name, currentVersion) > 0,
+    changelog: release.body ?? '',
   }
 }
 
@@ -732,46 +850,50 @@ export async function backendReleaseAPI(currentVersion: string) {
   // available". Skip the check entirely for sing-box (#1870).
   if (isSingBoxVersion(currentVersion)) return { isUpdateAvailable: false }
 
-  const githubAPI = useGithubAPI()
   const { channel, repositoryURL, versionSuffix } =
     resolveBackendReleaseTarget(currentVersion)
 
-  const releaseByAssets = async (url: string, versionSuffix: string) => {
-    const { assets, body } = await githubAPI
-      .get(`${repositoryURL}/${url}`)
-      .json<ReleaseAPIResponse>()
-
-    const alreadyLatest = assets.some(({ name }) =>
-      name.includes(versionSuffix),
+  if (channel === 'beta') return { isUpdateAvailable: false }
+  const githubAPI = useGithubAPI()
+  let release: ReleaseAPIResponse | undefined
+  if (channel === 'alpha') {
+    const releases = await cachedReleaseRequest(
+      githubAPI,
+      `${repositoryURL}/releases`,
+      20,
     )
-
-    return {
-      isUpdateAvailable: !alreadyLatest,
-      changelog: body,
-    }
-  }
-
-  if (channel !== 'stable') {
-    if (channel === 'meta')
-      return await releaseByAssets('releases/latest', versionSuffix)
-
-    if (channel === 'alpha')
-      return await releaseByAssets(
-        'releases/tags/Prerelease-Alpha',
-        versionSuffix,
+    release = releases.find(
+      (release) => release.tag_name === 'Prerelease-Alpha',
+    )
+    release ??= (
+      await cachedReleaseRequest(
+        githubAPI,
+        `${repositoryURL}/releases/tags/Prerelease-Alpha`,
       )
-
-    return { isUpdateAvailable: false }
+    )[0]
+  } else {
+    release = await latestStableRelease(githubAPI, repositoryURL)
   }
-
-  // Stable version (e.g. "v1.19.9") - compare using semver
-  const { tag_name, body } = await githubAPI
-    .get(`${repositoryURL}/releases/latest`)
-    .json<ReleaseAPIResponse>()
+  if (!release) return { isUpdateAvailable: false }
 
   return {
-    isUpdateAvailable: compareVersions(tag_name, currentVersion) > 0,
-    changelog: body,
+    isUpdateAvailable:
+      channel === 'stable'
+        ? compareVersions(release.tag_name, currentVersion) > 0
+        : !release.assets.some(({ name }) => name.includes(versionSuffix)),
+    changelog: release.body ?? '',
+  }
+}
+
+function toReleaseInfo(
+  release: ReleaseAPIResponse,
+  isCurrent: boolean,
+): ReleaseInfo {
+  return {
+    version: release.tag_name,
+    changelog: release.body ?? '',
+    publishedAt: release.published_at,
+    isCurrent,
   }
 }
 
@@ -779,67 +901,42 @@ export async function fetchFrontendReleasesAPI(
   currentVersion: string,
   count: number = 10,
 ): Promise<ReleaseInfo[]> {
-  const githubAPI = useGithubAPI()
-  const releases = await githubAPI
-    .get(`repos/MetaCubeX/metacubexd/releases`, {
-      searchParams: { per_page: count },
-    })
-    .json<ReleaseAPIResponse[]>()
+  const releases = await cachedReleaseRequest(
+    useGithubAPI(),
+    'repos/MetaCubeX/metacubexd/releases',
+    Math.max(20, count),
+  )
 
-  return releases.map((release) => ({
-    version: release.tag_name,
-    changelog: release.body,
-    publishedAt: release.published_at,
-    isCurrent: release.tag_name === currentVersion,
-  }))
+  return releases
+    .slice(0, count)
+    .map((release) =>
+      toReleaseInfo(release, release.tag_name === currentVersion),
+    )
 }
 
 export async function fetchBackendReleasesAPI(
   currentVersion: string,
   count: number = 10,
 ): Promise<ReleaseInfo[]> {
-  const githubAPI = useGithubAPI()
+  if (isSingBoxVersion(currentVersion)) return []
   const { channel, repositoryURL, versionSuffix } =
     resolveBackendReleaseTarget(currentVersion)
+  if (channel === 'beta') return []
+  const releases = await cachedReleaseRequest(
+    useGithubAPI(),
+    `${repositoryURL}/releases`,
+    Math.max(20, channel === 'alpha' ? count * 2 : count),
+  )
 
-  if (channel === 'stable') {
-    // Stable version (e.g. "v1.19.9") - fetch stable releases
-    let releases = await githubAPI
-      .get(`${repositoryURL}/releases`, {
-        searchParams: { per_page: count },
-      })
-      .json<ReleaseAPIResponse[]>()
-    releases = releases.filter(isStableRelease)
-
-    return releases.map((release) => ({
-      version: release.tag_name,
-      changelog: release.body,
-      publishedAt: release.published_at,
-      isCurrent: release.tag_name === currentVersion,
-    }))
-  }
-
-  let releases: ReleaseAPIResponse[] = []
-
-  if (channel === 'meta') {
-    releases = await githubAPI
-      .get(`${repositoryURL}/releases`, { searchParams: { per_page: count } })
-      .json<ReleaseAPIResponse[]>()
-    releases = releases.filter(isStableRelease)
-  } else if (channel === 'alpha') {
-    releases = await githubAPI
-      .get(`${repositoryURL}/releases`, {
-        searchParams: { per_page: count * 2 },
-      })
-      .json<ReleaseAPIResponse[]>()
-    releases = releases.filter(isAlphaRelease).slice(0, count)
-  }
-
-  return releases.map((release) => ({
-    version: release.tag_name,
-    changelog: release.body,
-    publishedAt: release.published_at,
-    isCurrent:
-      release.assets?.some(({ name }) => name.includes(versionSuffix)) ?? false,
-  }))
+  return releases
+    .filter(channel === 'alpha' ? isAlphaRelease : isStableRelease)
+    .slice(0, count)
+    .map((release) =>
+      toReleaseInfo(
+        release,
+        channel === 'stable'
+          ? release.tag_name === currentVersion
+          : release.assets.some(({ name }) => name.includes(versionSuffix)),
+      ),
+    )
 }
