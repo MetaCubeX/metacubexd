@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.277.0](https://github.com/MetaCubeX/metacubexd/compare/v1.276.0...v1.277.0) (2026-11-24)
+
+
+### Features
+
+* cache github request ([#2274](https://github.com/MetaCubeX/metacubexd/issues/2274)) ([d9233d6](https://github.com/MetaCubeX/metacubexd/commit/d9233d6f567741398b5fa095426cfd51185b3237))
+
+
+### Bug Fixes
+
+* allow HTTP clipboard ([#2272](https://github.com/MetaCubeX/metacubexd/issues/2272)) ([8d76bba](https://github.com/MetaCubeX/metacubexd/commit/8d76bba6c7fb9a72a3f3441019beadcfb00696f1))
+* remove topProxies label ([#2273](https://github.com/MetaCubeX/metacubexd/issues/2273)) ([cdfa163](https://github.com/MetaCubeX/metacubexd/commit/cdfa1632574146c0710c6e48a89bf93bd31873c1))
+* **ui:** let the connections table columns be resized by dragging ([#2270](https://github.com/MetaCubeX/metacubexd/issues/2270)) ([20732d5](https://github.com/MetaCubeX/metacubexd/commit/20732d5f993313d5a9fda8ceaf55f7ddbd9f3f46))
+
 ## [1.276.0](https://github.com/MetaCubeX/metacubexd/compare/v1.275.2...v1.276.0) (2026-11-21)
 
 
