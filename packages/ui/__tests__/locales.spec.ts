@@ -7,12 +7,7 @@ const localesDir = resolve(process.cwd(), 'i18n/locales')
 // Locales that must have full key parity with the canonical en.json source.
 // en is the source of truth; these locales translate the exact same key set
 // (missing keys fall back at runtime, but parity is required here).
-//
-// ru.json is intentionally excluded from the strict-parity set: it predates
-// several feature keys (recommendation.*, shortcuts.*, connectionError, retry…)
-// and back-filling its Russian translations is out of this task's scope. It is
-// still covered by the valid-JSON check below so it can't silently break.
-const PARITY_LOCALES = ['zh', 'ja', 'ko', 'fr', 'fa'] as const
+const PARITY_LOCALES = ['zh', 'ru', 'ja', 'ko', 'fr', 'fa'] as const
 const ALL_LOCALES = ['zh', 'ru', 'ja', 'ko', 'fr', 'fa'] as const
 
 type JsonValue =
