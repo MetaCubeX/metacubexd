@@ -2,6 +2,7 @@ import type { themes } from '~/constants'
 import type {
   ConnectionsTableColumnOrder,
   ConnectionsTableColumnVisibility,
+  ConnectionsTableColumnWidths,
 } from '~/types'
 import type { IPProvider } from '~/types/network'
 import { defineStore } from 'pinia'
@@ -131,6 +132,12 @@ export const useConfigStore = defineStore('config', () => {
     useLocalStorage<ConnectionsTableColumnOrder>(
       'connectionsTableColumnOrder',
       CONNECTIONS_TABLE_INITIAL_COLUMN_ORDER,
+    )
+  // Widths the user dragged, in em. Columns without one use the built-in width.
+  const connectionsTableColumnWidths =
+    useLocalStorage<ConnectionsTableColumnWidths>(
+      'connectionsTableColumnWidths',
+      {},
     )
   // One-time migration from useMobileConnectionsTable boolean
   // Must be done before useLocalStorage reads the key so the factory isn't
@@ -391,6 +398,7 @@ export const useConfigStore = defineStore('config', () => {
     connectionsTableSize,
     connectionsTableColumnVisibility,
     connectionsTableColumnOrder,
+    connectionsTableColumnWidths,
     connectionsDisplayMode,
     quickFilterText,
     // Logs

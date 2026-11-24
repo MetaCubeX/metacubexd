@@ -207,6 +207,9 @@ export type ConnectionsTableColumnVisibility = Partial<
   Record<CONNECTIONS_TABLE_ACCESSOR_KEY, boolean>
 >
 export type ConnectionsTableColumnOrder = CONNECTIONS_TABLE_ACCESSOR_KEY[]
+export type ConnectionsTableColumnWidths = Partial<
+  Record<CONNECTIONS_TABLE_ACCESSOR_KEY, number>
+>
 
 export type DataUsageType =
   | 'sourceIP'
