@@ -13,6 +13,7 @@ import {
 } from '@tabler/icons-vue'
 import { toast } from 'vue-sonner'
 import { onControlInvalidate } from '~/composables/useControlSync'
+import { copyText } from '~/utils/clipboard'
 import { controlErrorMessage } from '~/utils/controlError'
 
 const { t, locale } = useI18n()
@@ -20,7 +21,6 @@ const router = useRouter()
 const { hasFeature, ready } = useControlInfo()
 const kernelStore = useKernelStore()
 const { isShareable, qrSvg } = useShareQr()
-const { copy: copyToClipboard } = useClipboard()
 
 useHead({ title: computed(() => t('profiles')) })
 
@@ -338,7 +338,7 @@ const onShare = (p: ProfileMeta) => {
 
 const onCopyShareUrl = async () => {
   if (!shareUrl.value) return
-  await copyToClipboard(shareUrl.value)
+  if (!(await copyText(shareUrl.value))) return
   toast.success(t('profilesShareCopied'))
 }
 </script>

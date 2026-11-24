@@ -16,6 +16,7 @@ import {
   IconZoomOutFilled,
 } from '@tabler/icons-vue'
 import { LOG_LEVEL } from '~/constants'
+import { copyText } from '~/utils/clipboard'
 
 const { t } = useI18n()
 
@@ -255,7 +256,7 @@ function logsToText() {
 const copied = ref(false)
 
 async function copyLogs() {
-  await navigator.clipboard.writeText(logsToText())
+  if (!(await copyText(logsToText()))) return
   copied.value = true
   setTimeout(() => {
     copied.value = false
