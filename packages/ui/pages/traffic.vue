@@ -482,7 +482,7 @@ const currentViewLabel = computed(
             class="animate-fade-slide-in col-span-1 min-h-[300px] w-full overflow-hidden rounded-xl border border-[color-mix(in_oklab,var(--color-base-content)_10%,transparent)] bg-base-200 p-4 shadow-sm transition-all duration-200 [animation-delay:250ms] hover:border-[color-mix(in_oklab,var(--color-base-content)_20%,transparent)] xl:h-full"
           >
             <TrafficRankings
-              :title="t('topProxies').slice(0, 2) + currentViewLabel"
+              :title="currentViewLabel"
               :icon="currentViewOption?.icon"
               :data="sortedDataUsageEntries"
               :selected-row="selectedRow"
