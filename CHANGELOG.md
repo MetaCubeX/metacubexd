@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.277.1](https://github.com/MetaCubeX/metacubexd/compare/v1.277.0...v1.277.1) (2026-11-26)
+
+
+### Bug Fixes
+
+* **agent:** stop re-fetching a failing subscription on every scheduler tick ([#2279](https://github.com/MetaCubeX/metacubexd/issues/2279)) ([194b3e7](https://github.com/MetaCubeX/metacubexd/commit/194b3e7ffbbb1b7304b7427882ce2bda84787ef5)), closes [#2278](https://github.com/MetaCubeX/metacubexd/issues/2278)
+
 ## [1.277.0](https://github.com/MetaCubeX/metacubexd/compare/v1.276.0...v1.277.0) (2026-11-24)
 
 
