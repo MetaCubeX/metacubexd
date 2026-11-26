@@ -384,7 +384,13 @@ export function createProfileStore(opts: ProfileStoreOptions): ProfileStore {
           await store.compose(id)
           current.editorStatus = 'clean'
         } catch (error) {
-          if (!(error instanceof ConfigPatchConflictError)) throw error
+          if (!(error instanceof ConfigPatchConflictError)) {
+            // The subscription was fetched and written: record it before
+            // reporting the compose failure, or the scheduler sees a stale
+            // updatedAt and fetches it again on every tick (#2278).
+            await writeIndex(list)
+            throw error
+          }
           current.editorStatus = 'conflicted'
         }
         await writeIndex(list)

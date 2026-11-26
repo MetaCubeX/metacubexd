@@ -22,6 +22,15 @@ export interface ProfileSchedulerDeps {
   onResult?: (result: ProfileRefreshResult) => void | Promise<void>
 }
 
+// Waits before retrying a profile whose refresh failed, by consecutive failure
+// count. Each wait is capped at the profile's own updateInterval, so a failing
+// subscription is never fetched more often than a working one would be.
+export const REFRESH_FAILURE_BACKOFF_MS = [
+  5 * 60_000,
+  15 * 60_000,
+  60 * 60_000,
+] as const
+
 export interface ProfileScheduler {
   start: () => void
   stop: () => void
@@ -41,23 +50,41 @@ export function createProfileScheduler(
 
   let handle: ReturnType<typeof setTimeout> | undefined
   let running = false
+  // Per-profile retry state after failed refreshes. In memory only: a restart
+  // retries once, then backs off again.
+  const failures = new Map<string, { count: number; retryAt: number }>()
 
   async function tick(): Promise<void> {
     if (!running) return
     const list = await profiles.list()
+    for (const id of failures.keys()) {
+      if (!list.some((meta) => meta.id === id)) failures.delete(id)
+    }
     for (const meta of list) {
       if (meta.type !== 'remote') continue
       const interval = meta.updateInterval ?? 0
       if (interval <= 0) continue
       if (now() - meta.updatedAt < interval * 60_000) continue
+      const failure = failures.get(meta.id)
+      if (failure && now() < failure.retryAt) continue
       // Best-effort: one failing refresh must not abort the rest. The outcome
       // (success/failure) is surfaced to onResult when provided.
       let result: ProfileRefreshResult
       try {
         await profiles.refresh(meta.id)
         await apply?.(meta.id)
+        failures.delete(meta.id)
         result = { id: meta.id, ok: true }
       } catch (err) {
+        const count = (failure?.count ?? 0) + 1
+        const step =
+          REFRESH_FAILURE_BACKOFF_MS[
+            Math.min(count, REFRESH_FAILURE_BACKOFF_MS.length) - 1
+          ]!
+        failures.set(meta.id, {
+          count,
+          retryAt: now() + Math.min(step, interval * 60_000),
+        })
         result = {
           id: meta.id,
           ok: false,
