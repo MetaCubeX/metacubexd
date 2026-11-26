@@ -122,6 +122,33 @@ append-proxy-groups:
     }
   })
 
+  it('splices directives onto an overlay array no matter the key order', () => {
+    const base = 'rules:\n  - MATCH,DIRECT\n'
+    const directiveFirst = `
+prepend-rules:
+  - DOMAIN,ahead.com,PROXY
+append-rules:
+  - DOMAIN,behind.com,REJECT
+rules:
+  - MATCH,PROXY
+`
+    const directiveLast = `
+rules:
+  - MATCH,PROXY
+prepend-rules:
+  - DOMAIN,ahead.com,PROXY
+append-rules:
+  - DOMAIN,behind.com,REJECT
+`
+    const expected = [
+      'DOMAIN,ahead.com,PROXY',
+      'MATCH,PROXY',
+      'DOMAIN,behind.com,REJECT',
+    ]
+    expect(merged(base, directiveFirst).rules).toEqual(expected)
+    expect(merged(base, directiveLast).rules).toEqual(expected)
+  })
+
   it('treats a missing base array as empty for directives', () => {
     const base = 'mode: rule\n'
     const overlay = 'append-rules:\n  - MATCH,DIRECT\n'

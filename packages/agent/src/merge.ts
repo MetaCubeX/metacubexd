@@ -57,19 +57,16 @@ function asArray(value: unknown): unknown[] {
 // - plain objects -> recurse
 // - scalars / plain arrays -> overlay value REPLACES the base value
 // - directive keys -> splice into the corresponding base array; never emitted
+// Directives run after every other key, so an overlay that also sets the
+// target array (e.g. `rules:`) gets the same result whatever the key order.
 function mergeOne(acc: PlainObject, overlay: PlainObject): void {
+  const directives: [(typeof DIRECTIVES)[string], unknown][] = []
   for (const [key, value] of Object.entries(overlay)) {
     const directive = Object.hasOwn(DIRECTIVES, key)
       ? DIRECTIVES[key]
       : undefined
     if (directive) {
-      // Treat a missing/non-array base value as an empty array.
-      const baseArr = asArray(acc[directive.target])
-      const extra = asArray(value)
-      acc[directive.target] =
-        directive.at === 'prepend'
-          ? [...extra, ...baseArr]
-          : [...baseArr, ...extra]
+      directives.push([directive, value])
       continue
     }
     const existing = Object.hasOwn(acc, key) ? acc[key] : undefined
@@ -85,6 +82,15 @@ function mergeOne(acc: PlainObject, overlay: PlainObject): void {
         writable: true,
       })
     }
+  }
+  for (const [directive, value] of directives) {
+    // Treat a missing/non-array base value as an empty array.
+    const baseArr = asArray(acc[directive.target])
+    const extra = asArray(value)
+    acc[directive.target] =
+      directive.at === 'prepend'
+        ? [...extra, ...baseArr]
+        : [...baseArr, ...extra]
   }
 }
 
