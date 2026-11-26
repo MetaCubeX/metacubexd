@@ -1,6 +1,6 @@
 import type { ProfileMeta, ProfileStore } from './types'
 import { describe, expect, it, vi } from 'vitest'
-import { createProfileScheduler } from './scheduler'
+import { createProfileScheduler, REFRESH_FAILURE_BACKOFF_MS } from './scheduler'
 
 // Minimal fake timer: capture the registered callback so the test can drive
 // ticks manually (mirrors supervisor.ts's injectable now()/deps style).
@@ -180,6 +180,106 @@ describe('createProfileScheduler', () => {
     expect(refresh).toHaveBeenCalledWith('bad')
     expect(refresh).toHaveBeenCalledWith('good')
     sched.stop()
+  })
+
+  // #2278: a refresh that keeps failing must not hit the subscription server
+  // on every 60s tick.
+  describe('failed refresh backoff', () => {
+    async function settle() {
+      await new Promise((r) => setImmediate(r))
+    }
+
+    function failingScheduler(updateInterval: number) {
+      // Far past updatedAt 0, so the profile is due even with a 24h interval.
+      let clock = 1_000_000_000
+      let fail = true
+      const list = [meta({ id: 'sub', updateInterval, updatedAt: 0 })]
+      const { store, refresh } = fakeProfiles(list, async () => {
+        if (fail) throw new Error('HTTP 503')
+        return list[0]!
+      })
+      const timers = fakeTimers()
+      const sched = createProfileScheduler({
+        profiles: store,
+        now: () => clock,
+        setTimer: timers.setTimer,
+        clearTimer: timers.clearTimer,
+      })
+      sched.start()
+      return {
+        refresh,
+        sched,
+        async tickAt(at: number) {
+          clock = at
+          timers.tick()
+          await settle()
+        },
+        start: clock,
+        succeed() {
+          fail = false
+        },
+      }
+    }
+
+    it('does not retry a failed refresh before its backoff has passed', async () => {
+      const s = failingScheduler(24 * 60)
+      await s.tickAt(s.start)
+      expect(s.refresh).toHaveBeenCalledTimes(1)
+      // Every 60s tick inside the first backoff window is skipped.
+      for (let minute = 1; minute < 5; minute++) {
+        await s.tickAt(s.start + minute * 60_000)
+      }
+      expect(s.refresh).toHaveBeenCalledTimes(1)
+      await s.tickAt(s.start + REFRESH_FAILURE_BACKOFF_MS[0])
+      expect(s.refresh).toHaveBeenCalledTimes(2)
+      s.sched.stop()
+    })
+
+    it('lengthens the wait after each consecutive failure', async () => {
+      const s = failingScheduler(24 * 60)
+      let at = s.start
+      await s.tickAt(at)
+      for (const wait of [
+        REFRESH_FAILURE_BACKOFF_MS[0],
+        REFRESH_FAILURE_BACKOFF_MS[1],
+        REFRESH_FAILURE_BACKOFF_MS[2],
+        REFRESH_FAILURE_BACKOFF_MS[2],
+      ]) {
+        const calls = s.refresh.mock.calls.length
+        await s.tickAt(at + wait - 60_000)
+        expect(s.refresh).toHaveBeenCalledTimes(calls)
+        at += wait
+        await s.tickAt(at)
+        expect(s.refresh).toHaveBeenCalledTimes(calls + 1)
+      }
+      s.sched.stop()
+    })
+
+    it('never waits longer than the profile update interval', async () => {
+      const s = failingScheduler(2) // 2 minutes, shorter than the first backoff
+      await s.tickAt(s.start)
+      await s.tickAt(s.start + 60_000)
+      expect(s.refresh).toHaveBeenCalledTimes(1)
+      await s.tickAt(s.start + 2 * 60_000)
+      expect(s.refresh).toHaveBeenCalledTimes(2)
+      s.sched.stop()
+    })
+
+    it('forgets the failures after a successful refresh', async () => {
+      const s = failingScheduler(24 * 60)
+      await s.tickAt(s.start)
+      await s.tickAt(s.start + REFRESH_FAILURE_BACKOFF_MS[0])
+      expect(s.refresh).toHaveBeenCalledTimes(2)
+      s.succeed()
+      const ok = s.start + REFRESH_FAILURE_BACKOFF_MS[0] + REFRESH_FAILURE_BACKOFF_MS[1]
+      await s.tickAt(ok)
+      expect(s.refresh).toHaveBeenCalledTimes(3)
+      // updatedAt stays 0 in this double, so the profile is due again: with
+      // the failures forgotten it is refreshed on the very next tick.
+      await s.tickAt(ok + 60_000)
+      expect(s.refresh).toHaveBeenCalledTimes(4)
+      s.sched.stop()
+    })
   })
 
   it('start() schedules a timer and stop() clears it / halts ticking', async () => {

@@ -765,6 +765,39 @@ describe('createProfileStore — refresh', () => {
     expect(refreshed.url).toBe('https://sub.example/clash')
   })
 
+  it('refresh keeps the new updatedAt when a script overlay fails to compose (#2278)', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'mcxd-profiles-ref-script-'))
+    let body = 'proxies: [first]\n'
+    const fakeFetch = (async () =>
+      new Response(body, { status: 200 })) as unknown as typeof fetch
+    let n = 0
+    const store = createProfileStore({
+      dir,
+      activeConfigPath: join(dir, '..', 'active.yaml'),
+      fetch: fakeFetch,
+      idGen: () => `id${++n}`,
+      scriptRunner: {
+        run: async () => {
+          throw new Error('script overlay failed')
+        },
+      },
+    })
+    const imported = await store.importFromUrl('https://sub.example/clash')
+    await store.create({ name: 'broken', content: 'throw 1', type: 'script' })
+
+    body = 'proxies: [second]\n'
+    await new Promise((r) => setTimeout(r, 2))
+    await expect(store.refresh(imported.id)).rejects.toThrow(
+      'script overlay failed',
+    )
+
+    // The subscription was fetched and written, so it is recorded as updated:
+    // otherwise the scheduler would fetch it again on every tick.
+    expect(await store.read(imported.id)).toBe('proxies: [second]\n')
+    const saved = (await store.list()).find((m) => m.id === imported.id)!
+    expect(saved.updatedAt).toBeGreaterThan(imported.updatedAt)
+  })
+
   it('refresh uses a custom stored userAgent', async () => {
     const dir = mkdtempSync(join(tmpdir(), 'mcxd-profiles-ref-ua-'))
     let seenUA: string | null = null

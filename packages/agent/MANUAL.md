@@ -149,6 +149,13 @@ or edits its composition during validation, the automatic apply is skipped.
 The scheduler waits for application before reporting the refresh result; failed
 application is reported as a failure instead of a successful update.
 
+A failed refresh is retried after 5 minutes, then 15 minutes, then every hour,
+never later than the profile's own update interval, and the backoff resets after
+a successful refresh. It is kept in memory, so a restarted agent tries once more
+before backing off again. A subscription that downloads but whose composition
+fails (for example, a script overlay that throws) is still recorded as updated,
+so it is not downloaded again until its next interval.
+
 Profile writes share an in-process queue for each profile directory. Refresh
 downloads do not block editing; their commit preserves concurrent metadata and
 other profiles, and rejects a result if its source was edited or deleted while
