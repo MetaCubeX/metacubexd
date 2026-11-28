@@ -101,40 +101,117 @@ describe('stores/proxies latency state', () => {
     expect(group?.all).toEqual(['US_124', 'US_88'])
   })
 
-  it.each([
-    ['provider-backed node', 'subscription'],
-    ['global node', ''],
-  ])('tests a nested selector through its selected %s', async (_, provider) => {
+  it('tests a selector by group name and never overwrites its provider member', async () => {
+    const url = 'https://latency.test/204'
+    const leaf = proxy({
+      extra: {
+        [url]: { history: [{ time: '2026-05-19T13:17:31Z', delay: 64 }] },
+      },
+    })
     const group = (name: string, now: string) =>
-      proxy({ name, type: 'Selector', now, all: [now] })
-    const leaf = proxy()
+      proxy({
+        name,
+        type: 'Selector',
+        now,
+        all: [now],
+      })
+    apiMocks.fetchProxyProvidersAPI.mockResolvedValue({
+      providers: {
+        subscription: {
+          name: 'subscription',
+          vehicleType: 'HTTP',
+          proxies: [leaf],
+        },
+      },
+    })
     apiMocks.fetchProxiesAPI.mockResolvedValue({
       proxies: {
         parent: group('parent', 'child'),
         child: group('child', leaf.name),
-        ...(provider ? {} : { [leaf.name]: leaf }),
       },
     })
-    if (provider) {
-      apiMocks.fetchProxyProvidersAPI.mockResolvedValue({
-        providers: {
-          [provider]: { name: provider, vehicleType: 'HTTP', proxies: [leaf] },
-        },
-      })
-    }
-    apiMocks.proxyLatencyTestAPI.mockResolvedValue({ delay: 42 })
     const store = useProxiesStore()
     await store.fetchProxies()
+    expect(store.getLatencyByName('parent', url)).toBe(0)
+    expect(store.getLatencyByName(leaf.name, url)).toBe(64)
 
-    const url = 'https://latency.test/204'
+    apiMocks.proxyLatencyTestAPI.mockResolvedValueOnce({ delay: 42 })
     await store.proxyLatencyTest('parent', '', url, 5000)
-
-    expect(apiMocks.proxyLatencyTestAPI).toHaveBeenCalledWith(
-      leaf.name,
-      provider,
+    expect(apiMocks.proxyLatencyTestAPI).toHaveBeenLastCalledWith(
+      'parent',
+      '',
       url,
       5000,
     )
+    expect(store.getLatencyByName('parent', url)).toBe(42)
+    expect(store.getLatencyByName(leaf.name, url)).toBe(64)
+    expect(store.getLatencyByName('child', url)).toBe(0)
+
+    apiMocks.proxyLatencyTestAPI.mockResolvedValueOnce({ delay: 51 })
+    await store.proxyLatencyTest(leaf.name, 'subscription', url, 5000)
+    expect(apiMocks.proxyLatencyTestAPI).toHaveBeenLastCalledWith(
+      leaf.name,
+      'subscription',
+      url,
+      5000,
+    )
+    expect(store.getLatencyByName('parent', url)).toBe(42)
+    expect(store.getLatencyByName(leaf.name, url)).toBe(51)
+
+    let finishProbe!: (value: { delay: number }) => void
+    apiMocks.proxyLatencyTestAPI.mockReturnValueOnce(
+      new Promise((resolve) => {
+        finishProbe = resolve
+      }),
+    )
+    const testing = store.proxyLatencyTest('parent', '', url, 5000)
+    expect(store.isTesting('parent')).toBe(true)
+    apiMocks.fetchProxiesAPI.mockResolvedValue({
+      proxies: {
+        parent: group('parent', 'child'),
+        child: group('child', 'DIRECT'),
+        DIRECT: proxy({ name: 'DIRECT', type: 'Direct' }),
+      },
+    })
+    await store.fetchProxies()
+    expect(store.getLatencyByName('parent', url)).toBe(0)
+    expect(store.getLatencyHistoryByName('parent', url)).toEqual([])
+    finishProbe({ delay: 92 })
+    await testing
+    expect(store.isTesting('parent')).toBe(false)
+    expect(store.getLatencyByName('parent', url)).toBe(0)
+  })
+
+  it('uses a load-balancing group as its own probe target', async () => {
+    const url = 'https://latency.test/204'
+    apiMocks.fetchProxiesAPI.mockResolvedValue({
+      proxies: {
+        balance: proxy({
+          name: 'balance',
+          type: 'LoadBalance',
+          now: 'node-a',
+          all: ['node-a'],
+        }),
+        'node-a': proxy({
+          extra: {
+            [url]: { history: [{ time: '2026-05-19T13:17:31Z', delay: 64 }] },
+          },
+        }),
+      },
+    })
+    const store = useProxiesStore()
+    await store.fetchProxies()
+    expect(store.getLatencyByName('balance', url)).toBe(0)
+    apiMocks.proxyLatencyTestAPI.mockResolvedValueOnce({ delay: 30 })
+    await store.proxyLatencyTest('balance', '', url, 5000)
+    expect(apiMocks.proxyLatencyTestAPI).toHaveBeenLastCalledWith(
+      'balance',
+      '',
+      url,
+      5000,
+    )
+    expect(store.getLatencyByName('balance', url)).toBe(30)
+    expect(store.getLatencyByName('node-a', url)).toBe(64)
   })
 
   it('preserves the previous latency value while an individual test is in flight', async () => {
