@@ -542,6 +542,11 @@ export const useProxiesStore = defineStore('proxies', () => {
     timeout: number | null,
   ) => {
     const nodeName = getNowProxyNodeName(proxyName)
+    // A group has no provider of its own, but its selected leaf may have one.
+    const nodeProvider =
+      nodeName === proxyName
+        ? provider
+        : (proxyNodeMap.value[nodeName]?.provider ?? '')
     const finalTestUrl = normalizeLatencyTestUrl(testUrl)
     const nodeRecommendationStore = useNodeRecommendationStore()
     // The Latency pill renders a spinner while this flag is set, hiding the
@@ -552,7 +557,7 @@ export const useProxiesStore = defineStore('proxies', () => {
     try {
       const { delay } = await proxyLatencyTestAPI(
         nodeName,
-        provider,
+        nodeProvider,
         finalTestUrl,
         timeout ?? configStore.latencyTestTimeoutDuration,
       )

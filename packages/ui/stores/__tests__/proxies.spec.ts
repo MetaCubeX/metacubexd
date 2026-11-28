@@ -101,6 +101,42 @@ describe('stores/proxies latency state', () => {
     expect(group?.all).toEqual(['US_124', 'US_88'])
   })
 
+  it.each([
+    ['provider-backed node', 'subscription'],
+    ['global node', ''],
+  ])('tests a nested selector through its selected %s', async (_, provider) => {
+    const group = (name: string, now: string) =>
+      proxy({ name, type: 'Selector', now, all: [now] })
+    const leaf = proxy()
+    apiMocks.fetchProxiesAPI.mockResolvedValue({
+      proxies: {
+        parent: group('parent', 'child'),
+        child: group('child', leaf.name),
+        ...(provider ? {} : { [leaf.name]: leaf }),
+      },
+    })
+    if (provider) {
+      apiMocks.fetchProxyProvidersAPI.mockResolvedValue({
+        providers: {
+          [provider]: { name: provider, vehicleType: 'HTTP', proxies: [leaf] },
+        },
+      })
+    }
+    apiMocks.proxyLatencyTestAPI.mockResolvedValue({ delay: 42 })
+    const store = useProxiesStore()
+    await store.fetchProxies()
+
+    const url = 'https://latency.test/204'
+    await store.proxyLatencyTest('parent', '', url, 5000)
+
+    expect(apiMocks.proxyLatencyTestAPI).toHaveBeenCalledWith(
+      leaf.name,
+      provider,
+      url,
+      5000,
+    )
+  })
+
   it('preserves the previous latency value while an individual test is in flight', async () => {
     let resolveLatency!: (value: { delay: number }) => void
     apiMocks.proxyLatencyTestAPI.mockReturnValue(
