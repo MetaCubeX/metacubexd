@@ -1,4 +1,4 @@
-<!-- packages/ui/pages/profiles.vue -->
+<!-- packages/ui/pages/profiles/index.vue -->
 <script setup lang="ts">
 import type { ProfileMeta } from '~/types/control'
 import {
