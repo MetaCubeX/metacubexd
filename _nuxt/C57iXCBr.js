@@ -1,0 +1,1 @@
+import{$n as e,Nn as t,cn as n}from"./CljHqNJ9.js";import{t as r}from"./CjdTf5Rz.js";var i=t({setup(){if(r){let t=e({link:[]});n(t);let{webManifest:i}=r;if(i){let{href:e,useCredentials:n}=i;n?t.value.link.push({rel:`manifest`,href:e,crossorigin:`use-credentials`}):t.value.link.push({rel:`manifest`,href:e})}}return()=>null}});export{i as default};
