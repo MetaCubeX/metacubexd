@@ -19,6 +19,7 @@ import { formatBytes, formatDuration } from '~/utils'
 
 const { t } = useI18n()
 const connectionsStore = useConnectionsStore()
+const configStore = useConfigStore()
 const reverseDns = useReverseDns()
 const {
   getAggregatedData,
@@ -29,9 +30,12 @@ const {
   getDevicesByProxyAndHost,
 } = useDataUsage()
 
-const formatClientLabel = (ip: string) => reverseDns.label(ip)
+// Same order as the Connections page: manual tag -> resolved hostname -> raw IP.
+const formatClientLabel = (ip: string) =>
+  configStore.clientSourceIPTags.find((tag) => tag.sourceIP === ip)?.tagName ||
+  reverseDns.label(ip)
 const clientLabelTitle = (ip: string) => {
-  const name = reverseDns.label(ip)
+  const name = formatClientLabel(ip)
   return name !== ip ? ip : ''
 }
 
