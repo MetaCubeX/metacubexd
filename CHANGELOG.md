@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.278.0](https://github.com/MetaCubeX/metacubexd/compare/v1.277.1...v1.278.0) (2026-11-28)
+
+
+### Features
+
+* **ui:** show client source IP tags on the Data Usage page ([#2284](https://github.com/MetaCubeX/metacubexd/issues/2284)) ([9e01e32](https://github.com/MetaCubeX/metacubexd/commit/9e01e32459daef5237758763994525d042dcff66))
+
+
+### Bug Fixes
+
+* **agent:** apply prepend/append directives after other overlay keys ([#2281](https://github.com/MetaCubeX/metacubexd/issues/2281)) ([9dd934a](https://github.com/MetaCubeX/metacubexd/commit/9dd934a4d6c245a9727849a56b47bd0f69dfca0e))
+* **ui:** move profiles page to profiles/index.vue so visual editor renders ([#2283](https://github.com/MetaCubeX/metacubexd/issues/2283)) ([5890083](https://github.com/MetaCubeX/metacubexd/commit/5890083274a84b7201d3f9a410f512a742c0d52b))
+* **ui:** use the selected node provider for latency tests ([#2285](https://github.com/MetaCubeX/metacubexd/issues/2285)) ([491d7cf](https://github.com/MetaCubeX/metacubexd/commit/491d7cf852c54bca1221e09549805a14a594fef4))
+
 ## [1.277.1](https://github.com/MetaCubeX/metacubexd/compare/v1.277.0...v1.277.1) (2026-11-26)
 
 
