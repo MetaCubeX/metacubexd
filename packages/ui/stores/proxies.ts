@@ -5,6 +5,7 @@ import type {
   ProxyWithProvider,
 } from '~/types'
 import { defineStore } from 'pinia'
+import { shallowReactive } from 'vue'
 import {
   closeAllConnectionsAPI,
   closeSingleConnectionAPI,
@@ -55,6 +56,19 @@ export const useProxiesStore = defineStore('proxies', () => {
   >([])
   const latencyMap = ref<Record<string, Record<string, number> | undefined>>({})
   const proxyNodeMap = ref<Record<string, ProxyInfo>>({})
+
+  // Mihomo's group history does not identify which selection produced it.
+  // Keep interactive group probes separate from member readings and scoped
+  // to the selection chain that the dashboard observed when probing.
+  const groupProbes = shallowReactive<
+    Record<
+      string,
+      {
+        selection: string
+        history: Record<string, Proxy['history']>
+      }
+    >
+  >({})
 
   // Loading states
   const proxyLatencyTestingMap = ref<Record<string, boolean>>({})
@@ -298,6 +312,14 @@ export const useProxiesStore = defineStore('proxies', () => {
 
     proxyNodeMap.value = newProxyNodeMap
     latencyMap.value = newLatencyMap
+    for (const [name, probe] of Object.entries(groupProbes)) {
+      if (
+        !isGroupProbeTarget(name) ||
+        probe.selection !== groupSelection(name)
+      ) {
+        delete groupProbes[name]
+      }
+    }
   }
 
   // Fetch proxies
@@ -406,6 +428,39 @@ export const useProxiesStore = defineStore('proxies', () => {
     await closeConnectionsThroughGroup(groupName)
   }
 
+  const isGroupProbeTarget = (name: string) => {
+    const node = proxyNodeMap.value[name]
+    return (
+      !!node &&
+      (!!node.latency ||
+        ['selector', 'urltest', 'fallback', 'loadbalance', 'relay'].includes(
+          node.type.toLowerCase(),
+        ))
+    )
+  }
+
+  const groupSelection = (name: string) => {
+    const chain = []
+    const visited = new Set<string>()
+    let current = name
+    while (current && !visited.has(current)) {
+      visited.add(current)
+      chain.push(current)
+      const node = proxyNodeMap.value[current]
+      // LoadBalance has no stable selected member.
+      if (!node || node.type.toLowerCase() === 'loadbalance') break
+      current = node.latency
+    }
+    return JSON.stringify(chain)
+  }
+
+  const groupProbeHistory = (name: string, testUrl: string) => {
+    const probe = groupProbes[name]
+    return probe?.selection === groupSelection(name)
+      ? (probe.history[testUrl] ?? [])
+      : []
+  }
+
   // Get now proxy node name (recursive)
   const getNowProxyNodeName = (name: string): string => {
     let node: ProxyInfo | undefined = proxyNodeMap.value[name]
@@ -414,7 +469,8 @@ export const useProxiesStore = defineStore('proxies', () => {
 
     const visited = new Set<string>()
     while (node && node.latency && node.latency !== node.name) {
-      if (visited.has(node.name)) return node.name
+      if (node.type.toLowerCase() === 'loadbalance' || visited.has(node.name))
+        return node.name
       visited.add(node.name)
       const nextNode: ProxyInfo | undefined = proxyNodeMap.value[node.latency]
       if (!nextNode) return node.name
@@ -427,6 +483,12 @@ export const useProxiesStore = defineStore('proxies', () => {
   // Get latency by name
   const getLatencyByName = (name: string, testUrl: string | null) => {
     const finalTestUrl = configStore.resolveLatencyTestUrl(testUrl)
+    if (isGroupProbeTarget(name)) {
+      return (
+        groupProbeHistory(name, finalTestUrl).at(-1)?.delay ??
+        configStore.latencyQualityMap.NOT_CONNECTED
+      )
+    }
     const latencyMapValue = latencyMap.value
     const nowName = getNowProxyNodeName(name)
 
@@ -455,6 +517,7 @@ export const useProxiesStore = defineStore('proxies', () => {
   // Get latency history by name
   const getLatencyHistoryByName = (name: string, testUrl: string | null) => {
     const finalTestUrl = configStore.resolveLatencyTestUrl(testUrl)
+    if (isGroupProbeTarget(name)) return groupProbeHistory(name, finalTestUrl)
     const nowProxyNodeName = getNowProxyNodeName(name)
     const nowHistories =
       proxyNodeMap.value[nowProxyNodeName]?.latencyTestHistory || {}
@@ -541,13 +604,35 @@ export const useProxiesStore = defineStore('proxies', () => {
     testUrl: string | null,
     timeout: number | null,
   ) => {
-    const nodeName = getNowProxyNodeName(proxyName)
-    // A group has no provider of its own, but its selected leaf may have one.
-    const nodeProvider =
-      nodeName === proxyName
-        ? provider
-        : (proxyNodeMap.value[nodeName]?.provider ?? '')
+    const nodeName = proxyName
     const finalTestUrl = normalizeLatencyTestUrl(testUrl)
+    const group = isGroupProbeTarget(nodeName)
+    if (group && proxyLatencyTestingMap.value[nodeName]) return
+    const selection = group ? groupSelection(nodeName) : undefined
+    let probe = groupProbes[nodeName]
+    if (selection !== undefined && probe?.selection !== selection) {
+      probe = { selection, history: {} }
+      groupProbes[nodeName] = probe
+    }
+    const recordGroupProbe = (delay: number) => {
+      if (
+        !probe ||
+        groupProbes[nodeName] !== probe ||
+        selection !== groupSelection(nodeName)
+      )
+        return
+      const history = [
+        ...(probe.history[finalTestUrl] ?? []),
+        {
+          time: new Date().toISOString(),
+          delay,
+        },
+      ].slice(-LATENCY_HISTORY_MAX)
+      groupProbes[nodeName] = {
+        ...probe,
+        history: { ...probe.history, [finalTestUrl]: history },
+      }
+    }
     const nodeRecommendationStore = useNodeRecommendationStore()
     // The Latency pill renders a spinner while this flag is set, hiding the
     // underlying value entirely, so there's no reason to clear it pre-flight
@@ -557,11 +642,15 @@ export const useProxiesStore = defineStore('proxies', () => {
     try {
       const { delay } = await proxyLatencyTestAPI(
         nodeName,
-        nodeProvider,
+        group ? '' : provider,
         finalTestUrl,
         timeout ?? configStore.latencyTestTimeoutDuration,
       )
 
+      if (group) {
+        recordGroupProbe(delay)
+        return
+      }
       recordLatencyTestResult(nodeName, finalTestUrl, delay)
       appendLatencyHistoryEntry(nodeName, finalTestUrl, delay)
       nodeRecommendationStore.recordTestResult(
@@ -570,6 +659,10 @@ export const useProxiesStore = defineStore('proxies', () => {
         delay > 0,
       )
     } catch {
+      if (group) {
+        recordGroupProbe(configStore.latencyQualityMap.NOT_CONNECTED)
+        return
+      }
       // Transport failure (timeout/network): leave latencyMap untouched so the
       // pill keeps showing the last known value. Record a failure datapoint
       // so the stability bar / sparkline still reflect the failed attempt.
